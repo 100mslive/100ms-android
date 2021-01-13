@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/HomeFragment"
-        android:name="live.hms.android100ms.HomeFragment"
+        android:name="live.hms.android100ms.home.HomeFragment"
         android:label="@string/home_fragment"
         tools:layout="@layout/fragment_home">
 
@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/MeetingFragment"
-        android:name="live.hms.android100ms.MeetingFragment"
+        android:name="live.hms.android100ms.meeting.MeetingFragment"
         android:label="@string/meeting_fragment"
         tools:layout="@layout/fragment_meeting">
 
@@ -32,7 +32,7 @@
 
     <fragment
         android:id="@+id/ChatFragment"
-        android:name="live.hms.android100ms.ChatFragment"
+        android:name="live.hms.android100ms.chat.ChatFragment"
         android:label="@string/chat_fragment"
         tools:layout="@layout/fragment_chat">
 
