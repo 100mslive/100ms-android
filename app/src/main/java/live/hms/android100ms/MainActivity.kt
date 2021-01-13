@@ -4,8 +4,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import live.hms.android100ms.databinding.ActivityMainBinding
+import live.hms.android100ms.util.viewLifecycle
 
 class MainActivity : AppCompatActivity() {
+
+    val TAG = "MainActivity"
+    private val binding by viewLifecycle(ActivityMainBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

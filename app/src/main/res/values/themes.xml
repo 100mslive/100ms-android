@@ -4,18 +4,28 @@
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primaryDarkColor</item>
         <item name="colorPrimaryVariant">@color/primaryColor</item>
-        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOnPrimary">@color/primaryTextColor</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/secondaryDarkColor</item>
         <item name="colorSecondaryVariant">@color/secondaryColor</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorOnSecondary">@color/secondaryTextColor</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorOnBackground">@android:color/white</item>
     </style>
 
     <style name="Theme.Android100ms.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="TextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="boxStrokeColor">@color/text_input_box_stroke</item>
+        <item name="android:textColorHint">@color/secondaryTextColor</item>
+        <item name="hintTextColor">@color/primaryTextColor</item>
     </style>
 </resources>

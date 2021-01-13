@@ -18,6 +18,73 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter android:label="conf-brytecam">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="conf.brytecam.com"
+                    android:scheme="https" />
+            </intent-filter>
+
+            <intent-filter android:label="staging-brytecam">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="staging.brytecam.com"
+                    android:scheme="https" />
+            </intent-filter>
+
+            <intent-filter android:label="qain-brytecam">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="qa-in.brytecam.com"
+                    android:scheme="https" />
+            </intent-filter>
+
+            <intent-filter android:label="prodin-100ms">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="prod-in.100ms.live"
+                    android:scheme="https" />
+            </intent-filter>
+
+            <intent-filter android:label="staging-100ms">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="staging-in.100ms.live"
+                    android:scheme="https" />
+            </intent-filter>
+
+            <intent-filter android:label="qain-100ms">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="qa-in.100ms.live"
+                    android:scheme="https" />
+            </intent-filter>
+
         </activity>
     </application>
 
