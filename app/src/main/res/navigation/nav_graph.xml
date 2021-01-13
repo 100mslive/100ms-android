@@ -3,26 +3,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/HomeFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="live.hms.android100ms.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:id="@+id/HomeFragment"
+        android:name="live.hms.android100ms.HomeFragment"
+        android:label="@string/home_fragment"
+        tools:layout="@layout/fragment_home">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_HomeFragment_to_MeetingFragment"
+            app:destination="@id/MeetingFragment" />
     </fragment>
+
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="live.hms.android100ms.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:id="@+id/MeetingFragment"
+        android:name="live.hms.android100ms.MeetingFragment"
+        android:label="@string/meeting_fragment"
+        tools:layout="@layout/fragment_meeting">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_MeetingFragment_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_ChatFragment"
+            app:destination="@id/ChatFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/ChatFragment"
+        android:name="live.hms.android100ms.ChatFragment"
+        android:label="@string/chat_fragment"
+        tools:layout="@layout/fragment_chat">
+
+        <action
+            android:id="@+id/action_ChatFragment_to_MeetingFragment"
+            app:destination="@id/MeetingFragment" />
+    </fragment>
+
+
 </navigation>
