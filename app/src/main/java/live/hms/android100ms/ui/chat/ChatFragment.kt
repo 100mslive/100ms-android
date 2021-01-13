@@ -1,4 +1,4 @@
-package live.hms.android100ms.chat
+package live.hms.android100ms.ui.chat
 
 import android.os.Bundle
 import android.view.LayoutInflater

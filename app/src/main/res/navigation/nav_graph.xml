@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/HomeFragment"
-        android:name="live.hms.android100ms.home.HomeFragment"
+        android:name="live.hms.android100ms.ui.home.HomeFragment"
         android:label="@string/home_fragment"
         tools:layout="@layout/fragment_home">
 
@@ -18,9 +18,14 @@
 
     <fragment
         android:id="@+id/MeetingFragment"
-        android:name="live.hms.android100ms.meeting.MeetingFragment"
+        android:name="live.hms.android100ms.ui.meeting.MeetingFragment"
         android:label="@string/meeting_fragment"
         tools:layout="@layout/fragment_meeting">
+
+        <argument
+            android:name="roomDetail"
+            app:argType="live.hms.android100ms.model.RoomDetails"
+            app:nullable="false" />
 
         <action
             android:id="@+id/action_MeetingFragment_to_HomeFragment"
@@ -32,7 +37,7 @@
 
     <fragment
         android:id="@+id/ChatFragment"
-        android:name="live.hms.android100ms.chat.ChatFragment"
+        android:name="live.hms.android100ms.ui.chat.ChatFragment"
         android:label="@string/chat_fragment"
         tools:layout="@layout/fragment_chat">
 

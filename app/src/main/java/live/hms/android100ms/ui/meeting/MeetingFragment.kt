@@ -1,4 +1,4 @@
-package live.hms.android100ms.meeting
+package live.hms.android100ms.ui.meeting
 
 import android.os.Bundle
 import android.view.LayoutInflater

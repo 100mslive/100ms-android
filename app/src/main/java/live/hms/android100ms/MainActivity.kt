@@ -9,9 +9,6 @@ import live.hms.android100ms.util.viewLifecycle
 
 class MainActivity : AppCompatActivity() {
 
-    val TAG = "MainActivity"
-    private val binding by viewLifecycle(ActivityMainBinding::inflate)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
