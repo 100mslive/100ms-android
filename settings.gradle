@@ -1,2 +1,3 @@
+include ':brytecam-sdk-0.9.8'
 include ':app'
 rootProject.name = "Android 100ms"
