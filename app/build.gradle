@@ -48,6 +48,7 @@ dependencies {
 
     //100ms.live SDK
     implementation project(':brytecam-sdk-0.9.8')
+    implementation 'org.webrtc:google-webrtc:1.0.32006'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.2"

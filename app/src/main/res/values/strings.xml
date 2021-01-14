@@ -11,5 +11,10 @@
     <string name="room_name">Room Name</string>
     <string name="username">Username</string>
     <string name="join_room">Join Room</string>
+    <string name="end_call">End Call</string>
+    <string name="toggle_video">Toggle Video</string>
+    <string name="toggle_audio">Toggle Audio</string>
+    <string name="flip_camera">Flip Camera</string>
+    <string name="android_test_user">android-test-user</string>
 
 </resources>
