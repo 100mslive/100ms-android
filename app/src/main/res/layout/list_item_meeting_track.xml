@@ -6,9 +6,23 @@
     android:layout_margin="4dp"
     app:cardCornerRadius="8dp">
 
-    <org.webrtc.SurfaceViewRenderer
-        android:id="@+id/surface_view"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:text="@string/john_doe"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

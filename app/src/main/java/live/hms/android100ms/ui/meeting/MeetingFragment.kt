@@ -1,6 +1,9 @@
 package live.hms.android100ms.ui.meeting
 
 import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +26,7 @@ import com.brytecam.lib.payload.HMSStreamInfo
 import com.brytecam.lib.webrtc.HMSRTCMediaStream
 import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
 import com.brytecam.lib.webrtc.HMSStream
+import com.google.android.material.snackbar.Snackbar
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
@@ -74,6 +78,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     private var hmsClient: HMSClient? = null
     private var hmsRoom: HMSRoom? = null
+    private var hmsPeer: HMSPeer? = null
     private var localMediaConstraints: HMSRTCMediaStreamConstraints? = null
     private var localMediaStream: HMSRTCMediaStream? = null
     private var localAudioTrack: AudioTrack? = null
@@ -116,6 +121,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     private fun initViewModel() {
         chatViewModel.broadcastMessage.observe(viewLifecycleOwner) { message ->
+            Log.v(TAG, "Sending broadcast: $message via $hmsClient")
             hmsClient?.broadcast(message.message, hmsRoom, object : HMSRequestHandler {
                 override fun onSuccess(s: String?) {
                     Log.v(TAG, "Successfully broadcast message=${message.message} (s=$s)")
@@ -174,7 +180,23 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private fun initRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = MeetingTrackAdapter(requireContext(), meetingTracks)
+            adapter = MeetingTrackAdapter(requireContext(), meetingTracks) { track ->
+                Snackbar.make(
+                    binding.root,
+                    "Name: ${track.peer.userName} (${track.peer.role}) \nId: ${track.peer.customerUserId}",
+                    Snackbar.LENGTH_LONG,
+                ).setAction("Copy") {
+                    val clipboard =
+                        requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Customer Id", track.peer.customerUserId)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(
+                        requireContext(),
+                        "Copied customer id of ${track.peer.userName} to clipboard",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }.show()
+            }
         }
     }
 
@@ -219,11 +241,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
                                 audioTrack?.setEnabled(settingsStore.publishAudio)
                             }
 
-                            currentDeviceTrack = MeetingTrack(null, videoTrack, audioTrack, true)
+                            currentDeviceTrack = MeetingTrack(
+                                hmsPeer!!,
+                                videoTrack,
+                                audioTrack,
+                                true
+                            )
                             meetingTracks.add(0, currentDeviceTrack!!)
 
                             requireActivity().runOnUiThread {
-                                binding.recyclerView.adapter?.notifyItemInserted(0)
+                                // binding.recyclerView.adapter?.notifyItemInserted(0)
+                                binding.recyclerView.adapter?.notifyDataSetChanged()
                             }
                         }
 
@@ -253,11 +281,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     private fun initHMSClient() {
-        val peer = HMSPeer(roomDetails.username, roomDetails.authToken)
+        hmsPeer = HMSPeer(roomDetails.username, roomDetails.authToken)
         hmsRoom = HMSRoom(roomDetails.roomId)
         val config = HMSClientConfig(roomDetails.endpoint)
-        hmsClient = HMSClient(this, requireContext(), peer, config)
-        hmsClient?.apply {
+        hmsClient = HMSClient(this, requireContext(), hmsPeer, config).apply {
             setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
             connect()
         }
@@ -470,7 +497,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
                     meetingTracks.add(MeetingTrack(peer, videoTrack, audioTrack))
                     requireActivity().runOnUiThread {
-                        binding.recyclerView.adapter?.notifyItemInserted(meetingTracks.size - 1)
+                        // binding.recyclerView.adapter?.notifyItemInserted(meetingTracks.size - 1)
+                        binding.recyclerView.adapter?.notifyDataSetChanged()
                     }
                 }
 
@@ -500,7 +528,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
         meetingTracks.removeAt(idx)
         requireActivity().runOnUiThread {
-            binding.recyclerView.adapter?.notifyItemRemoved(idx)
+            // binding.recyclerView.adapter?.notifyItemRemoved(idx)
+            binding.recyclerView.adapter?.notifyDataSetChanged()
+
         }
     }
 

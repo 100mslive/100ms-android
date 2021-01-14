@@ -10,7 +10,8 @@ import org.webrtc.RendererCommon
 
 class MeetingTrackAdapter(
     private val context: Context,
-    private val tracks: ArrayList<MeetingTrack>
+    private val tracks: ArrayList<MeetingTrack>,
+    private val onItemClick: (track: MeetingTrack) -> Unit
 ) : RecyclerView.Adapter<MeetingTrackAdapter.MeetingTrackViewHolder>() {
 
     inner class MeetingTrackViewHolder(val binding: ListItemMeetingTrackBinding) :
@@ -24,6 +25,8 @@ class MeetingTrackAdapter(
                 setEnableHardwareScaler(true)
                 track.videoTrack?.addSink(this)
             }
+            binding.name.text = track.peer.userName
+            binding.root.setOnClickListener { onItemClick(track) }
         }
     }
 
@@ -37,8 +40,10 @@ class MeetingTrackAdapter(
     }
 
     override fun onBindViewHolder(holder: MeetingTrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
-        holder.setIsRecyclable(false)
+        if (position < tracks.size) {
+            holder.bind(tracks[position])
+            holder.setIsRecyclable(false)
+        }
     }
 
     override fun getItemCount() = tracks.size

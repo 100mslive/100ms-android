@@ -8,6 +8,6 @@ data class ChatMessage(
     val message: String,
 ) {
     override fun toString(): String {
-        return "senderName=${senderName} time=${time} message=${message}"
+        return "ChatMessage(senderName=${senderName} time=${time} message=${message})"
     }
 }

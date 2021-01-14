@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,14 +49,16 @@ class ChatFragment : Fragment() {
         }
     }
 
+    private fun addMessage(message: ChatMessage) {
+        messages.add(message)
+        binding.recyclerView.adapter?.notifyItemInserted(messages.size - 1)
+    }
+
     private fun initViewModels() {
         messages.clear()
         messages.addAll(chatViewModel.getAllMessages())
 
-        chatViewModel.receivedMessage.observe(viewLifecycleOwner) { message ->
-            messages.add(message)
-            binding.recyclerView.adapter?.notifyItemInserted(messages.size - 1)
-        }
+        chatViewModel.receivedMessage.observe(viewLifecycleOwner) { addMessage(it) }
     }
 
     private fun initTextFields() {
@@ -67,14 +68,13 @@ class ChatFragment : Fragment() {
         }
 
         binding.fabSendMessage.setOnClickListener {
-            val message = binding.editTextMessage.text.toString()
-            chatViewModel.broadcastMessage(
-                ChatMessage(
-                    roomDetails.username,
-                    Date(),
-                    message
-                )
+            val message = ChatMessage(
+                roomDetails.username,
+                Date(),
+                binding.editTextMessage.text.toString()
             )
+            chatViewModel.broadcast(message)
+            addMessage(message)
             binding.editTextMessage.setText("")
         }
     }

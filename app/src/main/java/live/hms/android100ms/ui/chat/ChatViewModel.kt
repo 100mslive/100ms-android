@@ -17,11 +17,11 @@ class ChatViewModel : ViewModel() {
 
     fun getAllMessages() = messagesList
 
-    fun broadcastMessage(message: ChatMessage) {
+    fun broadcast(message: ChatMessage) {
         Log.v(TAG, "broadcastMessage: $message")
         messagesList.add(message)
-        receivedMessage.value = message
-        broadcastMessage.value = message
+        // broadcastMessage.value = message
+        broadcastMessage.postValue(message)
     }
 
     fun receivedMessage(message: ChatMessage) {
