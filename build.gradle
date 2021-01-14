@@ -11,6 +11,12 @@ buildscript {
 
         def nav_version = "2.3.2"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+
+        // Firebase Google-Services
+        classpath 'com.google.gms:google-services:4.3.4'
+
+        // Firebase Crashlytics
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
     }
 }
 
