@@ -25,6 +25,7 @@ import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
+import org.appspot.apprtc.AppRTCAudioManager
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
@@ -82,6 +83,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
         turnScreenOn()
         initRecyclerView()
+        initAudioManager()
         init()
 
         return binding.root
@@ -102,6 +104,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
     }
 
+    private fun initAudioManager() {
+        val manager = AppRTCAudioManager.create(requireContext())
+        Log.d(TAG, "Starting Audio manager")
+
+        manager.start(AppRTCAudioManager.AudioManagerEvents { selectedAudioDevice, availableAudioDevices ->
+            Log.d(
+                TAG,
+                "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
+            )
+        })
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -231,38 +244,18 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
 
         binding.fabToggleAudio.setOnClickListener {
-            binding.fabToggleAudio.apply {
-                val drawable = if (isVideoEnabled)
-                    R.drawable.ic_baseline_music_off_24
-                else
-                    R.drawable.ic_baseline_music_note_24
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    this.setImageDrawable(
-                        resources.getDrawable(
-                            drawable,
-                            this@MeetingFragment.requireContext().theme
-                        )
-                    );
-                } else {
-                    this.setImageDrawable(resources.getDrawable(drawable));
-                }
-            }
-
             currentDeviceTrack?.apply {
                 if (audioTrack != null) {
                     isAudioEnabled = !audioTrack.enabled()
                     audioTrack.setEnabled(isAudioEnabled)
                 }
             }
-        }
 
-        binding.fabToggleVideo.setOnClickListener {
-            binding.fabToggleVideo.apply {
-                val drawable = if (isVideoEnabled)
-                    R.drawable.ic_baseline_videocam_off_24
+            binding.fabToggleAudio.apply {
+                val drawable = if (isAudioEnabled)
+                    R.drawable.ic_baseline_music_note_24
                 else
-                    R.drawable.ic_baseline_videocam_24
+                    R.drawable.ic_baseline_music_off_24
 
                 this.setImageDrawable(
                     ResourcesCompat.getDrawable(
@@ -273,6 +266,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 )
             }
 
+        }
+
+        binding.fabToggleVideo.setOnClickListener {
             currentDeviceTrack?.apply {
                 if (videoTrack != null) {
                     isVideoEnabled = !videoTrack.enabled()
@@ -282,6 +278,21 @@ class MeetingFragment : Fragment(), HMSEventListener {
                         else HMSStream.getCameraCapturer().stop()
                     }
                 }
+            }
+
+            binding.fabToggleVideo.apply {
+                val drawable = if (isVideoEnabled)
+                    R.drawable.ic_baseline_videocam_24
+                else
+                    R.drawable.ic_baseline_videocam_off_24
+
+                this.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        drawable,
+                        this@MeetingFragment.requireContext().theme
+                    )
+                )
             }
         }
     }
