@@ -33,7 +33,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextEndpoint"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="@string/default_endpoint" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -63,8 +64,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextUsername"
                     android:layout_width="match_parent"
-                    android:text="@string/android_test_user"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="@string/android_test_user" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

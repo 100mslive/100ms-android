@@ -11,6 +11,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.brytecam.lib.*
@@ -321,12 +322,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
         localMediaStream = null
         hmsClient?.disconnect()
-    }
-
-    private fun setTracks(data: MediaStream, position: Int, name: String) {
-        if (data.videoTracks.size > 0) {
-
-        }
+        findNavController().navigate(
+            MeetingFragmentDirections.actionMeetingFragmentToHomeFragment()
+        )
     }
 
     // HMS Event Listener events below
