@@ -41,6 +41,11 @@
         android:label="@string/chat_fragment"
         tools:layout="@layout/fragment_chat">
 
+        <argument
+            android:name="roomDetail"
+            app:argType="live.hms.android100ms.model.RoomDetails"
+            app:nullable="false" />
+
         <action
             android:id="@+id/action_ChatFragment_to_MeetingFragment"
             app:destination="@id/MeetingFragment" />

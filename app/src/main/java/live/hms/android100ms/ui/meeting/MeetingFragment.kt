@@ -13,6 +13,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.brytecam.lib.*
 import com.brytecam.lib.payload.HMSPayloadData
@@ -24,6 +25,8 @@ import com.brytecam.lib.webrtc.HMSStream
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
+import live.hms.android100ms.ui.chat.ChatMessage
+import live.hms.android100ms.ui.chat.ChatViewModel
 import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
 import org.appspot.apprtc.AppRTCAudioManager
@@ -32,7 +35,9 @@ import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
+import java.util.*
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 
 class MeetingFragment : Fragment(), HMSEventListener {
@@ -73,6 +78,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private var localAudioTrack: AudioTrack? = null
     private var localVideoTrack: VideoTrack? = null
 
+    private val chatViewModel: ChatViewModel by navGraphViewModels(R.id.nav_graph) { defaultViewModelProviderFactory }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -83,6 +90,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
         roomDetails = args.roomDetail
 
         turnScreenOn()
+        initViewModel()
         initRecyclerView()
         initAudioManager()
         init()
@@ -105,16 +113,33 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
     }
 
+    private fun initViewModel() {
+        chatViewModel.broadcastMessage.observe(viewLifecycleOwner) { message ->
+            hmsClient?.broadcast(message.message, hmsRoom, object : HMSRequestHandler {
+                override fun onSuccess(s: String?) {
+                    Log.v(TAG, "Successfully broadcast message=${message.message} (s=$s)")
+                }
+
+                override fun onFailure(errorCode: Long, errorMessage: String) {
+                    Log.v(
+                        TAG,
+                        "Cannot broadcast message=${message.message} code=${errorCode} errorMessage=${errorMessage}"
+                    )
+                }
+            })
+        }
+    }
+
     private fun initAudioManager() {
         val manager = AppRTCAudioManager.create(requireContext())
         Log.d(TAG, "Starting Audio manager")
 
-        manager.start(AppRTCAudioManager.AudioManagerEvents { selectedAudioDevice, availableAudioDevices ->
+        manager.start { selectedAudioDevice, availableAudioDevices ->
             Log.d(
                 TAG,
                 "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
             )
-        })
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -296,6 +321,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 )
             }
         }
+
+        binding.fabChat.setOnClickListener {
+            findNavController().navigate(
+                MeetingFragmentDirections.actionMeetingFragmentToChatFragment(roomDetails)
+            )
+        }
     }
 
 
@@ -428,7 +459,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
                     requireActivity().runOnUiThread {
                         binding.recyclerView.adapter?.notifyItemInserted(meetingTracks.size - 1)
                     }
-                    // TODO: Update recycler view
                 }
 
                 override fun onFailure(errorCode: Long, errorReason: String) {
@@ -459,10 +489,21 @@ class MeetingFragment : Fragment(), HMSEventListener {
         requireActivity().runOnUiThread {
             binding.recyclerView.adapter?.notifyItemRemoved(idx)
         }
-        // TODO: Update recycler view
     }
 
     override fun onBroadcast(data: HMSPayloadData) {
-        TODO("Not yet implemented")
+        Log.v(TAG, "onBroadcast: peer=${data.peer} senderName=${data.senderName} msg=${data.msg}")
+        requireActivity().runOnUiThread {
+            // TODO: Remove this once the bug is fixed
+            val senderName =
+                if (data.senderName == null) "<error:senderName=null>" else data.senderName
+            chatViewModel.receivedMessage(
+                ChatMessage(
+                    senderName,
+                    Date(),
+                    data.msg
+                )
+            )
+        }
     }
 }

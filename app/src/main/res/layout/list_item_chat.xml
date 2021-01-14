@@ -20,14 +20,12 @@
         android:id="@+id/card_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         app:cardBackgroundColor="#eef1f6"
         app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"
         app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/name">
 
@@ -45,7 +43,7 @@
                 android:paddingLeft="12dp"
                 android:paddingTop="8dp"
                 android:paddingRight="12dp"
-                android:text="@string/lorem_ipsum"
+                android:text="lorem_ipsum"
                 android:textColor="#000000"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -54,7 +52,7 @@
 
 
     <TextView
-        android:id="@+id/text_gchat_timestamp_other"
+        android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"

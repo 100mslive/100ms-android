@@ -23,5 +23,6 @@
     <string name="message">Message</string>
 
     <string name="default_endpoint">wss://prod-in.100ms.live/ws</string>
+    <string name="chat">Chat</string>
 
 </resources>
