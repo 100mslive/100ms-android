@@ -13,7 +13,8 @@
 
         <action
             android:id="@+id/action_HomeFragment_to_MeetingFragment"
-            app:destination="@id/MeetingFragment" />
+            app:destination="@id/MeetingFragment"
+            app:launchSingleTop="true" />
     </fragment>
 
     <fragment
@@ -29,7 +30,11 @@
 
         <action
             android:id="@+id/action_MeetingFragment_to_HomeFragment"
-            app:destination="@id/HomeFragment" />
+            app:destination="@id/HomeFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/HomeFragment"
+            app:popUpToInclusive="true" />
+
         <action
             android:id="@+id/action_MeetingFragment_to_ChatFragment"
             app:destination="@id/ChatFragment" />
@@ -48,7 +53,9 @@
 
         <action
             android:id="@+id/action_ChatFragment_to_MeetingFragment"
-            app:destination="@id/MeetingFragment" />
+            app:destination="@id/MeetingFragment"
+            app:popUpTo="@id/MeetingFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
 

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -142,6 +143,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
     }
 
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -158,6 +160,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
         if (EasyPermissions.hasPermissions(requireContext(), *perms)) {
             initHMSClient()
             initFabs()
+            initOnBackPress()
         } else {
             EasyPermissions.requestPermissions(
                 this,
@@ -171,7 +174,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private fun initRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = MeetingTrackAdapter(meetingTracks)
+            adapter = MeetingTrackAdapter(requireContext(), meetingTracks)
         }
     }
 
@@ -356,6 +359,16 @@ class MeetingFragment : Fragment(), HMSEventListener {
         findNavController().navigate(
             MeetingFragmentDirections.actionMeetingFragmentToHomeFragment()
         )
+    }
+
+    private fun initOnBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    disconnect()
+                }
+            })
     }
 
     // HMS Event Listener events below
