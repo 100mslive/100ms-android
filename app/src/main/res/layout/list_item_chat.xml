@@ -13,6 +13,7 @@
         android:layout_marginStart="8dp"
         android:text="@string/john_doe"
         android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
-        app:cardBackgroundColor="#eef1f6"
+        app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
         app:cardPreventCornerOverlap="false"

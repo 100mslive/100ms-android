@@ -18,17 +18,30 @@ class ChatViewModel : ViewModel() {
         sendBroadcastCallback = callback
     }
 
+    fun removeSendBroadcastCallback() {
+        sendBroadcastCallback = null
+    }
+
     private val messages = MutableLiveData<ArrayList<ChatMessage>>()
     fun getMessages(): LiveData<ArrayList<ChatMessage>> = messages
+    fun clearMessages() {
+        _messages.clear()
+        messages.value = _messages
+    }
+
+    private fun addMessage(message: ChatMessage) {
+        _messages.add(message)
+        messages.value = _messages
+    }
 
     fun broadcast(message: ChatMessage) {
         Log.v(TAG, "broadcastMessage: $message")
         sendBroadcastCallback?.let { it(message) }
+        addMessage(message)
     }
 
     fun receivedMessage(message: ChatMessage) {
         Log.v(TAG, "receivedMessage: $message")
-        _messages.add(message)
-        messages.value = _messages
+        addMessage(message)
     }
 }

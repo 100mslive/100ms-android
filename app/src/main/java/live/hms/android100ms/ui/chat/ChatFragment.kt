@@ -54,7 +54,7 @@ class ChatFragment : Fragment() {
     private fun initRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = ChatAdapter(messages)
+            adapter = ChatAdapter(requireContext(), messages)
             scrollToPosition(messages.size - 1)
         }
     }
@@ -79,7 +79,8 @@ class ChatFragment : Fragment() {
             val message = ChatMessage(
                 roomDetails.username,
                 Date(),
-                binding.editTextMessage.text.toString()
+                binding.editTextMessage.text.toString(),
+                true
             )
             chatViewModel.broadcast(message)
             binding.editTextMessage.setText("")

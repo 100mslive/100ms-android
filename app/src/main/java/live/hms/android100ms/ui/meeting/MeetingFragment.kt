@@ -85,14 +85,14 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     private val chatViewModel: ChatViewModel by activityViewModels()
 
-    override fun onResume() {
-        super.onResume()
-        Log.v(TAG, "onResume")
-    }
 
-    override fun onPause() {
-        super.onPause()
-        Log.v(TAG, "onPause")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        roomDetails = args.roomDetail
+
+        initAudioManager()
+        initClient()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,14 +107,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
         binding = FragmentMeetingBinding.inflate(inflater, container, false)
 
         settingsStore = SettingsStore(requireContext())
-        roomDetails = args.roomDetail
 
         initRecyclerView()
-
         binding.containerPinView.visibility = View.GONE
 
-        initAudioManager()
-        init()
+        initButtons()
+        initOnBackPress()
 
         return binding.root
     }
@@ -128,6 +126,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 }
 
                 override fun onFailure(errorCode: Long, errorMessage: String) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Cannot send '${message}'. Please try again",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     Log.v(
                         TAG,
                         "Cannot broadcast message=${message} code=${errorCode} errorMessage=${errorMessage}"
@@ -160,8 +163,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     @AfterPermissionGranted(RC_CALL)
-    private fun init() {
-
+    private fun initClient() {
         val perms = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
         if (EasyPermissions.hasPermissions(requireContext(), *perms)) {
 
@@ -169,8 +171,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 HMSWebRTCEglUtils.getRootEglBase()
 
             initHMSClient()
-            initButtons()
-            initOnBackPress()
         } else {
             EasyPermissions.requestPermissions(
                 this,
@@ -431,6 +431,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
         localMediaStream = null
         hmsClient?.disconnect()
+
+        // Because the scope of Chat View Model is the entire activity
+        // We need to perform a cleanup
+        chatViewModel.removeSendBroadcastCallback()
+        chatViewModel.clearMessages()
+
         findNavController().navigate(
             MeetingFragmentDirections.actionMeetingFragmentToHomeFragment()
         )
@@ -579,16 +585,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     override fun onBroadcast(data: HMSPayloadData) {
-        Log.v(TAG, "onBroadcast: peer=${data.peer} senderName=${data.senderName} msg=${data.msg}")
+        Log.v(
+            TAG,
+            "onBroadcast: customerId=${data.peer.customerUserId} senderName=${data.senderName} msg=${data.msg}"
+        )
         requireActivity().runOnUiThread {
-            // TODO: Remove this once the bug is fixed
-            val senderName =
-                if (data.senderName == null) "<error:senderName=null>" else data.senderName
             chatViewModel.receivedMessage(
                 ChatMessage(
-                    senderName,
+                    data.senderName,
                     Date(),
-                    data.msg
+                    data.msg,
+                    false
                 )
             )
         }
