@@ -24,5 +24,8 @@
 
     <string name="default_endpoint">wss://prod-in.100ms.live/ws</string>
     <string name="chat">Chat</string>
+    <string name="pin_video">Pin Video</string>
+    <string name="unpin_video">Unpin Video</string>
+    <string name="_100ms_logo">100ms Logo</string>
 
 </resources>

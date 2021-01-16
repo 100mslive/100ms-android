@@ -1,16 +1,14 @@
 package live.hms.android100ms.ui.meeting
 
 import android.Manifest
+import android.app.KeyguardManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
@@ -26,6 +24,7 @@ import com.brytecam.lib.payload.HMSStreamInfo
 import com.brytecam.lib.webrtc.HMSRTCMediaStream
 import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
 import com.brytecam.lib.webrtc.HMSStream
+import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import com.google.android.material.snackbar.Snackbar
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
@@ -37,6 +36,7 @@ import live.hms.android100ms.util.viewLifecycle
 import org.appspot.apprtc.AppRTCAudioManager
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
+import org.webrtc.RendererCommon
 import org.webrtc.VideoTrack
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
@@ -73,6 +73,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     private var currentDeviceTrack: MeetingTrack? = null
     private val meetingTracks = ArrayList<MeetingTrack>()
+    private var pinnedTrack: MeetingTrack? = null
 
     private val executor = Executors.newSingleThreadExecutor()
 
@@ -95,28 +96,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
         settingsStore = SettingsStore(requireContext())
         roomDetails = args.roomDetail
 
-        turnScreenOn()
         initViewModel()
         initRecyclerView()
         initAudioManager()
         init()
 
         return binding.root
-    }
-
-    private fun turnScreenOn() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            requireActivity().setTurnScreenOn(true)
-        } else {
-            requireActivity().window
-                .addFlags(
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                            WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-                            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                            WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
-                )
-        }
     }
 
     private fun initViewModel() {
@@ -164,6 +149,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
         val perms = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
         if (EasyPermissions.hasPermissions(requireContext(), *perms)) {
+
+            if (HMSWebRTCEglUtils.getRootEglBaseContext() == null)
+                HMSWebRTCEglUtils.getRootEglBase()
+
             initHMSClient()
             initFabs()
             initOnBackPress()
@@ -180,7 +169,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private fun initRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = GridLayoutManager(requireContext(), 2)
-            adapter = MeetingTrackAdapter(requireContext(), meetingTracks) { track ->
+            adapter = MeetingTrackAdapter(requireContext(), meetingTracks, { track ->
                 Snackbar.make(
                     binding.root,
                     "Name: ${track.peer.userName} (${track.peer.role}) \nId: ${track.peer.customerUserId}",
@@ -196,8 +185,34 @@ class MeetingFragment : Fragment(), HMSEventListener {
                         Toast.LENGTH_SHORT
                     ).show()
                 }.show()
-            }
+            }, { pinTrack(it) })
         }
+    }
+
+    private fun pinTrack(track: MeetingTrack) {
+        binding.pinnedSurfaceView.apply {
+            if (binding.containerPinView.visibility == View.VISIBLE) {
+                // Already some other view is pinned
+                release()
+                clearImage()
+                pinnedTrack?.videoTrack?.removeSink(this)
+                pinnedTrack = null
+            }
+
+            init(HMSWebRTCEglUtils.getRootEglBaseContext(), null)
+            setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+            setEnableHardwareScaler(true)
+            pinnedTrack = track
+            pinnedTrack?.videoTrack?.addSink(this)
+        }
+
+        binding.name.text = track.peer.userName
+        binding.containerPinView.apply {
+            if (visibility == View.GONE) visibility = View.VISIBLE
+        }
+
+        val view = TextureView(requireContext())
+
     }
 
     private fun getUserMedia(
@@ -304,24 +319,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 if (audioTrack != null) {
                     isAudioEnabled = !audioTrack.enabled()
                     audioTrack.setEnabled(isAudioEnabled)
+                    updateFabIcons()
                 }
             }
-
-            binding.fabToggleAudio.apply {
-                val drawable = if (isAudioEnabled)
-                    R.drawable.ic_baseline_music_note_24
-                else
-                    R.drawable.ic_baseline_music_off_24
-
-                this.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        resources,
-                        drawable,
-                        this@MeetingFragment.requireContext().theme
-                    )
-                )
-            }
-
         }
 
         binding.fabToggleVideo.setOnClickListener {
@@ -329,32 +329,65 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 if (videoTrack != null) {
                     isVideoEnabled = !videoTrack.enabled()
                     videoTrack.setEnabled(isVideoEnabled)
+                    updateFabIcons()
                     executor.execute {
                         if (isVideoEnabled) HMSStream.getCameraCapturer().start()
                         else HMSStream.getCameraCapturer().stop()
                     }
                 }
             }
-
-            binding.fabToggleVideo.apply {
-                val drawable = if (isVideoEnabled)
-                    R.drawable.ic_baseline_videocam_24
-                else
-                    R.drawable.ic_baseline_videocam_off_24
-
-                this.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        resources,
-                        drawable,
-                        this@MeetingFragment.requireContext().theme
-                    )
-                )
-            }
         }
 
         binding.fabChat.setOnClickListener {
             findNavController().navigate(
                 MeetingFragmentDirections.actionMeetingFragmentToChatFragment(roomDetails)
+            )
+        }
+
+        binding.fabUnpin.setOnClickListener {
+            val visible = binding.containerPinView.visibility == View.VISIBLE
+            binding.pinnedSurfaceView.apply {
+                release()
+                clearImage()
+                pinnedTrack?.videoTrack?.removeSink(this)
+                pinnedTrack = null
+            }
+
+            if (visible) {
+                binding.containerPinView.visibility = View.GONE
+            }
+
+        }
+    }
+
+    private fun updateFabIcons() {
+        binding.fabToggleAudio.apply {
+            val drawable = if (isAudioEnabled)
+                R.drawable.ic_baseline_music_note_24
+            else
+                R.drawable.ic_baseline_music_off_24
+
+            this.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    drawable,
+                    this@MeetingFragment.requireContext().theme
+                )
+            )
+        }
+
+        binding.fabToggleVideo.apply {
+            val drawable = if (isVideoEnabled)
+                R.drawable.ic_baseline_videocam_24
+            else
+                R.drawable.ic_baseline_videocam_off_24
+
+            this.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    drawable,
+                    this@MeetingFragment.requireContext().theme
+                )
             )
         }
     }
@@ -515,7 +548,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
         // Get the index of the meeting track having uid
         var idx = -1
         for (i in 0..meetingTracks.size step 1) {
-            if (meetingTracks[i].peer?.uid.equals(streamInfo.uid, true)) {
+            if (meetingTracks[i].peer.uid.equals(streamInfo.uid, true)) {
                 idx = i
                 break
             }

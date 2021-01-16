@@ -6,7 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-private const val BASE_URL = "https://100ms-services.vercel.app/api/"
+private const val TOKEN_BASE_URL = "https://100ms-services.vercel.app/api/"
 
 private val okHttpClient = OkHttpClient.Builder()
     .addInterceptor(HttpLoggingInterceptor().apply {
@@ -19,7 +19,7 @@ private val okHttpClient = OkHttpClient.Builder()
 
 
 private fun getRetrofit() = Retrofit.Builder()
-    .baseUrl(BASE_URL)
+    .baseUrl(TOKEN_BASE_URL)
     .addConverterFactory(GsonConverterFactory.create())
     .client(okHttpClient)
     .build()

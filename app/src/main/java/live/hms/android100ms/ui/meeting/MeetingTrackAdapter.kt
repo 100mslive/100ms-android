@@ -11,13 +11,16 @@ import org.webrtc.RendererCommon
 class MeetingTrackAdapter(
     private val context: Context,
     private val tracks: ArrayList<MeetingTrack>,
-    private val onItemClick: (track: MeetingTrack) -> Unit
+    private val onItemClick: (track: MeetingTrack) -> Unit,
+    private val onMeetingTrackPinned: (track: MeetingTrack) -> Unit,
 ) : RecyclerView.Adapter<MeetingTrackAdapter.MeetingTrackViewHolder>() {
 
     inner class MeetingTrackViewHolder(val binding: ListItemMeetingTrackBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(track: MeetingTrack) {
-            if (HMSWebRTCEglUtils.getRootEglBaseContext() == null) HMSWebRTCEglUtils.getRootEglBase()
+            binding.name.text = track.peer.userName
+            binding.root.setOnClickListener { onItemClick(track) }
+            binding.buttonPin.setOnClickListener { onMeetingTrackPinned(track) }
 
             binding.surfaceView.apply {
                 init(HMSWebRTCEglUtils.getRootEglBaseContext(), null)
@@ -25,8 +28,6 @@ class MeetingTrackAdapter(
                 setEnableHardwareScaler(true)
                 track.videoTrack?.addSink(this)
             }
-            binding.name.text = track.peer.userName
-            binding.root.setOnClickListener { onItemClick(track) }
         }
     }
 

@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import live.hms.android100ms.databinding.ActivityMainBinding
-import live.hms.android100ms.util.viewLifecycle
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,6 +11,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        // TODO: Enable turn screen on / FLAG_SHOW_WHEN_LOCKED
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

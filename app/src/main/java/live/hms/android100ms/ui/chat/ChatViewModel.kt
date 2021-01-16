@@ -20,8 +20,8 @@ class ChatViewModel : ViewModel() {
     fun broadcast(message: ChatMessage) {
         Log.v(TAG, "broadcastMessage: $message")
         messagesList.add(message)
-        // broadcastMessage.value = message
-        broadcastMessage.postValue(message)
+        broadcastMessage.value = message
+        // broadcastMessage.postValue(message)
     }
 
     fun receivedMessage(message: ChatMessage) {
