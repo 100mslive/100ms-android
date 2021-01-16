@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.chat
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
@@ -10,23 +11,24 @@ class ChatViewModel : ViewModel() {
         private const val TAG = "ChatViewModel"
     }
 
-    private val messagesList = ArrayList<ChatMessage>()
+    private val _messages = ArrayList<ChatMessage>()
+    private var sendBroadcastCallback: ((ChatMessage) -> Unit)? = null
 
-    val broadcastMessage = MutableLiveData<ChatMessage>()
-    val receivedMessage = MutableLiveData<ChatMessage>()
+    fun setSendBroadcastCallback(callback: ((message: ChatMessage) -> Unit)) {
+        sendBroadcastCallback = callback
+    }
 
-    fun getAllMessages() = messagesList
+    private val messages = MutableLiveData<ArrayList<ChatMessage>>()
+    fun getMessages(): LiveData<ArrayList<ChatMessage>> = messages
 
     fun broadcast(message: ChatMessage) {
         Log.v(TAG, "broadcastMessage: $message")
-        messagesList.add(message)
-        broadcastMessage.value = message
-        // broadcastMessage.postValue(message)
+        sendBroadcastCallback?.let { it(message) }
     }
 
     fun receivedMessage(message: ChatMessage) {
         Log.v(TAG, "receivedMessage: $message")
-        messagesList.add(message)
-        receivedMessage.value = message
+        _messages.add(message)
+        messages.value = _messages
     }
 }

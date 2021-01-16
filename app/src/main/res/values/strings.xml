@@ -22,7 +22,7 @@
     <string name="send_message">Send Message</string>
     <string name="message">Message</string>
 
-    <string name="default_endpoint">wss://prod-in.100ms.live/ws</string>
+    <string name="default_endpoint">wss://qa-in.100ms.live/ws</string>
     <string name="chat">Chat</string>
     <string name="pin_video">Pin Video</string>
     <string name="unpin_video">Unpin Video</string>

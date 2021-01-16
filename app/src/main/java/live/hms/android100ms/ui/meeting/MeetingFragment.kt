@@ -11,9 +11,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.brytecam.lib.*
 import com.brytecam.lib.payload.HMSPayloadData
@@ -83,7 +83,22 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private var localAudioTrack: AudioTrack? = null
     private var localVideoTrack: VideoTrack? = null
 
-    private val chatViewModel: ChatViewModel by navGraphViewModels(R.id.nav_graph) { defaultViewModelProviderFactory }
+    private val chatViewModel: ChatViewModel by activityViewModels()
+
+    override fun onResume() {
+        super.onResume()
+        Log.v(TAG, "onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.v(TAG, "onPause")
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViewModel()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,7 +109,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
         settingsStore = SettingsStore(requireContext())
         roomDetails = args.roomDetail
 
-        initViewModel()
         initRecyclerView()
 
         binding.containerPinView.visibility = View.GONE
@@ -106,7 +120,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     private fun initViewModel() {
-        chatViewModel.broadcastMessage.observe(viewLifecycleOwner) { message ->
+        chatViewModel.setSendBroadcastCallback { message ->
             Log.v(TAG, "Sending broadcast: $message via $hmsClient")
             hmsClient?.broadcast(message.message, hmsRoom, object : HMSRequestHandler {
                 override fun onSuccess(s: String?) {
@@ -116,7 +130,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 override fun onFailure(errorCode: Long, errorMessage: String) {
                     Log.v(
                         TAG,
-                        "Cannot broadcast message=${message.message} code=${errorCode} errorMessage=${errorMessage}"
+                        "Cannot broadcast message=${message} code=${errorCode} errorMessage=${errorMessage}"
                     )
                 }
             })
@@ -436,15 +450,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
     override fun onConnect() {
         shouldReconnect = false
         requireActivity().runOnUiThread {
-            // Make Reconnect Progress view invisible
+            // TODO: Make Reconnect Progress view invisible
         }
 
         retryCount = 0
-        Log.v(TAG, "Connect success");
-        Log.v(
-            TAG,
-            "You should be able to see local camera feed once the network connection is established and the user is able to join the room"
-        );
+        Log.v(TAG, "onConnect");
 
         if (!isJoined) {
             hmsClient?.join(object : HMSRequestHandler {
