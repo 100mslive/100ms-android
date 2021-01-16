@@ -14,6 +14,7 @@ import live.hms.android100ms.api.Status
 import live.hms.android100ms.databinding.FragmentHomeBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
+import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
 
 class HomeFragment : Fragment() {
@@ -21,12 +22,14 @@ class HomeFragment : Fragment() {
 
     private var binding by viewLifecycle<FragmentHomeBinding>()
     private lateinit var homeViewModel: HomeViewModel
+    private lateinit var settings: SettingsStore
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
+        settings = SettingsStore(requireContext())
         initViewModel()
         initEditTextViews()
         initConnectButton()
@@ -82,6 +85,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun initEditTextViews() {
+        // Load the username saved earlier
+        binding.editTextUsername.setText(settings.username)
+
         val data = requireActivity().intent.data
         if (data != null) {
             Log.v(TAG, "Received Meeting URI via Intent: $data")
@@ -127,6 +133,9 @@ class HomeFragment : Fragment() {
             }
 
             if (allOk) {
+                // Save this username
+                settings.username = username
+
                 val env = endpoint.split(".")[0].replace("wss://", "")
                 homeViewModel.sendAuthTokenRequest(TokenRequest(roomName, username, "Guest", env))
             }

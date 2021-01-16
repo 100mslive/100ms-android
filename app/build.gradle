@@ -22,7 +22,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+            minifyEnabled false
+        }
         release {
+            buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -49,7 +54,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     //100ms.live SDK
-    implementation project(':brytecam-sdk-0.9.8')
+    implementation project(':hmsvideo-android')
     implementation 'org.webrtc:google-webrtc:1.0.32006'
 
     // Navigation

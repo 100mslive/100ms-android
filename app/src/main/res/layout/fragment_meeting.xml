@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:layout_margin="4dp"
-            android:visibility="gone"
             app:cardCornerRadius="8dp">
 
             <RelativeLayout
@@ -29,30 +28,41 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_margin="4dp">
 
-                    <TextView
-                        android:id="@+id/name"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:text="@string/john_doe"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:layout_margin="4dp"
+                        android:orientation="horizontal">
 
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fab_unpin"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:contentDescription="@string/unpin_video"
-                        android:src="@drawable/ic_baseline_close_16"
-                        app:fabCustomSize="28dp" />
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/john_doe"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/button_unpin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="8dp"
+                            android:background="@android:color/transparent"
+                            android:contentDescription="@string/unpin_video"
+                            android:padding="0dp"
+                            android:src="@drawable/ic_baseline_close_16" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
             </RelativeLayout>
 
 

@@ -1,11 +1,9 @@
 package live.hms.android100ms.ui.meeting
 
 import android.Manifest
-import android.app.KeyguardManager
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -98,6 +96,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
         initViewModel()
         initRecyclerView()
+
+        binding.containerPinView.visibility = View.GONE
+
         initAudioManager()
         init()
 
@@ -154,7 +155,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 HMSWebRTCEglUtils.getRootEglBase()
 
             initHMSClient()
-            initFabs()
+            initButtons()
             initOnBackPress()
         } else {
             EasyPermissions.requestPermissions(
@@ -305,7 +306,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
     }
 
-    private fun initFabs() {
+    private fun initButtons() {
         binding.fabEndCall.setOnClickListener { disconnect() }
         binding.fabFlipCamera.setOnClickListener {
             hmsClient?.apply {
@@ -344,7 +345,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
             )
         }
 
-        binding.fabUnpin.setOnClickListener {
+        binding.buttonUnpin.setOnClickListener {
             val visible = binding.containerPinView.visibility == View.VISIBLE
             binding.pinnedSurfaceView.apply {
                 release()

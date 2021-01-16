@@ -3,7 +3,7 @@ package live.hms.android100ms.util
 import android.content.Context
 import androidx.core.content.edit
 
-class SettingsStore(private val context: Context) {
+class SettingsStore(context: Context) {
 
     companion object {
         const val SETTINGS_SHARED_PREF = "settings-shared-preferences"
@@ -13,6 +13,7 @@ class SettingsStore(private val context: Context) {
         const val CODEC = "codec"
         const val VIDEO_BITRATE = "video-bitrate"
         const val VIDEO_FRAME_RATE = "video-frame-rate"
+        const val USERNAME = "username"
     }
 
 
@@ -57,4 +58,9 @@ class SettingsStore(private val context: Context) {
     public var videoFrameRate: String
         get() = sharedPreferences.getString(VIDEO_FRAME_RATE, "256")!!
         set(value) = putString(VIDEO_FRAME_RATE, value)
+
+    public var username: String
+        get() = sharedPreferences.getString(USERNAME, "")!!
+        set(value) = putString(USERNAME, value)
+
 }

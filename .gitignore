@@ -1,6 +1,8 @@
 *.iml
 .gradle
 app/google-services.json
+app/gradle.properties
+hmsvideo-android
 /local.properties
 .idea
 .DS_Store

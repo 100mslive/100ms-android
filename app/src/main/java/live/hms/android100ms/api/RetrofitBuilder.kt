@@ -1,12 +1,11 @@
 package live.hms.android100ms.api
 
+import live.hms.android100ms.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-
-private const val TOKEN_BASE_URL = "https://100ms-services.vercel.app/api/"
 
 private val okHttpClient = OkHttpClient.Builder()
     .addInterceptor(HttpLoggingInterceptor().apply {
@@ -19,7 +18,7 @@ private val okHttpClient = OkHttpClient.Builder()
 
 
 private fun getRetrofit() = Retrofit.Builder()
-    .baseUrl(TOKEN_BASE_URL)
+    .baseUrl(BuildConfig.TOKEN_ENDPOINT)
     .addConverterFactory(GsonConverterFactory.create())
     .client(okHttpClient)
     .build()
