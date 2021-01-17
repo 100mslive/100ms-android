@@ -364,7 +364,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
             }
             MeetingOptions.SHARE -> {
                 val meetingUrl = roomDetails.let {
-                    "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}role=Guest"
+                    "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}&role=Guest"
                 }
                 val clip = ClipData.newPlainText("Meeting Link", meetingUrl)
                 clipboard.setPrimaryClip(clip)
