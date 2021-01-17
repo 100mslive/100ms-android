@@ -25,16 +25,16 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/container_env"
-                style="@style/TextInputLayout"
+                style="@style/AutoCompleteTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/environment"
-                app:endIconMode="clear_text">
+                android:hint="@string/environment">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_env"
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete_text_env"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

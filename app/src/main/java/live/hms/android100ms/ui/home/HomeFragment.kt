@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import live.hms.android100ms.model.CreateRoomRequest
 import live.hms.android100ms.model.RecordingInfo
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
+import live.hms.android100ms.util.ENVIRONMENTS
 import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
 
@@ -66,25 +68,33 @@ class HomeFragment : Fragment() {
         binding.buttonRoom.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
 
+        binding.switchIsJoin.apply {
+            visibility = View.GONE
+            isEnabled = false
+        }
+
         binding.containerRoom.isEnabled = false
         binding.containerUsername.isEnabled = false
         binding.containerEnv.isEnabled = false
-
-        binding.switchRecord.isEnabled = false
-        binding.switchIsJoin.isEnabled = false
     }
 
     private fun hideProgressBar() {
         binding.buttonRoom.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
 
+        binding.switchRecord.apply {
+            // If in join room mode, disable switch record toggle
+            isEnabled = !binding.switchIsJoin.isEnabled
+        }
+
+        binding.switchIsJoin.apply {
+            visibility = View.GONE
+            isEnabled = true
+        }
+
         binding.containerRoom.isEnabled = true
         binding.containerUsername.isEnabled = true
         binding.containerEnv.isEnabled = true
-
-        // If in join room mode, disable switch record toggle
-        binding.switchRecord.isEnabled = !binding.switchIsJoin.isEnabled
-        binding.switchIsJoin.isEnabled = true
     }
 
     private fun observeLiveData() {
@@ -97,7 +107,7 @@ class HomeFragment : Fragment() {
                     hideProgressBar()
                     val data = response.data!!
                     val roomDetails = RoomDetails(
-                        env = binding.editTextEnv.text.toString(),
+                        env = binding.autoCompleteTextEnv.text.toString(),
                         roomId = binding.editTextRoom.text.toString(),
                         username = binding.editTextUsername.text.toString(),
                         authToken = data.token
@@ -136,7 +146,7 @@ class HomeFragment : Fragment() {
                             roomId = data.roomId,
                             username = binding.editTextUsername.text.toString(),
                             role = "Host",
-                            environment = binding.editTextEnv.text.toString()
+                            environment = binding.autoCompleteTextEnv.text.toString()
                         )
                     )
                 }
@@ -165,13 +175,17 @@ class HomeFragment : Fragment() {
             val environment = host.split('.')[0]
             Log.v(TAG, "Incoming: room-id:$roomId, host:$host")
 
-            binding.editTextEnv.setText(environment)
+            binding.autoCompleteTextEnv.setText(environment)
             binding.editTextRoom.setText(roomId)
             binding.switchIsJoin.isChecked = true
         }
 
+        binding.autoCompleteTextEnv.setAdapter(
+            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, ENVIRONMENTS)
+        )
+
         mapOf(
-            binding.editTextEnv to binding.containerEnv,
+            binding.autoCompleteTextEnv to binding.containerEnv,
             binding.editTextRoom to binding.containerRoom,
             binding.editTextUsername to binding.containerUsername
         ).forEach {
@@ -187,7 +201,7 @@ class HomeFragment : Fragment() {
             val isJoin = binding.switchIsJoin.isChecked
             val enableRecording = binding.switchRecord.isChecked
 
-            val env = binding.editTextEnv.text.toString()
+            val env = binding.autoCompleteTextEnv.text.toString()
             if (env.isEmpty()) {
                 allOk = false
                 binding.containerEnv.error = "Env cannot be empty"

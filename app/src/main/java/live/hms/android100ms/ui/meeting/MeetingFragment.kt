@@ -6,10 +6,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.TextureView
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -24,7 +26,6 @@ import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
 import com.brytecam.lib.webrtc.HMSStream
 import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import com.google.android.material.snackbar.Snackbar
-import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.chat.ChatMessage
@@ -83,13 +84,19 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private var localAudioTrack: AudioTrack? = null
     private var localVideoTrack: VideoTrack? = null
 
+    private val meetingViewModel: MeetingViewModel by activityViewModels()
     private val chatViewModel: ChatViewModel by activityViewModels()
 
+    private lateinit var clipboard: ClipboardManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         roomDetails = args.roomDetail
+        clipboard = requireActivity()
+            .getSystemService(Context.CLIPBOARD_SERVICE)
+                as ClipboardManager
+
 
         initAudioManager()
         initClient()
@@ -118,6 +125,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     private fun initViewModel() {
+        meetingViewModel.selectedOption.observe(viewLifecycleOwner) { onMeetingOptionSelected(it) }
+
         chatViewModel.setSendBroadcastCallback { message ->
             Log.v(TAG, "Sending broadcast: $message via $hmsClient")
             hmsClient?.broadcast(message.message, hmsRoom, object : HMSRequestHandler {
@@ -186,8 +195,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
                     "Name: ${track.peer.userName} (${track.peer.role}) \nId: ${track.peer.customerUserId}",
                     Snackbar.LENGTH_LONG,
                 ).setAction("Copy") {
-                    val clipboard =
-                        requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Customer Id", track.peer.customerUserId)
                     clipboard.setPrimaryClip(clip)
                     Toast.makeText(
@@ -316,45 +323,76 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
     }
 
-    private fun initButtons() {
-        binding.fabEndCall.setOnClickListener { disconnect() }
-        binding.fabFlipCamera.setOnClickListener {
-            hmsClient?.apply {
-                isCameraToggled = true
-                switchCamera()
+    private fun onMeetingOptionSelected(option: MeetingOptions) {
+        Log.v(TAG, "onMeetingOptionSelected(option=${option})")
+        when (option) {
+            MeetingOptions.NONE -> {
             }
-        }
-
-        binding.fabToggleAudio.setOnClickListener {
-            currentDeviceTrack?.apply {
-                if (audioTrack != null) {
-                    isAudioEnabled = !audioTrack.enabled()
-                    audioTrack.setEnabled(isAudioEnabled)
-                    updateFabIcons()
+            MeetingOptions.END_CALL -> {
+                disconnect()
+            }
+            MeetingOptions.FLIP_CAMERA -> {
+                hmsClient?.apply {
+                    isCameraToggled = true
+                    switchCamera()
                 }
             }
-        }
-
-        binding.fabToggleVideo.setOnClickListener {
-            currentDeviceTrack?.apply {
-                if (videoTrack != null) {
-                    isVideoEnabled = !videoTrack.enabled()
-                    videoTrack.setEnabled(isVideoEnabled)
-                    updateFabIcons()
-                    executor.execute {
-                        if (isVideoEnabled) HMSStream.getCameraCapturer().start()
-                        else HMSStream.getCameraCapturer().stop()
+            MeetingOptions.TOGGLE_AUDIO -> {
+                currentDeviceTrack?.apply {
+                    if (audioTrack != null) {
+                        isAudioEnabled = !audioTrack.enabled()
+                        audioTrack.setEnabled(isAudioEnabled)
                     }
                 }
             }
+            MeetingOptions.TOGGLE_VIDEO -> {
+                currentDeviceTrack?.apply {
+                    if (videoTrack != null) {
+                        isVideoEnabled = !videoTrack.enabled()
+                        videoTrack.setEnabled(isVideoEnabled)
+                        executor.execute {
+                            if (isVideoEnabled) HMSStream.getCameraCapturer().start()
+                            else HMSStream.getCameraCapturer().stop()
+                        }
+                    }
+                }
+            }
+            MeetingOptions.OPEN_CHAT -> {
+                findNavController().navigate(
+                    MeetingFragmentDirections.actionMeetingFragmentToChatFragment(roomDetails)
+                )
+            }
+            MeetingOptions.SHARE -> {
+                val meetingUrl = roomDetails.let {
+                    "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}role=Guest"
+                }
+                val clip = ClipData.newPlainText("Meeting Link", meetingUrl)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(
+                    requireContext(),
+                    "Copied meeting link to clipboard",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            MeetingOptions.OPEN_SETTINGS -> {
+                // TODO: Go to settings fragment
+                Toast.makeText(
+                    requireContext(),
+                    "Work in progress",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
-        binding.fabChat.setOnClickListener {
-            findNavController().navigate(
-                MeetingFragmentDirections.actionMeetingFragmentToChatFragment(roomDetails)
-            )
+        // Hacky-fix: Since onBackPress from any child fragment
+        // the observer fires the last event received
+        // Eg: OPEN_CHAT is called again onBackPress which open the chat again
+        if (option != MeetingOptions.NONE) {
+            meetingViewModel.selectOption(MeetingOptions.NONE)
         }
+    }
 
+    private fun initButtons() {
         binding.buttonUnpin.setOnClickListener {
             val visible = binding.containerPinView.visibility == View.VISIBLE
             binding.pinnedSurfaceView.apply {
@@ -367,48 +405,15 @@ class MeetingFragment : Fragment(), HMSEventListener {
             if (visible) {
                 binding.containerPinView.visibility = View.GONE
             }
-
         }
 
         binding.fabMoreOptions.setOnClickListener {
+            val metadata = MeetingOptionsMetadata(isAudioEnabled, isVideoEnabled)
             findNavController().navigate(
-                MeetingFragmentDirections.actionMeetingFragmentToMeetingOptionsBottomSheet()
+                MeetingFragmentDirections.actionMeetingFragmentToMeetingOptionsBottomSheet(metadata)
             )
         }
     }
-
-    private fun updateFabIcons() {
-        binding.fabToggleAudio.apply {
-            val drawable = if (isAudioEnabled)
-                R.drawable.ic_baseline_music_note_24
-            else
-                R.drawable.ic_baseline_music_off_24
-
-            this.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    drawable,
-                    this@MeetingFragment.requireContext().theme
-                )
-            )
-        }
-
-        binding.fabToggleVideo.apply {
-            val drawable = if (isVideoEnabled)
-                R.drawable.ic_baseline_videocam_24
-            else
-                R.drawable.ic_baseline_videocam_off_24
-
-            this.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    drawable,
-                    this@MeetingFragment.requireContext().theme
-                )
-            )
-        }
-    }
-
 
     private fun disconnect() {
         isJoined = false
@@ -449,6 +454,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
+                    Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
                     disconnect()
                 }
             })
@@ -591,9 +597,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
             "onBroadcast: customerId=${data.peer.customerUserId} senderName=${data.senderName} msg=${data.msg}"
         )
         requireActivity().runOnUiThread {
+            val senderName = data.senderName ?: "error<senderName=null>"
             chatViewModel.receivedMessage(
                 ChatMessage(
-                    data.senderName,
+                    senderName,
                     Date(),
                     data.msg,
                     false

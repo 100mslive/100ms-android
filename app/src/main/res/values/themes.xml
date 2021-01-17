@@ -29,6 +29,14 @@
         <item name="hintTextColor">@color/primaryTextColor</item>
     </style>
 
+    <style name="AutoCompleteTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:layout_marginBottom">6dp</item>
+        <item name="boxStrokeColor">@color/text_input_box_stroke</item>
+        <item name="android:textColorHint">@color/secondaryFadedTextColor</item>
+        <item name="hintTextColor">@color/primaryTextColor</item>
+    </style>
+
     <style name="BottomSheetMaterialButton" parent="@style/Widget.MaterialComponents.Button">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">0dp</item>

@@ -1,7 +1,6 @@
 package live.hms.android100ms.ui.chat
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +8,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentChatBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.meeting.MeetingFragmentArgs
@@ -71,19 +68,24 @@ class ChatFragment : Fragment() {
     }
 
     private fun initTextFields() {
-        binding.editTextMessage.addTextChangedListener { text ->
-            binding.fabSendMessage.isEnabled = text.toString().isNotEmpty()
+        binding.editTextMessage.apply {
+            addTextChangedListener { text ->
+                binding.fabSendMessage.isEnabled = text.toString().isNotEmpty()
+            }
         }
 
-        binding.fabSendMessage.setOnClickListener {
-            val message = ChatMessage(
-                roomDetails.username,
-                Date(),
-                binding.editTextMessage.text.toString(),
-                true
-            )
-            chatViewModel.broadcast(message)
-            binding.editTextMessage.setText("")
+        binding.fabSendMessage.apply {
+            isEnabled = false // Disabled by default
+            setOnClickListener {
+                val message = ChatMessage(
+                    roomDetails.username,
+                    Date(),
+                    binding.editTextMessage.text.toString(),
+                    true
+                )
+                chatViewModel.broadcast(message)
+                binding.editTextMessage.setText("")
+            }
         }
     }
 }
