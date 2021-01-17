@@ -10,8 +10,11 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import live.hms.android100ms.R
 import live.hms.android100ms.api.Status
 import live.hms.android100ms.databinding.FragmentHomeBinding
+import live.hms.android100ms.model.CreateRoomRequest
+import live.hms.android100ms.model.RecordingInfo
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
 import live.hms.android100ms.util.SettingsStore
@@ -31,6 +34,7 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         settings = SettingsStore(requireContext())
         initViewModel()
+        initSwitches()
         initEditTextViews()
         initConnectButton()
         return binding.root
@@ -41,14 +45,46 @@ class HomeFragment : Fragment() {
         observeLiveData()
     }
 
+    private fun initSwitches() {
+        binding.switchIsJoin.setOnCheckedChangeListener { _, isJoin ->
+            val buttonText = if (isJoin) R.string.join_room else R.string.create_room
+            val roomEditTextText = if (isJoin) R.string.room_id else R.string.room_name
+
+            binding.containerRoom.hint = resources.getString(roomEditTextText)
+            binding.buttonRoom.setText(buttonText)
+            binding.editTextRoom.text = null
+            binding.switchRecord.apply {
+                if (!isJoin) isChecked = false
+
+                isEnabled = !isJoin
+                visibility = if (isJoin) View.GONE else View.VISIBLE
+            }
+        }
+    }
+
     private fun showProgressBar() {
-        binding.buttonJoinRoom.visibility = View.GONE
+        binding.buttonRoom.visibility = View.GONE
         binding.progressBar.visibility = View.VISIBLE
+
+        binding.containerRoom.isEnabled = false
+        binding.containerUsername.isEnabled = false
+        binding.containerEnv.isEnabled = false
+
+        binding.switchRecord.isEnabled = false
+        binding.switchIsJoin.isEnabled = false
     }
 
     private fun hideProgressBar() {
-        binding.buttonJoinRoom.visibility = View.VISIBLE
+        binding.buttonRoom.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
+
+        binding.containerRoom.isEnabled = true
+        binding.containerUsername.isEnabled = true
+        binding.containerEnv.isEnabled = true
+
+        // If in join room mode, disable switch record toggle
+        binding.switchRecord.isEnabled = !binding.switchIsJoin.isEnabled
+        binding.switchIsJoin.isEnabled = true
     }
 
     private fun observeLiveData() {
@@ -60,10 +96,9 @@ class HomeFragment : Fragment() {
                 Status.SUCCESS -> {
                     hideProgressBar()
                     val data = response.data!!
-                    val endpoint = binding.editTextEndpoint.text.toString();
                     val roomDetails = RoomDetails(
-                        endpoint = endpoint,
-                        roomId = binding.editTextRoomName.text.toString(),
+                        env = binding.editTextEnv.text.toString(),
+                        roomId = binding.editTextRoom.text.toString(),
                         username = binding.editTextUsername.text.toString(),
                         authToken = data.token
                     )
@@ -72,6 +107,40 @@ class HomeFragment : Fragment() {
                         HomeFragmentDirections.actionHomeFragmentToMeetingFragment(roomDetails)
                     )
                 }
+                Status.ERROR -> {
+                    hideProgressBar()
+                    Toast.makeText(
+                        requireContext(),
+                        response.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        homeViewModel.createRoomResponse.observe(viewLifecycleOwner) { response ->
+            when (response.status) {
+                Status.LOADING -> {
+                    showProgressBar()
+                }
+                Status.SUCCESS -> {
+                    val data = response.data!!
+                    Toast.makeText(
+                        requireContext(),
+                        "Created room ${data.roomId} \uD83E\uDD73",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    homeViewModel.sendAuthTokenRequest(
+                        TokenRequest(
+                            roomId = data.roomId,
+                            username = binding.editTextUsername.text.toString(),
+                            role = "Host",
+                            environment = binding.editTextEnv.text.toString()
+                        )
+                    )
+                }
+
                 Status.ERROR -> {
                     hideProgressBar()
                     Toast.makeText(
@@ -92,16 +161,18 @@ class HomeFragment : Fragment() {
         if (data != null) {
             Log.v(TAG, "Received Meeting URI via Intent: $data")
             val roomId = data.getQueryParameter("room")
-            val host = data.host
+            val host = data.host!!
+            val environment = host.split('.')[0]
             Log.v(TAG, "Incoming: room-id:$roomId, host:$host")
 
-            binding.editTextEndpoint.setText("wss://${host}/ws")
-            binding.editTextRoomName.setText(roomId)
+            binding.editTextEnv.setText(environment)
+            binding.editTextRoom.setText(roomId)
+            binding.switchIsJoin.isChecked = true
         }
 
         mapOf(
-            binding.editTextEndpoint to binding.containerEndpoint,
-            binding.editTextRoomName to binding.containerRoomName,
+            binding.editTextEnv to binding.containerEnv,
+            binding.editTextRoom to binding.containerRoom,
             binding.editTextUsername to binding.containerUsername
         ).forEach {
             it.key.addTextChangedListener { text ->
@@ -111,19 +182,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun initConnectButton() {
-        binding.buttonJoinRoom.setOnClickListener {
+        binding.buttonRoom.setOnClickListener {
             var allOk = true
+            val isJoin = binding.switchIsJoin.isChecked
+            val enableRecording = binding.switchRecord.isChecked
 
-            val endpoint = binding.editTextEndpoint.text.toString()
-            if (endpoint.isEmpty()) {
+            val env = binding.editTextEnv.text.toString()
+            if (env.isEmpty()) {
                 allOk = false
-                binding.containerEndpoint.error = "Endpoint cannot be empty"
+                binding.containerEnv.error = "Env cannot be empty"
             }
 
-            val roomName = binding.editTextRoomName.text.toString()
-            if (roomName.isEmpty()) {
+            val room = binding.editTextRoom.text.toString()
+            if (room.isEmpty()) {
                 allOk = false
-                binding.containerRoomName.error = "Room Name cannot be empty"
+                binding.containerRoom.error = "Room Name cannot be empty"
             }
 
             val username = binding.editTextUsername.text.toString()
@@ -136,8 +209,17 @@ class HomeFragment : Fragment() {
                 // Save this username
                 settings.username = username
 
-                val env = endpoint.split(".")[0].replace("wss://", "")
-                homeViewModel.sendAuthTokenRequest(TokenRequest(roomName, username, "Guest", env))
+                if (isJoin) {
+                    homeViewModel.sendAuthTokenRequest(TokenRequest(room, username, "Guest", env))
+                } else {
+                    homeViewModel.sendCreateRoomRequest(
+                        CreateRoomRequest(
+                            room,
+                            env,
+                            RecordingInfo(enableRecording)
+                        )
+                    )
+                }
             }
         }
     }

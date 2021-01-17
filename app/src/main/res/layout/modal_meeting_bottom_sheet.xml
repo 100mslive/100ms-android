@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.circularreveal.CircularRevealGridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:columnCount="3"
+    android:padding="12dp"
+    android:useDefaultMargins="false"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_end_call"
+        style="@style/BottomSheetMaterialButton"
+        android:backgroundTint="@android:color/holo_red_light"
+        android:contentDescription="@string/end_call"
+        android:text="@string/end_call"
+        app:icon="@drawable/ic_baseline_call_end_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_toggle_video"
+        style="@style/BottomSheetMaterialButton"
+        android:contentDescription="@string/toggle_video"
+        android:text="@string/toggle_video"
+        app:icon="@drawable/ic_baseline_videocam_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_toggle_audio"
+        style="@style/BottomSheetMaterialButton"
+        android:contentDescription="@string/toggle_audio"
+        android:text="@string/toggle_audio"
+        app:icon="@drawable/ic_baseline_music_note_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_flip_camer"
+        style="@style/BottomSheetMaterialButton"
+        android:contentDescription="@string/flip_camera"
+        android:text="@string/flip_camera"
+        app:icon="@drawable/ic_baseline_flip_camera_ios_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_chat"
+        style="@style/BottomSheetMaterialButton"
+        android:contentDescription="@string/chat"
+        android:text="@string/chat"
+        app:icon="@drawable/ic_baseline_chat_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_share"
+        style="@style/BottomSheetMaterialButton"
+        android:contentDescription="@string/share"
+        android:text="@string/share"
+        app:icon="@drawable/ic_baseline_share_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_settings"
+        style="@style/BottomSheetMaterialButton"
+        android:contentDescription="@string/settings"
+        android:text="@string/settings"
+        app:icon="@drawable/ic_baseline_settings_24" />
+
+</com.google.android.material.circularreveal.CircularRevealGridLayout>

@@ -38,7 +38,16 @@
         <action
             android:id="@+id/action_MeetingFragment_to_ChatFragment"
             app:destination="@id/ChatFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_MeetingOptionsBottomSheet"
+            app:destination="@id/MeetingOptionsBottomSheet" />
     </fragment>
+
+    <dialog
+        android:id="@+id/MeetingOptionsBottomSheet"
+        android:name="live.hms.android100ms.ui.meeting.MeetingOptionsBottomSheet"
+        android:label="@string/meeting_options"
+        tools:layout="@layout/modal_meeting_bottom_sheet" />
 
     <fragment
         android:id="@+id/ChatFragment"

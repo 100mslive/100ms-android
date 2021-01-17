@@ -1,3 +1,4 @@
 # https://100ms.gitbook.io/100ms/helpers/runkit
 # Place your endpoint URL below in double quotes
 TOKEN_ENDPOINT=
+CREATE_ROOM_ENDPOINT=

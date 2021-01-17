@@ -5,10 +5,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class RoomDetails(
-    val endpoint: String,
+    val env: String,
     val roomId: String,
     val username: String,
     val authToken: String
 ) : Parcelable {
-    val env = endpoint.split(".")[0].replace("wss://", "");
+    val endpoint = "wss://${env}.100ms.live/ws"
 }

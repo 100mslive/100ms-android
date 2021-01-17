@@ -166,10 +166,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private fun initClient() {
         val perms = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
         if (EasyPermissions.hasPermissions(requireContext(), *perms)) {
-
-            if (HMSWebRTCEglUtils.getRootEglBaseContext() == null)
-                HMSWebRTCEglUtils.getRootEglBase()
-
             initHMSClient()
         } else {
             EasyPermissions.requestPermissions(
@@ -373,6 +369,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
             }
 
         }
+
+        binding.fabMoreOptions.setOnClickListener {
+            findNavController().navigate(
+                MeetingFragmentDirections.actionMeetingFragmentToMeetingOptionsBottomSheet()
+            )
+        }
     }
 
     private fun updateFabIcons() {
@@ -479,7 +481,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 }
             })
         }
-
     }
 
     override fun onDisconnect(errorMessage: String?) {
