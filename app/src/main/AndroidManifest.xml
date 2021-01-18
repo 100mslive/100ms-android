@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Android100ms">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.home.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.Android100ms.NoActionBar">
             <intent-filter>
@@ -90,8 +90,11 @@
                     android:host="qa-in.100ms.live"
                     android:scheme="https" />
             </intent-filter>
-
         </activity>
+        <activity
+            android:name=".ui.meeting.MeetingActivity"
+            android:label="@string/meeting"
+            android:theme="@style/Theme.Android100ms.NoActionBar" />
     </application>
 
 </manifest>

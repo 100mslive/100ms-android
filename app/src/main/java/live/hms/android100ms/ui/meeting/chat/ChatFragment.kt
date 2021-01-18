@@ -1,4 +1,4 @@
-package live.hms.android100ms.ui.chat
+package live.hms.android100ms.ui.meeting.chat
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +11,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.android100ms.databinding.FragmentChatBinding
 import live.hms.android100ms.model.RoomDetails
-import live.hms.android100ms.ui.meeting.MeetingFragmentArgs
 import live.hms.android100ms.util.viewLifecycle
 import java.util.*
 import kotlin.collections.ArrayList
@@ -23,7 +22,7 @@ class ChatFragment : Fragment() {
     }
 
     private var binding by viewLifecycle<FragmentChatBinding>()
-    private val args: MeetingFragmentArgs by navArgs()
+    private val args: ChatFragmentArgs by navArgs()
 
     private val chatViewModel: ChatViewModel by activityViewModels()
     private lateinit var roomDetails: RoomDetails

@@ -3,39 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/HomeFragment">
-
-    <fragment
-        android:id="@+id/HomeFragment"
-        android:name="live.hms.android100ms.ui.home.HomeFragment"
-        android:label="@string/home_fragment"
-        tools:layout="@layout/fragment_home">
-
-        <action
-            android:id="@+id/action_HomeFragment_to_MeetingFragment"
-            app:destination="@id/MeetingFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/MeetingFragment"
-            app:popUpToInclusive="true" />
-    </fragment>
+    app:startDestination="@id/MeetingFragment">
 
     <fragment
         android:id="@+id/MeetingFragment"
         android:name="live.hms.android100ms.ui.meeting.MeetingFragment"
         android:label="@string/meeting_fragment"
         tools:layout="@layout/fragment_meeting">
-
-        <argument
-            android:name="roomDetail"
-            app:argType="live.hms.android100ms.model.RoomDetails"
-            app:nullable="false" />
-
-        <action
-            android:id="@+id/action_MeetingFragment_to_HomeFragment"
-            app:destination="@id/HomeFragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/HomeFragment"
-            app:popUpToInclusive="true" />
 
         <action
             android:id="@+id/action_MeetingFragment_to_ChatFragment"
@@ -61,7 +35,7 @@
 
     <fragment
         android:id="@+id/ChatFragment"
-        android:name="live.hms.android100ms.ui.chat.ChatFragment"
+        android:name="live.hms.android100ms.ui.meeting.chat.ChatFragment"
         android:label="@string/chat_fragment"
         tools:layout="@layout/fragment_chat">
 

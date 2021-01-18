@@ -1,8 +1,3 @@
 package live.hms.android100ms.util
 
-val ENVIRONMENTS = listOf(
-    "qa-in",
-    "prod-in",
-    "staging-in"
-)
-
+const val ROOM_DETAILS = "room-details"

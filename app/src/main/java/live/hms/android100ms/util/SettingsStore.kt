@@ -14,6 +14,8 @@ class SettingsStore(context: Context) {
         const val VIDEO_BITRATE = "video-bitrate"
         const val VIDEO_FRAME_RATE = "video-frame-rate"
         const val USERNAME = "username"
+        const val LAST_USED_ROOM_ID = "last-used-room-id"
+        const val LAST_USED_ENV = "last-used-env"
     }
 
 
@@ -63,4 +65,11 @@ class SettingsStore(context: Context) {
         get() = sharedPreferences.getString(USERNAME, "")!!
         set(value) = putString(USERNAME, value)
 
+    public var lastUsedRoomId: String
+        get() = sharedPreferences.getString(LAST_USED_ROOM_ID, "")!!
+        set(value) = putString(LAST_USED_ROOM_ID, value)
+
+    public var lastUsedEnv: String
+        get() = sharedPreferences.getString(LAST_USED_ENV, "")!!
+        set(value) = putString(LAST_USED_ENV, value)
 }

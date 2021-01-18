@@ -1,4 +1,4 @@
-package live.hms.android100ms.ui.chat
+package live.hms.android100ms.ui.meeting.chat
 
 import android.util.Log
 import androidx.lifecycle.LiveData

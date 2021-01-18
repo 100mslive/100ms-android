@@ -6,7 +6,7 @@
     <string name="chat_fragment">Chat Fragment</string>
 
 
-    <string name="environment">Environment (qa-in/staging-in/prod-in)</string>
+    <string name="environment">Environment</string>
     <string name="room_id">Room Id</string>
     <string name="room_name">Room Name</string>
     <string name="username">Username</string>
@@ -36,5 +36,6 @@
     <string name="share">Share</string>
     <string name="more_options">More Options</string>
     <string name="meeting_options">Meeting Options</string>
+    <string name="meeting">Meeting</string>
 
 </resources>

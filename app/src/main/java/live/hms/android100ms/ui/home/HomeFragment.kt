@@ -1,16 +1,15 @@
 package live.hms.android100ms.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import live.hms.android100ms.R
 import live.hms.android100ms.api.Status
 import live.hms.android100ms.databinding.FragmentHomeBinding
@@ -18,12 +17,16 @@ import live.hms.android100ms.model.CreateRoomRequest
 import live.hms.android100ms.model.RecordingInfo
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
-import live.hms.android100ms.util.ENVIRONMENTS
+import live.hms.android100ms.ui.meeting.MeetingActivity
+import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
 
 class HomeFragment : Fragment() {
-    val TAG = "HomeFragment"
+
+    companion object {
+        private const val TAG = "HomeFragment"
+    }
 
     private var binding by viewLifecycle<FragmentHomeBinding>()
     private lateinit var homeViewModel: HomeViewModel
@@ -107,15 +110,19 @@ class HomeFragment : Fragment() {
                     hideProgressBar()
                     val data = response.data!!
                     val roomDetails = RoomDetails(
-                        env = binding.autoCompleteTextEnv.text.toString(),
+                        env = binding.editTextEnv.text.toString(),
                         roomId = binding.editTextRoom.text.toString(),
                         username = binding.editTextUsername.text.toString(),
                         authToken = data.token
                     )
                     Log.v(TAG, "Auth Token: ${roomDetails.authToken}")
-                    findNavController().navigate(
-                        HomeFragmentDirections.actionHomeFragmentToMeetingFragment(roomDetails)
-                    )
+
+                    // Start the meeting activity
+                    Intent(requireContext(), MeetingActivity::class.java).apply {
+                        putExtra(ROOM_DETAILS, roomDetails)
+                        startActivity(this)
+                        requireActivity().finish()
+                    }
                 }
                 Status.ERROR -> {
                     hideProgressBar()
@@ -146,7 +153,7 @@ class HomeFragment : Fragment() {
                             roomId = data.roomId,
                             username = binding.editTextUsername.text.toString(),
                             role = "Host",
-                            environment = binding.autoCompleteTextEnv.text.toString()
+                            environment = binding.editTextEnv.text.toString()
                         )
                     )
                 }
@@ -164,8 +171,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun initEditTextViews() {
-        // Load the username saved earlier
+        // Load the data if saved earlier (easy debugging)
         binding.editTextUsername.setText(settings.username)
+        binding.editTextEnv.setText(settings.lastUsedEnv)
+        binding.editTextRoom.setText(settings.lastUsedRoomId)
 
         val data = requireActivity().intent.data
         if (data != null) {
@@ -175,17 +184,13 @@ class HomeFragment : Fragment() {
             val environment = host.split('.')[0]
             Log.v(TAG, "Incoming: room-id:$roomId, host:$host")
 
-            binding.autoCompleteTextEnv.setText(environment)
+            binding.editTextEnv.setText(environment)
             binding.editTextRoom.setText(roomId)
             binding.switchIsJoin.isChecked = true
         }
 
-        binding.autoCompleteTextEnv.setAdapter(
-            ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, ENVIRONMENTS)
-        )
-
         mapOf(
-            binding.autoCompleteTextEnv to binding.containerEnv,
+            binding.editTextEnv to binding.containerEnv,
             binding.editTextRoom to binding.containerRoom,
             binding.editTextUsername to binding.containerUsername
         ).forEach {
@@ -201,7 +206,7 @@ class HomeFragment : Fragment() {
             val isJoin = binding.switchIsJoin.isChecked
             val enableRecording = binding.switchRecord.isChecked
 
-            val env = binding.autoCompleteTextEnv.text.toString()
+            val env = binding.editTextEnv.text.toString()
             if (env.isEmpty()) {
                 allOk = false
                 binding.containerEnv.error = "Env cannot be empty"
@@ -220,11 +225,13 @@ class HomeFragment : Fragment() {
             }
 
             if (allOk) {
-                // Save this username
+                // Save this username, env
                 settings.username = username
+                settings.lastUsedEnv = env
 
                 if (isJoin) {
                     homeViewModel.sendAuthTokenRequest(TokenRequest(room, username, "Guest", env))
+                    settings.lastUsedRoomId = room
                 } else {
                     homeViewModel.sendCreateRoomRequest(
                         CreateRoomRequest(

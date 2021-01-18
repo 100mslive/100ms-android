@@ -9,4 +9,9 @@ data class MeetingTrack(
     val videoTrack: VideoTrack?,
     val audioTrack: AudioTrack?,
     val isCurrentDeviceStream: Boolean = false
-)
+) {
+    override fun toString(): String {
+        val peerStr = "HMSPeer(peerId=${peer.peerId}, username=${peer.userName})"
+        return "MeetingTrack(${peerStr}, ${videoTrack}, ${audioTrack}, isCurrentDeviceStream=${isCurrentDeviceStream}"
+    }
+}

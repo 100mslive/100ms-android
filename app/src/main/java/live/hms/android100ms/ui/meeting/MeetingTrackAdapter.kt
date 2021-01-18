@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.meeting
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -15,17 +16,55 @@ class MeetingTrackAdapter(
     private val onMeetingTrackPinned: (track: MeetingTrack) -> Unit,
 ) : RecyclerView.Adapter<MeetingTrackAdapter.MeetingTrackViewHolder>() {
 
-    inner class MeetingTrackViewHolder(val binding: ListItemMeetingTrackBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    companion object {
+        const val TAG = "MeetingTrackAdapter"
+    }
+
+    inner class MeetingTrackViewHolder(
+        val binding: ListItemMeetingTrackBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        // TODO: Hold a reference to the track used earlier
+        //  such that when ViewHolder is used again, we unbind
+        //  the old track
+        private var oldTrack: MeetingTrack? = null
+
+        private fun tryReleasingSurfaceView(newTrack: MeetingTrack): Boolean {
+            var isSurfaceViewInitialized = false
+            oldTrack?.let { track ->
+                Log.v(TAG, "Releasing SurfaceViewRenderer bind to $track")
+
+                binding.surfaceView.apply {
+                    track.videoTrack?.removeSink(this)
+                    clearImage()
+
+                    isSurfaceViewInitialized = true
+                }
+
+                // Remove the reference to the old-track
+                null
+            }
+
+            // Update the reference
+            oldTrack = newTrack
+
+            return isSurfaceViewInitialized
+        }
+
         fun bind(track: MeetingTrack) {
+            Log.v(TAG, "binding track=${track}, (oldTrack=${oldTrack}")
+            val isSurfaceViewInitialized = tryReleasingSurfaceView(track)
+
             binding.name.text = track.peer.userName
             binding.root.setOnClickListener { onItemClick(track) }
             binding.buttonPin.setOnClickListener { onMeetingTrackPinned(track) }
 
             binding.surfaceView.apply {
-                init(HMSWebRTCEglUtils.getRootEglBaseContext(), null)
-                setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
-                setEnableHardwareScaler(true)
+                if (!isSurfaceViewInitialized) {
+                    init(HMSWebRTCEglUtils.getRootEglBaseContext(), null)
+                    setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+                    setEnableHardwareScaler(true)
+                }
                 track.videoTrack?.addSink(this)
             }
         }
@@ -41,10 +80,7 @@ class MeetingTrackAdapter(
     }
 
     override fun onBindViewHolder(holder: MeetingTrackViewHolder, position: Int) {
-        if (position < tracks.size) {
-            holder.bind(tracks[position])
-            holder.setIsRecyclable(false)
-        }
+        holder.bind(tracks[position])
     }
 
     override fun getItemCount() = tracks.size

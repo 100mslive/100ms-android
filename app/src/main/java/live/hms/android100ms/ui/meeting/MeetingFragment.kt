@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,7 +16,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.brytecam.lib.*
 import com.brytecam.lib.payload.HMSPayloadData
@@ -28,8 +28,10 @@ import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import com.google.android.material.snackbar.Snackbar
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
-import live.hms.android100ms.ui.chat.ChatMessage
-import live.hms.android100ms.ui.chat.ChatViewModel
+import live.hms.android100ms.ui.home.HomeActivity
+import live.hms.android100ms.ui.meeting.chat.ChatMessage
+import live.hms.android100ms.ui.meeting.chat.ChatViewModel
+import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
 import org.appspot.apprtc.AppRTCAudioManager
@@ -55,7 +57,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     private var binding by viewLifecycle<FragmentMeetingBinding>()
-    private val args: MeetingFragmentArgs by navArgs()
 
     private lateinit var settingsStore: SettingsStore
     private lateinit var roomDetails: RoomDetails
@@ -92,7 +93,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        roomDetails = args.roomDetail
+        roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
         clipboard = requireActivity()
             .getSystemService(Context.CLIPBOARD_SERVICE)
                 as ClipboardManager
@@ -444,9 +445,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
         chatViewModel.removeSendBroadcastCallback()
         chatViewModel.clearMessages()
 
-        findNavController().navigate(
-            MeetingFragmentDirections.actionMeetingFragmentToHomeFragment()
-        )
+        // Go to home page
+        Intent(requireContext(), HomeActivity::class.java).apply {
+            startActivity(this)
+            requireActivity().finish()
+        }
     }
 
     private fun initOnBackPress() {
@@ -475,6 +478,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
                 override fun onSuccess(p0: String?) {
                     isJoined = true
                     Log.v(TAG, "Join Success")
+                    Thread.sleep(1000)
                     getUserMedia(
                         isFrontCameraEnabled,
                         settingsStore.publishAudio,
@@ -597,10 +601,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
             "onBroadcast: customerId=${data.peer.customerUserId} senderName=${data.senderName} msg=${data.msg}"
         )
         requireActivity().runOnUiThread {
-            val senderName = data.senderName ?: "error<senderName=null>"
             chatViewModel.receivedMessage(
                 ChatMessage(
-                    senderName,
+                    data.peer.userName,
                     Date(),
                     data.msg,
                     false
