@@ -10,5 +10,7 @@ data class RoomDetails(
     val username: String,
     val authToken: String
 ) : Parcelable {
-    val endpoint = "wss://${env}.100ms.live/ws"
+    val endpoint: String
+        get() = "wss://${env}.100ms.live/ws"
+
 }

@@ -9,6 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/bottom_controls"
+        android:layout_alignParentTop="true"
         android:animateLayoutChanges="true"
         android:orientation="vertical">
 
@@ -77,15 +79,43 @@
 
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_more_options"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/bottom_controls"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
-        android:contentDescription="@string/more_options"
-        android:src="@drawable/ic_baseline_more_vert_24" />
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/button_toggle_video"
+            style="@style/MeetingBottomControlButton"
+            android:contentDescription="@string/toggle_video"
+            android:src="@drawable/ic_baseline_videocam_24" />
+
+        <ImageButton
+            android:id="@+id/button_toggle_audio"
+            style="@style/MeetingBottomControlButton"
+            android:contentDescription="@string/toggle_audio"
+            android:src="@drawable/ic_baseline_music_note_24" />
+
+        <ImageButton
+            android:id="@+id/button_open_chat"
+            style="@style/MeetingBottomControlButton"
+            android:contentDescription="@string/open_chat"
+            android:src="@drawable/ic_baseline_chat_24" />
+
+        <ImageButton
+            android:id="@+id/button_end_call"
+            style="@style/MeetingBottomControlButton"
+            android:contentDescription="@string/end_call"
+            android:src="@drawable/ic_baseline_call_end_24" />
+
+        <ImageButton
+            android:id="@+id/button_share"
+            style="@style/MeetingBottomControlButton"
+            android:contentDescription="@string/share"
+            android:src="@drawable/ic_baseline_share_24" />
+
+    </LinearLayout>
 
 </RelativeLayout>

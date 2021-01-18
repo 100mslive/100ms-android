@@ -5,24 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import live.hms.android100ms.databinding.FragmentChatBinding
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import live.hms.android100ms.databinding.FragmentBottomSheetChatBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.util.viewLifecycle
 import java.util.*
 import kotlin.collections.ArrayList
 
-class ChatFragment : Fragment() {
+class ChatBottomSheetFragment : BottomSheetDialogFragment() {
 
     companion object {
         private const val TAG = "ChatFragment"
     }
 
-    private var binding by viewLifecycle<FragmentChatBinding>()
-    private val args: ChatFragmentArgs by navArgs()
+    private var binding by viewLifecycle<FragmentBottomSheetChatBinding>()
+    private val args: ChatBottomSheetFragmentArgs by navArgs()
 
     private val chatViewModel: ChatViewModel by activityViewModels()
     private lateinit var roomDetails: RoomDetails
@@ -38,7 +38,7 @@ class ChatFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentChatBinding.inflate(inflater, container, false)
+        binding = FragmentBottomSheetChatBinding.inflate(inflater, container, false)
         roomDetails = args.roomDetail
 
         initRecyclerView()

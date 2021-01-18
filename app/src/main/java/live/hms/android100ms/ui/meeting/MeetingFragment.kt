@@ -26,6 +26,7 @@ import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
 import com.brytecam.lib.webrtc.HMSStream
 import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import com.google.android.material.snackbar.Snackbar
+import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.HomeActivity
@@ -85,7 +86,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     private var localAudioTrack: AudioTrack? = null
     private var localVideoTrack: VideoTrack? = null
 
-    private val meetingViewModel: MeetingViewModel by activityViewModels()
     private val chatViewModel: ChatViewModel by activityViewModels()
 
     private lateinit var clipboard: ClipboardManager
@@ -126,8 +126,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     private fun initViewModel() {
-        meetingViewModel.selectedOption.observe(viewLifecycleOwner) { onMeetingOptionSelected(it) }
-
         chatViewModel.setSendBroadcastCallback { message ->
             Log.v(TAG, "Sending broadcast: $message via $hmsClient")
             hmsClient?.broadcast(message.message, hmsRoom, object : HMSRequestHandler {
@@ -324,76 +322,32 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
     }
 
-    private fun onMeetingOptionSelected(option: MeetingOptions) {
-        Log.v(TAG, "onMeetingOptionSelected(option=${option})")
-        when (option) {
-            MeetingOptions.NONE -> {
-            }
-            MeetingOptions.END_CALL -> {
-                disconnect()
-            }
-            MeetingOptions.FLIP_CAMERA -> {
-                hmsClient?.apply {
-                    isCameraToggled = true
-                    switchCamera()
-                }
-            }
-            MeetingOptions.TOGGLE_AUDIO -> {
-                currentDeviceTrack?.apply {
-                    if (audioTrack != null) {
-                        isAudioEnabled = !audioTrack.enabled()
-                        audioTrack.setEnabled(isAudioEnabled)
-                    }
-                }
-            }
-            MeetingOptions.TOGGLE_VIDEO -> {
-                currentDeviceTrack?.apply {
-                    if (videoTrack != null) {
-                        isVideoEnabled = !videoTrack.enabled()
-                        videoTrack.setEnabled(isVideoEnabled)
-                        executor.execute {
-                            if (isVideoEnabled) HMSStream.getCameraCapturer().start()
-                            else HMSStream.getCameraCapturer().stop()
-                        }
-                    }
-                }
-            }
-            MeetingOptions.OPEN_CHAT -> {
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToChatFragment(roomDetails)
-                )
-            }
-            MeetingOptions.SHARE -> {
-                val meetingUrl = roomDetails.let {
-                    "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}&role=Guest"
-                }
-                val clip = ClipData.newPlainText("Meeting Link", meetingUrl)
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(
-                    requireContext(),
-                    "Copied meeting link to clipboard",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            MeetingOptions.OPEN_SETTINGS -> {
-                // TODO: Go to settings fragment
-                Toast.makeText(
-                    requireContext(),
-                    "Work in progress",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+    /**
+     * Changes the icons for buttons as per the current settings
+     */
+    private fun updateButtonsUI() {
+        binding.buttonToggleAudio.apply {
+            setImageResource(
+                if (isAudioEnabled)
+                    R.drawable.ic_baseline_music_note_24
+                else
+                    R.drawable.ic_baseline_music_off_24
+            )
         }
 
-        // Hacky-fix: Since onBackPress from any child fragment
-        // the observer fires the last event received
-        // Eg: OPEN_CHAT is called again onBackPress which open the chat again
-        if (option != MeetingOptions.NONE) {
-            meetingViewModel.selectOption(MeetingOptions.NONE)
+        binding.buttonToggleVideo.apply {
+            setImageResource(
+                if (isVideoEnabled)
+                    R.drawable.ic_baseline_videocam_24
+                else
+                    R.drawable.ic_baseline_videocam_off_24
+            )
         }
     }
 
     private fun initButtons() {
+        updateButtonsUI()
+
         binding.buttonUnpin.setOnClickListener {
             val visible = binding.containerPinView.visibility == View.VISIBLE
             binding.pinnedSurfaceView.apply {
@@ -408,12 +362,57 @@ class MeetingFragment : Fragment(), HMSEventListener {
             }
         }
 
-        binding.fabMoreOptions.setOnClickListener {
-            val metadata = MeetingOptionsMetadata(isAudioEnabled, isVideoEnabled)
+        binding.buttonToggleVideo.setOnClickListener {
+            currentDeviceTrack?.apply {
+                if (videoTrack != null) {
+                    isVideoEnabled = !videoTrack.enabled()
+                    videoTrack.setEnabled(isVideoEnabled)
+                    if (isVideoEnabled) {
+                        HMSStream.getCameraCapturer().start()
+                    } else {
+                        HMSStream.getCameraCapturer().stop()
+                    }
+                    updateButtonsUI()
+                }
+            }
+        }
+
+        binding.buttonToggleAudio.setOnClickListener {
+            currentDeviceTrack?.apply {
+                if (audioTrack != null) {
+                    isAudioEnabled = !audioTrack.enabled()
+                    audioTrack.setEnabled(isAudioEnabled)
+                    updateButtonsUI()
+                }
+            }
+        }
+
+        binding.buttonOpenChat.setOnClickListener {
             findNavController().navigate(
-                MeetingFragmentDirections.actionMeetingFragmentToMeetingOptionsBottomSheet(metadata)
+                MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(roomDetails)
             )
         }
+
+        binding.buttonEndCall.setOnClickListener { disconnect() }
+
+        binding.buttonShare.setOnClickListener {
+            val meetingUrl = roomDetails.let {
+                "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}&role=Guest"
+            }
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, meetingUrl)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            startActivity(shareIntent)
+        }
+
+        // TODO: Add switch camera
+        /* hmsClient?.apply {
+            isCameraToggled = true
+            switchCamera()
+        } */
     }
 
     private fun disconnect() {

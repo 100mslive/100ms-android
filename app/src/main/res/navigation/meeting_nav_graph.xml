@@ -12,38 +12,22 @@
         tools:layout="@layout/fragment_meeting">
 
         <action
-            android:id="@+id/action_MeetingFragment_to_ChatFragment"
-            app:destination="@id/ChatFragment" />
+            android:id="@+id/action_MeetingFragment_to_ChatBottomSheetFragment"
+            app:destination="@id/ChatBottomSheetFragment" />
 
-        <action
-            android:id="@+id/action_MeetingFragment_to_MeetingOptionsBottomSheet"
-            app:destination="@id/MeetingOptionsBottomSheet" />
     </fragment>
 
     <dialog
-        android:id="@+id/MeetingOptionsBottomSheet"
-        android:name="live.hms.android100ms.ui.meeting.MeetingOptionsBottomSheet"
-        android:label="@string/meeting_options"
-        tools:layout="@layout/modal_meeting_bottom_sheet">
-
-        <argument
-            android:name="metadata"
-            app:argType="live.hms.android100ms.ui.meeting.MeetingOptionsMetadata"
-            app:nullable="false" />
-
-    </dialog>
-
-    <fragment
-        android:id="@+id/ChatFragment"
-        android:name="live.hms.android100ms.ui.meeting.chat.ChatFragment"
+        android:id="@+id/ChatBottomSheetFragment"
+        android:name="live.hms.android100ms.ui.meeting.chat.ChatBottomSheetFragment"
         android:label="@string/chat_fragment"
-        tools:layout="@layout/fragment_chat">
+        tools:layout="@layout/fragment_bottom_sheet_chat">
 
         <argument
             android:name="roomDetail"
             app:argType="live.hms.android100ms.model.RoomDetails"
             app:nullable="false" />
 
-    </fragment>
+    </dialog>
 
 </navigation>

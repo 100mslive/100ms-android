@@ -37,5 +37,6 @@
     <string name="more_options">More Options</string>
     <string name="meeting_options">Meeting Options</string>
     <string name="meeting">Meeting</string>
+    <string name="open_chat">Open Chat</string>
 
 </resources>
