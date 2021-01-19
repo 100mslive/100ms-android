@@ -1,6 +1,5 @@
 package live.hms.android100ms.ui.meeting
 
-import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -29,18 +28,16 @@ import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.HomeActivity
+import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
-import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
 import org.appspot.apprtc.AppRTCAudioManager
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
-import pub.devrel.easypermissions.AfterPermissionGranted
-import pub.devrel.easypermissions.EasyPermissions
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
@@ -50,7 +47,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   companion object {
     private const val TAG = "MeetingFragment"
-    private const val RC_CALL = 111
 
     private const val FRONT_FACING_CAMERA = "user"
     private const val REAR_FACING_CAMERA = "environment"
@@ -58,13 +54,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
 
-  private lateinit var settingsStore: SettingsStore
+  private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  private var shouldReconnect = false
   private var isJoined = false
   private var isPublished = false
-  private var retryCount = 0
 
   private var isFrontCameraEnabled = true
   private var isCameraToggled = false
@@ -73,7 +67,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private var currentDeviceTrack: MeetingTrack? = null
   private val videoGridItems = ArrayList<MeetingTrack>()
-  private var pinnedTrack: MeetingTrack? = null
 
   private val executor = Executors.newSingleThreadExecutor()
 
@@ -100,7 +93,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
 
     initAudioManager()
-    initClient()
+    initHMSClient()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -139,7 +132,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
 
-    settingsStore = SettingsStore(requireContext())
+    settings = SettingsStore(requireContext())
 
     initVideoGrid()
     initButtons()
@@ -183,31 +176,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
   }
 
-
-  override fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<out String>,
-    grantResults: IntArray
-  ) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-  }
-
-  @AfterPermissionGranted(RC_CALL)
-  private fun initClient() {
-    val perms = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-    if (EasyPermissions.hasPermissions(requireContext(), *perms)) {
-      initHMSClient()
-    } else {
-      EasyPermissions.requestPermissions(
-        this,
-        "Need User permissions to proceed",
-        RC_CALL,
-        *perms
-      )
-    }
-  }
-
   private fun initVideoGrid() {
     binding.viewPagerVideoGrid.apply {
       adapter = VideoGridAdapter(this@MeetingFragment) { video ->
@@ -247,12 +215,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
     audioEnabled: Boolean,
     cameraToggle: Boolean
   ) {
-    localMediaConstraints = HMSRTCMediaStreamConstraints(true, settingsStore.publishVideo)
+    localMediaConstraints = HMSRTCMediaStreamConstraints(true, settings.publishVideo)
     localMediaConstraints?.apply {
-      videoCodec = settingsStore.codec
-      videoFrameRate = settingsStore.videoFrameRate.toInt()
-      videoResolution = settingsStore.videoResolution
-      videoMaxBitRate = settingsStore.videoBitrate.toInt()
+      videoCodec = settings.codec
+      videoFrameRate = settings.videoFrameRate.toInt()
+      videoResolution = settings.videoResolution
+      videoMaxBitRate = settings.videoBitrate.toInt()
 
       if (frontCamEnabled) {
         isFrontCameraEnabled = true
@@ -275,11 +243,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
             mediaStream?.stream?.apply {
               if (videoTracks.isNotEmpty()) {
                 videoTrack = videoTracks[0]
-                videoTrack?.setEnabled(settingsStore.publishVideo)
+                videoTrack?.setEnabled(settings.publishVideo)
               }
               if (audioTracks.isNotEmpty()) {
                 audioTrack = audioTracks[0]
-                audioTrack?.setEnabled(settingsStore.publishAudio)
+                audioTrack?.setEnabled(settings.publishAudio)
               }
 
               currentDeviceTrack = MeetingTrack(
@@ -447,12 +415,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   // HMS Event Listener events below
   override fun onConnect() {
-    shouldReconnect = false
-    requireActivity().runOnUiThread {
-      // TODO: Make Reconnect Progress view invisible
-    }
+    // TODO: Make Reconnect Progress view invisible
 
-    retryCount = 0
     Log.v(TAG, "onConnect");
 
     if (!isJoined) {
@@ -463,7 +427,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
           Thread.sleep(1000)
           getUserMedia(
             isFrontCameraEnabled,
-            settingsStore.publishAudio,
+            settings.publishAudio,
             isCameraToggled
           )
         }
@@ -477,7 +441,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   override fun onDisconnect(errorMessage: String?) {
     Log.v(TAG, "onDisconnect: $errorMessage")
-    shouldReconnect = true
     isJoined = false
     isPublished = false
 

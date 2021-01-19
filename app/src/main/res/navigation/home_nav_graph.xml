@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_nav_graph"
-    app:startDestination="@id/HomeFragment">
-
+    app:startDestination="@id/PermissionFragment">
 
     <fragment
         android:id="@+id/HomeFragment"
@@ -23,5 +22,16 @@
         android:name="live.hms.android100ms.ui.home.settings.SettingsFragment"
         android:label="@string/settings_fragment"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/PermissionFragment"
+        android:name="live.hms.android100ms.ui.home.permission.PermissionFragment"
+        android:label="@string/permission_fragment"
+        tools:layout="@layout/fragment_permission">
+
+        <action
+            android:id="@+id/action_PermissionFragment_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
+    </fragment>
 
 </navigation>

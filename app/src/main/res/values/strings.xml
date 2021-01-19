@@ -56,4 +56,11 @@
     <string name="video_framerate">Video Framerate</string>
     <string name="advanced_settings">Advanced Settings</string>
 
+    <string name="permission_fragment">Permission Fragment</string>
+    <string name="permission_artwork">Permission Artwork</string>
+    <string name="permission_heading">Grant permission to use camera and microphone</string>
+    <string name="permission_description">Access to camera and microphone is needed to make sure other participants can see and hear you during a call</string>
+    <string name="grant_permissions">Grant Permissions</string>
+    <string name="do_it_later">Do it later</string>
+
 </resources>
