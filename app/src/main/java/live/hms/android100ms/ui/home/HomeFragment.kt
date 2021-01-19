@@ -176,6 +176,7 @@ class HomeFragment : Fragment() {
     binding.editTextEnv.setText(settings.lastUsedEnv)
     binding.editTextRoom.setText(settings.lastUsedRoomId)
 
+
     val data = requireActivity().intent.data
     if (data != null) {
       Log.v(TAG, "Received Meeting URI via Intent: $data")

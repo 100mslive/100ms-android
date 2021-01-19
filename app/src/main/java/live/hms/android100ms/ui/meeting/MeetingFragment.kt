@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -88,6 +89,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private lateinit var clipboard: ClipboardManager
 
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -101,9 +103,28 @@ class MeetingFragment : Fragment(), HMSEventListener {
     initClient()
   }
 
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+      R.id.action_share_link -> {
+        val meetingUrl = roomDetails.let {
+          "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}&role=Guest"
+        }
+        val sendIntent = Intent().apply {
+          action = Intent.ACTION_SEND
+          putExtra(Intent.EXTRA_TEXT, meetingUrl)
+          type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
+      }
+    }
+    return false
+  }
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     initViewModel()
+    setHasOptionsMenu(true)
   }
 
   override fun onCreateView(
@@ -309,7 +330,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
    */
   private fun updateButtonsUI() {
     binding.buttonToggleAudio.apply {
-      setImageResource(
+      setIconResource(
         if (isAudioEnabled)
           R.drawable.ic_baseline_music_note_24
         else
@@ -318,7 +339,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     binding.buttonToggleVideo.apply {
-      setImageResource(
+      setIconResource(
         if (isVideoEnabled)
           R.drawable.ic_baseline_videocam_24
         else
@@ -363,24 +384,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     binding.buttonEndCall.setOnClickListener { disconnect() }
 
-    binding.buttonShare.setOnClickListener {
-      val meetingUrl = roomDetails.let {
-        "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}&role=Guest"
-      }
-      val sendIntent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, meetingUrl)
-        type = "text/plain"
-      }
-      val shareIntent = Intent.createChooser(sendIntent, null)
-      startActivity(shareIntent)
-    }
-
-    // TODO: Add switch camera
-    /* hmsClient?.apply {
+    binding.buttonFlipCamera.setOnClickListener {
+      hmsClient?.apply {
         isCameraToggled = true
         switchCamera()
-    } */
+      }
+    }
   }
 
   private fun disconnect() {

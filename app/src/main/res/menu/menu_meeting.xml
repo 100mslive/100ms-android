@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_share_screen"
+        android:icon="@drawable/ic_baseline_mobile_screen_share_24"
+        android:title="@string/share_screen" />
+
+    <item
+        android:id="@+id/action_record_meeting"
+        android:icon="@drawable/ic_baseline_record_button_24"
+        android:title="@string/record_meeting" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:title="@string/settings" />
+
+    <item
+        android:id="@+id/action_share_link"
+        android:icon="@drawable/ic_baseline_share_24"
+        android:title="@string/share_link" />
+</menu>

@@ -30,37 +30,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@color/secondaryColor"
         android:orientation="horizontal">
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_toggle_video"
             style="@style/MeetingBottomControlButton"
             android:contentDescription="@string/toggle_video"
-            android:src="@drawable/ic_baseline_videocam_24" />
+            app:icon="@drawable/ic_baseline_videocam_24" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_toggle_audio"
             style="@style/MeetingBottomControlButton"
             android:contentDescription="@string/toggle_audio"
-            android:src="@drawable/ic_baseline_music_note_24" />
+            app:icon="@drawable/ic_baseline_music_note_24" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_open_chat"
             style="@style/MeetingBottomControlButton"
             android:contentDescription="@string/open_chat"
-            android:src="@drawable/ic_baseline_chat_24" />
+            app:icon="@drawable/ic_baseline_chat_24" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_end_call"
             style="@style/MeetingBottomControlButton"
             android:contentDescription="@string/end_call"
-            android:src="@drawable/ic_baseline_call_end_24" />
+            app:icon="@drawable/ic_baseline_call_end_24"
+            app:iconTint="@android:color/holo_red_light" />
 
-        <ImageButton
-            android:id="@+id/button_share"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_flip_camera"
             style="@style/MeetingBottomControlButton"
-            android:contentDescription="@string/share"
-            android:src="@drawable/ic_baseline_share_24" />
+            android:contentDescription="@string/flip_camera"
+            app:icon="@drawable/ic_baseline_flip_camera_ios_24" />
 
     </LinearLayout>
 

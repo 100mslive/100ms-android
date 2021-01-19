@@ -48,16 +48,18 @@
         <item name="cornerRadius">4dp</item>
     </style>
 
-    <style name="MeetingBottomControlButton">
+    <style name="MeetingBottomControlButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:clickable">true</item>
         <item name="android:layout_margin">0dp</item>
-        <item name="background">@android:color/transparent</item>
-        <item name="backgroundTint">@android:color/transparent</item>
-        <item name="backgroundColor">@android:color/transparent</item>
+        <item name="android:inset">0dp</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconTint">@color/secondaryTextColor</item>
     </style>
 
 </resources>
