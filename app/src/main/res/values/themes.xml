@@ -31,6 +31,7 @@
         <item name="boxBackgroundColor">@color/textInputBoxBackgroundColor</item>
         <item name="android:textColorHint">@color/secondaryFadedTextColor</item>
         <item name="hintTextColor">@color/primaryTextColor</item>
+        <item name="endIconMode">clear_text</item>
     </style>
 
     <style name="AutoCompleteTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">

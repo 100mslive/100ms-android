@@ -122,6 +122,7 @@ class HomeFragment : Fragment() {
 
   private fun tryJoiningRoomAs(role: String) {
     val username = binding.editTextName.text.toString()
+
     // Update the name in local store if required
     if (binding.checkboxUseDefault.isChecked) {
       settings.username = username

@@ -27,8 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="@string/message"
-            app:endIconMode="clear_text">
+            android:hint="@string/message">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextMessage"

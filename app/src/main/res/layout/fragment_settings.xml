@@ -167,14 +167,15 @@
 
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_bitrate"
-                style="@style/TextInputLayout"
+                android:id="@+id/container_video_bitrate"
+                style="@style/AutoCompleteTextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/video_bitrate">
+                android:hint="@string/video_bitrate"
+                android:labelFor="@id/auto_complete_video_bitrate">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_video_bitrate"
+                <AutoCompleteTextView
+                    android:id="@+id/auto_complete_video_bitrate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number" />
