@@ -73,7 +73,7 @@ class HomeFragment : Fragment() {
   @SuppressLint("SetTextI18n")
   private fun updateProgressBarUI(isRoomCreator: Boolean) {
     val headingPrefix = if (isRoomCreator) "Creating room for" else "Joining as"
-    binding.progressBarHeading.text = "$headingPrefix ${settings.username}..."
+    binding.progressBarHeading.text = "$headingPrefix ${getUsername()}..."
 
     val descriptionDefaults = if (settings.publishVideo && settings.publishAudio) {
       "Video and microphone will be turned on by default.\n"
@@ -120,8 +120,10 @@ class HomeFragment : Fragment() {
     binding.switchRecord.isEnabled = true
   }
 
+  private fun getUsername() = binding.editTextName.text.toString()
+
   private fun tryJoiningRoomAs(role: String) {
-    val username = binding.editTextName.text.toString()
+    val username = getUsername()
 
     // Update the name in local store if required
     if (binding.checkboxUseDefault.isChecked) {
@@ -153,7 +155,7 @@ class HomeFragment : Fragment() {
           val roomDetails = RoomDetails(
             env = settings.environment,
             roomId = settings.lastUsedRoomId,
-            username = settings.username,
+            username = getUsername(),
             authToken = data.token
           )
           Log.v(TAG, "Auth Token: ${roomDetails.authToken}")
