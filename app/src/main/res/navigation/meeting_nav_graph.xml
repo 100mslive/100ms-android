@@ -28,6 +28,11 @@
             app:argType="live.hms.android100ms.model.RoomDetails"
             app:nullable="false" />
 
+        <argument
+            android:name="currentUserPeerId"
+            app:argType="string"
+            app:nullable="false" />
+
     </dialog>
 
 </navigation>

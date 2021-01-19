@@ -363,7 +363,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     binding.buttonOpenChat.setOnClickListener {
       findNavController().navigate(
-        MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(roomDetails)
+        MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
+          roomDetails,
+          hmsPeer!!.peerId
+        )
       )
     }
 
@@ -553,12 +556,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
   override fun onBroadcast(data: HMSPayloadData) {
     Log.v(
       TAG,
-      "onBroadcast: customerId=${data.peer.customerUserId} senderName=${data.senderName} msg=${data.msg}"
+      "onBroadcast: customerId=${data.peer.customerUserId} userName=${data.peer.userName} msg=${data.msg}"
     )
     requireActivity().runOnUiThread {
+      // TODO
+      var username  = data.peer.userName
+      if (username.isEmpty()) username = "error<senderName=null>"
+
       chatViewModel.receivedMessage(
         ChatMessage(
-          data.peer.userName,
+          data.peer.peerId ?: "Peer Id Null",
+          username,
           Date(),
           data.msg,
           false

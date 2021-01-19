@@ -22,12 +22,14 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private var binding by viewLifecycle<FragmentBottomSheetChatBinding>()
-  private val args: ChatBottomSheetFragmentArgs by navArgs()
 
   private val chatViewModel: ChatViewModel by activityViewModels()
-  private lateinit var roomDetails: RoomDetails
 
-  private val messages = ArrayList<ChatMessage>()
+  private val args: ChatBottomSheetFragmentArgs by navArgs()
+  private lateinit var roomDetails: RoomDetails
+  private lateinit var currentUserPeerId: String
+
+  private val messages = ArrayList<ChatMessageCollection>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -40,8 +42,11 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   ): View {
     binding = FragmentBottomSheetChatBinding.inflate(inflater, container, false)
     roomDetails = args.roomDetail
+    currentUserPeerId = args.currentUserPeerId
 
     initRecyclerView()
+    initButtons()
+    initToolbar()
     initTextFields()
 
     return binding.root
@@ -50,7 +55,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   private fun initRecyclerView() {
     binding.recyclerView.apply {
       layoutManager = LinearLayoutManager(requireContext())
-      adapter = ChatAdapter(requireContext(), messages)
+      adapter = ChatAdapter(messages)
       scrollToPosition(messages.size - 1)
     }
   }
@@ -66,17 +71,12 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     }
   }
 
-  private fun initTextFields() {
-    binding.editTextMessage.apply {
-      addTextChangedListener { text ->
-        binding.fabSendMessage.isEnabled = text.toString().isNotEmpty()
-      }
-    }
-
-    binding.fabSendMessage.apply {
+  private fun initButtons() {
+    binding.buttonSendMessage.apply {
       isEnabled = false // Disabled by default
       setOnClickListener {
         val message = ChatMessage(
+          currentUserPeerId,
           roomDetails.username,
           Date(),
           binding.editTextMessage.text.toString(),
@@ -84,6 +84,19 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
         )
         chatViewModel.broadcast(message)
         binding.editTextMessage.setText("")
+      }
+    }
+  }
+
+
+  private fun initToolbar() {
+    binding.toolbar.setNavigationOnClickListener { dismiss() }
+  }
+
+  private fun initTextFields() {
+    binding.editTextMessage.apply {
+      addTextChangedListener { text ->
+        binding.buttonSendMessage.isEnabled = text.toString().isNotEmpty()
       }
     }
   }

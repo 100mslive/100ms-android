@@ -73,5 +73,6 @@
 
     <string name="joining_as_john_doe">Joining as John Doe</string>
     <string name="home_progress_bar_description">Video and microphone will be turned off by default. You can change the defaults in the app settings.</string>
+    <string name="close_chat">Close Chat</string>
 
 </resources>
