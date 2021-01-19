@@ -7,12 +7,12 @@ import live.hms.android100ms.util.viewLifecycle
 
 class MeetingActivity : AppCompatActivity() {
 
-    private val binding by viewLifecycle(ActivityMeetingBinding::inflate)
+  private val binding by viewLifecycle(ActivityMeetingBinding::inflate)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-    }
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(binding.root)
+    setSupportActionBar(binding.toolbar)
+    supportActionBar?.setDisplayShowTitleEnabled(false)
+  }
 }

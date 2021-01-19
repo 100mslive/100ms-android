@@ -17,74 +17,74 @@ import kotlin.collections.ArrayList
 
 class ChatBottomSheetFragment : BottomSheetDialogFragment() {
 
-    companion object {
-        private const val TAG = "ChatFragment"
+  companion object {
+    private const val TAG = "ChatFragment"
+  }
+
+  private var binding by viewLifecycle<FragmentBottomSheetChatBinding>()
+  private val args: ChatBottomSheetFragmentArgs by navArgs()
+
+  private val chatViewModel: ChatViewModel by activityViewModels()
+  private lateinit var roomDetails: RoomDetails
+
+  private val messages = ArrayList<ChatMessage>()
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    initViewModels()
+  }
+
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    binding = FragmentBottomSheetChatBinding.inflate(inflater, container, false)
+    roomDetails = args.roomDetail
+
+    initRecyclerView()
+    initTextFields()
+
+    return binding.root
+  }
+
+  private fun initRecyclerView() {
+    binding.recyclerView.apply {
+      layoutManager = LinearLayoutManager(requireContext())
+      adapter = ChatAdapter(requireContext(), messages)
+      scrollToPosition(messages.size - 1)
+    }
+  }
+
+  private fun initViewModels() {
+    chatViewModel.getMessages().observe(viewLifecycleOwner) {
+      messages.clear()
+      messages.addAll(it)
+      binding.recyclerView.apply {
+        adapter?.notifyDataSetChanged()
+        scrollToPosition(messages.size - 1)
+      }
+    }
+  }
+
+  private fun initTextFields() {
+    binding.editTextMessage.apply {
+      addTextChangedListener { text ->
+        binding.fabSendMessage.isEnabled = text.toString().isNotEmpty()
+      }
     }
 
-    private var binding by viewLifecycle<FragmentBottomSheetChatBinding>()
-    private val args: ChatBottomSheetFragmentArgs by navArgs()
-
-    private val chatViewModel: ChatViewModel by activityViewModels()
-    private lateinit var roomDetails: RoomDetails
-
-    private val messages = ArrayList<ChatMessage>()
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initViewModels()
+    binding.fabSendMessage.apply {
+      isEnabled = false // Disabled by default
+      setOnClickListener {
+        val message = ChatMessage(
+          roomDetails.username,
+          Date(),
+          binding.editTextMessage.text.toString(),
+          true
+        )
+        chatViewModel.broadcast(message)
+        binding.editTextMessage.setText("")
+      }
     }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentBottomSheetChatBinding.inflate(inflater, container, false)
-        roomDetails = args.roomDetail
-
-        initRecyclerView()
-        initTextFields()
-
-        return binding.root
-    }
-
-    private fun initRecyclerView() {
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = ChatAdapter(requireContext(), messages)
-            scrollToPosition(messages.size - 1)
-        }
-    }
-
-    private fun initViewModels() {
-        chatViewModel.getMessages().observe(viewLifecycleOwner) {
-            messages.clear()
-            messages.addAll(it)
-            binding.recyclerView.apply {
-                adapter?.notifyDataSetChanged()
-                scrollToPosition(messages.size - 1)
-            }
-        }
-    }
-
-    private fun initTextFields() {
-        binding.editTextMessage.apply {
-            addTextChangedListener { text ->
-                binding.fabSendMessage.isEnabled = text.toString().isNotEmpty()
-            }
-        }
-
-        binding.fabSendMessage.apply {
-            isEnabled = false // Disabled by default
-            setOnClickListener {
-                val message = ChatMessage(
-                    roomDetails.username,
-                    Date(),
-                    binding.editTextMessage.text.toString(),
-                    true
-                )
-                chatViewModel.broadcast(message)
-                binding.editTextMessage.setText("")
-            }
-        }
-    }
+  }
 }

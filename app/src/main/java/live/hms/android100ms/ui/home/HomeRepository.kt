@@ -9,11 +9,11 @@ import retrofit2.Response
 
 class HomeRepository {
 
-    suspend fun fetchAuthToken(request: TokenRequest): Response<TokenResponse> {
-        return TokenApiService.fetchAuthToken(request)
-    }
+  suspend fun fetchAuthToken(request: TokenRequest): Response<TokenResponse> {
+    return TokenApiService.fetchAuthToken(request)
+  }
 
-    suspend fun createRoom(request: CreateRoomRequest): Response<CreateRoomResponse> {
-        return TokenApiService.createRoom(request)
-    }
+  suspend fun createRoom(request: CreateRoomRequest): Response<CreateRoomResponse> {
+    return TokenApiService.createRoom(request)
+  }
 }

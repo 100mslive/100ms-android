@@ -10,8 +10,16 @@ data class MeetingTrack(
     val audioTrack: AudioTrack?,
     val isCurrentDeviceStream: Boolean = false
 ) {
-    override fun toString(): String {
-        val peerStr = "HMSPeer(peerId=${peer.peerId}, username=${peer.userName})"
-        return "MeetingTrack(${peerStr}, ${videoTrack}, ${audioTrack}, isCurrentDeviceStream=${isCurrentDeviceStream}"
+  override fun equals(other: Any?): Boolean {
+    if (other is MeetingTrack) {
+      return other.peer.customerUserId == peer.customerUserId
     }
+
+    return super.equals(other)
+  }
+
+  override fun toString(): String {
+    val peerStr = "HMSPeer(peerId=${peer.peerId}, username=${peer.userName})"
+    return "MeetingTrack(${peerStr}, ${videoTrack}, ${audioTrack}, isCurrentDeviceStream=${isCurrentDeviceStream}"
+  }
 }

@@ -11,52 +11,52 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ChatAdapter(
-    private val context: Context,
-    private val messages: ArrayList<ChatMessage>
+  private val context: Context,
+  private val messages: ArrayList<ChatMessage>
 ) : RecyclerView.Adapter<ChatAdapter.ChatMessageViewHolder>() {
 
-    private val simpleDateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+  private val simpleDateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-    inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+  inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(message: ChatMessage) {
-            binding.name.text = message.senderName
-            binding.message.text = message.message
-            binding.timestamp.text = simpleDateFormat.format(message.time)
+    fun bind(message: ChatMessage) {
+      binding.name.text = message.senderName
+      binding.message.text = message.message
+      binding.timestamp.text = simpleDateFormat.format(message.time)
 
-            val messageTextColor = if (message.isSentByMe)
-                R.color.secondaryTextColor
-            else
-                android.R.color.black
+      val messageTextColor = if (message.isSentByMe)
+        R.color.secondaryTextColor
+      else
+        android.R.color.black
 
-            val cardBackgroundColor = if (message.isSentByMe)
-                R.color.secondaryColor
-            else
-                android.R.color.white
+      val cardBackgroundColor = if (message.isSentByMe)
+        R.color.secondaryColor
+      else
+        android.R.color.white
 
-            binding.message.setTextColor(ContextCompat.getColor(context, messageTextColor))
-            binding.cardMessage.setCardBackgroundColor(
-                ContextCompat.getColor(
-                    context,
-                    cardBackgroundColor
-                )
-            )
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {
-        val binding = ListItemChatBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
+      binding.message.setTextColor(ContextCompat.getColor(context, messageTextColor))
+      binding.cardMessage.setCardBackgroundColor(
+        ContextCompat.getColor(
+          context,
+          cardBackgroundColor
         )
-        return ChatMessageViewHolder(binding)
+      )
     }
+  }
 
-    override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
-        holder.bind(messages[position])
-    }
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {
+    val binding = ListItemChatBinding.inflate(
+      LayoutInflater.from(parent.context),
+      parent,
+      false
+    )
+    return ChatMessageViewHolder(binding)
+  }
 
-    override fun getItemCount() = messages.size
+  override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
+    holder.bind(messages[position])
+  }
+
+  override fun getItemCount() = messages.size
 }
