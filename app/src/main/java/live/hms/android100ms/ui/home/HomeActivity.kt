@@ -19,4 +19,9 @@ class HomeActivity : AppCompatActivity() {
 
     // TODO: Enable turn screen on / FLAG_SHOW_WHEN_LOCKED
   }
+
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    menuInflater.inflate(R.menu.menu_home, menu)
+    return true
+  }
 }

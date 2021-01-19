@@ -1,4 +1,4 @@
-package live.hms.android100ms.util
+package live.hms.android100ms.ui.home.settings
 
 import android.content.Context
 import androidx.core.content.edit

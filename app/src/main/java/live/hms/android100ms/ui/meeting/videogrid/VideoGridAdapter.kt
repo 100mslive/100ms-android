@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import live.hms.android100ms.ui.meeting.MeetingTrack
-import live.hms.android100ms.util.SettingsStore
+import live.hms.android100ms.ui.home.settings.SettingsStore
 import kotlin.math.min
 
 class VideoGridAdapter(

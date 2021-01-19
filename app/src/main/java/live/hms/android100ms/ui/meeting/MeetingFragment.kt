@@ -32,8 +32,8 @@ import live.hms.android100ms.ui.home.HomeActivity
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
+import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.util.ROOM_DETAILS
-import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
 import org.appspot.apprtc.AppRTCAudioManager
 import org.webrtc.AudioTrack
@@ -116,6 +116,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
         }
         val shareIntent = Intent.createChooser(sendIntent, null)
         startActivity(shareIntent)
+      }
+      R.id.action_record_meeting -> {
+        Toast.makeText(requireContext(), "Recording Not Supported", Toast.LENGTH_SHORT).show()
+      }
+      R.id.action_share_screen -> {
+        Toast.makeText(requireContext(), "Screen Share Not Supported", Toast.LENGTH_SHORT).show()
       }
     }
     return false
@@ -476,6 +482,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     isPublished = false
 
     // TODO: Clean up of views
+    // TODO: Handle no internet available / lost internet / network change
 
     localMediaStream = null
     localAudioTrack = null

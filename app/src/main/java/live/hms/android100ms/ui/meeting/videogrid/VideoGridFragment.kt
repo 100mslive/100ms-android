@@ -88,6 +88,8 @@ class VideoGridFragment(
     }
 
     Log.v(TAG, "Initialized GridLayout with ${initialVideos.size} views")
+
+    updateGridLayoutDimensions()
   }
 
   fun updateVideos(newVideos: List<MeetingTrack>) {

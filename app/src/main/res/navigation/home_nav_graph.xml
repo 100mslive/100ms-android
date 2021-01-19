@@ -10,7 +10,18 @@
         android:id="@+id/HomeFragment"
         android:name="live.hms.android100ms.ui.home.HomeFragment"
         android:label="@string/home_fragment"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
 
+        <action
+            android:id="@+id/action_HomeFragment_to_SettingsFragment"
+            app:destination="@id/SettingsFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/SettingsFragment"
+        android:name="live.hms.android100ms.ui.home.settings.SettingsFragment"
+        android:label="@string/settings_fragment"
+        tools:layout="@layout/fragment_settings" />
 
 </navigation>

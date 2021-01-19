@@ -4,12 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import live.hms.android100ms.R
 import live.hms.android100ms.api.Status
 import live.hms.android100ms.databinding.FragmentHomeBinding
@@ -18,8 +20,8 @@ import live.hms.android100ms.model.RecordingInfo
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
 import live.hms.android100ms.ui.meeting.MeetingActivity
+import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.util.ROOM_DETAILS
-import live.hms.android100ms.util.SettingsStore
 import live.hms.android100ms.util.viewLifecycle
 
 class HomeFragment : Fragment() {
@@ -32,16 +34,32 @@ class HomeFragment : Fragment() {
   private lateinit var homeViewModel: HomeViewModel
   private lateinit var settings: SettingsStore
 
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    when (item.itemId) {
+      R.id.action_settings -> {
+        findNavController().navigate(
+          HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
+        )
+      }
+    }
+    return false
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentHomeBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
+
+    setHasOptionsMenu(true)
+
     initViewModel()
     initSwitches()
     initEditTextViews()
     initConnectButton()
+
     return binding.root
   }
 
