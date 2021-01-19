@@ -10,7 +10,7 @@
     <string name="room_id">Room Id</string>
     <string name="room_name">Room Name</string>
     <string name="username">Username</string>
-    <string name="join_room">Join Room</string>
+    <string name="join_now">Join Now</string>
     <string name="create_room">Create Room</string>
     <string name="end_call">End Call</string>
 
@@ -62,5 +62,16 @@
     <string name="permission_description">Access to camera and microphone is needed to make sure other participants can see and hear you during a call</string>
     <string name="grant_permissions">Grant Permissions</string>
     <string name="do_it_later">Do it later</string>
+
+    <string name="join_a_meeting">Join a meeting</string>
+    <string name="start_a_meeting">Start a meeting</string>
+    <string name="get_started">Get Started</string>
+    <string name="meeting_url_hint">Enter meeting ID or paste joining link</string>
+    <string name="meeting_name">Meeting Name</string>
+    <string name="enter_name">Enter Name</string>
+    <string name="use_as_default">Use as default</string>
+
+    <string name="joining_as_john_doe">Joining as John Doe</string>
+    <string name="home_progress_bar_description">Video and microphone will be turned off by default. You can change the defaults in the app settings.</string>
 
 </resources>

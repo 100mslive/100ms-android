@@ -16,7 +16,7 @@ class SettingsStore(context: Context) {
     const val USERNAME = "username"
 
     const val LAST_USED_ROOM_ID = "last-used-room-id"
-    const val LAST_USED_ENV = "last-used-env"
+    const val ENVIRONMENT = "last-used-env"
 
     const val VIDEO_GRID_ROWS = "video-grid-rows"
     const val VIDEO_GRID_COLUMNS = "video-grid-columns"
@@ -81,9 +81,9 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getString(LAST_USED_ROOM_ID, "")!!
     set(value) = putString(LAST_USED_ROOM_ID, value)
 
-  public var lastUsedEnv: String
-    get() = sharedPreferences.getString(LAST_USED_ENV, "")!!
-    set(value) = putString(LAST_USED_ENV, value)
+  public var environment: String
+    get() = sharedPreferences.getString(ENVIRONMENT, "prod-in")!!
+    set(value) = putString(ENVIRONMENT, value)
 
 
   public var videoGridRows: Int
@@ -140,8 +140,8 @@ class SettingsStore(context: Context) {
       return this
     }
 
-    public fun setLastUsedEnv(value: String): MultiCommitHelper {
-      editor.putString(LAST_USED_ENV, value)
+    public fun setEnvironment(value: String): MultiCommitHelper {
+      editor.putString(ENVIRONMENT, value)
       return this
     }
 

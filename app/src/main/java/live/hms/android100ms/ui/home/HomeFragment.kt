@@ -1,12 +1,15 @@
 package live.hms.android100ms.ui.home
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -19,8 +22,8 @@ import live.hms.android100ms.model.CreateRoomRequest
 import live.hms.android100ms.model.RecordingInfo
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
-import live.hms.android100ms.ui.meeting.MeetingActivity
 import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.meeting.MeetingActivity
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
 
@@ -56,7 +59,6 @@ class HomeFragment : Fragment() {
     setHasOptionsMenu(true)
 
     initViewModel()
-    initSwitches()
     initEditTextViews()
     initConnectButton()
 
@@ -68,69 +70,89 @@ class HomeFragment : Fragment() {
     observeLiveData()
   }
 
-  private fun initSwitches() {
-    binding.switchIsJoin.setOnCheckedChangeListener { _, isJoin ->
-      val buttonText = if (isJoin) R.string.join_room else R.string.create_room
-      val roomEditTextText = if (isJoin) R.string.room_id else R.string.room_name
+  @SuppressLint("SetTextI18n")
+  private fun updateProgressBarUI(isRoomCreator: Boolean) {
+    val headingPrefix = if (isRoomCreator) "Creating room for" else "Joining as"
+    binding.progressBarHeading.text = "$headingPrefix ${settings.username}..."
 
-      binding.containerRoom.hint = resources.getString(roomEditTextText)
-      binding.buttonRoom.setText(buttonText)
-      binding.editTextRoom.text = null
-      binding.switchRecord.apply {
-        if (!isJoin) isChecked = false
-
-        isEnabled = !isJoin
-        visibility = if (isJoin) View.GONE else View.VISIBLE
-      }
+    val descriptionDefaults = if (settings.publishVideo && settings.publishAudio) {
+      "Video and microphone will be turned on by default.\n"
+    } else if (settings.publishVideo && !settings.publishVideo) {
+      "Only audio will be turned on by default\n"
+    } else if (!settings.publishVideo && settings.publishVideo) {
+      "Only video will be turned on by default\n"
+    } else {
+      "Video and microphone will be turned off by default.\n"
     }
+
+    val descriptionSetting = "You can change the defaults in the app settings."
+
+    binding.progressBarDescription.text = descriptionDefaults + descriptionSetting
   }
 
   private fun showProgressBar() {
-    binding.buttonRoom.visibility = View.GONE
-    binding.progressBar.visibility = View.VISIBLE
+    binding.buttonStartMeeting.visibility = View.GONE
+    binding.buttonJoinMeeting.visibility = View.GONE
 
-    binding.switchIsJoin.apply {
-      visibility = View.GONE
-      isEnabled = false
-    }
+    binding.containerCardStartMeeting.visibility = View.GONE
+    binding.containerCardJoin.visibility = View.GONE
+    binding.containerCardName.visibility = View.GONE
+    binding.containerCardProgressBar.visibility = View.VISIBLE
 
-    binding.containerRoom.isEnabled = false
-    binding.containerUsername.isEnabled = false
-    binding.containerEnv.isEnabled = false
+    binding.containerRoomName.isEnabled = false
+    binding.containerMeetingUrl.isEnabled = false
+    binding.containerRoomName.isEnabled = false
+    binding.switchRecord.isEnabled = false
   }
 
   private fun hideProgressBar() {
-    binding.buttonRoom.visibility = View.VISIBLE
-    binding.progressBar.visibility = View.GONE
+    binding.buttonStartMeeting.visibility = View.VISIBLE
+    binding.buttonJoinMeeting.visibility = View.VISIBLE
 
-    binding.switchRecord.apply {
-      // If in join room mode, disable switch record toggle
-      isEnabled = !binding.switchIsJoin.isEnabled
+    binding.containerCardStartMeeting.visibility = View.VISIBLE
+    binding.containerCardJoin.visibility = View.VISIBLE
+    binding.containerCardName.visibility = View.VISIBLE
+    binding.containerCardProgressBar.visibility = View.GONE
+
+    binding.containerRoomName.isEnabled = true
+    binding.containerMeetingUrl.isEnabled = true
+    binding.containerRoomName.isEnabled = true
+    binding.switchRecord.isEnabled = true
+  }
+
+  private fun tryJoiningRoomAs(role: String) {
+    val username = binding.editTextName.text.toString()
+    // Update the name in local store if required
+    if (binding.checkboxUseDefault.isChecked) {
+      settings.username = username
     }
 
-    binding.switchIsJoin.apply {
-      visibility = View.GONE
-      isEnabled = true
-    }
-
-    binding.containerRoom.isEnabled = true
-    binding.containerUsername.isEnabled = true
-    binding.containerEnv.isEnabled = true
+    homeViewModel.sendAuthTokenRequest(
+      TokenRequest(
+        roomId = settings.lastUsedRoomId,
+        username = username,
+        role = role,
+        environment = settings.environment
+      )
+    )
   }
 
   private fun observeLiveData() {
     homeViewModel.authTokenResponse.observe(viewLifecycleOwner) { response ->
       when (response.status) {
         Status.LOADING -> {
+          updateProgressBarUI(false)
           showProgressBar()
         }
         Status.SUCCESS -> {
-          hideProgressBar()
+          // No need to hide progress bar here, as we directly move to
+          // the next page
+
           val data = response.data!!
           val roomDetails = RoomDetails(
-            env = binding.editTextEnv.text.toString(),
-            roomId = binding.editTextRoom.text.toString(),
-            username = binding.editTextUsername.text.toString(),
+            env = settings.environment,
+            roomId = settings.lastUsedRoomId,
+            username = settings.username,
             authToken = data.token
           )
           Log.v(TAG, "Auth Token: ${roomDetails.authToken}")
@@ -156,6 +178,7 @@ class HomeFragment : Fragment() {
     homeViewModel.createRoomResponse.observe(viewLifecycleOwner) { response ->
       when (response.status) {
         Status.LOADING -> {
+          updateProgressBarUI(true)
           showProgressBar()
         }
         Status.SUCCESS -> {
@@ -165,15 +188,7 @@ class HomeFragment : Fragment() {
             "Created room ${data.roomId} \uD83E\uDD73",
             Toast.LENGTH_SHORT
           ).show()
-
-          homeViewModel.sendAuthTokenRequest(
-            TokenRequest(
-              roomId = data.roomId,
-              username = binding.editTextUsername.text.toString(),
-              role = "Host",
-              environment = binding.editTextEnv.text.toString()
-            )
-          )
+          tryJoiningRoomAs("Host")
         }
 
         Status.ERROR -> {
@@ -190,28 +205,37 @@ class HomeFragment : Fragment() {
 
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
-    binding.editTextUsername.setText(settings.username)
-    binding.editTextEnv.setText(settings.lastUsedEnv)
-    binding.editTextRoom.setText(settings.lastUsedRoomId)
+    binding.editTextName.setText(settings.username)
+
+    // TODO: Set text as a meeting URL obtained by parsing the TOKEN_ENDPOINT
+    // TODO: Will the meeting link always point to 100ms.live base url?
 
 
     val data = requireActivity().intent.data
-    if (data != null) {
-      Log.v(TAG, "Received Meeting URI via Intent: $data")
-      val roomId = data.getQueryParameter("room")
-      val host = data.host!!
-      val environment = host.split('.')[0]
-      Log.v(TAG, "Incoming: room-id:$roomId, host:$host")
 
-      binding.editTextEnv.setText(environment)
-      binding.editTextRoom.setText(roomId)
-      binding.switchIsJoin.isChecked = true
+    val url = when {
+      data != null -> {
+        Log.v(TAG, "Received Meeting URI via Intent: $data")
+        data.toString()
+      }
+
+      settings.lastUsedRoomId.isNotEmpty() -> {
+        "https://${settings.environment}.100ms.live/?" +
+            arrayOf(
+              "room=${settings.lastUsedRoomId}",
+              "env=${settings.environment}",
+              "role=Guest"
+            ).joinToString("&")
+      }
+      else -> ""
     }
 
+    binding.editTextMeetingUrl.setText(url)
+
     mapOf(
-      binding.editTextEnv to binding.containerEnv,
-      binding.editTextRoom to binding.containerRoom,
-      binding.editTextUsername to binding.containerUsername
+      binding.editTextName to binding.containerName,
+      binding.editTextMeetingUrl to binding.containerMeetingUrl,
+      binding.editTextRoomName to binding.containerRoomName
     ).forEach {
       it.key.addTextChangedListener { text ->
         if (text.toString().isNotEmpty()) it.value.error = null
@@ -219,47 +243,67 @@ class HomeFragment : Fragment() {
     }
   }
 
+  private fun isValidUserName(): Boolean {
+    val username = binding.editTextName.text.toString()
+    if (username.isEmpty()) {
+      binding.containerName.error = "Username cannot be empty"
+      return false
+    }
+    return true
+  }
+
   private fun initConnectButton() {
-    binding.buttonRoom.setOnClickListener {
-      var allOk = true
-      val isJoin = binding.switchIsJoin.isChecked
+    binding.buttonJoinMeeting.setOnClickListener {
+      var allOk = isValidUserName()
+
+      val meetingUrl = binding.editTextMeetingUrl.text.toString()
+      val validUrl = URLUtil.isValidUrl(meetingUrl)
+      if (meetingUrl.isEmpty()) {
+        allOk = false
+        binding.containerMeetingUrl.error = "Meeting URL cannot be empty"
+      } else if (meetingUrl.contains(" ") && !validUrl) {
+        allOk = false
+        binding.containerMeetingUrl.error = "Meeting URL or Meeting ID is invalid"
+      } else if (validUrl) {
+        // Save both environment and room-id
+        try {
+          val uri = Uri.parse(meetingUrl)
+          val roomId = uri.getQueryParameter("room")!!
+          val host = uri.host!!
+          val environment = host.split('.')[0]
+
+          settings.lastUsedRoomId = roomId
+          settings.environment = environment
+        } catch (e: Exception) {
+          allOk = false
+          binding.containerMeetingUrl.error = "Meeting URL missing room query param"
+        }
+      } else {
+        // No spaces, and not a url -- could only be a room-id
+        settings.lastUsedRoomId = meetingUrl
+      }
+
+      if (allOk) tryJoiningRoomAs("Guest")
+    }
+
+    binding.buttonStartMeeting.setOnClickListener {
+      var allOk = isValidUserName()
       val enableRecording = binding.switchRecord.isChecked
 
-      val env = binding.editTextEnv.text.toString()
-      if (env.isEmpty()) {
+      val roomName = binding.editTextRoomName.text.toString()
+      if (roomName.isEmpty()) {
         allOk = false
-        binding.containerEnv.error = "Env cannot be empty"
-      }
-
-      val room = binding.editTextRoom.text.toString()
-      if (room.isEmpty()) {
-        allOk = false
-        binding.containerRoom.error = "Room Name cannot be empty"
-      }
-
-      val username = binding.editTextUsername.text.toString()
-      if (username.isEmpty()) {
-        allOk = false
-        binding.containerUsername.error = "Username cannot be empty"
+        binding.containerRoomName.error = "Room Name cannot be empty"
       }
 
       if (allOk) {
-        // Save this username, env
-        settings.username = username
-        settings.lastUsedEnv = env
-
-        if (isJoin) {
-          homeViewModel.sendAuthTokenRequest(TokenRequest(room, username, "Guest", env))
-          settings.lastUsedRoomId = room
-        } else {
-          homeViewModel.sendCreateRoomRequest(
-            CreateRoomRequest(
-              room,
-              env,
-              RecordingInfo(enableRecording)
-            )
+        homeViewModel.sendCreateRoomRequest(
+          CreateRoomRequest(
+            roomName,
+            settings.environment,
+            RecordingInfo(enableRecording)
           )
-        }
+        )
       }
     }
   }
