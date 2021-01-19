@@ -10,5 +10,5 @@
 
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#ffffff</color>
-    <color name="secondaryFadedTextColor">#30ffffff</color>
+    <color name="secondaryFadedTextColor">#40ffffff</color>
 </resources>

@@ -23,6 +23,7 @@ import com.brytecam.lib.webrtc.HMSRTCMediaStream
 import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
 import com.brytecam.lib.webrtc.HMSStream
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
@@ -106,8 +107,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   override fun onCreateView(
-      inflater: LayoutInflater, container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
 
@@ -124,21 +125,21 @@ class MeetingFragment : Fragment(), HMSEventListener {
     chatViewModel.setSendBroadcastCallback { message ->
       Log.v(TAG, "Sending broadcast: $message via $hmsClient")
       hmsClient?.broadcast(message.message, hmsRoom, object : HMSRequestHandler {
-          override fun onSuccess(s: String?) {
-              Log.v(TAG, "Successfully broadcast message=${message.message} (s=$s)")
-          }
+        override fun onSuccess(s: String?) {
+          Log.v(TAG, "Successfully broadcast message=${message.message} (s=$s)")
+        }
 
-          override fun onFailure(errorCode: Long, errorMessage: String) {
-              Toast.makeText(
-                  requireContext(),
-                  "Cannot send '${message}'. Please try again",
-                  Toast.LENGTH_SHORT
-              ).show()
-              Log.v(
-                  TAG,
-                  "Cannot broadcast message=${message} code=${errorCode} errorMessage=${errorMessage}"
-              )
-          }
+        override fun onFailure(errorCode: Long, errorMessage: String) {
+          Toast.makeText(
+            requireContext(),
+            "Cannot send '${message}'. Please try again",
+            Toast.LENGTH_SHORT
+          ).show()
+          Log.v(
+            TAG,
+            "Cannot broadcast message=${message} code=${errorCode} errorMessage=${errorMessage}"
+          )
+        }
       })
     }
   }
@@ -149,17 +150,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     manager.start { selectedAudioDevice, availableAudioDevices ->
       Log.d(
-          TAG,
-          "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
+        TAG,
+        "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
       )
     }
   }
 
 
   override fun onRequestPermissionsResult(
-      requestCode: Int,
-      permissions: Array<out String>,
-      grantResults: IntArray
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
   ) {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
@@ -172,10 +173,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
       initHMSClient()
     } else {
       EasyPermissions.requestPermissions(
-          this,
-          "Need User permissions to proceed",
-          RC_CALL,
-          *perms
+        this,
+        "Need User permissions to proceed",
+        RC_CALL,
+        *perms
       )
     }
   }
@@ -188,20 +189,25 @@ class MeetingFragment : Fragment(), HMSEventListener {
         Log.v(TAG, "onVideoItemClick: $video")
 
         Snackbar.make(
-            binding.root,
-            "Name: ${video.peer.userName} (${video.peer.role}) \nId: ${video.peer.customerUserId}",
-            Snackbar.LENGTH_LONG,
+          binding.root,
+          "Name: ${video.peer.userName} (${video.peer.role}) \nId: ${video.peer.customerUserId}",
+          Snackbar.LENGTH_LONG,
         ).setAction("Copy") {
           val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
           clipboard.setPrimaryClip(clip)
           Toast.makeText(
-              requireContext(),
-              "Copied customer id of ${video.peer.userName} to clipboard",
-              Toast.LENGTH_SHORT
+            requireContext(),
+            "Copied customer id of ${video.peer.userName} to clipboard",
+            Toast.LENGTH_SHORT
           ).show()
         }.show()
       }
+
+      TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
+        // No text to be shown
+      }.attach()
     }
+
   }
 
   private fun updateVideoGridUI() {
@@ -210,9 +216,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun getUserMedia(
-      frontCamEnabled: Boolean,
-      audioEnabled: Boolean,
-      cameraToggle: Boolean
+    frontCamEnabled: Boolean,
+    audioEnabled: Boolean,
+    cameraToggle: Boolean
   ) {
     localMediaConstraints = HMSRTCMediaStreamConstraints(true, settingsStore.publishVideo)
     localMediaConstraints?.apply {
@@ -229,62 +235,62 @@ class MeetingFragment : Fragment(), HMSEventListener {
       }
 
       hmsClient?.getUserMedia(
-          requireContext(),
-          localMediaConstraints,
-          object : HMSClient.GetUserMediaListener {
-              override fun onSuccess(mediaStream: HMSRTCMediaStream?) {
-                  Log.v(TAG, "GetUserMedia Success")
-                  localMediaStream = mediaStream
+        requireContext(),
+        localMediaConstraints,
+        object : HMSClient.GetUserMediaListener {
+          override fun onSuccess(mediaStream: HMSRTCMediaStream?) {
+            Log.v(TAG, "GetUserMedia Success")
+            localMediaStream = mediaStream
 
-                  var videoTrack: VideoTrack? = null
-                  var audioTrack: AudioTrack? = null
+            var videoTrack: VideoTrack? = null
+            var audioTrack: AudioTrack? = null
 
-                  mediaStream?.stream?.apply {
-                      if (videoTracks.isNotEmpty()) {
-                          videoTrack = videoTracks[0]
-                          videoTrack?.setEnabled(settingsStore.publishVideo)
-                      }
-                      if (audioTracks.isNotEmpty()) {
-                          audioTrack = audioTracks[0]
-                          audioTrack?.setEnabled(settingsStore.publishAudio)
-                      }
-
-                      currentDeviceTrack = MeetingTrack(
-                          hmsPeer!!,
-                          videoTrack,
-                          audioTrack,
-                          true
-                      )
-
-                      requireActivity().runOnUiThread {
-                          Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
-                          videoGridItems.add(0, currentDeviceTrack!!)
-                          updateVideoGridUI()
-                      }
-                  }
-
-                  if (!isPublished) {
-                      hmsClient?.publish(
-                          localMediaStream,
-                          hmsRoom,
-                          localMediaConstraints,
-                          object : HMSStreamRequestHandler {
-                              override fun onSuccess(data: HMSPublishStream?) {
-                                  Log.v(TAG, "Publish Success ${data!!.mid}")
-                                  isPublished = true
-                              }
-
-                              override fun onFailure(errorCode: Long, errorReason: String?) {
-                                  Log.v(TAG, "Publish Failure $errorCode $errorReason")
-                              }
-                          })
-                  }
+            mediaStream?.stream?.apply {
+              if (videoTracks.isNotEmpty()) {
+                videoTrack = videoTracks[0]
+                videoTrack?.setEnabled(settingsStore.publishVideo)
+              }
+              if (audioTracks.isNotEmpty()) {
+                audioTrack = audioTracks[0]
+                audioTrack?.setEnabled(settingsStore.publishAudio)
               }
 
-              override fun onFailure(errorCode: Long, errorReason: String?) {
-                  Log.v(TAG, "GetUserMedia failed: $errorCode $errorReason")
+              currentDeviceTrack = MeetingTrack(
+                hmsPeer!!,
+                videoTrack,
+                audioTrack,
+                true
+              )
+
+              requireActivity().runOnUiThread {
+                Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
+                videoGridItems.add(0, currentDeviceTrack!!)
+                updateVideoGridUI()
               }
-          })
+            }
+
+            if (!isPublished) {
+              hmsClient?.publish(
+                localMediaStream,
+                hmsRoom,
+                localMediaConstraints,
+                object : HMSStreamRequestHandler {
+                  override fun onSuccess(data: HMSPublishStream?) {
+                    Log.v(TAG, "Publish Success ${data!!.mid}")
+                    isPublished = true
+                  }
+
+                  override fun onFailure(errorCode: Long, errorReason: String?) {
+                    Log.v(TAG, "Publish Failure $errorCode $errorReason")
+                  }
+                })
+            }
+          }
+
+          override fun onFailure(errorCode: Long, errorReason: String?) {
+            Log.v(TAG, "GetUserMedia failed: $errorCode $errorReason")
+          }
+        })
     }
   }
 
@@ -304,19 +310,19 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private fun updateButtonsUI() {
     binding.buttonToggleAudio.apply {
       setImageResource(
-          if (isAudioEnabled)
-              R.drawable.ic_baseline_music_note_24
-          else
-              R.drawable.ic_baseline_music_off_24
+        if (isAudioEnabled)
+          R.drawable.ic_baseline_music_note_24
+        else
+          R.drawable.ic_baseline_music_off_24
       )
     }
 
     binding.buttonToggleVideo.apply {
       setImageResource(
-          if (isVideoEnabled)
-              R.drawable.ic_baseline_videocam_24
-          else
-              R.drawable.ic_baseline_videocam_off_24
+        if (isVideoEnabled)
+          R.drawable.ic_baseline_videocam_24
+        else
+          R.drawable.ic_baseline_videocam_off_24
       )
     }
   }
@@ -351,7 +357,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     binding.buttonOpenChat.setOnClickListener {
       findNavController().navigate(
-          MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(roomDetails)
+        MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(roomDetails)
       )
     }
 
@@ -383,13 +389,13 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     try {
       hmsClient?.leave(object : HMSRequestHandler {
-          override fun onSuccess(s: String?) {
-              Log.v(TAG, "On Leave Success")
-          }
+        override fun onSuccess(s: String?) {
+          Log.v(TAG, "On Leave Success")
+        }
 
-          override fun onFailure(l: Long, s: String?) {
-              Log.v(TAG, "On Leave Failure")
-          }
+        override fun onFailure(l: Long, s: String?) {
+          Log.v(TAG, "On Leave Failure")
+        }
       })
       HMSStream.stopCapturers()
     } catch (e: Exception) {
@@ -415,13 +421,13 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private fun initOnBackPress() {
     requireActivity().onBackPressedDispatcher.addCallback(
-        viewLifecycleOwner,
-        object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-                disconnect()
-            }
-        })
+      viewLifecycleOwner,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
+          disconnect()
+        }
+      })
   }
 
   // HMS Event Listener events below
@@ -436,20 +442,20 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     if (!isJoined) {
       hmsClient?.join(object : HMSRequestHandler {
-          override fun onSuccess(p0: String?) {
-              isJoined = true
-              Log.v(TAG, "Join Success")
-              Thread.sleep(1000)
-              getUserMedia(
-                  isFrontCameraEnabled,
-                  settingsStore.publishAudio,
-                  isCameraToggled
-              )
-          }
+        override fun onSuccess(p0: String?) {
+          isJoined = true
+          Log.v(TAG, "Join Success")
+          Thread.sleep(1000)
+          getUserMedia(
+            isFrontCameraEnabled,
+            settingsStore.publishAudio,
+            isCameraToggled
+          )
+        }
 
-          override fun onFailure(p0: Long, p1: String?) {
-              Log.v(TAG, "Join Failure")
-          }
+        override fun onFailure(p0: Long, p1: String?) {
+          Log.v(TAG, "Join Failure")
+        }
       })
     }
   }
@@ -471,61 +477,61 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   override fun onPeerJoin(peer: HMSPeer) {
     Log.v(
-        TAG,
-        "onPeerJoin: uid=${peer.uid}, role=${peer.role}, userId=${peer.customerUserId}, peerId=${peer.peerId}"
+      TAG,
+      "onPeerJoin: uid=${peer.uid}, role=${peer.role}, userId=${peer.customerUserId}, peerId=${peer.peerId}"
     )
     Toast.makeText(
-        requireContext(),
-        "${peer.userName} - ${peer.peerId} joined",
-        Toast.LENGTH_SHORT
+      requireContext(),
+      "${peer.userName} - ${peer.peerId} joined",
+      Toast.LENGTH_SHORT
     ).show()
   }
 
   override fun onPeerLeave(peer: HMSPeer) {
     Log.v(
-        TAG,
-        "onPeerLeave: uid=${peer.uid}, role=${peer.role}, userId=${peer.customerUserId}, peerId=${peer.peerId}"
+      TAG,
+      "onPeerLeave: uid=${peer.uid}, role=${peer.role}, userId=${peer.customerUserId}, peerId=${peer.peerId}"
     )
     Toast.makeText(
-        requireContext(),
-        "${peer.userName} - ${peer.peerId} left",
-        Toast.LENGTH_SHORT
+      requireContext(),
+      "${peer.userName} - ${peer.peerId} left",
+      Toast.LENGTH_SHORT
     ).show()
   }
 
 
   override fun onStreamAdd(peer: HMSPeer, streamInfo: HMSStreamInfo) {
     Log.v(
-        TAG,
-        "onStreamAdd: peer-uid:${peer.uid}, role=${peer.role}, userId:${peer.customerUserId}"
+      TAG,
+      "onStreamAdd: peer-uid:${peer.uid}, role=${peer.role}, userId:${peer.customerUserId}"
     )
 
     // Handling all the on stream add events inside a single thread to avoid race condition during rendering
     executor.execute {
       hmsClient?.subscribe(streamInfo, hmsRoom, object : HMSMediaRequestHandler {
-          override fun onSuccess(stream: MediaStream) {
-              var videoTrack: VideoTrack? = null
-              var audioTrack: AudioTrack? = null
+        override fun onSuccess(stream: MediaStream) {
+          var videoTrack: VideoTrack? = null
+          var audioTrack: AudioTrack? = null
 
-              if (stream.videoTracks.size > 0) {
-                  videoTrack = stream.videoTracks[0]
-                  videoTrack.setEnabled(true)
-              }
-
-              if (stream.audioTracks.size > 0) {
-                  audioTrack = stream.audioTracks[0]
-                  audioTrack.setEnabled(true)
-              }
-
-              requireActivity().runOnUiThread {
-                  videoGridItems.add(MeetingTrack(peer, videoTrack, audioTrack))
-                  updateVideoGridUI()
-              }
+          if (stream.videoTracks.size > 0) {
+            videoTrack = stream.videoTracks[0]
+            videoTrack.setEnabled(true)
           }
 
-          override fun onFailure(errorCode: Long, errorReason: String) {
-              Log.v(TAG, "onStreamAdd: subscribe failure: $errorCode $errorReason")
+          if (stream.audioTracks.size > 0) {
+            audioTrack = stream.audioTracks[0]
+            audioTrack.setEnabled(true)
           }
+
+          requireActivity().runOnUiThread {
+            videoGridItems.add(MeetingTrack(peer, videoTrack, audioTrack))
+            updateVideoGridUI()
+          }
+        }
+
+        override fun onFailure(errorCode: Long, errorReason: String) {
+          Log.v(TAG, "onStreamAdd: subscribe failure: $errorCode $errorReason")
+        }
       })
     }
   }
@@ -556,17 +562,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   override fun onBroadcast(data: HMSPayloadData) {
     Log.v(
-        TAG,
-        "onBroadcast: customerId=${data.peer.customerUserId} senderName=${data.senderName} msg=${data.msg}"
+      TAG,
+      "onBroadcast: customerId=${data.peer.customerUserId} senderName=${data.senderName} msg=${data.msg}"
     )
     requireActivity().runOnUiThread {
       chatViewModel.receivedMessage(
-          ChatMessage(
-              data.peer.userName,
-              Date(),
-              data.msg,
-              false
-          )
+        ChatMessage(
+          data.peer.userName,
+          Date(),
+          data.msg,
+          false
+        )
       )
     }
   }

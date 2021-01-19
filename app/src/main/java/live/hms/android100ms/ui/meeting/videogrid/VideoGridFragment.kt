@@ -12,10 +12,15 @@ import live.hms.android100ms.databinding.GridItemVideoBinding
 import live.hms.android100ms.ui.meeting.MeetingTrack
 import live.hms.android100ms.util.viewLifecycle
 import org.webrtc.RendererCommon
+import kotlin.math.max
+import kotlin.math.min
 
 class VideoGridFragment(
-  private val videos: MutableList<MeetingTrack>,
-  private val rows: Int, private val columns: Int,
+  private val initialVideos: MutableList<MeetingTrack>,
+
+  // TODO: Add assert check for maxRows and maxColumns values
+  private val maxRows: Int, private val maxColumns: Int,
+
   private val onVideoItemClick: (video: MeetingTrack) -> Unit
 ) : Fragment() {
 
@@ -45,12 +50,36 @@ class VideoGridFragment(
     return binding.root
   }
 
-  private fun initGridLayout() {
+  private val rows: Int
+    get() = min(max(1, renderedViews.size), maxRows)
+
+  private val columns: Int
+    get() {
+      val result = max(1, (renderedViews.size + rows - 1) / rows)
+      if (result > maxColumns) {
+        val videos = renderedViews.map { it.video }
+        throw IllegalStateException(
+          "At most ${maxRows * maxColumns} videos are allowed. Provided $videos"
+        )
+      }
+
+      return result
+    }
+
+  private fun updateGridLayoutDimensions() {
     binding.container.apply {
       rowCount = rows
       columnCount = columns
+    }
 
-      for (video in videos) {
+    Log.v(TAG, "updateGridLayoutDimensions: ${rows}x${columns}")
+  }
+
+  private fun initGridLayout() {
+    updateGridLayoutDimensions()
+
+    binding.container.apply {
+      for (video in initialVideos) {
         val videoBinding = createVideoView(this)
         bindVideo(videoBinding, video)
         addView(videoBinding.root)
@@ -58,7 +87,7 @@ class VideoGridFragment(
       }
     }
 
-    Log.v(TAG, "Initialized GridLayout with ${videos.size} views")
+    Log.v(TAG, "Initialized GridLayout with ${initialVideos.size} views")
   }
 
   fun updateVideos(newVideos: List<MeetingTrack>) {
@@ -99,14 +128,14 @@ class VideoGridFragment(
       TAG,
       "updateVideos: Change grid items from ${renderedViews.size} -> ${newRenderedViews.size}"
     )
+
     renderedViews.clear()
     renderedViews.addAll(newRenderedViews)
+
+    updateGridLayoutDimensions()
   }
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
-    // TODO: Is it okay to assume the surface view is always initialized once?
-    //  and never recycled?
-
     binding.container.setOnClickListener { onVideoItemClick(item) }
 
     binding.name.text = item.peer.userName
@@ -149,11 +178,11 @@ class VideoGridFragment(
   }
 
   private fun createVideoView(parent: ViewGroup): GridItemVideoBinding {
-    // TODO: Get height based on the parent view's height and number of rows (include padding)
     return GridItemVideoBinding.inflate(
       LayoutInflater.from(context),
       parent,
       false
     )
   }
+
 }
