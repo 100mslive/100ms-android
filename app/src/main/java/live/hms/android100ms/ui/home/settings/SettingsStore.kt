@@ -24,7 +24,7 @@ class SettingsStore(context: Context) {
 
 
   private val sharedPreferences = context.getSharedPreferences(
-      SETTINGS_SHARED_PREF, Context.MODE_PRIVATE
+    SETTINGS_SHARED_PREF, Context.MODE_PRIVATE
   )
 
   private fun putString(key: String, value: String) {
@@ -64,13 +64,13 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getString(CODEC, "VP8")!!
     set(value) = putString(CODEC, value)
 
-  public var videoBitrate: String
-    get() = sharedPreferences.getString(VIDEO_BITRATE, "256")!!
-    set(value) = putString(VIDEO_BITRATE, value)
+  public var videoBitrate: Int
+    get() = sharedPreferences.getInt(VIDEO_BITRATE, 256)!!
+    set(value) = putInt(VIDEO_BITRATE, value)
 
-  public var videoFrameRate: String
-    get() = sharedPreferences.getString(VIDEO_FRAME_RATE, "256")!!
-    set(value) = putString(VIDEO_FRAME_RATE, value)
+  public var videoFrameRate: Int
+    get() = sharedPreferences.getInt(VIDEO_FRAME_RATE, 24)!!
+    set(value) = putInt(VIDEO_FRAME_RATE, value)
 
   public var username: String
     get() = sharedPreferences.getString(USERNAME, "")!!
@@ -93,5 +93,72 @@ class SettingsStore(context: Context) {
   public var videoGridColumns: Int
     get() = sharedPreferences.getInt(VIDEO_GRID_COLUMNS, 2)
     set(value) = putInt(VIDEO_GRID_COLUMNS, value)
+
+
+  inner class MultiCommitHelper {
+
+    private val editor = sharedPreferences.edit()
+
+    public fun setPublishVideo(value: Boolean): MultiCommitHelper {
+      editor.putBoolean(PUBLISH_VIDEO, value)
+      return this
+    }
+
+    public fun setPublishAudio(value: Boolean): MultiCommitHelper {
+      editor.putBoolean(PUBLISH_AUDIO, value)
+      return this
+    }
+
+    public fun setVideoResolution(value: String): MultiCommitHelper {
+      editor.putString(VIDEO_RESOLUTION, value)
+      return this
+    }
+
+    public fun setCodec(value: String): MultiCommitHelper {
+      editor.putString(CODEC, value)
+      return this
+    }
+
+    public fun setVideoBitrate(value: Int): MultiCommitHelper {
+      editor.putInt(VIDEO_BITRATE, value)
+      return this
+    }
+
+    public fun setVideoFrameRate(value: Int): MultiCommitHelper {
+      editor.putInt(VIDEO_FRAME_RATE, value)
+      return this
+    }
+
+    public fun setUsername(value: String): MultiCommitHelper {
+      editor.putString(USERNAME, value)
+      return this
+    }
+
+
+    public fun setLastUsedRoomId(value: String): MultiCommitHelper {
+      editor.putString(LAST_USED_ROOM_ID, value)
+      return this
+    }
+
+    public fun setLastUsedEnv(value: String): MultiCommitHelper {
+      editor.putString(LAST_USED_ENV, value)
+      return this
+    }
+
+    public fun setVideoGridRows(value: Int): MultiCommitHelper {
+      editor.putInt(VIDEO_GRID_ROWS, value)
+      return this
+    }
+
+    public fun setVideoGridColumns(value: Int): MultiCommitHelper {
+      editor.putInt(VIDEO_GRID_COLUMNS, value)
+      return this
+    }
+
+    public fun commit() {
+      editor.commit()
+    }
+
+  }
 
 }

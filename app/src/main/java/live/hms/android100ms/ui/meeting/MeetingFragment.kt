@@ -82,6 +82,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private lateinit var clipboard: ClipboardManager
 
+  private lateinit var audioManager: AppRTCAudioManager
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -94,6 +95,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     initAudioManager()
     initHMSClient()
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    destructAudioManager()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -165,15 +171,19 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun initAudioManager() {
-    val manager = AppRTCAudioManager.create(requireContext())
+    audioManager = AppRTCAudioManager.create(requireContext())
     Log.d(TAG, "Starting Audio manager")
 
-    manager.start { selectedAudioDevice, availableAudioDevices ->
+    audioManager.start { selectedAudioDevice, availableAudioDevices ->
       Log.d(
         TAG,
         "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
       )
     }
+  }
+
+  private fun destructAudioManager() {
+    audioManager.stop()
   }
 
   private fun initVideoGrid() {
@@ -218,9 +228,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
     localMediaConstraints = HMSRTCMediaStreamConstraints(true, settings.publishVideo)
     localMediaConstraints?.apply {
       videoCodec = settings.codec
-      videoFrameRate = settings.videoFrameRate.toInt()
+      videoFrameRate = settings.videoFrameRate
       videoResolution = settings.videoResolution
-      videoMaxBitRate = settings.videoBitrate.toInt()
+      videoMaxBitRate = settings.videoBitrate
 
       if (frontCamEnabled) {
         isFrontCameraEnabled = true
@@ -228,65 +238,66 @@ class MeetingFragment : Fragment(), HMSEventListener {
       } else {
         cameraFacing = REAR_FACING_CAMERA
       }
-
-      hmsClient?.getUserMedia(
-        requireContext(),
-        localMediaConstraints,
-        object : HMSClient.GetUserMediaListener {
-          override fun onSuccess(mediaStream: HMSRTCMediaStream?) {
-            Log.v(TAG, "GetUserMedia Success")
-            localMediaStream = mediaStream
-
-            var videoTrack: VideoTrack? = null
-            var audioTrack: AudioTrack? = null
-
-            mediaStream?.stream?.apply {
-              if (videoTracks.isNotEmpty()) {
-                videoTrack = videoTracks[0]
-                videoTrack?.setEnabled(settings.publishVideo)
-              }
-              if (audioTracks.isNotEmpty()) {
-                audioTrack = audioTracks[0]
-                audioTrack?.setEnabled(settings.publishAudio)
-              }
-
-              currentDeviceTrack = MeetingTrack(
-                hmsPeer!!,
-                videoTrack,
-                audioTrack,
-                true
-              )
-
-              requireActivity().runOnUiThread {
-                Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
-                videoGridItems.add(0, currentDeviceTrack!!)
-                updateVideoGridUI()
-              }
-            }
-
-            if (!isPublished) {
-              hmsClient?.publish(
-                localMediaStream,
-                hmsRoom,
-                localMediaConstraints,
-                object : HMSStreamRequestHandler {
-                  override fun onSuccess(data: HMSPublishStream?) {
-                    Log.v(TAG, "Publish Success ${data!!.mid}")
-                    isPublished = true
-                  }
-
-                  override fun onFailure(errorCode: Long, errorReason: String?) {
-                    Log.v(TAG, "Publish Failure $errorCode $errorReason")
-                  }
-                })
-            }
-          }
-
-          override fun onFailure(errorCode: Long, errorReason: String?) {
-            Log.v(TAG, "GetUserMedia failed: $errorCode $errorReason")
-          }
-        })
     }
+
+    hmsClient?.getUserMedia(
+      requireContext(),
+      localMediaConstraints,
+      object : HMSClient.GetUserMediaListener {
+        override fun onSuccess(mediaStream: HMSRTCMediaStream?) {
+          Log.v(TAG, "GetUserMedia Success")
+          localMediaStream = mediaStream
+
+          var videoTrack: VideoTrack? = null
+          var audioTrack: AudioTrack? = null
+
+          mediaStream?.stream?.apply {
+            if (videoTracks.isNotEmpty()) {
+              videoTrack = videoTracks[0]
+              videoTrack?.setEnabled(settings.publishVideo)
+            }
+            if (audioTracks.isNotEmpty()) {
+              audioTrack = audioTracks[0]
+              audioTrack?.setEnabled(settings.publishAudio)
+            }
+
+            currentDeviceTrack = MeetingTrack(
+              hmsPeer!!,
+              videoTrack,
+              audioTrack,
+              true
+            )
+
+            requireActivity().runOnUiThread {
+              Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
+              videoGridItems.add(0, currentDeviceTrack!!)
+              updateVideoGridUI()
+            }
+          }
+
+          if (!isPublished) {
+            hmsClient?.publish(
+              localMediaStream,
+              hmsRoom,
+              localMediaConstraints,
+              object : HMSStreamRequestHandler {
+                override fun onSuccess(data: HMSPublishStream?) {
+                  Log.v(TAG, "Publish Success ${data!!.mid}")
+                  isPublished = true
+                }
+
+                override fun onFailure(errorCode: Long, errorReason: String?) {
+                  Log.v(TAG, "Publish Failure $errorCode $errorReason")
+                }
+              })
+          }
+        }
+
+        override fun onFailure(errorCode: Long, errorReason: String?) {
+          Log.v(TAG, "GetUserMedia failed: $errorCode $errorReason")
+        }
+      })
+
   }
 
   private fun initHMSClient() {
