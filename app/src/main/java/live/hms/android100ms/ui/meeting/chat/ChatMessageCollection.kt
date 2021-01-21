@@ -11,7 +11,7 @@ data class ChatMessageCollection(
     @JvmStatic
     fun fromChatMessage(message: ChatMessage): ChatMessageCollection {
       return ChatMessageCollection(
-        message.peerId,
+        message.customerId,
         message.senderName,
         message.isSentByMe,
         arrayListOf(message)

@@ -15,8 +15,8 @@ android {
         applicationId "live.hms.android100ms"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 2
-        versionName "1.1"
+        versionCode 4
+        versionName "1.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

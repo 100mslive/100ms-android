@@ -6,7 +6,7 @@ fun addMessageToChatCollections(
 ) {
   if (collection.isNotEmpty()) {
     val lastMessage = collection.last()
-    if (lastMessage.peerId == message.peerId) {
+    if (lastMessage.peerId == message.customerId) {
       lastMessage.messages.add(message)
       return
     }

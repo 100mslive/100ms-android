@@ -5,6 +5,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.GridLayout
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import live.hms.android100ms.databinding.FragmentVideoGridBinding
@@ -37,16 +39,13 @@ class VideoGridFragment(
 
   private val renderedViews = ArrayList<RenderedViewPair>()
 
-  // TODO: Change view layout based on number of items
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentVideoGridBinding.inflate(inflater, container, false)
-
     initGridLayout()
-
     return binding.root
   }
 
@@ -67,7 +66,26 @@ class VideoGridFragment(
     }
 
   private fun updateGridLayoutDimensions() {
+    var colIdx = 0
+    var rowIdx = 0
+
     binding.container.apply {
+      for (child in children) {
+        val params = child.layoutParams as GridLayout.LayoutParams
+        params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
+        params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
+
+        if (colIdx + 1 == columns) {
+          rowIdx += 1
+          colIdx = 0
+        } else {
+          colIdx += 1
+        }
+      }
+
+      // Forces maxIndex to be recalculated when columnCount is set
+      requestLayout()
+
       rowCount = rows
       columnCount = columns
     }
@@ -141,10 +159,16 @@ class VideoGridFragment(
     binding.container.setOnClickListener { onVideoItemClick(item) }
 
     binding.name.text = item.peer.userName
-    binding.nameInitials.text = item.peer.userName
-      .split(' ')
-      .mapNotNull { it.firstOrNull()?.toString() }
-      .reduce { acc, s -> acc + s }
+
+    binding.nameInitials.text = item.peer.userName.let { value ->
+      if (value.isEmpty()) {
+        "--"
+      } else {
+        value.split(' ')
+          .mapNotNull { it.firstOrNull()?.toString() }
+          .reduce { acc, s -> acc + s }
+      }
+    }
 
     val events = object : RendererCommon.RendererEvents {
       override fun onFirstFrameRendered() {

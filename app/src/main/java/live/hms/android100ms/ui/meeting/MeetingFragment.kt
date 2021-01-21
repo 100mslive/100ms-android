@@ -365,7 +365,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       findNavController().navigate(
         MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
           roomDetails,
-          hmsPeer!!.peerId
+          hmsPeer!!.customerUserId
         )
       )
     }
@@ -549,7 +549,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     requireActivity().runOnUiThread {
       videoGridItems.removeAt(idx)
       updateVideoGridUI()
-
     }
   }
 
@@ -565,7 +564,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
       chatViewModel.receivedMessage(
         ChatMessage(
-          data.peer.peerId ?: "Peer Id Null",
+          // TODO: Change uid -> Customer ID
+          data.peer.uid,
           username,
           Date(),
           data.msg,

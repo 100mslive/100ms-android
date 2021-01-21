@@ -29,7 +29,7 @@
             app:nullable="false" />
 
         <argument
-            android:name="currentUserPeerId"
+            android:name="currentUserCustomerId"
             app:argType="string"
             app:nullable="false" />
 

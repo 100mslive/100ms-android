@@ -27,7 +27,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
 
   private val args: ChatBottomSheetFragmentArgs by navArgs()
   private lateinit var roomDetails: RoomDetails
-  private lateinit var currentUserPeerId: String
+  private lateinit var currentUserCustomerId: String
 
   private val messages = ArrayList<ChatMessageCollection>()
 
@@ -42,7 +42,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   ): View {
     binding = FragmentBottomSheetChatBinding.inflate(inflater, container, false)
     roomDetails = args.roomDetail
-    currentUserPeerId = args.currentUserPeerId
+    currentUserCustomerId= args.currentUserCustomerId
 
     initRecyclerView()
     initButtons()
@@ -76,7 +76,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
       isEnabled = false // Disabled by default
       setOnClickListener {
         val message = ChatMessage(
-          currentUserPeerId,
+          currentUserCustomerId,
           roomDetails.username,
           Date(),
           binding.editTextMessage.text.toString(),
