@@ -271,6 +271,15 @@ class MeetingFragment : Fragment(), HMSEventListener {
       cameraFacing = settings.camera
     }
 
+    Log.v(
+      TAG, "getUserMedia() with " +
+          "videoCodec=${localMediaConstraints.videoCodec}, " +
+          "videoFrameRate=${localMediaConstraints.videoFrameRate}, " +
+          "videoResolution=${localMediaConstraints.videoResolution}, " +
+          "videoMaxBitRate=${localMediaConstraints.videoMaxBitRate}, " +
+          "cameraFacing=${localMediaConstraints.cameraFacing}, "
+    )
+
     // onConnect -> Join -> getUserMedia
     hmsClient?.getUserMedia(
       requireActivity().applicationContext,
