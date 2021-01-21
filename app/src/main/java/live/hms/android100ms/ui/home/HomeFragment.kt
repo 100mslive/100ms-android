@@ -2,7 +2,6 @@ package live.hms.android100ms.ui.home
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -39,6 +38,20 @@ class HomeFragment : Fragment() {
   private lateinit var homeViewModel: HomeViewModel
   private lateinit var settings: SettingsStore
 
+  override fun onResume() {
+    super.onResume()
+    val data = requireActivity().intent.data
+    Log.v(TAG, "onResume(): Trying to update $data into EditTextMeetingUrl")
+
+    if (data != null) {
+      val url = data.toString()
+      val urlIsValid = updateAndVerifyMeetingUrl(url)
+      if (urlIsValid) {
+        binding.editTextMeetingUrl.setText(url)
+      }
+    }
+
+  }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
@@ -223,6 +236,25 @@ class HomeFragment : Fragment() {
     }
   }
 
+  private fun updateAndVerifyMeetingUrl(url: String): Boolean {
+    var allOk = true
+    try {
+      val uri = Uri.parse(url)
+      val roomId = uri.getQueryParameter("room")!!
+      val host = uri.host!!
+      val environment = host.split('.')[0]
+
+      settings.lastUsedRoomId = roomId
+      settings.environment = environment
+    } catch (e: Exception) {
+      Log.e(TAG, "Cannot update $url", e)
+      allOk = false
+      binding.containerMeetingUrl.error = "Meeting URL missing room query param"
+    }
+
+    return allOk
+  }
+
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
     binding.editTextName.setText(settings.username)
@@ -286,18 +318,7 @@ class HomeFragment : Fragment() {
         binding.containerMeetingUrl.error = "Meeting URL or Meeting ID is invalid"
       } else if (validUrl) {
         // Save both environment and room-id
-        try {
-          val uri = Uri.parse(meetingUrl)
-          val roomId = uri.getQueryParameter("room")!!
-          val host = uri.host!!
-          val environment = host.split('.')[0]
-
-          settings.lastUsedRoomId = roomId
-          settings.environment = environment
-        } catch (e: Exception) {
-          allOk = false
-          binding.containerMeetingUrl.error = "Meeting URL missing room query param"
-        }
+        allOk = allOk && updateAndVerifyMeetingUrl(meetingUrl)
       } else {
         // No spaces, and not a url -- could only be a room-id
         settings.lastUsedRoomId = meetingUrl
