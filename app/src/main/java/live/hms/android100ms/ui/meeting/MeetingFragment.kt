@@ -218,7 +218,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private fun updateVideoGridUI() {
     val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
     adapter.setItems(videoGridItems)
-    Log.v(TAG, "updated video grid UI with ${videoGridItems.size} items")
+    Log.v(TAG, "updated video Grid UI with ${videoGridItems.size} items")
   }
 
   private fun updateProgressBarUI(heading: String, description: String) {
@@ -271,12 +271,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       videoFrameRate = settings.videoFrameRate
       videoResolution = settings.videoResolution
       videoMaxBitRate = settings.videoBitrate
-
-      cameraFacing = if (isFrontCameraEnabled) {
-        FRONT_FACING_CAMERA
-      } else {
-        REAR_FACING_CAMERA
-      }
+      cameraFacing = settings.camera
     }
 
     hmsClient?.getUserMedia(

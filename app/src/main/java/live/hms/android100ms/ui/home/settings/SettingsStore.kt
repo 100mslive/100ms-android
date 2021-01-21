@@ -8,6 +8,7 @@ class SettingsStore(context: Context) {
   companion object {
     const val SETTINGS_SHARED_PREF = "settings-shared-preferences"
     const val PUBLISH_VIDEO = "publish-video"
+    const val CAMERA = "camera"
     const val PUBLISH_AUDIO = "publish-audio"
     const val VIDEO_RESOLUTION = "video-resolution"
     const val CODEC = "codec"
@@ -51,6 +52,11 @@ class SettingsStore(context: Context) {
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
     set(value) = putBoolean(PUBLISH_VIDEO, value)
+
+  var camera: String
+    get() = sharedPreferences.getString(CAMERA, "user")!!
+    set(value) = putString(CAMERA, value)
+
 
   var publishAudio: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_AUDIO, true)
@@ -101,6 +107,11 @@ class SettingsStore(context: Context) {
 
     fun setPublishVideo(value: Boolean): MultiCommitHelper {
       editor.putBoolean(PUBLISH_VIDEO, value)
+      return this
+    }
+
+    fun setCamera(value: String): MultiCommitHelper {
+      editor.putString(CAMERA, value)
       return this
     }
 

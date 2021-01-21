@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -11,17 +13,44 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.android100ms.databinding.FragmentSettingsBinding
 import live.hms.android100ms.util.viewLifecycle
-import org.appspot.apprtc.AppRTCAudioManager
 
 class SettingsFragment : Fragment() {
+
+  companion object {
+    private const val TAG = "SettingsFragment"
+
+    private val VIDEO_RESOLUTIONS = mapOf(
+      "4K (2160p)" to "3840 x 2160",
+      "Full HD (1080p)" to "1920 x 1080",
+      "HD (720p)" to "1280 x 720",
+      "VGA (480p)" to "640 x 480",
+      "QVGA (240p)" to "320 x 240",
+      "QQVGA (120p)" to "160 x 120",
+    )
+
+    private val CODECS = arrayOf("VP8")
+
+    private val VIDEO_BITRATES = mapOf(
+      "Lowest (100 kbps)" to 100,
+      "Low (256 kbps)" to 256,
+      "Medium (512 kbps)" to 512,
+      "High (1 mbps)" to 1024,
+      "LAN (4 mbps)" to 4096
+    )
+
+    private const val FRONT_FACING_CAMERA = "user"
+    private const val REAR_FACING_CAMERA = "environment"
+
+    private val CAMERAS = mapOf(
+      "Front Facing Camera" to FRONT_FACING_CAMERA,
+      "Rear Facing Camera" to REAR_FACING_CAMERA,
+    )
+  }
 
   private var binding by viewLifecycle<FragmentSettingsBinding>()
 
   private lateinit var settings: SettingsStore
   private lateinit var commitHelper: SettingsStore.MultiCommitHelper
-
-  private val audioDevices = ArrayList<HashMap<String, AppRTCAudioManager.AudioDevice>>()
-  private val videoDevices = ArrayList<String>()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -138,11 +167,47 @@ class SettingsFragment : Fragment() {
   private fun initAutoCompleteViews() {
     // TODO
     binding.apply {
-      autoCompleteVideoSource.isEnabled = false
-      autoCompleteMicrophoneSource.isEnabled = false
-      autoCompleteResolution.isEnabled = false
-      autoCompleteCodecs.isEnabled = false
-      autoCompleteVideoBitrate.isEnabled = false
+      initAutoCompleteView(
+        autoCompleteVideoSource,
+        CAMERAS.filterValues { it == settings.camera }.keys.first(),
+        CAMERAS.keys.toTypedArray(),
+      ) { commitHelper.setCamera(CAMERAS.getValue(it)) }
+
+      initAutoCompleteView(
+        autoCompleteResolution,
+        VIDEO_RESOLUTIONS.filterValues { it == settings.videoResolution }.keys.first(),
+        VIDEO_RESOLUTIONS.keys.toTypedArray()
+      ) { commitHelper.setVideoResolution(VIDEO_RESOLUTIONS.getValue(it)) }
+
+      initAutoCompleteView(
+        autoCompleteCodecs,
+        settings.codec,
+        CODECS,
+      ) { commitHelper.setCodec(it) }
+
+      initAutoCompleteView(
+        autoCompleteVideoBitrate,
+        VIDEO_BITRATES.filterValues { it == settings.videoBitrate }.keys.first(),
+        VIDEO_BITRATES.keys.toTypedArray(),
+      ) { commitHelper.setVideoBitrate(VIDEO_BITRATES.getValue(it)) }
+
+    }
+  }
+
+  private fun initAutoCompleteView(
+    view: AutoCompleteTextView,
+    defaultText: String,
+    items: Array<String>,
+    saveOnValid: (value: String) -> Unit
+  ) {
+    val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
+    view.apply {
+      setText(defaultText)
+      setAdapter(adapter)
+
+      setOnItemClickListener { _, _, position, _ ->
+        saveOnValid(items[position])
+      }
     }
   }
 
