@@ -71,8 +71,12 @@
     <string name="enter_name">Enter Name</string>
     <string name="use_as_default">Use as default</string>
 
-    <string name="joining_as_john_doe">Joining as John Doe</string>
-    <string name="home_progress_bar_description">Video and microphone will be turned off by default. You can change the defaults in the app settings.</string>
+    <string name="progress_bar_heading">Progress Bar Heading</string>
+    <string name="progress_bar_description">Progress Bar Description</string>
     <string name="close_chat">Close Chat</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="oops_you_are_disconnected">Oops! You are disconnected</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="reason">Reason</string>
 
 </resources>

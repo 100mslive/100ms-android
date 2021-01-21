@@ -39,7 +39,6 @@ import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
 import java.util.*
-import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
 
 
@@ -57,26 +56,18 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  private var isJoined = false
-  private var isPublished = false
-
+  // TODO: Get default camera from settings
   private var isFrontCameraEnabled = true
-  private var isCameraToggled = false
+
   private var isAudioEnabled = true
   private var isVideoEnabled = true
 
   private var currentDeviceTrack: MeetingTrack? = null
   private val videoGridItems = ArrayList<MeetingTrack>()
 
-  private val executor = Executors.newSingleThreadExecutor()
-
   private var hmsClient: HMSClient? = null
   private var hmsRoom: HMSRoom? = null
   private var hmsPeer: HMSPeer? = null
-  private var localMediaConstraints: HMSRTCMediaStreamConstraints? = null
-  private var localMediaStream: HMSRTCMediaStream? = null
-  private var localAudioTrack: AudioTrack? = null
-  private var localVideoTrack: VideoTrack? = null
 
   private val chatViewModel: ChatViewModel by activityViewModels()
 
@@ -91,15 +82,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
     clipboard = requireActivity()
       .getSystemService(Context.CLIPBOARD_SERVICE)
         as ClipboardManager
-
-
-    initAudioManager()
-    initHMSClient()
+    audioManager = AppRTCAudioManager.create(requireContext())
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    destructAudioManager()
+    stopAudioManager()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -137,12 +125,25 @@ class MeetingFragment : Fragment(), HMSEventListener {
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
-
     settings = SettingsStore(requireContext())
+
+    hideErrorView()
+
+    updateProgressBarUI(
+      "Connecting...",
+      "Please wait while we connect you to ${roomDetails.endpoint}"
+    )
+    showProgressBar()
 
     initVideoGrid()
     initButtons()
     initOnBackPress()
+
+
+    // We need only instance of HMSClient, hence it is not safe to initialize
+    // inside onViewCreated as it will trigger redundant connect calls whenever,
+    // onViewCreated is called.
+    if (hmsClient == null) initHMSClient()
 
     return binding.root
   }
@@ -170,10 +171,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
   }
 
-  private fun initAudioManager() {
-    audioManager = AppRTCAudioManager.create(requireContext())
+  private fun startAudioManager() {
     Log.d(TAG, "Starting Audio manager")
-
     audioManager.start { selectedAudioDevice, availableAudioDevices ->
       Log.d(
         TAG,
@@ -182,7 +181,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
   }
 
-  private fun destructAudioManager() {
+  private fun stopAudioManager() {
+    Log.v(TAG, "Stopping Audio Manager")
     audioManager.stop()
   }
 
@@ -218,25 +218,64 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private fun updateVideoGridUI() {
     val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
     adapter.setItems(videoGridItems)
+    Log.v(TAG, "updated video grid UI with ${videoGridItems.size} items")
   }
 
-  private fun getUserMedia(
-    frontCamEnabled: Boolean,
-    audioEnabled: Boolean,
-    cameraToggle: Boolean
-  ) {
-    localMediaConstraints = HMSRTCMediaStreamConstraints(true, settings.publishVideo)
-    localMediaConstraints?.apply {
+  private fun updateProgressBarUI(heading: String, description: String) {
+    binding.progressBar.heading.text = heading
+    binding.progressBar.description.apply {
+      visibility = if (description.isEmpty()) View.GONE else View.VISIBLE
+      text = description
+    }
+  }
+
+  private fun hideProgressBar() {
+    binding.viewPagerVideoGrid.visibility = View.VISIBLE
+    binding.tabLayoutDots.visibility = View.VISIBLE
+    binding.bottomControls.visibility = View.VISIBLE
+
+    binding.progressBar.root.visibility = View.GONE
+  }
+
+  private fun showProgressBar() {
+    binding.viewPagerVideoGrid.visibility = View.GONE
+    binding.tabLayoutDots.visibility = View.GONE
+    binding.bottomControls.visibility = View.GONE
+
+    binding.progressBar.root.visibility = View.VISIBLE
+  }
+
+  private fun hideErrorView() {
+    binding.viewPagerVideoGrid.visibility = View.VISIBLE
+    binding.tabLayoutDots.visibility = View.VISIBLE
+    binding.bottomControls.visibility = View.VISIBLE
+
+    binding.disconnectError.root.visibility = View.GONE
+  }
+
+  private fun showErrorView(reason: String) {
+    binding.viewPagerVideoGrid.visibility = View.GONE
+    binding.tabLayoutDots.visibility = View.GONE
+    binding.bottomControls.visibility = View.GONE
+
+    binding.disconnectError.root.visibility = View.VISIBLE
+    binding.disconnectError.reason.text = reason
+  }
+
+  private fun getUserMedia() {
+    // TODO: Listen to changes in settings.publishVideo
+
+    val localMediaConstraints = HMSRTCMediaStreamConstraints(true, settings.publishVideo)
+    localMediaConstraints.apply {
       videoCodec = settings.codec
       videoFrameRate = settings.videoFrameRate
       videoResolution = settings.videoResolution
       videoMaxBitRate = settings.videoBitrate
 
-      if (frontCamEnabled) {
-        isFrontCameraEnabled = true
-        cameraFacing = FRONT_FACING_CAMERA
+      cameraFacing = if (isFrontCameraEnabled) {
+        FRONT_FACING_CAMERA
       } else {
-        cameraFacing = REAR_FACING_CAMERA
+        REAR_FACING_CAMERA
       }
     }
 
@@ -246,7 +285,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
       object : HMSClient.GetUserMediaListener {
         override fun onSuccess(mediaStream: HMSRTCMediaStream?) {
           Log.v(TAG, "GetUserMedia Success")
-          localMediaStream = mediaStream
 
           var videoTrack: VideoTrack? = null
           var audioTrack: AudioTrack? = null
@@ -268,29 +306,26 @@ class MeetingFragment : Fragment(), HMSEventListener {
               true
             )
 
-            requireActivity().runOnUiThread {
+            runOnUiThread {
               Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
               videoGridItems.add(0, currentDeviceTrack!!)
               updateVideoGridUI()
             }
           }
 
-          if (!isPublished) {
-            hmsClient?.publish(
-              localMediaStream,
-              hmsRoom,
-              localMediaConstraints,
-              object : HMSStreamRequestHandler {
-                override fun onSuccess(data: HMSPublishStream?) {
-                  Log.v(TAG, "Publish Success ${data!!.mid}")
-                  isPublished = true
-                }
+          hmsClient?.publish(
+            mediaStream,
+            hmsRoom,
+            localMediaConstraints,
+            object : HMSStreamRequestHandler {
+              override fun onSuccess(data: HMSPublishStream?) {
+                Log.v(TAG, "Publish Success ${data!!.mid}")
+              }
 
-                override fun onFailure(errorCode: Long, errorReason: String?) {
-                  Log.v(TAG, "Publish Failure $errorCode $errorReason")
-                }
-              })
-          }
+              override fun onFailure(errorCode: Long, errorReason: String?) {
+                Log.v(TAG, "Publish Failure $errorCode $errorReason")
+              }
+            })
         }
 
         override fun onFailure(errorCode: Long, errorReason: String?) {
@@ -301,6 +336,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun initHMSClient() {
+    updateProgressBarUI(
+      "Connecting...",
+      "Please wait while we connect you to ${roomDetails.endpoint}"
+    )
+    showProgressBar()
+
     hmsPeer = HMSPeer(roomDetails.username, roomDetails.authToken)
     hmsRoom = HMSRoom(roomDetails.roomId)
     val config = HMSClientConfig(roomDetails.endpoint)
@@ -374,16 +415,18 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     binding.buttonFlipCamera.setOnClickListener {
       hmsClient?.apply {
-        isCameraToggled = true
         switchCamera()
       }
+    }
+
+    binding.disconnectError.buttonRetry.setOnClickListener {
+      Log.v(TAG, "Trying to reconnect")
+      hideErrorView()
+      initHMSClient()
     }
   }
 
   private fun disconnect() {
-    isJoined = false
-    isPublished = false
-
     try {
       hmsClient?.leave(object : HMSRequestHandler {
         override fun onSuccess(s: String?) {
@@ -399,21 +442,32 @@ class MeetingFragment : Fragment(), HMSEventListener {
       e.printStackTrace()
     }
 
-    // TODO: Cleanup
-
-    localMediaStream = null
+    cleanup()
     hmsClient?.disconnect()
-
-    // Because the scope of Chat View Model is the entire activity
-    // We need to perform a cleanup
-    chatViewModel.removeSendBroadcastCallback()
-    chatViewModel.clearMessages()
 
     // Go to home page
     Intent(requireContext(), HomeActivity::class.java).apply {
       startActivity(this)
       requireActivity().finish()
     }
+  }
+
+  private fun cleanup() {
+    // Because the scope of Chat View Model is the entire activity
+    // We need to perform a cleanup
+    chatViewModel.removeSendBroadcastCallback()
+    chatViewModel.clearMessages()
+
+    // Remove all the video stream
+    videoGridItems.clear()
+    updateVideoGridUI()
+
+    stopAudioManager()
+
+    currentDeviceTrack = null
+    hmsClient = null
+    hmsRoom = null
+    hmsPeer = null
   }
 
   private fun initOnBackPress() {
@@ -429,80 +483,92 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   // HMS Event Listener events below
   override fun onConnect() {
-    // TODO: Make Reconnect Progress view invisible
-
     Log.v(TAG, "onConnect");
 
-    if (!isJoined) {
+    runOnUiThread {
+      updateProgressBarUI(
+        "Connected! Joining meeting...",
+        ""
+      )
+
       hmsClient?.join(object : HMSRequestHandler {
         override fun onSuccess(p0: String?) {
-          isJoined = true
-          Log.v(TAG, "Join Success")
+          Log.v(TAG, "Join onSuccess($p0)")
+
+          // FIXME: Remove this hacky-fix
           Thread.sleep(1000)
-          getUserMedia(
-            isFrontCameraEnabled,
-            settings.publishAudio,
-            isCameraToggled
-          )
+
+          runOnUiThread {
+            startAudioManager()
+            hideProgressBar()
+            getUserMedia()
+          }
         }
 
         override fun onFailure(p0: Long, p1: String?) {
-          Log.v(TAG, "Join Failure")
+          Log.v(TAG, "Join onFailure($p0, $p1)")
         }
       })
+
     }
   }
 
-  override fun onDisconnect(errorMessage: String?) {
-    Log.v(TAG, "onDisconnect: $errorMessage")
-    isJoined = false
-    isPublished = false
-
-    // TODO: Clean up of views
-    // TODO: Handle no internet available / lost internet / network change
-
-    localMediaStream = null
-    localAudioTrack = null
-    localVideoTrack = null
-
-    // TODO: Init Reconnect
+  override fun onDisconnect(errorMessage: String) {
+    runOnUiThread {
+      Log.v(TAG, "onDisconnect: $errorMessage")
+      cleanup()
+      hideProgressBar()
+      showErrorView(errorMessage)
+    }
   }
 
   override fun onPeerJoin(peer: HMSPeer) {
     Log.v(
       TAG,
-      "onPeerJoin: uid=${peer.uid}, role=${peer.role}, userId=${peer.customerUserId}, peerId=${peer.peerId}"
+      "onPeerJoin: uid=${peer.uid}, " +
+          "role=${peer.role}, " +
+          "userId=${peer.customerUserId}, " +
+          "peerId=${peer.peerId}"
     )
-    Toast.makeText(
-      requireContext(),
-      "${peer.userName} - ${peer.peerId} joined",
-      Toast.LENGTH_SHORT
-    ).show()
+    runOnUiThread {
+      Toast.makeText(
+        requireContext(),
+        "${peer.userName} - ${peer.peerId} joined",
+        Toast.LENGTH_SHORT
+      ).show()
+    }
   }
 
   override fun onPeerLeave(peer: HMSPeer) {
     Log.v(
       TAG,
-      "onPeerLeave: uid=${peer.uid}, role=${peer.role}, userId=${peer.customerUserId}, peerId=${peer.peerId}"
+      "onPeerLeave: uid=${peer.uid}, " +
+          "role=${peer.role}, " +
+          "userId=${peer.customerUserId}, " +
+          "peerId=${peer.peerId}"
     )
-    Toast.makeText(
-      requireContext(),
-      "${peer.userName} - ${peer.peerId} left",
-      Toast.LENGTH_SHORT
-    ).show()
+    runOnUiThread {
+      Toast.makeText(
+        requireContext(),
+        "${peer.userName} - ${peer.peerId} left",
+        Toast.LENGTH_SHORT
+      ).show()
+    }
   }
 
 
   override fun onStreamAdd(peer: HMSPeer, streamInfo: HMSStreamInfo) {
     Log.v(
       TAG,
-      "onStreamAdd: peer-uid:${peer.uid}, role=${peer.role}, userId:${peer.customerUserId}"
+      "onStreamAdd: peer-uid:${peer.uid}, " +
+          "role=${peer.role}, " +
+          "userId:${peer.customerUserId}, " +
+          "streamInfo:${streamInfo}"
     )
 
-    // Handling all the on stream add events inside a single thread to avoid race condition during rendering
-    executor.execute {
-      hmsClient?.subscribe(streamInfo, hmsRoom, object : HMSMediaRequestHandler {
-        override fun onSuccess(stream: MediaStream) {
+    hmsClient?.subscribe(streamInfo, hmsRoom, object : HMSMediaRequestHandler {
+      override fun onSuccess(stream: MediaStream) {
+        runOnUiThread {
           var videoTrack: VideoTrack? = null
           var audioTrack: AudioTrack? = null
 
@@ -515,51 +581,49 @@ class MeetingFragment : Fragment(), HMSEventListener {
             audioTrack = stream.audioTracks[0]
             audioTrack.setEnabled(true)
           }
-
-          requireActivity().runOnUiThread {
-            videoGridItems.add(MeetingTrack(peer, videoTrack, audioTrack))
-            updateVideoGridUI()
-          }
+          videoGridItems.add(MeetingTrack(peer, videoTrack, audioTrack))
+          updateVideoGridUI()
         }
+      }
 
-        override fun onFailure(errorCode: Long, errorReason: String) {
-          Log.v(TAG, "onStreamAdd: subscribe failure: $errorCode $errorReason")
-        }
-      })
-    }
+      override fun onFailure(errorCode: Long, errorReason: String) {
+        Log.v(TAG, "onStreamAdd: subscribe failure: $errorCode $errorReason")
+      }
+    })
   }
 
   override fun onStreamRemove(streamInfo: HMSStreamInfo) {
     Log.v(TAG, "onStreamRemove: ${streamInfo.uid}")
 
-    // Get the index of the meeting track having uid
-    var idx = -1
-    for (i in 0..videoGridItems.size step 1) {
-      if (videoGridItems[i].peer.uid.equals(streamInfo.uid, true)) {
-        idx = i
-        break
+    runOnUiThread {
+      var found = false
+
+      // Get the index of the meeting track having uid
+      videoGridItems.forEachIndexed { index, meetingTrack ->
+        if (meetingTrack.peer.uid.equals(streamInfo.uid, true)) {
+          videoGridItems.removeAt(index)
+          updateVideoGridUI()
+          found = true
+        }
       }
-    }
 
-    if (idx == -1) {
-      Log.v(TAG, "onStreamRemove: ${streamInfo.uid} not found in meeting tracks")
-      return
-    }
-
-    requireActivity().runOnUiThread {
-      videoGridItems.removeAt(idx)
-      updateVideoGridUI()
+      if (!found) {
+        Log.v(TAG, "onStreamRemove: ${streamInfo.uid} not found in meeting tracks")
+      }
     }
   }
 
   override fun onBroadcast(data: HMSPayloadData) {
     Log.v(
       TAG,
-      "onBroadcast: customerId=${data.peer.customerUserId} userName=${data.peer.userName} msg=${data.msg}"
+      "onBroadcast: customerId=${data.peer.customerUserId}, " +
+          "userName=${data.peer.userName}, " +
+          "msg=${data.msg}"
     )
-    requireActivity().runOnUiThread {
-      // TODO
-      var username  = data.peer.userName
+
+    runOnUiThread {
+      // FIXME: Get the user name anyhow!
+      var username = data.peer.userName
       if (username.isEmpty()) username = "error<senderName=null>"
 
       chatViewModel.receivedMessage(
@@ -573,5 +637,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
         )
       )
     }
+  }
+
+  // Helper function
+  private fun runOnUiThread(action: Runnable) {
+    requireActivity().runOnUiThread(action)
   }
 }

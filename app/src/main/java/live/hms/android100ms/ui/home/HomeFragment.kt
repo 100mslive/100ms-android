@@ -2,6 +2,7 @@ package live.hms.android100ms.ui.home
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -63,6 +64,7 @@ class HomeFragment : Fragment() {
     initEditTextViews()
     initConnectButton()
     initOnBackPress()
+    hideProgressBar()
 
     return binding.root
   }
@@ -89,7 +91,7 @@ class HomeFragment : Fragment() {
   @SuppressLint("SetTextI18n")
   private fun updateProgressBarUI(isRoomCreator: Boolean) {
     val headingPrefix = if (isRoomCreator) "Creating room for" else "Joining as"
-    binding.progressBarHeading.text = "$headingPrefix ${getUsername()}..."
+    binding.progressBar.heading.text = "$headingPrefix ${getUsername()}..."
 
     val descriptionDefaults = if (settings.publishVideo && settings.publishAudio) {
       "Video and microphone will be turned on by default.\n"
@@ -102,8 +104,7 @@ class HomeFragment : Fragment() {
     }
 
     val descriptionSetting = "You can change the defaults in the app settings."
-
-    binding.progressBarDescription.text = descriptionDefaults + descriptionSetting
+    binding.progressBar.description.text = descriptionDefaults + descriptionSetting
   }
 
   private fun showProgressBar() {
@@ -113,7 +114,7 @@ class HomeFragment : Fragment() {
     binding.containerCardStartMeeting.visibility = View.GONE
     binding.containerCardJoin.visibility = View.GONE
     binding.containerCardName.visibility = View.GONE
-    binding.containerCardProgressBar.visibility = View.VISIBLE
+    binding.progressBar.root.visibility = View.VISIBLE
 
     binding.containerRoomName.isEnabled = false
     binding.containerMeetingUrl.isEnabled = false
@@ -128,7 +129,7 @@ class HomeFragment : Fragment() {
     binding.containerCardStartMeeting.visibility = View.VISIBLE
     binding.containerCardJoin.visibility = View.VISIBLE
     binding.containerCardName.visibility = View.VISIBLE
-    binding.containerCardProgressBar.visibility = View.GONE
+    binding.progressBar.root.visibility = View.GONE
 
     binding.containerRoomName.isEnabled = true
     binding.containerMeetingUrl.isEnabled = true
