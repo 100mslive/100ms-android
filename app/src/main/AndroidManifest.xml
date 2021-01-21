@@ -18,48 +18,15 @@
         <activity
             android:name=".ui.home.HomeActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Android100ms.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter android:label="conf-brytecam">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="conf.brytecam.com"
-                    android:scheme="https" />
-            </intent-filter>
-
-            <intent-filter android:label="staging-brytecam">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="staging.brytecam.com"
-                    android:scheme="https" />
-            </intent-filter>
-
-            <intent-filter android:label="qain-brytecam">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="qa-in.brytecam.com"
-                    android:scheme="https" />
-            </intent-filter>
-
-            <intent-filter android:label="prodin-100ms">
+            <intent-filter android:label="Join Meeting">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -68,35 +35,21 @@
                 <data
                     android:host="prod-in.100ms.live"
                     android:scheme="https" />
-            </intent-filter>
-
-            <intent-filter android:label="staging-100ms">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="staging-in.100ms.live"
-                    android:scheme="https" />
-            </intent-filter>
-
-            <intent-filter android:label="qain-100ms">
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
                 <data
                     android:host="qa-in.100ms.live"
                     android:scheme="https" />
+
             </intent-filter>
+
         </activity>
+
         <activity
             android:name=".ui.meeting.MeetingActivity"
             android:label="@string/meeting"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Android100ms.NoActionBar" />
+
     </application>
 
 </manifest>

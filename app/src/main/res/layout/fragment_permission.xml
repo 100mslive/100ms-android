@@ -64,7 +64,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/do_it_later"
                 android:textAllCaps="false"
-                android:textColor="@color/secondaryColor" />
+                android:textColor="@color/secondaryColor"
+                android:visibility="gone" />
 
         </LinearLayout>
 

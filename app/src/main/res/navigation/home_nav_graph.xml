@@ -15,6 +15,10 @@
             android:id="@+id/action_HomeFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
 
+        <action
+            android:id="@+id/action_HomeFragment_to_MeetingActivity"
+            app:destination="@id/MeetingActivity" />
+
     </fragment>
 
     <fragment
@@ -31,7 +35,15 @@
 
         <action
             android:id="@+id/action_PermissionFragment_to_HomeFragment"
-            app:destination="@id/HomeFragment" />
+            app:destination="@id/HomeFragment"
+            app:popUpTo="@id/HomeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
+
+    <activity
+        android:id="@+id/MeetingActivity"
+        android:name="live.hms.android100ms.ui.meeting.MeetingActivity"
+        android:label="Meeting Activity"
+        tools:layout="@layout/activity_meeting" />
 
 </navigation>

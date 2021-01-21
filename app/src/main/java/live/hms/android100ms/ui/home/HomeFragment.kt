@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.URLUtil
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -61,9 +62,24 @@ class HomeFragment : Fragment() {
     initViewModel()
     initEditTextViews()
     initConnectButton()
+    initOnBackPress()
 
     return binding.root
   }
+
+  private fun initOnBackPress() {
+    requireActivity().apply {
+      onBackPressedDispatcher.addCallback(
+        this@HomeFragment.viewLifecycleOwner,
+        object : OnBackPressedCallback(true) {
+          override fun handleOnBackPressed() {
+            Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
+            finish()
+          }
+        })
+    }
+  }
+
 
   private fun initViewModel() {
     homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)

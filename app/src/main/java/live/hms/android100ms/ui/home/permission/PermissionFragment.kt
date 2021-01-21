@@ -57,6 +57,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
   @AfterPermissionGranted(RC_CALL)
   private fun gotoHomePage() {
     if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
+      Log.v(TAG, "Permission=$PERMISSIONS granted, moving to HomeFragment")
       findNavController().navigate(
         PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
       )
