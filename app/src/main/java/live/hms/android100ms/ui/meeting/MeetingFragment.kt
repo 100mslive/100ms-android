@@ -46,9 +46,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   companion object {
     private const val TAG = "MeetingFragment"
-
-    private const val FRONT_FACING_CAMERA = "user"
-    private const val REAR_FACING_CAMERA = "environment"
   }
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
@@ -274,8 +271,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
       cameraFacing = settings.camera
     }
 
+    // onConnect -> Join -> getUserMedia
     hmsClient?.getUserMedia(
-      requireContext(),
+      requireActivity().applicationContext,
       localMediaConstraints,
       object : HMSClient.GetUserMediaListener {
         override fun onSuccess(mediaStream: HMSRTCMediaStream?) {
@@ -561,8 +559,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
           "streamInfo:${streamInfo}"
     )
 
+    Log.v(TAG, "Subscribing via $hmsClient")
     hmsClient?.subscribe(streamInfo, hmsRoom, object : HMSMediaRequestHandler {
       override fun onSuccess(stream: MediaStream) {
+        Log.v(TAG, "Subscribe($streamInfo): peer-id=${peer.uid} -- onSuccess($stream)")
         runOnUiThread {
           var videoTrack: VideoTrack? = null
           var audioTrack: AudioTrack? = null
@@ -582,7 +582,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
       }
 
       override fun onFailure(errorCode: Long, errorReason: String) {
-        Log.v(TAG, "onStreamAdd: subscribe failure: $errorCode $errorReason")
+        Log.v(
+          TAG,
+          "Subscribe($streamInfo): peer-id=${peer.uid} -- onFailure($errorCode, $errorReason)"
+        )
       }
     })
   }
@@ -592,18 +595,23 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
     runOnUiThread {
       var found = false
+      val toRemove = arrayListOf<MeetingTrack>()
 
       // Get the index of the meeting track having uid
-      videoGridItems.forEachIndexed { index, meetingTrack ->
+      videoGridItems.forEach { meetingTrack ->
         if (meetingTrack.peer.uid.equals(streamInfo.uid, true)) {
-          videoGridItems.removeAt(index)
-          updateVideoGridUI()
+          toRemove.add(meetingTrack)
           found = true
         }
       }
 
+      videoGridItems.removeAll(toRemove)
+
       if (!found) {
         Log.v(TAG, "onStreamRemove: ${streamInfo.uid} not found in meeting tracks")
+      } else {
+        // Update the grid layout as we have removed some views
+        updateVideoGridUI()
       }
     }
   }

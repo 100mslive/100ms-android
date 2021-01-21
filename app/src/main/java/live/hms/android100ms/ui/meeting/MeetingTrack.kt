@@ -5,10 +5,10 @@ import org.webrtc.AudioTrack
 import org.webrtc.VideoTrack
 
 data class MeetingTrack(
-    val peer: HMSPeer,
-    val videoTrack: VideoTrack?,
-    val audioTrack: AudioTrack?,
-    val isCurrentDeviceStream: Boolean = false
+  val peer: HMSPeer,
+  val videoTrack: VideoTrack?,
+  val audioTrack: AudioTrack?,
+  val isCurrentDeviceStream: Boolean = false
 ) {
   override fun equals(other: Any?): Boolean {
     if (other is MeetingTrack) {
@@ -19,7 +19,16 @@ data class MeetingTrack(
   }
 
   override fun toString(): String {
-    val peerStr = "HMSPeer(peerId=${peer.peerId}, username=${peer.userName})"
-    return "MeetingTrack(${peerStr}, ${videoTrack}, ${audioTrack}, isCurrentDeviceStream=${isCurrentDeviceStream}"
+    val peerStr = "HMSPeer(" +
+        "peerId=${peer.peerId}, " +
+        "username=${peer.userName}, " +
+        "customerUserId=${peer.customerUserId}" +
+        ")"
+    return "MeetingTrack(" +
+        "${peerStr}, " +
+        "${videoTrack}, " +
+        "${audioTrack}, " +
+        "isCurrentDeviceStream=${isCurrentDeviceStream}" +
+        ")"
   }
 }

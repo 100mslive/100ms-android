@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
-import live.hms.android100ms.ui.meeting.MeetingTrack
 import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.meeting.MeetingTrack
 import kotlin.math.min
 
 class VideoGridAdapter(
@@ -75,7 +75,11 @@ class VideoGridAdapter(
     if (fragment != null) {
       // Manually update the fragment
       val newVideos = getVideosForPage(position)
-      Log.v(TAG, "onBindViewHolder: Manually updating fragment $tag with newVideos=$newVideos")
+      Log.v(
+        TAG,
+        "onBindViewHolder: Manually updating fragment $tag with " +
+            "total ${newVideos.size} [newVideos=$newVideos]"
+      )
       (fragment as VideoGridFragment).updateVideos(newVideos)
 
     } else {
