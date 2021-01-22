@@ -135,21 +135,6 @@ class VideoGridFragment(
     updateGridLayoutDimensions()
   }
 
-  override fun onDestroyView() {
-    super.onDestroyView()
-
-    // Unbind all the views attached clearing the EglContext
-    binding.container.apply {
-      for (currentRenderedView in renderedViews) {
-        unbindVideo(currentRenderedView.binding, currentRenderedView.video)
-        removeView(currentRenderedView.binding.root)
-      }
-    }
-
-    renderedViews.clear()
-    crashlyticsLog(TAG, "Unbind all views from grid (children=${binding.container.childCount}")
-  }
-
   fun updateVideos(newVideos: List<MeetingTrack>) {
     crashlyticsLog(
       TAG,
