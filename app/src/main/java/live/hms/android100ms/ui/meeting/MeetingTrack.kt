@@ -5,6 +5,7 @@ import org.webrtc.AudioTrack
 import org.webrtc.VideoTrack
 
 data class MeetingTrack(
+  val mediaId: String,
   val peer: HMSPeer,
   val videoTrack: VideoTrack?,
   val audioTrack: AudioTrack?,
@@ -12,7 +13,9 @@ data class MeetingTrack(
 ) {
   override fun equals(other: Any?): Boolean {
     if (other is MeetingTrack) {
-      return other.peer.customerUserId == peer.customerUserId
+      return other.peer.customerUserId == peer.customerUserId &&
+          other.peer.peerId == peer.peerId &&
+          other.mediaId == mediaId
     }
 
     return super.equals(other)
@@ -25,10 +28,11 @@ data class MeetingTrack(
         "customerUserId=${peer.customerUserId}" +
         ")"
     return "MeetingTrack(" +
-        "${peerStr}, " +
-        "${videoTrack != null}, " +
-        "${audioTrack != null}, " +
-        "$isCurrentDeviceStream" +
+        "mid=$mediaId, " +
+        "peer=$peerStr, " +
+        "hasVideo=${videoTrack != null}, " +
+        "hasAudio=${audioTrack != null}, " +
+        "isCurrentDeviceStream=$isCurrentDeviceStream" +
         ")"
   }
 }

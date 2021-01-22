@@ -265,6 +265,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private fun getUserMedia() {
     // TODO: Listen to changes in settings.publishVideo
+    //  To be done only when the user can change the publishVideo
+    //  while in a meeting.
 
     val localMediaConstraints = HMSRTCMediaStreamConstraints(true, settings.publishVideo)
     localMediaConstraints.apply {
@@ -304,19 +306,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
               audioTrack = audioTracks[0]
               audioTrack?.setEnabled(settings.publishAudio)
             }
-
-            currentDeviceTrack = MeetingTrack(
-              hmsPeer!!,
-              videoTrack,
-              audioTrack,
-              true
-            )
-
-            runOnUiThread {
-              Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
-              videoGridItems.add(0, currentDeviceTrack!!)
-              updateVideoGridUI()
-            }
           }
 
           hmsClient?.publish(
@@ -324,17 +313,31 @@ class MeetingFragment : Fragment(), HMSEventListener {
             hmsRoom,
             localMediaConstraints,
             object : HMSStreamRequestHandler {
-              override fun onSuccess(data: HMSPublishStream?) {
-                crashlyticsLog(TAG, "Publish Success ${data!!.mid}")
+              override fun onSuccess(data: HMSPublishStream) {
+                crashlyticsLog(TAG, "Publish Success ${data.mid}")
+
+                runOnUiThread {
+                  currentDeviceTrack = MeetingTrack(
+                    data.mid,
+                    hmsPeer!!,
+                    videoTrack,
+                    audioTrack,
+                    true
+                  )
+
+                  Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
+                  videoGridItems.add(0, currentDeviceTrack!!)
+                  updateVideoGridUI()
+                }
               }
 
-              override fun onFailure(errorCode: Long, errorReason: String?) {
+              override fun onFailure(errorCode: Long, errorReason: String) {
                 crashlyticsLog(TAG, "Publish Failure $errorCode $errorReason")
               }
             })
         }
 
-        override fun onFailure(errorCode: Long, errorReason: String?) {
+        override fun onFailure(errorCode: Long, errorReason: String) {
           crashlyticsLog(TAG, "GetUserMedia failed: $errorCode $errorReason")
         }
       })
@@ -592,7 +595,15 @@ class MeetingFragment : Fragment(), HMSEventListener {
             audioTrack = stream.audioTracks[0]
             audioTrack.setEnabled(true)
           }
-          videoGridItems.add(MeetingTrack(peer, videoTrack, audioTrack))
+
+          videoGridItems.add(
+            MeetingTrack(
+              streamInfo.mid,
+              peer,
+              videoTrack, audioTrack,
+              false
+            )
+          )
           updateVideoGridUI()
         }
       }
@@ -607,7 +618,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   override fun onStreamRemove(streamInfo: HMSStreamInfo) {
-    Log.v(TAG, "onStreamRemove: ${streamInfo.uid}")
+    Log.v(TAG, "onStreamRemove: uid=${streamInfo.uid} mid=${streamInfo.mid}")
 
     runOnUiThread {
       var found = false
@@ -615,7 +626,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
       // Get the index of the meeting track having uid
       videoGridItems.forEach { meetingTrack ->
-        if (meetingTrack.peer.uid.equals(streamInfo.uid, true)) {
+        if (
+          meetingTrack.peer.uid == streamInfo.uid
+          && meetingTrack.mediaId == streamInfo.mid
+          && meetingTrack.peer.customerUserId == streamInfo.peer.customerUserId
+        ) {
           toRemove.add(meetingTrack)
           found = true
         }
@@ -624,7 +639,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       videoGridItems.removeAll(toRemove)
 
       if (!found) {
-        Log.v(TAG, "onStreamRemove: ${streamInfo.uid} not found in meeting tracks")
+        crashlyticsLog(TAG, "onStreamRemove: ${streamInfo.uid} not found in meeting tracks")
       } else {
         // Update the grid layout as we have removed some views
         updateVideoGridUI()
