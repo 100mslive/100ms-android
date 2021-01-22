@@ -47,9 +47,9 @@ class VideoGridAdapter(
   private fun getVideosForPage(position: Int): MutableList<MeetingTrack> {
     val pageVideos = ArrayList<MeetingTrack>()
 
-    // Range is [fromIndex, toIndex) -- Notice the bounds
+    // Range is [fromIndex, toIndex] -- Notice the bounds
     val fromIndex = position * itemsPerPage
-    val toIndex = min(items.size, (position + 1) * itemsPerPage)
+    val toIndex = min(items.size, (position + 1) * itemsPerPage) - 1
 
     for (idx in fromIndex..toIndex step 1) {
       pageVideos.add(items[idx])
