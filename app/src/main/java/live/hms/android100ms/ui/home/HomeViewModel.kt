@@ -9,6 +9,7 @@ import live.hms.android100ms.model.CreateRoomRequest
 import live.hms.android100ms.model.CreateRoomResponse
 import live.hms.android100ms.model.TokenRequest
 import live.hms.android100ms.model.TokenResponse
+import live.hms.android100ms.util.crashlytics
 import live.hms.android100ms.util.handleResponse
 
 class HomeViewModel : ViewModel() {
@@ -20,26 +21,36 @@ class HomeViewModel : ViewModel() {
   fun sendAuthTokenRequest(request: TokenRequest) {
     viewModelScope.launch {
       authTokenResponse.postValue(Resource.loading())
-      val response = repository.fetchAuthToken(request)
-      authTokenResponse.postValue(
-        handleResponse(
-          response,
-          "Could not fetch auth token. Try again"
+      try {
+        val response = repository.fetchAuthToken(request)
+        authTokenResponse.postValue(
+          handleResponse(
+            response,
+            "Could not fetch auth token. Try again"
+          )
         )
-      )
+      } catch (e: Exception) {
+        crashlytics.recordException(e)
+        authTokenResponse.postValue(Resource.error(e.message))
+      }
     }
   }
 
   fun sendCreateRoomRequest(request: CreateRoomRequest) {
     viewModelScope.launch {
       createRoomResponse.postValue(Resource.loading())
-      val response = repository.createRoom(request)
-      createRoomResponse.postValue(
-        handleResponse(
-          response,
-          "Could not fetch create room. Try again"
+      try {
+        val response = repository.createRoom(request)
+        createRoomResponse.postValue(
+          handleResponse(
+            response,
+            "Could not create room. Try again"
+          )
         )
-      )
+      } catch (e: Exception) {
+        crashlytics.recordException(e)
+        authTokenResponse.postValue(Resource.error(e.message))
+      }
     }
   }
 }
