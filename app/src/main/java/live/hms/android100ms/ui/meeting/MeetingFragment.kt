@@ -188,6 +188,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private fun initVideoGrid() {
     binding.viewPagerVideoGrid.apply {
+      offscreenPageLimit = 1
       adapter = VideoGridAdapter(this@MeetingFragment) { video ->
         // TODO: Implement Hero/Pin View
 
