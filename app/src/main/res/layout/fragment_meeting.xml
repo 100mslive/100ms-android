@@ -51,7 +51,7 @@
             android:id="@+id/button_toggle_audio"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/toggle_audio"
-            app:icon="@drawable/ic_baseline_music_note_24" />
+            app:icon="@drawable/ic_baseline_mic_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_open_chat"

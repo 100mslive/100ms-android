@@ -32,8 +32,7 @@ import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
-import live.hms.android100ms.util.ROOM_DETAILS
-import live.hms.android100ms.util.viewLifecycle
+import live.hms.android100ms.util.*
 import org.appspot.apprtc.AppRTCAudioManager
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
@@ -76,6 +75,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
     super.onCreate(savedInstanceState)
 
     roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+
+    roomDetails.apply {
+      crashlyticsSetKey(ROOM_ID, roomId)
+      crashlyticsSetKey(USERNAME, username)
+    }
+
     clipboard = requireActivity()
       .getSystemService(Context.CLIPBOARD_SERVICE)
         as ClipboardManager
@@ -360,9 +365,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
     binding.buttonToggleAudio.apply {
       setIconResource(
         if (isAudioEnabled)
-          R.drawable.ic_baseline_music_note_24
+          R.drawable.ic_baseline_mic_24
         else
-          R.drawable.ic_baseline_music_off_24
+          R.drawable.ic_baseline_mic_off_24
       )
     }
 
