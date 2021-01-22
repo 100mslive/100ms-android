@@ -335,6 +335,9 @@ class HomeFragment : Fragment() {
       if (roomName.isEmpty()) {
         allOk = false
         binding.containerRoomName.error = "Room Name cannot be empty"
+      } else if (!roomName.matches(Regex("^[a-zA-Z.-:_]+$"))) {
+        allOk = false
+        binding.containerRoomName.error = "Can contain only alphabets, numbers and . - : _"
       }
 
       if (allOk) {
