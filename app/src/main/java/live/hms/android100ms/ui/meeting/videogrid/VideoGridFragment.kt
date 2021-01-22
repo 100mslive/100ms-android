@@ -1,7 +1,6 @@
 package live.hms.android100ms.ui.meeting.videogrid
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.databinding.FragmentVideoGridBinding
 import live.hms.android100ms.databinding.GridItemVideoBinding
 import live.hms.android100ms.ui.meeting.MeetingTrack
+import live.hms.android100ms.util.crashlyticsLog
 import live.hms.android100ms.util.viewLifecycle
 import org.webrtc.RendererCommon
 import kotlin.math.max
@@ -40,7 +40,10 @@ class VideoGridFragment(
   }
 
   init {
-    Log.v(TAG, "Received ${initialVideos.size} initial videos for ${maxRows}x${maxColumns}")
+    crashlyticsLog(
+      TAG,
+      "Received ${initialVideos.size} initial videos for ${maxRows}x${maxColumns}"
+    )
     if (BuildConfig.DEBUG && initialVideos.size > (maxRows * maxColumns)) {
       error("Cannot show ${initialVideos.size} videos in a ${maxRows}x${maxColumns} grid")
     }
@@ -82,15 +85,14 @@ class VideoGridFragment(
     }
 
   private fun updateGridLayoutDimensions() {
-    Log.v(TAG, "updateGridLayoutDimensions: ${rows}x${columns}")
+    crashlyticsLog(TAG, "updateGridLayoutDimensions: ${rows}x${columns}")
 
     var childIdx: Pair<Int, Int>? = null
     var colIdx = 0
     var rowIdx = 0
 
     binding.container.apply {
-      // FIXME: Somehow children.size > (rows * columns)
-      Log.v(TAG, "Updating GridLayout.spec for ${children.count()} children")
+      crashlyticsLog(TAG, "Updating GridLayout.spec for ${children.count()} children")
       for (child in children) {
         childIdx = Pair(rowIdx, colIdx)
 
@@ -106,7 +108,7 @@ class VideoGridFragment(
         }
       }
 
-      Log.v(TAG, "Changed GridLayout's children spec with bottom-right at $childIdx")
+      crashlyticsLog(TAG, "Changed GridLayout's children spec with bottom-right at $childIdx")
 
       // Forces maxIndex to be recalculated when rowCount/columnCount is set
       requestLayout()
@@ -128,13 +130,28 @@ class VideoGridFragment(
       }
     }
 
-    Log.v(TAG, "Initialized GridLayout with ${initialVideos.size} views")
+    crashlyticsLog(TAG, "Initialized GridLayout with ${initialVideos.size} views")
 
     updateGridLayoutDimensions()
   }
 
+  override fun onDestroyView() {
+    super.onDestroyView()
+
+    // Unbind all the views attached clearing the EglContext
+    binding.container.apply {
+      for (currentRenderedView in renderedViews) {
+        unbindVideo(currentRenderedView.binding, currentRenderedView.video)
+        removeView(currentRenderedView.binding.root)
+      }
+    }
+  }
+
   fun updateVideos(newVideos: List<MeetingTrack>) {
-    Log.v(TAG, "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid")
+    crashlyticsLog(
+      TAG,
+      "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
+    )
 
     val newRenderedViews = ArrayList<RenderedViewPair>()
 
@@ -142,7 +159,7 @@ class VideoGridFragment(
     for (currentRenderedView in renderedViews) {
       val newVideo = newVideos.find { it == currentRenderedView.video }
       if (newVideo == null) {
-        Log.v(
+        crashlyticsLog(
           TAG,
           "updateVideos: Removing view for video=${currentRenderedView.video} from fragment=$tag"
         )
@@ -158,19 +175,19 @@ class VideoGridFragment(
       // Check if video already rendered
       val renderedViewPair = renderedViews.find { it.video == newVideo }
       if (renderedViewPair != null) {
-        Log.v(TAG, "updateVideos: Keeping view for video=$newVideo in fragment=$tag")
+        crashlyticsLog(TAG, "updateVideos: Keeping view for video=$newVideo in fragment=$tag")
         newRenderedViews.add(renderedViewPair)
       } else {
         // Create a new view
         val videoBinding = createVideoView(binding.container)
         bindVideo(videoBinding, newVideo)
-        Log.v(TAG, "updateVideos: Creating view for video=${newVideo} from fragment=$tag")
+        crashlyticsLog(TAG, "updateVideos: Creating view for video=${newVideo} from fragment=$tag")
         binding.container.addView(videoBinding.root)
         newRenderedViews.add(RenderedViewPair(videoBinding, newVideo))
       }
     }
 
-    Log.v(
+    crashlyticsLog(
       TAG,
       "updateVideos: Change grid items from ${renderedViews.size} -> ${newRenderedViews.size}"
     )

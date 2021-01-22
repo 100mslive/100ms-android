@@ -15,8 +15,8 @@ android {
         applicationId "live.hms.android100ms"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 6
-        versionName "1.0.4"
+        versionCode 7
+        versionName "1.0.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,7 +53,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     //100ms.live SDK
-    implementation project(':hmsvideo-android')
+    implementation project(":hmsvideo-android")
     implementation 'org.webrtc:google-webrtc:1.0.32006'
 
     // Navigation

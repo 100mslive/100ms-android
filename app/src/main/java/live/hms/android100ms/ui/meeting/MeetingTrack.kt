@@ -26,9 +26,9 @@ data class MeetingTrack(
         ")"
     return "MeetingTrack(" +
         "${peerStr}, " +
-        "${videoTrack}, " +
-        "${audioTrack}, " +
-        "isCurrentDeviceStream=${isCurrentDeviceStream}" +
+        "${videoTrack != null}, " +
+        "${audioTrack != null}, " +
+        "$isCurrentDeviceStream" +
         ")"
   }
 }
