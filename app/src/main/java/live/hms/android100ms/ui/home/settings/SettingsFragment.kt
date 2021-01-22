@@ -145,14 +145,14 @@ class SettingsFragment : Fragment() {
         settings.videoGridRows,
         editTextRows, containerRows,
         "Maximum Rows",
-        1, 5,
+        1, 3,
       ) { commitHelper.setVideoGridRows(it) }
 
       initNonEmptyEditTextWithRange(
         settings.videoGridColumns,
         editTextColumns, containerColumns,
         "Maximum Rows",
-        1, 5,
+        1, 3,
       ) { commitHelper.setVideoGridColumns(it) }
 
       initNonEmptyEditTextWithRange(
@@ -165,7 +165,6 @@ class SettingsFragment : Fragment() {
   }
 
   private fun initAutoCompleteViews() {
-    // TODO
     binding.apply {
       initAutoCompleteView(
         autoCompleteVideoSource,

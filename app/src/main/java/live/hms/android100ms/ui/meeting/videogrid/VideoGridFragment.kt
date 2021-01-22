@@ -218,6 +218,9 @@ class VideoGridFragment(
 
   private fun unbindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
     binding.surfaceView.apply {
+      // NOTE: We don't dispose off the MediaStreamTrack here as it can
+      // be re-used by the ViewPager/RecyclerView
+
       item.videoTrack?.removeSink(this)
       release()
       clearImage()

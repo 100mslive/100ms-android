@@ -367,7 +367,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
    * Changes the icons for buttons as per the current settings
    */
   private fun updateButtonsUI() {
+    // TODO: Listen to changes in publishVideo & publishAudio
+    //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
     binding.buttonToggleAudio.apply {
+      visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
+      isEnabled = settings.publishAudio
       setIconResource(
         if (isAudioEnabled)
           R.drawable.ic_baseline_mic_24
@@ -377,6 +381,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     binding.buttonToggleVideo.apply {
+      visibility = if (settings.publishVideo) View.VISIBLE else View.GONE
+      isEnabled = settings.publishVideo
       setIconResource(
         if (isVideoEnabled)
           R.drawable.ic_baseline_videocam_24
@@ -390,6 +396,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     updateButtonsUI()
 
     binding.buttonToggleVideo.setOnClickListener {
+      Log.v(TAG, "buttonToggleVideo.onClick()")
       currentDeviceTrack?.apply {
         if (videoTrack != null) {
           isVideoEnabled = !videoTrack.enabled()
@@ -405,6 +412,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
 
     binding.buttonToggleAudio.setOnClickListener {
+      Log.v(TAG, "buttonToggleAudio.onClick()")
       currentDeviceTrack?.apply {
         if (audioTrack != null) {
           isAudioEnabled = !audioTrack.enabled()
@@ -467,7 +475,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private fun cleanup() {
     // Because the scope of Chat View Model is the entire activity
     // We need to perform a cleanup
-    chatViewModel.removeSendBroadcastCallback()
     chatViewModel.clearMessages()
 
     // Remove all the video stream
@@ -526,11 +533,22 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   override fun onDisconnect(errorMessage: String) {
-    runOnUiThread {
-      Log.v(TAG, "onDisconnect: $errorMessage")
-      cleanup()
-      hideProgressBar()
-      showErrorView(errorMessage)
+    if (activity != null) {
+      runOnUiThread {
+        Log.v(TAG, "onDisconnect: $errorMessage")
+        cleanup()
+        hideProgressBar()
+        showErrorView(errorMessage)
+      }
+    } else {
+      // The user quit the app due to which the Fragment was detached from the
+      // parent MeetingActivity.
+      // It is safe to ignore this case assuming the user will not be able to recreate the
+      // same instance of destroyed activity.
+      crashlyticsLog(
+        TAG,
+        "onDisconnect(errorMessage=$errorMessage) called after activity was detached"
+      )
     }
   }
 
@@ -570,7 +588,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
 
   override fun onStreamAdd(peer: HMSPeer, streamInfo: HMSStreamInfo) {
-    Log.v(
+    crashlyticsLog(
       TAG,
       "onStreamAdd: peer-uid:${peer.uid}, " +
           "role=${peer.role}, " +
@@ -581,7 +599,14 @@ class MeetingFragment : Fragment(), HMSEventListener {
     Log.v(TAG, "Subscribing via $hmsClient")
     hmsClient?.subscribe(streamInfo, hmsRoom, object : HMSMediaRequestHandler {
       override fun onSuccess(stream: MediaStream) {
-        crashlyticsLog(TAG, "Subscribe($streamInfo): peer-id=${peer.uid} -- onSuccess($stream)")
+        crashlyticsLog(
+          TAG,
+          "Subscribe(" +
+              "uid=${streamInfo.uid}, " +
+              "mid=${streamInfo.mid}, " +
+              "userName=${streamInfo.userName}): " +
+              "peer-id=${peer.uid} -- onSuccess($stream)"
+        )
         runOnUiThread {
           var videoTrack: VideoTrack? = null
           var audioTrack: AudioTrack? = null
@@ -618,7 +643,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   override fun onStreamRemove(streamInfo: HMSStreamInfo) {
-    Log.v(TAG, "onStreamRemove: uid=${streamInfo.uid} mid=${streamInfo.mid}")
+    crashlyticsLog(TAG, "onStreamRemove: uid=${streamInfo.uid} mid=${streamInfo.mid}")
 
     runOnUiThread {
       var found = false
