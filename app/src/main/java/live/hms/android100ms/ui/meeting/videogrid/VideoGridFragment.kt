@@ -145,6 +145,9 @@ class VideoGridFragment(
         removeView(currentRenderedView.binding.root)
       }
     }
+
+    renderedViews.clear()
+    crashlyticsLog(TAG, "Unbind all views from grid (children=${binding.container.childCount}")
   }
 
   fun updateVideos(newVideos: List<MeetingTrack>) {

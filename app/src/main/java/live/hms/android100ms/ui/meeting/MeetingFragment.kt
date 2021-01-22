@@ -52,9 +52,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  // TODO: Get default camera from settings
-  private var isFrontCameraEnabled = true
-
+  // TODO: Disable video/audio buttons during audio/video only publish modes
   private var isAudioEnabled = true
   private var isVideoEnabled = true
 
@@ -77,8 +75,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
 
     roomDetails.apply {
-      crashlyticsSetKey(ROOM_ID, roomId)
-      crashlyticsSetKey(USERNAME, username)
+      crashlytics.setCustomKey(ROOM_ID, roomId)
+      crashlytics.setCustomKey(USERNAME, username)
     }
 
     clipboard = requireActivity()
@@ -164,7 +162,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
             "Cannot send '${message}'. Please try again",
             Toast.LENGTH_SHORT
           ).show()
-          Log.v(
+          crashlyticsLog(
             TAG,
             "Cannot broadcast message=${message} code=${errorCode} errorMessage=${errorMessage}"
           )
@@ -276,7 +274,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       cameraFacing = settings.camera
     }
 
-    Log.v(
+    crashlyticsLog(
       TAG, "getUserMedia() with " +
           "videoCodec=${localMediaConstraints.videoCodec}, " +
           "videoFrameRate=${localMediaConstraints.videoFrameRate}, " +
@@ -326,17 +324,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
             localMediaConstraints,
             object : HMSStreamRequestHandler {
               override fun onSuccess(data: HMSPublishStream?) {
-                Log.v(TAG, "Publish Success ${data!!.mid}")
+                crashlyticsLog(TAG, "Publish Success ${data!!.mid}")
               }
 
               override fun onFailure(errorCode: Long, errorReason: String?) {
-                Log.v(TAG, "Publish Failure $errorCode $errorReason")
+                crashlyticsLog(TAG, "Publish Failure $errorCode $errorReason")
               }
             })
         }
 
         override fun onFailure(errorCode: Long, errorReason: String?) {
-          Log.v(TAG, "GetUserMedia failed: $errorCode $errorReason")
+          crashlyticsLog(TAG, "GetUserMedia failed: $errorCode $errorReason")
         }
       })
 
@@ -349,7 +347,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
     )
     showProgressBar()
 
-    hmsPeer = HMSPeer(roomDetails.username, roomDetails.authToken)
+    hmsPeer = HMSPeer(roomDetails.username, roomDetails.authToken).apply {
+      crashlytics.setUserId(customerUserId)
+    }
+
     hmsRoom = HMSRoom(roomDetails.roomId)
     val config = HMSClientConfig(roomDetails.endpoint)
     hmsClient = HMSClient(this, requireContext(), hmsPeer, config).apply {
@@ -512,8 +513,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
           }
         }
 
-        override fun onFailure(p0: Long, p1: String?) {
-          Log.v(TAG, "Join onFailure($p0, $p1)")
+        override fun onFailure(errorCode: Long, errorMessage: String?) {
+          crashlyticsLog(TAG, "Join onFailure($errorCode, $errorMessage)")
         }
       })
 
@@ -576,7 +577,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     Log.v(TAG, "Subscribing via $hmsClient")
     hmsClient?.subscribe(streamInfo, hmsRoom, object : HMSMediaRequestHandler {
       override fun onSuccess(stream: MediaStream) {
-        Log.v(TAG, "Subscribe($streamInfo): peer-id=${peer.uid} -- onSuccess($stream)")
+        crashlyticsLog(TAG, "Subscribe($streamInfo): peer-id=${peer.uid} -- onSuccess($stream)")
         runOnUiThread {
           var videoTrack: VideoTrack? = null
           var audioTrack: AudioTrack? = null
@@ -596,7 +597,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       }
 
       override fun onFailure(errorCode: Long, errorReason: String) {
-        Log.v(
+        crashlyticsLog(
           TAG,
           "Subscribe($streamInfo): peer-id=${peer.uid} -- onFailure($errorCode, $errorReason)"
         )
