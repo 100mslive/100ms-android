@@ -128,13 +128,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     settings = SettingsStore(requireContext())
 
     hideErrorView()
-
-    updateProgressBarUI(
-      "Connecting...",
-      "Please wait while we connect you to ${roomDetails.endpoint}"
-    )
-    showProgressBar()
-
     initVideoGrid()
     initButtons()
     initOnBackPress()
@@ -369,6 +362,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private fun updateButtonsUI() {
     // TODO: Listen to changes in publishVideo & publishAudio
     //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
+
     binding.buttonToggleAudio.apply {
       visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
       isEnabled = settings.publishAudio
@@ -447,29 +441,29 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun disconnect() {
-    try {
-      hmsClient?.leave(object : HMSRequestHandler {
-        override fun onSuccess(s: String?) {
-          Log.v(TAG, "On Leave Success")
+    HMSStream.stopCapturers()
+
+    hmsClient?.leave(object : HMSRequestHandler {
+      override fun onSuccess(s: String?) {
+        crashlyticsLog(TAG, "[${Thread.currentThread()}] hmsClient.leave() -> onSuccess($s)")
+
+        // Go to home page
+        runOnUiThread {
+          hmsClient?.disconnect()
+          cleanup()
+
+          Intent(requireContext(), HomeActivity::class.java).apply {
+            Log.v(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
+            startActivity(this)
+            requireActivity().finish()
+          }
         }
+      }
 
-        override fun onFailure(l: Long, s: String?) {
-          Log.v(TAG, "On Leave Failure")
-        }
-      })
-      HMSStream.stopCapturers()
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-
-    cleanup()
-    hmsClient?.disconnect()
-
-    // Go to home page
-    Intent(requireContext(), HomeActivity::class.java).apply {
-      startActivity(this)
-      requireActivity().finish()
-    }
+      override fun onFailure(l: Long, s: String?) {
+        crashlyticsLog(TAG, "hmsClient.leave() -> onFailure($l, $s)")
+      }
+    })
   }
 
   private fun cleanup() {
@@ -487,6 +481,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     hmsClient = null
     hmsRoom = null
     hmsPeer = null
+    crashlyticsLog(TAG, "cleanup() done")
   }
 
   private fun initOnBackPress() {
