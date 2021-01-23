@@ -39,6 +39,7 @@ import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.properties.Delegates
 
 
 class MeetingFragment : Fragment(), HMSEventListener {
@@ -52,9 +53,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  // TODO: Disable video/audio buttons during audio/video only publish modes
-  private var isAudioEnabled = true
-  private var isVideoEnabled = true
+  private var isAudioEnabled by Delegates.notNull<Boolean>()
+  private var isVideoEnabled by Delegates.notNull<Boolean>()
 
   private var currentDeviceTrack: MeetingTrack? = null
   private val videoGridItems = ArrayList<MeetingTrack>()
@@ -126,12 +126,13 @@ class MeetingFragment : Fragment(), HMSEventListener {
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
+    isAudioEnabled = settings.publishAudio
+    isVideoEnabled = settings.publishVideo
 
     hideErrorView()
     initVideoGrid()
     initButtons()
     initOnBackPress()
-
 
     // We need only instance of HMSClient, hence it is not safe to initialize
     // inside onViewCreated as it will trigger redundant connect calls whenever,

@@ -73,6 +73,7 @@
 
     <string name="progress_bar_heading">Progress Bar Heading</string>
     <string name="progress_bar_description">Progress Bar Description</string>
+
     <string name="close_chat">Close Chat</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="oops_you_are_disconnected">Oops! You are disconnected</string>

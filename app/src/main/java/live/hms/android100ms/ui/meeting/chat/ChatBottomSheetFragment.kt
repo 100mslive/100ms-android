@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import live.hms.android100ms.databinding.FragmentBottomSheetChatBinding
+import live.hms.android100ms.databinding.DialogBottomSheetChatBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.util.viewLifecycle
 import java.util.*
@@ -21,7 +21,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     private const val TAG = "ChatFragment"
   }
 
-  private var binding by viewLifecycle<FragmentBottomSheetChatBinding>()
+  private var binding by viewLifecycle<DialogBottomSheetChatBinding>()
 
   private val chatViewModel: ChatViewModel by activityViewModels()
 
@@ -40,9 +40,9 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    binding = FragmentBottomSheetChatBinding.inflate(inflater, container, false)
+    binding = DialogBottomSheetChatBinding.inflate(inflater, container, false)
     roomDetails = args.roomDetail
-    currentUserCustomerId= args.currentUserCustomerId
+    currentUserCustomerId = args.currentUserCustomerId
 
     initRecyclerView()
     initButtons()

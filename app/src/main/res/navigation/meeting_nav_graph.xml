@@ -21,7 +21,7 @@
         android:id="@+id/ChatBottomSheetFragment"
         android:name="live.hms.android100ms.ui.meeting.chat.ChatBottomSheetFragment"
         android:label="@string/chat_fragment"
-        tools:layout="@layout/fragment_bottom_sheet_chat">
+        tools:layout="@layout/dialog_bottom_sheet_chat">
 
         <argument
             android:name="roomDetail"
