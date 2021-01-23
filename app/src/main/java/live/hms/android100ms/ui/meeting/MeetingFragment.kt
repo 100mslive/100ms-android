@@ -75,6 +75,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     roomDetails.apply {
       crashlytics.setCustomKey(ROOM_ID, roomId)
       crashlytics.setCustomKey(USERNAME, username)
+      crashlytics.setCustomKey(ROOM_ENDPOINT, endpoint)
     }
 
     clipboard = requireActivity()
