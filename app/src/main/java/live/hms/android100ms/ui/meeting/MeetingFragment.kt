@@ -389,7 +389,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private fun initButtons() {
     updateButtonsUI()
 
-    binding.buttonToggleVideo.setOnClickListener {
+    binding.buttonToggleVideo.setOnSingleClickListener(200L) {
       Log.v(TAG, "buttonToggleVideo.onClick()")
       currentDeviceTrack?.apply {
         if (videoTrack != null) {
@@ -405,7 +405,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       }
     }
 
-    binding.buttonToggleAudio.setOnClickListener {
+    binding.buttonToggleAudio.setOnSingleClickListener(200L) {
       Log.v(TAG, "buttonToggleAudio.onClick()")
       currentDeviceTrack?.apply {
         if (audioTrack != null) {
@@ -425,7 +425,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       )
     }
 
-    binding.buttonEndCall.setOnClickListener { disconnect() }
+    binding.buttonEndCall.setOnSingleClickListener(350L) { disconnect() }
 
     binding.buttonFlipCamera.setOnClickListener {
       hmsClient?.apply {
@@ -433,7 +433,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       }
     }
 
-    binding.disconnectError.buttonRetry.setOnClickListener {
+    binding.disconnectError.buttonRetry.setOnSingleClickListener(300L) {
       Log.v(TAG, "Trying to reconnect")
       hideErrorView()
       initHMSClient()
