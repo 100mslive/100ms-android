@@ -166,9 +166,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun startAudioManager() {
-    Log.d(TAG, "Starting Audio manager")
+    Log.v(TAG, "Starting Audio manager")
+
     audioManager.start { selectedAudioDevice, availableAudioDevices ->
-      Log.d(
+      Log.v(
         TAG,
         "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
       )
@@ -176,7 +177,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun stopAudioManager() {
-    Log.v(TAG, "Stopping Audio Manager")
+    Log.v(TAG, "Stopping Audio Manager :: selectedAudioDevice:${audioManager.selectedAudioDevice}")
     audioManager.stop()
   }
 
@@ -216,7 +217,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     Log.v(TAG, "updated video Grid UI with ${videoGridItems.size} items")
   }
 
-  private fun updateProgressBarUI(heading: String, description: String) {
+  private fun updateProgressBarUI(heading: String, description: String = "") {
     binding.progressBar.heading.text = heading
     binding.progressBar.description.apply {
       visibility = if (description.isEmpty()) View.GONE else View.VISIBLE
@@ -442,6 +443,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun disconnect() {
+    ThreadUtils.checkIsOnMainThread()
+    updateProgressBarUI("Leaving meeting...")
+    showProgressBar()
+
     HMSStream.stopCapturers()
 
     hmsClient?.leave(object : HMSRequestHandler {
@@ -694,8 +699,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
   }
 
-  // Helper function
   private fun runOnUiThread(action: Runnable) {
-    requireActivity().runOnUiThread(action)
+    // Call only when fragment is attached to an activity
+    activity?.runOnUiThread(action)
   }
 }

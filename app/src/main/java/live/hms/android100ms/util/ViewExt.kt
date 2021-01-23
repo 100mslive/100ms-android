@@ -12,10 +12,10 @@ fun View.setOnSingleClickListener(l: (View) -> Unit) {
 }
 
 // Keep the listener at last such that we can use kotlin lambda
-fun View.setOnSingleClickListener(delay: Long, l: View.OnClickListener) {
-  setOnClickListener(OnSingleClickListener(l, delay))
+fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {
+  setOnClickListener(OnSingleClickListener(l, waitDelay))
 }
 
-fun View.setOnSingleClickListener(delay: Long, l: (View) -> Unit) {
-  setOnClickListener(OnSingleClickListener(l, delay))
+fun View.setOnSingleClickListener(waitDelay: Long, l: (View) -> Unit) {
+  setOnClickListener(OnSingleClickListener(l, waitDelay))
 }

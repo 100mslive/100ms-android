@@ -1,10 +1,13 @@
 package live.hms.android100ms.ui.meeting.videogrid
 
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.adapter.FragmentViewHolder
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingTrack
+import live.hms.android100ms.util.ThreadUtils
 import live.hms.android100ms.util.crashlyticsLog
 import kotlin.math.min
 
@@ -15,21 +18,43 @@ class VideoGridAdapter(
 
   companion object {
     const val TAG = "VideoGridAdapter"
+
+    private const val DEBOUNCED_UPDATE_DELAY = 500L
   }
 
   private val items = ArrayList<MeetingTrack>()
+  private val itemsPendingUpdate = ArrayList<MeetingTrack>()
 
   private val context = parentFragment.requireContext()
   private val settings = SettingsStore(context)
 
   private val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
 
-  fun setItems(newItems: MutableList<MeetingTrack>) {
+  private val setItemsHandler = Handler(Looper.getMainLooper())
+  private val setItemsRunnable = Runnable {
+    ThreadUtils.checkIsOnMainThread()
     items.clear()
-    items.addAll(newItems)
+    items.addAll(itemsPendingUpdate)
+    itemsPendingUpdate.clear()
 
     crashlyticsLog(TAG, "Updated items: size=${items.size}")
     notifyDataSetChanged()
+  }
+
+  /**
+   * This method a debounced-delay of [DEBOUNCED_UPDATE_DELAY] such that
+   * if it called multiple times with delay less than debounce,
+   * it will update the view just once.
+   *
+   * @param newItems: Complete list of video items which needs
+   *  to be updated in the VideoGrid
+   */
+  fun setItems(newItems: MutableList<MeetingTrack>) {
+    itemsPendingUpdate.clear()
+    itemsPendingUpdate.addAll(newItems)
+
+    setItemsHandler.removeCallbacks(setItemsRunnable)
+    setItemsHandler.postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
   }
 
   // TODO: Listen to changes in rows, columns in settings
