@@ -1,9 +1,6 @@
 package live.hms.android100ms.ui.meeting
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -129,7 +127,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     isAudioEnabled = settings.publishAudio
     isVideoEnabled = settings.publishVideo
 
-    hideErrorView()
     initVideoGrid()
     initButtons()
     initOnBackPress()
@@ -241,21 +238,34 @@ class MeetingFragment : Fragment(), HMSEventListener {
     binding.progressBar.root.visibility = View.VISIBLE
   }
 
-  private fun hideErrorView() {
-    binding.viewPagerVideoGrid.visibility = View.VISIBLE
-    binding.tabLayoutDots.visibility = View.VISIBLE
-    binding.bottomControls.visibility = View.VISIBLE
-
-    binding.disconnectError.root.visibility = View.GONE
+  private fun handleFailureWithQuitMeeting(title: String, errorMessage: String) {
+    AlertDialog.Builder(requireContext())
+      .setMessage(errorMessage)
+      .setTitle(title)
+      .setPositiveButton("Leave") { dialog, id ->
+        Log.v(TAG, "Leaving meeting due to '$title' :: $errorMessage")
+        leaveMeeting()
+        dialog.dismiss()
+      }
+      .setCancelable(false)
+      .create()
+      .show()
   }
 
-  private fun showErrorView(reason: String) {
-    binding.viewPagerVideoGrid.visibility = View.GONE
-    binding.tabLayoutDots.visibility = View.GONE
-    binding.bottomControls.visibility = View.GONE
+  private fun handleFailureWithRetry(title: String, errorMessage: String) {
+    cleanup()
 
-    binding.disconnectError.root.visibility = View.VISIBLE
-    binding.disconnectError.reason.text = reason
+    AlertDialog.Builder(requireContext())
+      .setMessage(errorMessage)
+      .setTitle(title)
+      .setPositiveButton("Retry") { dialog, id ->
+        Log.v(TAG, "Trying to reconnect")
+        initHMSClient()
+        dialog.dismiss()
+      }
+      .setCancelable(false)
+      .create()
+      .show()
   }
 
   private fun getUserMedia() {
@@ -328,6 +338,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
               override fun onFailure(errorCode: Long, errorReason: String) {
                 crashlyticsLog(TAG, "Publish Failure $errorCode $errorReason")
+                handleFailureWithRetry("[$errorCode] Publish Failure", errorReason)
               }
             })
         }
@@ -427,22 +438,16 @@ class MeetingFragment : Fragment(), HMSEventListener {
       )
     }
 
-    binding.buttonEndCall.setOnSingleClickListener(350L) { disconnect() }
+    binding.buttonEndCall.setOnSingleClickListener(350L) { leaveMeeting() }
 
     binding.buttonFlipCamera.setOnClickListener {
       hmsClient?.apply {
         switchCamera()
       }
     }
-
-    binding.disconnectError.buttonRetry.setOnSingleClickListener(300L) {
-      Log.v(TAG, "Trying to reconnect")
-      hideErrorView()
-      initHMSClient()
-    }
   }
 
-  private fun disconnect() {
+  private fun leaveMeeting() {
     ThreadUtils.checkIsOnMainThread()
     updateProgressBarUI("Leaving meeting...")
     showProgressBar()
@@ -496,7 +501,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
       object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
           Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-          disconnect()
+          leaveMeeting()
         }
       })
   }
@@ -536,10 +541,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
   override fun onDisconnect(errorMessage: String) {
     if (activity != null) {
       runOnUiThread {
-        Log.v(TAG, "onDisconnect: $errorMessage")
-        cleanup()
-        hideProgressBar()
-        showErrorView(errorMessage)
+        crashlyticsLog(TAG, "onDisconnect: $errorMessage")
+        handleFailureWithRetry("You're disconnected", errorMessage)
       }
     } else {
       // The user quit the app due to which the Fragment was detached from the
@@ -639,6 +642,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
           TAG,
           "Subscribe($streamInfo): peer-id=${peer.uid} -- onFailure($errorCode, $errorReason)"
         )
+        handleFailureWithQuitMeeting("[$errorCode] Subscribe Failure", errorReason)
       }
     })
   }
