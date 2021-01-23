@@ -7,6 +7,7 @@
         <item name="colorOnPrimary">@color/primaryTextColor</item>
 
         <!-- Secondary brand color. -->
+        <item name="colorAccent">@color/secondaryColor</item>
         <item name="colorSecondary">@color/secondaryColor</item>
         <item name="colorSecondaryVariant">@color/secondaryDarkColor</item>
         <item name="colorOnSecondary">@color/secondaryTextColor</item>
@@ -14,9 +15,9 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
-        <!-- Customize your theme here. -->
         <item name="colorOnSurface">@android:color/white</item>
         <item name="colorOnBackground">@android:color/white</item>
+        <item name="colorOnPrimarySurface">@android:color/white</item>
     </style>
 
     <style name="Theme.Android100ms.NoActionBar">

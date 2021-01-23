@@ -10,11 +10,6 @@
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar" />
 
-    <include
-        android:id="@+id/disconnect_error"
-        layout="@layout/meeting_disconnect_error" />
-
-
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager_video_grid"
         android:layout_width="match_parent"
