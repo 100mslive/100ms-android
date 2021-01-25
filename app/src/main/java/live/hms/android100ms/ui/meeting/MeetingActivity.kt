@@ -3,6 +3,7 @@ package live.hms.android100ms.ui.meeting
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.Menu
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import live.hms.android100ms.R
@@ -18,6 +19,9 @@ class MeetingActivity : AppCompatActivity() {
     setContentView(binding.root)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
+
+
+    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
   }
 
   @SuppressLint("RestrictedApi")

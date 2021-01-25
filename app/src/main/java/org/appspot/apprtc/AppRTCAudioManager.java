@@ -21,11 +21,16 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.appspot.apprtc.util.AppRTCUtils;
 import org.webrtc.ThreadUtils;
+
+import live.hms.android100ms.R;
 
 /**
  * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
@@ -57,10 +62,10 @@ public class AppRTCAudioManager {
   }
 
   private final Context apprtcContext;
-  
+  @Nullable
   private AudioManager audioManager;
 
-  
+  @Nullable
   private AudioManagerEvents audioManagerEvents;
   private AudioManagerState amState;
   private int savedAudioMode = AudioManager.MODE_INVALID;
@@ -86,13 +91,13 @@ public class AppRTCAudioManager {
   private AudioDevice userSelectedAudioDevice;
 
   // Contains speakerphone setting: auto, true or false
-   private final String useSpeakerphone;
+  @Nullable private final String useSpeakerphone;
 
   // Proximity sensor object. It measures the proximity of an object in cm
   // relative to the view screen of a device and can therefore be used to
   // assist device switching (close to ear <=> use headset earpiece if
   // available, far from ear <=> use speaker phone).
-   private AppRTCProximitySensor proximitySensor;
+  @Nullable private AppRTCProximitySensor proximitySensor;
 
   // Handles all tasks related to Bluetooth headset devices.
   private final AppRTCBluetoothManager bluetoothManager;
@@ -105,7 +110,7 @@ public class AppRTCAudioManager {
   private BroadcastReceiver wiredHeadsetReceiver;
 
   // Callback method for changes in audio focus.
-  
+  @Nullable
   private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
 
   /**
@@ -160,7 +165,7 @@ public class AppRTCAudioManager {
     return new AppRTCAudioManager(context);
   }
 
-  public AppRTCAudioManager(Context context) {
+  private AppRTCAudioManager(Context context) {
     Log.d(TAG, "ctor");
     ThreadUtils.checkIsOnMainThread();
     apprtcContext = context;
@@ -170,8 +175,8 @@ public class AppRTCAudioManager {
     amState = AudioManagerState.UNINITIALIZED;
 
     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-    useSpeakerphone = sharedPreferences.getString("speakerphone_preference",
-       "auto");
+    useSpeakerphone = sharedPreferences.getString(context.getString(R.string.pref_speakerphone_key),
+        context.getString(R.string.pref_speakerphone_default));
     Log.d(TAG, "useSpeakerphone: " + useSpeakerphone);
     if (useSpeakerphone.equals(SPEAKERPHONE_FALSE)) {
       defaultAudioDevice = AudioDevice.EARPIECE;
