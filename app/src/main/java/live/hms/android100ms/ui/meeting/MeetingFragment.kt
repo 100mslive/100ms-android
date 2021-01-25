@@ -99,8 +99,17 @@ class MeetingFragment : Fragment(), HMSEventListener {
           setIcon(R.drawable.ic_baseline_volume_up_24)
         }
 
-        videoGridItems.forEach {
-          it.audioTrack?.setEnabled(!isVolumeMuted)
+        videoGridItems.forEach { track ->
+          // Ignore the current user's track
+          if (track != currentDeviceTrack) {
+            track.audioTrack?.apply {
+              // WARN: Trying to enable an already enabled video
+              //  raises IllegalStateException: MediaStreamTrack has been disposed
+              if (enabled() == isVolumeMuted) {
+                setEnabled(!isVolumeMuted)
+              }
+            }
+          }
         }
 
         true
@@ -622,10 +631,12 @@ class MeetingFragment : Fragment(), HMSEventListener {
   override fun onStreamAdd(peer: HMSPeer, streamInfo: HMSStreamInfo) {
     crashlyticsLog(
       TAG,
-      "onStreamAdd: peer-uid:${peer.uid}, " +
-          "role=${peer.role}, " +
-          "userId:${peer.customerUserId}, " +
-          "streamInfo:${streamInfo}"
+      "onStreamAdd: peer-uid:${peer.uid} " +
+          "name=${peer.userName}, " +
+          "role=${peer.role} " +
+          "userId=${peer.customerUserId} " +
+          "mid=${streamInfo.mid} " +
+          "uid=${streamInfo.uid}"
     )
 
     Log.v(TAG, "Subscribing via $hmsClient")
@@ -650,7 +661,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
           if (stream.audioTracks.size > 0) {
             audioTrack = stream.audioTracks[0]
-            audioTrack.setEnabled(true)
+            audioTrack.setEnabled(!isVolumeMuted)
           }
 
           videoGridItems.add(
@@ -676,7 +687,13 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   override fun onStreamRemove(streamInfo: HMSStreamInfo) {
-    crashlyticsLog(TAG, "onStreamRemove: uid=${streamInfo.uid} mid=${streamInfo.mid}")
+    crashlyticsLog(
+      TAG,
+      "onStreamRemove: " +
+          "name=${streamInfo.userName} " +
+          "uid=${streamInfo.uid} " +
+          "mid=${streamInfo.mid}"
+    )
 
     runOnUiThread {
       var found = false
@@ -706,7 +723,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   override fun onBroadcast(data: HMSPayloadData) {
-    Log.v(
+    crashlyticsLog(
       TAG,
       "onBroadcast: customerId=${data.peer.customerUserId}, " +
           "userName=${data.peer.userName}, " +

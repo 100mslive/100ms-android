@@ -106,7 +106,7 @@ class VideoGridAdapter(
     crashlyticsLog(
       TAG,
       "onBindViewHolder($holder, $position, $payloads): "
-          + "tag=$tag, fragment=$fragment, "
+          + "fragment-tag=$tag, "
           + "pageCount=$itemCount, itemsPerPage=$itemsPerPage"
     )
 
@@ -115,7 +115,7 @@ class VideoGridAdapter(
       val newVideos = getVideosForPage(position)
       crashlyticsLog(
         TAG,
-        "onBindViewHolder: Manually updating fragment $tag with " +
+        "onBindViewHolder: Manually updating fragment-tag=$tag with " +
             "total ${newVideos.size} [newVideos=$newVideos]"
       )
       (fragment as VideoGridFragment).updateVideos(newVideos)
