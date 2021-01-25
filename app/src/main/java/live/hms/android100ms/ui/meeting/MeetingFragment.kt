@@ -92,6 +92,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     menu.findItem(R.id.action_volume).apply {
       setOnMenuItemClickListener {
         isVolumeMuted = !isVolumeMuted
+        crashlytics.recordException(Exception("Did you catch me?"))
         if (isVolumeMuted) {
           setIcon(R.drawable.ic_baseline_volume_off_24)
         } else {
@@ -126,6 +127,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
       }
       R.id.action_share_screen -> {
         Toast.makeText(requireContext(), "Screen Share Not Supported", Toast.LENGTH_SHORT).show()
+      }
+      R.id.action_email_logs -> {
+        requireContext().startActivity(
+          EmailUtils.getCrashLogIntent(requireContext())
+        )
       }
     }
     return false
@@ -182,10 +188,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun startAudioManager() {
-    Log.v(TAG, "Starting Audio manager")
+    crashlyticsLog(TAG, "Starting Audio manager")
 
     audioManager.start { selectedAudioDevice, availableAudioDevices ->
-      Log.v(
+      crashlyticsLog(
         TAG,
         "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
       )
@@ -193,7 +199,10 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun stopAudioManager() {
-    Log.v(TAG, "Stopping Audio Manager :: selectedAudioDevice:${audioManager.selectedAudioDevice}")
+    crashlyticsLog(
+      TAG,
+      "Stopping Audio Manager::selectedAudioDevice:${audioManager.selectedAudioDevice}"
+    )
     audioManager.stop()
   }
 

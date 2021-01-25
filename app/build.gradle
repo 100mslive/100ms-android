@@ -24,10 +24,12 @@ android {
     buildTypes {
         debug {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+            buildConfigField "String", "BUG_REPORT_EMAIL", BUG_REPORT_EMAIL
             minifyEnabled false
         }
         release {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+            buildConfigField "String", "BUG_REPORT_EMAIL", BUG_REPORT_EMAIL
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
