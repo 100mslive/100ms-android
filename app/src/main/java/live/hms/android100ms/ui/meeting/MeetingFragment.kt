@@ -3,10 +3,7 @@ package live.hms.android100ms.ui.meeting
 import android.content.*
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -53,6 +50,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private var isAudioEnabled by Delegates.notNull<Boolean>()
   private var isVideoEnabled by Delegates.notNull<Boolean>()
+  private var isVolumeMuted = false
 
   private var currentDeviceTrack: MeetingTrack? = null
   private val videoGridItems = ArrayList<MeetingTrack>()
@@ -87,6 +85,26 @@ class MeetingFragment : Fragment(), HMSEventListener {
   override fun onDestroy() {
     super.onDestroy()
     stopAudioManager()
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    menu.findItem(R.id.action_volume).apply {
+      setOnMenuItemClickListener {
+        isVolumeMuted = !isVolumeMuted
+        if (isVolumeMuted) {
+          setIcon(R.drawable.ic_baseline_volume_off_24)
+        } else {
+          setIcon(R.drawable.ic_baseline_volume_up_24)
+        }
+
+        videoGridItems.forEach {
+          it.audioTrack?.setEnabled(!isVolumeMuted)
+        }
+
+        true
+      }
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
