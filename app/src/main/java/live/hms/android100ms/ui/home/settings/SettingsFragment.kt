@@ -1,23 +1,34 @@
 package live.hms.android100ms.ui.home.settings
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.databinding.FragmentSettingsBinding
+import live.hms.android100ms.ui.home.HomeActivity
 import live.hms.android100ms.util.viewLifecycle
+import kotlin.system.exitProcess
+
 
 class SettingsFragment : Fragment() {
 
   companion object {
     private const val TAG = "SettingsFragment"
+
+    private const val LEAK_CANARY_PENDING_INTENT_ID = 10023
 
     private val VIDEO_RESOLUTIONS = mapOf(
       "4K (2160p)" to "3840 x 2160",
@@ -221,6 +232,50 @@ class SettingsFragment : Fragment() {
     }
   }
 
+  private var forceDismissLeakCanaryDialog = false
+
+  private fun handleLeakCanaryToggle(isChecked: Boolean) {
+    if (forceDismissLeakCanaryDialog) {
+      /*
+      Since we set a OnCheckedChangeListener on leak-canary switch,
+      when we programmatically toggle it on negative-button click,
+      it calls this function again -- Initiating a un-ending loop
+      of dialogs.
+
+      This flag aims to hack-fix this issue.
+       */
+      forceDismissLeakCanaryDialog = false
+      return
+    }
+
+    AlertDialog.Builder(requireContext())
+      .setMessage(
+        "You're about to toggle leak canary which requires restarting this app. " +
+            "The app will be closed when you press Confirm."
+      )
+      .setTitle("Confirm Change")
+      .setPositiveButton("Confirm") { _, _ ->
+
+        // Commit all the changes as we forcefully kill the app.
+        commitHelper.setIsLeakCanaryEnabled(isChecked)
+        commitHelper.commit()
+
+
+        System.exit(0)
+      }
+      .setNegativeButton("Discard") { dialog, _ ->
+        forceDismissLeakCanaryDialog = true
+
+        // Revert back the changes
+        binding.switchToggleLeakCanary.isChecked = !isChecked
+        dialog.dismiss()
+      }
+      .setCancelable(false)
+      .create()
+      .show()
+
+  }
+
   private fun initSwitches() {
     binding.apply {
       initSwitch(
@@ -233,9 +288,17 @@ class SettingsFragment : Fragment() {
         switchMuteMicrophoneOnJoin
       ) { commitHelper.setPublishAudio(!it) }
 
+      initSwitch(
+        settings.isLeakCanaryEnabled,
+        switchToggleLeakCanary
+      ) { handleLeakCanaryToggle(it) }
+
       // Disable the switches not yet supported (TODO)
       switchMirrorVideo.isEnabled = false
       switchShowPreviewBeforeJoin.isEnabled = false
+
+      // Disable leak-canary switch for non-debug builds
+      switchToggleLeakCanary.isEnabled = BuildConfig.DEBUG
     }
   }
 
