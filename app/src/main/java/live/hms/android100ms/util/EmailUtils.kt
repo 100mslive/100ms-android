@@ -44,6 +44,7 @@ object EmailUtils {
         "SDK Version: ${Build.VERSION.SDK_INT}" +
         "\n--------------------------------------------\n"
 
+    Log.v(TAG, "Created intent with Email Description:\n\n$emailDescription")
 
     return Intent(Intent.ACTION_SEND).apply {
       type = "vnd.android.cursor.dir/email";

@@ -25,6 +25,7 @@ import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingActivity
+import live.hms.android100ms.util.EmailUtils
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
 
@@ -58,6 +59,11 @@ class HomeFragment : Fragment() {
       R.id.action_settings -> {
         findNavController().navigate(
           HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
+        )
+      }
+      R.id.action_email_logs -> {
+        requireContext().startActivity(
+          EmailUtils.getCrashLogIntent(requireContext())
         )
       }
     }

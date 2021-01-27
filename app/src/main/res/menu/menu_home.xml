@@ -5,5 +5,11 @@
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_baseline_settings_24"
         android:title="@string/settings"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_email_logs"
+        android:icon="@drawable/ic_baseline_bug_report_24"
+        android:title="@string/bug_report"
+        app:showAsAction="never" />
 </menu>
