@@ -1,11 +1,14 @@
 package live.hms.android100ms.ui.home.settings
 
 import android.content.Context
+import android.util.Log
 import androidx.core.content.edit
 
 class SettingsStore(context: Context) {
 
   companion object {
+    const val TAG = "SettingsStore"
+
     const val SETTINGS_SHARED_PREF = "settings-shared-preferences"
     const val PUBLISH_VIDEO = "publish-video"
     const val CAMERA = "camera"
@@ -21,6 +24,8 @@ class SettingsStore(context: Context) {
 
     const val VIDEO_GRID_ROWS = "video-grid-rows"
     const val VIDEO_GRID_COLUMNS = "video-grid-columns"
+
+    const val LEAK_CANARY = "leak-canary"
   }
 
 
@@ -100,6 +105,10 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getInt(VIDEO_GRID_COLUMNS, 2)
     set(value) = putInt(VIDEO_GRID_COLUMNS, value)
 
+  var isLeakCanaryEnabled: Boolean
+    get() = sharedPreferences.getBoolean(LEAK_CANARY, true)
+    set(value) = putBoolean(LEAK_CANARY, value)
+
 
   inner class MultiCommitHelper {
 
@@ -166,7 +175,13 @@ class SettingsStore(context: Context) {
       return this
     }
 
+    fun setIsLeakCanaryEnabled(value: Boolean): MultiCommitHelper {
+      editor.putBoolean(LEAK_CANARY, value)
+      return this
+    }
+
     fun commit() {
+      Log.v(TAG, "Commit changes at once")
       editor.commit()
     }
 
