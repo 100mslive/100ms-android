@@ -1,14 +1,16 @@
 package live.hms.android100ms.util
 
+import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.viewbinding.ViewBinding
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+
+const val TAG = "ViewBindingLifecycleExtension"
 
 /**
  * An extension to bind and unbind a value based on the view lifecycle of a Fragment.
@@ -30,15 +32,17 @@ fun <T : ViewBinding> Fragment.viewLifecycle(): ReadWriteProperty<Fragment, T> =
 
       this@viewLifecycle
         .viewLifecycleOwnerLiveData
-        .observe(this@viewLifecycle, Observer { owner: LifecycleOwner? ->
-          owner?.lifecycle?.addObserver(this)
+        .observe(this@viewLifecycle, { owner: LifecycleOwner ->
+          owner.lifecycle.addObserver(this)
         })
     }
 
-    // binding is made null when view is destroyed.
-
     override fun onDestroy(owner: LifecycleOwner) {
+      super.onDestroy(owner)
+      Log.d(TAG, "Removing reference to $binding during onDestroy($owner)")
+
       binding = null
+      owner.lifecycle.removeObserver(this)
     }
 
     override fun getValue(thisRef: Fragment, property: KProperty<*>): T {

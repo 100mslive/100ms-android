@@ -8,14 +8,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.ActivityMeetingBinding
-import live.hms.android100ms.util.viewLifecycle
 
 class MeetingActivity : AppCompatActivity() {
 
-  private val binding by viewLifecycle(ActivityMeetingBinding::inflate)
+  private var _binding: ActivityMeetingBinding? = null
+
+  private val binding: ActivityMeetingBinding
+    get() = _binding!!
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    _binding = ActivityMeetingBinding.inflate(layoutInflater)
+
     setContentView(binding.root)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -33,5 +37,10 @@ class MeetingActivity : AppCompatActivity() {
     }
 
     return true
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
   }
 }

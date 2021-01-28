@@ -36,6 +36,7 @@
         <action
             android:id="@+id/action_PermissionFragment_to_HomeFragment"
             app:destination="@id/HomeFragment"
+            app:launchSingleTop="true"
             app:popUpTo="@id/HomeFragment"
             app:popUpToInclusive="true" />
     </fragment>

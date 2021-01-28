@@ -8,14 +8,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.ActivityHomeBinding
-import live.hms.android100ms.util.viewLifecycle
 
 class HomeActivity : AppCompatActivity() {
 
-  private val binding by viewLifecycle(ActivityHomeBinding::inflate)
+  private var _binding: ActivityHomeBinding? = null
+  private val binding: ActivityHomeBinding
+    get() = _binding!!
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    _binding = ActivityHomeBinding.inflate(layoutInflater)
+
     setContentView(binding.root)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -37,5 +40,10 @@ class HomeActivity : AppCompatActivity() {
   override fun onNewIntent(intent: Intent?) {
     super.onNewIntent(intent)
     setIntent(intent)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    _binding = null
   }
 }

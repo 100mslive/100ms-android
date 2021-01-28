@@ -1,9 +1,5 @@
 package live.hms.android100ms.ui.home.settings
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,9 +14,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.databinding.FragmentSettingsBinding
-import live.hms.android100ms.ui.home.HomeActivity
 import live.hms.android100ms.util.viewLifecycle
-import kotlin.system.exitProcess
 
 
 class SettingsFragment : Fragment() {
@@ -37,6 +31,7 @@ class SettingsFragment : Fragment() {
       "VGA (480p)" to "640 x 480",
       "QVGA (240p)" to "320 x 240",
       "QQVGA (120p)" to "160 x 120",
+      "90p" to "90 x 90"
     )
 
     private val CODECS = arrayOf("VP8")
