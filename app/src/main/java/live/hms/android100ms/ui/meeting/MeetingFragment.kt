@@ -673,7 +673,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
         if (
           meetingTrack.peer.uid == streamInfo.uid
           && meetingTrack.mediaId == streamInfo.mid
-          && meetingTrack.peer.customerUserId == streamInfo.peer.customerUserId
         ) {
           toRemove.add(meetingTrack)
           found = true

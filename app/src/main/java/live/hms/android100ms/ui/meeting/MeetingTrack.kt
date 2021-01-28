@@ -13,8 +13,7 @@ data class MeetingTrack(
 ) {
   override fun equals(other: Any?): Boolean {
     if (other is MeetingTrack) {
-      return other.peer.customerUserId == peer.customerUserId &&
-          other.peer.peerId == peer.peerId &&
+      return other.peer.uid == peer.uid &&
           other.mediaId == mediaId
     }
 
