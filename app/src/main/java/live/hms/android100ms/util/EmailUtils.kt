@@ -46,10 +46,14 @@ object EmailUtils {
 
     Log.v(TAG, "Created intent with Email Description:\n\n$emailDescription")
 
+    val to = BuildConfig.BUG_REPORT_EMAIL_TO.split(',').toTypedArray()
+    val cc = BuildConfig.BUG_REPORT_EMAIL_CC.split(',').toTypedArray()
+
     return Intent(Intent.ACTION_SEND).apply {
       type = "vnd.android.cursor.dir/email";
       putExtra(Intent.EXTRA_STREAM, logUri)
-      putExtra(Intent.EXTRA_EMAIL, arrayOf(BuildConfig.BUG_REPORT_EMAIL))
+      putExtra(Intent.EXTRA_EMAIL, to)
+      putExtra(Intent.EXTRA_CC, cc)
       putExtra(Intent.EXTRA_SUBJECT, "Bug Report: Android 100ms Sample App")
       putExtra(Intent.EXTRA_TEXT, emailDescription)
       flags = Intent.FLAG_GRANT_READ_URI_PERMISSION

@@ -15,8 +15,8 @@ android {
         applicationId "live.hms.android100ms"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 9
-        versionName "1.0.7"
+        versionCode 10
+        versionName "1.0.8"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,12 +24,14 @@ android {
     buildTypes {
         debug {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "BUG_REPORT_EMAIL", BUG_REPORT_EMAIL
+            buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
+            buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled false
         }
         release {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "BUG_REPORT_EMAIL", BUG_REPORT_EMAIL
+            buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
+            buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
