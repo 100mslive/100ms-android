@@ -344,6 +344,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
               override fun onFailure(errorCode: Long, errorReason: String) {
                 crashlyticsLog(TAG, "Publish Failure $errorCode $errorReason")
+                hmsClient?.disconnect()
                 handleFailureWithRetry("[$errorCode] Publish Failure", errorReason)
               }
             })
