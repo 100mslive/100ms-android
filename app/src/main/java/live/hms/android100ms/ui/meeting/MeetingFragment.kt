@@ -82,8 +82,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     audioManager = AppRTCAudioManager.create(requireContext())
   }
 
-  override fun onDestroy() {
-    super.onDestroy()
+  override fun onStop() {
+    super.onStop()
     stopAudioManager()
   }
 

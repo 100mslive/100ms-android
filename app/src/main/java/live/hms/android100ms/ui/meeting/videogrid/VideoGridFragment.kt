@@ -253,9 +253,4 @@ class VideoGridFragment(
     /** No need to call [updateGridLayoutDimensions] as view is about to be destroyed! */
 
   }
-
-  override fun onDestroyView() {
-    super.onDestroyView()
-    crashlyticsLog(TAG, "Fragment=$tag onDestroyView() called with ${renderedViews.size} items")
-  }
 }
