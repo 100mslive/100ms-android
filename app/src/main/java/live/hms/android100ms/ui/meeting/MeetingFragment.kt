@@ -50,7 +50,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private var isAudioEnabled by Delegates.notNull<Boolean>()
   private var isVideoEnabled by Delegates.notNull<Boolean>()
-  private var isVolumeMuted = false
 
   private var currentDeviceTrack: MeetingTrack? = null
   private val videoGridItems = ArrayList<MeetingTrack>()
@@ -85,36 +84,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
   override fun onDestroy() {
     super.onDestroy()
     stopAudioManager()
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    menu.findItem(R.id.action_volume).apply {
-      setOnMenuItemClickListener {
-        isVolumeMuted = !isVolumeMuted
-        crashlytics.recordException(Exception("Did you catch me?"))
-        if (isVolumeMuted) {
-          setIcon(R.drawable.ic_baseline_volume_off_24)
-        } else {
-          setIcon(R.drawable.ic_baseline_volume_up_24)
-        }
-
-        videoGridItems.forEach { track ->
-          // Ignore the current user's track
-          if (track != currentDeviceTrack) {
-            track.audioTrack?.apply {
-              // WARN: Trying to enable an already enabled video
-              //  raises IllegalStateException: MediaStreamTrack has been disposed
-              if (enabled() == isVolumeMuted) {
-                setEnabled(!isVolumeMuted)
-              }
-            }
-          }
-        }
-
-        true
-      }
-    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -661,7 +630,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
           if (stream.audioTracks.size > 0) {
             audioTrack = stream.audioTracks[0]
-            audioTrack.setEnabled(!isVolumeMuted)
+            audioTrack.setEnabled(true)
           }
 
           videoGridItems.add(
