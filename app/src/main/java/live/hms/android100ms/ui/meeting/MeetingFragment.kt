@@ -604,7 +604,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     runOnUiThread {
       Toast.makeText(
         requireContext(),
-        "${peer.userName} - ${peer.peerId} joined",
+        "${peer.userName} joined",
         Toast.LENGTH_SHORT
       ).show()
     }
@@ -621,7 +621,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     runOnUiThread {
       Toast.makeText(
         requireContext(),
-        "${peer.userName} - ${peer.peerId} left",
+        "${peer.userName} left",
         Toast.LENGTH_SHORT
       ).show()
     }
@@ -731,15 +731,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
     )
 
     runOnUiThread {
-      // FIXME: Get the user name anyhow!
-      var username = data.peer.userName
-      if (username.isEmpty()) username = "error<senderName=null>"
-
       chatViewModel.receivedMessage(
         ChatMessage(
           // TODO: Change uid -> Customer ID
           data.peer.uid,
-          username,
+          data.senderName,
           Date(),
           data.msg,
           false
