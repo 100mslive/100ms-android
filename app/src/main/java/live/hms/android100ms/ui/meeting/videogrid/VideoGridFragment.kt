@@ -154,7 +154,7 @@ class VideoGridFragment(
 
         binding.container.apply {
           unbindVideo(currentRenderedView.binding, currentRenderedView.video)
-          removeView(currentRenderedView.binding.root)
+          removeViewInLayout(currentRenderedView.binding.root)
         }
       }
     }
@@ -217,6 +217,7 @@ class VideoGridFragment(
   }
 
   private fun unbindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
+    crashlyticsLog(TAG, "fragment=$tag: unbindVideo(item=$item)")
     binding.surfaceView.apply {
       // NOTE: We don't dispose off the MediaStreamTrack here as it can
       // be re-used by the ViewPager/RecyclerView
@@ -235,8 +236,26 @@ class VideoGridFragment(
     )
   }
 
+  override fun onStop() {
+    super.onStop()
+    crashlyticsLog(TAG, "Fragment=$tag onStop() called with ${renderedViews.size} items")
+
+    // Perform a cleanup of all the views
+    renderedViews.forEach {
+      binding.container.apply {
+        unbindVideo(it.binding, it.video)
+        removeViewInLayout(it.binding.root)
+      }
+    }
+
+    renderedViews.clear()
+
+    /** No need to call [updateGridLayoutDimensions] as view is about to be destroyed! */
+
+  }
+
   override fun onDestroyView() {
     super.onDestroyView()
-    crashlyticsLog(TAG, "Fragment=$tag onDestroyView() called with (${renderedViews.size} items)")
+    crashlyticsLog(TAG, "Fragment=$tag onDestroyView() called with ${renderedViews.size} items")
   }
 }
