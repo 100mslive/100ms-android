@@ -30,7 +30,7 @@ import kotlin.math.min
  *  - 8 videos will have 4 rows, 2 columns
  */
 class VideoGridFragment(
-  private val initialVideos: MutableList<MeetingTrack>,
+  private val initialVideos: Array<MeetingTrack>,
   private val maxRows: Int, private val maxColumns: Int,
   private val onVideoItemClick: (video: MeetingTrack) -> Unit
 ) : Fragment() {
@@ -135,7 +135,7 @@ class VideoGridFragment(
     updateGridLayoutDimensions()
   }
 
-  fun updateVideos(newVideos: List<MeetingTrack>) {
+  fun updateVideos(newVideos: Array<MeetingTrack>) {
     crashlyticsLog(
       TAG,
       "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
