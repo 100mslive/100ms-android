@@ -161,10 +161,8 @@ class HomeFragment : Fragment() {
   private fun tryJoiningRoomAs(role: String) {
     val username = getUsername()
 
-    // Update the name in local store if required
-    if (binding.checkboxUseDefault.isChecked) {
-      settings.username = username
-    }
+    // Update the name in local store
+    settings.username = username
 
     homeViewModel.sendAuthTokenRequest(
       TokenRequest(
