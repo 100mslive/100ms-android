@@ -11,6 +11,7 @@ data class MeetingTrack(
   val audioTrack: AudioTrack?,
   val isCurrentDeviceStream: Boolean = false
 ) {
+
   override fun equals(other: Any?): Boolean {
     if (other is MeetingTrack) {
       return other.peer.uid == peer.uid &&
