@@ -51,6 +51,9 @@ class VideoGridFragment(
 
   private var binding by viewLifecycle<FragmentVideoGridBinding>()
 
+  // Determined using the onResume() and onPause()
+  private var isViewVisible = false
+
   private data class RenderedViewPair(
     val binding: GridItemVideoBinding,
     val video: MeetingTrack
@@ -153,7 +156,10 @@ class VideoGridFragment(
         )
 
         binding.container.apply {
-          unbindVideo(currentRenderedView.binding, currentRenderedView.video)
+          // Unbind only when view is visible to user
+          if (isViewVisible) {
+            unbindSurfaceView(currentRenderedView.binding, currentRenderedView.video)
+          }
           removeViewInLayout(currentRenderedView.binding.root)
         }
       }
@@ -166,10 +172,17 @@ class VideoGridFragment(
         crashlyticsLog(TAG, "updateVideos: Keeping view for video=$newVideo in fragment=$tag")
         newRenderedViews.add(renderedViewPair)
       } else {
+        crashlyticsLog(TAG, "updateVideos: Creating view for video=${newVideo} from fragment=$tag")
+
         // Create a new view
         val videoBinding = createVideoView(binding.container)
         bindVideo(videoBinding, newVideo)
-        crashlyticsLog(TAG, "updateVideos: Creating view for video=${newVideo} from fragment=$tag")
+
+        // Bind surfaceView when view is visible to user
+        if (isViewVisible) {
+          bindSurfaceView(videoBinding, newVideo)
+        }
+
         binding.container.addView(videoBinding.root)
         newRenderedViews.add(RenderedViewPair(videoBinding, newVideo))
       }
@@ -184,6 +197,24 @@ class VideoGridFragment(
     renderedViews.addAll(newRenderedViews)
 
     updateGridLayoutDimensions()
+  }
+
+  private fun bindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
+    if (item.videoTrack == null) return
+    crashlyticsLog(TAG, "fragment=$tag: init context for $item")
+
+    binding.surfaceView.apply {
+      val context = HMSWebRTCEglUtils.getRootEglBaseContext()
+
+      if (BuildConfig.DEBUG && context == null) {
+        error("Received HMSWebRTCEglUtils=NULL")
+      }
+
+      init(context, null)
+      item.videoTrack.addSink(this)
+    }
+
+    binding.surfaceView.visibility = View.VISIBLE
   }
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
@@ -202,36 +233,25 @@ class VideoGridFragment(
     }
 
     // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
-
-    val isVideoAvailable = item.videoTrack != null
-
-    binding.nameInitials.visibility = if (isVideoAvailable) View.GONE else View.VISIBLE
-    binding.surfaceView.visibility = if (isVideoAvailable) View.VISIBLE else View.GONE
-
-    if (isVideoAvailable) binding.surfaceView.apply {
-      val context = HMSWebRTCEglUtils.getRootEglBaseContext()
-
-      if (BuildConfig.DEBUG && context == null) {
-        error("Received HMSWebRTCEglUtils=NULL")
-      }
-
-      init(context, null)
-      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+    binding.surfaceView.apply {
+      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
       setEnableHardwareScaler(true)
-      item.videoTrack?.addSink(this)
     }
   }
 
-  private fun unbindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
-    crashlyticsLog(TAG, "fragment=$tag: unbindVideo(item=$item)")
+  private fun unbindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
+    if (item.videoTrack == null) return
+
+    crashlyticsLog(TAG, "fragment=$tag: releasing context for $item")
     binding.surfaceView.apply {
       // NOTE: We don't dispose off the MediaStreamTrack here as it can
       // be re-used by the ViewPager/RecyclerView
 
-      item.videoTrack?.removeSink(this)
+      item.videoTrack.removeSink(this)
       release()
-      clearImage()
     }
+
+    binding.surfaceView.visibility = View.INVISIBLE
   }
 
   private fun createVideoView(parent: ViewGroup): GridItemVideoBinding {
@@ -242,21 +262,31 @@ class VideoGridFragment(
     )
   }
 
-  override fun onStop() {
-    super.onStop()
-    crashlyticsLog(TAG, "Fragment=$tag onStop() called with ${renderedViews.size} items")
+  override fun onResume() {
+    super.onResume()
+    crashlyticsLog(TAG, "Fragment=$tag onResume()")
+    isViewVisible = true
 
-    // Perform a cleanup of all the views
     renderedViews.forEach {
-      binding.container.apply {
-        unbindVideo(it.binding, it.video)
-        removeViewInLayout(it.binding.root)
-      }
+      bindSurfaceView(it.binding, it.video)
     }
+  }
 
+  override fun onPause() {
+    super.onPause()
+    crashlyticsLog(TAG, "Fragment=$tag onPause()")
+    isViewVisible = false
+
+    renderedViews.forEach {
+      unbindSurfaceView(it.binding, it.video)
+    }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    crashlyticsLog(TAG, "Fragment=$tag onDestroy()")
+
+    // Release all references to views
     renderedViews.clear()
-
-    /** No need to call [updateGridLayoutDimensions] as view is about to be destroyed! */
-
   }
 }
