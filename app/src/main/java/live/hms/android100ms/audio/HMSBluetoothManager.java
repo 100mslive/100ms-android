@@ -26,18 +26,20 @@ import android.os.Looper;
 import android.os.Process;
 import android.util.Log;
 
+import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
 
 import java.util.List;
 import java.util.Set;
-import live.hms.android100ms.util.AppRTCUtils;
-import org.webrtc.ThreadUtils;
+
+import live.hms.android100ms.util.ThreadUtils;
+import live.hms.android100ms.util.Utils;
 
 /**
  * AppRTCProximitySensor manages functions related to Bluetoth devices in the
  * AppRTC demo.
  */
-public class AppRTCBluetoothManager {
+public class HMSBluetoothManager {
   private static final String TAG = "AppRTCBluetoothManager";
 
   // Timeout interval for starting or stopping audio to a Bluetooth SCO device.
@@ -66,7 +68,7 @@ public class AppRTCBluetoothManager {
   }
 
   private final Context apprtcContext;
-  private final AppRTCAudioManager apprtcAudioManager;
+  private final HMSAudioManager apprtcAudioManager;
   @Nullable
   private final AudioManager audioManager;
   private final Handler handler;
@@ -197,14 +199,14 @@ public class AppRTCBluetoothManager {
   }
 
   /** Construction. */
-  static AppRTCBluetoothManager create(Context context, AppRTCAudioManager audioManager) {
-    Log.d(TAG, "create" + AppRTCUtils.getThreadInfo());
-    return new AppRTCBluetoothManager(context, audioManager);
+  static HMSBluetoothManager create(Context context, HMSAudioManager audioManager) {
+    Log.d(TAG, "create" + ThreadUtils.getThreadInfo());
+    return new HMSBluetoothManager(context, audioManager);
   }
 
-  protected AppRTCBluetoothManager(Context context, AppRTCAudioManager audioManager) {
+  @MainThread
+  protected HMSBluetoothManager(Context context, HMSAudioManager audioManager) {
     Log.d(TAG, "ctor");
-    ThreadUtils.checkIsOnMainThread();
     apprtcContext = context;
     apprtcAudioManager = audioManager;
     this.audioManager = getAudioManager(context);
@@ -215,8 +217,8 @@ public class AppRTCBluetoothManager {
   }
 
   /** Returns the internal state. */
+  @MainThread
   public State getState() {
-    ThreadUtils.checkIsOnMainThread();
     return bluetoothState;
   }
 
@@ -233,8 +235,8 @@ public class AppRTCBluetoothManager {
    * Note that the AppRTCAudioManager is also involved in driving this state
    * change.
    */
+  @MainThread
   public void start() {
-    ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "start");
     if (!hasPermission(apprtcContext, android.Manifest.permission.BLUETOOTH)) {
       Log.w(TAG, "Process (pid=" + Process.myPid() + ") lacks BLUETOOTH permission");
@@ -281,8 +283,8 @@ public class AppRTCBluetoothManager {
   }
 
   /** Stops and closes all components related to Bluetooth audio. */
+  @MainThread
   public void stop() {
-    ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "stop: BT state=" + bluetoothState);
     if (bluetoothAdapter == null) {
       return;
@@ -314,12 +316,12 @@ public class AppRTCBluetoothManager {
    * ends. Also note that: up to and including API version JELLY_BEAN_MR1, this method initiates a
    * virtual voice call to the Bluetooth headset. After API version JELLY_BEAN_MR2 only a raw SCO
    * audio connection is established.
-   * TODO(henrika): should we add support for virtual voice call to BT headset also for JBMR2 and
-   * higher. It might be required to initiates a virtual voice call since many devices do not
-   * accept SCO audio without a "call".
+   * TODO: should we add support for virtual voice call to BT headset also for JBMR2 and
+   *  higher. It might be required to initiates a virtual voice call since many devices do not
+   *  accept SCO audio without a "call".
    */
+  @MainThread
   public boolean startScoAudio() {
-    ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "startSco: BT state=" + bluetoothState + ", "
             + "attempts: " + scoConnectionAttempts + ", "
             + "SCO is on: " + isScoOn());
@@ -347,8 +349,8 @@ public class AppRTCBluetoothManager {
   }
 
   /** Stops Bluetooth SCO connection with remote device. */
+  @MainThread
   public void stopScoAudio() {
-    ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "stopScoAudio: BT state=" + bluetoothState + ", "
             + "SCO is on: " + isScoOn());
     if (bluetoothState != State.SCO_CONNECTING && bluetoothState != State.SCO_CONNECTED) {
@@ -439,22 +441,22 @@ public class AppRTCBluetoothManager {
   }
 
   /** Ensures that the audio manager updates its list of available audio devices. */
+  @MainThread
   private void updateAudioDeviceState() {
-    ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "updateAudioDeviceState");
     apprtcAudioManager.updateAudioDeviceState();
   }
 
   /** Starts timer which times out after BLUETOOTH_SCO_TIMEOUT_MS milliseconds. */
+  @MainThread
   private void startTimer() {
-    ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "startTimer");
     handler.postDelayed(bluetoothTimeoutRunnable, BLUETOOTH_SCO_TIMEOUT_MS);
   }
 
   /** Cancels any outstanding timer tasks. */
+  @MainThread
   private void cancelTimer() {
-    ThreadUtils.checkIsOnMainThread();
     Log.d(TAG, "cancelTimer");
     handler.removeCallbacks(bluetoothTimeoutRunnable);
   }
@@ -463,8 +465,8 @@ public class AppRTCBluetoothManager {
    * Called when start of the BT SCO channel takes too long time. Usually
    * happens when the BT device has been turned on during an ongoing call.
    */
+  @MainThread
   private void bluetoothTimeout() {
-    ThreadUtils.checkIsOnMainThread();
     if (bluetoothState == State.UNINITIALIZED || bluetoothHeadset == null) {
       return;
     }
