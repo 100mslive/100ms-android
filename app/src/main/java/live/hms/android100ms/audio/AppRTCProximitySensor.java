@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package org.appspot.apprtc;
+package live.hms.android100ms.audio;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -20,7 +20,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import org.appspot.apprtc.util.AppRTCUtils;
+import live.hms.android100ms.util.AppRTCUtils;
 import org.webrtc.ThreadUtils;
 
 /**

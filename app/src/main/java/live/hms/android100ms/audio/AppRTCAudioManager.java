@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package org.appspot.apprtc;
+package live.hms.android100ms.audio;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,7 +27,7 @@ import androidx.annotation.Nullable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import org.appspot.apprtc.util.AppRTCUtils;
+import live.hms.android100ms.util.AppRTCUtils;
 import org.webrtc.ThreadUtils;
 
 import live.hms.android100ms.R;

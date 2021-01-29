@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package org.appspot.apprtc;
+package live.hms.android100ms.audio;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
@@ -30,7 +30,7 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 import java.util.Set;
-import org.appspot.apprtc.util.AppRTCUtils;
+import live.hms.android100ms.util.AppRTCUtils;
 import org.webrtc.ThreadUtils;
 
 /**

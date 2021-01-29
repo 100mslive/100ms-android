@@ -29,7 +29,7 @@ import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
 import live.hms.android100ms.util.*
-import org.appspot.apprtc.AppRTCAudioManager
+import live.hms.android100ms.audio.AppRTCAudioManager
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
