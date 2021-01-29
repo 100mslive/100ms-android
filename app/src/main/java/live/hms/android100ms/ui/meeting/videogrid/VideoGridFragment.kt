@@ -211,10 +211,10 @@ class VideoGridFragment(
       }
 
       init(context, null)
-      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
-      setEnableHardwareScaler(true)
       item.videoTrack.addSink(this)
     }
+
+    binding.surfaceView.visibility = View.VISIBLE
   }
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
@@ -233,10 +233,10 @@ class VideoGridFragment(
     }
 
     // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
-
-    val isVideoAvailable = item.videoTrack != null
-    binding.nameInitials.visibility = if (isVideoAvailable) View.GONE else View.VISIBLE
-    binding.surfaceView.visibility = if (isVideoAvailable) View.VISIBLE else View.GONE
+    binding.surfaceView.apply {
+      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+      setEnableHardwareScaler(true)
+    }
   }
 
   private fun unbindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
@@ -249,8 +249,9 @@ class VideoGridFragment(
 
       item.videoTrack.removeSink(this)
       release()
-      clearImage()
     }
+
+    binding.surfaceView.visibility = View.INVISIBLE
   }
 
   private fun createVideoView(parent: ViewGroup): GridItemVideoBinding {
@@ -283,6 +284,7 @@ class VideoGridFragment(
 
   override fun onStop() {
     super.onStop()
+    crashlyticsLog(TAG, "Fragment=$tag onStop()")
 
     // Release all references to views
     renderedViews.clear()

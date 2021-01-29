@@ -14,12 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <org.webrtc.SurfaceViewRenderer
-            android:id="@+id/surface_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name_initials"
             android:layout_width="wrap_content"
@@ -30,6 +24,12 @@
             android:text="@string/john_doe_initials"
             android:textColor="@android:color/white"
             android:textSize="40sp" />
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
