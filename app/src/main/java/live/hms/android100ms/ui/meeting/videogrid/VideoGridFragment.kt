@@ -282,9 +282,9 @@ class VideoGridFragment(
     }
   }
 
-  override fun onStop() {
-    super.onStop()
-    crashlyticsLog(TAG, "Fragment=$tag onStop()")
+  override fun onDestroy() {
+    super.onDestroy()
+    crashlyticsLog(TAG, "Fragment=$tag onDestroy()")
 
     // Release all references to views
     renderedViews.clear()
