@@ -10,8 +10,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import live.hms.android100ms.util.Utils;
 import org.webrtc.ThreadUtils;
+
+import live.hms.android100ms.util.Utils;
 
 /**
  * AppRTCProximitySensor manages functions related to the proximity sensor in
@@ -36,7 +37,9 @@ public class HMSProximitySensor implements SensorEventListener {
   private Sensor proximitySensor;
   private boolean lastStateReportIsNear;
 
-  /** Construction */
+  /**
+   * Construction
+   */
   static HMSProximitySensor create(Context context, Runnable sensorStateListener) {
     return new HMSProximitySensor(context, sensorStateListener);
   }
@@ -62,7 +65,9 @@ public class HMSProximitySensor implements SensorEventListener {
     return true;
   }
 
-  /** Deactivate the proximity sensor. */
+  /**
+   * Deactivate the proximity sensor.
+   */
   public void stop() {
     threadChecker.checkIsOnValidThread();
     Log.d(TAG, "stop" + live.hms.android100ms.util.ThreadUtils.getThreadInfo());
@@ -72,7 +77,9 @@ public class HMSProximitySensor implements SensorEventListener {
     sensorManager.unregisterListener(this, proximitySensor);
   }
 
-  /** Getter for last reported state. Set to true if "near" is reported. */
+  /**
+   * Getter for last reported state. Set to true if "near" is reported.
+   */
   public boolean sensorReportsNearState() {
     threadChecker.checkIsOnValidThread();
     return lastStateReportIsNear;
@@ -109,8 +116,8 @@ public class HMSProximitySensor implements SensorEventListener {
     }
 
     Log.d(TAG, "onSensorChanged" + live.hms.android100ms.util.ThreadUtils.getThreadInfo() + ": "
-            + "accuracy=" + event.accuracy + ", timestamp=" + event.timestamp + ", distance="
-            + event.values[0]);
+        + "accuracy=" + event.accuracy + ", timestamp=" + event.timestamp + ", distance="
+        + event.values[0]);
   }
 
   /**
@@ -130,7 +137,9 @@ public class HMSProximitySensor implements SensorEventListener {
     return true;
   }
 
-  /** Helper method for logging information about the proximity sensor. */
+  /**
+   * Helper method for logging information about the proximity sensor.
+   */
   private void logProximitySensorInfo() {
     if (proximitySensor == null) {
       return;
