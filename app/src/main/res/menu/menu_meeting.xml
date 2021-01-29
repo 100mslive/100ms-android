@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--    <item-->
-    <!--        android:id="@+id/action_volume"-->
-    <!--        android:icon="@drawable/ic_baseline_volume_up_24"-->
-    <!--        android:title="@string/toggle_volume"-->
-    <!--        app:showAsAction="ifRoom" />-->
+    <item
+        android:id="@+id/action_volume"
+        android:icon="@drawable/ic_baseline_volume_up_24"
+        android:title="@string/toggle_volume"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_share_screen"
         android:icon="@drawable/ic_baseline_mobile_screen_share_24"

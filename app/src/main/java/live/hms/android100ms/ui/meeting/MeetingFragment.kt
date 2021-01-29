@@ -48,6 +48,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
+  private var isVolumeMuted = false
   private var isAudioEnabled by Delegates.notNull<Boolean>()
   private var isVideoEnabled by Delegates.notNull<Boolean>()
 
@@ -63,6 +64,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private lateinit var clipboard: ClipboardManager
 
   private lateinit var audioManager: AppRTCAudioManager
+
+  override fun onResume() {
+    super.onResume()
+    audioManager.updateAudioDeviceState()
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -113,6 +119,31 @@ class MeetingFragment : Fragment(), HMSEventListener {
       }
     }
     return false
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    menu.findItem(R.id.action_volume).apply {
+      setOnMenuItemClickListener {
+        isVolumeMuted = !isVolumeMuted
+        if (isVolumeMuted) {
+          setIcon(R.drawable.ic_baseline_volume_off_24)
+        } else {
+          setIcon(R.drawable.ic_baseline_volume_up_24)
+        }
+
+        val volume = if (isVolumeMuted) 0.0 else 1.0
+
+        videoGridItems.forEach { track ->
+          // Ignore the current user's track
+          if (track != currentDeviceTrack) {
+            track.audioTrack?.setVolume(volume)
+          }
+        }
+
+        true
+      }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

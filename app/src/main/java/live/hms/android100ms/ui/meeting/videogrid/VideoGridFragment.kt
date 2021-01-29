@@ -209,7 +209,13 @@ class VideoGridFragment(
     binding.surfaceView.visibility = if (isVideoAvailable) View.VISIBLE else View.GONE
 
     if (isVideoAvailable) binding.surfaceView.apply {
-      init(HMSWebRTCEglUtils.getRootEglBaseContext(), null)
+      val context = HMSWebRTCEglUtils.getRootEglBaseContext()
+
+      if (BuildConfig.DEBUG && context == null) {
+        error("Received HMSWebRTCEglUtils=NULL")
+      }
+
+      init(context, null)
       setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
       setEnableHardwareScaler(true)
       item.videoTrack?.addSink(this)
