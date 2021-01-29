@@ -663,6 +663,11 @@ class MeetingFragment : Fragment(), HMSEventListener {
           if (stream.audioTracks.size > 0) {
             audioTrack = stream.audioTracks[0]
             audioTrack.setEnabled(true)
+            if (isVolumeMuted) {
+              audioTrack.setVolume(0.0)
+            } else {
+              audioTrack.setVolume(1.0)
+            }
           }
 
           videoGridItems.add(
