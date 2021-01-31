@@ -85,6 +85,9 @@
     <string name="pref_speakerphone_title">Speakerphone.</string>
     <string name="pref_speakerphone_dlg">Speakerphone.</string>
     <string name="pref_speakerphone_default">auto</string>
-    <string name="bug_report">Bug Report </string>
+    <string name="bug_report">Bug Report</string>
     <string name="leak_canary">Leak Canary</string>
+
+    <string name="retry">Retry</string>
+    <string name="leave">Leave</string>
 </resources>

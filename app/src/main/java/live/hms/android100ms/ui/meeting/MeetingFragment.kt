@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.MainThread
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -279,8 +280,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     AlertDialog.Builder(requireContext())
       .setMessage(errorMessage)
       .setTitle(title)
-      .setPositiveButton("Leave") { dialog, id ->
-        Log.v(TAG, "Leaving meeting due to '$title' :: $errorMessage")
+      .setPositiveButton(R.string.leave) { dialog, id ->
+        Log.d(TAG, "Leaving meeting due to '$title' :: $errorMessage")
         leaveMeeting()
         dialog.dismiss()
       }
@@ -295,8 +296,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     AlertDialog.Builder(requireContext())
       .setMessage(errorMessage)
       .setTitle(title)
-      .setPositiveButton("Retry") { dialog, id ->
-        Log.v(TAG, "Trying to reconnect")
+      .setPositiveButton(R.string.retry) { dialog, id ->
+        Log.d(TAG, "Trying to reconnect")
         initHMSClient()
         dialog.dismiss()
       }
@@ -375,6 +376,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
               override fun onFailure(errorCode: Long, errorReason: String) {
                 crashlyticsLog(TAG, "Publish Failure $errorCode $errorReason")
+                // TODO: Leave the meeting, then disconnect
                 hmsClient?.disconnect()
                 handleFailureWithRetry("[$errorCode] Publish Failure", errorReason)
               }
@@ -383,6 +385,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
         override fun onFailure(errorCode: Long, errorReason: String) {
           crashlyticsLog(TAG, "GetUserMedia failed: $errorCode $errorReason")
+          // TODO: Leave the meeting, then disconnect
+          hmsClient?.disconnect()
+          handleFailureWithRetry("[$errorCode] GetUserMedia Failure", errorReason)
         }
       })
 
@@ -485,8 +490,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
     }
   }
 
+  @MainThread
   private fun leaveMeeting() {
-    ThreadUtils.checkIsOnMainThread()
     updateProgressBarUI("Leaving meeting...")
     showProgressBar()
 
