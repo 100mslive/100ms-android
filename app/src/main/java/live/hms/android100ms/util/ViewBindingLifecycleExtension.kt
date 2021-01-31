@@ -25,21 +25,9 @@ fun <T : ViewBinding> Fragment.viewLifecycle(): ReadWriteProperty<Fragment, T> =
 
     private var binding: T? = null
 
-    init {
-      // Observe the view lifecycle of the Fragment.
-      // The view lifecycle owner is null before onCreateView and after onDestroyView.
-      // The observer is automatically removed after the onDestroy event.
-
-      this@viewLifecycle
-        .viewLifecycleOwnerLiveData
-        .observe(this@viewLifecycle, { owner: LifecycleOwner ->
-          owner.lifecycle.addObserver(this)
-        })
-    }
-
     override fun onDestroy(owner: LifecycleOwner) {
       super.onDestroy(owner)
-      Log.d(TAG, "Removing reference to $binding during onDestroy($owner)")
+      crashlyticsLog(TAG, "Removing reference to $binding during onDestroy($owner)")
 
       binding = null
       owner.lifecycle.removeObserver(this)
@@ -50,7 +38,27 @@ fun <T : ViewBinding> Fragment.viewLifecycle(): ReadWriteProperty<Fragment, T> =
     }
 
     override fun setValue(thisRef: Fragment, property: KProperty<*>, value: T) {
+      if (this.binding != null) {
+        error("ViewBindingLifecycleExtension: binding already initialized to $binding")
+      }
+
       this.binding = value
+      Log.d(TAG, "Updated binding to $binding (source: $thisRef)")
+
+      // Observe the view lifecycle of the Fragment.
+      // The view lifecycle owner is null before onCreateView and after onDestroyView.
+      // The observer is automatically removed after the onDestroy event.
+      thisRef
+        .viewLifecycleOwnerLiveData
+        .observe(thisRef.viewLifecycleOwner) {
+          it.lifecycle.addObserver(this)
+        }
+
+      crashlyticsLog(
+        TAG,
+        "Observing lifecycle of $thisRef -- " +
+            "binding reference will be removed when view gets destroyed"
+      )
     }
   }
 

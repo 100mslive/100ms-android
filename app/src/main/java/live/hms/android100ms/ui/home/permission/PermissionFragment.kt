@@ -25,16 +25,18 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
   }
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    checkAlreadyGrantedPermissions()
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentPermissionBinding.inflate(inflater, container, false)
-
-    checkAlreadyGrantedPermissions()
     initButtons()
-
     return binding.root
   }
 
@@ -71,7 +73,6 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     }
   }
 
-
   override fun onRequestPermissionsResult(
     requestCode: Int,
     permissions: Array<out String>,
@@ -80,7 +81,6 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
   }
-
 
   // Permission Callbacks
   override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
