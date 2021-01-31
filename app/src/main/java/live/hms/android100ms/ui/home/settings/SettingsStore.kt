@@ -3,6 +3,7 @@ package live.hms.android100ms.ui.home.settings
 import android.content.Context
 import android.util.Log
 import androidx.core.content.edit
+import live.hms.android100ms.util.crashlyticsLog
 
 class SettingsStore(context: Context) {
 
@@ -13,7 +14,8 @@ class SettingsStore(context: Context) {
     const val PUBLISH_VIDEO = "publish-video"
     const val CAMERA = "camera"
     const val PUBLISH_AUDIO = "publish-audio"
-    const val VIDEO_RESOLUTION = "video-resolution"
+    const val VIDEO_RESOLUTION_WIDTH = "video-resolution-width"
+    const val VIDEO_RESOLUTION_HEIGHT = "video-resolution-height"
     const val CODEC = "codec"
     const val VIDEO_BITRATE = "video-bitrate"
     const val VIDEO_FRAME_RATE = "video-frame-rate"
@@ -67,9 +69,13 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(PUBLISH_AUDIO, true)
     set(value) = putBoolean(PUBLISH_AUDIO, value)
 
-  var videoResolution: String
-    get() = sharedPreferences.getString(VIDEO_RESOLUTION, "640 x 480")!!
-    set(value) = putString(VIDEO_RESOLUTION, value)
+  var videoResolutionWidth: Int
+    get() = sharedPreferences.getInt(VIDEO_RESOLUTION_WIDTH, 640)
+    set(value) = putInt(VIDEO_RESOLUTION_WIDTH, value)
+
+  var videoResolutionHeight: Int
+    get() = sharedPreferences.getInt(VIDEO_RESOLUTION_HEIGHT, 480)
+    set(value) = putInt(VIDEO_RESOLUTION_HEIGHT, value)
 
   var codec: String
     get() = sharedPreferences.getString(CODEC, "VP8")!!
@@ -109,7 +115,6 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(LEAK_CANARY, true)
     set(value) = putBoolean(LEAK_CANARY, value)
 
-
   inner class MultiCommitHelper {
 
     private val editor = sharedPreferences.edit()
@@ -129,8 +134,13 @@ class SettingsStore(context: Context) {
       return this
     }
 
-    fun setVideoResolution(value: String): MultiCommitHelper {
-      editor.putString(VIDEO_RESOLUTION, value)
+    fun setVideoResolutionWidth(value: Int): MultiCommitHelper {
+      editor.putInt(VIDEO_RESOLUTION_WIDTH, value)
+      return this
+    }
+
+    fun setVideoResolutionHeight(value: Int): MultiCommitHelper {
+      editor.putInt(VIDEO_RESOLUTION_HEIGHT, value)
       return this
     }
 
@@ -153,7 +163,6 @@ class SettingsStore(context: Context) {
       editor.putString(USERNAME, value)
       return this
     }
-
 
     fun setLastUsedRoomId(value: String): MultiCommitHelper {
       editor.putString(LAST_USED_ROOM_ID, value)
@@ -181,7 +190,6 @@ class SettingsStore(context: Context) {
     }
 
     fun commit() {
-      Log.v(TAG, "Commit changes at once")
       editor.commit()
     }
 

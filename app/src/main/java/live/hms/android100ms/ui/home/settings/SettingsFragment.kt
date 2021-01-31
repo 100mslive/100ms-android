@@ -22,8 +22,6 @@ class SettingsFragment : Fragment() {
   companion object {
     private const val TAG = "SettingsFragment"
 
-    private const val LEAK_CANARY_PENDING_INTENT_ID = 10023
-
     private val VIDEO_RESOLUTIONS = mapOf(
       "4K (2160p)" to "3840 x 2160",
       "Full HD (1080p)" to "1920 x 1080",
@@ -36,7 +34,7 @@ class SettingsFragment : Fragment() {
 
     private val CODECS = arrayOf("VP8")
 
-    private val VIDEO_BITRATES = mapOf(
+    private val VIDEO_BITRATE = mapOf(
       "Lowest (100 kbps)" to 100,
       "Low (256 kbps)" to 256,
       "Medium (512 kbps)" to 512,
@@ -167,6 +165,20 @@ class SettingsFragment : Fragment() {
         "Video Frame Rate",
         1, 30,
       ) { commitHelper.setVideoFrameRate(it) }
+
+      initNonEmptyEditTextWithRange(
+        settings.videoResolutionWidth,
+        editTextResolutionWidth, containerResolutionWidth,
+        "Width",
+        1, 3840
+      ) { commitHelper.setVideoResolutionWidth(it) }
+
+      initNonEmptyEditTextWithRange(
+        settings.videoResolutionHeight,
+        editTextResolutionHeight, containerResolutionHeight,
+        "Height",
+        1, 2160
+      ) { commitHelper.setVideoResolutionHeight(it) }
     }
   }
 
@@ -179,12 +191,6 @@ class SettingsFragment : Fragment() {
       ) { commitHelper.setCamera(CAMERAS.getValue(it)) }
 
       initAutoCompleteView(
-        autoCompleteResolution,
-        VIDEO_RESOLUTIONS.filterValues { it == settings.videoResolution }.keys.first(),
-        VIDEO_RESOLUTIONS.keys.toTypedArray()
-      ) { commitHelper.setVideoResolution(VIDEO_RESOLUTIONS.getValue(it)) }
-
-      initAutoCompleteView(
         autoCompleteCodecs,
         settings.codec,
         CODECS,
@@ -192,9 +198,9 @@ class SettingsFragment : Fragment() {
 
       initAutoCompleteView(
         autoCompleteVideoBitrate,
-        VIDEO_BITRATES.filterValues { it == settings.videoBitrate }.keys.first(),
-        VIDEO_BITRATES.keys.toTypedArray(),
-      ) { commitHelper.setVideoBitrate(VIDEO_BITRATES.getValue(it)) }
+        VIDEO_BITRATE.filterValues { it == settings.videoBitrate }.keys.first(),
+        VIDEO_BITRATE.keys.toTypedArray(),
+      ) { commitHelper.setVideoBitrate(VIDEO_BITRATE.getValue(it)) }
 
     }
   }

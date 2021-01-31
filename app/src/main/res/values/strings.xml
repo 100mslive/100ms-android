@@ -90,4 +90,6 @@
 
     <string name="retry">Retry</string>
     <string name="leave">Leave</string>
+    <string name="video_resolution_height">Video Resolution (Height)</string>
+    <string name="video_resolution_width">Video Resolution (Width)</string>
 </resources>

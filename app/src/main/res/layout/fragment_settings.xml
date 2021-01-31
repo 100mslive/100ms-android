@@ -116,19 +116,34 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_resolution"
-                style="@style/AutoCompleteTextInputLayout"
+                android:id="@+id/container_resolution_width"
+                style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/video_resolution"
-                android:labelFor="@id/auto_complete_resolution">
+                android:hint="@string/video_resolution_width">
 
-                <AutoCompleteTextView
-                    android:id="@+id/auto_complete_resolution"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_resolution_width"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none" />
+                    android:inputType="number" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/container_resolution_height"
+                style="@style/TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/video_resolution_height">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_resolution_height"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

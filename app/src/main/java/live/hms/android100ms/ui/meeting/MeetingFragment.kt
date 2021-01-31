@@ -312,10 +312,14 @@ class MeetingFragment : Fragment(), HMSEventListener {
     //  while in a meeting.
 
     val localMediaConstraints = HMSRTCMediaStreamConstraints(true, settings.publishVideo)
+
+    val resolution =
+      "${settings.videoResolutionWidth}x${settings.videoResolutionHeight}@${settings.videoFrameRate}"
+
     localMediaConstraints.apply {
       videoCodec = settings.codec
       videoFrameRate = settings.videoFrameRate
-      videoResolution = settings.videoResolution
+      videoResolution = resolution
       videoMaxBitRate = settings.videoBitrate
       cameraFacing = settings.camera
     }
