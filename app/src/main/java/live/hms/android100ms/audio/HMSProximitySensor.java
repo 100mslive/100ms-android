@@ -10,8 +10,9 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import org.webrtc.ThreadUtils;
+import org.webrtc.ThreadUtils.ThreadChecker;
 
+import live.hms.android100ms.util.ThreadUtils;
 import live.hms.android100ms.util.Utils;
 
 /**
@@ -29,7 +30,7 @@ public class HMSProximitySensor implements SensorEventListener {
   // This class should be created, started and stopped on one thread
   // (e.g. the main thread). We use |nonThreadSafe| to ensure that this is
   // the case. Only active when |DEBUG| is set to true.
-  private final ThreadUtils.ThreadChecker threadChecker = new ThreadUtils.ThreadChecker();
+  private final ThreadChecker threadChecker = new ThreadChecker();
 
   private final Runnable onSensorStateListener;
   private final SensorManager sensorManager;
@@ -45,7 +46,7 @@ public class HMSProximitySensor implements SensorEventListener {
   }
 
   private HMSProximitySensor(Context context, Runnable sensorStateListener) {
-    Log.d(TAG, "AppRTCProximitySensor" + live.hms.android100ms.util.ThreadUtils.getThreadInfo());
+    Log.d(TAG, "AppRTCProximitySensor" + ThreadUtils.getThreadInfo());
     onSensorStateListener = sensorStateListener;
     sensorManager = ((SensorManager) context.getSystemService(Context.SENSOR_SERVICE));
   }
@@ -56,7 +57,7 @@ public class HMSProximitySensor implements SensorEventListener {
    */
   public boolean start() {
     threadChecker.checkIsOnValidThread();
-    Log.d(TAG, "start" + live.hms.android100ms.util.ThreadUtils.getThreadInfo());
+    Log.d(TAG, "start" + ThreadUtils.getThreadInfo());
     if (!initDefaultSensor()) {
       // Proximity sensor is not supported on this device.
       return false;
@@ -70,7 +71,7 @@ public class HMSProximitySensor implements SensorEventListener {
    */
   public void stop() {
     threadChecker.checkIsOnValidThread();
-    Log.d(TAG, "stop" + live.hms.android100ms.util.ThreadUtils.getThreadInfo());
+    Log.d(TAG, "stop" + ThreadUtils.getThreadInfo());
     if (proximitySensor == null) {
       return;
     }
@@ -115,7 +116,7 @@ public class HMSProximitySensor implements SensorEventListener {
       onSensorStateListener.run();
     }
 
-    Log.d(TAG, "onSensorChanged" + live.hms.android100ms.util.ThreadUtils.getThreadInfo() + ": "
+    Log.d(TAG, "onSensorChanged" + ThreadUtils.getThreadInfo() + ": "
         + "accuracy=" + event.accuracy + ", timestamp=" + event.timestamp + ", distance="
         + event.values[0]);
   }

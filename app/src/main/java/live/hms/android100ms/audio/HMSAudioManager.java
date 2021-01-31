@@ -21,6 +21,7 @@ import java.util.Set;
 
 import live.hms.android100ms.R;
 import live.hms.android100ms.util.LogUtils;
+import live.hms.android100ms.util.ThreadUtils;
 import live.hms.android100ms.util.Utils;
 
 /**
@@ -147,7 +148,7 @@ public class HMSAudioManager {
       int state = intent.getIntExtra("state", STATE_UNPLUGGED);
       int microphone = intent.getIntExtra("microphone", HAS_NO_MIC);
       String name = intent.getStringExtra("name");
-      Log.d(TAG, "WiredHeadsetReceiver.onReceive" + live.hms.android100ms.util.ThreadUtils.getThreadInfo() + ": "
+      Log.d(TAG, "WiredHeadsetReceiver.onReceive" + ThreadUtils.getThreadInfo() + ": "
           + "a=" + intent.getAction() + ", s="
           + (state == STATE_UNPLUGGED ? "unplugged" : "plugged") + ", m="
           + (microphone == HAS_MIC ? "mic" : "no mic") + ", n=" + name + ", sb="
