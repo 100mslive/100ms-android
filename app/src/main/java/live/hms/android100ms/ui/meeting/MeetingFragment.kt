@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
+import live.hms.android100ms.ui.home.HomeActivity
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
@@ -140,16 +141,41 @@ class MeetingFragment : Fragment() {
     return binding.root
   }
 
+  private fun goToHomePage() {
+    Intent(requireContext(), HomeActivity::class.java).apply {
+      Log.v(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
+      startActivity(this)
+    }
+
+    requireActivity().finish()
+  }
+
   private fun initViewModel() {
     chatViewModel.setSendBroadcastCallback { meetingViewModel.broadcastMessage(it) }
 
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
       when (state) {
         is MeetingState.Disconnected -> {
-          if (state.isError) {
-            // Handle Separately
-          } else {
-            // WHAT?
+          if (state.showDialog) {
+            AlertDialog.Builder(requireContext())
+              .setMessage(state.message)
+              .setTitle(state.heading)
+              .setPositiveButton(R.string.leave) { dialog, _ ->
+                Log.d(TAG, "Leaving meeting due to '${state.heading}' :: ${state.message}")
+
+                if (state.goToHome) {
+                  goToHomePage()
+                } else {
+                  meetingViewModel.startMeeting()
+                }
+
+                dialog.dismiss()
+              }
+              .setCancelable(false)
+              .create()
+              .show()
+          } else if (state.goToHome) {
+            goToHomePage()
           }
         }
         is MeetingState.Connecting -> {
@@ -292,44 +318,6 @@ class MeetingFragment : Fragment() {
     binding.bottomControls.visibility = View.GONE
 
     binding.progressBar.root.visibility = View.VISIBLE
-  }
-
-  private fun handleFailureWithQuitMeeting(title: String, errorMessage: String) {
-    AlertDialog.Builder(requireContext())
-      .setMessage(errorMessage)
-      .setTitle(title)
-      .setPositiveButton(R.string.leave) { dialog, _ ->
-        Log.d(TAG, "Leaving meeting due to '$title' :: $errorMessage")
-        meetingViewModel.leaveMeeting()
-        dialog.dismiss()
-      }
-      .setCancelable(false)
-      .create()
-      .show()
-  }
-
-  private fun handleFailureWithRetry(title: String, errorMessage: String) {
-    cleanup()
-
-    AlertDialog.Builder(requireContext())
-      .setMessage(errorMessage)
-      .setTitle(title)
-      .setPositiveButton(R.string.retry) { dialog, _ ->
-        Log.d(TAG, "Trying to reconnect")
-        initHMSClient()
-        dialog.dismiss()
-      }
-      .setCancelable(false)
-      .create()
-      .show()
-  }
-
-  private fun initHMSClient() {
-    updateProgressBarUI(
-      "Connecting...",
-      "Please wait while we connect you to ${roomDetails.endpoint}"
-    )
-    showProgressBar()
   }
 
   private fun initButtons() {

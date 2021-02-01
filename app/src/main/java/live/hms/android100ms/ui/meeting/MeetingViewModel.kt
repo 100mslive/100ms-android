@@ -20,20 +20,6 @@ import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
 
-/**
- * TODO:
- *  1. Ensure that view model does not try to connect HMSClient again and again.
- *  2. Have [RoomDetails] as parameter
- *  3. Mute all videos
- *  4. Define overall UI States
- *    - CONFERENCE
- *    - LOADING
- *    - ERROR_QUIT
- *    - ERROR_RETRY
- *  5. Live Data:
- *    - Streams: ArrayList<MeetingTrack>
- */
-
 class MeetingViewModel(
   application: Application,
   private val roomDetails: RoomDetails
@@ -138,20 +124,19 @@ class MeetingViewModel(
   fun leaveMeeting() {
     state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
 
-    // TODO: Make sure that we have stopped capturing whenever we disconnect/leave
+    // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
     HMSStream.stopCapturers()
 
     client.leave(object : HMSRequestHandler {
       override fun onSuccess(data: String) {
         crashlyticsLog(TAG, "[${Thread.currentThread()}] hmsClient.leave() -> onSuccess($data)")
         client.disconnect()
-
-        // TODO: Go to home page
         state.postValue(MeetingState.Disconnected(goToHome = true))
       }
 
       override fun onFailure(code: Long, reason: String) {
         crashlyticsLog(TAG, "hmsClient.leave() -> onFailure($code, $reason)")
+        state.postValue(MeetingState.Disconnected(true, "[$code] Leave Failure", reason, true))
       }
     })
   }
@@ -184,12 +169,12 @@ class MeetingViewModel(
     tracks.postValue(_tracks)
   }
 
-  private fun removeTrack(info: HMSStreamInfo) {
+  private fun removeTrack(uid: String, mid: String) {
     var found = false
     val toRemove = ArrayList<MeetingTrack>()
 
     _tracks.forEach { track ->
-      if (track.peer.uid == info.uid && track.mediaId == info.mid) {
+      if (track.peer.uid == uid && track.mediaId == mid) {
         found = true
         toRemove.add(track)
       }
@@ -197,7 +182,7 @@ class MeetingViewModel(
 
     _tracks.removeAll(toRemove)
     if (!found) {
-      crashlyticsLog(TAG, "onStreamRemove: ${info.uid} not found in meeting tracks")
+      crashlyticsLog(TAG, "onStreamRemove: $uid & $mid not found in meeting tracks")
     } else {
       // Update the grid layout as we have removed some views
       tracks.postValue(_tracks)
@@ -252,11 +237,9 @@ class MeetingViewModel(
           }
         }
 
-        override fun onFailure(errorCode: Long, errorReason: String) {
-          crashlyticsLog(TAG, "Publish Failure $errorCode $errorReason")
-          // TODO: Leave the meeting, then disconnect
-          client.disconnect()
-          // handleFailureWithRetry("[$errorCode] Publish Failure", errorReason)
+        override fun onFailure(code: Long, reason: String) {
+          crashlyticsLog(TAG, "Publish Failure $code $reason")
+          handleFailure(false, "[$code] Publish Failure", reason)
         }
       })
   }
@@ -305,11 +288,9 @@ class MeetingViewModel(
           publishUserStream(constraints, mediaStream)
         }
 
-        override fun onFailure(errorCode: Long, errorReason: String) {
-          crashlyticsLog(TAG, "GetUserMedia failed: $errorCode $errorReason")
-          // TODO: Leave the meeting, then disconnect
-          client.disconnect()
-          // handleFailureWithRetry("[$errorCode] GetUserMedia Failure", errorReason)
+        override fun onFailure(code: Long, reason: String) {
+          crashlyticsLog(TAG, "GetUserMedia failed: $code $reason")
+          handleFailure(false, "[$code] GetUserMedia Failure", reason)
         }
       })
 
@@ -325,8 +306,9 @@ class MeetingViewModel(
         getUserMedia()
       }
 
-      override fun onFailure(code: Long, reason: String?) {
+      override fun onFailure(code: Long, reason: String) {
         crashlyticsLog(TAG, "Join onFailure($code, $reason)")
+        handleFailure(false, "[$code] Join Failure", reason)
       }
     })
   }
@@ -339,6 +321,25 @@ class MeetingViewModel(
     crashlyticsLog(TAG, "cleanup() done")
   }
 
+  /**
+   * @param fatal Requires closing the MeetingActivity, going back to home page
+   * @param title Set the title displayed in the Dialog
+   * @param message Set the message to display.
+   */
+  private fun handleFailure(
+    fatal: Boolean,
+    title: String,
+    message: String
+  ) {
+    crashlyticsLog(TAG, "handleFailure($fatal, $title, $message)")
+
+    // TODO: Leave meeting gracefully
+    HMSStream.stopCapturers()
+    client.disconnect()
+    state.postValue(MeetingState.Disconnected(true, title, message, fatal))
+    cleanup()
+  }
+
   // HMS Events
   override fun onConnect() {
     Log.d(TAG, "onConnect()")
@@ -347,13 +348,8 @@ class MeetingViewModel(
 
   override fun onDisconnect(errorMessage: String) {
     crashlyticsLog(TAG, "onDisconnect: $errorMessage")
-    state.postValue(
-      MeetingState.Disconnected(
-        isError = true,
-        heading = "Disconnected",
-        message = errorMessage
-      )
-    )
+    state.postValue(MeetingState.Disconnected(true, "Disconnected", errorMessage))
+    cleanup()
   }
 
   override fun onPeerJoin(peer: HMSPeer) {
@@ -420,10 +416,9 @@ class MeetingViewModel(
         addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false))
       }
 
-      override fun onFailure(code: Long, reason: String?) {
+      override fun onFailure(code: Long, reason: String) {
         crashlyticsLog(TAG, "Subscribe($info): peer-id=${peer.uid} -- onFailure($code, $reason)")
-        // TODO: Leave meeting
-        // handleFailureWithQuitMeeting("[$errorCode] Subscribe Failure", errorReason)
+        handleFailure(true, "[$code] Subscribe Failure", reason)
       }
     })
   }
@@ -437,7 +432,7 @@ class MeetingViewModel(
           "mid=${info.mid}"
     )
 
-    removeTrack(info)
+    removeTrack(info.uid, info.mid)
   }
 
   override fun onBroadcast(data: HMSPayloadData) {

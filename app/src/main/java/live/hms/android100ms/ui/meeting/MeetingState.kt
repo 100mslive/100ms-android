@@ -6,7 +6,7 @@ package live.hms.android100ms.ui.meeting
 sealed class MeetingState {
 
   data class Disconnected(
-    val isError: Boolean = false,
+    val showDialog: Boolean = false,
     val heading: String = "",
     val message: String = "",
 
