@@ -30,6 +30,7 @@
                 android:src="@drawable/permission_artwork" />
 
             <com.google.android.material.textview.MaterialTextView
+                style="@style/MaterialTextViewHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -37,14 +38,14 @@
                 android:layout_marginBottom="8dp"
                 android:gravity="center"
                 android:text="@string/permission_heading"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
+                android:textSize="14sp"
                 android:gravity="center"
                 android:text="@string/permission_description" />
 

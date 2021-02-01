@@ -100,7 +100,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_advanced_settings"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            style="@style/MaterialTextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_baseline_keyboard_arrow_down_24"

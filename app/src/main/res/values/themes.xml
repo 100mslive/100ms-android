@@ -18,6 +18,8 @@
         <item name="colorOnSurface">@android:color/white</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="colorOnPrimarySurface">@android:color/white</item>
+
+        <item name="fontFamily">@font/clan_pro_news</item>
     </style>
 
     <style name="Theme.Android100ms.NoActionBar">
@@ -42,6 +44,18 @@
         <item name="boxBackgroundColor">@color/textInputBoxBackgroundColor</item>
         <item name="android:textColorHint">@color/secondaryFadedTextColor</item>
         <item name="hintTextColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="MaterialButton" parent="Widget.MaterialComponents.Button">
+        <item name="fontFamily">@font/clan_pro_medium</item>
+    </style>
+
+    <style name="MaterialTextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="fontFamily">@font/clan_pro_medium</item>
+    </style>
+
+    <style name="MaterialTextViewHeading" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">@font/clan_pro_medium</item>
     </style>
 
     <style name="MaterialImageButton" parent="Widget.MaterialComponents.Button.TextButton">
