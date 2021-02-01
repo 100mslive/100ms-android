@@ -1,17 +1,20 @@
 <!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
-    <color name="primaryColor">#231F23</color>
-    <color name="primaryLightColor">#533F46</color>
-    <color name="primaryDarkColor">#2B252B</color>
+    <color name="primaryColor">#0B0F15</color>
+    <color name="primaryLightColor">#161B22</color>
+    <color name="primaryDarkColor">#0F141D</color>
 
-    <color name="secondaryColor">#E35E8B</color>
-    <color name="secondaryLightColor">#533F46</color>
-    <color name="secondaryDarkColor">#2B252B</color>
+    <color name="secondaryColor">#2F80FF</color>
+    <color name="secondaryLightColor">#2B3139</color>
+    <color name="secondaryDarkColor">#1B2028</color>
 
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#ffffff</color>
     <color name="secondaryFadedTextColor">#40ffffff</color>
 
     <color name="textInputBoxBackgroundColor">#0AC4C4C4</color>
-    <color name="switchCheckedTint">#E35E8B</color>
+    <color name="switchCheckedTint">@color/secondaryColor</color>
+    <color name="switchUnCheckedTint">@color/secondaryLightColor</color>
+
+    <color name="red">#D74451</color>
 </resources>
