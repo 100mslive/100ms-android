@@ -6,39 +6,27 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.MainThread
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.brytecam.lib.*
-import com.brytecam.lib.payload.HMSPayloadData
-import com.brytecam.lib.payload.HMSPublishStream
-import com.brytecam.lib.payload.HMSStreamInfo
-import com.brytecam.lib.webrtc.HMSRTCMediaStream
-import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
-import com.brytecam.lib.webrtc.HMSStream
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
-import live.hms.android100ms.ui.home.HomeActivity
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
 import live.hms.android100ms.util.*
 import live.hms.android100ms.audio.HMSAudioManager
-import org.webrtc.AudioTrack
-import org.webrtc.MediaStream
-import org.webrtc.VideoTrack
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.properties.Delegates
 
 
-class MeetingFragment : Fragment(), HMSEventListener {
+class MeetingFragment : Fragment() {
 
   companion object {
     private const val TAG = "MeetingFragment"
@@ -49,22 +37,19 @@ class MeetingFragment : Fragment(), HMSEventListener {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  private var isVolumeMuted = false
-  private var isAudioEnabled by Delegates.notNull<Boolean>()
-  private var isVideoEnabled by Delegates.notNull<Boolean>()
-
-  private var currentDeviceTrack: MeetingTrack? = null
-  private val videoGridItems = ArrayList<MeetingTrack>()
-
-  private var hmsClient: HMSClient? = null
-  private var hmsRoom: HMSRoom? = null
-  private var hmsPeer: HMSPeer? = null
+  private var isAudioMuted = false
 
   private val chatViewModel: ChatViewModel by activityViewModels()
 
-  private lateinit var clipboard: ClipboardManager
+  private val meetingViewModel: MeetingViewModel by viewModels {
+    MeetingViewModelFactory(
+      requireActivity().application,
+      requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+    )
+  }
 
   private lateinit var audioManager: HMSAudioManager
+  private lateinit var clipboard: ClipboardManager
 
   override fun onResume() {
     super.onResume()
@@ -75,12 +60,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
     super.onCreate(savedInstanceState)
 
     roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
-
-    roomDetails.apply {
-      crashlytics.setCustomKey(ROOM_ID, roomId)
-      crashlytics.setCustomKey(USERNAME, username)
-      crashlytics.setCustomKey(ROOM_ENDPOINT, endpoint)
-    }
 
     clipboard = requireActivity()
       .getSystemService(Context.CLIPBOARD_SERVICE)
@@ -126,21 +105,14 @@ class MeetingFragment : Fragment(), HMSEventListener {
     super.onCreateOptionsMenu(menu, inflater)
     menu.findItem(R.id.action_volume).apply {
       setOnMenuItemClickListener {
-        isVolumeMuted = !isVolumeMuted
-        if (isVolumeMuted) {
+        isAudioMuted = !isAudioMuted
+        if (isAudioMuted) {
           setIcon(R.drawable.ic_baseline_volume_off_24)
         } else {
           setIcon(R.drawable.ic_baseline_volume_up_24)
         }
 
-        val volume = if (isVolumeMuted) 0.0 else 1.0
-
-        videoGridItems.forEach { track ->
-          // Ignore the current user's track
-          if (track != currentDeviceTrack) {
-            track.audioTrack?.setVolume(volume)
-          }
-        }
+        meetingViewModel.toggleSpeakerAudio(isAudioMuted)
 
         true
       }
@@ -159,41 +131,95 @@ class MeetingFragment : Fragment(), HMSEventListener {
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
-    isAudioEnabled = settings.publishAudio
-    isVideoEnabled = settings.publishVideo
 
     initVideoGrid()
     initButtons()
     initOnBackPress()
 
-    // We need only instance of HMSClient, hence it is not safe to initialize
-    // inside onViewCreated as it will trigger redundant connect calls whenever,
-    // onViewCreated is called.
-    if (hmsClient == null) initHMSClient()
-
+    meetingViewModel.startMeeting()
     return binding.root
   }
 
   private fun initViewModel() {
-    chatViewModel.setSendBroadcastCallback { message ->
-      Log.v(TAG, "Sending broadcast: $message via $hmsClient")
-      hmsClient?.broadcast(message.message, hmsRoom, object : HMSRequestHandler {
-        override fun onSuccess(s: String?) {
-          Log.v(TAG, "Successfully broadcast message=${message.message} (s=$s)")
-        }
+    chatViewModel.setSendBroadcastCallback { meetingViewModel.broadcastMessage(it) }
 
-        override fun onFailure(errorCode: Long, errorMessage: String) {
-          Toast.makeText(
-            requireContext(),
-            "Cannot send '${message}'. Please try again",
-            Toast.LENGTH_SHORT
-          ).show()
-          crashlyticsLog(
-            TAG,
-            "Cannot broadcast message=${message} code=${errorCode} errorMessage=${errorMessage}"
-          )
+    meetingViewModel.state.observe(viewLifecycleOwner) { state ->
+      when (state) {
+        is MeetingState.Disconnected -> {
+          if (state.isError) {
+            // Handle Separately
+          } else {
+            // WHAT?
+          }
         }
-      })
+        is MeetingState.Connecting -> {
+          updateProgressBarUI(state.heading, state.message)
+          showProgressBar()
+        }
+        is MeetingState.Joining -> {
+          updateProgressBarUI(state.heading, state.message)
+          showProgressBar()
+        }
+        is MeetingState.LoadingMedia -> {
+          updateProgressBarUI(state.heading, state.message)
+          showProgressBar()
+        }
+        is MeetingState.PublishingMedia -> {
+          updateProgressBarUI(state.heading, state.message)
+          showProgressBar()
+        }
+        is MeetingState.Ongoing -> {
+          hideProgressBar()
+        }
+        is MeetingState.Disconnecting -> {
+          updateProgressBarUI(state.heading, state.message)
+          showProgressBar()
+        }
+      }
+    }
+
+    meetingViewModel.isVideoEnabled.observe(viewLifecycleOwner) { enabled ->
+      binding.buttonToggleVideo.apply {
+        visibility = if (settings.publishVideo) View.VISIBLE else View.GONE
+        isEnabled = settings.publishVideo
+
+        setIconResource(
+          if (enabled) R.drawable.ic_baseline_videocam_24
+          else R.drawable.ic_baseline_videocam_off_24
+        )
+      }
+    }
+
+    meetingViewModel.isAudioEnabled.observe(viewLifecycleOwner) { enabled ->
+      binding.buttonToggleAudio.apply {
+        visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
+        isEnabled = settings.publishAudio
+
+        setIconResource(
+          if (enabled) R.drawable.ic_baseline_mic_24
+          else R.drawable.ic_baseline_mic_off_24
+        )
+      }
+    }
+
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+      // TODO: This will fire whenever the onResume is called.
+
+      val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
+      adapter.setItems(tracks)
+      Log.v(TAG, "updated video Grid UI with ${tracks.size} items")
+    }
+
+    meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) { data ->
+      chatViewModel.receivedMessage(
+        ChatMessage(
+          data.peer.uid,
+          data.senderName,
+          Date(),
+          data.msg,
+          false
+        )
+      )
     }
   }
 
@@ -209,10 +235,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
   }
 
   private fun stopAudioManager() {
-    crashlyticsLog(
-      TAG,
-      "Stopping Audio Manager::selectedAudioDevice:${audioManager.selectedAudioDevice}"
-    )
+    val devices = audioManager.selectedAudioDevice
+    crashlyticsLog(TAG, "Stopping Audio Manager:selectedAudioDevice:${devices}")
     audioManager.stop()
   }
 
@@ -246,12 +270,6 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   }
 
-  private fun updateVideoGridUI() {
-    val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
-    adapter.setItems(videoGridItems)
-    Log.v(TAG, "updated video Grid UI with ${videoGridItems.size} items")
-  }
-
   private fun updateProgressBarUI(heading: String, description: String = "") {
     binding.progressBar.heading.text = heading
     binding.progressBar.description.apply {
@@ -280,9 +298,9 @@ class MeetingFragment : Fragment(), HMSEventListener {
     AlertDialog.Builder(requireContext())
       .setMessage(errorMessage)
       .setTitle(title)
-      .setPositiveButton(R.string.leave) { dialog, id ->
+      .setPositiveButton(R.string.leave) { dialog, _ ->
         Log.d(TAG, "Leaving meeting due to '$title' :: $errorMessage")
-        leaveMeeting()
+        meetingViewModel.leaveMeeting()
         dialog.dismiss()
       }
       .setCancelable(false)
@@ -296,7 +314,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     AlertDialog.Builder(requireContext())
       .setMessage(errorMessage)
       .setTitle(title)
-      .setPositiveButton(R.string.retry) { dialog, id ->
+      .setPositiveButton(R.string.retry) { dialog, _ ->
         Log.d(TAG, "Trying to reconnect")
         initHMSClient()
         dialog.dismiss()
@@ -306,222 +324,39 @@ class MeetingFragment : Fragment(), HMSEventListener {
       .show()
   }
 
-  private fun getUserMedia() {
-    // TODO: Listen to changes in settings.publishVideo
-    //  To be done only when the user can change the publishVideo
-    //  while in a meeting.
-
-    val localMediaConstraints = HMSRTCMediaStreamConstraints(true, settings.publishVideo)
-
-    val resolution =
-      "${settings.videoResolutionWidth}x${settings.videoResolutionHeight}@${settings.videoFrameRate}"
-
-    localMediaConstraints.apply {
-      videoCodec = settings.codec
-      videoFrameRate = settings.videoFrameRate
-      videoResolution = resolution
-      videoMaxBitRate = settings.videoBitrate
-      cameraFacing = settings.camera
-    }
-
-    crashlyticsLog(
-      TAG, "getUserMedia() with " +
-          "videoCodec=${localMediaConstraints.videoCodec}, " +
-          "videoFrameRate=${localMediaConstraints.videoFrameRate}, " +
-          "videoResolution=${localMediaConstraints.videoResolution}, " +
-          "videoMaxBitRate=${localMediaConstraints.videoMaxBitRate}, " +
-          "cameraFacing=${localMediaConstraints.cameraFacing}, "
-    )
-
-    // onConnect -> Join -> getUserMedia
-    hmsClient?.getUserMedia(
-      requireActivity().applicationContext,
-      localMediaConstraints,
-      object : HMSClient.GetUserMediaListener {
-        override fun onSuccess(mediaStream: HMSRTCMediaStream?) {
-          Log.v(TAG, "GetUserMedia Success")
-
-          var videoTrack: VideoTrack? = null
-          var audioTrack: AudioTrack? = null
-
-          mediaStream?.stream?.apply {
-            if (videoTracks.isNotEmpty()) {
-              videoTrack = videoTracks[0]
-              videoTrack?.setEnabled(settings.publishVideo)
-            }
-            if (audioTracks.isNotEmpty()) {
-              audioTrack = audioTracks[0]
-              audioTrack?.setEnabled(settings.publishAudio)
-            }
-          }
-
-          hmsClient?.publish(
-            mediaStream,
-            hmsRoom,
-            localMediaConstraints,
-            object : HMSStreamRequestHandler {
-              override fun onSuccess(data: HMSPublishStream) {
-                crashlyticsLog(TAG, "Publish Success ${data.mid}")
-
-                runOnUiThread {
-                  currentDeviceTrack = MeetingTrack(
-                    data.mid,
-                    hmsPeer!!,
-                    videoTrack,
-                    audioTrack,
-                    true
-                  )
-
-                  Log.v(TAG, "Adding $currentDeviceTrack to ViewPagerVideoGrid")
-                  videoGridItems.add(0, currentDeviceTrack!!)
-                  updateVideoGridUI()
-                }
-              }
-
-              override fun onFailure(errorCode: Long, errorReason: String) {
-                crashlyticsLog(TAG, "Publish Failure $errorCode $errorReason")
-                // TODO: Leave the meeting, then disconnect
-                hmsClient?.disconnect()
-                handleFailureWithRetry("[$errorCode] Publish Failure", errorReason)
-              }
-            })
-        }
-
-        override fun onFailure(errorCode: Long, errorReason: String) {
-          crashlyticsLog(TAG, "GetUserMedia failed: $errorCode $errorReason")
-          // TODO: Leave the meeting, then disconnect
-          hmsClient?.disconnect()
-          handleFailureWithRetry("[$errorCode] GetUserMedia Failure", errorReason)
-        }
-      })
-
-  }
-
   private fun initHMSClient() {
     updateProgressBarUI(
       "Connecting...",
       "Please wait while we connect you to ${roomDetails.endpoint}"
     )
     showProgressBar()
-
-    hmsPeer = HMSPeer(roomDetails.username, roomDetails.authToken).apply {
-      crashlytics.setUserId(customerUserId)
-    }
-
-    hmsRoom = HMSRoom(roomDetails.roomId)
-    val config = HMSClientConfig(roomDetails.endpoint)
-    hmsClient = HMSClient(this, requireContext(), hmsPeer, config).apply {
-      setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
-      connect()
-    }
-  }
-
-  /**
-   * Changes the icons for buttons as per the current settings
-   */
-  private fun updateButtonsUI() {
-    // TODO: Listen to changes in publishVideo & publishAudio
-    //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
-
-    binding.buttonToggleAudio.apply {
-      visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
-      isEnabled = settings.publishAudio
-      setIconResource(
-        if (isAudioEnabled)
-          R.drawable.ic_baseline_mic_24
-        else
-          R.drawable.ic_baseline_mic_off_24
-      )
-    }
-
-    binding.buttonToggleVideo.apply {
-      visibility = if (settings.publishVideo) View.VISIBLE else View.GONE
-      isEnabled = settings.publishVideo
-      setIconResource(
-        if (isVideoEnabled)
-          R.drawable.ic_baseline_videocam_24
-        else
-          R.drawable.ic_baseline_videocam_off_24
-      )
-    }
   }
 
   private fun initButtons() {
-    updateButtonsUI()
-
     binding.buttonToggleVideo.setOnSingleClickListener(200L) {
       Log.v(TAG, "buttonToggleVideo.onClick()")
-      currentDeviceTrack?.apply {
-        if (videoTrack != null) {
-          isVideoEnabled = !videoTrack.enabled()
-          videoTrack.setEnabled(isVideoEnabled)
-          if (isVideoEnabled) {
-            HMSStream.getCameraCapturer().start()
-          } else {
-            HMSStream.getCameraCapturer().stop()
-          }
-          updateButtonsUI()
-        }
-      }
+      meetingViewModel.toggleUserMic()
     }
 
     binding.buttonToggleAudio.setOnSingleClickListener(200L) {
       Log.v(TAG, "buttonToggleAudio.onClick()")
-      currentDeviceTrack?.apply {
-        if (audioTrack != null) {
-          isAudioEnabled = !audioTrack.enabled()
-          audioTrack.setEnabled(isAudioEnabled)
-          updateButtonsUI()
-        }
-      }
+      meetingViewModel.toggleUserVideo()
     }
 
     binding.buttonOpenChat.setOnClickListener {
       findNavController().navigate(
         MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
           roomDetails,
-          hmsPeer!!.customerUserId
+          meetingViewModel.peer.customerUserId
         )
       )
     }
 
-    binding.buttonEndCall.setOnSingleClickListener(350L) { leaveMeeting() }
+    binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
 
     binding.buttonFlipCamera.setOnClickListener {
-      hmsClient?.apply {
-        switchCamera()
-      }
+      meetingViewModel.flipCamera()
     }
-  }
-
-  @MainThread
-  private fun leaveMeeting() {
-    updateProgressBarUI("Leaving meeting...")
-    showProgressBar()
-
-    HMSStream.stopCapturers()
-
-    hmsClient?.leave(object : HMSRequestHandler {
-      override fun onSuccess(s: String?) {
-        crashlyticsLog(TAG, "[${Thread.currentThread()}] hmsClient.leave() -> onSuccess($s)")
-
-        // Go to home page
-        runOnUiThread {
-          hmsClient?.disconnect()
-          cleanup()
-
-          Intent(requireContext(), HomeActivity::class.java).apply {
-            Log.v(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
-            startActivity(this)
-            requireActivity().finish()
-          }
-        }
-      }
-
-      override fun onFailure(l: Long, s: String?) {
-        crashlyticsLog(TAG, "hmsClient.leave() -> onFailure($l, $s)")
-      }
-    })
   }
 
   private fun cleanup() {
@@ -529,16 +364,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     // We need to perform a cleanup
     chatViewModel.clearMessages()
 
-    // Remove all the video stream
-    videoGridItems.clear()
-    updateVideoGridUI()
-
     stopAudioManager()
-
-    currentDeviceTrack = null
-    hmsClient = null
-    hmsRoom = null
-    hmsPeer = null
     crashlyticsLog(TAG, "cleanup() done")
   }
 
@@ -548,218 +374,8 @@ class MeetingFragment : Fragment(), HMSEventListener {
       object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
           Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-          leaveMeeting()
+          meetingViewModel.leaveMeeting()
         }
       })
-  }
-
-  // HMS Event Listener events below
-  override fun onConnect() {
-    Log.v(TAG, "onConnect");
-
-    runOnUiThread {
-      updateProgressBarUI(
-        "Connected! Joining meeting...",
-        ""
-      )
-
-      hmsClient?.join(object : HMSRequestHandler {
-        override fun onSuccess(p0: String?) {
-          Log.v(TAG, "Join onSuccess($p0)")
-
-          // FIXME: Remove this hacky-fix
-          Thread.sleep(1000)
-
-          runOnUiThread {
-            startAudioManager()
-            hideProgressBar()
-            getUserMedia()
-          }
-        }
-
-        override fun onFailure(errorCode: Long, errorMessage: String?) {
-          crashlyticsLog(TAG, "Join onFailure($errorCode, $errorMessage)")
-        }
-      })
-
-    }
-  }
-
-  override fun onDisconnect(errorMessage: String) {
-    if (activity != null) {
-      runOnUiThread {
-        crashlyticsLog(TAG, "onDisconnect: $errorMessage")
-        handleFailureWithRetry("You're disconnected", errorMessage)
-      }
-    } else {
-      // The user quit the app due to which the Fragment was detached from the
-      // parent MeetingActivity.
-      // It is safe to ignore this case assuming the user will not be able to recreate the
-      // same instance of destroyed activity.
-      crashlyticsLog(
-        TAG,
-        "onDisconnect(errorMessage=$errorMessage) called after activity was detached"
-      )
-    }
-  }
-
-  override fun onPeerJoin(peer: HMSPeer) {
-    Log.v(
-      TAG,
-      "onPeerJoin: uid=${peer.uid}, " +
-          "role=${peer.role}, " +
-          "userId=${peer.customerUserId}, " +
-          "peerId=${peer.peerId}"
-    )
-    runOnUiThread {
-      Toast.makeText(
-        requireContext(),
-        "${peer.userName} joined",
-        Toast.LENGTH_SHORT
-      ).show()
-    }
-  }
-
-  override fun onPeerLeave(peer: HMSPeer) {
-    Log.v(
-      TAG,
-      "onPeerLeave: uid=${peer.uid}, " +
-          "role=${peer.role}, " +
-          "userId=${peer.customerUserId}, " +
-          "peerId=${peer.peerId}"
-    )
-    runOnUiThread {
-      Toast.makeText(
-        requireContext(),
-        "${peer.userName} left",
-        Toast.LENGTH_SHORT
-      ).show()
-    }
-  }
-
-
-  override fun onStreamAdd(peer: HMSPeer, streamInfo: HMSStreamInfo) {
-    crashlyticsLog(
-      TAG,
-      "onStreamAdd: peer-uid:${peer.uid} " +
-          "name=${peer.userName}, " +
-          "role=${peer.role} " +
-          "userId=${peer.customerUserId} " +
-          "mid=${streamInfo.mid} " +
-          "uid=${streamInfo.uid}"
-    )
-
-    Log.v(TAG, "Subscribing via $hmsClient")
-    hmsClient?.subscribe(streamInfo, hmsRoom, object : HMSMediaRequestHandler {
-      override fun onSuccess(stream: MediaStream) {
-        crashlyticsLog(
-          TAG,
-          "Subscribe(" +
-              "uid=${streamInfo.uid}, " +
-              "mid=${streamInfo.mid}, " +
-              "userName=${streamInfo.userName}): " +
-              "peer-id=${peer.uid} -- onSuccess($stream)"
-        )
-        runOnUiThread {
-          var videoTrack: VideoTrack? = null
-          var audioTrack: AudioTrack? = null
-
-          if (stream.videoTracks.size > 0) {
-            videoTrack = stream.videoTracks[0]
-            videoTrack.setEnabled(true)
-          }
-
-          if (stream.audioTracks.size > 0) {
-            audioTrack = stream.audioTracks[0]
-            audioTrack.setEnabled(true)
-            if (isVolumeMuted) {
-              audioTrack.setVolume(0.0)
-            } else {
-              audioTrack.setVolume(1.0)
-            }
-          }
-
-          videoGridItems.add(
-            MeetingTrack(
-              streamInfo.mid,
-              peer,
-              videoTrack, audioTrack,
-              false
-            )
-          )
-          updateVideoGridUI()
-        }
-      }
-
-      override fun onFailure(errorCode: Long, errorReason: String) {
-        crashlyticsLog(
-          TAG,
-          "Subscribe($streamInfo): peer-id=${peer.uid} -- onFailure($errorCode, $errorReason)"
-        )
-        handleFailureWithQuitMeeting("[$errorCode] Subscribe Failure", errorReason)
-      }
-    })
-  }
-
-  override fun onStreamRemove(streamInfo: HMSStreamInfo) {
-    crashlyticsLog(
-      TAG,
-      "onStreamRemove: " +
-          "name=${streamInfo.userName} " +
-          "uid=${streamInfo.uid} " +
-          "mid=${streamInfo.mid}"
-    )
-
-    runOnUiThread {
-      var found = false
-      val toRemove = arrayListOf<MeetingTrack>()
-
-      // Get the index of the meeting track having uid
-      videoGridItems.forEach { meetingTrack ->
-        if (
-          meetingTrack.peer.uid == streamInfo.uid
-          && meetingTrack.mediaId == streamInfo.mid
-        ) {
-          toRemove.add(meetingTrack)
-          found = true
-        }
-      }
-
-      videoGridItems.removeAll(toRemove)
-
-      if (!found) {
-        crashlyticsLog(TAG, "onStreamRemove: ${streamInfo.uid} not found in meeting tracks")
-      } else {
-        // Update the grid layout as we have removed some views
-        updateVideoGridUI()
-      }
-    }
-  }
-
-  override fun onBroadcast(data: HMSPayloadData) {
-    crashlyticsLog(
-      TAG,
-      "onBroadcast: customerId=${data.peer.customerUserId}, " +
-          "userName=${data.peer.userName}, " +
-          "msg=${data.msg}"
-    )
-
-    runOnUiThread {
-      chatViewModel.receivedMessage(
-        ChatMessage(
-          // TODO: Change uid -> Customer ID
-          data.peer.uid,
-          data.senderName,
-          Date(),
-          data.msg,
-          false
-        )
-      )
-    }
-  }
-
-  private fun runOnUiThread(action: Runnable) {
-    // Call only when fragment is attached to an activity
-    activity?.runOnUiThread(action)
   }
 }
