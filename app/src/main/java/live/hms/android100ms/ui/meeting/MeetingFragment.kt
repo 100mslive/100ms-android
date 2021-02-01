@@ -29,7 +29,7 @@ import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
 import live.hms.android100ms.util.*
-import org.appspot.apprtc.AppRTCAudioManager
+import live.hms.android100ms.audio.HMSAudioManager
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
@@ -64,7 +64,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
 
   private lateinit var clipboard: ClipboardManager
 
-  private lateinit var audioManager: AppRTCAudioManager
+  private lateinit var audioManager: HMSAudioManager
 
   override fun onResume() {
     super.onResume()
@@ -85,7 +85,7 @@ class MeetingFragment : Fragment(), HMSEventListener {
     clipboard = requireActivity()
       .getSystemService(Context.CLIPBOARD_SERVICE)
         as ClipboardManager
-    audioManager = AppRTCAudioManager.create(requireContext())
+    audioManager = HMSAudioManager.create(requireContext())
   }
 
   override fun onStop() {

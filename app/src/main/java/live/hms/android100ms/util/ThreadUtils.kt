@@ -8,4 +8,13 @@ object ThreadUtils {
       "Not on main thread!"
     }
   }
+
+  /**
+   * Helper method for building a string of thread information.
+   */
+  @JvmStatic
+  fun getThreadInfo(): String {
+    val thread = Thread.currentThread()
+    return "@[name=${thread.name}, id=${thread.id}]"
+  }
 }

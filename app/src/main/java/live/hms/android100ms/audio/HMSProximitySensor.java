@@ -1,14 +1,4 @@
-/*
- *  Copyright 2014 The WebRTC Project Authors. All rights reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree. An additional intellectual property rights grant can be found
- *  in the file PATENTS.  All contributing project authors may
- *  be found in the AUTHORS file in the root of the source tree.
- */
-
-package org.appspot.apprtc;
+package live.hms.android100ms.audio;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -20,8 +10,10 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import org.appspot.apprtc.util.AppRTCUtils;
-import org.webrtc.ThreadUtils;
+import org.webrtc.ThreadUtils.ThreadChecker;
+
+import live.hms.android100ms.util.ThreadUtils;
+import live.hms.android100ms.util.Utils;
 
 /**
  * AppRTCProximitySensor manages functions related to the proximity sensor in
@@ -32,13 +24,13 @@ import org.webrtc.ThreadUtils;
  * A LUX-value more than the threshold means the proximity sensor returns "FAR".
  * Anything less than the threshold value and the sensor  returns "NEAR".
  */
-public class AppRTCProximitySensor implements SensorEventListener {
+public class HMSProximitySensor implements SensorEventListener {
   private static final String TAG = "AppRTCProximitySensor";
 
   // This class should be created, started and stopped on one thread
   // (e.g. the main thread). We use |nonThreadSafe| to ensure that this is
   // the case. Only active when |DEBUG| is set to true.
-  private final ThreadUtils.ThreadChecker threadChecker = new ThreadUtils.ThreadChecker();
+  private final ThreadChecker threadChecker = new ThreadChecker();
 
   private final Runnable onSensorStateListener;
   private final SensorManager sensorManager;
@@ -46,13 +38,15 @@ public class AppRTCProximitySensor implements SensorEventListener {
   private Sensor proximitySensor;
   private boolean lastStateReportIsNear;
 
-  /** Construction */
-  static AppRTCProximitySensor create(Context context, Runnable sensorStateListener) {
-    return new AppRTCProximitySensor(context, sensorStateListener);
+  /**
+   * Construction
+   */
+  static HMSProximitySensor create(Context context, Runnable sensorStateListener) {
+    return new HMSProximitySensor(context, sensorStateListener);
   }
 
-  private AppRTCProximitySensor(Context context, Runnable sensorStateListener) {
-    Log.d(TAG, "AppRTCProximitySensor" + AppRTCUtils.getThreadInfo());
+  private HMSProximitySensor(Context context, Runnable sensorStateListener) {
+    Log.d(TAG, "AppRTCProximitySensor" + ThreadUtils.getThreadInfo());
     onSensorStateListener = sensorStateListener;
     sensorManager = ((SensorManager) context.getSystemService(Context.SENSOR_SERVICE));
   }
@@ -63,7 +57,7 @@ public class AppRTCProximitySensor implements SensorEventListener {
    */
   public boolean start() {
     threadChecker.checkIsOnValidThread();
-    Log.d(TAG, "start" + AppRTCUtils.getThreadInfo());
+    Log.d(TAG, "start" + ThreadUtils.getThreadInfo());
     if (!initDefaultSensor()) {
       // Proximity sensor is not supported on this device.
       return false;
@@ -72,17 +66,21 @@ public class AppRTCProximitySensor implements SensorEventListener {
     return true;
   }
 
-  /** Deactivate the proximity sensor. */
+  /**
+   * Deactivate the proximity sensor.
+   */
   public void stop() {
     threadChecker.checkIsOnValidThread();
-    Log.d(TAG, "stop" + AppRTCUtils.getThreadInfo());
+    Log.d(TAG, "stop" + ThreadUtils.getThreadInfo());
     if (proximitySensor == null) {
       return;
     }
     sensorManager.unregisterListener(this, proximitySensor);
   }
 
-  /** Getter for last reported state. Set to true if "near" is reported. */
+  /**
+   * Getter for last reported state. Set to true if "near" is reported.
+   */
   public boolean sensorReportsNearState() {
     threadChecker.checkIsOnValidThread();
     return lastStateReportIsNear;
@@ -91,7 +89,7 @@ public class AppRTCProximitySensor implements SensorEventListener {
   @Override
   public final void onAccuracyChanged(Sensor sensor, int accuracy) {
     threadChecker.checkIsOnValidThread();
-    AppRTCUtils.assertIsTrue(sensor.getType() == Sensor.TYPE_PROXIMITY);
+    Utils.assertIsTrue(sensor.getType() == Sensor.TYPE_PROXIMITY);
     if (accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
       Log.e(TAG, "The values returned by this sensor cannot be trusted");
     }
@@ -100,7 +98,7 @@ public class AppRTCProximitySensor implements SensorEventListener {
   @Override
   public final void onSensorChanged(SensorEvent event) {
     threadChecker.checkIsOnValidThread();
-    AppRTCUtils.assertIsTrue(event.sensor.getType() == Sensor.TYPE_PROXIMITY);
+    Utils.assertIsTrue(event.sensor.getType() == Sensor.TYPE_PROXIMITY);
     // As a best practice; do as little as possible within this method and
     // avoid blocking.
     float distanceInCentimeters = event.values[0];
@@ -118,9 +116,9 @@ public class AppRTCProximitySensor implements SensorEventListener {
       onSensorStateListener.run();
     }
 
-    Log.d(TAG, "onSensorChanged" + AppRTCUtils.getThreadInfo() + ": "
-            + "accuracy=" + event.accuracy + ", timestamp=" + event.timestamp + ", distance="
-            + event.values[0]);
+    Log.d(TAG, "onSensorChanged" + ThreadUtils.getThreadInfo() + ": "
+        + "accuracy=" + event.accuracy + ", timestamp=" + event.timestamp + ", distance="
+        + event.values[0]);
   }
 
   /**
@@ -140,7 +138,9 @@ public class AppRTCProximitySensor implements SensorEventListener {
     return true;
   }
 
-  /** Helper method for logging information about the proximity sensor. */
+  /**
+   * Helper method for logging information about the proximity sensor.
+   */
   private void logProximitySensorInfo() {
     if (proximitySensor == null) {
       return;
