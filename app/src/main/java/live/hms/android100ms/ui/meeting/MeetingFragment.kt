@@ -156,6 +156,8 @@ class MeetingFragment : Fragment() {
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
       when (state) {
         is MeetingState.Disconnected -> {
+          stopAudioManager()
+
           if (state.showDialog) {
             AlertDialog.Builder(requireContext())
               .setMessage(state.message)
@@ -195,6 +197,7 @@ class MeetingFragment : Fragment() {
           showProgressBar()
         }
         is MeetingState.Ongoing -> {
+          startAudioManager()
           hideProgressBar()
         }
         is MeetingState.Disconnecting -> {
