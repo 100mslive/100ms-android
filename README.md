@@ -51,7 +51,7 @@ On the first time of launch, user will be prompted with permissions. Then you ar
 
 In the launch screen, here we have two options:
 
-![Home Page](images/home-page.jpg?raw=true "Home Page")
+<img src="images/home-page.jpg?raw=true" width="300">
 
 ### Join meeting
 
