@@ -38,8 +38,6 @@ class MeetingFragment : Fragment() {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  private var isAudioMuted = false
-
   private val chatViewModel: ChatViewModel by activityViewModels()
 
   private val meetingViewModel: MeetingViewModel by viewModels {
@@ -102,18 +100,24 @@ class MeetingFragment : Fragment() {
     return false
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    menu.findItem(R.id.action_volume).apply {
-      setOnMenuItemClickListener {
-        isAudioMuted = !isAudioMuted
-        if (isAudioMuted) {
-          setIcon(R.drawable.ic_baseline_volume_off_24)
-        } else {
-          setIcon(R.drawable.ic_baseline_volume_up_24)
-        }
+  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+    item.apply {
+      if (meetingViewModel.isAudioMuted) {
+        setIcon(R.drawable.ic_baseline_volume_off_24)
+      } else {
+        setIcon(R.drawable.ic_baseline_volume_up_24)
+      }
+    }
+  }
 
-        meetingViewModel.toggleSpeakerAudio(isAudioMuted)
+  override fun onPrepareOptionsMenu(menu: Menu) {
+    super.onPrepareOptionsMenu(menu)
+
+    menu.findItem(R.id.action_volume).apply {
+      updateActionVolumeMenuIcon(this)
+      setOnMenuItemClickListener {
+        meetingViewModel.toggleAudio()
+        updateActionVolumeMenuIcon(this)
 
         true
       }
@@ -154,15 +158,20 @@ class MeetingFragment : Fragment() {
     chatViewModel.setSendBroadcastCallback { meetingViewModel.broadcastMessage(it) }
 
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
+      Log.v(TAG, "Meeting State: $state")
       when (state) {
         is MeetingState.Disconnected -> {
+          cleanup()
+          hideProgressBar()
           stopAudioManager()
 
           if (state.showDialog) {
+            val positiveButtonText = if (state.goToHome) R.string.leave else R.string.retry
+
             AlertDialog.Builder(requireContext())
               .setMessage(state.message)
               .setTitle(state.heading)
-              .setPositiveButton(R.string.leave) { dialog, _ ->
+              .setPositiveButton(positiveButtonText) { dialog, _ ->
                 Log.d(TAG, "Leaving meeting due to '${state.heading}' :: ${state.message}")
 
                 if (state.goToHome) {
@@ -180,6 +189,7 @@ class MeetingFragment : Fragment() {
             goToHomePage()
           }
         }
+
         is MeetingState.Connecting -> {
           updateProgressBarUI(state.heading, state.message)
           showProgressBar()

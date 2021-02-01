@@ -36,10 +36,15 @@ class MeetingViewModel(
     }
   }
 
-  private var isAudioMuted = false
-
   private val _tracks = ArrayList<MeetingTrack>()
   private var currentDeviceTrack: MeetingTrack? = null
+
+  // Flag to keep track whether the incoming audio need's to be muted
+  private var _isAudioMuted = false
+
+  // Public variable which can be accessed by views
+  public val isAudioMuted: Boolean
+    get() = _isAudioMuted
 
   private val settings = SettingsStore(getApplication())
 
@@ -51,6 +56,7 @@ class MeetingViewModel(
   // Live data for user media controls
   val isAudioEnabled = MutableLiveData(settings.publishAudio)
   val isVideoEnabled = MutableLiveData(settings.publishVideo)
+
 
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
@@ -91,9 +97,13 @@ class MeetingViewModel(
     }
   }
 
-  fun toggleSpeakerAudio(mute: Boolean) {
-    isAudioMuted = mute
-    val volume = if (isAudioMuted) 0.0 else 1.0
+  /**
+   * Helper function to toggle others audio tracks
+   */
+  fun toggleAudio() {
+    _isAudioMuted = !_isAudioMuted
+
+    val volume = if (_isAudioMuted) 0.0 else 1.0
     _tracks.forEach { track ->
       if (track != currentDeviceTrack) {
         track.audioTrack?.setVolume(volume)
@@ -101,11 +111,9 @@ class MeetingViewModel(
     }
   }
 
-
   fun startMeeting() {
     if (state.value !is MeetingState.Disconnected) {
-      Log.w(TAG, "Cannot start meeting in ${state.value} state")
-      return
+      error("Cannot start meeting in ${state.value} state")
     }
 
     state.postValue(
@@ -114,6 +122,13 @@ class MeetingViewModel(
         "Please wait while we connect you to ${roomDetails.endpoint}"
       )
     )
+
+    // FIXME(HMS-1115): Using the same HMSClient instance to call connect() after
+    //  failure raises the same error.
+    client = HMSClient(this, getApplication(), peer, config).apply {
+      setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
+    }
+
     client.connect()
   }
 
@@ -123,9 +138,7 @@ class MeetingViewModel(
 
   fun leaveMeeting() {
     state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
-
-    // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
-    HMSStream.stopCapturers()
+    cleanup()
 
     client.leave(object : HMSRequestHandler {
       override fun onSuccess(data: String) {
@@ -313,7 +326,20 @@ class MeetingViewModel(
     })
   }
 
+  /**
+   * Called whenever the meeting is ended (both due to user action or failure)
+   * Resets all the values to default
+   */
   private fun cleanup() {
+    // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
+    HMSStream.stopCapturers()
+
+    // Reset the values of bottom control buttons
+    isAudioEnabled.postValue(settings.publishAudio)
+    isVideoEnabled.postValue(settings.publishVideo)
+
+    _isAudioMuted = false
+
     // Remove all the video stream
     _tracks.clear()
     tracks.postValue(_tracks)
@@ -322,7 +348,8 @@ class MeetingViewModel(
   }
 
   /**
-   * @param fatal Requires closing the MeetingActivity, going back to home page
+   * @param fatal Failure requires closing the MeetingActivity,
+   *  going back to home page
    * @param title Set the title displayed in the Dialog
    * @param message Set the message to display.
    */
@@ -333,11 +360,9 @@ class MeetingViewModel(
   ) {
     crashlyticsLog(TAG, "handleFailure($fatal, $title, $message)")
 
-    // TODO: Leave meeting gracefully
-    HMSStream.stopCapturers()
     client.disconnect()
-    state.postValue(MeetingState.Disconnected(true, title, message, fatal))
     cleanup()
+    state.postValue(MeetingState.Disconnected(true, title, message, fatal))
   }
 
   // HMS Events
@@ -348,8 +373,8 @@ class MeetingViewModel(
 
   override fun onDisconnect(errorMessage: String) {
     crashlyticsLog(TAG, "onDisconnect: $errorMessage")
-    state.postValue(MeetingState.Disconnected(true, "Disconnected", errorMessage))
     cleanup()
+    state.postValue(MeetingState.Disconnected(true, "Disconnected", errorMessage))
   }
 
   override fun onPeerJoin(peer: HMSPeer) {
@@ -406,7 +431,7 @@ class MeetingViewModel(
           audioTrack = stream.audioTracks[0]
           audioTrack.setEnabled(true)
 
-          if (isAudioMuted) {
+          if (_isAudioMuted) {
             audioTrack.setVolume(0.0)
           } else {
             audioTrack.setVolume(1.0)

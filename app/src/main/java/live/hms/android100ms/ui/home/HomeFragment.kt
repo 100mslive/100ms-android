@@ -312,7 +312,7 @@ class HomeFragment : Fragment() {
     binding.buttonJoinMeeting.setOnClickListener {
       var allOk = isValidUserName()
 
-      val meetingUrl = binding.editTextMeetingUrl.text.toString()
+      val meetingUrl = binding.editTextMeetingUrl.text.toString().trim()
       val validUrl = URLUtil.isValidUrl(meetingUrl)
       if (meetingUrl.isEmpty()) {
         allOk = false
