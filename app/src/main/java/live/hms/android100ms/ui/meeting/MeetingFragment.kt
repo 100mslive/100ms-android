@@ -15,6 +15,7 @@ import com.brytecam.lib.*
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.android100ms.R
+import live.hms.android100ms.audio.HMSAudioManager
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.HomeActivity
@@ -23,7 +24,6 @@ import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
 import live.hms.android100ms.util.*
-import live.hms.android100ms.audio.HMSAudioManager
 import java.util.*
 
 
@@ -219,9 +219,6 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.isVideoEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleVideo.apply {
-        visibility = if (settings.publishVideo) View.VISIBLE else View.GONE
-        isEnabled = settings.publishVideo
-
         setIconResource(
           if (enabled) R.drawable.ic_baseline_videocam_24
           else R.drawable.ic_baseline_videocam_off_24
@@ -231,9 +228,6 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.isAudioEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleAudio.apply {
-        visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
-        isEnabled = settings.publishAudio
-
         setIconResource(
           if (enabled) R.drawable.ic_baseline_mic_24
           else R.drawable.ic_baseline_mic_off_24
@@ -334,14 +328,24 @@ class MeetingFragment : Fragment() {
   }
 
   private fun initButtons() {
-    binding.buttonToggleVideo.setOnSingleClickListener(200L) {
-      Log.v(TAG, "buttonToggleVideo.onClick()")
-      meetingViewModel.toggleUserMic()
+    binding.buttonToggleVideo.apply {
+      visibility = if (settings.publishVideo) View.VISIBLE else View.GONE
+      isEnabled = settings.publishVideo
+
+      setOnSingleClickListener(200L) {
+        Log.v(TAG, "buttonToggleVideo.onClick()")
+        meetingViewModel.toggleUserMic()
+      }
     }
 
-    binding.buttonToggleAudio.setOnSingleClickListener(200L) {
-      Log.v(TAG, "buttonToggleAudio.onClick()")
-      meetingViewModel.toggleUserVideo()
+    binding.buttonToggleAudio.apply {
+      visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
+      isEnabled = settings.publishAudio
+
+      setOnSingleClickListener(200L) {
+        Log.v(TAG, "buttonToggleAudio.onClick()")
+        meetingViewModel.toggleUserVideo()
+      }
     }
 
     binding.buttonOpenChat.setOnClickListener {
@@ -355,8 +359,17 @@ class MeetingFragment : Fragment() {
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
 
-    binding.buttonFlipCamera.setOnClickListener {
-      meetingViewModel.flipCamera()
+    binding.buttonFlipCamera.apply {
+      if (!settings.publishVideo) {
+        visibility = View.GONE
+        isEnabled = false
+      } else {
+        visibility = View.VISIBLE
+        isEnabled = true
+        setOnClickListener {
+          meetingViewModel.flipCamera()
+        }
+      }
     }
   }
 

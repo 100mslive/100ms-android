@@ -133,6 +133,10 @@ class MeetingViewModel(
   }
 
   fun flipCamera() {
+    if (!settings.publishVideo) {
+      error("Cannot switch camera when Video is disabled")
+    }
+
     client.switchCamera()
   }
 
