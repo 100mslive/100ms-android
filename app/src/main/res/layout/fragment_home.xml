@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:background="@color/primaryColor"
     tools:context=".ui.home.HomeFragment">
 
     <com.google.android.material.card.MaterialCardView
@@ -57,13 +58,13 @@
             android:orientation="vertical">
 
             <com.google.android.material.textview.MaterialTextView
+                style="@style/MaterialTextViewHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/join_a_meeting"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/container_meeting_url"
@@ -82,6 +83,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_join_meeting"
+                style="@style/MaterialButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/join_now"
@@ -110,13 +112,13 @@
             android:orientation="vertical">
 
             <com.google.android.material.textview.MaterialTextView
+                style="@style/MaterialTextViewHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/get_started"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/container_room_name"
@@ -138,12 +140,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:text="@string/record_meeting"
-                android:textStyle="bold" />
+                android:text="@string/record_meeting" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_start_meeting"
-                style="@style/Widget.MaterialComponents.Button"
+                style="@style/MaterialButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/secondaryColor"
@@ -158,6 +159,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <include
+        android:visibility="gone"
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar" />
 

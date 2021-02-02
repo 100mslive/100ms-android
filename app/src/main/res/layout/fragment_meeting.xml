@@ -59,7 +59,7 @@
             style="@style/MaterialImageButton"
             android:contentDescription="@string/end_call"
             app:icon="@drawable/ic_baseline_call_end_24"
-            app:iconTint="@android:color/holo_red_light" />
+            app:iconTint="@color/red" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_flip_camera"

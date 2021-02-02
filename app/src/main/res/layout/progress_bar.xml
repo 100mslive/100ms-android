@@ -22,6 +22,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/heading"
+            style="@style/MaterialTextViewHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -29,8 +30,7 @@
             android:gravity="center"
             android:text="@string/progress_bar_heading"
             android:textColor="@color/primaryTextColor"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="16sp" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/description"
@@ -42,7 +42,8 @@
             android:layout_marginBottom="24dp"
             android:gravity="center"
             android:text="@string/progress_bar_description"
-            android:textColor="@color/primaryTextColor" />
+            android:textColor="@color/primaryTextColor"
+            android:textSize="14sp" />
 
         <ProgressBar
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
