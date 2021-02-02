@@ -1,20 +1,24 @@
 <!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
-    <color name="primaryColor">#0B0F15</color>
-    <color name="primaryLightColor">#161B22</color>
-    <color name="primaryDarkColor">#0F141D</color>
-
-    <color name="secondaryColor">#2F80FF</color>
-    <color name="secondaryLightColor">#2B3139</color>
-    <color name="secondaryDarkColor">#1B2028</color>
-
-    <color name="primaryTextColor">#ffffff</color>
-    <color name="secondaryTextColor">#ffffff</color>
-    <color name="secondaryFadedTextColor">#40ffffff</color>
-
-    <color name="textInputBoxBackgroundColor">#0AC4C4C4</color>
-    <color name="switchCheckedTint">@color/secondaryColor</color>
-    <color name="switchUnCheckedTint">@color/secondaryLightColor</color>
+    <color name="blue_0">#0b0f15</color>
+    <color name="blue_1">#0f141d</color>
+    <color name="blue_2">#161b22</color>
+    <color name="blue_3">#1b2028</color>
+    <color name="blue_4">#2b3139</color>
+    <color name="primary_blue">#2f80ff</color>
 
     <color name="red">#D74451</color>
+    <color name="white">#ffffff</color>
+
+    <color name="primaryColor">@color/blue_0</color>
+    <color name="primaryLightColor">@color/blue_2</color>
+    <color name="primaryDarkColor">@color/blue_1</color>
+
+    <color name="secondaryColor">@color/primary_blue</color>
+    <color name="secondaryLightColor">@color/blue_4</color>
+    <color name="secondaryDarkColor">@color/blue_3</color>
+
+    <color name="primaryTextColor">@color/white</color>
+    <color name="secondaryTextColor">@color/white</color>
+    <color name="secondaryFadedTextColor">#40ffffff</color>
 </resources>

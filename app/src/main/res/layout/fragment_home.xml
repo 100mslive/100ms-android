@@ -159,6 +159,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <include
+        android:visibility="gone"
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar" />
 
