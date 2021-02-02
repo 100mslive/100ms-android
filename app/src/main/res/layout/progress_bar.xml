@@ -29,7 +29,6 @@
             android:layout_margin="12dp"
             android:gravity="center"
             android:text="@string/progress_bar_heading"
-            android:textColor="@color/primaryTextColor"
             android:textSize="16sp" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -42,7 +41,6 @@
             android:layout_marginBottom="24dp"
             android:gravity="center"
             android:text="@string/progress_bar_description"
-            android:textColor="@color/primaryTextColor"
             android:textSize="14sp" />
 
         <ProgressBar

@@ -9,16 +9,5 @@
 
     <color name="red">#D74451</color>
     <color name="white">#ffffff</color>
-
-    <color name="primaryColor">@color/blue_0</color>
-    <color name="primaryLightColor">@color/blue_2</color>
-    <color name="primaryDarkColor">@color/blue_1</color>
-
-    <color name="secondaryColor">@color/primary_blue</color>
-    <color name="secondaryLightColor">@color/blue_4</color>
-    <color name="secondaryDarkColor">@color/blue_3</color>
-
-    <color name="primaryTextColor">@color/white</color>
-    <color name="secondaryTextColor">@color/white</color>
-    <color name="secondaryFadedTextColor">#40ffffff</color>
+    <color name="fadedWhite">#40ffffff</color>
 </resources>

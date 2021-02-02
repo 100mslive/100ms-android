@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:background="@color/primaryColor"
     tools:context=".ui.home.HomeFragment">
 
     <com.google.android.material.card.MaterialCardView
@@ -63,7 +62,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/join_a_meeting"
-                android:textColor="@color/primaryTextColor"
                 android:textSize="16sp" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -87,8 +85,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/join_now"
-                android:textAllCaps="false"
-                android:textColor="@color/secondaryColor" />
+                android:textAllCaps="false" />
 
         </LinearLayout>
 
@@ -117,7 +114,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/get_started"
-                android:textColor="@color/primaryTextColor"
                 android:textSize="16sp" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -137,6 +133,7 @@
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switch_record"
+                style="@style/MaterialSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
@@ -147,10 +144,9 @@
                 style="@style/MaterialButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/secondaryColor"
+                android:backgroundTint="@color/primary_blue"
                 android:text="@string/start_a_meeting"
                 android:textAllCaps="false"
-                android:textColor="@color/secondaryTextColor"
                 app:icon="@drawable/ic_baseline_videocam_24"
                 app:iconGravity="textStart" />
 
@@ -159,8 +155,8 @@
     </com.google.android.material.card.MaterialCardView>
 
     <include
-        android:visibility="gone"
         android:id="@+id/progress_bar"
-        layout="@layout/progress_bar" />
+        layout="@layout/progress_bar"
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

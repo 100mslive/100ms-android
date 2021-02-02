@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/primaryColor"
+        android:background="@color/blue_3"
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton

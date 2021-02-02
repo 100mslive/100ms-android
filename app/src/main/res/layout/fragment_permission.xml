@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_margin="12dp"
-        android:backgroundTint="@color/primaryColor"
         android:elevation="24dp"
         app:cardElevation="24dp"
         tools:context=".ui.home.permission.PermissionFragment">
@@ -45,18 +44,18 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
-                android:textSize="14sp"
                 android:gravity="center"
-                android:text="@string/permission_description" />
+                android:text="@string/permission_description"
+                android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_grant_permission"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/primary_blue"
                 android:text="@string/grant_permissions"
-                android:textAllCaps="false"
-                app:backgroundTint="@color/secondaryColor" />
+                android:textAllCaps="false" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_do_it_later"
@@ -65,7 +64,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/do_it_later"
                 android:textAllCaps="false"
-                android:textColor="@color/secondaryColor"
                 android:visibility="gone" />
 
         </LinearLayout>
