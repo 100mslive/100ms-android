@@ -70,7 +70,7 @@ class MeetingViewModel(
 
   private val room = HMSRoom(roomDetails.roomId)
   private val config = HMSClientConfig(roomDetails.endpoint)
-  private var client = HMSClient(this, getApplication(), peer, config).apply {
+  private val client = HMSClient(this, getApplication(), peer, config).apply {
     setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
   }
 
@@ -122,12 +122,6 @@ class MeetingViewModel(
         "Please wait while we connect you to ${roomDetails.endpoint}"
       )
     )
-
-    // FIXME(HMS-1115): Using the same HMSClient instance to call connect() after
-    //  failure raises the same error.
-    client = HMSClient(this, getApplication(), peer, config).apply {
-      setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
-    }
 
     client.connect()
   }
