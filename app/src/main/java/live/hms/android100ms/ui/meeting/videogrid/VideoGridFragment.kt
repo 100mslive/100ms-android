@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import android.widget.GridLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.databinding.FragmentVideoGridBinding
 import live.hms.android100ms.databinding.GridItemVideoBinding
 import live.hms.android100ms.ui.meeting.MeetingTrack
+import live.hms.android100ms.util.NameUtils
+import live.hms.android100ms.util.SurfaceViewRendererUtil
 import live.hms.android100ms.util.crashlyticsLog
 import live.hms.android100ms.util.viewLifecycle
 import org.webrtc.RendererCommon
@@ -36,7 +37,7 @@ class VideoGridFragment(
 ) : Fragment() {
 
   companion object {
-    const val TAG = "VideoGridFragment"
+    private const val TAG = "VideoGridFragment"
   }
 
   init {
@@ -200,21 +201,11 @@ class VideoGridFragment(
   }
 
   private fun bindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    if (item.videoTrack == null) return
-    crashlyticsLog(TAG, "fragment=$tag: init context for $item")
-
-    binding.surfaceView.apply {
-      val context = HMSWebRTCEglUtils.getRootEglBaseContext()
-
-      if (BuildConfig.DEBUG && context == null) {
-        error("Received HMSWebRTCEglUtils=NULL")
-      }
-
-      init(context, null)
-      item.videoTrack.addSink(this)
+    val success = SurfaceViewRendererUtil.bind(binding.surfaceView, item)
+    if (success) {
+      crashlyticsLog(TAG, "fragment=$tag: init context for $item")
+      binding.surfaceView.visibility = View.VISIBLE
     }
-
-    binding.surfaceView.visibility = View.VISIBLE
   }
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
@@ -222,15 +213,7 @@ class VideoGridFragment(
 
     binding.name.text = item.peer.userName
 
-    binding.nameInitials.text = item.peer.userName.let { value ->
-      if (value.isEmpty()) {
-        "--"
-      } else {
-        value.split(' ')
-          .mapNotNull { it.firstOrNull()?.toString() }
-          .reduce { acc, s -> acc + s }
-      }
-    }
+    binding.nameInitials.text = NameUtils.getInitials(item.peer.userName)
 
     // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
     binding.surfaceView.apply {
@@ -240,18 +223,12 @@ class VideoGridFragment(
   }
 
   private fun unbindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    if (item.videoTrack == null) return
+    val success = SurfaceViewRendererUtil.unbind(binding.surfaceView, item)
 
-    crashlyticsLog(TAG, "fragment=$tag: releasing context for $item")
-    binding.surfaceView.apply {
-      // NOTE: We don't dispose off the MediaStreamTrack here as it can
-      // be re-used by the ViewPager/RecyclerView
-
-      item.videoTrack.removeSink(this)
-      release()
+    if (success) {
+      crashlyticsLog(TAG, "fragment=$tag: releasing context for $item")
+      binding.surfaceView.visibility = View.INVISIBLE
     }
-
-    binding.surfaceView.visibility = View.INVISIBLE
   }
 
   private fun createVideoView(parent: ViewGroup): GridItemVideoBinding {

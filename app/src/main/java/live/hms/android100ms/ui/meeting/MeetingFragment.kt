@@ -237,6 +237,7 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       // TODO: This will fire whenever the onResume is called.
+      // TODO: Check for pinned view and call setItems of respective adapter!
 
       val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
       adapter.setItems(tracks)
