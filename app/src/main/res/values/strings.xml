@@ -44,10 +44,10 @@
     <string name="default_name">Default Name</string>
     <string name="default_video_source">Default Video Source</string>
     <string name="default_microphone_source">Default Microphone Source</string>
-    <string name="turn_off_video_while_joining">Turn off video while joining</string>
+    <string name="publish_video_while_joining">Publish video while joining</string>
     <string name="show_video_preview_before_joining">Show video preview before joining</string>
     <string name="mirror_my_video">Mirror my video</string>
-    <string name="mute_microphone_while_joining">Mute microphone while joining</string>
+    <string name="publish_audio_while_joining">Publish audio while joining</string>
     <string name="maximum_rows">Maximum Rows</string>
     <string name="maximum_columns">Maximum Columns</string>
     <string name="video_resolution">Video Resolution</string>

@@ -280,21 +280,21 @@ class SettingsFragment : Fragment() {
   private fun initSwitches() {
     binding.apply {
       initSwitch(
-        !settings.publishVideo,
-        switchMuteVideoOnJoin
-      ) { commitHelper.setPublishVideo(!it) }
+        settings.publishVideo,
+        switchPublishVideoOnJoin
+      ) { commitHelper.setPublishVideo(it) }
 
       initSwitch(
-        !settings.publishAudio,
-        switchMuteMicrophoneOnJoin
-      ) { commitHelper.setPublishAudio(!it) }
+        settings.publishAudio,
+        switchPublishAudioOnJoin
+      ) { commitHelper.setPublishAudio(it) }
 
       initSwitch(
         settings.isLeakCanaryEnabled,
         switchToggleLeakCanary
       ) { handleLeakCanaryToggle(it) }
 
-      // Disable the switches not yet supported (TODO)
+      // Disable the switches not yet supported (TODO: Add support)
       switchMirrorVideo.isEnabled = false
       switchShowPreviewBeforeJoin.isEnabled = false
 

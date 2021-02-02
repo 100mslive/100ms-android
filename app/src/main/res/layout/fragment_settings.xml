@@ -75,16 +75,16 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_mute_video_on_join"
+            android:id="@+id/switch_publish_video_on_join"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/turn_off_video_while_joining" />
+            android:text="@string/publish_video_while_joining" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_mute_microphone_on_join"
+            android:id="@+id/switch_publish_audio_on_join"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/mute_microphone_while_joining" />
+            android:text="@string/publish_audio_while_joining" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_mirror_video"
