@@ -14,12 +14,13 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_dots"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="8dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
+        android:layout_margin="4dp"
         android:backgroundTint="@color/blue_1"
-        app:tabBackground="@drawable/dot_selector"
+        app:tabBackground="@drawable/dot_selector_4"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp" />
 

@@ -18,7 +18,8 @@ import live.hms.android100ms.ui.home.HomeActivity
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
-import live.hms.android100ms.ui.meeting.videogrid.GridVideoFragment
+import live.hms.android100ms.ui.meeting.pinnedvideo.PinnedVideoFragment
+import live.hms.android100ms.ui.meeting.videogrid.VideoGridFragment
 import live.hms.android100ms.util.*
 import java.util.*
 
@@ -45,7 +46,7 @@ class MeetingFragment : Fragment() {
 
   private lateinit var audioManager: HMSAudioManager
 
-  private var meetingViewMode = MeetingViewMode.GRID_VIEW
+  private var meetingViewMode = MeetingViewMode.GRID
 
   override fun onResume() {
     super.onResume()
@@ -95,11 +96,11 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_grid_view -> {
-        changeMeetingMode(MeetingViewMode.GRID_VIEW)
+        changeMeetingMode(MeetingViewMode.GRID)
       }
 
       R.id.action_pinned_view -> {
-        changeMeetingMode(MeetingViewMode.PINNED_VIEW)
+        changeMeetingMode(MeetingViewMode.PINNED)
       }
     }
     return false
@@ -280,16 +281,24 @@ class MeetingFragment : Fragment() {
   }
 
   private fun changeMeetingMode(newMode: MeetingViewMode) {
+    if (meetingViewMode == newMode) {
+      Toast.makeText(
+        requireContext(),
+        "Already in ViewMode=$newMode",
+        Toast.LENGTH_SHORT
+      ).show()
+      return
+    }
+
     meetingViewMode = newMode
     updateVideoView()
   }
 
   private fun updateVideoView() {
-    /* val fragment = when (meetingViewMode) {
-      MeetingViewMode.GRID_VIEW -> GridVideoFragment()
-      MeetingViewMode.PINNED_VIEW -> PinnedVideoFragment()
-    } */
-    val fragment = GridVideoFragment()
+    val fragment = when (meetingViewMode) {
+      MeetingViewMode.GRID -> VideoGridFragment()
+      MeetingViewMode.PINNED -> PinnedVideoFragment()
+    }
 
     childFragmentManager
       .beginTransaction()
@@ -319,7 +328,7 @@ class MeetingFragment : Fragment() {
 
       setOnSingleClickListener(200L) {
         Log.v(TAG, "buttonToggleVideo.onClick()")
-        meetingViewModel.toggleUserMic()
+        meetingViewModel.toggleUserVideo()
       }
     }
 
@@ -329,7 +338,7 @@ class MeetingFragment : Fragment() {
 
       setOnSingleClickListener(200L) {
         Log.v(TAG, "buttonToggleAudio.onClick()")
-        meetingViewModel.toggleUserVideo()
+        meetingViewModel.toggleUserMic()
       }
     }
 

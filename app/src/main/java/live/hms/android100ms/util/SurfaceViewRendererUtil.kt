@@ -1,11 +1,14 @@
 package live.hms.android100ms.util
 
+import android.util.Log
 import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.ui.meeting.MeetingTrack
 import org.webrtc.SurfaceViewRenderer
 
 object SurfaceViewRendererUtil {
+
+  private const val TAG = "SurfaceViewRendererUtil"
 
   fun bind(view: SurfaceViewRenderer, item: MeetingTrack): Boolean {
     if (item.videoTrack == null) return false
@@ -21,6 +24,7 @@ object SurfaceViewRendererUtil {
       item.videoTrack.addSink(this)
     }
 
+    crashlyticsLog(TAG, "Initialized EglContext for item=$item (view=$view)")
     return true
   }
 
@@ -35,6 +39,7 @@ object SurfaceViewRendererUtil {
       release()
     }
 
+    crashlyticsLog(TAG, "Released EglContext for item=$item (view=$view)")
     return true
   }
 

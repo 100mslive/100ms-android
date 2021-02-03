@@ -20,9 +20,9 @@ import live.hms.android100ms.ui.meeting.MeetingViewModelFactory
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
 
-class GridVideoFragment : Fragment() {
+class VideoGridFragment : Fragment() {
   companion object {
-    private const val TAG = "GridVideoFragment"
+    private const val TAG = "VideoGridFragment"
   }
 
   private var binding by viewLifecycle<FragmentGridVideoBinding>()
@@ -60,7 +60,7 @@ class GridVideoFragment : Fragment() {
   private fun initVideoGrid() {
     binding.viewPagerVideoGrid.apply {
       offscreenPageLimit = 1
-      adapter = VideoGridAdapter(this@GridVideoFragment) { video ->
+      adapter = VideoGridAdapter(this@VideoGridFragment) { video ->
         Log.v(TAG, "onVideoItemClick: $video")
 
         Snackbar.make(

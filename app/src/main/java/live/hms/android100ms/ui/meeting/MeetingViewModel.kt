@@ -74,7 +74,7 @@ class MeetingViewModel(
     setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
   }
 
-  fun toggleUserMic() {
+  fun toggleUserVideo() {
     currentDeviceTrack?.videoTrack?.apply {
       val isVideo = !enabled()
       setEnabled(isVideo)
@@ -88,7 +88,7 @@ class MeetingViewModel(
     }
   }
 
-  fun toggleUserVideo() {
+  fun toggleUserMic() {
     currentDeviceTrack?.audioTrack?.apply {
       val isAudio = !enabled()
       setEnabled(isAudio)

@@ -37,7 +37,7 @@ class VideoGridPageFragment(
 ) : Fragment() {
 
   companion object {
-    private const val TAG = "VideoGridFragment"
+    private const val TAG = "VideoGridPageFragment"
   }
 
   init {

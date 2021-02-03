@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,16 +15,15 @@ import live.hms.android100ms.ui.meeting.MeetingTrack
 import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.ui.meeting.MeetingViewModelFactory
 import live.hms.android100ms.util.*
+import org.webrtc.RendererCommon
 
-class PinnedVideoFragment(
-  initialPinnedTrack: MeetingTrack
-) : Fragment() {
+class PinnedVideoFragment : Fragment() {
 
   companion object {
     private const val TAG = "PinnedVideoFragment"
   }
 
-  private var pinnedTrack = initialPinnedTrack
+  private var pinnedTrack: MeetingTrack? = null
 
   private var binding by viewLifecycle<FragmentPinnedVideoBinding>()
 
@@ -39,25 +39,18 @@ class PinnedVideoFragment(
 
   override fun onResume() {
     super.onResume()
-    crashlyticsLog(TAG, "Fragment=$tag onResume()")
-    isViewVisible = true
+    Log.d(TAG, "onResume()")
 
-    binding.pinVideo.surfaceView.apply {
-      SurfaceViewRendererUtil.bind(this, pinnedTrack).let { success ->
-        visibility = if (success) View.VISIBLE else View.GONE
-      }
-    }
+    isViewVisible = true
+    handleOnPinVideoVisibilityChange()
   }
 
   override fun onPause() {
     super.onPause()
-    crashlyticsLog(TAG, "Fragment=$tag onPause()")
-    isViewVisible = false
+    Log.d(TAG, "onPause()")
 
-    binding.pinVideo.surfaceView.apply {
-      SurfaceViewRendererUtil.unbind(this, pinnedTrack)
-      visibility = View.GONE
-    }
+    isViewVisible = false
+    handleOnPinVideoVisibilityChange()
   }
 
   override fun onCreateView(
@@ -73,48 +66,81 @@ class PinnedVideoFragment(
   }
 
   private fun initPinnedView() {
-    updatePinnedVideoText()
     binding.pinVideo.surfaceView.apply {
-      SurfaceViewRendererUtil.bind(this, pinnedTrack).let { success ->
-        visibility = if (success) View.VISIBLE else View.GONE
-      }
+      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+      setEnableHardwareScaler(true)
     }
+
+    updatePinnedVideoText()
   }
 
   private fun initRecyclerView() {
     binding.recyclerViewVideos.apply {
       layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-      adapter = VideoListAdapter() { updatePinViewVideo(it.track) }
+      adapter = VideoListAdapter() { changePinViewVideo(it) }
     }
   }
 
   private fun updatePinnedVideoText() {
-    val name = pinnedTrack.peer.userName
+    val name = pinnedTrack?.peer?.userName ?: ""
     binding.pinVideo.name.text = name
     binding.pinVideo.nameInitials.text = NameUtils.getInitials(name)
   }
 
-  private fun updatePinViewVideo(track: MeetingTrack) {
-    binding.pinVideo.surfaceView.apply {
-      SurfaceViewRendererUtil.unbind(this, pinnedTrack)
-      visibility = View.GONE
+  private fun handleOnPinVideoVisibilityChange() {
+    crashlyticsLog(TAG, "handleOnPinVideoVisibilityChange: isViewVisible=${isViewVisible}")
 
-      pinnedTrack = track
-      SurfaceViewRendererUtil.bind(this, pinnedTrack).let { success ->
-        if (success) visibility = View.VISIBLE
+    pinnedTrack?.let { track ->
+      binding.pinVideo.surfaceView.apply {
+        if (isViewVisible) {
+          SurfaceViewRendererUtil.bind(this, track).let { success ->
+            if (success) visibility = View.VISIBLE
+          }
+        } else {
+          SurfaceViewRendererUtil.unbind(this, track)
+          visibility = View.GONE
+        }
+      }
+
+    }
+  }
+
+  @MainThread
+  private fun changePinViewVideo(track: MeetingTrack) {
+    if (track == pinnedTrack) {
+      crashlyticsLog(TAG, "Track=$track is already pinned")
+      return
+    }
+
+    crashlyticsLog(TAG, "Changing pin-view video to $track (previous=$pinnedTrack)")
+    binding.pinVideo.surfaceView.apply {
+      if (isViewVisible) {
+        // Unbind and Bind only when the view is only released() / init() respectively
+        pinnedTrack?.let {
+          SurfaceViewRendererUtil.unbind(this, it)
+          visibility = View.GONE
+        }
+
+        SurfaceViewRendererUtil.bind(this, track).let { success ->
+          if (success) visibility = View.VISIBLE
+        }
       }
     }
 
+    pinnedTrack = track
     updatePinnedVideoText()
   }
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      // TODO: Check if pinned track is removed -- Handle it if removed!
+      val found = tracks.any { it == pinnedTrack }
+      if (!found && tracks.isNotEmpty()) {
+        changePinViewVideo(tracks[0])
+      }
 
       val adapter = binding.recyclerViewVideos.adapter as VideoListAdapter
       adapter.setItems(tracks)
-      Log.d(TAG, "Update video-list items: size=${tracks.size}")
+      Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
   }
 }

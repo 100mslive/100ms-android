@@ -133,14 +133,6 @@ class VideoGridAdapter(
     }
   }
 
-  fun clearItems() {
-    itemsPendingUpdate.clear()
-    setItemsHandler.apply {
-      removeCallbacks(setItemsRunnable)
-      postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
-    }
-  }
-
   // TODO: Listen to changes in rows, columns in settings
   override fun getItemCount() = pageItems.size
 

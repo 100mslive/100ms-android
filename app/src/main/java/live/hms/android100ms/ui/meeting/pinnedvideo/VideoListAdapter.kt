@@ -13,7 +13,7 @@ import live.hms.android100ms.util.ThreadUtils
 import live.hms.android100ms.util.crashlyticsLog
 
 class VideoListAdapter(
-  private val onVideoItemClick: (item: VideoListItem) -> Unit
+  private val onVideoItemClick: (item: MeetingTrack) -> Unit
 ) : RecyclerView.Adapter<VideoListAdapter.VideoItemViewHolder>() {
 
   companion object {
@@ -28,6 +28,9 @@ class VideoListAdapter(
 
     fun bind(item: VideoListItem) {
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.userName)
+      binding.name.text = item.track.peer.userName
+
+      binding.root.setOnClickListener { onVideoItemClick(item.track) }
     }
   }
 
