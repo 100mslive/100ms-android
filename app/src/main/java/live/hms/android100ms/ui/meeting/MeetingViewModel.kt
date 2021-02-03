@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.brytecam.lib.*
+import com.brytecam.lib.error.ActionType
+import com.brytecam.lib.error.HMSException
 import com.brytecam.lib.payload.HMSPayloadData
 import com.brytecam.lib.payload.HMSPublishStream
 import com.brytecam.lib.payload.HMSStreamInfo
@@ -43,13 +45,13 @@ class MeetingViewModel(
   private var _isAudioMuted = false
 
   // Public variable which can be accessed by views
-  public val isAudioMuted: Boolean
+  val isAudioMuted: Boolean
     get() = _isAudioMuted
 
   private val settings = SettingsStore(getApplication())
 
   // Live data to define the overall UI
-  val state = MutableLiveData<MeetingState>(MeetingState.Disconnected(false))
+  val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
 
   // TODO: Listen to changes in publishVideo & publishAudio
   //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
@@ -142,12 +144,12 @@ class MeetingViewModel(
       override fun onSuccess(data: String) {
         crashlyticsLog(TAG, "[${Thread.currentThread()}] hmsClient.leave() -> onSuccess($data)")
         client.disconnect()
-        state.postValue(MeetingState.Disconnected(goToHome = true))
+        state.postValue(MeetingState.Disconnected(true))
       }
 
-      override fun onFailure(code: Long, reason: String) {
-        crashlyticsLog(TAG, "hmsClient.leave() -> onFailure($code, $reason)")
-        state.postValue(MeetingState.Disconnected(true, "[$code] Leave Failure", reason, true))
+      override fun onFailure(exception: HMSException) {
+        crashlyticsLog(TAG, "hmsClient.leave() -> onFailure(${toString(exception)}")
+        state.postValue(MeetingState.Failure(exception))
       }
     })
   }
@@ -159,13 +161,13 @@ class MeetingViewModel(
         Log.v(TAG, "Successfully broadcast message=${message.message} onSuccess($data)")
       }
 
-      override fun onFailure(code: Long, reason: String) {
+      override fun onFailure(exception: HMSException) {
         Toast.makeText(
           getApplication(),
           "Cannot send '${message}'. Please try again",
           Toast.LENGTH_SHORT
         ).show()
-        crashlyticsLog(TAG, "Cannot broadcast message=${message} code=${code} reason=${reason}")
+        crashlyticsLog(TAG, "Cannot broadcast message=${message} onFailure(${toString(exception)}")
       }
     })
   }
@@ -248,9 +250,9 @@ class MeetingViewModel(
           }
         }
 
-        override fun onFailure(code: Long, reason: String) {
-          crashlyticsLog(TAG, "Publish Failure $code $reason")
-          handleFailure(false, "[$code] Publish Failure", reason)
+        override fun onFailure(exception: HMSException) {
+          crashlyticsLog(TAG, "Publish Failure onFailure(${toString(exception)})")
+          handleFailure(exception)
         }
       })
   }
@@ -299,9 +301,9 @@ class MeetingViewModel(
           publishUserStream(constraints, mediaStream)
         }
 
-        override fun onFailure(code: Long, reason: String) {
-          crashlyticsLog(TAG, "GetUserMedia failed: $code $reason")
-          handleFailure(false, "[$code] GetUserMedia Failure", reason)
+        override fun onFailure(exception: HMSException) {
+          crashlyticsLog(TAG, "GetUserMedia failed: ${toString(exception)}")
+          handleFailure(exception)
         }
       })
 
@@ -317,9 +319,9 @@ class MeetingViewModel(
         getUserMedia()
       }
 
-      override fun onFailure(code: Long, reason: String) {
-        crashlyticsLog(TAG, "Join onFailure($code, $reason)")
-        handleFailure(false, "[$code] Join Failure", reason)
+      override fun onFailure(exception: HMSException) {
+        crashlyticsLog(TAG, "Join onFailure(${toString(exception)})")
+        handleFailure(exception)
       }
     })
   }
@@ -346,21 +348,14 @@ class MeetingViewModel(
   }
 
   /**
-   * @param fatal Failure requires closing the MeetingActivity,
-   *  going back to home page
-   * @param title Set the title displayed in the Dialog
-   * @param message Set the message to display.
+   * @param exception [HMSException] Failure instance
    */
-  private fun handleFailure(
-    fatal: Boolean,
-    title: String,
-    message: String
-  ) {
-    crashlyticsLog(TAG, "handleFailure($fatal, $title, $message)")
+  private fun handleFailure(exception: HMSException) {
+    crashlyticsLog(TAG, "handleFailure(${toString(exception)})")
 
     client.disconnect()
     cleanup()
-    state.postValue(MeetingState.Disconnected(true, title, message, fatal))
+    state.postValue(MeetingState.Failure(exception))
   }
 
   // HMS Events
@@ -372,7 +367,14 @@ class MeetingViewModel(
   override fun onDisconnect(errorMessage: String) {
     crashlyticsLog(TAG, "onDisconnect: $errorMessage")
     cleanup()
-    state.postValue(MeetingState.Disconnected(true, "Disconnected", errorMessage))
+    state.postValue(
+      MeetingState.Failure(
+        HMSException
+          .HMSExceptionBuilder(0, errorMessage)
+          .setMethodType(ActionType.DISCONNECT)
+          .build(),
+      )
+    )
   }
 
   override fun onPeerJoin(peer: HMSPeer) {
@@ -439,9 +441,12 @@ class MeetingViewModel(
         addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false))
       }
 
-      override fun onFailure(code: Long, reason: String) {
-        crashlyticsLog(TAG, "Subscribe($info): peer-id=${peer.uid} -- onFailure($code, $reason)")
-        handleFailure(true, "[$code] Subscribe Failure", reason)
+      override fun onFailure(exception: HMSException) {
+        crashlyticsLog(
+          TAG,
+          "Subscribe($info): peer-id=${peer.uid} -- onFailure(${toString(exception)})"
+        )
+        handleFailure(exception)
       }
     })
   }

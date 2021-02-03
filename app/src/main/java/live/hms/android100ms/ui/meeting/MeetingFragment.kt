@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.brytecam.lib.error.ActionType
 import live.hms.android100ms.R
 import live.hms.android100ms.audio.HMSAudioManager
 import live.hms.android100ms.databinding.FragmentMeetingBinding
@@ -166,34 +167,31 @@ class MeetingFragment : Fragment() {
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
       Log.v(TAG, "Meeting State: $state")
       when (state) {
-        is MeetingState.Disconnected -> {
+        is MeetingState.Failure -> {
           cleanup()
           hideProgressBar()
           stopAudioManager()
 
-          if (state.showDialog) {
-            val positiveButtonText = if (state.goToHome) R.string.leave else R.string.retry
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage("${state.exception.errorCode} : ${state.exception.errorMessage}")
+            .setTitle(R.string.error)
+            .setCancelable(false)
 
-            AlertDialog.Builder(requireContext())
-              .setMessage(state.message)
-              .setTitle(state.heading)
-              .setPositiveButton(positiveButtonText) { dialog, _ ->
-                Log.d(TAG, "Leaving meeting due to '${state.heading}' :: ${state.message}")
 
-                if (state.goToHome) {
-                  goToHomePage()
-                } else {
-                  meetingViewModel.startMeeting()
-                }
-
-                dialog.dismiss()
-              }
-              .setCancelable(false)
-              .create()
-              .show()
-          } else if (state.goToHome) {
-            goToHomePage()
+          if (state.exception.action != ActionType.SUBSCRIBE) {
+            builder.setPositiveButton(R.string.retry) { dialog, _ ->
+              meetingViewModel.startMeeting()
+              dialog.dismiss()
+            }
           }
+
+          builder.setNegativeButton(R.string.leave) { dialog, _ ->
+            goToHomePage()
+            dialog.dismiss()
+          }
+
+          builder.create().show()
+
         }
 
         is MeetingState.Connecting -> {
@@ -219,6 +217,13 @@ class MeetingFragment : Fragment() {
         is MeetingState.Disconnecting -> {
           updateProgressBarUI(state.heading, state.message)
           showProgressBar()
+        }
+        is MeetingState.Disconnected -> {
+          cleanup()
+          hideProgressBar()
+          stopAudioManager()
+
+          if (state.goToHome) goToHomePage()
         }
       }
     }
