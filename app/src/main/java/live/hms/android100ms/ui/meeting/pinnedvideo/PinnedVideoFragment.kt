@@ -1,17 +1,19 @@
 package live.hms.android100ms.ui.meeting.pinnedvideo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.android100ms.databinding.FragmentPinnedVideoBinding
+import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.meeting.MeetingTrack
-import live.hms.android100ms.util.NameUtils
-import live.hms.android100ms.util.SurfaceViewRendererUtil
-import live.hms.android100ms.util.crashlyticsLog
-import live.hms.android100ms.util.viewLifecycle
+import live.hms.android100ms.ui.meeting.MeetingViewModel
+import live.hms.android100ms.ui.meeting.MeetingViewModelFactory
+import live.hms.android100ms.util.*
 
 class PinnedVideoFragment(
   initialPinnedTrack: MeetingTrack
@@ -25,15 +27,15 @@ class PinnedVideoFragment(
 
   private var binding by viewLifecycle<FragmentPinnedVideoBinding>()
 
+  private val meetingViewModel: MeetingViewModel by activityViewModels {
+    MeetingViewModelFactory(
+      requireActivity().application,
+      requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+    )
+  }
+
   // Determined using the onResume() and onPause()
   private var isViewVisible = false
-
-  fun setItems(newItems: ArrayList<MeetingTrack>) {
-    // TODO: Check if pinned track is removed -- Handle it if removed!
-
-    val adapter = binding.recyclerViewVideos.adapter as VideoListAdapter
-    adapter.setItems(newItems)
-  }
 
   override fun onResume() {
     super.onResume()
@@ -66,6 +68,7 @@ class PinnedVideoFragment(
     binding = FragmentPinnedVideoBinding.inflate(inflater, container, false)
     initRecyclerView()
     initPinnedView()
+    initViewModels()
     return binding.root
   }
 
@@ -103,5 +106,15 @@ class PinnedVideoFragment(
     }
 
     updatePinnedVideoText()
+  }
+
+  private fun initViewModels() {
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+      // TODO: Check if pinned track is removed -- Handle it if removed!
+
+      val adapter = binding.recyclerViewVideos.adapter as VideoListAdapter
+      adapter.setItems(tracks)
+      Log.d(TAG, "Update video-list items: size=${tracks.size}")
+    }
   }
 }

@@ -66,8 +66,19 @@ class VideoListAdapter(
     tracksPendingUpdate.clear()
     tracksPendingUpdate.addAll(newItems)
 
-    setItemsHandler.removeCallbacks(setItemsRunnable)
-    setItemsHandler.postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
+    setItemsHandler.apply {
+      removeCallbacks(setItemsRunnable)
+      postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
+    }
+  }
+
+  fun clearItems() {
+    tracksPendingUpdate.clear()
+
+    setItemsHandler.apply {
+      removeCallbacks(setItemsRunnable)
+      postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
+    }
   }
 
 

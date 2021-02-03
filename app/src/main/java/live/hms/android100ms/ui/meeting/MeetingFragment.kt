@@ -1,6 +1,6 @@
 package live.hms.android100ms.ui.meeting
 
-import android.content.*
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -9,11 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.brytecam.lib.*
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.android100ms.R
 import live.hms.android100ms.audio.HMSAudioManager
 import live.hms.android100ms.databinding.FragmentMeetingBinding
@@ -22,7 +18,7 @@ import live.hms.android100ms.ui.home.HomeActivity
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
-import live.hms.android100ms.ui.meeting.videogrid.VideoGridAdapter
+import live.hms.android100ms.ui.meeting.videogrid.GridVideoFragment
 import live.hms.android100ms.util.*
 import java.util.*
 
@@ -40,7 +36,7 @@ class MeetingFragment : Fragment() {
 
   private val chatViewModel: ChatViewModel by activityViewModels()
 
-  private val meetingViewModel: MeetingViewModel by viewModels {
+  private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
       requireActivity().application,
       requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
@@ -48,7 +44,8 @@ class MeetingFragment : Fragment() {
   }
 
   private lateinit var audioManager: HMSAudioManager
-  private lateinit var clipboard: ClipboardManager
+
+  private var meetingViewMode = MeetingViewMode.GRID_VIEW
 
   override fun onResume() {
     super.onResume()
@@ -60,9 +57,6 @@ class MeetingFragment : Fragment() {
 
     roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
 
-    clipboard = requireActivity()
-      .getSystemService(Context.CLIPBOARD_SERVICE)
-        as ClipboardManager
     audioManager = HMSAudioManager.create(requireContext())
   }
 
@@ -85,16 +79,27 @@ class MeetingFragment : Fragment() {
         val shareIntent = Intent.createChooser(sendIntent, null)
         startActivity(shareIntent)
       }
+
       R.id.action_record_meeting -> {
         Toast.makeText(requireContext(), "Recording Not Supported", Toast.LENGTH_SHORT).show()
       }
+
       R.id.action_share_screen -> {
         Toast.makeText(requireContext(), "Screen Share Not Supported", Toast.LENGTH_SHORT).show()
       }
+
       R.id.action_email_logs -> {
         requireContext().startActivity(
           EmailUtils.getCrashLogIntent(requireContext())
         )
+      }
+
+      R.id.action_grid_view -> {
+        changeMeetingMode(MeetingViewMode.GRID_VIEW)
+      }
+
+      R.id.action_pinned_view -> {
+        changeMeetingMode(MeetingViewMode.PINNED_VIEW)
       }
     }
     return false
@@ -137,7 +142,7 @@ class MeetingFragment : Fragment() {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
 
-    initVideoGrid()
+    updateVideoView()
     initButtons()
     initOnBackPress()
 
@@ -235,15 +240,6 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      // TODO: This will fire whenever the onResume is called.
-      // TODO: Check for pinned view and call setItems of respective adapter!
-
-      val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
-      adapter.setItems(tracks)
-      Log.v(TAG, "updated video Grid UI with ${tracks.size} items")
-    }
-
     meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) { data ->
       chatViewModel.receivedMessage(
         ChatMessage(
@@ -274,35 +270,6 @@ class MeetingFragment : Fragment() {
     audioManager.stop()
   }
 
-  private fun initVideoGrid() {
-    binding.viewPagerVideoGrid.apply {
-      offscreenPageLimit = 1
-      adapter = VideoGridAdapter(this@MeetingFragment) { video ->
-        // TODO: Implement Hero/Pin View
-
-        Log.v(TAG, "onVideoItemClick: $video")
-
-        Snackbar.make(
-          binding.root,
-          "Name: ${video.peer.userName} (${video.peer.role}) \nId: ${video.peer.customerUserId}",
-          Snackbar.LENGTH_LONG,
-        ).setAction("Copy") {
-          val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
-          clipboard.setPrimaryClip(clip)
-          Toast.makeText(
-            requireContext(),
-            "Copied customer id of ${video.peer.userName} to clipboard",
-            Toast.LENGTH_SHORT
-          ).show()
-        }.show()
-      }
-
-      TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
-        // No text to be shown
-      }.attach()
-    }
-
-  }
 
   private fun updateProgressBarUI(heading: String, description: String = "") {
     binding.progressBar.heading.text = heading
@@ -312,17 +279,34 @@ class MeetingFragment : Fragment() {
     }
   }
 
+  private fun changeMeetingMode(newMode: MeetingViewMode) {
+    meetingViewMode = newMode
+    updateVideoView()
+  }
+
+  private fun updateVideoView() {
+    /* val fragment = when (meetingViewMode) {
+      MeetingViewMode.GRID_VIEW -> GridVideoFragment()
+      MeetingViewMode.PINNED_VIEW -> PinnedVideoFragment()
+    } */
+    val fragment = GridVideoFragment()
+
+    childFragmentManager
+      .beginTransaction()
+      .replace(R.id.fragment_container, fragment)
+      .addToBackStack(null)
+      .commit()
+  }
+
   private fun hideProgressBar() {
-    binding.viewPagerVideoGrid.visibility = View.VISIBLE
-    binding.tabLayoutDots.visibility = View.VISIBLE
+    binding.fragmentContainer.visibility = View.VISIBLE
     binding.bottomControls.visibility = View.VISIBLE
 
     binding.progressBar.root.visibility = View.GONE
   }
 
   private fun showProgressBar() {
-    binding.viewPagerVideoGrid.visibility = View.GONE
-    binding.tabLayoutDots.visibility = View.GONE
+    binding.fragmentContainer.visibility = View.GONE
     binding.bottomControls.visibility = View.GONE
 
     binding.progressBar.root.visibility = View.VISIBLE

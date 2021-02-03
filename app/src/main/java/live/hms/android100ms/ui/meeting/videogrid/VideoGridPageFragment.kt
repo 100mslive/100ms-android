@@ -8,7 +8,7 @@ import android.widget.GridLayout
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import live.hms.android100ms.BuildConfig
-import live.hms.android100ms.databinding.FragmentVideoGridBinding
+import live.hms.android100ms.databinding.FragmentVideoGridPageBinding
 import live.hms.android100ms.databinding.GridItemVideoBinding
 import live.hms.android100ms.ui.meeting.MeetingTrack
 import live.hms.android100ms.util.NameUtils
@@ -30,7 +30,7 @@ import kotlin.math.min
  *  - 5 videos will have 4 rows, 2 columns
  *  - 8 videos will have 4 rows, 2 columns
  */
-class VideoGridFragment(
+class VideoGridPageFragment(
   private val initialVideos: Array<MeetingTrack>,
   private val maxRows: Int, private val maxColumns: Int,
   private val onVideoItemClick: (video: MeetingTrack) -> Unit
@@ -50,7 +50,7 @@ class VideoGridFragment(
     }
   }
 
-  private var binding by viewLifecycle<FragmentVideoGridBinding>()
+  private var binding by viewLifecycle<FragmentVideoGridPageBinding>()
 
   // Determined using the onResume() and onPause()
   private var isViewVisible = false
@@ -67,7 +67,7 @@ class VideoGridFragment(
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    binding = FragmentVideoGridBinding.inflate(inflater, container, false)
+    binding = FragmentVideoGridPageBinding.inflate(inflater, container, false)
     initGridLayout()
     return binding.root
   }

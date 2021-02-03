@@ -127,8 +127,18 @@ class VideoGridAdapter(
     itemsPendingUpdate.clear()
     itemsPendingUpdate.addAll(newItems)
 
-    setItemsHandler.removeCallbacks(setItemsRunnable)
-    setItemsHandler.postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
+    setItemsHandler.apply {
+      removeCallbacks(setItemsRunnable)
+      postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
+    }
+  }
+
+  fun clearItems() {
+    itemsPendingUpdate.clear()
+    setItemsHandler.apply {
+      removeCallbacks(setItemsRunnable)
+      postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
+    }
   }
 
   // TODO: Listen to changes in rows, columns in settings
@@ -141,7 +151,7 @@ class VideoGridAdapter(
 
     crashlyticsLog(TAG, "createFragment($position): videos=${page.items}, size=${rows}x${columns}")
 
-    return VideoGridFragment(page.items, rows, columns, onVideoItemClick)
+    return VideoGridPageFragment(page.items, rows, columns, onVideoItemClick)
   }
 
   override fun getItemId(position: Int): Long {
@@ -184,7 +194,7 @@ class VideoGridAdapter(
         "onBindViewHolder: Manually updating fragment-tag=$tag with " +
             "total ${page.items.size} [$page]"
       )
-      (fragment as VideoGridFragment).updateVideos(page.items)
+      (fragment as VideoGridPageFragment).updateVideos(page.items)
 
     } else {
       super.onBindViewHolder(holder, position, payloads)

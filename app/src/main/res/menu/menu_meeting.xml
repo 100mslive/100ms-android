@@ -6,9 +6,22 @@
         android:icon="@drawable/ic_baseline_volume_up_24"
         android:title="@string/toggle_volume"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_grid_view"
+        android:icon="@drawable/ic_grid_view_24"
+        android:title="@string/grid_view"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_pinned_view"
+        android:icon="@drawable/ic_pinned_view_24"
+        android:title="@string/pinned_view"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_share_screen"
-        android:icon="@drawable/ic_baseline_mobile_screen_share_24"
+        android:icon="@drawable/ic_mobile_screen_share_24"
         android:title="@string/share_screen"
         app:showAsAction="never" />
 
