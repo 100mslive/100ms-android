@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.brytecam.lib.*
-import com.brytecam.lib.error.ActionType
 import com.brytecam.lib.error.HMSException
 import com.brytecam.lib.payload.HMSPayloadData
 import com.brytecam.lib.payload.HMSPublishStream
@@ -114,7 +113,7 @@ class MeetingViewModel(
   }
 
   fun startMeeting() {
-    if (state.value !is MeetingState.Disconnected) {
+    if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
 
@@ -364,17 +363,10 @@ class MeetingViewModel(
     joinMeeting()
   }
 
-  override fun onDisconnect(errorMessage: String) {
-    crashlyticsLog(TAG, "onDisconnect: $errorMessage")
+  override fun onDisconnect(exception: HMSException) {
+    crashlyticsLog(TAG, "onDisconnect: ${toString(exception)}")
     cleanup()
-    state.postValue(
-      MeetingState.Failure(
-        HMSException
-          .HMSExceptionBuilder(0, errorMessage)
-          .setMethodType(ActionType.DISCONNECT)
-          .build(),
-      )
-    )
+    state.postValue(MeetingState.Failure(exception))
   }
 
   override fun onPeerJoin(peer: HMSPeer) {
