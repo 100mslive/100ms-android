@@ -15,6 +15,21 @@ class HomeActivity : AppCompatActivity() {
   private val binding: ActivityHomeBinding
     get() = _binding!!
 
+  private fun finishIfOngoingActiveTaskPresent() {
+    if (!isTaskRoot
+      && intent.hasCategory(Intent.CATEGORY_LAUNCHER)
+      && intent.action != null
+      && intent.action.equals(Intent.ACTION_MAIN)
+    ) {
+      finish()
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    finishIfOngoingActiveTaskPresent()
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     _binding = ActivityHomeBinding.inflate(layoutInflater)

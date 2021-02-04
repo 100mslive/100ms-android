@@ -154,10 +154,9 @@ class MeetingFragment : Fragment() {
 
   private fun goToHomePage() {
     Intent(requireContext(), HomeActivity::class.java).apply {
-      Log.v(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
+      crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
       startActivity(this)
     }
-
     requireActivity().finish()
   }
 
