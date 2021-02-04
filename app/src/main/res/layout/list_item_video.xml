@@ -3,20 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="@dimen/video_list_size"
     android:layout_height="@dimen/video_list_size"
-    android:layout_marginEnd="4dp"
     android:layout_marginTop="4dp"
+    android:layout_marginEnd="4dp"
     android:layout_marginBottom="4dp"
     app:cardCornerRadius="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <org.webrtc.SurfaceViewRenderer
-            android:id="@+id/surface_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name_initials"
@@ -28,6 +22,13 @@
             android:text="@string/john_doe_initials"
             android:textColor="@android:color/white"
             android:textSize="24sp" />
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
@@ -61,6 +62,7 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
 
     </RelativeLayout>
 

@@ -67,7 +67,7 @@ class PinnedVideoFragment : Fragment() {
 
   private fun initPinnedView() {
     binding.pinVideo.surfaceView.apply {
-      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
       setEnableHardwareScaler(true)
     }
 

@@ -22,15 +22,39 @@ class VideoListAdapter(
     val binding: ListItemVideoBinding
   ) : RecyclerView.ViewHolder(binding.root) {
 
+    var bindedItem: MeetingTrack? = null
+
     fun bind(item: VideoListItem) {
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.userName)
       binding.name.text = item.track.peer.userName
 
       binding.root.setOnClickListener { onVideoItemClick(item.track) }
+
+      // TODO: Release context when not viewed somehow !
+      /* binding.surfaceView.apply {
+        var alreadyBinded = false
+
+        bindedItem?.let {
+          alreadyBinded = true
+          SurfaceViewRendererUtil.unbind(this, it)
+          visibility = View.GONE
+        }
+
+        if (!alreadyBinded) {
+          setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+          setEnableHardwareScaler(true)
+        }
+
+        SurfaceViewRendererUtil.bind(this, item.track).let { success ->
+          if (success) visibility = View.VISIBLE
+        }
+        bindedItem = item.track
+      } */
     }
   }
 
   private val items = ArrayList<VideoListItem>()
+
   /**
    * @param newItems: Complete list of video items which needs
    *  to be updated in the VideoGrid
@@ -55,7 +79,7 @@ class VideoListAdapter(
       false
     )
 
-    crashlyticsLog(TAG, "onCreateViewHolder($parent, $viewType)")
+    crashlyticsLog(TAG, "onCreateViewHolder(viewType=$viewType)")
     return VideoItemViewHolder(binding)
   }
 
@@ -63,6 +87,7 @@ class VideoListAdapter(
     crashlyticsLog(TAG, "onBindViewHolder: ${items[position]}")
     holder.bind(items[position])
   }
+
 
   override fun getItemCount() = items.size
 }

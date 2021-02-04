@@ -1,6 +1,6 @@
 package live.hms.android100ms.ui.meeting
 
-import com.brytecam.lib.error.HMSException
+import live.hms.video.error.HMSException
 
 // TODO: Provide a way to bind a message with each state
 //  such that the UI can be updated with proper message as well.

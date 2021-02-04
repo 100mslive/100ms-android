@@ -1,6 +1,6 @@
 package live.hms.android100ms.util
 
-import com.brytecam.lib.error.HMSException
+import live.hms.video.error.HMSException
 
 fun toString(exception: HMSException): String {
   return "HMSException(" +

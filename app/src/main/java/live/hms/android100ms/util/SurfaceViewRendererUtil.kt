@@ -1,9 +1,8 @@
 package live.hms.android100ms.util
 
-import android.util.Log
-import com.brytecam.lib.webrtc.HMSWebRTCEglUtils
 import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.ui.meeting.MeetingTrack
+import live.hms.video.webrtc.HMSWebRTCEglUtils
 import org.webrtc.SurfaceViewRenderer
 
 object SurfaceViewRendererUtil {

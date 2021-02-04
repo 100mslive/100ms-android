@@ -7,21 +7,23 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.brytecam.lib.*
-import com.brytecam.lib.error.HMSException
-import com.brytecam.lib.payload.HMSPayloadData
-import com.brytecam.lib.payload.HMSPublishStream
-import com.brytecam.lib.payload.HMSStreamInfo
-import com.brytecam.lib.webrtc.HMSRTCMediaStream
-import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
-import com.brytecam.lib.webrtc.HMSStream
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.util.*
+import live.hms.video.*
+import live.hms.video.error.HMSException
+import live.hms.video.payload.HMSPayloadData
+import live.hms.video.payload.HMSPublishStream
+import live.hms.video.payload.HMSStreamInfo
+import live.hms.video.webrtc.HMSRTCMediaStream
+import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
+import live.hms.video.webrtc.HMSStream
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MeetingViewModel(
   application: Application,
@@ -41,7 +43,7 @@ class MeetingViewModel(
     }
   }
 
-  private val _tracks = ArrayList<MeetingTrack>()
+  private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
   private var currentDeviceTrack: MeetingTrack? = null
 
   // Flag to keep track whether the incoming audio need's to be muted
@@ -66,8 +68,8 @@ class MeetingViewModel(
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
 
-  private val addTrackHandler = Handler(Looper.getMainLooper())
-  private val addTracksRunnable = Runnable { tracks.postValue(_tracks) }
+  private val updateTrackHandler = Handler(Looper.getMainLooper())
+  private val updateTrackRunnable = Runnable { tracks.postValue(_tracks) }
 
   // Live data to notify about broadcast data
   val broadcastsReceived = MutableLiveData<HMSPayloadData>()
@@ -93,7 +95,7 @@ class MeetingViewModel(
       }
 
       isVideoEnabled.postValue(isVideo)
-      crashlyticsLog(TAG, "toggleUserVideo: videoTrackState=${state()} enabled=$isVideo")
+      crashlyticsLog(TAG, "toggleUserVideo: enabled=$isVideo")
     }
   }
 
@@ -103,7 +105,7 @@ class MeetingViewModel(
       setEnabled(isAudio)
 
       isAudioEnabled.postValue(isAudio)
-      crashlyticsLog(TAG, "toggleUserMic: audioTrackState=${state()} enabled=$isAudio")
+      crashlyticsLog(TAG, "toggleUserMic: enabled=$isAudio")
     }
   }
 
@@ -194,30 +196,25 @@ class MeetingViewModel(
       _tracks.add(track)
     }
 
-    addTrackHandler.apply {
-      removeCallbacks(addTracksRunnable)
-      postDelayed(addTracksRunnable, DEBOUNCED_UPDATE_DELAY)
-    }
+    tracks.postValue(_tracks)
+    /* updateTrackHandler.apply {
+      removeCallbacks(updateTrackRunnable)
+      postDelayed(updateTrackRunnable, DEBOUNCED_UPDATE_DELAY)
+    } */
   }
 
   private fun removeTrack(uid: String, mid: String) {
-    var found = false
-    val toRemove = ArrayList<MeetingTrack>()
-
-    _tracks.forEach { track ->
-      if (track.peer.uid == uid && track.mediaId == mid) {
-        found = true
-        toRemove.add(track)
-      }
+    val trackToRemove = _tracks.find {
+      it.peer.uid == uid && it.mediaId == mid
     }
+    _tracks.remove(trackToRemove)
 
-    _tracks.removeAll(toRemove)
-    if (!found) {
-      crashlyticsLog(TAG, "onStreamRemove: $uid & $mid not found in meeting tracks")
-    } else {
-      // Update the grid layout as we have removed some views
-      tracks.postValue(_tracks)
-    }
+    // Update the view as we have removed some views
+    tracks.postValue(_tracks)
+    /* updateTrackHandler.apply {
+      removeCallbacks(updateTrackRunnable)
+      postDelayed(updateTrackRunnable, DEBOUNCED_UPDATE_DELAY)
+    } */
   }
 
   private fun publishUserStream(

@@ -4,13 +4,13 @@ buildscript {
     repositories {
         google()
         jcenter()
-
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.3.3"
+        // Jetpack Navigation
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.3.3'
 
         // Firebase Google-Services
         classpath 'com.google.gms:google-services:4.3.5'
@@ -24,6 +24,8 @@ allprojects {
     repositories {
         google()
         jcenter()
+
+        maven { url 'https://jitpack.io' }
     }
 }
 
