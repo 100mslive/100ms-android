@@ -1,6 +1,8 @@
 package live.hms.android100ms.ui.meeting
 
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
@@ -27,6 +29,8 @@ class MeetingViewModel(
 ) : AndroidViewModel(application), HMSEventListener {
   companion object {
     private const val TAG = "MeetingViewModel"
+
+    private const val DEBOUNCED_UPDATE_DELAY = 500L
   }
 
   init {
@@ -62,6 +66,9 @@ class MeetingViewModel(
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
 
+  private val addTrackHandler = Handler(Looper.getMainLooper())
+  private val addTracksRunnable = Runnable { tracks.postValue(_tracks) }
+
   // Live data to notify about broadcast data
   val broadcastsReceived = MutableLiveData<HMSPayloadData>()
 
@@ -86,6 +93,7 @@ class MeetingViewModel(
       }
 
       isVideoEnabled.postValue(isVideo)
+      crashlyticsLog(TAG, "toggleUserVideo: videoTrackState=${state()} enabled=$isVideo")
     }
   }
 
@@ -95,6 +103,7 @@ class MeetingViewModel(
       setEnabled(isAudio)
 
       isAudioEnabled.postValue(isAudio)
+      crashlyticsLog(TAG, "toggleUserMic: audioTrackState=${state()} enabled=$isAudio")
     }
   }
 
@@ -171,6 +180,13 @@ class MeetingViewModel(
     })
   }
 
+
+  /**
+   * This method has a debounced-delay of [DEBOUNCED_UPDATE_DELAY]
+   * such that if it called multiple times with delay less
+   * than debounce, it will update the post the new list of
+   * tracks just once.
+   */
   private fun addTrack(track: MeetingTrack) {
     if (track.isCurrentDeviceStream) {
       _tracks.add(0, track)
@@ -178,7 +194,10 @@ class MeetingViewModel(
       _tracks.add(track)
     }
 
-    tracks.postValue(_tracks)
+    addTrackHandler.apply {
+      removeCallbacks(addTracksRunnable)
+      postDelayed(addTracksRunnable, DEBOUNCED_UPDATE_DELAY)
+    }
   }
 
   private fun removeTrack(uid: String, mid: String) {

@@ -24,7 +24,7 @@ object SurfaceViewRendererUtil {
       item.videoTrack.addSink(this)
     }
 
-    crashlyticsLog(TAG, "Initialized EglContext for item=$item (view=$view)")
+    crashlyticsLog(TAG, "Initialized EglContext for item=$item")
     return true
   }
 
@@ -39,7 +39,7 @@ object SurfaceViewRendererUtil {
       release()
     }
 
-    crashlyticsLog(TAG, "Released EglContext for item=$item (view=$view)")
+    crashlyticsLog(TAG, "Released EglContext for item=$item")
     return true
   }
 

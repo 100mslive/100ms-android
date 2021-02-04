@@ -1,7 +1,5 @@
 package live.hms.android100ms.ui.meeting.videogrid
 
-import android.os.Handler
-import android.os.Looper
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -19,12 +17,9 @@ class VideoGridAdapter(
 
   companion object {
     const val TAG = "VideoGridAdapter"
-
-    private const val DEBOUNCED_UPDATE_DELAY = 500L
   }
 
   private val items = ArrayList<MeetingTrack>()
-  private val itemsPendingUpdate = ArrayList<MeetingTrack>()
 
   private val pageItems = ArrayList<VideoGridPageItem>()
 
@@ -32,8 +27,6 @@ class VideoGridAdapter(
   private val settings = SettingsStore(context)
 
   private val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
-
-  private val setItemsHandler = Handler(Looper.getMainLooper())
 
   /** Used by [getPageForPosition] to assign new id's */
   private var pageItemCurrId: Long = 0
@@ -68,14 +61,16 @@ class VideoGridAdapter(
     return VideoGridPageItem(pageItemCurrId, getVideosForPosition(position))
   }
 
-  private val setItemsRunnable = Runnable {
+  /**
+   * @param newItems: Complete list of video items which needs
+   *  to be updated in the VideoGrid
+   */
+  fun setItems(newItems: MutableList<MeetingTrack>) {
     ThreadUtils.checkIsOnMainThread()
 
     // Update the private list [items] used to create pages
     items.clear()
-    items.addAll(itemsPendingUpdate)
-    itemsPendingUpdate.clear()
-
+    items.addAll(newItems)
 
     // Keep as many pageItems possible
     // with the same id. Hence, we update the list of pageItem
@@ -113,24 +108,6 @@ class VideoGridAdapter(
     diff.dispatchUpdatesTo(this)
 
     crashlyticsLog(TAG, "Updated pageItems: size=${pageItems.size}")
-  }
-
-  /**
-   * This method a debounced-delay of [DEBOUNCED_UPDATE_DELAY] such that
-   * if it called multiple times with delay less than debounce,
-   * it will update the view just once.
-   *
-   * @param newItems: Complete list of video items which needs
-   *  to be updated in the VideoGrid
-   */
-  fun setItems(newItems: MutableList<MeetingTrack>) {
-    itemsPendingUpdate.clear()
-    itemsPendingUpdate.addAll(newItems)
-
-    setItemsHandler.apply {
-      removeCallbacks(setItemsRunnable)
-      postDelayed(setItemsRunnable, DEBOUNCED_UPDATE_DELAY)
-    }
   }
 
   // TODO: Listen to changes in rows, columns in settings
