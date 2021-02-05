@@ -1,8 +1,6 @@
 package live.hms.android100ms.ui.meeting
 
 import android.app.Application
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
@@ -31,8 +29,6 @@ class MeetingViewModel(
 ) : AndroidViewModel(application), HMSEventListener {
   companion object {
     private const val TAG = "MeetingViewModel"
-
-    private const val DEBOUNCED_UPDATE_DELAY = 500L
   }
 
   init {
@@ -67,9 +63,6 @@ class MeetingViewModel(
 
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
-
-  /* private val updateTrackHandler = Handler(Looper.getMainLooper())
-  private val updateTrackRunnable = Runnable { tracks.postValue(_tracks) } */
 
   // Live data to notify about broadcast data
   val broadcastsReceived = MutableLiveData<HMSPayloadData>()
@@ -184,13 +177,6 @@ class MeetingViewModel(
     })
   }
 
-
-  /**
-   * This method has a debounced-delay of [DEBOUNCED_UPDATE_DELAY]
-   * such that if it called multiple times with delay less
-   * than debounce, it will update the post the new list of
-   * tracks just once.
-   */
   private fun addTrack(track: MeetingTrack) {
     synchronized(_tracks) {
       if (track.isCurrentDeviceStream) {
@@ -200,10 +186,6 @@ class MeetingViewModel(
       }
 
       tracks.postValue(_tracks)
-      /* updateTrackHandler.apply {
-        removeCallbacks(updateTrackRunnable)
-        postDelayed(updateTrackRunnable, DEBOUNCED_UPDATE_DELAY)
-      } */
     }
   }
 
@@ -217,11 +199,6 @@ class MeetingViewModel(
       // Update the view as we have removed some views
       tracks.postValue(_tracks)
     }
-
-    /* updateTrackHandler.apply {
-      removeCallbacks(updateTrackRunnable)
-      postDelayed(updateTrackRunnable, DEBOUNCED_UPDATE_DELAY)
-    } */
   }
 
   private fun publishUserStream(
@@ -279,7 +256,7 @@ class MeetingViewModel(
       })
   }
 
-  private fun getUserMedia() {
+  private fun getLocalScreen() {
     // TODO: Listen to changes in settings.publishVideo
     //  To be done only when the user can change the publishVideo
     //  while in a meeting.
@@ -314,10 +291,10 @@ class MeetingViewModel(
     )
 
     // onConnect -> Join -> getUserMedia
-    client.getUserMedia(
+    client.getLocalStream(
       getApplication(),
       constraints,
-      object : HMSClient.GetUserMediaListener {
+      object : HMSClient.GetLocalStreamListener{
         override fun onSuccess(mediaStream: HMSRTCMediaStream) {
           Log.v(TAG, "GetUserMedia Success")
           publishUserStream(constraints, mediaStream)
@@ -338,7 +315,7 @@ class MeetingViewModel(
       override fun onSuccess(data: String) {
         crashlyticsLog(TAG, "Join onSuccess($data)")
         // TODO: Start audio-manager
-        getUserMedia()
+        getLocalScreen()
       }
 
       override fun onFailure(exception: HMSException) {
