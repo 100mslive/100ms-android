@@ -5,7 +5,11 @@ import android.util.Log
 import leakcanary.LeakCanary
 import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.meeting.MeetingActivity
+import live.hms.android100ms.util.EmailUtils
+import live.hms.android100ms.util.LogUtils
 import live.hms.android100ms.util.crashlyticsLog
+import java.util.*
 
 class GlobalApplication : Application() {
 
@@ -13,8 +17,20 @@ class GlobalApplication : Application() {
     const val TAG = "GlobalApplication"
   }
 
+  private fun initSaveLogsOnCrash() {
+    val defaultHandler = Thread.getDefaultUncaughtExceptionHandler() // Crashlytics Handler
+
+    Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+      LogUtils.saveLogsToFile(applicationContext, "crash-log")
+      defaultHandler?.uncaughtException(thread, throwable)
+    }
+  }
+
+
   override fun onCreate() {
+    initSaveLogsOnCrash()
     super.onCreate()
+
     Log.v(TAG, "onCreate()")
 
     if (BuildConfig.DEBUG) {

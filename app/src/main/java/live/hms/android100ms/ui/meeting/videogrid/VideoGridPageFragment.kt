@@ -158,9 +158,7 @@ class VideoGridPageFragment(
 
         binding.container.apply {
           // Unbind only when view is visible to user
-          if (isViewVisible) {
-            unbindSurfaceView(currentRenderedView.binding, currentRenderedView.video)
-          }
+          if (isViewVisible) unbindSurfaceView(currentRenderedView.binding, currentRenderedView.video)
           removeViewInLayout(currentRenderedView.binding.root)
         }
       }
@@ -201,10 +199,8 @@ class VideoGridPageFragment(
   }
 
   private fun bindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    val success = SurfaceViewRendererUtil.bind(binding.surfaceView, item)
-    if (success) {
-      crashlyticsLog(TAG, "fragment=$tag: init context for $item")
-      binding.surfaceView.visibility = View.VISIBLE
+    SurfaceViewRendererUtil.bind(binding.surfaceView, item, "fragment=$tag").let {
+      if (it) binding.surfaceView.visibility = View.VISIBLE
     }
   }
 
@@ -223,11 +219,8 @@ class VideoGridPageFragment(
   }
 
   private fun unbindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    val success = SurfaceViewRendererUtil.unbind(binding.surfaceView, item)
-
-    if (success) {
-      crashlyticsLog(TAG, "fragment=$tag: releasing context for $item")
-      binding.surfaceView.visibility = View.INVISIBLE
+    SurfaceViewRendererUtil.unbind(binding.surfaceView, item, "fragment=$tag").let {
+      if (it) binding.surfaceView.visibility = View.INVISIBLE
     }
   }
 

@@ -11,5 +11,5 @@
         android:id="@+id/action_email_logs"
         android:icon="@drawable/ic_baseline_bug_report_24"
         android:title="@string/bug_report"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 </menu>

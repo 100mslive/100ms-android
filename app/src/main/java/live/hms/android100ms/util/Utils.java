@@ -1,7 +1,7 @@
 package live.hms.android100ms.util;
 
 /**
- * AppRTCUtils provides helper functions for managing thread safety.
+ * HMSUtils provides helper functions for managing thread safety.
  */
 public final class Utils {
   private Utils() {

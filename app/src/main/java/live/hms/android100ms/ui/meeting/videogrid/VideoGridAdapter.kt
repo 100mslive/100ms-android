@@ -88,12 +88,10 @@ class VideoGridAdapter(
         val videos = getVideosForPosition(pageIdx)
         val newPage = VideoGridPageItem(page.id, videos)
         newPageItems.add(newPage)
-        crashlyticsLog(TAG, "Created $newPage replacing $page")
       } else {
         // Create a brand new page
         val page = getPageForPosition(pageIdx)
         newPageItems.add(page)
-        crashlyticsLog(TAG, "Created new $page")
       }
 
       pageIdx += 1
