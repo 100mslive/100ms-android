@@ -16,8 +16,8 @@ import live.hms.android100ms.util.ThreadUtils;
 import live.hms.android100ms.util.Utils;
 
 /**
- * AppRTCProximitySensor manages functions related to the proximity sensor in
- * the AppRTC demo.
+ * HMSProximitySensor manages functions related to the proximity sensor in
+ * the HMS demo.
  * On most device, the proximity sensor is implemented as a boolean-sensor.
  * It returns just two values "NEAR" or "FAR". Thresholding is done on the LUX
  * value i.e. the LUX value of the light sensor is compared with a threshold.
@@ -25,7 +25,7 @@ import live.hms.android100ms.util.Utils;
  * Anything less than the threshold value and the sensor  returns "NEAR".
  */
 public class HMSProximitySensor implements SensorEventListener {
-  private static final String TAG = "AppRTCProximitySensor";
+  private static final String TAG = "HMSProximitySensor";
 
   // This class should be created, started and stopped on one thread
   // (e.g. the main thread). We use |nonThreadSafe| to ensure that this is
@@ -46,7 +46,7 @@ public class HMSProximitySensor implements SensorEventListener {
   }
 
   private HMSProximitySensor(Context context, Runnable sensorStateListener) {
-    Log.d(TAG, "AppRTCProximitySensor" + ThreadUtils.getThreadInfo());
+    Log.d(TAG, "HMSProximitySensor" + ThreadUtils.getThreadInfo());
     onSensorStateListener = sensorStateListener;
     sensorManager = ((SensorManager) context.getSystemService(Context.SENSOR_SERVICE));
   }
