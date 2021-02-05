@@ -68,8 +68,8 @@ class MeetingViewModel(
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
 
-  private val updateTrackHandler = Handler(Looper.getMainLooper())
-  private val updateTrackRunnable = Runnable { tracks.postValue(_tracks) }
+  /* private val updateTrackHandler = Handler(Looper.getMainLooper())
+  private val updateTrackRunnable = Runnable { tracks.postValue(_tracks) } */
 
   // Live data to notify about broadcast data
   val broadcastsReceived = MutableLiveData<HMSPayloadData>()
@@ -113,12 +113,14 @@ class MeetingViewModel(
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    _isAudioMuted = !_isAudioMuted
+    synchronized(_tracks) {
+      _isAudioMuted = !_isAudioMuted
 
-    val volume = if (_isAudioMuted) 0.0 else 1.0
-    _tracks.forEach { track ->
-      if (track != currentDeviceTrack) {
-        track.audioTrack?.setVolume(volume)
+      val volume = if (_isAudioMuted) 0.0 else 1.0
+      _tracks.forEach { track ->
+        if (track != currentDeviceTrack) {
+          track.audioTrack?.setVolume(volume)
+        }
       }
     }
   }
@@ -190,27 +192,32 @@ class MeetingViewModel(
    * tracks just once.
    */
   private fun addTrack(track: MeetingTrack) {
-    if (track.isCurrentDeviceStream) {
-      _tracks.add(0, track)
-    } else {
-      _tracks.add(track)
-    }
+    synchronized(_tracks) {
+      if (track.isCurrentDeviceStream) {
+        _tracks.add(0, track)
+      } else {
+        _tracks.add(track)
+      }
 
-    tracks.postValue(_tracks)
-    /* updateTrackHandler.apply {
-      removeCallbacks(updateTrackRunnable)
-      postDelayed(updateTrackRunnable, DEBOUNCED_UPDATE_DELAY)
-    } */
+      tracks.postValue(_tracks)
+      /* updateTrackHandler.apply {
+        removeCallbacks(updateTrackRunnable)
+        postDelayed(updateTrackRunnable, DEBOUNCED_UPDATE_DELAY)
+      } */
+    }
   }
 
   private fun removeTrack(uid: String, mid: String) {
-    val trackToRemove = _tracks.find {
-      it.peer.uid == uid && it.mediaId == mid
-    }
-    _tracks.remove(trackToRemove)
+    synchronized(_tracks) {
+      val trackToRemove = _tracks.find {
+        it.peer.uid == uid && it.mediaId == mid
+      }
+      _tracks.remove(trackToRemove)
 
-    // Update the view as we have removed some views
-    tracks.postValue(_tracks)
+      // Update the view as we have removed some views
+      tracks.postValue(_tracks)
+    }
+
     /* updateTrackHandler.apply {
       removeCallbacks(updateTrackRunnable)
       postDelayed(updateTrackRunnable, DEBOUNCED_UPDATE_DELAY)
@@ -356,8 +363,10 @@ class MeetingViewModel(
     _isAudioMuted = false
 
     // Remove all the video stream
-    _tracks.clear()
-    tracks.postValue(_tracks)
+    synchronized(_tracks) {
+      _tracks.clear()
+      tracks.postValue(_tracks)
+    }
 
     crashlyticsLog(TAG, "cleanup() done")
   }
