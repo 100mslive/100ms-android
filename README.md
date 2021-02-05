@@ -13,7 +13,7 @@ Here you will find everything you need to build experiences with video using 100
 
 The Android SDK supports Android API level 24 and higher. It is built for armeabi-v7a, arm64-v8a, x86, and x86_64 architectures.
 
-## Quick start to run the sample application
+## Setup Guide
 
 - Clone this repository
 
@@ -34,6 +34,7 @@ The Android SDK supports Android API level 24 and higher. It is built for armeab
   TOKEN_ENDPOINT="https://example-tokenservice.runkit.sh/" # Valid
   TOKEN_ENDPOINT="https://example-tokenservice.runkit.sh" # Invalid
   ```
+- Create [firebase project](https://firebase.google.com/docs/android/setup#console) and save the [`google-services.json`](https://support.google.com/firebase/answer/7015592?hl=en) in `app/google-services.json`
 
 # Run the application
 
