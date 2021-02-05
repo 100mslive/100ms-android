@@ -10,23 +10,13 @@
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar" />
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager_video_grid"
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/tab_layout_dots"
-        android:layout_alignParentTop="true" />
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout_dots"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_above="@id/bottom_controls"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        app:tabBackground="@drawable/dot_selector"
-        app:tabGravity="center"
-        app:tabIndicatorHeight="0dp" />
+        android:layout_alignParentTop="true"
+        android:layout_margin="8dp" />
 
     <LinearLayout
         android:id="@+id/bottom_controls"

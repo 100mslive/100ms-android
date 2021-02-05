@@ -25,10 +25,10 @@ import live.hms.android100ms.util.ThreadUtils;
 import live.hms.android100ms.util.Utils;
 
 /**
- * AppRTCAudioManager manages all audio related parts of the AppRTC demo.
+ * HMSAudioManager manages all audio related parts of the HMS demo.
  */
 public class HMSAudioManager {
-  private static final String TAG = "AppRTCAudioManager";
+  private static final String TAG = "HMSAudioManager";
   private static final String SPEAKERPHONE_AUTO = "auto";
   private static final String SPEAKERPHONE_TRUE = "true";
   private static final String SPEAKERPHONE_FALSE = "false";
@@ -57,7 +57,7 @@ public class HMSAudioManager {
         AudioDevice selectedAudioDevice, Set<AudioDevice> availableAudioDevices);
   }
 
-  private final Context apprtcContext;
+  private final Context hmscontext;
   @Nullable
   private AudioManager audioManager;
 
@@ -168,7 +168,7 @@ public class HMSAudioManager {
   @MainThread
   private HMSAudioManager(Context context) {
     Log.d(TAG, "ctor");
-    apprtcContext = context;
+    hmscontext = context;
     audioManager = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE));
     bluetoothManager = HMSBluetoothManager.create(context, this);
     wiredHeadsetReceiver = new WiredHeadsetReceiver();
@@ -357,7 +357,7 @@ public class HMSAudioManager {
 
   /**
    * Changes default audio device.
-   * TODO: add usage of this method in the AppRTCMobile client.
+   * TODO: add usage of this method in the HMSMobile client.
    */
   @MainThread
   public void setDefaultAudioDevice(AudioDevice defaultDevice) {
@@ -412,14 +412,14 @@ public class HMSAudioManager {
    * Helper method for receiver registration.
    */
   private void registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
-    apprtcContext.registerReceiver(receiver, filter);
+    hmscontext.registerReceiver(receiver, filter);
   }
 
   /**
    * Helper method for unregistration of an existing receiver.
    */
   private void unregisterReceiver(BroadcastReceiver receiver) {
-    apprtcContext.unregisterReceiver(receiver);
+    hmscontext.unregisterReceiver(receiver);
   }
 
   /**
@@ -448,7 +448,7 @@ public class HMSAudioManager {
    * Gets the current earpiece state.
    */
   private boolean hasEarpiece() {
-    return apprtcContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
+    return hmscontext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
   }
 
   /**

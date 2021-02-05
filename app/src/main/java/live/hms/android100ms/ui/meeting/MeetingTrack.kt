@@ -1,6 +1,6 @@
 package live.hms.android100ms.ui.meeting
 
-import com.brytecam.lib.HMSPeer
+import live.hms.video.HMSPeer
 import org.webrtc.AudioTrack
 import org.webrtc.VideoTrack
 

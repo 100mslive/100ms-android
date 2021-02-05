@@ -14,7 +14,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import live.hms.android100ms.R
 import live.hms.android100ms.api.Status
@@ -36,11 +36,12 @@ class HomeFragment : Fragment() {
   }
 
   private var binding by viewLifecycle<FragmentHomeBinding>()
-  private lateinit var homeViewModel: HomeViewModel
+  private val homeViewModel: HomeViewModel by viewModels()
   private lateinit var settings: SettingsStore
 
   override fun onResume() {
     super.onResume()
+
     val data = requireActivity().intent.data
     Log.v(TAG, "onResume(): Trying to update $data into EditTextMeetingUrl")
 
@@ -79,7 +80,7 @@ class HomeFragment : Fragment() {
 
     setHasOptionsMenu(true)
 
-    initViewModel()
+    observeLiveData()
     initEditTextViews()
     initConnectButton()
     initOnBackPress()
@@ -101,11 +102,6 @@ class HomeFragment : Fragment() {
     }
   }
 
-
-  private fun initViewModel() {
-    homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-    observeLiveData()
-  }
 
   @SuppressLint("SetTextI18n")
   private fun updateProgressBarUI(isRoomCreator: Boolean) {
@@ -198,8 +194,8 @@ class HomeFragment : Fragment() {
           Intent(requireContext(), MeetingActivity::class.java).apply {
             putExtra(ROOM_DETAILS, roomDetails)
             startActivity(this)
-            requireActivity().finish()
           }
+          requireActivity().finish()
         }
         Status.ERROR -> {
           hideProgressBar()

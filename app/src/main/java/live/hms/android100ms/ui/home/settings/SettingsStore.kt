@@ -1,9 +1,7 @@
 package live.hms.android100ms.ui.home.settings
 
 import android.content.Context
-import android.util.Log
 import androidx.core.content.edit
-import live.hms.android100ms.util.crashlyticsLog
 
 class SettingsStore(context: Context) {
 

@@ -25,11 +25,11 @@ import java.util.Set;
 import live.hms.android100ms.util.ThreadUtils;
 
 /**
- * AppRTCProximitySensor manages functions related to Bluetoth devices in the
- * AppRTC demo.
+ * HMSProximitySensor manages functions related to Bluetoth devices in the
+ * HMS demo.
  */
 public class HMSBluetoothManager {
-  private static final String TAG = "AppRTCBluetoothManager";
+  private static final String TAG = "HMSBluetoothManager";
 
   // Timeout interval for starting or stopping audio to a Bluetooth SCO device.
   private static final int BLUETOOTH_SCO_TIMEOUT_MS = 4000;
@@ -56,8 +56,8 @@ public class HMSBluetoothManager {
     SCO_CONNECTED
   }
 
-  private final Context apprtcContext;
-  private final HMSAudioManager apprtcAudioManager;
+  private final Context HMSContext;
+  private final HMSAudioManager hmsAudioManager;
   @Nullable
   private final AudioManager audioManager;
   private final Handler handler;
@@ -198,8 +198,8 @@ public class HMSBluetoothManager {
   @MainThread
   protected HMSBluetoothManager(Context context, HMSAudioManager audioManager) {
     Log.d(TAG, "ctor");
-    apprtcContext = context;
-    apprtcAudioManager = audioManager;
+    HMSContext = context;
+    hmsAudioManager = audioManager;
     this.audioManager = getAudioManager(context);
     bluetoothState = State.UNINITIALIZED;
     bluetoothServiceListener = new BluetoothServiceListener();
@@ -225,13 +225,13 @@ public class HMSBluetoothManager {
    * is connected and enabled:
    * UNINITIALIZED --> HEADSET_UNAVAILABLE --> HEADSET_AVAILABLE -->
    * SCO_CONNECTING --> SCO_CONNECTED <==> audio is now routed via BT SCO.
-   * Note that the AppRTCAudioManager is also involved in driving this state
+   * Note that the HMSAudioManager is also involved in driving this state
    * change.
    */
   @MainThread
   public void start() {
     Log.d(TAG, "start");
-    if (!hasPermission(apprtcContext, android.Manifest.permission.BLUETOOTH)) {
+    if (!hasPermission(HMSContext, android.Manifest.permission.BLUETOOTH)) {
       Log.w(TAG, "Process (pid=" + Process.myPid() + ") lacks BLUETOOTH permission");
       return;
     }
@@ -257,7 +257,7 @@ public class HMSBluetoothManager {
     // Establish a connection to the HEADSET profile (includes both Bluetooth Headset and
     // Hands-Free) proxy object and install a listener.
     if (!getBluetoothProfileProxy(
-        apprtcContext, bluetoothServiceListener, BluetoothProfile.HEADSET)) {
+        HMSContext, bluetoothServiceListener, BluetoothProfile.HEADSET)) {
       Log.e(TAG, "BluetoothAdapter.getProfileProxy(HEADSET) failed");
       return;
     }
@@ -402,11 +402,11 @@ public class HMSBluetoothManager {
   }
 
   protected void registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
-    apprtcContext.registerReceiver(receiver, filter);
+    HMSContext.registerReceiver(receiver, filter);
   }
 
   protected void unregisterReceiver(BroadcastReceiver receiver) {
-    apprtcContext.unregisterReceiver(receiver);
+    HMSContext.unregisterReceiver(receiver);
   }
 
   protected boolean getBluetoothProfileProxy(
@@ -415,7 +415,7 @@ public class HMSBluetoothManager {
   }
 
   protected boolean hasPermission(Context context, String permission) {
-    return apprtcContext.checkPermission(permission, Process.myPid(), Process.myUid())
+    return HMSContext.checkPermission(permission, Process.myPid(), Process.myUid())
         == PackageManager.PERMISSION_GRANTED;
   }
 
@@ -445,7 +445,7 @@ public class HMSBluetoothManager {
   @MainThread
   private void updateAudioDeviceState() {
     Log.d(TAG, "updateAudioDeviceState");
-    apprtcAudioManager.updateAudioDeviceState();
+    hmsAudioManager.updateAudioDeviceState();
   }
 
   /**

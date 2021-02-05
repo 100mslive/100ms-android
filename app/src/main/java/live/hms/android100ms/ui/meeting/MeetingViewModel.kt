@@ -5,20 +5,23 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.brytecam.lib.*
-import com.brytecam.lib.payload.HMSPayloadData
-import com.brytecam.lib.payload.HMSPublishStream
-import com.brytecam.lib.payload.HMSStreamInfo
-import com.brytecam.lib.webrtc.HMSRTCMediaStream
-import com.brytecam.lib.webrtc.HMSRTCMediaStreamConstraints
-import com.brytecam.lib.webrtc.HMSStream
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.util.*
+import live.hms.video.*
+import live.hms.video.error.HMSException
+import live.hms.video.payload.HMSPayloadData
+import live.hms.video.payload.HMSPublishStream
+import live.hms.video.payload.HMSStreamInfo
+import live.hms.video.webrtc.HMSRTCMediaStream
+import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
+import live.hms.video.webrtc.HMSStream
 import org.webrtc.AudioTrack
 import org.webrtc.MediaStream
 import org.webrtc.VideoTrack
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MeetingViewModel(
   application: Application,
@@ -36,20 +39,20 @@ class MeetingViewModel(
     }
   }
 
-  private val _tracks = ArrayList<MeetingTrack>()
+  private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
   private var currentDeviceTrack: MeetingTrack? = null
 
   // Flag to keep track whether the incoming audio need's to be muted
   private var _isAudioMuted = false
 
   // Public variable which can be accessed by views
-  public val isAudioMuted: Boolean
+  val isAudioMuted: Boolean
     get() = _isAudioMuted
 
   private val settings = SettingsStore(getApplication())
 
   // Live data to define the overall UI
-  val state = MutableLiveData<MeetingState>(MeetingState.Disconnected(false))
+  val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
 
   // TODO: Listen to changes in publishVideo & publishAudio
   //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
@@ -74,7 +77,7 @@ class MeetingViewModel(
     setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
   }
 
-  fun toggleUserMic() {
+  fun toggleUserVideo() {
     currentDeviceTrack?.videoTrack?.apply {
       val isVideo = !enabled()
       setEnabled(isVideo)
@@ -85,15 +88,17 @@ class MeetingViewModel(
       }
 
       isVideoEnabled.postValue(isVideo)
+      crashlyticsLog(TAG, "toggleUserVideo: enabled=$isVideo")
     }
   }
 
-  fun toggleUserVideo() {
+  fun toggleUserMic() {
     currentDeviceTrack?.audioTrack?.apply {
       val isAudio = !enabled()
       setEnabled(isAudio)
 
       isAudioEnabled.postValue(isAudio)
+      crashlyticsLog(TAG, "toggleUserMic: enabled=$isAudio")
     }
   }
 
@@ -101,18 +106,20 @@ class MeetingViewModel(
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    _isAudioMuted = !_isAudioMuted
+    synchronized(_tracks) {
+      _isAudioMuted = !_isAudioMuted
 
-    val volume = if (_isAudioMuted) 0.0 else 1.0
-    _tracks.forEach { track ->
-      if (track != currentDeviceTrack) {
-        track.audioTrack?.setVolume(volume)
+      val volume = if (_isAudioMuted) 0.0 else 1.0
+      _tracks.forEach { track ->
+        if (track != currentDeviceTrack) {
+          track.audioTrack?.setVolume(volume)
+        }
       }
     }
   }
 
   fun startMeeting() {
-    if (state.value !is MeetingState.Disconnected) {
+    if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
 
@@ -142,12 +149,12 @@ class MeetingViewModel(
       override fun onSuccess(data: String) {
         crashlyticsLog(TAG, "[${Thread.currentThread()}] hmsClient.leave() -> onSuccess($data)")
         client.disconnect()
-        state.postValue(MeetingState.Disconnected(goToHome = true))
+        state.postValue(MeetingState.Disconnected(true))
       }
 
-      override fun onFailure(code: Long, reason: String) {
-        crashlyticsLog(TAG, "hmsClient.leave() -> onFailure($code, $reason)")
-        state.postValue(MeetingState.Disconnected(true, "[$code] Leave Failure", reason, true))
+      override fun onFailure(exception: HMSException) {
+        crashlyticsLog(TAG, "hmsClient.leave() -> onFailure(${toString(exception)}")
+        state.postValue(MeetingState.Failure(exception))
       }
     })
   }
@@ -159,43 +166,37 @@ class MeetingViewModel(
         Log.v(TAG, "Successfully broadcast message=${message.message} onSuccess($data)")
       }
 
-      override fun onFailure(code: Long, reason: String) {
+      override fun onFailure(exception: HMSException) {
         Toast.makeText(
           getApplication(),
           "Cannot send '${message}'. Please try again",
           Toast.LENGTH_SHORT
         ).show()
-        crashlyticsLog(TAG, "Cannot broadcast message=${message} code=${code} reason=${reason}")
+        crashlyticsLog(TAG, "Cannot broadcast message=${message} onFailure(${toString(exception)}")
       }
     })
   }
 
   private fun addTrack(track: MeetingTrack) {
-    if (track.isCurrentDeviceStream) {
-      _tracks.add(0, track)
-    } else {
-      _tracks.add(track)
-    }
+    synchronized(_tracks) {
+      if (track.isCurrentDeviceStream) {
+        _tracks.add(0, track)
+      } else {
+        _tracks.add(track)
+      }
 
-    tracks.postValue(_tracks)
+      tracks.postValue(_tracks)
+    }
   }
 
   private fun removeTrack(uid: String, mid: String) {
-    var found = false
-    val toRemove = ArrayList<MeetingTrack>()
-
-    _tracks.forEach { track ->
-      if (track.peer.uid == uid && track.mediaId == mid) {
-        found = true
-        toRemove.add(track)
+    synchronized(_tracks) {
+      val trackToRemove = _tracks.find {
+        it.peer.uid == uid && it.mediaId == mid
       }
-    }
+      _tracks.remove(trackToRemove)
 
-    _tracks.removeAll(toRemove)
-    if (!found) {
-      crashlyticsLog(TAG, "onStreamRemove: $uid & $mid not found in meeting tracks")
-    } else {
-      // Update the grid layout as we have removed some views
+      // Update the view as we have removed some views
       tracks.postValue(_tracks)
     }
   }
@@ -248,14 +249,14 @@ class MeetingViewModel(
           }
         }
 
-        override fun onFailure(code: Long, reason: String) {
-          crashlyticsLog(TAG, "Publish Failure $code $reason")
-          handleFailure(false, "[$code] Publish Failure", reason)
+        override fun onFailure(exception: HMSException) {
+          crashlyticsLog(TAG, "Publish Failure onFailure(${toString(exception)})")
+          handleFailure(exception)
         }
       })
   }
 
-  private fun getUserMedia() {
+  private fun getLocalScreen() {
     // TODO: Listen to changes in settings.publishVideo
     //  To be done only when the user can change the publishVideo
     //  while in a meeting.
@@ -290,18 +291,18 @@ class MeetingViewModel(
     )
 
     // onConnect -> Join -> getUserMedia
-    client.getUserMedia(
+    client.getLocalStream(
       getApplication(),
       constraints,
-      object : HMSClient.GetUserMediaListener {
+      object : HMSClient.GetLocalStreamListener{
         override fun onSuccess(mediaStream: HMSRTCMediaStream) {
           Log.v(TAG, "GetUserMedia Success")
           publishUserStream(constraints, mediaStream)
         }
 
-        override fun onFailure(code: Long, reason: String) {
-          crashlyticsLog(TAG, "GetUserMedia failed: $code $reason")
-          handleFailure(false, "[$code] GetUserMedia Failure", reason)
+        override fun onFailure(exception: HMSException) {
+          crashlyticsLog(TAG, "GetUserMedia failed: ${toString(exception)}")
+          handleFailure(exception)
         }
       })
 
@@ -314,12 +315,12 @@ class MeetingViewModel(
       override fun onSuccess(data: String) {
         crashlyticsLog(TAG, "Join onSuccess($data)")
         // TODO: Start audio-manager
-        getUserMedia()
+        getLocalScreen()
       }
 
-      override fun onFailure(code: Long, reason: String) {
-        crashlyticsLog(TAG, "Join onFailure($code, $reason)")
-        handleFailure(false, "[$code] Join Failure", reason)
+      override fun onFailure(exception: HMSException) {
+        crashlyticsLog(TAG, "Join onFailure(${toString(exception)})")
+        handleFailure(exception)
       }
     })
   }
@@ -339,28 +340,23 @@ class MeetingViewModel(
     _isAudioMuted = false
 
     // Remove all the video stream
-    _tracks.clear()
-    tracks.postValue(_tracks)
+    synchronized(_tracks) {
+      _tracks.clear()
+      tracks.postValue(_tracks)
+    }
 
     crashlyticsLog(TAG, "cleanup() done")
   }
 
   /**
-   * @param fatal Failure requires closing the MeetingActivity,
-   *  going back to home page
-   * @param title Set the title displayed in the Dialog
-   * @param message Set the message to display.
+   * @param exception [HMSException] Failure instance
    */
-  private fun handleFailure(
-    fatal: Boolean,
-    title: String,
-    message: String
-  ) {
-    crashlyticsLog(TAG, "handleFailure($fatal, $title, $message)")
+  private fun handleFailure(exception: HMSException) {
+    crashlyticsLog(TAG, "handleFailure(${toString(exception)})")
 
     client.disconnect()
     cleanup()
-    state.postValue(MeetingState.Disconnected(true, title, message, fatal))
+    state.postValue(MeetingState.Failure(exception))
   }
 
   // HMS Events
@@ -369,10 +365,10 @@ class MeetingViewModel(
     joinMeeting()
   }
 
-  override fun onDisconnect(errorMessage: String) {
-    crashlyticsLog(TAG, "onDisconnect: $errorMessage")
+  override fun onDisconnect(exception: HMSException) {
+    crashlyticsLog(TAG, "onDisconnect: ${toString(exception)}")
     cleanup()
-    state.postValue(MeetingState.Disconnected(true, "Disconnected", errorMessage))
+    state.postValue(MeetingState.Failure(exception))
   }
 
   override fun onPeerJoin(peer: HMSPeer) {
@@ -439,9 +435,12 @@ class MeetingViewModel(
         addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false))
       }
 
-      override fun onFailure(code: Long, reason: String) {
-        crashlyticsLog(TAG, "Subscribe($info): peer-id=${peer.uid} -- onFailure($code, $reason)")
-        handleFailure(true, "[$code] Subscribe Failure", reason)
+      override fun onFailure(exception: HMSException) {
+        crashlyticsLog(
+          TAG,
+          "Subscribe($info): peer-id=${peer.uid} -- onFailure(${toString(exception)})"
+        )
+        handleFailure(exception)
       }
     })
   }

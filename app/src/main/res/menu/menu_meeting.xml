@@ -6,27 +6,47 @@
         android:icon="@drawable/ic_baseline_volume_up_24"
         android:title="@string/toggle_volume"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_share_screen"
-        android:icon="@drawable/ic_baseline_mobile_screen_share_24"
-        android:title="@string/share_screen"
-        app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_record_meeting"
-        android:icon="@drawable/ic_baseline_record_button_24"
-        android:title="@string/record_meeting"
-        app:showAsAction="never" />
+    <group>
 
-    <item
-        android:id="@+id/action_share_link"
-        android:icon="@drawable/ic_baseline_share_24"
-        android:title="@string/share_link"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_grid_view"
+            android:icon="@drawable/ic_grid_view_24"
+            android:title="@string/grid_view"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_email_logs"
-        android:icon="@drawable/ic_baseline_bug_report_24"
-        android:title="@string/bug_report"
-        app:showAsAction="never" />
+        <item
+            android:id="@+id/action_pinned_view"
+            android:icon="@drawable/ic_pinned_view_24"
+            android:title="@string/pinned_view"
+            app:showAsAction="never" />
+
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/action_share_screen"
+            android:icon="@drawable/ic_mobile_screen_share_24"
+            android:title="@string/share_screen"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_record_meeting"
+            android:icon="@drawable/ic_baseline_record_button_24"
+            android:title="@string/record_meeting"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_share_link"
+            android:icon="@drawable/ic_baseline_share_24"
+            android:title="@string/share_link"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_email_logs"
+            android:icon="@drawable/ic_baseline_bug_report_24"
+            android:title="@string/bug_report"
+            app:showAsAction="never" />
+
+    </group>
 </menu>
