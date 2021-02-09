@@ -28,12 +28,14 @@
             android:id="@+id/action_share_screen"
             android:icon="@drawable/ic_mobile_screen_share_24"
             android:title="@string/share_screen"
+            android:visible="false"
             app:showAsAction="never" />
 
         <item
             android:id="@+id/action_record_meeting"
             android:icon="@drawable/ic_baseline_record_button_24"
             android:title="@string/record_meeting"
+            android:visible="false"
             app:showAsAction="never" />
 
         <item
