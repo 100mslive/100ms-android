@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import live.hms.android100ms.databinding.ListItemVideoBinding
 import live.hms.android100ms.ui.meeting.MeetingTrack
 import live.hms.android100ms.util.NameUtils
+import live.hms.android100ms.util.SurfaceViewRendererUtil
 import live.hms.android100ms.util.crashlyticsLog
+import org.webrtc.RendererCommon
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit
@@ -18,38 +20,44 @@ class VideoListAdapter(
     private const val TAG = "VideoListAdapter"
   }
 
+  override fun onViewAttachedToWindow(holder: VideoItemViewHolder) {
+    super.onViewAttachedToWindow(holder)
+    // TODO: Limit the maximum number of SurfaceView's occupying EglContext
+    SurfaceViewRendererUtil.bind(
+      holder.binding.surfaceView,
+      items[holder.adapterPosition].track,
+      "VideoListAdapter::onViewAttachedFromWindow"
+    )
+
+    // TODO: Change visibility of NameInitials
+  }
+
+  override fun onViewDetachedFromWindow(holder: VideoItemViewHolder) {
+    super.onViewDetachedFromWindow(holder)
+    SurfaceViewRendererUtil.unbind(
+      holder.binding.surfaceView,
+      items[holder.adapterPosition].track,
+      "VideoListAdapter::onViewDetachedFromWindow"
+    )
+
+    // TODO: Change visibility of NameInitials
+  }
+
+
   inner class VideoItemViewHolder(
     val binding: ListItemVideoBinding
   ) : RecyclerView.ViewHolder(binding.root) {
-
-    var bindedItem: MeetingTrack? = null
 
     fun bind(item: VideoListItem) {
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.userName)
       binding.name.text = item.track.peer.userName
 
+      binding.surfaceView.apply {
+        setEnableHardwareScaler(true)
+        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+      }
+
       binding.root.setOnClickListener { onVideoItemClick(item.track) }
-
-      // TODO: Release context when not viewed somehow !
-      /* binding.surfaceView.apply {
-        var alreadyBinded = false
-
-        bindedItem?.let {
-          alreadyBinded = true
-          SurfaceViewRendererUtil.unbind(this, it)
-          visibility = View.GONE
-        }
-
-        if (!alreadyBinded) {
-          setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
-          setEnableHardwareScaler(true)
-        }
-
-        SurfaceViewRendererUtil.bind(this, item.track).let { success ->
-          if (success) visibility = View.VISIBLE
-        }
-        bindedItem = item.track
-      } */
     }
   }
 

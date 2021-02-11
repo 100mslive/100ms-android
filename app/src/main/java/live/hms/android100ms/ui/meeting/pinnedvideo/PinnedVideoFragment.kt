@@ -143,4 +143,12 @@ class PinnedVideoFragment : Fragment() {
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
   }
+
+  override fun onStop() {
+    super.onStop()
+
+    // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
+    // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
+    binding.recyclerViewVideos.adapter = null
+  }
 }
