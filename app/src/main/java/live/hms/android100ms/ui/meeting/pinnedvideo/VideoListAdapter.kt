@@ -1,6 +1,8 @@
 package live.hms.android100ms.ui.meeting.pinnedvideo
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.DiffUtil
@@ -23,30 +25,22 @@ class VideoListAdapter(
   override fun onViewAttachedToWindow(holder: VideoItemViewHolder) {
     super.onViewAttachedToWindow(holder)
     // TODO: Limit the maximum number of SurfaceView's occupying EglContext
-    SurfaceViewRendererUtil.bind(
-      holder.binding.surfaceView,
-      items[holder.adapterPosition].track,
-      "VideoListAdapter::onViewAttachedFromWindow"
-    )
-
-    // TODO: Change visibility of NameInitials
+    Log.d(TAG, "onViewAttachedToWindow($holder)")
+    holder.bindSurfaceView()
   }
 
   override fun onViewDetachedFromWindow(holder: VideoItemViewHolder) {
     super.onViewDetachedFromWindow(holder)
-    SurfaceViewRendererUtil.unbind(
-      holder.binding.surfaceView,
-      items[holder.adapterPosition].track,
-      "VideoListAdapter::onViewDetachedFromWindow"
-    )
-
-    // TODO: Change visibility of NameInitials
+    Log.d(TAG, "onViewDetachedFromWindow($holder)")
+    holder.unbindSurfaceView()
   }
 
 
   inner class VideoItemViewHolder(
     val binding: ListItemVideoBinding
   ) : RecyclerView.ViewHolder(binding.root) {
+
+    private var itemRef: VideoListItem? = null
 
     fun bind(item: VideoListItem) {
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.userName)
@@ -55,9 +49,49 @@ class VideoListAdapter(
       binding.surfaceView.apply {
         setEnableHardwareScaler(true)
         setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+
+        // Meanwhile until the video is not binded, hide the view.
+        visibility = View.GONE
+
+        // Update the reference such that when view is attached to window
+        // surface view is initialized with correct [VideoTrack]
+        itemRef = item
       }
 
       binding.root.setOnClickListener { onVideoItemClick(item.track) }
+    }
+
+    /**
+     * [bindSurfaceView] relies on [onViewAttachedToWindow] called `after`
+     * [onBindViewHolder] is called.
+     *
+     * [unbindSurfaceView] relied on [onViewDetachedFromWindow] called `before`
+     * [onBindViewHolder] is called such that before binding another item we
+     * always release context occupied by the previous view.
+     */
+
+    fun bindSurfaceView() {
+      itemRef?.let { item ->
+        SurfaceViewRendererUtil.bind(
+          binding.surfaceView,
+          item.track,
+          "VideoItemViewHolder::bindSurfaceView"
+        ).let { success ->
+          if (success) binding.surfaceView.visibility = View.VISIBLE
+        }
+      }
+    }
+
+    fun unbindSurfaceView() {
+      itemRef?.let { item ->
+        SurfaceViewRendererUtil.unbind(
+          binding.surfaceView,
+          item.track,
+          "VideoItemViewHolder::unbindSurfaceView"
+        ).let { success ->
+          if (success) binding.surfaceView.visibility = View.GONE
+        }
+      }
     }
   }
 
