@@ -143,9 +143,10 @@ class PinnedVideoFragment : Fragment() {
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      val found = tracks.any { it == pinnedTrack }
-      if (!found && tracks.isNotEmpty()) {
-        changePinViewVideo(tracks[0])
+      if (tracks.isNotEmpty()) {
+        // Pin a screen if possible else pin user's video
+        val toPin = tracks.find { it.isScreen } ?: tracks[0]
+        changePinViewVideo(toPin)
       }
 
       videoListAdapter.setItems(tracks)
