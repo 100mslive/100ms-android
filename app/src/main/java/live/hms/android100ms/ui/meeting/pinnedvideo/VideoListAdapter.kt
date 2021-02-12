@@ -22,6 +22,9 @@ class VideoListAdapter(
     private const val TAG = "VideoListAdapter"
   }
 
+  override fun getItemId(position: Int) = items[position].id
+
+
   override fun onViewAttachedToWindow(holder: VideoItemViewHolder) {
     super.onViewAttachedToWindow(holder)
     // TODO: Limit the maximum number of SurfaceView's occupying EglContext
@@ -35,12 +38,13 @@ class VideoListAdapter(
     holder.unbindSurfaceView()
   }
 
-
   inner class VideoItemViewHolder(
     val binding: ListItemVideoBinding
   ) : RecyclerView.ViewHolder(binding.root) {
 
     private var itemRef: VideoListItem? = null
+
+    private var isSurfaceViewBinded = false
 
     fun bind(item: VideoListItem) {
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.userName)
@@ -56,40 +60,45 @@ class VideoListAdapter(
         // Update the reference such that when view is attached to window
         // surface view is initialized with correct [VideoTrack]
         itemRef = item
+        isSurfaceViewBinded = false
       }
 
       binding.root.setOnClickListener { onVideoItemClick(item.track) }
     }
 
-    /**
-     * [bindSurfaceView] relies on [onViewAttachedToWindow] called `after`
-     * [onBindViewHolder] is called.
-     *
-     * [unbindSurfaceView] relied on [onViewDetachedFromWindow] called `before`
-     * [onBindViewHolder] is called such that before binding another item we
-     * always release context occupied by the previous view.
-     */
-
     fun bindSurfaceView() {
+      if (isSurfaceViewBinded) {
+        Log.d(TAG, "bindSurfaceView: Surface view already initialized")
+        return
+      }
+
       itemRef?.let { item ->
         SurfaceViewRendererUtil.bind(
           binding.surfaceView,
           item.track,
           "VideoItemViewHolder::bindSurfaceView"
         ).let { success ->
-          if (success) binding.surfaceView.visibility = View.VISIBLE
+          if (success) {
+            binding.surfaceView.visibility = View.VISIBLE
+            isSurfaceViewBinded = true
+          }
         }
       }
     }
 
     fun unbindSurfaceView() {
+      if (!isSurfaceViewBinded) return
+
       itemRef?.let { item ->
         SurfaceViewRendererUtil.unbind(
           binding.surfaceView,
           item.track,
           "VideoItemViewHolder::unbindSurfaceView"
         ).let { success ->
-          if (success) binding.surfaceView.visibility = View.GONE
+          if (success) {
+            binding.surfaceView.visibility = View.GONE
+            isSurfaceViewBinded = false
+          }
         }
       }
     }
@@ -120,8 +129,6 @@ class VideoListAdapter(
       parent,
       false
     )
-
-    crashlyticsLog(TAG, "onCreateViewHolder(viewType=$viewType)")
     return VideoItemViewHolder(binding)
   }
 
@@ -130,6 +137,24 @@ class VideoListAdapter(
     holder.bind(items[position])
   }
 
+  override fun onBindViewHolder(
+    holder: VideoItemViewHolder,
+    position: Int,
+    payloads: MutableList<Any>
+  ) {
+    if (payloads.isEmpty()) {
+      return super.onBindViewHolder(holder, position, payloads)
+    }
+
+    crashlyticsLog(
+      TAG,
+      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
+          "[payloads=$payloads]"
+    )
+    holder.unbindSurfaceView() // Free the context initialized for the previous item
+    holder.bind(items[position])
+    holder.bindSurfaceView()
+  }
 
   override fun getItemCount() = items.size
 }

@@ -25,6 +25,8 @@ class PinnedVideoFragment : Fragment() {
 
   private var pinnedTrack: MeetingTrack? = null
 
+  private val videoListAdapter = VideoListAdapter() { changePinViewVideo(it) }
+
   private var binding by viewLifecycle<FragmentPinnedVideoBinding>()
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
@@ -43,6 +45,8 @@ class PinnedVideoFragment : Fragment() {
 
     isViewVisible = true
     handleOnPinVideoVisibilityChange()
+
+    binding.recyclerViewVideos.adapter = videoListAdapter
   }
 
   override fun onPause() {
@@ -51,6 +55,10 @@ class PinnedVideoFragment : Fragment() {
 
     isViewVisible = false
     handleOnPinVideoVisibilityChange()
+
+    // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
+    // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
+    binding.recyclerViewVideos.adapter = null
   }
 
   override fun onCreateView(
@@ -58,6 +66,7 @@ class PinnedVideoFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    Log.d(TAG, "onCreateView($inflater, $container, $savedInstanceState)")
     binding = FragmentPinnedVideoBinding.inflate(inflater, container, false)
     initRecyclerView()
     initPinnedView()
@@ -77,7 +86,6 @@ class PinnedVideoFragment : Fragment() {
   private fun initRecyclerView() {
     binding.recyclerViewVideos.apply {
       layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-      adapter = VideoListAdapter() { changePinViewVideo(it) }
     }
   }
 
@@ -138,17 +146,8 @@ class PinnedVideoFragment : Fragment() {
         changePinViewVideo(tracks[0])
       }
 
-      val adapter = binding.recyclerViewVideos.adapter as VideoListAdapter
-      adapter.setItems(tracks)
+      videoListAdapter.setItems(tracks)
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
-  }
-
-  override fun onStop() {
-    super.onStop()
-
-    // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
-    // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
-    binding.recyclerViewVideos.adapter = null
   }
 }
