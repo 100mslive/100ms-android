@@ -93,6 +93,7 @@
     <string name="error">Error</string>
     <string name="video_resolution_height">Video Resolution (Height)</string>
     <string name="video_resolution_width">Video Resolution (Width)</string>
-    <string name="pinned_view">Pinned View</string>
+    <string name="hero_view">Hero View</string>
     <string name="grid_view">Grid View</string>
+    <string name="screen_share">Screen Share</string>
 </resources>

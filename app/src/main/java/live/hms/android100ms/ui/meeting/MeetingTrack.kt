@@ -9,7 +9,8 @@ data class MeetingTrack(
   val peer: HMSPeer,
   val videoTrack: HMSRTCVideoTrack?,
   val audioTrack: HMSRTCAudioTrack?,
-  val isCurrentDeviceStream: Boolean = false
+  val isCurrentDeviceStream: Boolean = false,
+  val isScreen: Boolean = false,
 ) {
 
   override fun equals(other: Any?): Boolean {
@@ -32,7 +33,8 @@ data class MeetingTrack(
         "peer=$peerStr, " +
         "hasVideo=${videoTrack != null}, " +
         "hasAudio=${audioTrack != null}, " +
-        "isCurrentDeviceStream=$isCurrentDeviceStream" +
+        "isCurrentDeviceStream=$isCurrentDeviceStream, " +
+        "isScreen=$isScreen" +
         ")"
   }
 }

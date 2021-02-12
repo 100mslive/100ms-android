@@ -14,7 +14,6 @@ import live.hms.video.error.HMSException
 import live.hms.video.payload.HMSPayloadData
 import live.hms.video.payload.HMSPublishStream
 import live.hms.video.payload.HMSStreamInfo
-import live.hms.video.HMSRTCMediaStream
 import live.hms.video.webrtc.HMSRTCAudioTrack
 import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
 import live.hms.video.webrtc.HMSRTCVideoTrack
@@ -216,7 +215,7 @@ class MeetingViewModel(
 
     localStream.videoTracks.let { tracks ->
       if (tracks.isNotEmpty()) {
-        videoTrack= tracks[0]
+        videoTrack = tracks[0]
       }
     }
 
@@ -293,7 +292,7 @@ class MeetingViewModel(
     client.getLocalStream(
       getApplication(),
       constraints,
-      object : HMSClient.GetLocalStreamListener{
+      object : HMSClient.GetLocalStreamListener {
         override fun onSuccess(mediaStream: HMSRTCMediaStream) {
           Log.v(TAG, "GetUserMedia Success")
           localStream = mediaStream
@@ -432,7 +431,7 @@ class MeetingViewModel(
           }
         }
 
-        addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false))
+        addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false, info.isScreen))
       }
 
       override fun onFailure(exception: HMSException) {

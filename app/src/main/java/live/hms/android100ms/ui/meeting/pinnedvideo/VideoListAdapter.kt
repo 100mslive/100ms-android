@@ -49,6 +49,7 @@ class VideoListAdapter(
     fun bind(item: VideoListItem) {
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.userName)
       binding.name.text = item.track.peer.userName
+      binding.screenShareIcon.visibility = if (item.track.isScreen) View.VISIBLE else View.GONE
 
       binding.surfaceView.apply {
         setEnableHardwareScaler(true)
