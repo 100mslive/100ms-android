@@ -1,4 +1,4 @@
-# 100ms Sample Android Application in Java
+# 100ms Sample Android Application in Kotlin
 
 Here you will find everything you need to build experiences with video using 100ms Android SDK. Dive into our SDKs, quick starts, add real-time video, voice, and screen sharing to your web and mobile applications.
 
