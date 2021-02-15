@@ -292,7 +292,7 @@ class MeetingViewModel(
     client.getLocalStream(
       getApplication(),
       constraints,
-      object : HMSClient.GetLocalStreamListener {
+      object : HMSClient.LocalStreamListener {
         override fun onSuccess(mediaStream: HMSRTCMediaStream) {
           Log.v(TAG, "GetUserMedia Success")
           localStream = mediaStream
