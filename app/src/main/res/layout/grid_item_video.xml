@@ -56,6 +56,15 @@
                     android:gravity="center"
                     android:text="@string/john_doe" />
 
+                <ImageView
+                    android:id="@+id/screen_share_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
+                    android:contentDescription="@string/screen_share"
+                    android:src="@drawable/ic_mobile_screen_share_24" />
+
                 <!-- TODO: Add other icons here -->
 
             </LinearLayout>

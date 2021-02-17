@@ -1,15 +1,16 @@
 package live.hms.android100ms.ui.meeting
 
 import live.hms.video.HMSPeer
-import org.webrtc.AudioTrack
-import org.webrtc.VideoTrack
+import live.hms.video.webrtc.HMSRTCAudioTrack
+import live.hms.video.webrtc.HMSRTCVideoTrack
 
 data class MeetingTrack(
   val mediaId: String,
   val peer: HMSPeer,
-  val videoTrack: VideoTrack?,
-  val audioTrack: AudioTrack?,
-  val isCurrentDeviceStream: Boolean = false
+  val videoTrack: HMSRTCVideoTrack?,
+  val audioTrack: HMSRTCAudioTrack?,
+  val isCurrentDeviceStream: Boolean = false,
+  val isScreen: Boolean = false,
 ) {
 
   override fun equals(other: Any?): Boolean {
@@ -32,7 +33,8 @@ data class MeetingTrack(
         "peer=$peerStr, " +
         "hasVideo=${videoTrack != null}, " +
         "hasAudio=${audioTrack != null}, " +
-        "isCurrentDeviceStream=$isCurrentDeviceStream" +
+        "isCurrentDeviceStream=$isCurrentDeviceStream, " +
+        "isScreen=$isScreen" +
         ")"
   }
 }

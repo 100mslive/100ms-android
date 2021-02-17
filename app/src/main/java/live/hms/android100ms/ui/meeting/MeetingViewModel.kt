@@ -14,12 +14,9 @@ import live.hms.video.error.HMSException
 import live.hms.video.payload.HMSPayloadData
 import live.hms.video.payload.HMSPublishStream
 import live.hms.video.payload.HMSStreamInfo
-import live.hms.video.webrtc.HMSRTCMediaStream
+import live.hms.video.webrtc.HMSRTCAudioTrack
 import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
-import live.hms.video.webrtc.HMSStream
-import org.webrtc.AudioTrack
-import org.webrtc.MediaStream
-import org.webrtc.VideoTrack
+import live.hms.video.webrtc.HMSRTCVideoTrack
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -71,6 +68,8 @@ class MeetingViewModel(
     crashlytics.setUserId(customerUserId)
   }
 
+  private lateinit var localStream: HMSRTCMediaStream
+
   private val room = HMSRoom(roomDetails.roomId)
   private val config = HMSClientConfig(roomDetails.endpoint)
   private val client = HMSClient(this, getApplication(), peer, config).apply {
@@ -79,12 +78,12 @@ class MeetingViewModel(
 
   fun toggleUserVideo() {
     currentDeviceTrack?.videoTrack?.apply {
-      val isVideo = !enabled()
-      setEnabled(isVideo)
+      val isVideo = !enabled
+      enabled = isVideo
       if (isVideo) {
-        HMSStream.getCameraCapturer().start()
+        localStream.cameraVideoCapturer.start()
       } else {
-        HMSStream.getCameraCapturer().stop()
+        localStream.cameraVideoCapturer.stop()
       }
 
       isVideoEnabled.postValue(isVideo)
@@ -94,8 +93,8 @@ class MeetingViewModel(
 
   fun toggleUserMic() {
     currentDeviceTrack?.audioTrack?.apply {
-      val isAudio = !enabled()
-      setEnabled(isAudio)
+      val isAudio = !enabled
+      enabled = isAudio
 
       isAudioEnabled.postValue(isAudio)
       crashlyticsLog(TAG, "toggleUserMic: enabled=$isAudio")
@@ -138,7 +137,9 @@ class MeetingViewModel(
       error("Cannot switch camera when Video is disabled")
     }
 
-    client.switchCamera()
+    // NOTE: During audio-only calls, this switch-camera is ignored
+    //  as no camera in use
+    localStream.cameraVideoCapturer.switchCamera()
   }
 
   fun leaveMeeting() {
@@ -201,10 +202,7 @@ class MeetingViewModel(
     }
   }
 
-  private fun publishUserStream(
-    constraints: HMSRTCMediaStreamConstraints,
-    mediaStream: HMSRTCMediaStream
-  ) {
+  private fun publishUserStream(constraints: HMSRTCMediaStreamConstraints) {
     state.postValue(
       MeetingState.PublishingMedia(
         "Publishing Media",
@@ -212,23 +210,23 @@ class MeetingViewModel(
       )
     )
 
-    var videoTrack: VideoTrack? = null
-    var audioTrack: AudioTrack? = null
+    var videoTrack: HMSRTCVideoTrack? = null
+    var audioTrack: HMSRTCAudioTrack? = null
 
-    mediaStream.stream?.apply {
-
-      if (videoTracks.isNotEmpty()) {
-        videoTrack = videoTracks[0]
-        videoTrack?.setEnabled(settings.publishVideo)
+    localStream.videoTracks.let { tracks ->
+      if (tracks.isNotEmpty()) {
+        videoTrack = tracks[0]
       }
-      if (audioTracks.isNotEmpty()) {
-        audioTrack = audioTracks[0]
-        audioTrack?.setEnabled(settings.publishAudio)
+    }
+
+    localStream.audioTracks.let { tracks ->
+      if (tracks.isNotEmpty()) {
+        audioTrack = tracks[0]
       }
     }
 
     client.publish(
-      mediaStream,
+      localStream,
       room,
       constraints,
       object : HMSStreamRequestHandler {
@@ -294,10 +292,11 @@ class MeetingViewModel(
     client.getLocalStream(
       getApplication(),
       constraints,
-      object : HMSClient.GetLocalStreamListener{
+      object : HMSClient.LocalStreamListener {
         override fun onSuccess(mediaStream: HMSRTCMediaStream) {
           Log.v(TAG, "GetUserMedia Success")
-          publishUserStream(constraints, mediaStream)
+          localStream = mediaStream
+          publishUserStream(constraints)
         }
 
         override fun onFailure(exception: HMSException) {
@@ -331,7 +330,8 @@ class MeetingViewModel(
    */
   private fun cleanup() {
     // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
-    HMSStream.stopCapturers()
+    localStream.cameraVideoCapturer.stop()
+    // TODO: Check if audio & video should be disposed
 
     // Reset the values of bottom control buttons
     isAudioEnabled.postValue(settings.publishAudio)
@@ -403,7 +403,7 @@ class MeetingViewModel(
     )
 
     client.subscribe(info, room, object : HMSMediaRequestHandler {
-      override fun onSuccess(stream: MediaStream) {
+      override fun onSuccess(stream: HMSRTCMediaStream) {
         crashlyticsLog(
           TAG,
           "Subscribe(" +
@@ -413,17 +413,16 @@ class MeetingViewModel(
               "peer-id=${peer.uid} -- onSuccess($stream)"
         )
 
-        var videoTrack: VideoTrack? = null
-        var audioTrack: AudioTrack? = null
+        var videoTrack: HMSRTCVideoTrack? = null
+        var audioTrack: HMSRTCAudioTrack? = null
 
+        // Video and Audio tracks are enabled by default
         if (stream.videoTracks.size > 0) {
           videoTrack = stream.videoTracks[0]
-          videoTrack.setEnabled(true)
         }
 
         if (stream.audioTracks.size > 0) {
           audioTrack = stream.audioTracks[0]
-          audioTrack.setEnabled(true)
 
           if (_isAudioMuted) {
             audioTrack.setVolume(0.0)
@@ -432,7 +431,7 @@ class MeetingViewModel(
           }
         }
 
-        addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false))
+        addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false, info.isScreen))
       }
 
       override fun onFailure(exception: HMSException) {

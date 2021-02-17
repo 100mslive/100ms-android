@@ -25,6 +25,8 @@ class PinnedVideoFragment : Fragment() {
 
   private var pinnedTrack: MeetingTrack? = null
 
+  private val videoListAdapter = VideoListAdapter() { changePinViewVideo(it) }
+
   private var binding by viewLifecycle<FragmentPinnedVideoBinding>()
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
@@ -43,6 +45,8 @@ class PinnedVideoFragment : Fragment() {
 
     isViewVisible = true
     handleOnPinVideoVisibilityChange()
+
+    binding.recyclerViewVideos.adapter = videoListAdapter
   }
 
   override fun onPause() {
@@ -51,6 +55,10 @@ class PinnedVideoFragment : Fragment() {
 
     isViewVisible = false
     handleOnPinVideoVisibilityChange()
+
+    // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
+    // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
+    binding.recyclerViewVideos.adapter = null
   }
 
   override fun onCreateView(
@@ -58,6 +66,7 @@ class PinnedVideoFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    Log.d(TAG, "onCreateView($inflater, $container, $savedInstanceState)")
     binding = FragmentPinnedVideoBinding.inflate(inflater, container, false)
     initRecyclerView()
     initPinnedView()
@@ -77,14 +86,15 @@ class PinnedVideoFragment : Fragment() {
   private fun initRecyclerView() {
     binding.recyclerViewVideos.apply {
       layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-      adapter = VideoListAdapter() { changePinViewVideo(it) }
     }
   }
 
   private fun updatePinnedVideoText() {
     val name = pinnedTrack?.peer?.userName ?: ""
+    val isScreen = pinnedTrack?.isScreen ?: false
     binding.pinVideo.name.text = name
     binding.pinVideo.nameInitials.text = NameUtils.getInitials(name)
+    binding.pinVideo.screenShareIcon.visibility = if (isScreen) View.VISIBLE else View.GONE
   }
 
   private fun handleOnPinVideoVisibilityChange() {
@@ -133,13 +143,13 @@ class PinnedVideoFragment : Fragment() {
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      val found = tracks.any { it == pinnedTrack }
-      if (!found && tracks.isNotEmpty()) {
-        changePinViewVideo(tracks[0])
+      if (tracks.isNotEmpty()) {
+        // Pin a screen if possible else pin user's video
+        val toPin = tracks.find { it.isScreen } ?: tracks[0]
+        changePinViewVideo(toPin)
       }
 
-      val adapter = binding.recyclerViewVideos.adapter as VideoListAdapter
-      adapter.setItems(tracks)
+      videoListAdapter.setItems(tracks)
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
   }
