@@ -118,7 +118,7 @@ class PinnedVideoFragment : Fragment() {
   @MainThread
   private fun changePinViewVideo(track: MeetingTrack) {
     if (track == pinnedTrack) {
-      crashlyticsLog(TAG, "Track=$track is already pinned")
+      Log.d(TAG, "changePinViewVideo: Track=$track is already pinned")
       return
     }
 
@@ -151,6 +151,12 @@ class PinnedVideoFragment : Fragment() {
 
       videoListAdapter.setItems(tracks)
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
+    }
+
+    meetingViewModel.dominantSpeakerTrack.observe(viewLifecycleOwner) { speaker ->
+      if (speaker != null && pinnedTrack?.isScreen == false) {
+        changePinViewVideo(speaker)
+      }
     }
   }
 }

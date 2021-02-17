@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.meeting.videogrid
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -206,6 +207,9 @@ class VideoGridPageFragment(
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
     binding.container.setOnClickListener { onVideoItemClick(item) }
+    /* item.audioEnergy.observe(viewLifecycleOwner) { audioEnergy ->
+      Log.d(TAG, "bindVideo: $audioEnergy")
+    } */
 
     binding.name.text = item.peer.userName
     binding.nameInitials.text = NameUtils.getInitials(item.peer.userName)
