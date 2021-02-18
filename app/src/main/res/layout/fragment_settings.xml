@@ -106,7 +106,7 @@
             style="@style/MaterialTextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_baseline_keyboard_arrow_down_24"
+            android:drawableEnd="@drawable/ic_keyboard_arrow_down_24"
             android:gravity="center_vertical"
             android:text="@string/advanced_settings"
             android:textAllCaps="false"

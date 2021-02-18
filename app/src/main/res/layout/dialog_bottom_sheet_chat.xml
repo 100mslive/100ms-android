@@ -19,7 +19,7 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:navigationIcon="@drawable/ic_baseline_close_16"
+            app:navigationIcon="@drawable/ic_close_16"
             app:title="@string/chat" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -58,7 +58,7 @@
             android:id="@+id/button_send_message"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/send_message"
-            app:icon="@drawable/ic_baseline_send_24" />
+            app:icon="@drawable/ic_send_24" />
 
     </LinearLayout>
 

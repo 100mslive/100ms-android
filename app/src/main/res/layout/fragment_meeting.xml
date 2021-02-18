@@ -30,32 +30,32 @@
             android:id="@+id/button_toggle_video"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/toggle_video"
-            app:icon="@drawable/ic_baseline_videocam_24" />
+            app:icon="@drawable/ic_videocam_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_toggle_audio"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/toggle_audio"
-            app:icon="@drawable/ic_baseline_mic_24" />
+            app:icon="@drawable/ic_mic_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_open_chat"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/open_chat"
-            app:icon="@drawable/ic_baseline_chat_24" />
+            app:icon="@drawable/ic_chat_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_end_call"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/end_call"
-            app:icon="@drawable/ic_baseline_call_end_24"
+            app:icon="@drawable/ic_call_end_24"
             app:iconTint="@color/red" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_flip_camera"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/flip_camera"
-            app:icon="@drawable/ic_baseline_flip_camera_ios_24" />
+            app:icon="@drawable/ic_flip_camera_ios_24" />
 
     </LinearLayout>
 

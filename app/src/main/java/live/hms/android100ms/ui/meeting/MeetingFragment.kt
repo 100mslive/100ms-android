@@ -111,9 +111,9 @@ class MeetingFragment : Fragment() {
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
     item.apply {
       if (meetingViewModel.isAudioMuted) {
-        setIcon(R.drawable.ic_baseline_volume_off_24)
+        setIcon(R.drawable.ic_volume_off_24)
       } else {
-        setIcon(R.drawable.ic_baseline_volume_up_24)
+        setIcon(R.drawable.ic_volume_up_24)
       }
     }
   }
@@ -231,8 +231,8 @@ class MeetingFragment : Fragment() {
     meetingViewModel.isVideoEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleVideo.apply {
         setIconResource(
-          if (enabled) R.drawable.ic_baseline_videocam_24
-          else R.drawable.ic_baseline_videocam_off_24
+          if (enabled) R.drawable.ic_videocam_24
+          else R.drawable.ic_videocam_off_24
         )
       }
     }
@@ -240,8 +240,8 @@ class MeetingFragment : Fragment() {
     meetingViewModel.isAudioEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleAudio.apply {
         setIconResource(
-          if (enabled) R.drawable.ic_baseline_mic_24
-          else R.drawable.ic_baseline_mic_off_24
+          if (enabled) R.drawable.ic_mic_24
+          else R.drawable.ic_mic_off_24
         )
       }
     }

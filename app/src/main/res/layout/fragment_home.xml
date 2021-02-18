@@ -147,7 +147,7 @@
                 android:backgroundTint="@color/primary_blue"
                 android:text="@string/start_a_meeting"
                 android:textAllCaps="false"
-                app:icon="@drawable/ic_baseline_videocam_24"
+                app:icon="@drawable/ic_videocam_24"
                 app:iconGravity="textStart" />
 
         </LinearLayout>
