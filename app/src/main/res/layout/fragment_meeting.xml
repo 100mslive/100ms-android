@@ -55,13 +55,6 @@
             app:icon="@drawable/ic_call_end_24"
             app:iconTint="@color/red" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_flip_camera"
-            android:layout_height="match_parent"
-            style="@style/MaterialImageButton"
-            android:contentDescription="@string/flip_camera"
-            app:icon="@drawable/ic_flip_camera_ios_24" />
-
     </LinearLayout>
 
 </RelativeLayout>

@@ -134,6 +134,20 @@ class MeetingFragment : Fragment() {
         true
       }
     }
+
+    menu.findItem(R.id.action_flip_camera).apply {
+      if (!settings.publishVideo) {
+        isVisible = false
+        isEnabled = false
+      } else {
+        isVisible = true
+        isEnabled = true
+        setOnMenuItemClickListener {
+          if (isMeetingOngoing) meetingViewModel.flipCamera()
+          true
+        }
+      }
+    }
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -365,19 +379,6 @@ class MeetingFragment : Fragment() {
     }
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
-
-    binding.buttonFlipCamera.apply {
-      if (!settings.publishVideo) {
-        visibility = View.GONE
-        isEnabled = false
-      } else {
-        visibility = View.VISIBLE
-        isEnabled = true
-        setOnClickListener {
-          meetingViewModel.flipCamera()
-        }
-      }
-    }
   }
 
   private fun cleanup() {

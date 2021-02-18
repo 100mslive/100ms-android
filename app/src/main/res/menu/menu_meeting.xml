@@ -7,6 +7,12 @@
         android:title="@string/toggle_volume"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/action_flip_camera"
+        android:icon="@drawable/ic_flip_camera_ios_24"
+        android:title="@string/flip_camera"
+        app:showAsAction="ifRoom" />
+
     <group>
 
         <item

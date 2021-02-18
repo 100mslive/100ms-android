@@ -214,7 +214,7 @@ class VideoGridPageFragment(
 
     // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
     binding.surfaceView.apply {
-      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
       setEnableHardwareScaler(true)
     }
   }

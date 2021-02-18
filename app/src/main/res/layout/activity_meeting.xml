@@ -7,26 +7,9 @@
     android:orientation="vertical"
     tools:context=".ui.meeting.MeetingActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:contentDescription="@string/_100ms_logo"
-                android:src="@drawable/logo_text" />
-
-        </androidx.appcompat.widget.Toolbar>
-
-    </com.google.android.material.appbar.AppBarLayout>
+    <include
+        android:id="@+id/containerToolbar"
+        layout="@layout/toolbar_meeting" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
