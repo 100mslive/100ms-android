@@ -17,6 +17,7 @@ import live.hms.video.payload.HMSStreamInfo
 import live.hms.video.webrtc.HMSRTCAudioTrack
 import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
 import live.hms.video.webrtc.HMSRTCVideoTrack
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -331,7 +332,12 @@ class MeetingViewModel(
   private fun cleanup() {
     // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
     if (settings.publishVideo) {
-      localStream.cameraVideoCapturer.stop()
+      try {
+        localStream.cameraVideoCapturer.stop()
+      } catch (e: UninitializedPropertyAccessException) {
+        e.printStackTrace()
+        crashlytics.recordException(e)
+      }
     }
 
     // Reset the values of bottom control buttons
