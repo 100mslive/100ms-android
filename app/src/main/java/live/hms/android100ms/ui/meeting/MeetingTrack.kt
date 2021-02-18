@@ -16,7 +16,7 @@ data class MeetingTrack(
   val audioTrack: HMSRTCAudioTrack? =
     if (stream.audioTracks.size > 0) stream.audioTracks[0] else null
   val videoTrack: HMSRTCVideoTrack? =
-    if (stream.audioTracks.size > 0) stream.videoTracks[0] else null
+    if (stream.videoTracks.size > 0) stream.videoTracks[0] else null
 
   override fun equals(other: Any?): Boolean {
     if (other is MeetingTrack) {

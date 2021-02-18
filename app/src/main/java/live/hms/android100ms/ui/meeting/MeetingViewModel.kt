@@ -514,12 +514,16 @@ class MeetingViewModel(
               "for getStats() x $getStatsCalls"
         )
 
-        if (maxAudioEnergyTrack != null && maxAudioEnergyTrack != dominantSpeakerTrack.value) {
-          Log.d(
-            TAG, "getStatsTask: Changing dominant speaker to " +
-                "$maxAudioEnergyTrack (from ${dominantSpeakerTrack.value}"
-          )
-          dominantSpeakerTrack.postValue(maxAudioEnergyTrack)
+        maxAudioEnergyTrack?.let {
+          if (maxAudioEnergyTrack != dominantSpeakerTrack.value && maxAudioEnergy > 0.01) {
+            Log.d(
+              TAG, "getStatsTask: maxAudioEnergy=$maxAudioEnergy" +
+                  "Changing dominant speaker to " +
+                  "$maxAudioEnergyTrack (from ${dominantSpeakerTrack.value}"
+            )
+            dominantSpeakerTrack.postValue(maxAudioEnergyTrack)
+          }
+
         }
 
         pollHandler.postDelayed(this, AUDIO_ENERGY_DELAY)
