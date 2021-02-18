@@ -21,31 +21,35 @@
     <LinearLayout
         android:id="@+id/bottom_controls"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:layout_alignParentBottom="true"
         android:background="@color/blue_3"
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_toggle_video"
+            android:layout_height="match_parent"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/toggle_video"
             app:icon="@drawable/ic_videocam_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_toggle_audio"
+            android:layout_height="match_parent"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/toggle_audio"
             app:icon="@drawable/ic_mic_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_open_chat"
+            android:layout_height="match_parent"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/open_chat"
             app:icon="@drawable/ic_chat_24" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_end_call"
+            android:layout_height="match_parent"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/end_call"
             app:icon="@drawable/ic_call_end_24"
@@ -53,6 +57,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_flip_camera"
+            android:layout_height="match_parent"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/flip_camera"
             app:icon="@drawable/ic_flip_camera_ios_24" />

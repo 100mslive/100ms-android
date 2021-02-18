@@ -50,6 +50,8 @@ class MeetingFragment : Fragment() {
 
   private var meetingViewMode = MeetingViewMode.GRID
 
+  private var isMeetingOngoing = false
+
   override fun onResume() {
     super.onResume()
     audioManager.updateAudioDeviceState()
@@ -124,8 +126,10 @@ class MeetingFragment : Fragment() {
     menu.findItem(R.id.action_volume).apply {
       updateActionVolumeMenuIcon(this)
       setOnMenuItemClickListener {
-        meetingViewModel.toggleAudio()
-        updateActionVolumeMenuIcon(this)
+        if (isMeetingOngoing) {
+          meetingViewModel.toggleAudio()
+          updateActionVolumeMenuIcon(this)
+        }
 
         true
       }
@@ -166,6 +170,8 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
       Log.v(TAG, "Meeting State: $state")
+      isMeetingOngoing = false
+
       when (state) {
         is MeetingState.Failure -> {
           cleanup()
@@ -213,6 +219,8 @@ class MeetingFragment : Fragment() {
         is MeetingState.Ongoing -> {
           startAudioManager()
           hideProgressBar()
+
+          isMeetingOngoing = true
         }
         is MeetingState.Disconnecting -> {
           updateProgressBarUI(state.heading, state.message)
