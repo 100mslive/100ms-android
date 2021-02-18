@@ -1,158 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_gravity="bottom"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context=".ui.home.HomeFragment">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:orientation="vertical">
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:context=".ui.home.HomeFragment">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/container_card_name"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            app:cardCornerRadius="8dp">
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_name"
-                style="@style/TextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="12dp"
-                android:layout_weight="1"
-                android:hint="@string/enter_name">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textNoSuggestions" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/container_card_join"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            app:cardCornerRadius="8dp">
-
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/container_card_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                android:animateLayoutChanges="true"
-                android:orientation="vertical">
-
-                <com.google.android.material.textview.MaterialTextView
-                    style="@style/MaterialTextViewHeading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/join_a_meeting"
-                    android:textSize="16sp" />
+                app:cardCornerRadius="8dp">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/container_meeting_url"
+                    android:id="@+id/container_name"
                     style="@style/TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/meeting_url_hint">
+                    android:layout_gravity="center"
+                    android:layout_margin="12dp"
+                    android:layout_weight="1"
+                    android:hint="@string/enter_name">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_text_meeting_url"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textMultiLine" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_join_meeting"
-                    style="@style/MaterialButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/join_now"
-                    android:textAllCaps="false" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/container_card_start_meeting"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            app:cardCornerRadius="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                android:animateLayoutChanges="true"
-                android:orientation="vertical">
-
-                <com.google.android.material.textview.MaterialTextView
-                    style="@style/MaterialTextViewHeading"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/get_started"
-                    android:textSize="16sp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/container_room_name"
-                    style="@style/TextInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/meeting_name">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_text_room_name"
+                        android:id="@+id/edit_text_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textNoSuggestions" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switch_record"
-                    style="@style/MaterialSwitch"
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/container_card_join"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:text="@string/record_meeting" />
+                    android:layout_margin="12dp"
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_start_meeting"
-                    style="@style/MaterialButton"
+                    <com.google.android.material.textview.MaterialTextView
+                        style="@style/MaterialTextViewHeading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/join_a_meeting"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/container_meeting_url"
+                        style="@style/TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/meeting_url_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_text_meeting_url"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textMultiLine" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_join_meeting"
+                        style="@style/MaterialButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/join_now"
+                        android:textAllCaps="false" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/container_card_start_meeting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="8dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/primary_blue"
-                    android:text="@string/start_a_meeting"
-                    android:textAllCaps="false"
-                    app:icon="@drawable/ic_videocam_24"
-                    app:iconGravity="textStart" />
+                    android:layout_margin="12dp"
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <com.google.android.material.textview.MaterialTextView
+                        style="@style/MaterialTextViewHeading"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/get_started"
+                        android:textSize="16sp" />
 
-        </com.google.android.material.card.MaterialCardView>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/container_room_name"
+                        style="@style/TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/meeting_name">
 
-        <include
-            android:id="@+id/progress_bar"
-            layout="@layout/progress_bar"
-            android:visibility="gone" />
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_text_room_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textNoSuggestions" />
 
-    </LinearLayout>
-</ScrollView>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_record"
+                        style="@style/MaterialSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
+                        android:text="@string/record_meeting" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_start_meeting"
+                        style="@style/MaterialButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/primary_blue"
+                        android:text="@string/start_a_meeting"
+                        android:textAllCaps="false"
+                        app:icon="@drawable/ic_videocam_24"
+                        app:iconGravity="textStart" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <include
+        android:id="@+id/progress_bar"
+        layout="@layout/progress_bar"
+        android:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

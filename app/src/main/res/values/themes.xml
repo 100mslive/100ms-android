@@ -42,7 +42,7 @@
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">0dp</item>
         <item name="boxBackgroundColor">@color/blue_4</item>
-        <item name="android:textColorHint">@color/fadedWhite</item>
+        <item name="android:textColorHint">@color/white_faded_30</item>
         <item name="hintTextColor">@color/white</item>
         <item name="endIconMode">clear_text</item>
     </style>
@@ -53,7 +53,7 @@
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">0dp</item>
         <item name="boxBackgroundColor">@color/blue_4</item>
-        <item name="android:textColorHint">@color/fadedWhite</item>
+        <item name="android:textColorHint">@color/white_faded_30</item>
         <item name="hintTextColor">@color/white</item>
     </style>
 
@@ -63,12 +63,12 @@
     </style>
 
     <style name="MaterialTextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/text_label_color</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="fontFamily">@font/clan_pro_medium</item>
     </style>
 
     <style name="MaterialTextViewHeading" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textColor">@color/text_label_color</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="fontFamily">@font/clan_pro_medium</item>
     </style>
 
