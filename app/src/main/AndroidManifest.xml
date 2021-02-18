@@ -27,6 +27,7 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             android:theme="@style/Theme.Android100ms.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -55,8 +56,8 @@
             android:label="@string/meeting"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             android:theme="@style/Theme.Android100ms.NoActionBar" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"
