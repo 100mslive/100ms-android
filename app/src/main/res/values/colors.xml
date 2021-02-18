@@ -6,8 +6,9 @@
     <color name="blue_3">#1b2028</color>
     <color name="blue_4">#2b3139</color>
     <color name="primary_blue">#2f80ff</color>
+    <color name="text_label_color">#c0c1c3</color>
 
     <color name="red">#D74451</color>
     <color name="white">#ffffff</color>
-    <color name="fadedWhite">#40ffffff</color>
+    <color name="fadedWhite">#4dffffff</color>
 </resources>
