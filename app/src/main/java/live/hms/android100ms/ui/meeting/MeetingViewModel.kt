@@ -330,8 +330,9 @@ class MeetingViewModel(
    */
   private fun cleanup() {
     // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
-    localStream.cameraVideoCapturer.stop()
-    // TODO: Check if audio & video should be disposed
+    if (settings.publishVideo) {
+      localStream.cameraVideoCapturer.stop()
+    }
 
     // Reset the values of bottom control buttons
     isAudioEnabled.postValue(settings.publishAudio)
