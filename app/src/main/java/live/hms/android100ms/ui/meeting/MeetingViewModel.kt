@@ -2,7 +2,7 @@ package live.hms.android100ms.ui.meeting
 
 import android.app.Application
 import android.os.Handler
-import android.os.HandlerThread
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
@@ -16,6 +16,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.payload.HMSPayloadData
 import live.hms.video.payload.HMSPublishStream
 import live.hms.video.payload.HMSStreamInfo
+import live.hms.video.webrtc.HMSPeerConnectionFactory
 import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
 import java.util.*
 import kotlin.collections.ArrayList
@@ -42,7 +43,7 @@ class MeetingViewModel(
   private var currentDeviceTrack: MeetingTrack? = null
 
   // Flag to keep track whether the incoming audio need's to be muted
-  private var _isAudioMuted = false
+  private var _isAudioMuted = true
 
   // Public variable which can be accessed by views
   val isAudioMuted: Boolean
@@ -322,7 +323,12 @@ class MeetingViewModel(
 
     // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
     if (settings.publishVideo) {
-      localStream.cameraVideoCapturer.stop()
+      try {
+        localStream.cameraVideoCapturer.stop()
+      } catch (e: Exception) {
+        e.printStackTrace()
+        crashlytics.recordException(e)
+      }
     }
 
     // Reset the values of bottom control buttons
@@ -452,90 +458,95 @@ class MeetingViewModel(
     broadcastsReceived.postValue(data)
   }
 
-  private val pollThread = HandlerThread("pollAudioEnergy").apply { start() }
-  private val pollHandler = Handler(pollThread.looper)
   private val totalAudioEnergyMap = HashMap<String, Double>()
 
-  private val getStatsTask = object : Runnable {
-    override fun run() {
-      synchronized(_tracks) {
-        val startTimeMillis = System.currentTimeMillis()
-        var getStatsCalls = 0
+  private val getStatsTask = Runnable {
+    synchronized(_tracks) {
+      val startTimeMillis = System.currentTimeMillis()
+      var getStatsCalls = 0
 
-        var maxAudioEnergyTrack: MeetingTrack? = null
-        var maxAudioEnergy = 0.0
+      var maxAudioEnergyTrackIdx = -1
+      var maxAudioEnergy = 0.0
 
-        for (conn in client.hmsPeerConnectionList) {
-          val track = _tracks.find {
-            it.mediaId == conn.streamId
-                || (
-                it.isCurrentDeviceStream
-                    && it.peer.peerId == conn.peerId
-                )
-          } ?: continue
-          if (track.audioTrack == null) continue
+      val connections = client.hmsPeerConnectionList
+      for (conn in connections) {
+        val idx = _tracks.indexOfFirst {
+          it.mediaId == conn.streamId
+              || (
+              it.isCurrentDeviceStream
+                  && it.peer.peerId == conn.peerId
+              )
+        }
+        if (idx == -1 || _tracks[idx].audioTrack == null) continue
 
+        getStatsCalls += 1
+        conn.peerConnection.getStats { stats ->
+          stats.statsMap.values.forEach { report ->
+            if (
+              (report.type == "inbound-rtp" || report.type == "outbound-rtp" || report.type == "media-source")
+              && report.members.containsKey("kind")
+              && report.members["kind"] == "audio"
+              && report.members.containsKey("totalAudioEnergy")
+            ) {
+              val totalAudioEnergy = report.members["totalAudioEnergy"] as Double
+              val audioLevel = report.members["audioLevel"] as Double
+              val audioEnergyDelta = totalAudioEnergy -
+                  totalAudioEnergyMap.getOrDefault(conn.streamId, 0.0)
+              totalAudioEnergyMap[conn.streamId] = totalAudioEnergy
 
-          getStatsCalls += 1
-          conn.peerConnection.getStats { stats ->
-            stats.statsMap.values.forEach { report ->
-              if (
-                (report.type == "inbound-rtp" || report.type == "outbound-rtp" || report.type == "media-source")
-                && report.members.containsKey("kind")
-                && report.members["kind"] == "audio"
-                && report.members.containsKey("totalAudioEnergy")
-              ) {
-                val totalAudioEnergy = report.members["totalAudioEnergy"] as Double
-                val audioLevel = report.members["audioLevel"] as Double
-                val audioEnergyDelta = totalAudioEnergy -
-                    totalAudioEnergyMap.getOrDefault(conn.streamId, 0.0)
-                totalAudioEnergyMap[conn.streamId] = totalAudioEnergy
-
-                if (audioEnergyDelta > maxAudioEnergy) {
-                  maxAudioEnergy = audioEnergyDelta
-                  maxAudioEnergyTrack = track
-                }
-
-                Log.d(
-                  TAG,
-                  "getStatsTask: " +
-                      "audioEnergy=$audioEnergyDelta " +
-                      "audioLevel=$audioLevel " +
-                      "totalAudioEnergy=$totalAudioEnergy " +
-                      "($track)"
-                )
+              if (audioEnergyDelta > maxAudioEnergy) {
+                maxAudioEnergy = audioEnergyDelta
+                maxAudioEnergyTrackIdx = idx
+                Log.d(TAG, "getStatsTask: Updated max to ${_tracks[idx]}")
               }
+
+              Log.d(
+                TAG,
+                "getStatsTask: " +
+                    "audioEnergy=$audioEnergyDelta " +
+                    "audioLevel=$audioLevel " +
+                    "totalAudioEnergy=$totalAudioEnergy " +
+                    "(${_tracks[idx]})"
+              )
             }
           }
         }
+      }
 
+      Log.d(
+        TAG, "getStatsTask: Took ${System.currentTimeMillis() - startTimeMillis}ms " +
+            "for getStats() x $getStatsCalls"
+      )
+
+      if (
+        maxAudioEnergyTrackIdx != -1
+        && _tracks[maxAudioEnergyTrackIdx] != dominantSpeakerTrack.value
+        && maxAudioEnergy > 0.01
+      ) {
         Log.d(
-          TAG, "getStatsTask: Took ${System.currentTimeMillis() - startTimeMillis}ms " +
-              "for getStats() x $getStatsCalls"
+          TAG, "getStatsTask: maxAudioEnergy=$maxAudioEnergy" +
+              "Changing dominant speaker to " +
+              "${_tracks[maxAudioEnergyTrackIdx]} " +
+              "(from ${dominantSpeakerTrack.value}"
         )
-
-        maxAudioEnergyTrack?.let {
-          if (maxAudioEnergyTrack != dominantSpeakerTrack.value && maxAudioEnergy > 0.01) {
-            Log.d(
-              TAG, "getStatsTask: maxAudioEnergy=$maxAudioEnergy" +
-                  "Changing dominant speaker to " +
-                  "$maxAudioEnergyTrack (from ${dominantSpeakerTrack.value}"
-            )
-            dominantSpeakerTrack.postValue(maxAudioEnergyTrack)
-          }
-
-        }
-
-        pollHandler.postDelayed(this, AUDIO_ENERGY_DELAY)
+        dominantSpeakerTrack.postValue(_tracks[maxAudioEnergyTrackIdx])
       }
     }
   }
 
+  // Handler on main thread
+  private val pollHandler = Handler(Looper.getMainLooper())
+
   fun startPollingAudioEnergyLevel() {
-    pollHandler.postDelayed(getStatsTask, AUDIO_ENERGY_DELAY)
+    Log.d(TAG, "startPollingAudioEnergyLevel()")
+    pollHandler.postDelayed({
+      Log.d(TAG, "startPollingAudioEnergyLevel: scheduled new Task")
+      HMSPeerConnectionFactory.getExecutor().execute(getStatsTask)
+    }, 500)
   }
 
   private fun stopPollingAudioEnergy() {
-    pollHandler.removeCallbacks(getStatsTask)
+    Log.d(TAG, "stopPollingAudioEnergy()")
+    pollHandler.removeCallbacksAndMessages(null)
   }
 }
