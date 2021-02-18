@@ -209,7 +209,8 @@ class VideoGridPageFragment(
 
     binding.name.text = item.peer.userName
     binding.nameInitials.text = NameUtils.getInitials(item.peer.userName)
-    binding.screenShareIcon.visibility = if (item.isScreen) View.VISIBLE else View.GONE
+    binding.iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
+    binding.iconVideoOff.visibility = if (item.videoTrack == null) View.VISIBLE else View.GONE
 
     // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
     binding.surfaceView.apply {

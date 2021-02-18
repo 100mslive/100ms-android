@@ -92,9 +92,11 @@ class PinnedVideoFragment : Fragment() {
   private fun updatePinnedVideoText() {
     val name = pinnedTrack?.peer?.userName ?: ""
     val isScreen = pinnedTrack?.isScreen ?: false
+    val isVideoOff = pinnedTrack?.videoTrack == null
     binding.pinVideo.name.text = name
     binding.pinVideo.nameInitials.text = NameUtils.getInitials(name)
-    binding.pinVideo.screenShareIcon.visibility = if (isScreen) View.VISIBLE else View.GONE
+    binding.pinVideo.iconScreenShare.visibility = if (isScreen) View.VISIBLE else View.GONE
+    binding.pinVideo.iconVideoOff.visibility = if (isVideoOff) View.VISIBLE else View.GONE
   }
 
   private fun handleOnPinVideoVisibilityChange() {
