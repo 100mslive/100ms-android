@@ -3,7 +3,7 @@ package live.hms.android100ms.util
 object NameUtils {
   fun getInitials(name: String): String {
     val characters = name
-      .replace(Regex("[^a-z ]"), "")
+      .replace(Regex("[^a-zA-Z ]"), "")
 
     return if (characters.isEmpty()) {
       "--"
