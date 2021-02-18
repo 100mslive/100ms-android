@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/100mslive/android-sdk.svg)](https://docs.100ms.live/client-side/android)
+
 # 100ms Sample Android Application in Kotlin
 
 Here you will find everything you need to build experiences with video using 100ms Android SDK. Dive into our SDKs, quick starts, add real-time video, voice, and screen sharing to your web and mobile applications.
