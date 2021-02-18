@@ -1,6 +1,8 @@
 package live.hms.android100ms.ui.meeting.pinnedvideo
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.DiffUtil
@@ -8,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import live.hms.android100ms.databinding.ListItemVideoBinding
 import live.hms.android100ms.ui.meeting.MeetingTrack
 import live.hms.android100ms.util.NameUtils
+import live.hms.android100ms.util.SurfaceViewRendererUtil
 import live.hms.android100ms.util.crashlyticsLog
+import org.webrtc.RendererCommon
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit
@@ -18,38 +22,86 @@ class VideoListAdapter(
     private const val TAG = "VideoListAdapter"
   }
 
+  override fun getItemId(position: Int) = items[position].id
+
+
+  override fun onViewAttachedToWindow(holder: VideoItemViewHolder) {
+    super.onViewAttachedToWindow(holder)
+    // TODO: Limit the maximum number of SurfaceView's occupying EglContext
+    Log.d(TAG, "onViewAttachedToWindow($holder)")
+    holder.bindSurfaceView()
+  }
+
+  override fun onViewDetachedFromWindow(holder: VideoItemViewHolder) {
+    super.onViewDetachedFromWindow(holder)
+    Log.d(TAG, "onViewDetachedFromWindow($holder)")
+    holder.unbindSurfaceView()
+  }
+
   inner class VideoItemViewHolder(
     val binding: ListItemVideoBinding
   ) : RecyclerView.ViewHolder(binding.root) {
 
-    var bindedItem: MeetingTrack? = null
+    private var itemRef: VideoListItem? = null
+
+    private var isSurfaceViewBinded = false
 
     fun bind(item: VideoListItem) {
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.userName)
       binding.name.text = item.track.peer.userName
+      binding.screenShareIcon.visibility = if (item.track.isScreen) View.VISIBLE else View.GONE
+
+      binding.surfaceView.apply {
+        setEnableHardwareScaler(true)
+        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+
+        // Meanwhile until the video is not binded, hide the view.
+        visibility = View.GONE
+
+        // Update the reference such that when view is attached to window
+        // surface view is initialized with correct [VideoTrack]
+        itemRef = item
+        isSurfaceViewBinded = false
+      }
 
       binding.root.setOnClickListener { onVideoItemClick(item.track) }
+    }
 
-      // TODO: Release context when not viewed somehow !
-      /* binding.surfaceView.apply {
-        var alreadyBinded = false
+    fun bindSurfaceView() {
+      if (isSurfaceViewBinded) {
+        Log.d(TAG, "bindSurfaceView: Surface view already initialized")
+        return
+      }
 
-        bindedItem?.let {
-          alreadyBinded = true
-          SurfaceViewRendererUtil.unbind(this, it)
-          visibility = View.GONE
+      itemRef?.let { item ->
+        SurfaceViewRendererUtil.bind(
+          binding.surfaceView,
+          item.track,
+          "VideoItemViewHolder::bindSurfaceView"
+        ).let { success ->
+          if (success) {
+            binding.surfaceView.visibility = View.VISIBLE
+            isSurfaceViewBinded = true
+          }
         }
+      }
+    }
 
-        if (!alreadyBinded) {
-          setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
-          setEnableHardwareScaler(true)
-        }
+    fun unbindSurfaceView() {
+      if (!isSurfaceViewBinded) return
 
-        SurfaceViewRendererUtil.bind(this, item.track).let { success ->
-          if (success) visibility = View.VISIBLE
+      itemRef?.let { item ->
+        SurfaceViewRendererUtil.unbind(
+          binding.surfaceView,
+          item.track,
+          "VideoItemViewHolder::unbindSurfaceView"
+        ).let { success ->
+          if (success) {
+            binding.surfaceView.visibility = View.GONE
+            isSurfaceViewBinded = false
+          }
         }
-        bindedItem = item.track
-      } */
+      }
     }
   }
 
@@ -78,8 +130,6 @@ class VideoListAdapter(
       parent,
       false
     )
-
-    crashlyticsLog(TAG, "onCreateViewHolder(viewType=$viewType)")
     return VideoItemViewHolder(binding)
   }
 
@@ -88,6 +138,24 @@ class VideoListAdapter(
     holder.bind(items[position])
   }
 
+  override fun onBindViewHolder(
+    holder: VideoItemViewHolder,
+    position: Int,
+    payloads: MutableList<Any>
+  ) {
+    if (payloads.isEmpty()) {
+      return super.onBindViewHolder(holder, position, payloads)
+    }
+
+    crashlyticsLog(
+      TAG,
+      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
+          "[payloads=$payloads]"
+    )
+    holder.unbindSurfaceView() // Free the context initialized for the previous item
+    holder.bind(items[position])
+    holder.bindSurfaceView()
+  }
 
   override fun getItemCount() = items.size
 }

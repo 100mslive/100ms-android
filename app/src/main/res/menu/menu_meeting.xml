@@ -18,7 +18,7 @@
         <item
             android:id="@+id/action_pinned_view"
             android:icon="@drawable/ic_pinned_view_24"
-            android:title="@string/pinned_view"
+            android:title="@string/hero_view"
             app:showAsAction="never" />
 
     </group>
