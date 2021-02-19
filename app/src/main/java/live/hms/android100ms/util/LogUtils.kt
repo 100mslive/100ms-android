@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import java.io.File
 import java.io.IOException
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -34,6 +35,8 @@ object LogUtils {
     val logsDir = File(context.getExternalFilesDir(null), "")
     val fileNameSuffix = Date().let { "${dateFormatter.format(it)}-${it.time}" }
     val logFile = File(logsDir, "$filename-$fileNameSuffix.log")
+
+    crashlytics.recordException(Exception("Logs Update :)"))
 
     try {
       Runtime.getRuntime().exec(

@@ -19,6 +19,9 @@ import live.hms.video.payload.HMSStreamInfo
 import live.hms.video.webrtc.HMSPeerConnectionFactory
 import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -28,7 +31,6 @@ class MeetingViewModel(
 ) : AndroidViewModel(application), HMSEventListener {
   companion object {
     private const val TAG = "MeetingViewModel"
-    private const val AUDIO_ENERGY_DELAY: Long = 500
   }
 
   init {
@@ -43,7 +45,7 @@ class MeetingViewModel(
   private var currentDeviceTrack: MeetingTrack? = null
 
   // Flag to keep track whether the incoming audio need's to be muted
-  private var _isAudioMuted = true
+  private var _isAudioMuted = false
 
   // Public variable which can be accessed by views
   val isAudioMuted: Boolean
@@ -460,93 +462,88 @@ class MeetingViewModel(
 
   private val totalAudioEnergyMap = HashMap<String, Double>()
 
-  private val getStatsTask = Runnable {
-    synchronized(_tracks) {
-      val startTimeMillis = System.currentTimeMillis()
-      var getStatsCalls = 0
+  private val getStatsTask = object : Runnable {
+    override fun run() {
+      synchronized(_tracks) {
+        val startTimeMillis = System.currentTimeMillis()
+        var getStatsCalls = 0
 
-      var maxAudioEnergyTrackIdx = -1
-      var maxAudioEnergy = 0.0
+        var maxAudioEnergyTrackIdx = -1
+        var maxAudioEnergy = 0.0
 
-      val connections = client.hmsPeerConnectionList
-      for (conn in connections) {
-        val idx = _tracks.indexOfFirst {
-          it.mediaId == conn.streamId
-              || (
-              it.isCurrentDeviceStream
-                  && it.peer.peerId == conn.peerId
-              )
-        }
-        if (idx == -1 || _tracks[idx].audioTrack == null) continue
+        val connections = client.hmsPeerConnectionList
+        for (conn in connections) {
+          if (conn.peerConnection.nativePeerConnection == 0L) continue
 
-        getStatsCalls += 1
-        conn.peerConnection.getStats { stats ->
-          stats.statsMap.values.forEach { report ->
-            if (
-              (report.type == "inbound-rtp" || report.type == "outbound-rtp" || report.type == "media-source")
-              && report.members.containsKey("kind")
-              && report.members["kind"] == "audio"
-              && report.members.containsKey("totalAudioEnergy")
-            ) {
-              val totalAudioEnergy = report.members["totalAudioEnergy"] as Double
-              val audioLevel = report.members["audioLevel"] as Double
-              val audioEnergyDelta = totalAudioEnergy -
-                  totalAudioEnergyMap.getOrDefault(conn.streamId, 0.0)
-              totalAudioEnergyMap[conn.streamId] = totalAudioEnergy
+          val idx = _tracks.indexOfFirst {
+            it.mediaId == conn.streamId
+                || (
+                it.isCurrentDeviceStream
+                    && it.peer.peerId == conn.peerId
+                )
+          }
+          if (idx == -1 || _tracks[idx].audioTrack == null) continue
+          val track = _tracks[idx]
 
-              if (audioEnergyDelta > maxAudioEnergy) {
-                maxAudioEnergy = audioEnergyDelta
-                maxAudioEnergyTrackIdx = idx
-                Log.d(TAG, "getStatsTask: Updated max to ${_tracks[idx]}")
+          getStatsCalls += 1
+          conn.peerConnection.getStats { stats ->
+            stats.statsMap.values.forEach { report ->
+              if (
+                (report.type == "inbound-rtp" || report.type == "outbound-rtp" || report.type == "media-source")
+                && report.members.containsKey("kind")
+                && report.members["kind"] == "audio"
+                && report.members.containsKey("totalAudioEnergy")
+              ) {
+                val totalAudioEnergy = report.members["totalAudioEnergy"] as Double
+                val audioEnergyDelta = totalAudioEnergy -
+                    totalAudioEnergyMap.getOrDefault(conn.streamId, 0.0)
+                totalAudioEnergyMap[conn.streamId] = totalAudioEnergy
+                Log.d(TAG, "getStatsTask: audioEnergy=$audioEnergyDelta of $track")
+
+                if (audioEnergyDelta > maxAudioEnergy) {
+                  maxAudioEnergy = audioEnergyDelta
+                  maxAudioEnergyTrackIdx = idx
+                }
               }
-
-              Log.d(
-                TAG,
-                "getStatsTask: " +
-                    "audioEnergy=$audioEnergyDelta " +
-                    "audioLevel=$audioLevel " +
-                    "totalAudioEnergy=$totalAudioEnergy " +
-                    "(${_tracks[idx]})"
-              )
             }
           }
         }
-      }
 
-      Log.d(
-        TAG, "getStatsTask: Took ${System.currentTimeMillis() - startTimeMillis}ms " +
-            "for getStats() x $getStatsCalls"
-      )
-
-      if (
-        maxAudioEnergyTrackIdx != -1
-        && _tracks[maxAudioEnergyTrackIdx] != dominantSpeakerTrack.value
-        && maxAudioEnergy > 0.01
-      ) {
         Log.d(
-          TAG, "getStatsTask: maxAudioEnergy=$maxAudioEnergy" +
-              "Changing dominant speaker to " +
-              "${_tracks[maxAudioEnergyTrackIdx]} " +
-              "(from ${dominantSpeakerTrack.value}"
+          TAG, "getStatsTask: Took ${System.currentTimeMillis() - startTimeMillis}ms " +
+              "for getStats() x $getStatsCalls"
         )
-        dominantSpeakerTrack.postValue(_tracks[maxAudioEnergyTrackIdx])
+
+        if (
+          maxAudioEnergyTrackIdx != -1
+          && _tracks[maxAudioEnergyTrackIdx] != dominantSpeakerTrack.value
+          && maxAudioEnergy > 0.01
+        ) {
+          val dominantTrack = _tracks[maxAudioEnergyTrackIdx]
+          Log.d(TAG, "getStatsTask: Dominant Speaker=$dominantTrack")
+          dominantSpeakerTrack.postValue(dominantTrack)
+        }
       }
     }
   }
 
-  // Handler on main thread
-  private val pollHandler = Handler(Looper.getMainLooper())
+  private var scheduledFuture: ScheduledFuture<*>? = null
 
   fun startPollingAudioEnergyLevel() {
     Log.d(TAG, "startPollingAudioEnergyLevel()")
-    pollHandler.postDelayed({
-      Log.d(TAG, "startPollingAudioEnergyLevel: scheduled new Task")
-      HMSPeerConnectionFactory.getExecutor().execute(getStatsTask)
-    }, 500)
+
+    scheduledFuture = HMSPeerConnectionFactory.getExecutor().scheduleWithFixedDelay(
+      getStatsTask,
+      2000,
+      500,
+      TimeUnit.MILLISECONDS
+    )
   }
 
   private fun stopPollingAudioEnergy() {
     Log.d(TAG, "stopPollingAudioEnergy()")
-    pollHandler.removeCallbacksAndMessages(null)
+    assert(scheduledFuture != null)
+
+    scheduledFuture?.cancel(false)
   }
 }
