@@ -20,6 +20,8 @@
     <string name="flip_camera">Flip Camera</string>
     <string name="android_test_user">android-test-user</string>
     <string name="john_doe">John Doe</string>
+    <string name="speaker_john_doe">Speaker - John Doe</string>
+    <string name="no_one_speaking">No one is speaking</string>
     <string name="john_doe_initials">JD</string>
     <string name="lorem_ipsum">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</string>
     <string name="_8_00">8:00</string>
@@ -50,6 +52,7 @@
     <string name="publish_audio_while_joining">Publish audio while joining</string>
     <string name="maximum_rows">Maximum Rows</string>
     <string name="maximum_columns">Maximum Columns</string>
+    <string name="silence_audio_level_threshold">Silence Audio Level Threshold</string>
     <string name="video_resolution">Video Resolution</string>
     <string name="video_codec">Video Codec</string>
     <string name="video_bitrate">Video Bitrate</string>

@@ -19,6 +19,8 @@ class SettingsStore(context: Context) {
     const val VIDEO_FRAME_RATE = "video-frame-rate"
     const val USERNAME = "username"
 
+    const val SILENCE_AUDIO_LEVEL_THRESHOLD = "silence-audio-level-threshold"
+
     const val LAST_USED_ROOM_ID = "last-used-room-id"
     const val ENVIRONMENT = "last-used-env"
 
@@ -50,6 +52,13 @@ class SettingsStore(context: Context) {
   private fun putBoolean(key: String, value: Boolean) {
     sharedPreferences.edit {
       putBoolean(key, value)
+      commit()
+    }
+  }
+
+  private fun putFloat(key: String, value: Float) {
+    sharedPreferences.edit {
+      putFloat(key, value)
       commit()
     }
   }
@@ -91,6 +100,9 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getString(USERNAME, "Android User")!!
     set(value) = putString(USERNAME, value)
 
+  var silenceAudioLevelThreshold: Float
+    get() = sharedPreferences.getFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, 0.01f)
+    set(value) = putFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
 
   var lastUsedRoomId: String
     get() = sharedPreferences.getString(LAST_USED_ROOM_ID, "")!!
@@ -159,6 +171,11 @@ class SettingsStore(context: Context) {
 
     fun setUsername(value: String): MultiCommitHelper {
       editor.putString(USERNAME, value)
+      return this
+    }
+
+    fun setSilenceAudioLevelThreshold(value: Float): MultiCommitHelper {
+      editor.putFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
       return this
     }
 

@@ -17,7 +17,6 @@ import live.hms.video.payload.HMSStreamInfo
 import live.hms.video.webrtc.HMSRTCAudioTrack
 import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
 import live.hms.video.webrtc.HMSRTCVideoTrack
-import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -64,6 +63,9 @@ class MeetingViewModel(
 
   // Live data to notify about broadcast data
   val broadcastsReceived = MutableLiveData<HMSPayloadData>()
+
+  // Dominant speaker
+  val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
 
   val peer = HMSPeer(roomDetails.username, roomDetails.authToken).apply {
     crashlytics.setUserId(customerUserId)
@@ -194,7 +196,7 @@ class MeetingViewModel(
   private fun removeTrack(uid: String, mid: String) {
     synchronized(_tracks) {
       val trackToRemove = _tracks.find {
-        it.peer.uid == uid && it.mediaId == mid
+        it.peer.peerId == uid && it.mediaId == mid
       }
       _tracks.remove(trackToRemove)
 
@@ -235,16 +237,18 @@ class MeetingViewModel(
           crashlyticsLog(TAG, "Publish Success ${data.mid}")
 
           currentDeviceTrack = MeetingTrack(
-            data.mid,
+            localStream.streamId,
             peer,
             videoTrack,
             audioTrack,
             true
           ).apply {
-            state.postValue(MeetingState.Ongoing())
-
             addTrack(this)
             Log.v(TAG, "Adding user track $currentDeviceTrack to VideoGrid")
+
+            startAudioLevelMonitor()
+
+            state.postValue(MeetingState.Ongoing())
           }
         }
 
@@ -330,6 +334,8 @@ class MeetingViewModel(
    * Resets all the values to default
    */
   private fun cleanup() {
+    client.stopAudioLevelMonitor()
+
     // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
     if (settings.publishVideo) {
       try {
@@ -381,7 +387,7 @@ class MeetingViewModel(
   override fun onPeerJoin(peer: HMSPeer) {
     crashlyticsLog(
       TAG,
-      "onPeerJoin: uid=${peer.uid}, " +
+      "onPeerJoin: peerId=${peer.peerId}, " +
           "role=${peer.role}, " +
           "userId=${peer.customerUserId}, " +
           "peerId=${peer.peerId}"
@@ -391,7 +397,7 @@ class MeetingViewModel(
   override fun onPeerLeave(peer: HMSPeer) {
     crashlyticsLog(
       TAG,
-      "onPeerLeave: uid=${peer.uid}, " +
+      "onPeerLeave: peerId=${peer.peerId}, " +
           "role=${peer.role}, " +
           "userId=${peer.customerUserId}, " +
           "peerId=${peer.peerId}"
@@ -401,12 +407,12 @@ class MeetingViewModel(
   override fun onStreamAdd(peer: HMSPeer, info: HMSStreamInfo) {
     crashlyticsLog(
       TAG,
-      "onStreamAdd: peer-uid:${peer.uid} " +
+      "onStreamAdd: peerId:${peer.peerId} " +
           "name=${peer.userName}, " +
           "role=${peer.role} " +
           "userId=${peer.customerUserId} " +
           "mid=${info.mid} " +
-          "uid=${info.uid}"
+          "peerId=${info.peer.peerId}"
     )
 
     client.subscribe(info, room, object : HMSMediaRequestHandler {
@@ -414,10 +420,10 @@ class MeetingViewModel(
         crashlyticsLog(
           TAG,
           "Subscribe(" +
-              "uid=${info.uid}, " +
+              "uid=${info.peer.peerId}, " +
               "mid=${info.mid}, " +
               "userName=${info.userName}): " +
-              "peer-id=${peer.uid} -- onSuccess($stream)"
+              "peer-id=${peer.peerId} -- onSuccess($stream)"
         )
 
         var videoTrack: HMSRTCVideoTrack? = null
@@ -444,7 +450,7 @@ class MeetingViewModel(
       override fun onFailure(exception: HMSException) {
         crashlyticsLog(
           TAG,
-          "Subscribe($info): peer-id=${peer.uid} -- onFailure(${toString(exception)})"
+          "Subscribe($info): peer-id=${peer.peerId} -- onFailure(${toString(exception)})"
         )
         handleFailure(exception)
       }
@@ -456,21 +462,39 @@ class MeetingViewModel(
       TAG,
       "onStreamRemove: " +
           "name=${info.userName} " +
-          "uid=${info.uid} " +
+          "peerId=${info.peer.peerId} " +
           "mid=${info.mid}"
     )
 
-    removeTrack(info.uid, info.mid)
+    removeTrack(info.peer.peerId, info.mid)
   }
 
   override fun onBroadcast(data: HMSPayloadData) {
     crashlyticsLog(
       TAG,
-      "onBroadcast: customerId=${data.peer.customerUserId}, " +
+      "onBroadcast: peerId=${data.peer.peerId}, " +
           "userName=${data.peer.userName}, " +
           "msg=${data.msg}"
     )
 
     broadcastsReceived.postValue(data)
   }
+
+  private fun startAudioLevelMonitor() {
+    client.startAudioLevelMonitor(500) { audioInfo ->
+      Log.d(TAG, "startAudioLevelMonitor: $audioInfo")
+      // The audioInfo is sorted in descending order of audio-levels
+      // 1st item is dominant speaker
+      if (audioInfo.isNotEmpty()) {
+        if (audioInfo[0].audioLevel > settings.silenceAudioLevelThreshold) {
+          synchronized(_tracks) {
+            _tracks.find { it.mediaId == audioInfo[0].streamId }?.let {
+              dominantSpeaker.postValue(it)
+            }
+          }
+        } else dominantSpeaker.postValue(null)
+      }
+    }
+  }
+
 }

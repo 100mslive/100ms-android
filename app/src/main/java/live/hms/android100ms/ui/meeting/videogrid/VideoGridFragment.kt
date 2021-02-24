@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
+import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentGridVideoBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.meeting.MeetingViewModel
@@ -36,7 +37,6 @@ class VideoGridFragment : Fragment() {
     )
   }
 
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -52,10 +52,9 @@ class VideoGridFragment : Fragment() {
   ): View {
     binding = FragmentGridVideoBinding.inflate(inflater, container, false)
     initVideoGrid()
-    initVideoView()
+    initViewModels()
     return binding.root
   }
-
 
   private fun initVideoGrid() {
     binding.viewPagerVideoGrid.apply {
@@ -84,11 +83,19 @@ class VideoGridFragment : Fragment() {
     }
   }
 
-  private fun initVideoView() {
+  private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
       adapter.setItems(tracks)
       Log.d(TAG, "Updated video-grid items: size=${tracks.size}")
+    }
+
+    meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) { dominantSpeakerTrack ->
+      if (dominantSpeakerTrack == null) {
+        binding.dominantSpeakerName.setText(R.string.no_one_speaking)
+      } else {
+        binding.dominantSpeakerName.text = "Dominant Speaker: ${dominantSpeakerTrack.peer.userName}"
+      }
     }
   }
 }
