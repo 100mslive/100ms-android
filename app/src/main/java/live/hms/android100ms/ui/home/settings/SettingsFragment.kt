@@ -131,6 +131,33 @@ class SettingsFragment : Fragment() {
   }
 
   private fun initNonEmptyEditTextWithRange(
+    defaultText: Long,
+    editText: TextInputEditText,
+    container: TextInputLayout,
+    name: String,
+    minValue: Long, maxValue: Long,
+    saveOnValid: (value: Long) -> Unit
+  ) {
+    editText.apply {
+      setText(defaultText.toString())
+      addTextChangedListener { text ->
+        if (text.toString().isEmpty()) {
+          container.error = "$name cannot be empty"
+        } else {
+          val value = text.toString().toLong()
+          if (value < minValue || value > maxValue) {
+            container.error = "$name value should be in range [$minValue, $maxValue] inclusive"
+          } else {
+            container.error = null
+            saveOnValid(value)
+          }
+        }
+      }
+    }
+  }
+
+
+  private fun initNonEmptyEditTextWithRange(
     defaultText: Float,
     editText: TextInputEditText,
     container: TextInputLayout,
@@ -184,6 +211,13 @@ class SettingsFragment : Fragment() {
         "Maximum Rows",
         1, 3,
       ) { commitHelper.setVideoGridColumns(it) }
+
+      initNonEmptyEditTextWithRange(
+        settings.audioPollInterval,
+        editTextAudioPollInterval, containerAudioPollInterval,
+        "Audio Poll Interval",
+        100, 10000
+      ) { commitHelper.setAudioPollInterval(it) }
 
       initNonEmptyEditTextWithRange(
         settings.silenceAudioLevelThreshold,
@@ -327,6 +361,11 @@ class SettingsFragment : Fragment() {
         settings.isLeakCanaryEnabled,
         switchToggleLeakCanary
       ) { handleLeakCanaryToggle(it) }
+
+      initSwitch(
+        settings.detectDominantSpeaker,
+        switchShowDominantSpeaker
+      ) { commitHelper.setDetectDominantSpeaker(it) }
 
       // Disable the switches not yet supported (TODO: Add support)
       switchMirrorVideo.isEnabled = false

@@ -52,7 +52,9 @@
     <string name="publish_audio_while_joining">Publish audio while joining</string>
     <string name="maximum_rows">Maximum Rows</string>
     <string name="maximum_columns">Maximum Columns</string>
+    <string name="audio_poll_interval">Audio Poll Interval</string>
     <string name="silence_audio_level_threshold">Silence Audio Level Threshold</string>
+    <string name="show_dominant_speaker">Show Dominant Speaker</string>
     <string name="video_resolution">Video Resolution</string>
     <string name="video_codec">Video Codec</string>
     <string name="video_bitrate">Video Bitrate</string>

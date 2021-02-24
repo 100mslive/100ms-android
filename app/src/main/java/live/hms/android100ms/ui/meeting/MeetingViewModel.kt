@@ -246,7 +246,7 @@ class MeetingViewModel(
             addTrack(this)
             Log.v(TAG, "Adding user track $currentDeviceTrack to VideoGrid")
 
-            startAudioLevelMonitor()
+            if (settings.detectDominantSpeaker) startDetectDominantSpeakerMonitor()
 
             state.postValue(MeetingState.Ongoing())
           }
@@ -334,7 +334,9 @@ class MeetingViewModel(
    * Resets all the values to default
    */
   private fun cleanup() {
-    client.stopAudioLevelMonitor()
+    /** NOTE: Calling [HMSClient.disconnect] stop's the audio-level monitor
+     * However, we can manually stop it using [HMSClient.stopAudioLevelMonitor]
+     */
 
     // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
     if (settings.publishVideo) {
@@ -480,8 +482,8 @@ class MeetingViewModel(
     broadcastsReceived.postValue(data)
   }
 
-  private fun startAudioLevelMonitor() {
-    client.startAudioLevelMonitor(500) { audioInfo ->
+  private fun startDetectDominantSpeakerMonitor() {
+    client.startAudioLevelMonitor(settings.audioPollInterval) { audioInfo ->
       Log.d(TAG, "startAudioLevelMonitor: $audioInfo")
       // The audioInfo is sorted in descending order of audio-levels
       // 1st item is dominant speaker
