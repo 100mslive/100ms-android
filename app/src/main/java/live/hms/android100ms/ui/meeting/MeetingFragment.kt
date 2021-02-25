@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.meeting
 
 import android.content.Intent
+import android.media.MediaCodecList
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -249,7 +250,7 @@ class MeetingFragment : Fragment() {
     meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) { data ->
       chatViewModel.receivedMessage(
         ChatMessage(
-          data.peer.uid,
+          data.peer.customerUserId,
           data.senderName,
           Date(),
           data.msg,

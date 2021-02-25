@@ -19,6 +19,10 @@ class SettingsStore(context: Context) {
     const val VIDEO_FRAME_RATE = "video-frame-rate"
     const val USERNAME = "username"
 
+    const val DETECT_DOMINANT_SPEAKER = "detect-dominant-speaker"
+    const val AUDIO_POLL_INTERVAL = "audio-poll-interval"
+    const val SILENCE_AUDIO_LEVEL_THRESHOLD = "silence-audio-level-threshold"
+
     const val LAST_USED_ROOM_ID = "last-used-room-id"
     const val ENVIRONMENT = "last-used-env"
 
@@ -40,6 +44,13 @@ class SettingsStore(context: Context) {
     }
   }
 
+  private fun putLong(key: String, value: Long) {
+    sharedPreferences.edit {
+      putLong(key, value)
+      commit()
+    }
+  }
+
   private fun putInt(key: String, value: Int) {
     sharedPreferences.edit {
       putInt(key, value)
@@ -50,6 +61,13 @@ class SettingsStore(context: Context) {
   private fun putBoolean(key: String, value: Boolean) {
     sharedPreferences.edit {
       putBoolean(key, value)
+      commit()
+    }
+  }
+
+  private fun putFloat(key: String, value: Float) {
+    sharedPreferences.edit {
+      putFloat(key, value)
       commit()
     }
   }
@@ -91,6 +109,17 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getString(USERNAME, "Android User")!!
     set(value) = putString(USERNAME, value)
 
+  var detectDominantSpeaker: Boolean
+    get() = sharedPreferences.getBoolean(DETECT_DOMINANT_SPEAKER, true)
+    set(value) = putBoolean(DETECT_DOMINANT_SPEAKER, value)
+
+  var audioPollInterval: Long
+    get() = sharedPreferences.getLong(AUDIO_POLL_INTERVAL, 1000)
+    set(value) = putLong(AUDIO_POLL_INTERVAL, value)
+
+  var silenceAudioLevelThreshold: Float
+    get() = sharedPreferences.getFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, 0.01f)
+    set(value) = putFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
 
   var lastUsedRoomId: String
     get() = sharedPreferences.getString(LAST_USED_ROOM_ID, "")!!
@@ -159,6 +188,21 @@ class SettingsStore(context: Context) {
 
     fun setUsername(value: String): MultiCommitHelper {
       editor.putString(USERNAME, value)
+      return this
+    }
+
+    fun setDetectDominantSpeaker(value: Boolean): MultiCommitHelper {
+      editor.putBoolean(DETECT_DOMINANT_SPEAKER, value)
+      return this
+    }
+
+    fun setAudioPollInterval(value: Long): MultiCommitHelper {
+      editor.putLong(AUDIO_POLL_INTERVAL, value)
+      return this
+    }
+
+    fun setSilenceAudioLevelThreshold(value: Float): MultiCommitHelper {
+      editor.putFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
       return this
     }
 
