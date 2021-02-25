@@ -15,7 +15,7 @@ data class MeetingTrack(
 
   override fun equals(other: Any?): Boolean {
     if (other is MeetingTrack) {
-      return other.peer.uid == peer.uid &&
+      return other.peer.peerId == peer.peerId &&
           other.mediaId == mediaId
     }
 

@@ -32,7 +32,7 @@ class SettingsFragment : Fragment() {
       "90p" to "90 x 90"
     )
 
-    private val CODECS = arrayOf("VP8")
+    private val CODECS = arrayOf("VP8", "H264")
 
     private val VIDEO_BITRATE = mapOf(
       "Lowest (100 kbps)" to 100,
@@ -130,6 +130,59 @@ class SettingsFragment : Fragment() {
     }
   }
 
+  private fun initNonEmptyEditTextWithRange(
+    defaultText: Long,
+    editText: TextInputEditText,
+    container: TextInputLayout,
+    name: String,
+    minValue: Long, maxValue: Long,
+    saveOnValid: (value: Long) -> Unit
+  ) {
+    editText.apply {
+      setText(defaultText.toString())
+      addTextChangedListener { text ->
+        if (text.toString().isEmpty()) {
+          container.error = "$name cannot be empty"
+        } else {
+          val value = text.toString().toLong()
+          if (value < minValue || value > maxValue) {
+            container.error = "$name value should be in range [$minValue, $maxValue] inclusive"
+          } else {
+            container.error = null
+            saveOnValid(value)
+          }
+        }
+      }
+    }
+  }
+
+
+  private fun initNonEmptyEditTextWithRange(
+    defaultText: Float,
+    editText: TextInputEditText,
+    container: TextInputLayout,
+    name: String,
+    minValue: Float, maxValue: Float,
+    saveOnValid: (value: Float) -> Unit
+  ) {
+    editText.apply {
+      setText(defaultText.toString())
+      addTextChangedListener { text ->
+        if (text.toString().isEmpty()) {
+          container.error = "$name cannot be empty"
+        } else {
+          val value = text.toString().toFloat()
+          if (value < minValue || value > maxValue) {
+            container.error = "$name value should be in range [$minValue, $maxValue] inclusive"
+          } else {
+            container.error = null
+            saveOnValid(value)
+          }
+        }
+      }
+    }
+  }
+
   private fun initEditTexts() {
     binding.apply {
       initNonEmptyEditText(
@@ -158,6 +211,21 @@ class SettingsFragment : Fragment() {
         "Maximum Rows",
         1, 3,
       ) { commitHelper.setVideoGridColumns(it) }
+
+      initNonEmptyEditTextWithRange(
+        settings.audioPollInterval,
+        editTextAudioPollInterval, containerAudioPollInterval,
+        "Audio Poll Interval",
+        100, 10000
+      ) { commitHelper.setAudioPollInterval(it) }
+
+      initNonEmptyEditTextWithRange(
+        settings.silenceAudioLevelThreshold,
+        editTextSilenceAudioLevelThreshold,
+        containerSilenceAudioLevelThreshold,
+        "Silence Audio Level Threshold",
+        0.0f, 5.0f
+      ) { commitHelper.setSilenceAudioLevelThreshold(it) }
 
       initNonEmptyEditTextWithRange(
         settings.videoFrameRate,
@@ -293,6 +361,11 @@ class SettingsFragment : Fragment() {
         settings.isLeakCanaryEnabled,
         switchToggleLeakCanary
       ) { handleLeakCanaryToggle(it) }
+
+      initSwitch(
+        settings.detectDominantSpeaker,
+        switchShowDominantSpeaker
+      ) { commitHelper.setDetectDominantSpeaker(it) }
 
       // Disable the switches not yet supported (TODO: Add support)
       switchMirrorVideo.isEnabled = false

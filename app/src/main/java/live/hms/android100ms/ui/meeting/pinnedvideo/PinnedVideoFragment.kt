@@ -152,5 +152,13 @@ class PinnedVideoFragment : Fragment() {
       videoListAdapter.setItems(tracks)
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
+
+    meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) {
+      it?.let {
+        if (pinnedTrack?.isScreen != true) {
+          changePinViewVideo(it)
+        }
+      }
+    }
   }
 }

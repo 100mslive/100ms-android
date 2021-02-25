@@ -13,12 +13,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
+import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentGridVideoBinding
 import live.hms.android100ms.model.RoomDetails
+import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.ui.meeting.MeetingViewModelFactory
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
+import live.hms.video.webrtc.HMSPeerConnectionFactory
 
 class VideoGridFragment : Fragment() {
   companion object {
@@ -26,6 +29,7 @@ class VideoGridFragment : Fragment() {
   }
 
   private var binding by viewLifecycle<FragmentGridVideoBinding>()
+  private lateinit var settings: SettingsStore
 
   private lateinit var clipboard: ClipboardManager
 
@@ -35,7 +39,6 @@ class VideoGridFragment : Fragment() {
       requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
     )
   }
-
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -51,11 +54,12 @@ class VideoGridFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentGridVideoBinding.inflate(inflater, container, false)
+    settings = SettingsStore(requireContext())
+
     initVideoGrid()
-    initVideoView()
+    initViewModels()
     return binding.root
   }
-
 
   private fun initVideoGrid() {
     binding.viewPagerVideoGrid.apply {
@@ -84,11 +88,23 @@ class VideoGridFragment : Fragment() {
     }
   }
 
-  private fun initVideoView() {
+  private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
       adapter.setItems(tracks)
       Log.d(TAG, "Updated video-grid items: size=${tracks.size}")
+    }
+
+    if (settings.detectDominantSpeaker) {
+      meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) { dominantSpeakerTrack ->
+        if (dominantSpeakerTrack == null) {
+          binding.dominantSpeakerName.setText(R.string.no_one_speaking)
+        } else {
+          binding.dominantSpeakerName.text = "Dominant Speaker: ${dominantSpeakerTrack.peer.userName}"
+        }
+      }
+    } else {
+      binding.containerDominantSpeaker.visibility = View.GONE
     }
   }
 }
