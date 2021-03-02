@@ -40,6 +40,8 @@ class VideoGridFragment : Fragment() {
     )
   }
 
+  private lateinit var adapter: VideoGridAdapter
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -61,26 +63,38 @@ class VideoGridFragment : Fragment() {
     return binding.root
   }
 
-  private fun initVideoGrid() {
-    binding.viewPagerVideoGrid.apply {
-      offscreenPageLimit = 1
-      adapter = VideoGridAdapter(this@VideoGridFragment) { video ->
-        Log.v(TAG, "onVideoItemClick: $video")
+  override fun onResume() {
+    super.onResume()
+    binding.viewPagerVideoGrid.adapter = adapter
+  }
 
-        Snackbar.make(
+  override fun onPause() {
+    super.onPause()
+    binding.viewPagerVideoGrid.adapter = adapter
+  }
+
+  private fun initVideoGrid() {
+    adapter = VideoGridAdapter(this@VideoGridFragment) { video ->
+      Log.v(TAG, "onVideoItemClick: $video")
+
+      Snackbar.make(
           binding.root,
           "Name: ${video.peer.userName} (${video.peer.role}) \nId: ${video.peer.customerUserId}",
           Snackbar.LENGTH_LONG,
-        ).setAction("Copy") {
-          val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
-          clipboard.setPrimaryClip(clip)
-          Toast.makeText(
+      ).setAction("Copy") {
+        val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(
             requireContext(),
             "Copied customer id of ${video.peer.userName} to clipboard",
             Toast.LENGTH_SHORT
-          ).show()
-        }.show()
-      }
+        ).show()
+      }.show()
+    }
+
+    binding.viewPagerVideoGrid.apply {
+      offscreenPageLimit = 1
+      adapter = this@VideoGridFragment.adapter
 
       TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
         // No text to be shown
@@ -90,7 +104,6 @@ class VideoGridFragment : Fragment() {
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
       adapter.setItems(tracks)
       Log.d(TAG, "Updated video-grid items: size=${tracks.size}")
     }

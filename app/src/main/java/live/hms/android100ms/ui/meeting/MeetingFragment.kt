@@ -155,7 +155,10 @@ class MeetingFragment : Fragment() {
     settings = SettingsStore(requireContext())
 
     savedInstanceState?.let { state ->
-      if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
+      if (
+          resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+          && meetingViewMode != MeetingViewMode.PINNED
+      ){
         changeMeetingMode(MeetingViewMode.PINNED)
       }
     } ?: run {
