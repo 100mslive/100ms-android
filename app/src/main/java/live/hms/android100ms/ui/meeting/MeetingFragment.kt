@@ -167,13 +167,6 @@ class MeetingFragment : Fragment() {
     initButtons()
     initOnBackPress()
 
-    if (
-        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        && meetingViewMode == MeetingViewMode.GRID
-    ) {
-      changeMeetingMode(MeetingViewMode.PINNED)
-    }
-
     if (meetingViewModel.state.value is MeetingState.Disconnected) {
       // Handles configuration changes
       meetingViewModel.startMeeting()

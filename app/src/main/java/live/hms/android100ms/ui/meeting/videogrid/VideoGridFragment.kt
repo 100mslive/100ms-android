@@ -65,12 +65,12 @@ class VideoGridFragment : Fragment() {
 
   override fun onResume() {
     super.onResume()
-    binding.viewPagerVideoGrid.adapter = adapter
+    // binding.viewPagerVideoGrid.adapter = adapter
   }
 
   override fun onPause() {
     super.onPause()
-    binding.viewPagerVideoGrid.adapter = adapter
+    // binding.viewPagerVideoGrid.adapter = adapter
   }
 
   private fun initVideoGrid() {

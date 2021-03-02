@@ -118,7 +118,7 @@ class VideoGridAdapter(
 
     crashlyticsLog(TAG, "createFragment($position): videos=${page.items}, size=${rows}x${columns}")
 
-    return VideoGridPageFragment(page.items, rows, columns, onVideoItemClick)
+    return VideoGridPageFragment.newInstance(page.items, rows, columns, onVideoItemClick)
   }
 
   override fun getItemId(position: Int): Long {
