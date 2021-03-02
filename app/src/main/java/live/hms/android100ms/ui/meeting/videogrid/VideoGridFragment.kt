@@ -63,16 +63,6 @@ class VideoGridFragment : Fragment() {
     return binding.root
   }
 
-  override fun onResume() {
-    super.onResume()
-    // binding.viewPagerVideoGrid.adapter = adapter
-  }
-
-  override fun onPause() {
-    super.onPause()
-    // binding.viewPagerVideoGrid.adapter = adapter
-  }
-
   private fun initVideoGrid() {
     adapter = VideoGridAdapter(this@VideoGridFragment) { video ->
       Log.v(TAG, "onVideoItemClick: $video")
