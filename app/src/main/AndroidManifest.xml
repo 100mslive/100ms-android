@@ -50,9 +50,7 @@
             android:name=".ui.meeting.MeetingActivity"
             android:label="@string/meeting"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Android100ms.NoActionBar" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"

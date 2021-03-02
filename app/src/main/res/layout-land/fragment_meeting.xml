@@ -8,22 +8,26 @@
 
     <include
         android:id="@+id/progress_bar"
-        layout="@layout/progress_bar" />
+        layout="@layout/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_meeting_control_size"
-        android:layout_above="@id/bottom_controls"
-        android:layout_alignParentTop="true" />
+        android:layout_height="match_parent"
+        android:layout_toStartOf="@id/bottom_controls"
+        android:layout_alignParentTop="true"
+        android:layout_margin="8dp" />
 
     <LinearLayout
         android:id="@+id/bottom_controls"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_width="@dimen/bottom_meeting_control_size"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
         android:background="@color/blue_3"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_toggle_video"

@@ -1,6 +1,8 @@
 package live.hms.android100ms.ui.meeting
 
 import android.app.Application
+import android.media.MediaCodecInfo
+import android.media.MediaCodecList
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
@@ -120,11 +122,22 @@ class MeetingViewModel(
     }
   }
 
+  fun logMediaCodecs() {
+    val count = MediaCodecList.getCodecCount()
+    val arr = ArrayList<MediaCodecInfo>()
+    for (i in 0 until count) {
+      arr.add(MediaCodecList.getCodecInfoAt(i))
+    }
+
+    Log.d(TAG, "logMediaCodecs: $arr")
+  }
+
   fun startMeeting() {
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
 
+    logMediaCodecs()
     state.postValue(
       MeetingState.Connecting(
         "Connecting",

@@ -158,7 +158,10 @@ class VideoGridPageFragment(
 
         binding.container.apply {
           // Unbind only when view is visible to user
-          if (isViewVisible) unbindSurfaceView(currentRenderedView.binding, currentRenderedView.video)
+          if (isViewVisible) unbindSurfaceView(
+            currentRenderedView.binding,
+            currentRenderedView.video
+          )
           removeViewInLayout(currentRenderedView.binding.root)
         }
       }
@@ -199,28 +202,30 @@ class VideoGridPageFragment(
   }
 
   private fun bindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    SurfaceViewRendererUtil.bind(binding.surfaceView, item, "fragment=$tag").let {
-      if (it) binding.surfaceView.visibility = View.VISIBLE
+    SurfaceViewRendererUtil.bind(binding.videoCard.surfaceView, item, "fragment=$tag").let {
+      if (it) binding.videoCard.surfaceView.visibility = View.VISIBLE
     }
   }
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
     binding.container.setOnClickListener { onVideoItemClick(item) }
 
-    binding.name.text = item.peer.userName
-    binding.nameInitials.text = NameUtils.getInitials(item.peer.userName)
-    binding.screenShareIcon.visibility = if (item.isScreen) View.VISIBLE else View.GONE
+    binding.videoCard.apply {
+      name.text = item.peer.userName
+      nameInitials.text = NameUtils.getInitials(item.peer.userName)
+      screenShareIcon.visibility = if (item.isScreen) View.VISIBLE else View.GONE
 
-    // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
-    binding.surfaceView.apply {
-      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
-      setEnableHardwareScaler(true)
+      // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
+      surfaceView.apply {
+        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+        setEnableHardwareScaler(true)
+      }
     }
   }
 
   private fun unbindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    SurfaceViewRendererUtil.unbind(binding.surfaceView, item, "fragment=$tag").let {
-      if (it) binding.surfaceView.visibility = View.INVISIBLE
+    SurfaceViewRendererUtil.unbind(binding.videoCard.surfaceView, item, "fragment=$tag").let {
+      if (it) binding.videoCard.surfaceView.visibility = View.INVISIBLE
     }
   }
 
