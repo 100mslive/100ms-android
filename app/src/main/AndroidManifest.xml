@@ -40,12 +40,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="prod-in.100ms.live"
+                    android:host="*.100ms.live"
                     android:scheme="https" />
-                <data
-                    android:host="qa-in.100ms.live"
-                    android:scheme="https" />
-
             </intent-filter>
 
         </activity>
