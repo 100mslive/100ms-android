@@ -16,7 +16,7 @@ import live.hms.android100ms.audio.HMSAudioManager
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.HomeActivity
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.pinnedvideo.PinnedVideoFragment

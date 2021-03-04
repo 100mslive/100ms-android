@@ -4,12 +4,9 @@ import android.app.Application
 import android.util.Log
 import leakcanary.LeakCanary
 import live.hms.android100ms.BuildConfig
-import live.hms.android100ms.ui.home.settings.SettingsStore
-import live.hms.android100ms.ui.meeting.MeetingActivity
-import live.hms.android100ms.util.EmailUtils
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.util.LogUtils
 import live.hms.android100ms.util.crashlyticsLog
-import java.util.*
 
 class GlobalApplication : Application() {
 

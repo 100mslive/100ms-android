@@ -1,4 +1,4 @@
-package live.hms.android100ms.ui.home.settings
+package live.hms.android100ms.ui.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater

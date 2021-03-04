@@ -1,27 +1,22 @@
 package live.hms.android100ms.ui.meeting.videogrid
 
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentGridVideoBinding
 import live.hms.android100ms.model.RoomDetails
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.ui.meeting.MeetingViewModelFactory
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
-import live.hms.video.webrtc.HMSPeerConnectionFactory
 
 class VideoGridFragment : Fragment() {
   companion object {

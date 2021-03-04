@@ -23,7 +23,7 @@ import live.hms.android100ms.model.CreateRoomRequest
 import live.hms.android100ms.model.RecordingInfo
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingActivity
 import live.hms.android100ms.util.EmailUtils
 import live.hms.android100ms.util.ROOM_DETAILS

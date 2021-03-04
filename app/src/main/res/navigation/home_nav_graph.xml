@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/SettingsFragment"
-        android:name="live.hms.android100ms.ui.home.settings.SettingsFragment"
+        android:name="live.hms.android100ms.ui.settings.SettingsFragment"
         android:label="@string/settings_fragment"
         tools:layout="@layout/fragment_settings" />
 
