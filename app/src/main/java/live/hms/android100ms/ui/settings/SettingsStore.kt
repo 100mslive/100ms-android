@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.settings
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 
 class SettingsStore(context: Context) {
@@ -30,12 +31,26 @@ class SettingsStore(context: Context) {
     const val VIDEO_GRID_COLUMNS = "video-grid-columns"
 
     const val LEAK_CANARY = "leak-canary"
-  }
 
+    val APPLY_CONSTRAINTS_KEYS = arrayOf(
+        VIDEO_FRAME_RATE,
+        VIDEO_BITRATE,
+        VIDEO_RESOLUTION_HEIGHT,
+        VIDEO_RESOLUTION_WIDTH
+    )
+  }
 
   private val sharedPreferences = context.getSharedPreferences(
     SETTINGS_SHARED_PREF, Context.MODE_PRIVATE
   )
+
+  fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
+  }
+
+  fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
+  }
 
   private fun putString(key: String, value: String) {
     sharedPreferences.edit {

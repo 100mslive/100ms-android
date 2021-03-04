@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.meeting
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -51,9 +52,16 @@ class MeetingFragment : Fragment() {
 
   private var meetingViewMode = MeetingViewMode.GRID
 
+  private val onSettingsChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+    if (SettingsStore.APPLY_CONSTRAINTS_KEYS.contains(key)) {
+      meetingViewModel.updateLocalMediaStreamConstraints()
+    }
+  }
+
   override fun onResume() {
     super.onResume()
     audioManager.updateAudioDeviceState()
+    settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +83,7 @@ class MeetingFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     stopAudioManager()
+    settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
