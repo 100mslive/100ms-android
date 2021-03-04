@@ -21,10 +21,10 @@ import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridFragment
+import live.hms.android100ms.ui.settings.SettingsMode
 import live.hms.android100ms.util.*
 import live.hms.video.error.ActionType
 import java.util.*
-
 
 class MeetingFragment : Fragment() {
 
@@ -113,6 +113,12 @@ class MeetingFragment : Fragment() {
       R.id.action_pinned_view -> {
         changeMeetingMode(MeetingViewMode.PINNED)
       }
+
+      R.id.action_settings -> {
+        findNavController().navigate(
+            MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
+        )
+      }
     }
     return false
   }
@@ -158,7 +164,7 @@ class MeetingFragment : Fragment() {
       if (
           resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
           && meetingViewMode != MeetingViewMode.PINNED
-      ){
+      ) {
         changeMeetingMode(MeetingViewMode.PINNED)
       }
     } ?: run {
@@ -212,7 +218,6 @@ class MeetingFragment : Fragment() {
           }
 
           builder.create().show()
-
         }
 
         is MeetingState.Connecting -> {

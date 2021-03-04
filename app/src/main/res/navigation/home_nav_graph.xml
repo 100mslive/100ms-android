@@ -25,7 +25,14 @@
         android:id="@+id/SettingsFragment"
         android:name="live.hms.android100ms.ui.settings.SettingsFragment"
         android:label="@string/settings_fragment"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings">
+
+        <argument
+            android:name="mode"
+            app:argType="live.hms.android100ms.ui.settings.SettingsMode"
+            app:nullable="false" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/PermissionFragment"
