@@ -64,7 +64,7 @@ class VideoGridFragment : Fragment() {
   }
 
   private fun initVideoGrid() {
-    adapter = VideoGridAdapter(this@VideoGridFragment) { video ->
+    adapter = VideoGridAdapter(this@VideoGridFragment) /* { video ->
       Log.v(TAG, "onVideoItemClick: $video")
 
       Snackbar.make(
@@ -80,7 +80,7 @@ class VideoGridFragment : Fragment() {
             Toast.LENGTH_SHORT
         ).show()
       }.show()
-    }
+    } */
 
     binding.viewPagerVideoGrid.apply {
       offscreenPageLimit = 1
@@ -94,8 +94,8 @@ class VideoGridFragment : Fragment() {
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      adapter.setItems(tracks)
-      Log.d(TAG, "Updated video-grid items: size=${tracks.size}")
+      val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
+      adapter.totalPages = (tracks.size + itemsPerPage - 1) / itemsPerPage
     }
 
     if (settings.detectDominantSpeaker) {

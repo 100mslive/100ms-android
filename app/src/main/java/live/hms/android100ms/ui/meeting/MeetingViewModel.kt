@@ -297,7 +297,7 @@ class MeetingViewModel(
         "videoMaxBitRate=${constraints.videoMaxBitRate}, " +
         "cameraFacing=${constraints.cameraFacing}, "
 
-    crashlyticsLog(TAG, "getUserMedia() with $constraintsStr")
+    crashlyticsLog(TAG, "getLocalScreen() with $constraintsStr")
 
     state.postValue(
       MeetingState.LoadingMedia(
@@ -318,7 +318,7 @@ class MeetingViewModel(
         }
 
         override fun onFailure(exception: HMSException) {
-          crashlyticsLog(TAG, "GetUserMedia failed: ${toString(exception)}")
+          crashlyticsLog(TAG, "GetLocalStream failed: ${toString(exception)}")
           handleFailure(exception)
         }
       })

@@ -9,11 +9,11 @@ import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import live.hms.android100ms.BuildConfig
 import live.hms.android100ms.databinding.FragmentVideoGridPageBinding
 import live.hms.android100ms.databinding.GridItemVideoBinding
+import live.hms.android100ms.ui.home.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingTrack
+import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.util.NameUtils
 import live.hms.android100ms.util.SurfaceViewRendererUtil
 import live.hms.android100ms.util.crashlyticsLog
@@ -24,10 +24,6 @@ import kotlin.math.min
 import kotlin.properties.Delegates
 
 /**
- * @param initialVideos: List of videos which needs to shown in a grid
- * @param maxRows: Maximum number of rows in the grid
- * @param maxColumns: Maximum number columns in the grid
- *
  * The Grid is created by building column by column.
  * Example: For 4x2 (rows x columns)
  *  - 3 videos will have 3 rows, 1 column
@@ -39,31 +35,17 @@ class VideoGridPageFragment : Fragment() {
   companion object {
     private const val TAG = "VideoGridPageFragment"
 
-    private const val BUNDLE_MAX_ROWS = "bundle-max-rows"
-    private const val BUNDLE_MAX_COLUMNS = "bundle-max-columns"
+    private const val BUNDLE_PAGE_INDEX = "bundle-page-index"
 
-    public fun newInstance(
-        initialVideos: Array<MeetingTrack>,
-        maxRows: Int, maxColumns: Int,
-        onVideoItemClick: (video: MeetingTrack) -> Unit
-    ): VideoGridPageFragment {
+    public fun newInstance(pageIndex: Int): VideoGridPageFragment {
       return VideoGridPageFragment().apply {
-        arguments = bundleOf(
-            BUNDLE_MAX_ROWS to maxRows,
-            BUNDLE_MAX_COLUMNS to maxColumns
-        )
-        _initialVideos = initialVideos
-        _onVideoItemClick = onVideoItemClick
+        arguments = bundleOf(BUNDLE_PAGE_INDEX to pageIndex)
       }
     }
   }
 
-  // Initial non-serializable values which will be stored inside the ViewModel
-  private var _initialVideos: Array<MeetingTrack>? = null
-  private var _onVideoItemClick: ((MeetingTrack) -> Unit)? = null
-
   private var binding by viewLifecycle<FragmentVideoGridPageBinding>()
-  private val viewModel by viewModels<VideoGridPageViewModel>()
+  private val meetingViewModel by activityViewModels<MeetingViewModel>()
 
   // Determined using the onResume() and onPause()
   private var isViewVisible = false
@@ -74,6 +56,8 @@ class VideoGridPageFragment : Fragment() {
   )
 
   private val renderedViews = ArrayList<RenderedViewPair>()
+
+  private var pageIndex by Delegates.notNull<Int>()
   private var maxRows by Delegates.notNull<Int>()
   private var maxColumns by Delegates.notNull<Int>()
 
@@ -84,15 +68,14 @@ class VideoGridPageFragment : Fragment() {
   ): View {
     binding = FragmentVideoGridPageBinding.inflate(inflater, container, false)
 
-    maxRows = requireArguments()[BUNDLE_MAX_ROWS] as Int
-    maxColumns = requireArguments()[BUNDLE_MAX_COLUMNS] as Int
+    pageIndex = requireArguments()[BUNDLE_PAGE_INDEX] as Int
 
-    if (savedInstanceState == null) {
-      viewModel.initialVideos = _initialVideos!!
-      viewModel.onVideoItemClick = _onVideoItemClick!!
-    }
+    // TODO: Listen to changes in rows & columns
+    val settings = SettingsStore(requireContext())
+    maxRows = settings.videoGridRows
+    maxColumns = settings.videoGridColumns
 
-    initGridLayout()
+    initViewModels()
     return binding.root
   }
 
@@ -146,21 +129,26 @@ class VideoGridPageFragment : Fragment() {
     }
   }
 
-  private fun initGridLayout() {
-    updateGridLayoutDimensions()
+  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): Array<MeetingTrack> {
+    val pageVideos = ArrayList<MeetingTrack>()
 
-    binding.container.apply {
-      for (video in viewModel.initialVideos) {
-        val videoBinding = createVideoView(this)
-        bindVideo(videoBinding, video)
-        addView(videoBinding.root)
-        renderedViews.add(RenderedViewPair(videoBinding, video))
-      }
+    // Range is [fromIndex, toIndex] -- Notice the bounds
+    val itemsCount = maxRows * maxColumns
+    val fromIndex = pageIndex * itemsCount
+    val toIndex = min(tracks.size, (pageIndex + 1) * itemsCount) - 1
+
+    for (idx in fromIndex..toIndex step 1) {
+      pageVideos.add(tracks[idx])
     }
 
-    // crashlyticsLog(TAG, "Initialized GridLayout with ${initialVideos.size} views")
+    return pageVideos.toTypedArray()
+  }
 
-    updateGridLayoutDimensions()
+  private fun initViewModels() {
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+      val videos = getCurrentPageVideos(tracks)
+      updateVideos(videos)
+    }
   }
 
   fun updateVideos(newVideos: Array<MeetingTrack>) {
@@ -232,7 +220,8 @@ class VideoGridPageFragment : Fragment() {
   }
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
-    binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
+    // FIXME: Add a shared VM with activity scope to subscribe to events
+    // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
 
     binding.videoCard.apply {
       name.text = item.peer.userName
