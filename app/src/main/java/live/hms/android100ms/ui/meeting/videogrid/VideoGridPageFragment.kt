@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.android100ms.databinding.FragmentVideoGridPageBinding
 import live.hms.android100ms.databinding.GridItemVideoBinding
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingTrack
 import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.util.NameUtils

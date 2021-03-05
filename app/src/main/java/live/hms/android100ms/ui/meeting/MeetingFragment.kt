@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.meeting
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -16,15 +17,15 @@ import live.hms.android100ms.audio.HMSAudioManager
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.HomeActivity
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridFragment
+import live.hms.android100ms.ui.settings.SettingsMode
 import live.hms.android100ms.util.*
 import live.hms.video.error.ActionType
 import java.util.*
-
 
 class MeetingFragment : Fragment() {
 
@@ -51,9 +52,16 @@ class MeetingFragment : Fragment() {
 
   private var meetingViewMode = MeetingViewMode.GRID
 
+  private val onSettingsChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+    if (SettingsStore.APPLY_CONSTRAINTS_KEYS.contains(key)) {
+      meetingViewModel.updateLocalMediaStreamConstraints()
+    }
+  }
+
   override fun onResume() {
     super.onResume()
     audioManager.updateAudioDeviceState()
+    settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +83,7 @@ class MeetingFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     stopAudioManager()
+    settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -112,6 +121,12 @@ class MeetingFragment : Fragment() {
 
       R.id.action_pinned_view -> {
         changeMeetingMode(MeetingViewMode.PINNED)
+      }
+
+      R.id.action_settings -> {
+        findNavController().navigate(
+            MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
+        )
       }
     }
     return false
@@ -158,7 +173,7 @@ class MeetingFragment : Fragment() {
       if (
           resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
           && meetingViewMode != MeetingViewMode.PINNED
-      ){
+      ) {
         changeMeetingMode(MeetingViewMode.PINNED)
       }
     } ?: run {
@@ -212,7 +227,6 @@ class MeetingFragment : Fragment() {
           }
 
           builder.create().show()
-
         }
 
         is MeetingState.Connecting -> {

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.settings.SettingsFragment">
+    tools:context=".ui.settings.SettingsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,6 +73,99 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_resolution_width"
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/video_resolution_width">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_resolution_width"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_resolution_height"
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/video_resolution_height">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_resolution_height"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_codecs"
+            style="@style/AutoCompleteTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/video_codec"
+            android:labelFor="@id/auto_complete_codecs">
+
+            <AutoCompleteTextView
+                android:id="@+id/auto_complete_codecs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_video_bitrate"
+            style="@style/AutoCompleteTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/video_bitrate"
+            android:labelFor="@id/auto_complete_video_bitrate">
+
+            <AutoCompleteTextView
+                android:id="@+id/auto_complete_video_bitrate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_video_framerate"
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/video_framerate">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_video_framerate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_environment"
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/environment">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_environment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_publish_video_on_join"
             style="@style/MaterialSwitch"
@@ -101,162 +194,49 @@
             android:layout_height="wrap_content"
             android:text="@string/show_video_preview_before_joining" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_advanced_settings"
-            style="@style/MaterialTextButton"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_show_dominant_speaker"
+            style="@style/MaterialSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_baseline_keyboard_arrow_down_24"
-            android:gravity="center_vertical"
-            android:text="@string/advanced_settings"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:text="@string/show_dominant_speaker" />
 
-        <LinearLayout
-            android:id="@+id/container_advanced"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_silence_audio_level_threshold"
+            style="@style/TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:hint="@string/silence_audio_level_threshold">
 
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_resolution_width"
-                style="@style/TextInputLayout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_silence_audio_level_threshold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/video_resolution_width">
+                android:inputType="numberDecimal" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_resolution_width"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_audio_poll_interval"
+            style="@style/TextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/audio_poll_interval">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_resolution_height"
-                style="@style/TextInputLayout"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_audio_poll_interval"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/video_resolution_height">
+                android:inputType="number" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_resolution_height"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_toggle_leak_canary"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/leak_canary" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_codecs"
-                style="@style/AutoCompleteTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/video_codec"
-                android:labelFor="@id/auto_complete_codecs">
-
-                <AutoCompleteTextView
-                    android:id="@+id/auto_complete_codecs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_video_bitrate"
-                style="@style/AutoCompleteTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/video_bitrate"
-                android:labelFor="@id/auto_complete_video_bitrate">
-
-                <AutoCompleteTextView
-                    android:id="@+id/auto_complete_video_bitrate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_video_framerate"
-                style="@style/TextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/video_framerate">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_video_framerate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_environment"
-                style="@style/TextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/environment">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_environment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textNoSuggestions" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switch_show_dominant_speaker"
-                style="@style/MaterialSwitch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/show_dominant_speaker" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_silence_audio_level_threshold"
-                style="@style/TextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/silence_audio_level_threshold">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_silence_audio_level_threshold"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_audio_poll_interval"
-                style="@style/TextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/audio_poll_interval">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_audio_poll_interval"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/switch_toggle_leak_canary"
-                style="@style/MaterialSwitch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/leak_canary" />
-
-        </LinearLayout>
     </LinearLayout>
 </ScrollView>
