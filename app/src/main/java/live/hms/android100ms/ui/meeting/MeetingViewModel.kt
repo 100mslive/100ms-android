@@ -13,6 +13,7 @@ import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.util.*
 import live.hms.video.*
 import live.hms.video.error.HMSException
+import live.hms.video.events.HMSAnalyticsEventLevel
 import live.hms.video.payload.HMSPayloadData
 import live.hms.video.payload.HMSPublishStream
 import live.hms.video.payload.HMSStreamInfo
@@ -77,7 +78,9 @@ class MeetingViewModel(
   private lateinit var localStream: HMSRTCMediaStream
 
   private val room = HMSRoom(roomDetails.roomId)
-  private val config = HMSClientConfig(roomDetails.endpoint)
+  private val config = HMSClientConfig(roomDetails.endpoint).apply {
+    hmsAnalyticsEventLevel = HMSAnalyticsEventLevel.INFO
+  }
   private val client = HMSClient(this, getApplication(), peer, config).apply {
     setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
   }
