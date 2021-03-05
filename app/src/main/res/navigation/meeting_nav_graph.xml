@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_ChatBottomSheetFragment"
             app:destination="@id/ChatBottomSheetFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_SettingsFragment"
+            app:destination="@id/SettingsFragment" />
 
     </fragment>
 
@@ -34,5 +37,18 @@
             app:nullable="false" />
 
     </dialog>
+
+    <fragment
+        android:id="@+id/SettingsFragment"
+        android:name="live.hms.android100ms.ui.settings.SettingsFragment"
+        android:label="@string/settings_fragment"
+        tools:layout="@layout/fragment_settings">
+
+        <argument
+            android:name="mode"
+            app:argType="live.hms.android100ms.ui.settings.SettingsMode"
+            app:nullable="false" />
+
+    </fragment>
 
 </navigation>

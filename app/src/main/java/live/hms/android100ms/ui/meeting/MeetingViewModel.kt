@@ -1,16 +1,19 @@
 package live.hms.android100ms.ui.meeting
 
 import android.app.Application
+import android.media.MediaCodecInfo
+import android.media.MediaCodecList
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import live.hms.android100ms.model.RoomDetails
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.util.*
 import live.hms.video.*
 import live.hms.video.error.HMSException
+import live.hms.video.events.HMSAnalyticsEventLevel
 import live.hms.video.payload.HMSPayloadData
 import live.hms.video.payload.HMSPublishStream
 import live.hms.video.payload.HMSStreamInfo
@@ -19,6 +22,7 @@ import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
 import live.hms.video.webrtc.HMSRTCVideoTrack
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.reflect.typeOf
 
 class MeetingViewModel(
   application: Application,
@@ -74,7 +78,9 @@ class MeetingViewModel(
   private lateinit var localStream: HMSRTCMediaStream
 
   private val room = HMSRoom(roomDetails.roomId)
-  private val config = HMSClientConfig(roomDetails.endpoint)
+  private val config = HMSClientConfig(roomDetails.endpoint).apply {
+    hmsAnalyticsEventLevel = HMSAnalyticsEventLevel.INFO
+  }
   private val client = HMSClient(this, getApplication(), peer, config).apply {
     setLogLevel(HMSLogger.LogLevel.LOG_DEBUG)
   }
@@ -120,11 +126,22 @@ class MeetingViewModel(
     }
   }
 
+  fun logMediaCodecs() {
+    val count = MediaCodecList.getCodecCount()
+    val arr = ArrayList<MediaCodecInfo>()
+    for (i in 0 until count) {
+      arr.add(MediaCodecList.getCodecInfoAt(i))
+    }
+
+    Log.d(TAG, "logMediaCodecs: $arr")
+  }
+
   fun startMeeting() {
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
 
+    logMediaCodecs()
     state.postValue(
       MeetingState.Connecting(
         "Connecting",
@@ -205,6 +222,51 @@ class MeetingViewModel(
     }
   }
 
+  private fun getConstraintsFromSettings(): HMSRTCMediaStreamConstraints {
+    val constraints = HMSRTCMediaStreamConstraints(settings.publishAudio, settings.publishVideo)
+
+    val resolution = "${settings.videoResolutionWidth}" +
+        "x${settings.videoResolutionHeight}" +
+        "@${settings.videoFrameRate}"
+
+    constraints.apply {
+      videoCodec = settings.codec
+      videoFrameRate = settings.videoFrameRate
+      videoResolution = resolution
+      videoMaxBitRate = settings.videoBitrate
+      cameraFacing = settings.camera
+    }
+
+    val constraintsStr = "videoCodec=${constraints.videoCodec}, " +
+        "videoFrameRate=${constraints.videoFrameRate}, " +
+        "videoResolution=${resolution}, " +
+        "videoMaxBitRate=${constraints.videoMaxBitRate}, " +
+        "cameraFacing=${constraints.cameraFacing}, "
+
+    crashlyticsLog(TAG, "getConstraintsFromSettings() with $constraintsStr")
+    return constraints
+  }
+
+  public fun updateLocalMediaStreamConstraints() {
+    if (state.value !is MeetingState.Ongoing) {
+      throw IllegalStateException(
+          "applyConstraints work only in MeetingState.Ongoing " +
+          "[Current State: ${state.value}]"
+      )
+    }
+
+    client.applyConstraints(localStream, getConstraintsFromSettings(), object : HMSClient.LocalStreamListener {
+      override fun onSuccess(stream: HMSRTCMediaStream) {
+        Toast.makeText(
+            getApplication(),
+            "Successfully applied new constraints",
+            Toast.LENGTH_SHORT
+        ).show()
+      }
+      override fun onFailure(exception: HMSException) = handleFailure(exception)
+    })
+  }
+
   private fun publishUserStream(constraints: HMSRTCMediaStreamConstraints) {
     state.postValue(
       MeetingState.PublishingMedia(
@@ -264,32 +326,12 @@ class MeetingViewModel(
     //  To be done only when the user can change the publishVideo
     //  while in a meeting.
 
-    val constraints = HMSRTCMediaStreamConstraints(settings.publishAudio, settings.publishVideo)
-
-    val resolution = "${settings.videoResolutionWidth}" +
-        "x${settings.videoResolutionHeight}" +
-        "@${settings.videoFrameRate}"
-
-    constraints.apply {
-      videoCodec = settings.codec
-      videoFrameRate = settings.videoFrameRate
-      videoResolution = resolution
-      videoMaxBitRate = settings.videoBitrate
-      cameraFacing = settings.camera
-    }
-
-    val constraintsStr = "videoCodec=${constraints.videoCodec}, " +
-        "videoFrameRate=${constraints.videoFrameRate}, " +
-        "videoResolution=${resolution}, " +
-        "videoMaxBitRate=${constraints.videoMaxBitRate}, " +
-        "cameraFacing=${constraints.cameraFacing}, "
-
-    crashlyticsLog(TAG, "getUserMedia() with $constraintsStr")
+    val constraints = getConstraintsFromSettings()
 
     state.postValue(
       MeetingState.LoadingMedia(
         "Loading Media",
-        "Getting user audio & video with $constraintsStr"
+        "Getting user local stream"
       )
     )
 
@@ -305,7 +347,7 @@ class MeetingViewModel(
         }
 
         override fun onFailure(exception: HMSException) {
-          crashlyticsLog(TAG, "GetUserMedia failed: ${toString(exception)}")
+          crashlyticsLog(TAG, "GetLocalStream failed: ${toString(exception)}")
           handleFailure(exception)
         }
       })
