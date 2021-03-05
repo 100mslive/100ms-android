@@ -1,27 +1,22 @@
 package live.hms.android100ms.ui.meeting.videogrid
 
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.FragmentGridVideoBinding
 import live.hms.android100ms.model.RoomDetails
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.ui.meeting.MeetingViewModelFactory
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
-import live.hms.video.webrtc.HMSPeerConnectionFactory
 
 class VideoGridFragment : Fragment() {
   companion object {
@@ -39,6 +34,8 @@ class VideoGridFragment : Fragment() {
       requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
     )
   }
+
+  private lateinit var adapter: VideoGridAdapter
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -62,25 +59,27 @@ class VideoGridFragment : Fragment() {
   }
 
   private fun initVideoGrid() {
-    binding.viewPagerVideoGrid.apply {
-      offscreenPageLimit = 1
-      adapter = VideoGridAdapter(this@VideoGridFragment) { video ->
-        Log.v(TAG, "onVideoItemClick: $video")
+    adapter = VideoGridAdapter(this@VideoGridFragment) /* { video ->
+      Log.v(TAG, "onVideoItemClick: $video")
 
-        Snackbar.make(
+      Snackbar.make(
           binding.root,
           "Name: ${video.peer.userName} (${video.peer.role}) \nId: ${video.peer.customerUserId}",
           Snackbar.LENGTH_LONG,
-        ).setAction("Copy") {
-          val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
-          clipboard.setPrimaryClip(clip)
-          Toast.makeText(
+      ).setAction("Copy") {
+        val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(
             requireContext(),
             "Copied customer id of ${video.peer.userName} to clipboard",
             Toast.LENGTH_SHORT
-          ).show()
-        }.show()
-      }
+        ).show()
+      }.show()
+    } */
+
+    binding.viewPagerVideoGrid.apply {
+      offscreenPageLimit = 1
+      adapter = this@VideoGridFragment.adapter
 
       TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
         // No text to be shown
@@ -90,9 +89,8 @@ class VideoGridFragment : Fragment() {
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      val adapter = binding.viewPagerVideoGrid.adapter as VideoGridAdapter
-      adapter.setItems(tracks)
-      Log.d(TAG, "Updated video-grid items: size=${tracks.size}")
+      val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
+      adapter.totalPages = (tracks.size + itemsPerPage - 1) / itemsPerPage
     }
 
     if (settings.detectDominantSpeaker) {
