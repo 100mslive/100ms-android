@@ -40,6 +40,7 @@
         <item name="android:layout_marginTop">6dp</item>
         <item name="android:layout_marginBottom">6dp</item>
         <item name="boxStrokeWidth">0dp</item>
+        <item name="hintEnabled">false</item>
         <item name="boxStrokeWidthFocused">0dp</item>
         <item name="boxBackgroundColor">@color/blue_4</item>
         <item name="android:textColorHint">@color/white_faded_30</item>
@@ -50,6 +51,7 @@
     <style name="AutoCompleteTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="android:layout_marginTop">6dp</item>
         <item name="android:layout_marginBottom">6dp</item>
+        <item name="hintEnabled">false</item>
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">0dp</item>
         <item name="boxBackgroundColor">@color/blue_4</item>

@@ -31,12 +31,12 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_margin="12dp"
-                    android:layout_weight="1"
-                    android:hint="@string/enter_name">
+                    android:layout_weight="1">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_name"
                         android:layout_width="match_parent"
+                        android:hint="@string/enter_name"
                         android:layout_height="wrap_content"
                         android:inputType="textNoSuggestions" />
 
@@ -70,13 +70,13 @@
                         android:id="@+id/container_meeting_url"
                         style="@style/TextInputLayout"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/meeting_url_hint">
+                        android:layout_height="wrap_content">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_text_meeting_url"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:hint="@string/meeting_url_hint"
                             android:inputType="textMultiLine" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -119,13 +119,13 @@
                         android:id="@+id/container_room_name"
                         style="@style/TextInputLayout"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/meeting_name">
+                        android:layout_height="wrap_content">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_text_room_name"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:hint="@string/meeting_name"
                             android:inputType="textNoSuggestions" />
 
                     </com.google.android.material.textfield.TextInputLayout>
