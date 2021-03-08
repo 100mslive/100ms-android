@@ -2,7 +2,6 @@ package live.hms.android100ms.ui.meeting.chat
 
 import android.os.Bundle
 import android.view.*
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -47,6 +46,9 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     initRecyclerView()
     initButtons()
 
+    // Once we open the chat, assume that all messages will be seen
+    chatViewModel.unreadMessagesCount.postValue(0)
+
     return binding.root
   }
 
@@ -59,7 +61,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private fun initViewModels() {
-    chatViewModel.getMessages().observe(viewLifecycleOwner) {
+    chatViewModel.messages.observe(viewLifecycleOwner) {
       messages.clear()
       messages.addAll(it)
       binding.recyclerView.apply {
@@ -86,7 +88,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     }
   }
 
-  fun initToolbar() {
+  private fun initToolbar() {
     binding.toolbar.setOnMenuItemClickListener { item ->
       when(item.itemId) {
         R.id.action_close_chat -> { dismiss() }
