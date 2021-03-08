@@ -70,7 +70,7 @@
     </style>
 
     <style name="MaterialTextViewHeading" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textColor">@color/text_color</item>
+        <item name="android:textColor">@color/white</item>
         <item name="fontFamily">@font/clan_pro_medium</item>
     </style>
 
