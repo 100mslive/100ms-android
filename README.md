@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/100mslive/android-sdk.svg)](https://docs.100ms.live/client-side/android)
+
 # 100ms Sample Android Application in Kotlin
 
 Here you will find everything you need to build experiences with video using 100ms Android SDK. Dive into our SDKs, quick starts, add real-time video, voice, and screen sharing to your web and mobile applications.
@@ -85,27 +87,39 @@ This guide provides an overview of the key objects you'll use with 100ms' androi
 
 ## Pre-requisites
 
-### 1. Get the 100ms Android library files
+### 1. Add dependency to 100ms lib
 
-- Download sdk aar file from this repository present in the /brytecam-sdk-VERSION directory.
-- Open your project in Android Studio
-- Open File -> Project Structure -> Go to modules
-- Click on + sign and create a new module
-- Select import aar file and import the brytecam-sdk-VERSION.aar lib
-- Click Finish
+- Add the JitPack repository to your build file. Add it in your root `build.gradle` at the end of repositories of `allprojects`:
+
+```java 
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+	
+- Add the dependency in your app-level `gradle`
+
+```java 
+dependencies {
+		implementation 'com.github.100mslive:android-sdk:0.9.13'
+	}
+```
 
 ### 2. Add other dependencies
 
-Add all the following libraries in your app-level gradle file as dependencies.
+Add all the following libraries in your app-level `gradle` file as dependencies.
 - If you are using any of the following libraries already in your application, you can use the version you are already using.
 - Make sure `okhttp` and `webrtc` use the same version as mentioned below
 
-```
-implementation 'org.webrtc:google-webrtc:1.0.32006'
+``` implementation 'org.webrtc:google-webrtc:1.0.32006'
 implementation 'com.squareup.okhttp3:okhttp:3.6.0'
 implementation 'com.google.code.gson:gson:2.8.6'
 implementation 'org.jetbrains:annotations:15.0'
 ```
+
 ### 3. Get Access Keys
 
 Sign up on https://dashboard.100ms.live/register & visit Developer tab to get your access credentials

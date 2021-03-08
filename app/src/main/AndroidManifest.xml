@@ -41,12 +41,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="prod-in.100ms.live"
+                    android:host="*.100ms.live"
                     android:scheme="https" />
-                <data
-                    android:host="qa-in.100ms.live"
-                    android:scheme="https" />
-
             </intent-filter>
 
         </activity>
@@ -55,7 +51,6 @@
             android:name=".ui.meeting.MeetingActivity"
             android:label="@string/meeting"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             android:theme="@style/Theme.Android100ms.NoActionBar" />
 

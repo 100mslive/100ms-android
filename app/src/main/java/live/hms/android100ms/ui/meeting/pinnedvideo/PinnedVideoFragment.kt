@@ -1,5 +1,6 @@
 package live.hms.android100ms.ui.meeting.pinnedvideo
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -84,19 +85,26 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private fun initRecyclerView() {
+    val orientation = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      LinearLayoutManager.VERTICAL
+    } else {
+      LinearLayoutManager.HORIZONTAL
+    }
     binding.recyclerViewVideos.apply {
-      layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+      layoutManager = LinearLayoutManager(requireContext(), orientation, false)
     }
   }
 
   private fun updatePinnedVideoText() {
-    val name = pinnedTrack?.peer?.userName ?: ""
+    val nameStr = pinnedTrack?.peer?.userName ?: ""
     val isScreen = pinnedTrack?.isScreen ?: false
     val isVideoOff = pinnedTrack?.videoTrack == null
-    binding.pinVideo.name.text = name
-    binding.pinVideo.nameInitials.text = NameUtils.getInitials(name)
-    binding.pinVideo.iconScreenShare.visibility = if (isScreen) View.VISIBLE else View.GONE
-    binding.pinVideo.iconVideoOff.visibility = if (isVideoOff) View.VISIBLE else View.GONE
+    binding.pinVideo.apply {
+      name.text = nameStr
+      nameInitials.text = NameUtils.getInitials(nameStr)
+      iconScreenShare.visibility = if (isScreen) View.VISIBLE else View.GONE
+      iconVideoOff.visibility = if (isVideoOff) View.VISIBLE else View.GONE
+    }
   }
 
   private fun handleOnPinVideoVisibilityChange() {
@@ -113,7 +121,6 @@ class PinnedVideoFragment : Fragment() {
           visibility = View.GONE
         }
       }
-
     }
   }
 
@@ -153,6 +160,14 @@ class PinnedVideoFragment : Fragment() {
 
       videoListAdapter.setItems(tracks)
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
+    }
+
+    meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) {
+      it?.let {
+        if (pinnedTrack?.isScreen != true) {
+          changePinViewVideo(it)
+        }
+      }
     }
   }
 }

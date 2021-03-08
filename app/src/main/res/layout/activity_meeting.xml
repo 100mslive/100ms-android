@@ -8,7 +8,7 @@
     tools:context=".ui.meeting.MeetingActivity">
 
     <include
-        android:id="@+id/containerToolbar"
+        android:id="@+id/container_toolbar"
         layout="@layout/toolbar_meeting" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

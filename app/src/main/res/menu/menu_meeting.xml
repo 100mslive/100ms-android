@@ -13,6 +13,12 @@
         android:title="@string/flip_camera"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings_24"
+        android:title="@string/settings"
+        app:showAsAction="ifRoom" />
+
     <group>
 
         <item

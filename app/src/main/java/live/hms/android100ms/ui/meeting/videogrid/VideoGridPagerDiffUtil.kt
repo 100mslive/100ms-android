@@ -3,38 +3,21 @@ package live.hms.android100ms.ui.meeting.videogrid
 import androidx.recyclerview.widget.DiffUtil
 
 class VideoGridPagerDiffUtil(
-  private val oldList: List<VideoGridPageItem>,
-  private val newList: List<VideoGridPageItem>
+    private val oldPageCount: Int,
+    private val newPageCount: Int
 ) : DiffUtil.Callback() {
 
-  enum class PayloadKey {
-    VALUE
-  }
+  enum class PayloadKey { VALUE }
 
-  override fun getOldListSize() = oldList.size
-
-  override fun getNewListSize() = newList.size
+  override fun getOldListSize() = oldPageCount
+  override fun getNewListSize() = newPageCount
 
   override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-    return oldList[oldItemPosition].id == newList[newItemPosition].id
+    return (oldItemPosition < oldPageCount) && (newItemPosition < newPageCount) && (oldItemPosition == newItemPosition)
   }
 
   override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-    val oldItem = oldList[oldItemPosition]
-    val newItem = newList[newItemPosition]
-
-    if (oldItem.items.size != newItem.items.size) {
-      return false
-    }
-
-    val size = oldItem.items.size
-    for (i in 0 until size) {
-      if (oldItem.items[i] != newItem.items[i]) {
-        return false
-      }
-    }
-
-    return true
+    return (oldItemPosition < oldPageCount) && (newItemPosition < newPageCount) && (oldItemPosition == newItemPosition)
   }
 
   override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {

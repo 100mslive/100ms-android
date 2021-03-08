@@ -77,12 +77,12 @@
     </style>
 
     <style name="MaterialImageButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
-        <item name="android:padding">12dp</item>
+        <item name="android:padding">8dp</item>
         <item name="android:clickable">true</item>
         <item name="android:layout_margin">0dp</item>
         <item name="android:inset">0dp</item>

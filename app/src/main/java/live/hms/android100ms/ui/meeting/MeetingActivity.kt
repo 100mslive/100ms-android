@@ -1,8 +1,10 @@
 package live.hms.android100ms.ui.meeting
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
@@ -25,6 +27,12 @@ class MeetingActivity : AppCompatActivity() {
     setContentView(binding.root)
     setSupportActionBar(binding.containerToolbar.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
+
+    if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      binding.containerToolbar.container.visibility = View.GONE
+    } else {
+      binding.containerToolbar.container.visibility= View.VISIBLE
+    }
 
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
   }

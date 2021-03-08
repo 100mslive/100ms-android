@@ -23,8 +23,9 @@ import live.hms.android100ms.model.CreateRoomRequest
 import live.hms.android100ms.model.RecordingInfo
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.model.TokenRequest
-import live.hms.android100ms.ui.home.settings.SettingsStore
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingActivity
+import live.hms.android100ms.ui.settings.SettingsMode
 import live.hms.android100ms.util.EmailUtils
 import live.hms.android100ms.util.ROOM_DETAILS
 import live.hms.android100ms.util.viewLifecycle
@@ -46,25 +47,20 @@ class HomeFragment : Fragment() {
     Log.v(TAG, "onResume(): Trying to update $data into EditTextMeetingUrl")
 
     if (data != null) {
-      val url = data.toString()
-      val urlIsValid = updateAndVerifyMeetingUrl(url)
-      if (urlIsValid) {
-        binding.editTextMeetingUrl.setText(url)
-      }
+      updateAndVerifyMeetingUrl(data.toString())
     }
-
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_settings -> {
         findNavController().navigate(
-          HomeFragmentDirections.actionHomeFragmentToSettingsFragment()
+            HomeFragmentDirections.actionHomeFragmentToSettingsFragment(SettingsMode.HOME)
         )
       }
       R.id.action_email_logs -> {
         requireContext().startActivity(
-          EmailUtils.getCrashLogIntent(requireContext())
+            EmailUtils.getCrashLogIntent(requireContext())
         )
       }
     }
@@ -72,8 +68,8 @@ class HomeFragment : Fragment() {
   }
 
   override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
+      inflater: LayoutInflater, container: ViewGroup?,
+      savedInstanceState: Bundle?
   ): View {
     binding = FragmentHomeBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
@@ -92,13 +88,13 @@ class HomeFragment : Fragment() {
   private fun initOnBackPress() {
     requireActivity().apply {
       onBackPressedDispatcher.addCallback(
-        this@HomeFragment.viewLifecycleOwner,
-        object : OnBackPressedCallback(true) {
-          override fun handleOnBackPressed() {
-            Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-            finish()
-          }
-        })
+          this@HomeFragment.viewLifecycleOwner,
+          object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+              Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
+              finish()
+            }
+          })
     }
   }
 
@@ -161,12 +157,12 @@ class HomeFragment : Fragment() {
     settings.username = username
 
     homeViewModel.sendAuthTokenRequest(
-      TokenRequest(
-        roomId = settings.lastUsedRoomId,
-        username = username,
-        role = role,
-        environment = settings.environment
-      )
+        TokenRequest(
+            roomId = settings.lastUsedRoomId,
+            username = username,
+            role = role,
+            environment = settings.environment
+        )
     )
   }
 
@@ -183,10 +179,10 @@ class HomeFragment : Fragment() {
 
           val data = response.data!!
           val roomDetails = RoomDetails(
-            env = settings.environment,
-            roomId = settings.lastUsedRoomId,
-            username = getUsername(),
-            authToken = data.token
+              env = settings.environment,
+              roomId = settings.lastUsedRoomId,
+              username = getUsername(),
+              authToken = data.token
           )
           Log.v(TAG, "Auth Token: ${roomDetails.authToken}")
 
@@ -200,9 +196,9 @@ class HomeFragment : Fragment() {
         Status.ERROR -> {
           hideProgressBar()
           Toast.makeText(
-            requireContext(),
-            response.message,
-            Toast.LENGTH_SHORT
+              requireContext(),
+              response.message,
+              Toast.LENGTH_SHORT
           ).show()
         }
       }
@@ -217,9 +213,9 @@ class HomeFragment : Fragment() {
         Status.SUCCESS -> {
           val data = response.data!!
           Toast.makeText(
-            requireContext(),
-            "Created room ${data.roomId} \uD83E\uDD73",
-            Toast.LENGTH_SHORT
+              requireContext(),
+              "Created room ${data.roomId} \uD83E\uDD73",
+              Toast.LENGTH_SHORT
           ).show()
           tryJoiningRoomAs("Host")
         }
@@ -227,9 +223,9 @@ class HomeFragment : Fragment() {
         Status.ERROR -> {
           hideProgressBar()
           Toast.makeText(
-            requireContext(),
-            response.message,
-            Toast.LENGTH_SHORT
+              requireContext(),
+              response.message,
+              Toast.LENGTH_SHORT
           ).show()
         }
       }
@@ -242,14 +238,15 @@ class HomeFragment : Fragment() {
       val uri = Uri.parse(url)
       val roomId = uri.getQueryParameter("room")!!
       val host = uri.host!!
-      val environment = host.split('.')[0]
+      val environment = uri.getQueryParameter("env") ?: host.split('.')[0]
 
       settings.lastUsedRoomId = roomId
       settings.environment = environment
+      binding.editTextMeetingUrl.setText(roomId)
     } catch (e: Exception) {
       Log.e(TAG, "Cannot update $url", e)
       allOk = false
-      binding.containerMeetingUrl.error = "Meeting URL missing room query param"
+      binding.containerMeetingUrl.error = "Meeting url do not have roomId and env"
     }
 
     return allOk
@@ -274,20 +271,20 @@ class HomeFragment : Fragment() {
       settings.lastUsedRoomId.isNotEmpty() -> {
         "https://${settings.environment}.100ms.live/?" +
             arrayOf(
-              "room=${settings.lastUsedRoomId}",
-              "env=${settings.environment}",
-              "role=Guest"
+                "room=${settings.lastUsedRoomId}",
+                "env=${settings.environment}",
+                "role=Guest"
             ).joinToString("&")
       }
       else -> ""
     }
 
-    binding.editTextMeetingUrl.setText(url)
+    updateAndVerifyMeetingUrl(url)
 
     mapOf(
-      binding.editTextName to binding.containerName,
-      binding.editTextMeetingUrl to binding.containerMeetingUrl,
-      binding.editTextRoomName to binding.containerRoomName
+        binding.editTextName to binding.containerName,
+        binding.editTextMeetingUrl to binding.containerMeetingUrl,
+        binding.editTextRoomName to binding.containerRoomName
     ).forEach {
       it.key.addTextChangedListener { text ->
         if (text.toString().isNotEmpty()) it.value.error = null
@@ -342,11 +339,11 @@ class HomeFragment : Fragment() {
 
       if (allOk) {
         homeViewModel.sendCreateRoomRequest(
-          CreateRoomRequest(
-            roomName,
-            settings.environment,
-            RecordingInfo(enableRecording)
-          )
+            CreateRoomRequest(
+                roomName,
+                settings.environment,
+                RecordingInfo(enableRecording)
+            )
         )
       }
     }

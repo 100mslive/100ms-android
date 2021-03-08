@@ -5,12 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
+import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import live.hms.android100ms.BuildConfig
+import androidx.fragment.app.activityViewModels
 import live.hms.android100ms.databinding.FragmentVideoGridPageBinding
 import live.hms.android100ms.databinding.GridItemVideoBinding
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.MeetingTrack
+import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.util.NameUtils
 import live.hms.android100ms.util.SurfaceViewRendererUtil
 import live.hms.android100ms.util.crashlyticsLog
@@ -18,39 +21,31 @@ import live.hms.android100ms.util.viewLifecycle
 import org.webrtc.RendererCommon
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.properties.Delegates
 
 /**
- * @param initialVideos: List of videos which needs to shown in a grid
- * @param maxRows: Maximum number of rows in the grid
- * @param maxColumns: Maximum number columns in the grid
- *
  * The Grid is created by building column by column.
  * Example: For 4x2 (rows x columns)
  *  - 3 videos will have 3 rows, 1 column
  *  - 5 videos will have 4 rows, 2 columns
  *  - 8 videos will have 4 rows, 2 columns
  */
-class VideoGridPageFragment(
-  private val initialVideos: Array<MeetingTrack>,
-  private val maxRows: Int, private val maxColumns: Int,
-  private val onVideoItemClick: (video: MeetingTrack) -> Unit
-) : Fragment() {
+class VideoGridPageFragment : Fragment() {
 
   companion object {
     private const val TAG = "VideoGridPageFragment"
-  }
 
-  init {
-    crashlyticsLog(
-      TAG,
-      "Received ${initialVideos.size} initial videos for ${maxRows}x${maxColumns}"
-    )
-    if (BuildConfig.DEBUG && initialVideos.size > (maxRows * maxColumns)) {
-      error("Cannot show ${initialVideos.size} videos in a ${maxRows}x${maxColumns} grid")
+    private const val BUNDLE_PAGE_INDEX = "bundle-page-index"
+
+    public fun newInstance(pageIndex: Int): VideoGridPageFragment {
+      return VideoGridPageFragment().apply {
+        arguments = bundleOf(BUNDLE_PAGE_INDEX to pageIndex)
+      }
     }
   }
 
   private var binding by viewLifecycle<FragmentVideoGridPageBinding>()
+  private val meetingViewModel by activityViewModels<MeetingViewModel>()
 
   // Determined using the onResume() and onPause()
   private var isViewVisible = false
@@ -62,13 +57,25 @@ class VideoGridPageFragment(
 
   private val renderedViews = ArrayList<RenderedViewPair>()
 
+  private var pageIndex by Delegates.notNull<Int>()
+  private var maxRows by Delegates.notNull<Int>()
+  private var maxColumns by Delegates.notNull<Int>()
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentVideoGridPageBinding.inflate(inflater, container, false)
-    initGridLayout()
+
+    pageIndex = requireArguments()[BUNDLE_PAGE_INDEX] as Int
+
+    // TODO: Listen to changes in rows & columns
+    val settings = SettingsStore(requireContext())
+    maxRows = settings.videoGridRows
+    maxColumns = settings.videoGridColumns
+
+    initViewModels()
     return binding.root
   }
 
@@ -122,21 +129,26 @@ class VideoGridPageFragment(
     }
   }
 
-  private fun initGridLayout() {
-    updateGridLayoutDimensions()
+  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): Array<MeetingTrack> {
+    val pageVideos = ArrayList<MeetingTrack>()
 
-    binding.container.apply {
-      for (video in initialVideos) {
-        val videoBinding = createVideoView(this)
-        bindVideo(videoBinding, video)
-        addView(videoBinding.root)
-        renderedViews.add(RenderedViewPair(videoBinding, video))
-      }
+    // Range is [fromIndex, toIndex] -- Notice the bounds
+    val itemsCount = maxRows * maxColumns
+    val fromIndex = pageIndex * itemsCount
+    val toIndex = min(tracks.size, (pageIndex + 1) * itemsCount) - 1
+
+    for (idx in fromIndex..toIndex step 1) {
+      pageVideos.add(tracks[idx])
     }
 
-    crashlyticsLog(TAG, "Initialized GridLayout with ${initialVideos.size} views")
+    return pageVideos.toTypedArray()
+  }
 
-    updateGridLayoutDimensions()
+  private fun initViewModels() {
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+      val videos = getCurrentPageVideos(tracks)
+      updateVideos(videos)
+    }
   }
 
   fun updateVideos(newVideos: Array<MeetingTrack>) {
@@ -158,7 +170,10 @@ class VideoGridPageFragment(
 
         binding.container.apply {
           // Unbind only when view is visible to user
-          if (isViewVisible) unbindSurfaceView(currentRenderedView.binding, currentRenderedView.video)
+          if (isViewVisible) unbindSurfaceView(
+            currentRenderedView.binding,
+            currentRenderedView.video
+          )
           removeViewInLayout(currentRenderedView.binding.root)
         }
       }
@@ -199,29 +214,32 @@ class VideoGridPageFragment(
   }
 
   private fun bindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    SurfaceViewRendererUtil.bind(binding.surfaceView, item, "fragment=$tag").let {
-      if (it) binding.surfaceView.visibility = View.VISIBLE
+    SurfaceViewRendererUtil.bind(binding.videoCard.surfaceView, item, "fragment=$tag").let {
+      if (it) binding.videoCard.surfaceView.visibility = View.VISIBLE
     }
   }
 
   private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
-    binding.container.setOnClickListener { onVideoItemClick(item) }
+    // FIXME: Add a shared VM with activity scope to subscribe to events
+    // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
 
-    binding.name.text = item.peer.userName
-    binding.nameInitials.text = NameUtils.getInitials(item.peer.userName)
-    binding.iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
-    binding.iconVideoOff.visibility = if (item.videoTrack == null) View.VISIBLE else View.GONE
+    binding.videoCard.apply {
+      name.text = item.peer.userName
+      nameInitials.text = NameUtils.getInitials(item.peer.userName)
+      iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
+      iconVideoOff.visibility = if (item.videoTrack == null) View.VISIBLE else View.GONE
 
-    // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
-    binding.surfaceView.apply {
-      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-      setEnableHardwareScaler(true)
+      // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
+      surfaceView.apply {
+        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+        setEnableHardwareScaler(true)
+      }
     }
   }
 
   private fun unbindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
-    SurfaceViewRendererUtil.unbind(binding.surfaceView, item, "fragment=$tag").let {
-      if (it) binding.surfaceView.visibility = View.INVISIBLE
+    SurfaceViewRendererUtil.unbind(binding.videoCard.surfaceView, item, "fragment=$tag").let {
+      if (it) binding.videoCard.surfaceView.visibility = View.INVISIBLE
     }
   }
 
