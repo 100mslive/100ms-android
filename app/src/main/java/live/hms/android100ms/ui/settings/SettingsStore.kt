@@ -21,6 +21,7 @@ class SettingsStore(context: Context) {
     const val USERNAME = "username"
 
     const val DETECT_DOMINANT_SPEAKER = "detect-dominant-speaker"
+    const val SHOW_NETWORK_INFO = "show-network-info"
     const val AUDIO_POLL_INTERVAL = "audio-poll-interval"
     const val SILENCE_AUDIO_LEVEL_THRESHOLD = "silence-audio-level-threshold"
 
@@ -136,6 +137,10 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, 0.01f)
     set(value) = putFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
 
+  var showNetworkInfo: Boolean
+    get() = sharedPreferences.getBoolean(SHOW_NETWORK_INFO, true)
+    set(value) = putBoolean(SHOW_NETWORK_INFO, value)
+
   var lastUsedRoomId: String
     get() = sharedPreferences.getString(LAST_USED_ROOM_ID, "")!!
     set(value) = putString(LAST_USED_ROOM_ID, value)
@@ -208,6 +213,11 @@ class SettingsStore(context: Context) {
 
     fun setDetectDominantSpeaker(value: Boolean): MultiCommitHelper {
       editor.putBoolean(DETECT_DOMINANT_SPEAKER, value)
+      return this
+    }
+
+    fun setShowNetworkInfo(value: Boolean): MultiCommitHelper {
+      editor.putBoolean(SHOW_NETWORK_INFO, value)
       return this
     }
 
