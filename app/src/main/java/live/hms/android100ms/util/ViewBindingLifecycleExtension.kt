@@ -10,7 +10,7 @@ import androidx.viewbinding.ViewBinding
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-const val TAG = "ViewBindingLifecycleExtension"
+private const val TAG = "ViewBindingLifecycleExtension"
 
 /**
  * An extension to bind and unbind a value based on the view lifecycle of a Fragment.

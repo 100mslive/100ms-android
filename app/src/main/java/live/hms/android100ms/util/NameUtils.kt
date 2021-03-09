@@ -2,15 +2,13 @@ package live.hms.android100ms.util
 
 object NameUtils {
   fun getInitials(name: String): String {
-    val characters = name
-      .replace(Regex("[^a-zA-Z ]"), "")
-
-    return if (characters.isEmpty()) {
-      "--"
+    val words = name.trim().split(' ')
+    if (words.isEmpty()) {
+      return "--"
+    } else if (words.size == 1) {
+      return words[0].substring(0, words[0].length.coerceAtMost(2))
     } else {
-      characters.split(' ')
-        .mapNotNull { it.firstOrNull()?.toString() }
-        .reduce { acc, s -> acc + s }
+      return "${words[0][0]}${words[1][1]}"
     }
   }
 }

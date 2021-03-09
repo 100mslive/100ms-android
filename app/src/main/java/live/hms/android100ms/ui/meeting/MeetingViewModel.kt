@@ -14,6 +14,7 @@ import live.hms.android100ms.util.*
 import live.hms.video.*
 import live.hms.video.error.HMSException
 import live.hms.video.events.HMSAnalyticsEventLevel
+import live.hms.video.network.HMSNetworkQualityInfo
 import live.hms.video.payload.HMSPayloadData
 import live.hms.video.payload.HMSPublishStream
 import live.hms.video.payload.HMSStreamInfo
@@ -37,6 +38,7 @@ class MeetingViewModel(
       crashlytics.setCustomKey(ROOM_ID, roomId)
       crashlytics.setCustomKey(USERNAME, username)
       crashlytics.setCustomKey(ROOM_ENDPOINT, endpoint)
+      crashlytics.setCustomKey(AUTH_TOKEN, authToken)
     }
   }
 
@@ -70,6 +72,9 @@ class MeetingViewModel(
 
   // Dominant speaker
   val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
+
+  // Network Info
+  val networkInfo = MutableLiveData<HMSNetworkQualityInfo>()
 
   val peer = HMSPeer(roomDetails.username, roomDetails.authToken).apply {
     crashlytics.setUserId(customerUserId)
@@ -309,6 +314,7 @@ class MeetingViewModel(
             Log.v(TAG, "Adding user track $currentDeviceTrack to VideoGrid")
 
             if (settings.detectDominantSpeaker) startDetectDominantSpeakerMonitor()
+            if (settings.showNetworkInfo) startNetworkInfoMonitor()
 
             state.postValue(MeetingState.Ongoing())
           }
@@ -376,8 +382,9 @@ class MeetingViewModel(
    * Resets all the values to default
    */
   private fun cleanup() {
-    /** NOTE: Calling [HMSClient.disconnect] stop's the audio-level monitor
+    /** NOTE: Calling [HMSClient.disconnect] stop's the audio-level & network-info monitor
      * However, we can manually stop it using [HMSClient.stopAudioLevelMonitor]
+     * and [HMSClient.stopNetworkMonitor] respectively
      */
 
     // NOTE: Make sure that we have stopped capturing whenever we disconnect/leave/handle failures
@@ -410,6 +417,7 @@ class MeetingViewModel(
    */
   private fun handleFailure(exception: HMSException) {
     crashlyticsLog(TAG, "handleFailure(${toString(exception)})")
+    crashlytics.recordException(exception)
 
     client.disconnect()
     cleanup()
@@ -424,6 +432,8 @@ class MeetingViewModel(
 
   override fun onDisconnect(exception: HMSException) {
     crashlyticsLog(TAG, "onDisconnect: ${toString(exception)}")
+    crashlytics.recordException(exception)
+
     cleanup()
     state.postValue(MeetingState.Failure(exception))
   }
@@ -541,4 +551,7 @@ class MeetingViewModel(
     }
   }
 
+  private fun startNetworkInfoMonitor() {
+    client.startNetworkMonitor { networkInfo.postValue(it[0]) }
+  }
 }
