@@ -28,10 +28,6 @@
 -keepnames class live.hms.android100ms.model.RoomDetails
 -keepnames class live.hms.android100ms.ui.settings.SettingsMode
 
-# https://github.com/square/retrofit/blob/master/retrofit/src/main/resources/META-INF/proguard/retrofit2.pro
-# Keep the annotations
--keep class live.hms.android100ms.model.TokenResponse
-
-# video stream
+# Video libs
 -keep class org.webrtc.** { *; }
--keep class live.hms.video.** { *; }
+# -keep class live.hms.video.** { *; }
