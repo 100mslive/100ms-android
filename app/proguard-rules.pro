@@ -30,4 +30,4 @@
 
 # Video libs
 -keep class org.webrtc.** { *; }
-# -keep class live.hms.video.** { *; }
+-keep class live.hms.video.** { *; }

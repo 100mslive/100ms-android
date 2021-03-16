@@ -15,8 +15,8 @@ android {
         applicationId "live.hms.android100ms"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 22
-        versionName "1.0.20-rc2"
+        versionCode 25
+        versionName "1.0.20-rc4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,13 +26,9 @@ android {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
             buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
             buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-            firebaseCrashlytics {
-                mappingFileUploadEnabled true
-            }
+            minifyEnabled false
         }
+
         release {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
             buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
@@ -67,8 +63,7 @@ dependencies {
 
     //100ms.live SDK
     implementation 'org.webrtc:google-webrtc:1.0.32006'
-    // implementation 'com.github.100mslive:android-sdk:0.9.16'
-    implementation project(":hmsvideo-android")
+    implementation 'com.github.100mslive:android-sdk:0.9.16.2'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.3"
