@@ -10,6 +10,8 @@ import java.util.*
 
 
 object LogUtils {
+  private const val TAG = "LogUtils"
+
   /** Information about the current build, taken from system properties.  */
   val DEVICE_INFO = arrayOf(
     "Android SDK: ${Build.VERSION.SDK_INT}",
@@ -40,7 +42,7 @@ object LogUtils {
         "logcat -f ${logFile.absolutePath}"
       )
     } catch (e: IOException) {
-      Log.e(EmailUtils.TAG, "Error occurred while saving logs in ${logFile.absolutePath}", e)
+      Log.e(TAG, "Error occurred while saving logs in ${logFile.absolutePath}", e)
     }
 
     Log.v(TAG, "Saved logs to file ${logFile.absolutePath}")

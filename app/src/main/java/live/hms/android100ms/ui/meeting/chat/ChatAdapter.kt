@@ -1,6 +1,7 @@
 package live.hms.android100ms.ui.meeting.chat
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.android100ms.databinding.ListItemChatBinding
@@ -17,6 +18,7 @@ class ChatAdapter(
       binding.name.text = message.senderName
       val messages = message.messages.map { it.message }
       binding.message.text = messages.joinToString("\n")
+      binding.blueBar.visibility = if (message.isSentByMe) View.VISIBLE else View.GONE
     }
   }
 

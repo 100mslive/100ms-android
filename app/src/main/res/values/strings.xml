@@ -72,7 +72,6 @@
     <string name="start_a_meeting">Start a meeting</string>
     <string name="get_started">Get Started</string>
     <string name="meeting_url_hint">Enter meeting ID or paste joining link</string>
-    <string name="meeting_name">Meeting Name</string>
     <string name="enter_name">Enter Name</string>
     <string name="use_as_default">Use as default</string>
 
@@ -101,4 +100,9 @@
     <string name="hero_view">Hero View</string>
     <string name="grid_view">Grid View</string>
     <string name="screen_share">Screen Share</string>
+    <string name="meeting_name">Meeting Name</string>
+    <string name="more">More</string>
+    <string name="type_a_message">Type a message</string>
+    <string name="_8">8</string>
+    <string name="show_network_info">Show Network Info</string>
 </resources>

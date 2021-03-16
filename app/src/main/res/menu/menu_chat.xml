@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_close_chat"
+        android:icon="@drawable/ic_close_16"
+        android:title="@string/close_chat"
+        app:showAsAction="ifRoom" />
+</menu>

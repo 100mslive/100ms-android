@@ -3,13 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_volume"
-        android:icon="@drawable/ic_baseline_volume_up_24"
+        android:icon="@drawable/ic_volume_up_24"
         android:title="@string/toggle_volume"
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_flip_camera"
+        android:icon="@drawable/ic_flip_camera_ios_24"
+        android:title="@string/flip_camera"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_settings"
-        android:icon="@drawable/ic_baseline_settings_24"
+        android:icon="@drawable/ic_settings_24"
         android:title="@string/settings"
         app:showAsAction="ifRoom" />
 
@@ -39,20 +45,20 @@
 
         <item
             android:id="@+id/action_record_meeting"
-            android:icon="@drawable/ic_baseline_record_button_24"
+            android:icon="@drawable/ic_record_button_24"
             android:title="@string/record_meeting"
             android:visible="false"
             app:showAsAction="never" />
 
         <item
             android:id="@+id/action_share_link"
-            android:icon="@drawable/ic_baseline_share_24"
+            android:icon="@drawable/ic_share_24"
             android:title="@string/share_link"
             app:showAsAction="never" />
 
         <item
             android:id="@+id/action_email_logs"
-            android:icon="@drawable/ic_baseline_bug_report_24"
+            android:icon="@drawable/ic_bug_report_24"
             android:title="@string/bug_report"
             app:showAsAction="never" />
 

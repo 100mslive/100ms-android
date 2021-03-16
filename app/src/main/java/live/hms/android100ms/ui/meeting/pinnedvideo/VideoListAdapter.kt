@@ -27,7 +27,6 @@ class VideoListAdapter(
 
   override fun onViewAttachedToWindow(holder: VideoItemViewHolder) {
     super.onViewAttachedToWindow(holder)
-    // TODO: Limit the maximum number of SurfaceView's occupying EglContext
     Log.d(TAG, "onViewAttachedToWindow($holder)")
     holder.bindSurfaceView()
   }
@@ -53,7 +52,7 @@ class VideoListAdapter(
 
       binding.surfaceView.apply {
         setEnableHardwareScaler(true)
-        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
 
         // Meanwhile until the video is not binded, hide the view.
         visibility = View.GONE

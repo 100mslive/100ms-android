@@ -1,5 +1,6 @@
 package live.hms.android100ms.ui.meeting
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
 import live.hms.android100ms.R
 import live.hms.android100ms.audio.HMSAudioManager
 import live.hms.android100ms.databinding.FragmentMeetingBinding
@@ -51,6 +54,8 @@ class MeetingFragment : Fragment() {
   private lateinit var audioManager: HMSAudioManager
 
   private var meetingViewMode = MeetingViewMode.GRID
+
+  private var isMeetingOngoing = false
 
   private val onSettingsChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
     if (SettingsStore.APPLY_CONSTRAINTS_KEYS.contains(key)) {
@@ -135,9 +140,9 @@ class MeetingFragment : Fragment() {
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
     item.apply {
       if (meetingViewModel.isAudioMuted) {
-        setIcon(R.drawable.ic_baseline_volume_off_24)
+        setIcon(R.drawable.ic_volume_off_24)
       } else {
-        setIcon(R.drawable.ic_baseline_volume_up_24)
+        setIcon(R.drawable.ic_volume_up_24)
       }
     }
   }
@@ -148,10 +153,26 @@ class MeetingFragment : Fragment() {
     menu.findItem(R.id.action_volume).apply {
       updateActionVolumeMenuIcon(this)
       setOnMenuItemClickListener {
-        meetingViewModel.toggleAudio()
-        updateActionVolumeMenuIcon(this)
+        if (isMeetingOngoing) {
+          meetingViewModel.toggleAudio()
+          updateActionVolumeMenuIcon(this)
+        }
 
         true
+      }
+    }
+
+    menu.findItem(R.id.action_flip_camera).apply {
+      if (!settings.publishVideo) {
+        isVisible = false
+        isEnabled = false
+      } else {
+        isVisible = true
+        isEnabled = true
+        setOnMenuItemClickListener {
+          if (isMeetingOngoing) meetingViewModel.flipCamera()
+          true
+        }
       }
     }
   }
@@ -199,9 +220,21 @@ class MeetingFragment : Fragment() {
 
   private fun initViewModel() {
     chatViewModel.setSendBroadcastCallback { meetingViewModel.broadcastMessage(it) }
+    chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
+      if (count > 0) {
+        binding.unreadMessageCount.apply {
+          visibility = View.VISIBLE
+          text = count.toString()
+        }
+      } else {
+        binding.unreadMessageCount.visibility = View.GONE
+      }
+    }
 
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
       Log.v(TAG, "Meeting State: $state")
+      isMeetingOngoing = false
+
       when (state) {
         is MeetingState.Failure -> {
           cleanup()
@@ -248,6 +281,8 @@ class MeetingFragment : Fragment() {
         is MeetingState.Ongoing -> {
           startAudioManager()
           hideProgressBar()
+
+          isMeetingOngoing = true
         }
         is MeetingState.Disconnecting -> {
           updateProgressBarUI(state.heading, state.message)
@@ -266,8 +301,8 @@ class MeetingFragment : Fragment() {
     meetingViewModel.isVideoEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleVideo.apply {
         setIconResource(
-            if (enabled) R.drawable.ic_baseline_videocam_24
-            else R.drawable.ic_baseline_videocam_off_24
+          if (enabled) R.drawable.ic_videocam_24
+          else R.drawable.ic_videocam_off_24
         )
       }
     }
@@ -275,8 +310,8 @@ class MeetingFragment : Fragment() {
     meetingViewModel.isAudioEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleAudio.apply {
         setIconResource(
-            if (enabled) R.drawable.ic_baseline_mic_24
-            else R.drawable.ic_baseline_mic_off_24
+          if (enabled) R.drawable.ic_mic_24
+          else R.drawable.ic_mic_off_24
         )
       }
     }
@@ -392,19 +427,6 @@ class MeetingFragment : Fragment() {
     }
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
-
-    binding.buttonFlipCamera.apply {
-      if (!settings.publishVideo) {
-        visibility = View.GONE
-        isEnabled = false
-      } else {
-        visibility = View.VISIBLE
-        isEnabled = true
-        setOnClickListener {
-          meetingViewModel.flipCamera()
-        }
-      }
-    }
   }
 
   private fun cleanup() {
