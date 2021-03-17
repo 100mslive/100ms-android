@@ -1,14 +1,12 @@
 package live.hms.android100ms.ui.meeting.chat
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
+import android.view.*
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import live.hms.android100ms.R
 import live.hms.android100ms.databinding.DialogBottomSheetChatBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.util.viewLifecycle
@@ -44,10 +42,12 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     roomDetails = args.roomDetail
     currentUserCustomerId = args.currentUserCustomerId
 
+    initToolbar()
     initRecyclerView()
     initButtons()
-    initToolbar()
-    initTextFields()
+
+    // Once we open the chat, assume that all messages will be seen
+    chatViewModel.unreadMessagesCount.postValue(0)
 
     return binding.root
   }
@@ -61,7 +61,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private fun initViewModels() {
-    chatViewModel.getMessages().observe(viewLifecycleOwner) {
+    chatViewModel.messages.observe(viewLifecycleOwner) {
       messages.clear()
       messages.addAll(it)
       binding.recyclerView.apply {
@@ -72,15 +72,15 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   }
 
   private fun initButtons() {
-    binding.buttonSendMessage.apply {
-      isEnabled = false // Disabled by default
-      setOnClickListener {
+    binding.containerMessage.setEndIconOnClickListener {
+      val messageStr = binding.editTextMessage.text.toString().trim()
+      if (messageStr.isNotEmpty()) {
         val message = ChatMessage(
-          currentUserCustomerId,
-          roomDetails.username,
-          Date(),
-          binding.editTextMessage.text.toString(),
-          true
+            currentUserCustomerId,
+            roomDetails.username,
+            Date(),
+            messageStr,
+            true
         )
         chatViewModel.broadcast(message)
         binding.editTextMessage.setText("")
@@ -88,16 +88,12 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     }
   }
 
-
   private fun initToolbar() {
-    binding.toolbar.setNavigationOnClickListener { dismiss() }
-  }
-
-  private fun initTextFields() {
-    binding.editTextMessage.apply {
-      addTextChangedListener { text ->
-        binding.buttonSendMessage.isEnabled = text.toString().isNotEmpty()
+    binding.toolbar.setOnMenuItemClickListener { item ->
+      when(item.itemId) {
+        R.id.action_close_chat -> { dismiss() }
       }
+      true
     }
   }
 }

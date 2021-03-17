@@ -1,14 +1,18 @@
 package live.hms.android100ms.api
 
 import live.hms.android100ms.BuildConfig
+import live.hms.android100ms.util.crashlytics
+import live.hms.android100ms.util.crashlyticsLog
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+private const val TAG = "RetrofitBuilder"
+
 private val okHttpClient = OkHttpClient.Builder()
-  .addInterceptor(HttpLoggingInterceptor().apply {
+  .addInterceptor(HttpLoggingInterceptor { crashlyticsLog(TAG, it) }.apply {
     level = HttpLoggingInterceptor.Level.BODY
   })
   .callTimeout(10, TimeUnit.SECONDS)

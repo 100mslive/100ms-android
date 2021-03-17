@@ -7,7 +7,7 @@
     android:layout_rowWeight="1"
     android:layout_columnWeight="1"
     android:layout_margin="4dp"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="8dp">
 
     <include
         android:id="@+id/video_card"

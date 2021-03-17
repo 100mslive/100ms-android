@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import live.hms.android100ms.R
 import live.hms.android100ms.databinding.ActivityMeetingBinding
+import live.hms.android100ms.model.RoomDetails
+import live.hms.android100ms.util.ROOM_DETAILS
 
 class MeetingActivity : AppCompatActivity() {
 
@@ -23,13 +25,13 @@ class MeetingActivity : AppCompatActivity() {
     _binding = ActivityMeetingBinding.inflate(layoutInflater)
 
     setContentView(binding.root)
-    setSupportActionBar(binding.toolbar)
+    setSupportActionBar(binding.containerToolbar.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
 
     if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      binding.toolbar.visibility = View.GONE
+      binding.containerToolbar.container.visibility = View.GONE
     } else {
-      binding.toolbar.visibility = View.VISIBLE
+      binding.containerToolbar.container.visibility= View.VISIBLE
     }
 
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

@@ -1,7 +1,6 @@
 package live.hms.android100ms.ui.meeting.chat
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
@@ -22,12 +21,13 @@ class ChatViewModel : ViewModel() {
     sendBroadcastCallback = null
   }
 
-  private val messages = MutableLiveData<ArrayList<ChatMessageCollection>>()
+  val messages = MutableLiveData<ArrayList<ChatMessageCollection>>()
+  val unreadMessagesCount = MutableLiveData(0)
 
-  fun getMessages(): LiveData<ArrayList<ChatMessageCollection>> = messages
   fun clearMessages() {
     _messages.clear()
     messages.value = _messages
+    unreadMessagesCount.postValue(0)
   }
 
   private fun addMessage(message: ChatMessage) {
@@ -45,6 +45,7 @@ class ChatViewModel : ViewModel() {
 
   fun receivedMessage(message: ChatMessage) {
     Log.v(TAG, "receivedMessage: $message")
+    unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
     addMessage(message)
   }
 }

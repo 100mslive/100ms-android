@@ -1,5 +1,6 @@
 package live.hms.android100ms.ui.meeting.videogrid
 
+import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
@@ -87,6 +88,7 @@ class VideoGridFragment : Fragment() {
     }
   }
 
+  @SuppressLint("SetTextI18n")
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
@@ -103,6 +105,15 @@ class VideoGridFragment : Fragment() {
       }
     } else {
       binding.containerDominantSpeaker.visibility = View.GONE
+    }
+
+    if (settings.showNetworkInfo) {
+      meetingViewModel.networkInfo.observe(viewLifecycleOwner) { info ->
+        binding.networkInfo.text = "In:\t${info.incomingAvailableBitrate / 1000.0} kbps\n" +
+            "Out:\t${info.outgoingAvailableBitrate / 1000.0} kbps"
+      }
+    } else {
+      binding.containerNetworkInfo.visibility = View.GONE
     }
   }
 }

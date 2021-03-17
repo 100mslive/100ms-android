@@ -15,7 +15,14 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
+        <!-- Cards, Background etc -->
         <item name="colorSurface">@color/blue_3</item>
+
+        <!-- Overflow Menu -->
+        <item name="android:itemBackground">@color/blue_3</item>
+
+        <!-- Default Background Color -->
+        <item name="android:colorBackground">@color/blue_0</item>
 
         <item name="colorOnSurface">@android:color/white</item>
         <item name="colorOnBackground">@android:color/white</item>
@@ -32,9 +39,11 @@
     <style name="TextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
         <item name="android:layout_marginTop">6dp</item>
         <item name="android:layout_marginBottom">6dp</item>
-        <item name="boxStrokeColor">@color/blue_4</item>
-        <item name="android:textColorHint">@color/fadedWhite</item>
-        <item name="boxBackgroundColor">#10c4c4c4</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="hintEnabled">false</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxBackgroundColor">@color/blue_4</item>
+        <item name="android:textColorHint">@color/white_faded_30</item>
         <item name="hintTextColor">@color/white</item>
         <item name="endIconMode">clear_text</item>
     </style>
@@ -42,9 +51,11 @@
     <style name="AutoCompleteTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="android:layout_marginTop">6dp</item>
         <item name="android:layout_marginBottom">6dp</item>
-        <item name="boxStrokeColor">@color/blue_4</item>
-        <item name="boxBackgroundColor">#10c4c4c4</item>
-        <item name="android:textColorHint">@color/fadedWhite</item>
+        <item name="hintEnabled">false</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxBackgroundColor">@color/blue_4</item>
+        <item name="android:textColorHint">@color/white_faded_30</item>
         <item name="hintTextColor">@color/white</item>
     </style>
 
@@ -54,7 +65,7 @@
     </style>
 
     <style name="MaterialTextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/text_color</item>
         <item name="fontFamily">@font/clan_pro_medium</item>
     </style>
 

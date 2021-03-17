@@ -217,6 +217,7 @@ class HomeFragment : Fragment() {
               "Created room ${data.roomId} \uD83E\uDD73",
               Toast.LENGTH_SHORT
           ).show()
+          settings.lastUsedRoomId = data.roomId
           tryJoiningRoomAs("Host")
         }
 

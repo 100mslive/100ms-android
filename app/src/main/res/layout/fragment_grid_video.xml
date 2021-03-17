@@ -22,6 +22,22 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/container_network_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/network_info"
+            style="@style/MaterialTextViewHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:textSize="14sp" />
+
+    </com.google.android.material.card.MaterialCardView>
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager_video_grid"
         android:layout_width="match_parent"

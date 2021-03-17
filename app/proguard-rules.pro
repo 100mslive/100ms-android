@@ -19,3 +19,15 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports?platform=android
+-keepattributes SourceFile,LineNumberTable        # Keep file names and line numbers.
+-keep public class * extends java.lang.Exception  # Optional: Keep custom exceptions.
+
+# https://developer.android.com/guide/navigation/navigation-pass-data#proguard_considerations
+-keepnames class live.hms.android100ms.model.RoomDetails
+-keepnames class live.hms.android100ms.ui.settings.SettingsMode
+
+# Video libs
+-keep class org.webrtc.** { *; }
+-keep class live.hms.video.** { *; }

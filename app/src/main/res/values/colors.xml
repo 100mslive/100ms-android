@@ -5,9 +5,16 @@
     <color name="blue_2">#161b22</color>
     <color name="blue_3">#1b2028</color>
     <color name="blue_4">#2b3139</color>
+    <color name="name_initials_background">#3f4453</color>
     <color name="primary_blue">#2f80ff</color>
+
+    <color name="text_color">#c0c1c3</color>
+    <color name="text_color_faded_70">#b3c0c1c3</color>
+
+    <color name="black_faded_40">#66000000</color>
 
     <color name="red">#D74451</color>
     <color name="white">#ffffff</color>
-    <color name="fadedWhite">#40ffffff</color>
+    <color name="white_faded_30">#4dffffff</color>
+    <color name="white_faded_70">#b3ffffff</color>
 </resources>

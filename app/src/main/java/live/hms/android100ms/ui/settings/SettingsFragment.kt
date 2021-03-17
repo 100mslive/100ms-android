@@ -25,31 +25,31 @@ class SettingsFragment : Fragment() {
     private const val TAG = "SettingsFragment"
 
     private val VIDEO_RESOLUTIONS = mapOf(
-        "4K (2160p)" to "3840 x 2160",
-        "Full HD (1080p)" to "1920 x 1080",
-        "HD (720p)" to "1280 x 720",
-        "VGA (480p)" to "640 x 480",
-        "QVGA (240p)" to "320 x 240",
-        "QQVGA (120p)" to "160 x 120",
-        "90p" to "90 x 90"
+      "4K (2160p)" to "3840 x 2160",
+      "Full HD (1080p)" to "1920 x 1080",
+      "HD (720p)" to "1280 x 720",
+      "VGA (480p)" to "640 x 480",
+      "QVGA (240p)" to "320 x 240",
+      "QQVGA (120p)" to "160 x 120",
+      "90p" to "90 x 90"
     )
 
     private val CODECS = arrayOf("VP8", "H264")
 
     private val VIDEO_BITRATE = mapOf(
-        "Lowest (100 kbps)" to 100,
-        "Low (256 kbps)" to 256,
-        "Medium (512 kbps)" to 512,
-        "High (1 mbps)" to 1024,
-        "LAN (4 mbps)" to 4096
+      "Lowest (100 kbps)" to 100,
+      "Low (256 kbps)" to 256,
+      "Medium (512 kbps)" to 512,
+      "High (1 mbps)" to 1024,
+      "LAN (4 mbps)" to 4096
     )
 
     private const val FRONT_FACING_CAMERA = "user"
     private const val REAR_FACING_CAMERA = "environment"
 
     private val CAMERAS = mapOf(
-        "Front Facing Camera" to FRONT_FACING_CAMERA,
-        "Rear Facing Camera" to REAR_FACING_CAMERA,
+      "Front Facing Camera" to FRONT_FACING_CAMERA,
+      "Rear Facing Camera" to REAR_FACING_CAMERA,
     )
   }
 
@@ -61,9 +61,9 @@ class SettingsFragment : Fragment() {
   private lateinit var mode: SettingsMode
 
   override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
     binding = FragmentSettingsBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
@@ -85,12 +85,12 @@ class SettingsFragment : Fragment() {
   }
 
   private fun initNonEmptyEditText(
-      allowedMode: EnumSet<SettingsMode>,
-      defaultText: String,
-      editText: TextInputEditText,
-      container: TextInputLayout,
-      name: String,
-      saveOnValid: (value: String) -> Unit
+    allowedMode: EnumSet<SettingsMode>,
+    defaultText: String,
+    editText: TextInputEditText,
+    container: TextInputLayout,
+    name: String,
+    saveOnValid: (value: String) -> Unit
   ) {
     handleVisibility(allowedMode, container)
     editText.apply {
@@ -108,13 +108,13 @@ class SettingsFragment : Fragment() {
   }
 
   private fun initNonEmptyEditTextWithRange(
-      allowedMode: EnumSet<SettingsMode>,
-      defaultText: Int,
-      editText: TextInputEditText,
-      container: TextInputLayout,
-      name: String,
-      minValue: Int, maxValue: Int,
-      saveOnValid: (value: Int) -> Unit
+    allowedMode: EnumSet<SettingsMode>,
+    defaultText: Int,
+    editText: TextInputEditText,
+    container: TextInputLayout,
+    name: String,
+    minValue: Int, maxValue: Int,
+    saveOnValid: (value: Int) -> Unit
   ) {
     handleVisibility(allowedMode, container)
     editText.apply {
@@ -136,13 +136,13 @@ class SettingsFragment : Fragment() {
   }
 
   private fun initNonEmptyEditTextWithRange(
-      allowedMode: EnumSet<SettingsMode>,
-      defaultText: Long,
-      editText: TextInputEditText,
-      container: TextInputLayout,
-      name: String,
-      minValue: Long, maxValue: Long,
-      saveOnValid: (value: Long) -> Unit
+    allowedMode: EnumSet<SettingsMode>,
+    defaultText: Long,
+    editText: TextInputEditText,
+    container: TextInputLayout,
+    name: String,
+    minValue: Long, maxValue: Long,
+    saveOnValid: (value: Long) -> Unit
   ) {
     handleVisibility(allowedMode, container)
     editText.apply {
@@ -165,13 +165,13 @@ class SettingsFragment : Fragment() {
 
 
   private fun initNonEmptyEditTextWithRange(
-      allowedMode: EnumSet<SettingsMode>,
-      defaultText: Float,
-      editText: TextInputEditText,
-      container: TextInputLayout,
-      name: String,
-      minValue: Float, maxValue: Float,
-      saveOnValid: (value: Float) -> Unit
+    allowedMode: EnumSet<SettingsMode>,
+    defaultText: Float,
+    editText: TextInputEditText,
+    container: TextInputLayout,
+    name: String,
+    minValue: Float, maxValue: Float,
+    saveOnValid: (value: Float) -> Unit
   ) {
     handleVisibility(allowedMode, container)
     editText.apply {
@@ -195,76 +195,76 @@ class SettingsFragment : Fragment() {
   private fun initEditTexts() {
     binding.apply {
       initNonEmptyEditText(
-          EnumSet.of(SettingsMode.HOME),
-          settings.username,
-          editTextName, containerName,
-          "Username"
+        EnumSet.of(SettingsMode.HOME),
+        settings.username,
+        editTextName, containerName,
+        "Username"
       ) { commitHelper.setUsername(it) }
 
       initNonEmptyEditText(
-          EnumSet.of(SettingsMode.HOME),
-          settings.environment,
-          editTextEnvironment, containerEnvironment,
-          "Environment"
+        EnumSet.of(SettingsMode.HOME),
+        settings.environment,
+        editTextEnvironment, containerEnvironment,
+        "Environment"
       ) { commitHelper.setEnvironment(it) }
 
 
       // TODO: Make rows, columns available in SettingsMode.MEETING
       initNonEmptyEditTextWithRange(
-          EnumSet.of(SettingsMode.HOME),
-          settings.videoGridRows,
-          editTextRows, containerRows,
-          "Maximum Rows",
-          1, 3,
+        EnumSet.of(SettingsMode.HOME),
+        settings.videoGridRows,
+        editTextRows, containerRows,
+        "Maximum Rows",
+        1, 3,
       ) { commitHelper.setVideoGridRows(it) }
 
       initNonEmptyEditTextWithRange(
-          EnumSet.of(SettingsMode.HOME),
-          settings.videoGridColumns,
-          editTextColumns, containerColumns,
-          "Maximum Rows",
-          1, 3,
+        EnumSet.of(SettingsMode.HOME),
+        settings.videoGridColumns,
+        editTextColumns, containerColumns,
+        "Maximum Rows",
+        1, 3,
       ) { commitHelper.setVideoGridColumns(it) }
 
       initNonEmptyEditTextWithRange(
-          EnumSet.of(SettingsMode.HOME),
-          settings.audioPollInterval,
-          editTextAudioPollInterval, containerAudioPollInterval,
-          "Audio Poll Interval",
-          100, 10000
+        EnumSet.of(SettingsMode.HOME),
+        settings.audioPollInterval,
+        editTextAudioPollInterval, containerAudioPollInterval,
+        "Audio Poll Interval",
+        100, 10000
       ) { commitHelper.setAudioPollInterval(it) }
 
       initNonEmptyEditTextWithRange(
-          EnumSet.of(SettingsMode.HOME),
-          settings.silenceAudioLevelThreshold,
-          editTextSilenceAudioLevelThreshold,
-          containerSilenceAudioLevelThreshold,
-          "Silence Audio Level Threshold",
-          0.0f, 5.0f
+        EnumSet.of(SettingsMode.HOME),
+        settings.silenceAudioLevelThreshold,
+        editTextSilenceAudioLevelThreshold,
+        containerSilenceAudioLevelThreshold,
+        "Silence Audio Level Threshold",
+        0.0f, 5.0f
       ) { commitHelper.setSilenceAudioLevelThreshold(it) }
 
       initNonEmptyEditTextWithRange(
-          EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-          settings.videoFrameRate,
-          editTextVideoFramerate, containerVideoFramerate,
-          "Video Frame Rate",
-          1, 30,
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.videoFrameRate,
+        editTextVideoFramerate, containerVideoFramerate,
+        "Video Frame Rate",
+        1, 30,
       ) { commitHelper.setVideoFrameRate(it) }
 
       initNonEmptyEditTextWithRange(
-          EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-          settings.videoResolutionWidth,
-          editTextResolutionWidth, containerResolutionWidth,
-          "Width",
-          1, 3840
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.videoResolutionWidth,
+        editTextResolutionWidth, containerResolutionWidth,
+        "Width",
+        1, 3840
       ) { commitHelper.setVideoResolutionWidth(it) }
 
       initNonEmptyEditTextWithRange(
-          EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-          settings.videoResolutionHeight,
-          editTextResolutionHeight, containerResolutionHeight,
-          "Height",
-          1, 2160
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.videoResolutionHeight,
+        editTextResolutionHeight, containerResolutionHeight,
+        "Height",
+        1, 2160
       ) { commitHelper.setVideoResolutionHeight(it) }
     }
   }
@@ -272,39 +272,39 @@ class SettingsFragment : Fragment() {
   private fun initAutoCompleteViews() {
     binding.apply {
       initAutoCompleteView(
-          EnumSet.of(SettingsMode.HOME),
-          containerVideoSource,
-          autoCompleteVideoSource,
-          CAMERAS.filterValues { it == settings.camera }.keys.first(),
-          CAMERAS.keys.toTypedArray(),
+        EnumSet.of(SettingsMode.HOME),
+        containerVideoSource,
+        autoCompleteVideoSource,
+        CAMERAS.filterValues { it == settings.camera }.keys.first(),
+        CAMERAS.keys.toTypedArray(),
       ) { commitHelper.setCamera(CAMERAS.getValue(it)) }
 
       initAutoCompleteView(
-          EnumSet.of(SettingsMode.HOME),
-          containerCodecs,
-          autoCompleteCodecs,
-          settings.codec,
-          CODECS,
+        EnumSet.of(SettingsMode.HOME),
+        containerCodecs,
+        autoCompleteCodecs,
+        settings.codec,
+        CODECS,
       ) { commitHelper.setCodec(it) }
 
       initAutoCompleteView(
-          EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-          containerVideoBitrate,
-          autoCompleteVideoBitrate,
-          VIDEO_BITRATE.filterValues { it == settings.videoBitrate }.keys.first(),
-          VIDEO_BITRATE.keys.toTypedArray(),
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        containerVideoBitrate,
+        autoCompleteVideoBitrate,
+        VIDEO_BITRATE.filterValues { it == settings.videoBitrate }.keys.first(),
+        VIDEO_BITRATE.keys.toTypedArray(),
       ) { commitHelper.setVideoBitrate(VIDEO_BITRATE.getValue(it)) }
 
     }
   }
 
   private fun initAutoCompleteView(
-      allowedMode: EnumSet<SettingsMode>,
-      container: TextInputLayout,
-      view: AutoCompleteTextView,
-      defaultText: String,
-      items: Array<String>,
-      saveOnValid: (value: String) -> Unit
+    allowedMode: EnumSet<SettingsMode>,
+    container: TextInputLayout,
+    view: AutoCompleteTextView,
+    defaultText: String,
+    items: Array<String>,
+    saveOnValid: (value: String) -> Unit
   ) {
     handleVisibility(allowedMode, container)
     val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
@@ -319,10 +319,10 @@ class SettingsFragment : Fragment() {
   }
 
   private fun initSwitch(
-      allowedMode: EnumSet<SettingsMode>,
-      defaultIsChecked: Boolean,
-      view: SwitchMaterial,
-      saveOnChange: (isChecked: Boolean) -> Unit
+    allowedMode: EnumSet<SettingsMode>,
+    defaultIsChecked: Boolean,
+    view: SwitchMaterial,
+    saveOnChange: (isChecked: Boolean) -> Unit
   ) {
     view.apply {
       visibility = if (allowedMode.contains(mode)) View.VISIBLE else View.GONE
@@ -348,59 +348,65 @@ class SettingsFragment : Fragment() {
     }
 
     AlertDialog.Builder(requireContext())
-        .setMessage(
-            "You're about to toggle leak canary which requires restarting this app. " +
-                "The app will be closed when you press Confirm."
-        )
-        .setTitle("Confirm Change")
-        .setPositiveButton("Confirm") { _, _ ->
+      .setMessage(
+        "You're about to toggle leak canary which requires restarting this app. " +
+            "The app will be closed when you press Confirm."
+      )
+      .setTitle("Confirm Change")
+      .setPositiveButton("Confirm") { _, _ ->
 
-          // Commit all the changes as we forcefully kill the app.
-          commitHelper.setIsLeakCanaryEnabled(isChecked)
-          commitHelper.commit()
+        // Commit all the changes as we forcefully kill the app.
+        commitHelper.setIsLeakCanaryEnabled(isChecked)
+        commitHelper.commit()
 
 
-          System.exit(0)
-        }
-        .setNegativeButton("Discard") { dialog, _ ->
-          forceDismissLeakCanaryDialog = true
+        System.exit(0)
+      }
+      .setNegativeButton("Discard") { dialog, _ ->
+        forceDismissLeakCanaryDialog = true
 
-          // Revert back the changes
-          binding.switchToggleLeakCanary.isChecked = !isChecked
-          dialog.dismiss()
-        }
-        .setCancelable(false)
-        .create()
-        .show()
+        // Revert back the changes
+        binding.switchToggleLeakCanary.isChecked = !isChecked
+        dialog.dismiss()
+      }
+      .setCancelable(false)
+      .create()
+      .show()
 
   }
 
   private fun initSwitches() {
     binding.apply {
       initSwitch(
-          EnumSet.of(SettingsMode.HOME),
-          settings.publishVideo,
-          switchPublishVideoOnJoin
+        EnumSet.of(SettingsMode.HOME),
+        settings.publishVideo,
+        switchPublishVideoOnJoin
       ) { commitHelper.setPublishVideo(it) }
 
       initSwitch(
-          EnumSet.of(SettingsMode.HOME),
-          settings.publishAudio,
-          switchPublishAudioOnJoin
+        EnumSet.of(SettingsMode.HOME),
+        settings.publishAudio,
+        switchPublishAudioOnJoin
       ) { commitHelper.setPublishAudio(it) }
 
       initSwitch(
-          EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-          settings.isLeakCanaryEnabled,
-          switchToggleLeakCanary
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.isLeakCanaryEnabled,
+        switchToggleLeakCanary
       ) { handleLeakCanaryToggle(it) }
 
       // TODO: Make detectDominantSpeaker, audioLevel settings available in SettingsMode.MEETING
       initSwitch(
-          EnumSet.of(SettingsMode.HOME),
-          settings.detectDominantSpeaker,
-          switchShowDominantSpeaker
+        EnumSet.of(SettingsMode.HOME),
+        settings.detectDominantSpeaker,
+        switchShowDominantSpeaker
       ) { commitHelper.setDetectDominantSpeaker(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.showNetworkInfo,
+        switchShowNetworkInfo
+      ) { commitHelper.setShowNetworkInfo(it) }
 
       // Disable the switches not yet supported (TODO: Add support)
       switchMirrorVideo.isEnabled = false
