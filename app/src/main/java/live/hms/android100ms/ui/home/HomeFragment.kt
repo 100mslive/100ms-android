@@ -280,7 +280,7 @@ class HomeFragment : Fragment() {
       else -> ""
     }
 
-    updateAndVerifyMeetingUrl(url)
+    if (url != "") updateAndVerifyMeetingUrl(url)
 
     mapOf(
         binding.editTextName to binding.containerName,

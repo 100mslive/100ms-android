@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -53,6 +55,11 @@ class MeetingFragment : Fragment() {
   private var meetingViewMode = MeetingViewMode.GRID
 
   private var isMeetingOngoing = false
+
+  /** Count of number of failed retries made on disconnect
+   * Resets to 0 when successfully connected
+   */
+  private var retryCount = 0
 
   private val onSettingsChangeListener =
     SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -236,29 +243,40 @@ class MeetingFragment : Fragment() {
       when (state) {
         is MeetingState.Failure -> {
           cleanup()
-          hideProgressBar()
           stopAudioManager()
 
-          val builder = AlertDialog.Builder(requireContext())
-            .setMessage("${state.exception.errorCode} : ${state.exception.errorMessage}")
-            .setTitle(R.string.error)
-            .setCancelable(false)
-
-
-          if (state.exception.action != ActionType.SUBSCRIBE) {
-            builder.setPositiveButton(R.string.retry) { dialog, _ ->
-              reloadFragment()
+          if (state.exception.canRetry() && retryCount < 3) {
+            retryCount += 1
+            showProgressBar()
+            val waitTime = 1500L * retryCount
+            updateProgressBarUI("Disconnected (${retryCount})", "Retrying in ${waitTime}ms")
+            reloadFragment()
+            Handler(Looper.getMainLooper()).postDelayed({
               meetingViewModel.startMeeting()
+            }, waitTime)
+          } else {
+            hideProgressBar()
+            val builder = AlertDialog.Builder(requireContext())
+              .setMessage("${state.exception.errorCode} : ${state.exception.errorMessage}")
+              .setTitle(R.string.error)
+              .setCancelable(false)
+
+
+            if (state.exception.action != ActionType.SUBSCRIBE) {
+              builder.setPositiveButton(R.string.retry) { dialog, _ ->
+                reloadFragment()
+                meetingViewModel.startMeeting()
+                dialog.dismiss()
+              }
+            }
+
+            builder.setNegativeButton(R.string.leave) { dialog, _ ->
+              goToHomePage()
               dialog.dismiss()
             }
-          }
 
-          builder.setNegativeButton(R.string.leave) { dialog, _ ->
-            goToHomePage()
-            dialog.dismiss()
+            builder.create().show()
           }
-
-          builder.create().show()
         }
 
         is MeetingState.Connecting -> {
@@ -280,6 +298,7 @@ class MeetingFragment : Fragment() {
         is MeetingState.Ongoing -> {
           startAudioManager()
           hideProgressBar()
+          retryCount = 0
 
           isMeetingOngoing = true
         }
