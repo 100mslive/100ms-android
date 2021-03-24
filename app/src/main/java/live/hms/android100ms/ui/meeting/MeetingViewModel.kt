@@ -311,7 +311,7 @@ class MeetingViewModel(
             true
           ).apply {
             addTrack(this)
-            Log.v(TAG, "Adding user track $currentDeviceTrack to VideoGrid")
+            Log.v(TAG, "Adding user track $this to VideoGrid")
 
             if (settings.detectDominantSpeaker) startDetectDominantSpeakerMonitor()
             if (settings.showNetworkInfo) startNetworkInfoMonitor()
