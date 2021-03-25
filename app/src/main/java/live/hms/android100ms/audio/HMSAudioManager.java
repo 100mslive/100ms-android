@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
 import android.media.AudioDeviceInfo;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -14,6 +16,7 @@ import android.util.Log;
 
 import androidx.annotation.MainThread;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -197,6 +200,7 @@ public class HMSAudioManager {
     LogUtils.logDeviceInfo(TAG);
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.O)
   @SuppressWarnings("deprecation") // TODO: audioManager.requestAudioFocus() is deprecated.
   @MainThread
   public void start(AudioManagerEvents audioManagerEvents) {
@@ -259,10 +263,21 @@ public class HMSAudioManager {
     };
 
     // Request audio playout focus (without ducking) and install listener for changes in focus.
-    int result = audioManager.requestAudioFocus(audioFocusChangeListener,
-        AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-      Log.d(TAG, "Audio focus request granted for VOICE_CALL streams");
+    /*int result = audioManager.requestAudioFocus(audioFocusChangeListener,
+        AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);*/
+
+    AudioAttributes audioAttributes = new AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build();
+
+    AudioFocusRequest audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAudioAttributes(audioAttributes)
+            .build();
+
+    int result = audioManager.requestAudioFocus(audioFocusRequest);
+    if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED || result == AudioManager.AUDIOFOCUS_REQUEST_DELAYED) {
+      Log.d(TAG, "Audio focus request granted for CONTENT_TYPE_MUSIC streams");
     } else {
       Log.e(TAG, "Audio focus request failed");
     }
@@ -310,7 +325,7 @@ public class HMSAudioManager {
     bluetoothManager.stop();
 
     // Restore previously stored audio states.
-    setSpeakerphoneOn(savedIsSpeakerPhoneOn);
+    //setSpeakerphoneOn(savedIsSpeakerPhoneOn);
     setMicrophoneMute(savedIsMicrophoneMute);
     audioManager.setMode(savedAudioMode);
 
@@ -337,7 +352,7 @@ public class HMSAudioManager {
 
     switch (device) {
       case SPEAKER_PHONE:
-        setSpeakerphoneOn(true);
+        //setSpeakerphoneOn(true);
         break;
       case EARPIECE:
         setSpeakerphoneOn(false);
