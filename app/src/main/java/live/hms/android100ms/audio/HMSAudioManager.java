@@ -285,7 +285,7 @@ public class HMSAudioManager {
     // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
     // required to be in this mode when playout and/or recording starts for
     // best possible VoIP performance.
-    audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+    // audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
 
     // Always disable microphone mute during a WebRTC call.
     setMicrophoneMute(false);
