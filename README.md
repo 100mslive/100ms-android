@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/100mslive/android-sdk.svg)](https://docs.100ms.live/client-side/android)
+[![](https://jitpack.io/v/100mslive/android-sdk.svg)](https://docs.100ms.live/release-notes/android)
 
 # 100ms Sample Android Application in Kotlin
 
