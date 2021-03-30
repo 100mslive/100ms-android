@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
@@ -24,6 +25,7 @@ import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.pinnedvideo.PinnedVideoFragment
+import live.hms.android100ms.ui.meeting.plugins.PluginFragment
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridFragment
 import live.hms.android100ms.ui.settings.SettingsMode
 import live.hms.android100ms.util.*
@@ -230,6 +232,13 @@ class MeetingFragment : Fragment() {
         binding.unreadMessageCount.visibility = View.GONE
       }
     }
+    meetingViewModel.pluginData.observe(viewLifecycleOwner){state->
+      Log.d(TAG, "Plugin Data: $state")
+      if(state==null)
+        changeMeetingMode(MeetingViewMode.GRID)
+      else
+        changeMeetingMode(MeetingViewMode.PLUGIN)
+    }
 
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
       Log.v(TAG, "Meeting State: $state")
@@ -373,6 +382,7 @@ class MeetingFragment : Fragment() {
     val fragment = when (meetingViewMode) {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
+      MeetingViewMode.PLUGIN -> PluginFragment()
     }
 
     childFragmentManager

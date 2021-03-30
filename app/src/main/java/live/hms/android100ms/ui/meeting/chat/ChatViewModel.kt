@@ -3,6 +3,7 @@ package live.hms.android100ms.ui.meeting.chat
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import org.json.JSONObject
 
 class ChatViewModel : ViewModel() {
 

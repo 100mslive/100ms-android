@@ -21,9 +21,10 @@ import live.hms.video.payload.HMSStreamInfo
 import live.hms.video.webrtc.HMSRTCAudioTrack
 import live.hms.video.webrtc.HMSRTCMediaStreamConstraints
 import live.hms.video.webrtc.HMSRTCVideoTrack
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.reflect.typeOf
 
 class MeetingViewModel(
   application: Application,
@@ -56,6 +57,9 @@ class MeetingViewModel(
 
   // Live data to define the overall UI
   val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
+
+  //plugin realted Data
+  var pluginData = MutableLiveData<PluginData>(null)
 
   // TODO: Listen to changes in publishVideo & publishAudio
   //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
@@ -530,8 +534,32 @@ class MeetingViewModel(
           "userName=${data.peer.userName}, " +
           "msg=${data.msg}"
     )
+    Log.d(TAG, "on broadcast ${data.msg}")
+    try {
+      val message_json: JSONObject = JSONObject(data.msg)
+      val type=message_json.getString("type")
+      if(type=="PLUGIN") {
+        Log.v(TAG, "Plugin ${type}")
+        val name:String = message_json.getJSONObject("activePlugin").getString("name")
+        val url:String = message_json.getJSONObject("options").getString("url")
+        val type:PluginType = when(name){
+          "WHITEBOARD"->PluginType.WHITEBOARD
+          "DRIVE"->PluginType.DRIVE
+          else -> PluginType.WHITEBOARD
+        }
+        pluginData.postValue( PluginData(type,url,data.peer.peerId,data.peer.userName))
+        Log.v(TAG, "Plugin Started ${PluginData(type,url,data.peer.peerId,data.peer.userName)}")
+      }
+      else if(type=="PLUGIN_CLOSE"){
+        pluginData.postValue(null)
+        Log.v(TAG, "Plugin closed ${pluginData}")
+      }
 
-    broadcastsReceived.postValue(data)
+    }
+    catch(ex: JSONException){
+      broadcastsReceived.postValue(data)
+    }
+    
   }
 
   private fun startDetectDominantSpeakerMonitor() {
