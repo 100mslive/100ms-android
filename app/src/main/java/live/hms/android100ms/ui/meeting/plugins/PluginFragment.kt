@@ -85,7 +85,13 @@ class PluginFragment : Fragment() {
 //      setEnableHardwareScaler(true)
 //    }
     binding.webview.settings.javaScriptEnabled = true
-    meetingViewModel.pluginData.value?.url?.let { binding.webview.loadUrl(it) }
+
+    meetingViewModel.pluginData.observe(viewLifecycleOwner){
+      if (it != null) {
+        binding.webview.loadUrl(it.url)
+        binding.name.text=it.ownerName
+      }
+    }
     updatePinnedVideoText()
   }
 

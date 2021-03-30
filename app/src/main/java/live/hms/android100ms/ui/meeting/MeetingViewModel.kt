@@ -59,7 +59,7 @@ class MeetingViewModel(
   val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
 
   //plugin realted Data
-  var pluginData = MutableLiveData<PluginData>(null)
+  var pluginData = MutableLiveData<PluginData?>()
 
   // TODO: Listen to changes in publishVideo & publishAudio
   //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
@@ -548,7 +548,7 @@ class MeetingViewModel(
           else -> PluginType.WHITEBOARD
         }
         pluginData.postValue( PluginData(type,url,data.peer.peerId,data.peer.userName))
-        Log.v(TAG, "Plugin Started ${PluginData(type,url,data.peer.peerId,data.peer.userName)}")
+        Log.v(TAG, "Plugin Started ${PluginData(type,url,data.peer.userName,data.peer.peerId)}")
       }
       else if(type=="PLUGIN_CLOSE"){
         pluginData.postValue(null)
