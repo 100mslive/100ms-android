@@ -547,8 +547,8 @@ class MeetingViewModel(
           "DRIVE"->PluginType.DRIVE
           else -> PluginType.WHITEBOARD
         }
-        pluginData.postValue( PluginData(type,url,data.peer.peerId,data.peer.userName))
-        Log.v(TAG, "Plugin Started ${PluginData(type,url,data.peer.userName,data.peer.peerId)}")
+        pluginData.postValue( PluginData(type,url,data.peer.userName,data.peer.peerId))
+        Log.v(TAG, "Plugin Started ")
       }
       else if(type=="PLUGIN_CLOSE"){
         pluginData.postValue(null)
