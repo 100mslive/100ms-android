@@ -228,6 +228,8 @@ class MeetingViewModel(
 
       // Update the view as we have removed some views
       tracks.postValue(_tracks)
+      if(pluginData!=null&& pluginData.value!!.ownerUid==uid)
+        pluginData.postValue(null)
     }
   }
 
@@ -472,6 +474,7 @@ class MeetingViewModel(
           "mid=${info.mid} " +
           "peerId=${info.peer.peerId}"
     )
+    Log.v(TAG, "Adding stream $info ")
 
     client.subscribe(info, room, object : HMSMediaRequestHandler {
       override fun onSuccess(stream: HMSRTCMediaStream) {
