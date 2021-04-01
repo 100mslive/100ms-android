@@ -17,13 +17,13 @@ import live.hms.android100ms.audio.HMSAudioManager
 import live.hms.android100ms.databinding.FragmentMeetingBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.home.HomeActivity
-import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
 import live.hms.android100ms.ui.meeting.chat.ChatViewModel
 import live.hms.android100ms.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.android100ms.ui.meeting.plugins.PluginFragment
 import live.hms.android100ms.ui.meeting.videogrid.VideoGridFragment
 import live.hms.android100ms.ui.settings.SettingsMode
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.util.*
 import live.hms.video.error.ActionType
 import java.util.*
@@ -44,8 +44,8 @@ class MeetingFragment : Fragment() {
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
-        requireActivity().application,
-        requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+      requireActivity().application,
+      requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
     )
   }
 
@@ -55,11 +55,12 @@ class MeetingFragment : Fragment() {
 
   private var isMeetingOngoing = false
 
-  private val onSettingsChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-    if (SettingsStore.APPLY_CONSTRAINTS_KEYS.contains(key)) {
-      meetingViewModel.updateLocalMediaStreamConstraints()
+  private val onSettingsChangeListener =
+    SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+      if (SettingsStore.APPLY_CONSTRAINTS_KEYS.contains(key)) {
+        meetingViewModel.updateLocalMediaStreamConstraints()
+      }
     }
-  }
 
   override fun onResume() {
     super.onResume()
@@ -114,7 +115,7 @@ class MeetingFragment : Fragment() {
 
       R.id.action_email_logs -> {
         requireContext().startActivity(
-            EmailUtils.getCrashLogIntent(requireContext())
+          EmailUtils.getCrashLogIntent(requireContext())
         )
       }
 
@@ -128,7 +129,7 @@ class MeetingFragment : Fragment() {
 
       R.id.action_settings -> {
         findNavController().navigate(
-            MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
+          MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
         )
       }
     }
@@ -182,16 +183,16 @@ class MeetingFragment : Fragment() {
   }
 
   override fun onCreateView(
-      inflater: LayoutInflater, container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
 
     savedInstanceState?.let { state ->
       if (
-          resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-          && meetingViewMode != MeetingViewMode.PINNED
+        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        && meetingViewMode != MeetingViewMode.PINNED
       ) {
         changeMeetingMode(MeetingViewMode.PINNED)
       }
@@ -228,11 +229,11 @@ class MeetingFragment : Fragment() {
         binding.unreadMessageCount.visibility = View.GONE
       }
     }
-    meetingViewModel.pluginData.observe(viewLifecycleOwner){state->
+    meetingViewModel.pluginData.observe(viewLifecycleOwner) { state ->
       Log.d(TAG, "Plugin Data: $state")
-      if(state==null)
+      if (state == null)
         changeMeetingMode(MeetingViewMode.GRID)
-      else
+      else if (meetingViewMode != MeetingViewMode.PLUGIN)
         changeMeetingMode(MeetingViewMode.PLUGIN)
     }
 
@@ -247,9 +248,9 @@ class MeetingFragment : Fragment() {
           stopAudioManager()
 
           val builder = AlertDialog.Builder(requireContext())
-              .setMessage("${state.exception.errorCode} : ${state.exception.errorMessage}")
-              .setTitle(R.string.error)
-              .setCancelable(false)
+            .setMessage("${state.exception.errorCode} : ${state.exception.errorMessage}")
+            .setTitle(R.string.error)
+            .setCancelable(false)
 
 
           if (state.exception.action != ActionType.SUBSCRIBE) {
@@ -323,13 +324,13 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) { data ->
       chatViewModel.receivedMessage(
-          ChatMessage(
-              data.peer.customerUserId,
-              data.senderName,
-              Date(),
-              data.msg,
-              false
-          )
+        ChatMessage(
+          data.peer.customerUserId,
+          data.senderName,
+          Date(),
+          data.msg,
+          false
+        )
       )
     }
   }
@@ -339,8 +340,8 @@ class MeetingFragment : Fragment() {
 
     audioManager.start { selectedAudioDevice, availableAudioDevices ->
       crashlyticsLog(
-          TAG,
-          "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
+        TAG,
+        "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
       )
     }
   }
@@ -363,9 +364,9 @@ class MeetingFragment : Fragment() {
   private fun changeMeetingMode(newMode: MeetingViewMode) {
     if (meetingViewMode == newMode) {
       Toast.makeText(
-          requireContext(),
-          "Already in ViewMode=$newMode",
-          Toast.LENGTH_SHORT
+        requireContext(),
+        "Already in ViewMode=$newMode",
+        Toast.LENGTH_SHORT
       ).show()
       return
     }
@@ -382,10 +383,10 @@ class MeetingFragment : Fragment() {
     }
 
     childFragmentManager
-        .beginTransaction()
-        .replace(R.id.fragment_container, fragment)
-        .addToBackStack(null)
-        .commit()
+      .beginTransaction()
+      .replace(R.id.fragment_container, fragment)
+      .addToBackStack(null)
+      .commit()
   }
 
   private fun hideProgressBar() {
@@ -425,10 +426,10 @@ class MeetingFragment : Fragment() {
 
     binding.buttonOpenChat.setOnClickListener {
       findNavController().navigate(
-          MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
-              roomDetails,
-              meetingViewModel.peer.customerUserId
-          )
+        MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
+          roomDetails,
+          meetingViewModel.peer.customerUserId
+        )
       )
     }
 
@@ -446,12 +447,12 @@ class MeetingFragment : Fragment() {
 
   private fun initOnBackPress() {
     requireActivity().onBackPressedDispatcher.addCallback(
-        viewLifecycleOwner,
-        object : OnBackPressedCallback(true) {
-          override fun handleOnBackPressed() {
-            Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-            meetingViewModel.leaveMeeting()
-          }
-        })
+      viewLifecycleOwner,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
+          meetingViewModel.leaveMeeting()
+        }
+      })
   }
 }

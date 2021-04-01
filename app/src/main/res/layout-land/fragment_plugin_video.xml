@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     tools:context=".ui.meeting.pinnedvideo.PinnedVideoFragment">
 
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_margin="4dp"
         android:layout_weight="1">
 
@@ -82,7 +82,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_videos"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/video_list_size" />
+        android:layout_width="@dimen/video_list_size"
+        android:layout_height="match_parent" />
 
 </LinearLayout>
