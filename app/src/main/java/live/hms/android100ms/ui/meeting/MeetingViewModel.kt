@@ -8,8 +8,8 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import live.hms.android100ms.model.RoomDetails
-import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.ui.meeting.chat.ChatMessage
+import live.hms.android100ms.ui.settings.SettingsStore
 import live.hms.android100ms.util.*
 import live.hms.video.*
 import live.hms.video.error.HMSException
@@ -228,7 +228,7 @@ class MeetingViewModel(
 
       // Update the view as we have removed some views
       tracks.postValue(_tracks)
-      if(pluginData!=null&& pluginData.value!!.ownerUid==uid)
+      if (pluginData != null && pluginData.value!!.ownerUid == uid)
         pluginData.postValue(null)
     }
   }
@@ -261,21 +261,25 @@ class MeetingViewModel(
   public fun updateLocalMediaStreamConstraints() {
     if (state.value !is MeetingState.Ongoing) {
       throw IllegalStateException(
-          "applyConstraints work only in MeetingState.Ongoing " +
-          "[Current State: ${state.value}]"
+        "applyConstraints work only in MeetingState.Ongoing " +
+            "[Current State: ${state.value}]"
       )
     }
 
-    client.applyConstraints(localStream, getConstraintsFromSettings(), object : HMSClient.LocalStreamListener {
-      override fun onSuccess(stream: HMSRTCMediaStream) {
-        Toast.makeText(
+    client.applyConstraints(
+      localStream,
+      getConstraintsFromSettings(),
+      object : HMSClient.LocalStreamListener {
+        override fun onSuccess(stream: HMSRTCMediaStream) {
+          Toast.makeText(
             getApplication(),
             "Successfully applied new constraints",
             Toast.LENGTH_SHORT
-        ).show()
-      }
-      override fun onFailure(exception: HMSException) = handleFailure(exception)
-    })
+          ).show()
+        }
+
+        override fun onFailure(exception: HMSException) = handleFailure(exception)
+      })
   }
 
   private fun publishUserStream(constraints: HMSRTCMediaStreamConstraints) {
@@ -539,30 +543,38 @@ class MeetingViewModel(
     )
     Log.d(TAG, "on broadcast ${data.msg}")
     try {
-      val message_json: JSONObject = JSONObject(data.msg)
-      val type=message_json.getString("type")
-      if(type=="PLUGIN") {
-        Log.v(TAG, "Plugin ${type}")
-        val name:String = message_json.getJSONObject("activePlugin").getString("name")
-        val url:String = message_json.getJSONObject("options").getString("url")
-        val type:PluginType = when(name){
-          "WHITEBOARD"->PluginType.WHITEBOARD
-          "DRIVE"->PluginType.DRIVE
+      // Check if plugin broadcast
+      val message = JSONObject(data.msg)
+      val type = message.getString("type")
+      if (type == "PLUGIN") {
+        Log.v(TAG, "Plugin $type")
+        val name: String = message.getJSONObject("activePlugin").getString("name")
+        val url: String = message.getJSONObject("options").getString("url")
+        val isLocked: Boolean = message.getJSONObject("options").optBoolean("isLocked", false)
+        val pluginType = when (name) {
+          "WHITEBOARD" -> PluginType.WHITEBOARD
+          "DRIVE" -> PluginType.DRIVE
           else -> PluginType.WHITEBOARD
         }
-        pluginData.postValue( PluginData(type,url,data.peer.userName,data.peer.peerId))
+        pluginData.postValue(
+          PluginData(
+            pluginType,
+            url,
+            data.peer.userName,
+            data.peer.peerId,
+            isLocked = isLocked
+          )
+        )
         Log.v(TAG, "Plugin Started ")
-      }
-      else if(type=="PLUGIN_CLOSE"){
+      } else if (type == "PLUGIN_CLOSE") {
         pluginData.postValue(null)
-        Log.v(TAG, "Plugin closed ${pluginData}")
+        Log.v(TAG, "Plugin closed $pluginData")
       }
-
-    }
-    catch(ex: JSONException){
+    } catch (ex: JSONException) {
+      // Otherwise it's a regular chat message
       broadcastsReceived.postValue(data)
     }
-    
+
   }
 
   private fun startDetectDominantSpeakerMonitor() {

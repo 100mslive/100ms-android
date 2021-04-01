@@ -100,6 +100,7 @@
     <string name="hero_view">Hero View</string>
     <string name="grid_view">Grid View</string>
     <string name="screen_share">Screen Share</string>
+    <string name="locked">Locked</string>
     <string name="meeting_name">Meeting Name</string>
     <string name="more">More</string>
     <string name="type_a_message">Type a message</string>

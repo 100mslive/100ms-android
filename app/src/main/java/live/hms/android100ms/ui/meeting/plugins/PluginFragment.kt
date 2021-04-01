@@ -1,17 +1,16 @@
 package live.hms.android100ms.ui.meeting.plugins
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
-import live.hms.android100ms.databinding.FragmentPinnedVideoBinding
 import live.hms.android100ms.databinding.FragmentPluginVideoBinding
 import live.hms.android100ms.model.RoomDetails
 import live.hms.android100ms.ui.meeting.MeetingTrack
@@ -19,7 +18,6 @@ import live.hms.android100ms.ui.meeting.MeetingViewModel
 import live.hms.android100ms.ui.meeting.MeetingViewModelFactory
 import live.hms.android100ms.ui.meeting.pinnedvideo.VideoListAdapter
 import live.hms.android100ms.util.*
-import org.webrtc.RendererCommon
 
 class PluginFragment : Fragment() {
 
@@ -29,7 +27,7 @@ class PluginFragment : Fragment() {
 
   private var pinnedTrack: MeetingTrack? = null
 
-  private val videoListAdapter = VideoListAdapter() { changePinViewVideo(it) }
+  private val videoListAdapter = VideoListAdapter {}
 
   private var binding by viewLifecycle<FragmentPluginVideoBinding>()
 
@@ -48,7 +46,6 @@ class PluginFragment : Fragment() {
     Log.d(TAG, "onResume()")
 
     isViewVisible = true
-    handleOnPinVideoVisibilityChange()
 
     binding.recyclerViewVideos.adapter = videoListAdapter
   }
@@ -58,7 +55,6 @@ class PluginFragment : Fragment() {
     Log.d(TAG, "onPause()")
 
     isViewVisible = false
-    handleOnPinVideoVisibilityChange()
 
     // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
     // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
@@ -80,105 +76,40 @@ class PluginFragment : Fragment() {
   }
 
   private fun initPinnedView() {
-//    binding.pinVideo.surfaceView.apply {
-//      setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-//      setEnableHardwareScaler(true)
-//    }
     binding.webview.settings.javaScriptEnabled = true
-
-    meetingViewModel.pluginData.observe(viewLifecycleOwner){
-      if (it != null) {
-        binding.webview.loadUrl(it.url)
-        binding.name.text=it.ownerName
-      }
-    }
-    updatePinnedVideoText()
   }
 
   private fun initRecyclerView() {
-    val orientation = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      LinearLayoutManager.VERTICAL
-    } else {
-      LinearLayoutManager.HORIZONTAL
-    }
+    val orientation =
+      if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        LinearLayoutManager.VERTICAL
+      } else {
+        LinearLayoutManager.HORIZONTAL
+      }
     binding.recyclerViewVideos.apply {
       layoutManager = LinearLayoutManager(requireContext(), orientation, false)
     }
   }
 
-  private fun updatePinnedVideoText() {
-    val nameStr = pinnedTrack?.peer?.userName ?: ""
-    val isScreen =true
-    val isVideoOff = pinnedTrack?.videoTrack == null
-//    binding.pinVideo.apply {
-//      name.text = nameStr
-//      nameInitials.text = NameUtils.getInitials(nameStr)
-//      iconScreenShare.visibility = if (isScreen) View.VISIBLE else View.GONE
-//      iconVideoOff.visibility = if (isVideoOff) View.VISIBLE else View.GONE
-//    }
-  }
-
-  private fun handleOnPinVideoVisibilityChange() {
-    crashlyticsLog(TAG, "handleOnPinVideoVisibilityChange: isViewVisible=${isViewVisible}")
-
-    pinnedTrack?.let { track ->
-//      binding.pinVideo.surfaceView.apply {
-//        if (isViewVisible) {
-//          SurfaceViewRendererUtil.bind(this, track).let { success ->
-//            if (success) visibility = View.VISIBLE
-//          }
-//        } else {
-//          SurfaceViewRendererUtil.unbind(this, track)
-//          visibility = View.GONE
-//        }
-//      }
-    }
-  }
-
-  @MainThread
-  private fun changePinViewVideo(track: MeetingTrack) {
-    if (track == pinnedTrack) {
-      crashlyticsLog(TAG, "Track=$track is already pinned")
-      return
-    }
-
-    crashlyticsLog(TAG, "Changing pin-view video to $track (previous=$pinnedTrack)")
-//    binding.pinVideo.surfaceView.apply {
-//      if (isViewVisible) {
-//        // Unbind and Bind only when the view is only released() / init() respectively
-//        pinnedTrack?.let {
-//          SurfaceViewRendererUtil.unbind(this, it)
-//          visibility = View.GONE
-//        }
-//
-//        SurfaceViewRendererUtil.bind(this, track).let { success ->
-//          if (success) visibility = View.VISIBLE
-//        }
-//      }
-//    }
-
-    pinnedTrack = track
-    updatePinnedVideoText()
-  }
-
+  @SuppressLint("ClickableViewAccessibility")
   private fun initViewModels() {
-    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      if (tracks.isNotEmpty()) {
-        // Pin a screen if possible else pin user's video
-        val toPin = tracks.find { it.isScreen } ?: tracks[0]
-        changePinViewVideo(toPin)
-      }
+    meetingViewModel.pluginData.observe(viewLifecycleOwner) {
+      if (it != null) {
+        binding.webview.loadUrl(it.url)
+        binding.name.text = it.ownerName
+        binding.iconLocked.visibility = if (it.isLocked) View.VISIBLE else View.GONE
 
-      videoListAdapter.setItems(tracks)
-      Log.d(TAG, "Updated video-list items: size=${tracks.size}")
-    }
-
-    meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) {
-      it?.let {
-        if (pinnedTrack?.isScreen != true) {
-          changePinViewVideo(it)
+        if (it.isLocked) {
+          binding.webview.setOnTouchListener { _, _ -> true }
+        } else {
+          binding.webview.setOnTouchListener(null)
         }
       }
+    }
+
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+      videoListAdapter.setItems(tracks)
+      Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
   }
 }

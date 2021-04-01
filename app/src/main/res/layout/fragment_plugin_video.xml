@@ -51,8 +51,6 @@
                     android:gravity="center"
                     android:text="@string/john_doe" />
 
-
-
                 <ImageView
                     android:id="@+id/icon_screen_share"
                     android:layout_width="12dp"
@@ -63,7 +61,15 @@
                     android:src="@drawable/ic_mobile_screen_share_24"
                     app:tint="@color/white_faded_70" />
 
-                <!-- TODO: Add other icons here -->
+                <ImageView
+                    android:id="@+id/icon_locked"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="4dp"
+                    android:contentDescription="@string/locked"
+                    android:src="@drawable/ic_lock_24"
+                    app:tint="@color/white_faded_70" />
 
             </LinearLayout>
 
