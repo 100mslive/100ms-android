@@ -15,8 +15,8 @@ android {
         applicationId "live.hms.android100ms"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 26
-        versionName "1.0.20"
+        versionCode 27
+        versionName "1.0.21"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,7 +63,7 @@ dependencies {
 
     //100ms.live SDK
     implementation 'org.webrtc:google-webrtc:1.0.32006'
-    implementation 'com.github.100mslive:android-sdk:0.9.17'
+    implementation 'com.github.100mslive:android-sdk:0.9.17.2'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.3"
