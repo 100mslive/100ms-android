@@ -112,6 +112,7 @@ class VideoListAdapter(
    */
   @MainThread
   fun setItems(newItems: MutableList<MeetingTrack>) {
+    // FIXME: newItems.mapIndexed can raise ConcurrentModificationException
     val newVideoItems = newItems.mapIndexed { index, track -> VideoListItem(index.toLong(), track) }
 
     val callback = VideoListItemDiffUtil(items, newVideoItems)
