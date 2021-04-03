@@ -480,46 +480,48 @@ class MeetingViewModel(
     )
     Log.v(TAG, "Adding stream $info ")
 
-    client.subscribe(info, room, object : HMSMediaRequestHandler {
-      override fun onSuccess(stream: HMSRTCMediaStream) {
-        crashlyticsLog(
-          TAG,
-          "Subscribe(" +
-              "uid=${info.peer.peerId}, " +
-              "mid=${info.mid}, " +
-              "userName=${info.userName}): " +
-              "peer-id=${peer.peerId} -- onSuccess($stream)"
-        )
+    if(!info.description.equals("IGNORE")) {
+      client.subscribe(info, room, object : HMSMediaRequestHandler {
+        override fun onSuccess(stream: HMSRTCMediaStream) {
+          crashlyticsLog(
+                  TAG,
+                  "Subscribe(" +
+                          "uid=${info.peer.peerId}, " +
+                          "mid=${info.mid}, " +
+                          "userName=${info.userName}): " +
+                          "peer-id=${peer.peerId} -- onSuccess($stream)"
+          )
 
-        var videoTrack: HMSRTCVideoTrack? = null
-        var audioTrack: HMSRTCAudioTrack? = null
+          var videoTrack: HMSRTCVideoTrack? = null
+          var audioTrack: HMSRTCAudioTrack? = null
 
-        // Video and Audio tracks are enabled by default
-        if (stream.videoTracks.size > 0) {
-          videoTrack = stream.videoTracks[0]
-        }
-
-        if (stream.audioTracks.size > 0) {
-          audioTrack = stream.audioTracks[0]
-
-          if (_isAudioMuted) {
-            audioTrack.setVolume(0.0)
-          } else {
-            audioTrack.setVolume(1.0)
+          // Video and Audio tracks are enabled by default
+          if (stream.videoTracks.size > 0) {
+            videoTrack = stream.videoTracks[0]
           }
+
+          if (stream.audioTracks.size > 0) {
+            audioTrack = stream.audioTracks[0]
+
+            if (_isAudioMuted) {
+              audioTrack.setVolume(0.0)
+            } else {
+              audioTrack.setVolume(1.0)
+            }
+          }
+
+          addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false, info.isScreen))
         }
 
-        addTrack(MeetingTrack(info.mid, peer, videoTrack, audioTrack, false, info.isScreen))
-      }
-
-      override fun onFailure(exception: HMSException) {
-        crashlyticsLog(
-          TAG,
-          "Subscribe($info): peer-id=${peer.peerId} -- onFailure(${toString(exception)})"
-        )
-        handleFailure(exception)
-      }
-    })
+        override fun onFailure(exception: HMSException) {
+          crashlyticsLog(
+                  TAG,
+                  "Subscribe($info): peer-id=${peer.peerId} -- onFailure(${toString(exception)})"
+          )
+          handleFailure(exception)
+        }
+      })
+    }
   }
 
   override fun onStreamRemove(info: HMSStreamInfo) {
