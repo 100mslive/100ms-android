@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Android100ms" parent="Theme.MaterialComponents">
+    <style name="Theme.App2" parent="Theme.MaterialComponents">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/blue_1</item>
         <item name="colorPrimaryVariant">@color/blue_0</item>
@@ -31,7 +31,7 @@
         <item name="fontFamily">@font/clan_pro_news</item>
     </style>
 
-    <style name="Theme.Android100ms.NoActionBar">
+    <style name="Theme.App2.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

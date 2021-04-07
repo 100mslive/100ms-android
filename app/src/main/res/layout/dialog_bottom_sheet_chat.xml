@@ -21,7 +21,7 @@
             android:background="@color/blue_3"
             app:menu="@menu/menu_chat"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:title="@string/chat" />
+            app:title="@string/server_message_log" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -38,6 +38,7 @@
         android:baselineAligned="false"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <com.google.android.material.textfield.TextInputLayout

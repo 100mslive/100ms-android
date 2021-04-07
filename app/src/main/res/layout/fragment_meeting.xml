@@ -48,7 +48,7 @@
                 style="@style/MaterialImageButton"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/open_chat"
-                app:icon="@drawable/ic_chat_24" />
+                app:icon="@drawable/ic_assignment_24" />
 
             <TextView
                 android:id="@+id/unread_message_count"

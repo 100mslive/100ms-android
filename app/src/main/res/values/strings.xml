@@ -32,6 +32,7 @@
     <!--    <string name="default_endpoint"></string>-->
     <string name="default_endpoint">qa-in</string>
     <string name="chat">Chat</string>
+    <string name="server_message_log">Server Message Log</string>
     <string name="pin_video">Pin Video</string>
     <string name="unpin_video">Unpin Video</string>
     <string name="_100ms_logo">100ms Logo</string>

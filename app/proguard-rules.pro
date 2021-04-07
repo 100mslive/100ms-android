@@ -25,8 +25,8 @@
 -keep public class * extends java.lang.Exception  # Optional: Keep custom exceptions.
 
 # https://developer.android.com/guide/navigation/navigation-pass-data#proguard_considerations
--keepnames class live.hms.android100ms.model.RoomDetails
--keepnames class live.hms.android100ms.ui.settings.SettingsMode
+-keepnames class live.hms.app2.model.RoomDetails
+-keepnames class live.hms.app2.ui.settings.SettingsMode
 
 # Video libs
 -keep class org.webrtc.** { *; }

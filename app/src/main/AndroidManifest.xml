@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="live.hms.android100ms">
+    package="live.hms.app2">
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -14,21 +14,22 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".ui.GlobalApplication"
+        android:name="live.hms.app2.ui.GlobalApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:theme="@style/Theme.Android100ms">
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.App2">
 
         <activity
-            android:name=".ui.home.HomeActivity"
+            android:name="live.hms.app2.ui.home.HomeActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            android:theme="@style/Theme.Android100ms.NoActionBar">
+            android:theme="@style/Theme.App2.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -48,15 +49,15 @@
         </activity>
 
         <activity
-            android:name=".ui.meeting.MeetingActivity"
+            android:name="live.hms.app2.ui.meeting.MeetingActivity"
             android:label="@string/meeting"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            android:theme="@style/Theme.Android100ms.NoActionBar" />
+            android:theme="@style/Theme.App2.NoActionBar" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="live.hms.android100ms.provider"
+            android:authorities="live.hms.app2.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
