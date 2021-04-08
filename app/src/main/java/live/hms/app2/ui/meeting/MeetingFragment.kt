@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -16,11 +17,11 @@ import live.hms.app2.audio.HMSAudioManager
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
-import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 
 class MeetingFragment : Fragment() {
@@ -238,17 +239,15 @@ class MeetingFragment : Fragment() {
           hideProgressBar()
           stopAudioManager()
 
-          /* val builder = AlertDialog.Builder(requireContext())
-              .setMessage("${state.exception.errorCode} : ${state.exception.errorMessage}")
-              .setTitle(R.string.error)
-              .setCancelable(false)
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage(state.exception.message)
+            .setTitle(R.string.error)
+            .setCancelable(false)
 
 
-          if (state.exception.action != ActionType.SUBSCRIBE) {
-            builder.setPositiveButton(R.string.retry) { dialog, _ ->
-              meetingViewModel.startMeeting()
-              dialog.dismiss()
-            }
+          builder.setPositiveButton(R.string.retry) { dialog, _ ->
+            meetingViewModel.startMeeting()
+            dialog.dismiss()
           }
 
           builder.setNegativeButton(R.string.leave) { dialog, _ ->
@@ -256,7 +255,7 @@ class MeetingFragment : Fragment() {
             dialog.dismiss()
           }
 
-          builder.create().show() */
+          builder.create().show()
         }
 
         is MeetingState.Connecting -> {

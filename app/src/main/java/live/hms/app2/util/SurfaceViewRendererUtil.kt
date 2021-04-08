@@ -27,7 +27,11 @@ object SurfaceViewRendererUtil {
    * @param metadata Optional extra data which will be logged when context is
    *  successfully initialized
    */
-  fun bind(view: SurfaceViewRenderer, item: MeetingTrack, metadata: String = ""): Boolean {
+  fun bind(
+    view: SurfaceViewRenderer,
+    item: MeetingTrack,
+    metadata: String = "",
+  ): Boolean {
     if (item.video == null) return false
 
     view.apply {

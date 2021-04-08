@@ -159,7 +159,7 @@ class SettingsStore(context: Context) {
     set(value) = putInt(VIDEO_GRID_COLUMNS, value)
 
   var isLeakCanaryEnabled: Boolean
-    get() = sharedPreferences.getBoolean(LEAK_CANARY, true)
+    get() = sharedPreferences.getBoolean(LEAK_CANARY, false)
     set(value) = putBoolean(LEAK_CANARY, value)
 
   inner class MultiCommitHelper {
