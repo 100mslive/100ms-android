@@ -1,6 +1,7 @@
 package live.hms.app2.ui.meeting
 
 import android.app.Application
+import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -18,8 +19,8 @@ import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.enums.HMSRoomUpdate
-import live.hms.video.utils.HMSCoroutineScope
-import live.hms.video.utils.HMSLogger
+import live.hms.video.sdk.models.enums.HMSTrackUpdate
+import live.hms.video.utils.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -123,6 +124,17 @@ class MeetingViewModel(
     }
   }
 
+  fun makeToken(): String {
+    val token = AuthTokenUtils.AuthToken(
+      roomDetails.roomId,
+      IdHelper.makePeerId() + roomDetails.username,
+      "Guest"
+    )
+    val tokenStr = GsonUtils.gson.toJson(token)
+    val base64Payload = Base64.encodeToString(tokenStr.toByteArray(), Base64.DEFAULT)
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${base64Payload}.7WJIaNM6KZqGLqw5ESocQMGIx3b_ckWyu1FNW27gL5E"
+  }
+
   fun startMeeting() {
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
@@ -136,9 +148,8 @@ class MeetingViewModel(
     )
 
     HMSCoroutineScope.launch {
-      val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3Nfa2V5IjoiNWY5ZWRjNmJkMjM4MjE1YWVjNzcwMGUyIiwiYXBwX2lkIjoiNWY5ZWRjNmJkMjM4MjE1YWVjNzcwMGUxIiwicm9vbV9pZCI6ImhlbGxvIiwidXNlcl9pZCI6Ijk5ODRhOWRlLWYxOWYtNDFmNi1iZTE4LWQ0MGIzMGFkNGZlZmFkaXR5YSIsInJvbGUiOiJIb3N0IiwiaWF0IjoxNjE3ODk2NjgzLCJleHAiOjE2MTc5ODMwODMsImlzcyI6IjVmOWVkYzZiZDIzODIxNWFlYzc3MDBkZiIsImp0aSI6IjA4NzBhNGQ0LThkZWYtNDgzYS04OGJiLWQ0NjRkMzlhZGYxYiJ9.7WJIaNM6KZqGLqw5ESocQMGIx3b_ckWyu1FNW27gL5E"
       val info = JsonObject().apply { addProperty("name", roomDetails.username) }
-      val config = HMSConfig(roomDetails.username, token, info.toString())
+      val config = HMSConfig(roomDetails.username, makeToken(), info.toString())
       sdk.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
           Log.e(TAG, error.toString())
@@ -159,9 +170,18 @@ class MeetingViewModel(
           state.postValue(MeetingState.Ongoing())
         }
 
-        override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer, track: HMSTrack) {
+        override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
+          HMSLogger.d(TAG, "join:onPeerUpdate type=$type, peer=$peer")
+        }
+
+        override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
+          HMSLogger.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
+        }
+
+        override fun onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer) {
+          HMSLogger.d(TAG, "join:onTrackUpdate type=$type, track=$track, peer=$peer")
           when (type) {
-            HMSPeerUpdate.TRACK_ADDED -> {
+            HMSTrackUpdate.TRACK_ADDED -> {
               when (track.type) {
                 HMSTrackType.AUDIO -> Unit // TODO
                 HMSTrackType.VIDEO -> addTrack(
@@ -175,22 +195,12 @@ class MeetingViewModel(
                 )
               }
             }
-            HMSPeerUpdate.TRACK_REMOVED -> {
+            HMSTrackUpdate.TRACK_REMOVED -> {
               if (track.type == HMSTrackType.VIDEO) removeTrack(track.trackId)
             }
-          }
-        }
-
-        override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
-          when (type) {
-            HMSRoomUpdate.PEER_ADDED -> {
-              Log.d(TAG, "onRoomUpdate: $type ")
-            }
-            HMSRoomUpdate.PEER_REMOVED -> Unit
             else -> Unit
           }
         }
-
       })
     }
   }
