@@ -22,9 +22,10 @@ import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.CreateRoomRequest
 import live.hms.app2.model.RecordingInfo
 import live.hms.app2.model.RoomDetails
-import live.hms.app2.ui.settings.SettingsStore
+import live.hms.app2.model.TokenRequest
 import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsMode
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.EmailUtils
 import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
@@ -54,12 +55,12 @@ class HomeFragment : Fragment() {
     when (item.itemId) {
       R.id.action_settings -> {
         findNavController().navigate(
-            HomeFragmentDirections.actionHomeFragmentToSettingsFragment(SettingsMode.HOME)
+          HomeFragmentDirections.actionHomeFragmentToSettingsFragment(SettingsMode.HOME)
         )
       }
       R.id.action_email_logs -> {
         requireContext().startActivity(
-            EmailUtils.getCrashLogIntent(requireContext())
+          EmailUtils.getCrashLogIntent(requireContext())
         )
       }
     }
@@ -67,8 +68,8 @@ class HomeFragment : Fragment() {
   }
 
   override fun onCreateView(
-      inflater: LayoutInflater, container: ViewGroup?,
-      savedInstanceState: Bundle?
+    inflater: LayoutInflater, container: ViewGroup?,
+    savedInstanceState: Bundle?
   ): View {
     binding = FragmentHomeBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
@@ -87,13 +88,13 @@ class HomeFragment : Fragment() {
   private fun initOnBackPress() {
     requireActivity().apply {
       onBackPressedDispatcher.addCallback(
-          this@HomeFragment.viewLifecycleOwner,
-          object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-              Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-              finish()
-            }
-          })
+        this@HomeFragment.viewLifecycleOwner,
+        object : OnBackPressedCallback(true) {
+          override fun handleOnBackPressed() {
+            Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
+            finish()
+          }
+        })
     }
   }
 
@@ -155,26 +156,14 @@ class HomeFragment : Fragment() {
     // Update the name in local store
     settings.username = username
 
-    val roomDetails = RoomDetails(
-      env = settings.environment,
-      roomId = settings.lastUsedRoomId,
-      username = getUsername(),
-      authToken = "dummy"
+    homeViewModel.sendAuthTokenRequest(
+      TokenRequest(
+        roomId = settings.lastUsedRoomId,
+        username = username,
+        role = role,
+        environment = settings.environment
+      )
     )
-    Intent(requireContext(), MeetingActivity::class.java).apply {
-      putExtra(ROOM_DETAILS, roomDetails)
-      startActivity(this)
-    }
-    requireActivity().finish()
-
-//    homeViewModel.sendAuthTokenRequest(
-//        TokenRequest(
-//            roomId = settings.lastUsedRoomId,
-//            username = username,
-//            role = role,
-//            environment = settings.environment
-//        )
-//    )
   }
 
   private fun observeLiveData() {
@@ -190,10 +179,10 @@ class HomeFragment : Fragment() {
 
           val data = response.data!!
           val roomDetails = RoomDetails(
-              env = settings.environment,
-              roomId = settings.lastUsedRoomId,
-              username = getUsername(),
-              authToken = data.token
+            env = settings.environment,
+            roomId = settings.lastUsedRoomId,
+            username = getUsername(),
+            authToken = data.token
           )
           Log.v(TAG, "Auth Token: ${roomDetails.authToken}")
 
@@ -207,9 +196,9 @@ class HomeFragment : Fragment() {
         Status.ERROR -> {
           hideProgressBar()
           Toast.makeText(
-              requireContext(),
-              response.message,
-              Toast.LENGTH_SHORT
+            requireContext(),
+            response.message,
+            Toast.LENGTH_SHORT
           ).show()
         }
       }
@@ -224,9 +213,9 @@ class HomeFragment : Fragment() {
         Status.SUCCESS -> {
           val data = response.data!!
           Toast.makeText(
-              requireContext(),
-              "Created room ${data.roomId} \uD83E\uDD73",
-              Toast.LENGTH_SHORT
+            requireContext(),
+            "Created room ${data.roomId} \uD83E\uDD73",
+            Toast.LENGTH_SHORT
           ).show()
           tryJoiningRoomAs("Host")
         }
@@ -234,9 +223,9 @@ class HomeFragment : Fragment() {
         Status.ERROR -> {
           hideProgressBar()
           Toast.makeText(
-              requireContext(),
-              response.message,
-              Toast.LENGTH_SHORT
+            requireContext(),
+            response.message,
+            Toast.LENGTH_SHORT
           ).show()
         }
       }
@@ -282,9 +271,9 @@ class HomeFragment : Fragment() {
       settings.lastUsedRoomId.isNotEmpty() -> {
         "https://${settings.environment}.100ms.live/?" +
             arrayOf(
-                "room=${settings.lastUsedRoomId}",
-                "env=${settings.environment}",
-                "role=Guest"
+              "room=${settings.lastUsedRoomId}",
+              "env=${settings.environment}",
+              "role=Guest"
             ).joinToString("&")
       }
       else -> ""
@@ -293,9 +282,9 @@ class HomeFragment : Fragment() {
     updateAndVerifyMeetingUrl(url)
 
     mapOf(
-        binding.editTextName to binding.containerName,
-        binding.editTextMeetingUrl to binding.containerMeetingUrl,
-        binding.editTextRoomName to binding.containerRoomName
+      binding.editTextName to binding.containerName,
+      binding.editTextMeetingUrl to binding.containerMeetingUrl,
+      binding.editTextRoomName to binding.containerRoomName
     ).forEach {
       it.key.addTextChangedListener { text ->
         if (text.toString().isNotEmpty()) it.value.error = null
@@ -350,11 +339,11 @@ class HomeFragment : Fragment() {
 
       if (allOk) {
         homeViewModel.sendCreateRoomRequest(
-            CreateRoomRequest(
-                roomName,
-                settings.environment,
-                RecordingInfo(enableRecording)
-            )
+          CreateRoomRequest(
+            roomName,
+            settings.environment,
+            RecordingInfo(enableRecording)
+          )
         )
       }
     }

@@ -149,7 +149,7 @@ class MeetingViewModel(
 
     HMSCoroutineScope.launch {
       val info = JsonObject().apply { addProperty("name", roomDetails.username) }
-      val config = HMSConfig(roomDetails.username, makeToken(), info.toString())
+      val config = HMSConfig(roomDetails.username, roomDetails.authToken, info.toString())
       sdk.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
           Log.e(TAG, error.toString())
