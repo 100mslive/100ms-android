@@ -42,6 +42,8 @@ class HomeFragment : Fragment() {
 
   override fun onResume() {
     super.onResume()
+    // FIXME: Delete the below line
+    settings.environment = "qa-in"
 
     val data = requireActivity().intent.data
     Log.v(TAG, "onResume(): Trying to update $data into EditTextMeetingUrl")

@@ -172,6 +172,12 @@ class MeetingViewModel(
 
         override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
           HMSLogger.d(TAG, "join:onPeerUpdate type=$type, peer=$peer")
+          when (type) {
+            HMSPeerUpdate.PEER_LEFT -> {
+              peer.videoTrack?.let { removeTrack(it.trackId) }
+            }
+            else -> Unit
+          }
         }
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
