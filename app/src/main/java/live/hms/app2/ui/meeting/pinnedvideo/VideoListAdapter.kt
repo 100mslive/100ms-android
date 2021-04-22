@@ -46,8 +46,8 @@ class VideoListAdapter(
     private var isSurfaceViewBinded = false
 
     fun bind(item: VideoListItem) {
-      binding.nameInitials.text = NameUtils.getInitials(item.track.mediaId)
-      binding.name.text = item.track.mediaId
+      binding.nameInitials.text = NameUtils.getInitials(item.track.peerName)
+      binding.name.text = item.track.peerName
       binding.screenShareIcon.visibility = if (item.track.isScreen) View.VISIBLE else View.GONE
 
       binding.surfaceView.apply {

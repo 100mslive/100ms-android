@@ -5,6 +5,7 @@ import live.hms.video.media.tracks.HMSVideoTrack
 
 data class MeetingTrack(
   val mediaId: String,
+  val peerName: String,
   val video: HMSVideoTrack?,
   val audio: HMSAudioTrack?,
   val isCurrentDeviceStream: Boolean,

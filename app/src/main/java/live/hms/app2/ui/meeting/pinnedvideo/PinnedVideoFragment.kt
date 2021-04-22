@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.app2.databinding.FragmentPinnedVideoBinding
 import live.hms.app2.model.RoomDetails
@@ -96,7 +97,7 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private fun updatePinnedVideoText() {
-    val nameStr = pinnedTrack?.mediaId ?: "--"
+    val nameStr = pinnedTrack?.peerName ?: "--"
     val isScreen = pinnedTrack?.isScreen ?: false
     val isVideoOff = pinnedTrack?.video == null
     binding.pinVideo.apply {

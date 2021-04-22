@@ -15,6 +15,7 @@ import live.hms.video.media.tracks.*
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.HMSUpdateListener
 import live.hms.video.sdk.models.HMSConfig
+import live.hms.video.sdk.models.HMSMessage
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -74,7 +75,7 @@ class MeetingViewModel(
 
   val broadcastsReceived = MutableLiveData<String>()
 
-  private val sdk = HMSSDK
+  private val hmsSDK = HMSSDK
     .Builder(application)
     .setLogLevel(HMSLogger.LogLevel.VERBOSE)
     .build()
@@ -116,7 +117,7 @@ class MeetingViewModel(
       _isAudioMuted = !_isAudioMuted
 
       val volume = if (_isAudioMuted) 0.0 else 1.0
-      _videoTracks.forEach { track ->
+      _audioTracks.forEach { track ->
         if (track.audio != null && track.audio != localAudioTrack) {
           (track.audio as HMSRemoteAudioTrack).setVolume(volume)
         }
@@ -150,22 +151,22 @@ class MeetingViewModel(
     HMSCoroutineScope.launch {
       val info = JsonObject().apply { addProperty("name", roomDetails.username) }
       val config = HMSConfig(roomDetails.username, roomDetails.authToken, info.toString())
-      sdk.join(config, object : HMSUpdateListener {
+      hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
           Log.e(TAG, error.toString())
           state.postValue(MeetingState.Failure(error))
         }
 
         override fun onJoin(hmsRoom: HMSRoom) {
-          val peer = sdk.getLocalPeer()
+          val peer = hmsSDK.getLocalPeer()
           peer.audioTrack?.apply {
             localAudioTrack = (this as HMSLocalAudioTrack)
-            addTrack(MeetingTrack(trackId, null, localAudioTrack, true, false))
+            addTrack(MeetingTrack(trackId, peer.name, null, localAudioTrack, true, false))
           }
           peer.videoTrack?.apply {
             localVideoTrack = (this as HMSLocalVideoTrack)
             localVideoTrack!!.startCapturing()
-            addTrack(MeetingTrack(trackId, localVideoTrack, null, true, false))
+            addTrack(MeetingTrack(trackId, peer.name, localVideoTrack, null, true, false))
           }
           state.postValue(MeetingState.Ongoing())
         }
@@ -183,12 +184,22 @@ class MeetingViewModel(
           when (type) {
             HMSTrackUpdate.TRACK_ADDED -> {
               when (track.type) {
-                HMSTrackType.AUDIO -> Unit // TODO
+                HMSTrackType.AUDIO -> addTrack(
+                  MeetingTrack(
+                    track.trackId,
+                    peerName = peer.name,
+                    video = null,
+                    audio = (track as HMSRemoteAudioTrack),
+                    isCurrentDeviceStream = false,
+                    isScreen = false
+                  )
+                )
                 HMSTrackType.VIDEO -> addTrack(
                   MeetingTrack(
                     track.trackId,
-                    (track as HMSRemoteVideoTrack),
-                    null,
+                    peerName = peer.name,
+                    video = (track as HMSRemoteVideoTrack),
+                    audio = null,
                     isCurrentDeviceStream = false,
                     isScreen = false
                   )
@@ -200,6 +211,10 @@ class MeetingViewModel(
             }
             else -> Unit
           }
+        }
+
+        override  fun onMessageReceived(message: HMSMessage) {
+
         }
       })
     }
@@ -219,7 +234,7 @@ class MeetingViewModel(
 
   fun leaveMeeting() {
     state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
-    sdk.leave()
+    hmsSDK.leave()
     state.postValue(MeetingState.Disconnected(true))
   }
 

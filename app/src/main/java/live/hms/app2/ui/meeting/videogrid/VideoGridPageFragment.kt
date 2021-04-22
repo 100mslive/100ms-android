@@ -9,6 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import live.hms.app2.databinding.FragmentVideoGridPageBinding
 import live.hms.app2.databinding.GridItemVideoBinding
 import live.hms.app2.ui.settings.SettingsStore
@@ -224,8 +225,8 @@ class VideoGridPageFragment : Fragment() {
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
 
     binding.videoCard.apply {
-      name.text = item.mediaId
-      nameInitials.text = NameUtils.getInitials(item.mediaId)
+      name.text = item.peerName
+      nameInitials.text = NameUtils.getInitials(item.peerName)
       iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
       iconVideoOff.visibility = if (item.video != null) View.VISIBLE else View.GONE
 

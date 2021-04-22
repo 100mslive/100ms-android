@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">100ms</string>
+    <string name="app_name">100ms(v2)</string>
 
     <string name="home_fragment">Home Fragment</string>
     <string name="meeting_fragment">Meeting Fragment</string>
