@@ -97,11 +97,11 @@ class VideoGridFragment : Fragment() {
     }
 
     if (settings.detectDominantSpeaker) {
-      meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) { dominantSpeakerTrack ->
-        if (dominantSpeakerTrack == null) {
+      meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) { dominantSpeaker ->
+        if (dominantSpeaker == null) {
           binding.dominantSpeakerName.setText(R.string.no_one_speaking)
         } else {
-          binding.dominantSpeakerName.text = "Dominant Speaker: ${dominantSpeakerTrack.mediaId}"
+          binding.dominantSpeakerName.text = "Dominant Speaker: ${dominantSpeaker.peerName}"
         }
       }
     } else {

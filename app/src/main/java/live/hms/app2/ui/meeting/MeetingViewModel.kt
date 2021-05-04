@@ -177,6 +177,15 @@ class MeetingViewModel(
             HMSPeerUpdate.PEER_LEFT -> {
               peer.videoTrack?.let { removeTrack(it.trackId) }
             }
+            HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
+              val videoTrackId = peer.videoTrack?.trackId
+              videoTrackId?.let {
+                val meetingTrack = getTrackById(videoTrackId)
+                meetingTrack?.let {
+                  dominantSpeaker.value = it
+                }
+              }
+            }
             else -> Unit
           }
         }
@@ -225,6 +234,16 @@ class MeetingViewModel(
       })
     }
   }
+
+  fun getTrackById(trackId: String): MeetingTrack? {
+    for (track in _videoTracks) {
+      if (track.mediaId.equals(trackId, true))
+        return track
+    }
+
+    return null
+  }
+
 
   fun flipCamera() {
     if (!settings.publishVideo) {
