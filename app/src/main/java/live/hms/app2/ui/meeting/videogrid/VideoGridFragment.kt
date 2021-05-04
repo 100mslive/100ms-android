@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentGridVideoBinding

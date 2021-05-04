@@ -15,6 +15,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
@@ -219,7 +220,7 @@ class HomeFragment : Fragment() {
             "Created room ${data.roomId} \uD83E\uDD73",
             Toast.LENGTH_SHORT
           ).show()
-          tryJoiningRoomAs("Host")
+          tryJoiningRoomAs("Teacher")
         }
 
         Status.ERROR -> {
@@ -323,7 +324,7 @@ class HomeFragment : Fragment() {
         settings.lastUsedRoomId = meetingUrl
       }
 
-      if (allOk) tryJoiningRoomAs("Guest")
+      if (allOk) tryJoiningRoomAs("Teacher")
     }
 
     binding.buttonStartMeeting.setOnClickListener {
