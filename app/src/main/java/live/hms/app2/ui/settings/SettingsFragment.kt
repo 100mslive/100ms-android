@@ -44,6 +44,13 @@ class SettingsFragment : Fragment() {
       "LAN (4 mbps)" to 4096
     )
 
+    private val ROLES = arrayOf(
+      "Teacher",
+      "Student",
+      "Viewer",
+      "Admin"
+    )
+
     private const val FRONT_FACING_CAMERA = "user"
     private const val REAR_FACING_CAMERA = "environment"
 
@@ -294,6 +301,14 @@ class SettingsFragment : Fragment() {
         VIDEO_BITRATE.filterValues { it == settings.videoBitrate }.keys.first(),
         VIDEO_BITRATE.keys.toTypedArray(),
       ) { commitHelper.setVideoBitrate(VIDEO_BITRATE.getValue(it)) }
+
+      initAutoCompleteView(
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        containerRole,
+        autoCompleteRole,
+        ROLES[0],
+        ROLES,
+      ) { commitHelper.setRole(it) }
 
     }
   }

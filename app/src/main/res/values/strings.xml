@@ -59,6 +59,7 @@
     <string name="video_resolution">Video Resolution</string>
     <string name="video_codec">Video Codec</string>
     <string name="video_bitrate">Video Bitrate</string>
+    <string name="role">Role</string>
     <string name="video_framerate">Video Framerate</string>
     <string name="advanced_settings">Advanced Settings</string>
 

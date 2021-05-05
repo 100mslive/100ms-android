@@ -220,7 +220,7 @@ class HomeFragment : Fragment() {
             "Created room ${data.roomId} \uD83E\uDD73",
             Toast.LENGTH_SHORT
           ).show()
-          tryJoiningRoomAs("Teacher")
+          tryJoiningRoomAs(SettingsStore(requireContext()).role)
         }
 
         Status.ERROR -> {
@@ -324,7 +324,7 @@ class HomeFragment : Fragment() {
         settings.lastUsedRoomId = meetingUrl
       }
 
-      if (allOk) tryJoiningRoomAs("Teacher")
+      if (allOk) tryJoiningRoomAs(SettingsStore(requireContext()).role)
     }
 
     binding.buttonStartMeeting.setOnClickListener {

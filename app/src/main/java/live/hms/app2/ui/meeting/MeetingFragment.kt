@@ -295,7 +295,7 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    meetingViewModel.isVideoEnabled.observe(viewLifecycleOwner) { enabled ->
+    meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleVideo.apply {
         setIconResource(
           if (enabled) R.drawable.ic_videocam_24
@@ -304,7 +304,7 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    meetingViewModel.isAudioEnabled.observe(viewLifecycleOwner) { enabled ->
+    meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleAudio.apply {
         setIconResource(
           if (enabled) R.drawable.ic_mic_24
@@ -389,7 +389,7 @@ class MeetingFragment : Fragment() {
 
       setOnSingleClickListener(200L) {
         Log.v(TAG, "buttonToggleVideo.onClick()")
-        meetingViewModel.toggleUserVideo()
+        meetingViewModel.toggleLocalVideo()
       }
     }
 
@@ -400,7 +400,7 @@ class MeetingFragment : Fragment() {
 
       setOnSingleClickListener(200L) {
         Log.v(TAG, "buttonToggleAudio.onClick()")
-        meetingViewModel.toggleUserMic()
+        meetingViewModel.toggleLocalAudio()
       }
     }
 

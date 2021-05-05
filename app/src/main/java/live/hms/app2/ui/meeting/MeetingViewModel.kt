@@ -60,8 +60,8 @@ class MeetingViewModel(
   // TODO: Listen to changes in publishVideo & publishAudio
   //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
   // Live data for user media controls
-  val isAudioEnabled = MutableLiveData(settings.publishAudio)
-  val isVideoEnabled = MutableLiveData(settings.publishVideo)
+  val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
+  val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
   private var localAudioTrack: HMSLocalAudioTrack? = null
   private var localVideoTrack: HMSLocalVideoTrack? = null
@@ -80,7 +80,7 @@ class MeetingViewModel(
     .setLogLevel(HMSLogger.LogLevel.VERBOSE)
     .build()
 
-  fun toggleUserVideo() {
+  fun toggleLocalVideo() {
     HMSCoroutineScope.launch {
       localVideoTrack?.apply {
         val isVideo = !isEnabled
@@ -91,19 +91,19 @@ class MeetingViewModel(
           stopCapturing()
         }
 
-        isVideoEnabled.postValue(isVideo)
+        isLocalVideoEnabled.postValue(isVideo)
         crashlyticsLog(TAG, "toggleUserVideo: enabled=$isVideo")
       }
     }
   }
 
-  fun toggleUserMic() {
+  fun toggleLocalAudio() {
     HMSCoroutineScope.launch {
       localAudioTrack?.apply {
         val isAudio = !isEnabled
         setEnabled(isAudio)
 
-        isAudioEnabled.postValue(isAudio)
+        isLocalAudioEnabled.postValue(isAudio)
         crashlyticsLog(TAG, "toggleUserMic: enabled=$isAudio")
       }
     }
@@ -177,14 +177,19 @@ class MeetingViewModel(
             HMSPeerUpdate.PEER_LEFT -> {
               peer.videoTrack?.let { removeTrack(it.trackId) }
             }
+
             HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
               val videoTrackId = peer.videoTrack?.trackId
               videoTrackId?.let {
                 val meetingTrack = getTrackById(videoTrackId)
                 meetingTrack?.let {
-                  dominantSpeaker.value = it
+                  dominantSpeaker.postValue(it)
                 }
               }
+            }
+
+            HMSPeerUpdate.NO_DOMINANT_SPEAKER -> {
+              dominantSpeaker.postValue(null)
             }
             else -> Unit
           }
