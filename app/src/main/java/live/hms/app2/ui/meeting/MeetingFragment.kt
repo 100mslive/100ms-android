@@ -11,7 +11,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.audio.HMSAudioManager
@@ -84,6 +83,7 @@ class MeetingFragment : Fragment() {
   override fun onStop() {
     super.onStop()
     stopAudioManager()
+    chatViewModel.removeSendBroadcastCallback()
     settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
@@ -218,6 +218,7 @@ class MeetingFragment : Fragment() {
     meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
       chatViewModel.receivedMessage(it)
     }
+    chatViewModel.setSendBroadcastCallback { meetingViewModel.sendChatMessage(it) }
 
     chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
       if (count > 0) {

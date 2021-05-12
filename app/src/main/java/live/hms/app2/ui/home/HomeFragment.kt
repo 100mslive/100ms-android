@@ -15,7 +15,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
@@ -43,13 +42,10 @@ class HomeFragment : Fragment() {
 
   override fun onResume() {
     super.onResume()
-    // FIXME: Delete the below line
-    settings.environment = "qa-in"
-
     val data = requireActivity().intent.data
     Log.v(TAG, "onResume(): Trying to update $data into EditTextMeetingUrl")
 
-    if (data != null) {
+    if (data != null && data.toString().isNotEmpty()) {
       updateAndVerifyMeetingUrl(data.toString())
     }
   }
@@ -164,7 +160,7 @@ class HomeFragment : Fragment() {
         roomId = settings.lastUsedRoomId,
         username = username,
         role = role,
-        environment = settings.environment
+        environment = "qa-in"
       )
     )
   }
@@ -239,12 +235,10 @@ class HomeFragment : Fragment() {
     var allOk = true
     try {
       val uri = Uri.parse(url)
-      val roomId = uri.getQueryParameter("room")!!
-      val host = uri.host!!
-      val environment = uri.getQueryParameter("env") ?: host.split('.')[0]
+      val lastSlashIndex = uri.path!!.lastIndexOf("/")
+      val roomId = uri.path!!.substring(lastSlashIndex + 1)
 
       settings.lastUsedRoomId = roomId
-      settings.environment = environment
       binding.editTextMeetingUrl.setText(roomId)
     } catch (e: Exception) {
       Log.e(TAG, "Cannot update $url", e)
@@ -272,17 +266,12 @@ class HomeFragment : Fragment() {
       }
 
       settings.lastUsedRoomId.isNotEmpty() -> {
-        "https://${settings.environment}.100ms.live/?" +
-            arrayOf(
-              "room=${settings.lastUsedRoomId}",
-              "env=${settings.environment}",
-              "role=Guest"
-            ).joinToString("&")
+        "https://qa2.100ms.live/meeting/${settings.lastUsedRoomId}"
       }
       else -> ""
     }
 
-    updateAndVerifyMeetingUrl(url)
+    url.isNotBlank() && updateAndVerifyMeetingUrl(url)
 
     mapOf(
       binding.editTextName to binding.containerName,
@@ -344,7 +333,7 @@ class HomeFragment : Fragment() {
         homeViewModel.sendCreateRoomRequest(
           CreateRoomRequest(
             roomName,
-            settings.environment,
+           "qa-in",
             RecordingInfo(enableRecording)
           )
         )

@@ -115,7 +115,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(CODEC, value)
 
   var role: String
-    get() = sharedPreferences.getString(ROLE, "teacher")!!
+    get() = sharedPreferences.getString(ROLE, "Student")!!
     set(value) = putString(ROLE, value)
 
   var videoBitrate: Int
@@ -151,7 +151,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(LAST_USED_ROOM_ID, value)
 
   var environment: String
-    get() = sharedPreferences.getString(ENVIRONMENT, "prod-in")!!
+    get() = sharedPreferences.getString(ENVIRONMENT, "qa-in2")!!
     set(value) = putString(ENVIRONMENT, value)
 
 

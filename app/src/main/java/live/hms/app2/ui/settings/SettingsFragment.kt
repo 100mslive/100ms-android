@@ -306,7 +306,7 @@ class SettingsFragment : Fragment() {
         EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
         containerRole,
         autoCompleteRole,
-        ROLES[0],
+        settings.role,
         ROLES,
       ) { commitHelper.setRole(it) }
 

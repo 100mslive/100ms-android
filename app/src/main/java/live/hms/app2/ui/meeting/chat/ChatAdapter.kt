@@ -1,20 +1,23 @@
 package live.hms.app2.ui.meeting.chat
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemChatBinding
 import java.util.*
 
 class ChatAdapter(
-  private val messages: ArrayList<String>
+  private val messages: ArrayList<ChatMessage>
 ) : RecyclerView.Adapter<ChatAdapter.ChatMessageViewHolder>() {
 
   inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(message: String) {
-      binding.message.text = message
+    fun bind(message: ChatMessage) {
+      binding.name.text = message.senderName
+      binding.message.text = message.message
+      binding.blueBar.visibility = if (message.isSentByMe) View.VISIBLE else View.GONE
     }
   }
 

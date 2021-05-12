@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/blue_2"
     android:animateLayoutChanges="true"
+    android:background="@color/blue_2"
     android:orientation="vertical"
     tools:context=".ui.home.HomeFragment">
 
@@ -19,9 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/blue_3"
-            app:menu="@menu/menu_chat"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:title="@string/server_message_log" />
+            app:menu="@menu/menu_chat"
+            app:title="@string/chat" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,10 +35,9 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:baselineAligned="false"
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
-        android:visibility="gone"
+        android:baselineAligned="false"
         android:orientation="horizontal">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -47,26 +46,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
-            app:endIconMode="custom"
-            app:endIconTint="@color/white"
+            android:hint="@string/message"
             app:endIconDrawable="@drawable/ic_send_24"
-            android:hint="@string/message">
+            app:endIconMode="custom"
+            app:endIconTint="@color/white">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_message"
                 android:layout_width="match_parent"
-                android:hint="@string/type_a_message"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:hint="@string/type_a_message" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-<!--        <com.google.android.material.button.MaterialButton-->
-<!--            android:id="@+id/button_send_message"-->
-<!--            style="@style/MaterialImageButton"-->
-<!--            android:contentDescription="@string/send_message"-->
-<!--            app:icon="@drawable/ic_send_24" />-->
-
     </LinearLayout>
-
 
 </LinearLayout>

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.app2.databinding.FragmentPinnedVideoBinding
 import live.hms.app2.model.RoomDetails
@@ -97,14 +96,12 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private fun updatePinnedVideoText() {
-    val nameStr = pinnedTrack?.peerName ?: "--"
+    val nameStr = pinnedTrack?.peer?.name ?: "--"
     val isScreen = pinnedTrack?.isScreen ?: false
-    val isVideoOff = pinnedTrack?.video == null
     binding.pinVideo.apply {
       name.text = nameStr
       nameInitials.text = NameUtils.getInitials(nameStr)
       iconScreenShare.visibility = if (isScreen) View.VISIBLE else View.GONE
-      iconVideoOff.visibility = if (isVideoOff) View.VISIBLE else View.GONE
     }
   }
 
@@ -152,7 +149,7 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private fun initViewModels() {
-    meetingViewModel.videoTracks.observe(viewLifecycleOwner) { tracks ->
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       if (tracks.isNotEmpty()) {
         // Pin a screen if possible else pin user's video
         val toPin = tracks.find { it.isScreen } ?: tracks[0]

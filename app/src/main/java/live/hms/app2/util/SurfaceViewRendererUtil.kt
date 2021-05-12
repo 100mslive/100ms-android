@@ -41,7 +41,7 @@ object SurfaceViewRendererUtil {
       init(context, null)
       ++initializedContextCount
 
-      item.video.addSink(this)
+      item.video!!.addSink(this)
     }
 
     crashlyticsLog(
@@ -67,7 +67,7 @@ object SurfaceViewRendererUtil {
       // NOTE: We don't dispose off the MediaStreamTrack here as it can
       // be re-used by the any other view
 
-      item.video.removeSink(this)
+      item.video!!.removeSink(this)
       release()
       --initializedContextCount
     }

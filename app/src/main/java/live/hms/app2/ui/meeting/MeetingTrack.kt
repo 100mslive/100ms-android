@@ -1,22 +1,22 @@
 package live.hms.app2.ui.meeting
 
-import live.hms.video.media.tracks.HMSAudioTrack
-import live.hms.video.media.tracks.HMSVideoTrack
+import live.hms.video.media.tracks.*
+import live.hms.video.sdk.models.HMSPeer
 
 data class MeetingTrack(
-  val mediaId: String,
-  val peerName: String,
-  val video: HMSVideoTrack?,
-  val audio: HMSAudioTrack?,
-  val isCurrentDeviceStream: Boolean,
-  val isScreen: Boolean = false,
+  val peer: HMSPeer,
+  var video: HMSVideoTrack?,
+  var audio: HMSAudioTrack?,
 ) {
 
   override fun equals(other: Any?): Boolean {
     if (other is MeetingTrack) {
-      return other.mediaId == mediaId
+      return (other.peer.peerID == peer.peerID && other.video?.trackId == video?.trackId && other.audio?.trackId == audio?.trackId)
     }
 
     return super.equals(other)
   }
+
+  val isLocal: Boolean = peer.isLocal
+  val isScreen: Boolean = video?.source == HMSTrackSource.SCREEN
 }

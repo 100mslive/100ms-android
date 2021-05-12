@@ -9,12 +9,11 @@ import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import live.hms.app2.databinding.FragmentVideoGridPageBinding
 import live.hms.app2.databinding.GridItemVideoBinding
-import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
@@ -44,6 +43,8 @@ class VideoGridPageFragment : Fragment() {
       }
     }
   }
+
+  private val bindedVideoTrackIds = mutableSetOf<String>()
 
   private var binding by viewLifecycle<FragmentVideoGridPageBinding>()
   private val meetingViewModel by activityViewModels<MeetingViewModel>()
@@ -146,13 +147,13 @@ class VideoGridPageFragment : Fragment() {
   }
 
   private fun initViewModels() {
-    meetingViewModel.videoTracks.observe(viewLifecycleOwner) { tracks ->
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val videos = getCurrentPageVideos(tracks)
       updateVideos(videos)
     }
   }
 
-  fun updateVideos(newVideos: Array<MeetingTrack>) {
+  private fun updateVideos(newVideos: Array<MeetingTrack>) {
     crashlyticsLog(
       TAG,
       "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
@@ -186,6 +187,13 @@ class VideoGridPageFragment : Fragment() {
       if (renderedViewPair != null) {
         crashlyticsLog(TAG, "updateVideos: Keeping view for video=$newVideo in fragment=$tag")
         newRenderedViews.add(renderedViewPair)
+
+        if (isViewVisible && !bindedVideoTrackIds.contains(newVideo.video?.trackId ?: "")) {
+          // This view is not yet initialized (possibly because when AudioTrack was added --
+          // VideoTrack was not present, hence had to create an empty tile)
+          bindSurfaceView(renderedViewPair.binding, newVideo)
+        }
+
       } else {
         crashlyticsLog(TAG, "updateVideos: Creating view for video=${newVideo} from fragment=$tag")
 
@@ -211,12 +219,22 @@ class VideoGridPageFragment : Fragment() {
     renderedViews.clear()
     renderedViews.addAll(newRenderedViews)
 
+    // Re-bind all the videos, this handles any changes made in isMute
+    for (view in renderedViews) {
+      bindVideo(view.binding, view.video)
+    }
+
     updateGridLayoutDimensions()
   }
 
   private fun bindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
+    if (item.video == null || item.video?.isMute == true) return
+
     SurfaceViewRendererUtil.bind(binding.videoCard.surfaceView, item, "fragment=$tag").let {
-      if (it) binding.videoCard.surfaceView.visibility = View.VISIBLE
+      if (it) {
+        binding.videoCard.surfaceView.visibility = View.VISIBLE
+        bindedVideoTrackIds.add(item.video!!.trackId)
+      }
     }
   }
 
@@ -225,10 +243,19 @@ class VideoGridPageFragment : Fragment() {
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
 
     binding.videoCard.apply {
-      name.text = item.peerName
-      nameInitials.text = NameUtils.getInitials(item.peerName)
+      name.text = item.peer.name
+      nameInitials.text = NameUtils.getInitials(item.peer.name)
       iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
-      iconVideoOff.visibility = if (item.video != null) View.VISIBLE else View.GONE
+      iconAudioOff.visibility = if (
+        item.isScreen.not() &&
+        (item.audio == null || item.audio!!.isMute)
+      ) View.VISIBLE else View.GONE
+
+      if (item.video == null || item.video?.isMute == true) {
+        surfaceView.visibility = View.GONE
+      } else {
+        surfaceView.visibility = View.VISIBLE
+      }
 
       // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
       surfaceView.apply {
@@ -239,8 +266,13 @@ class VideoGridPageFragment : Fragment() {
   }
 
   private fun unbindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
+    if (!bindedVideoTrackIds.contains(item.video?.trackId ?: "")) return
+
     SurfaceViewRendererUtil.unbind(binding.videoCard.surfaceView, item, "fragment=$tag").let {
-      if (it) binding.videoCard.surfaceView.visibility = View.INVISIBLE
+      if (it) {
+        binding.videoCard.surfaceView.visibility = View.INVISIBLE
+        bindedVideoTrackIds.remove(item.video!!.trackId)
+      }
     }
   }
 

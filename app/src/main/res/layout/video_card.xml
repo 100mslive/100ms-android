@@ -53,13 +53,13 @@
                 android:text="@string/john_doe" />
 
             <ImageView
-                android:id="@+id/icon_video_off"
+                android:id="@+id/icon_audio_off"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="8dp"
                 android:contentDescription="@string/screen_share"
-                android:src="@drawable/ic_videocam_off_24"
+                android:src="@drawable/ic_mic_off_24"
                 app:tint="@color/white_faded_70" />
 
             <ImageView
@@ -71,8 +71,6 @@
                 android:contentDescription="@string/screen_share"
                 android:src="@drawable/ic_mobile_screen_share_24"
                 app:tint="@color/white_faded_70" />
-
-            <!-- TODO: Add other icons here -->
 
         </LinearLayout>
 

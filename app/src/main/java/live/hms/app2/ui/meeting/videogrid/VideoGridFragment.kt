@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentGridVideoBinding
@@ -91,7 +90,7 @@ class VideoGridFragment : Fragment() {
 
   @SuppressLint("SetTextI18n")
   private fun initViewModels() {
-    meetingViewModel.videoTracks.observe(viewLifecycleOwner) { tracks ->
+    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
       adapter.totalPages = (tracks.size + itemsPerPage - 1) / itemsPerPage
     }
@@ -101,7 +100,7 @@ class VideoGridFragment : Fragment() {
         if (dominantSpeaker == null) {
           binding.dominantSpeakerName.setText(R.string.no_one_speaking)
         } else {
-          binding.dominantSpeakerName.text = "Dominant Speaker: ${dominantSpeaker.peerName}"
+          binding.dominantSpeakerName.text = "Dominant Speaker: ${dominantSpeaker.peer.name}"
         }
       }
     } else {

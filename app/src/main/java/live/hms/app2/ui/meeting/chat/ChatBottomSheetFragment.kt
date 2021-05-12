@@ -27,7 +27,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   private lateinit var roomDetails: RoomDetails
   private lateinit var currentUserCustomerId: String
 
-  private val messages = ArrayList<String>()
+  private val messages = ArrayList<ChatMessage>()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
@@ -76,13 +76,12 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
       val messageStr = binding.editTextMessage.text.toString().trim()
       if (messageStr.isNotEmpty()) {
         val message = ChatMessage(
-            currentUserCustomerId,
             roomDetails.username,
             Date(),
             messageStr,
             true
         )
-        // chatViewModel.broadcast(message)
+        chatViewModel.broadcast(message)
         binding.editTextMessage.setText("")
       }
     }
