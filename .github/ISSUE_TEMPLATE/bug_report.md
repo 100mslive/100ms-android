@@ -34,8 +34,9 @@ If applicable, add screenshots or videos to help explain your problem.
 - 100ms SDK Version: [e.g 0.9.17.6]
 
 ## Additional context
-Add any other context about the problem here. 
+Add any other context about the problem here. Adding any of the below would help us in debugging, 
 1. Attach logs or link to the app specific logs with `HMSLogger.LogLevel = VERBOSE`
 2. List of possible fixes that you have tried
 3. Attach APK to the app where the issue is reproducible
-4. Link to the source code 
+4. Link to the source code of the app where issue is present
+5. Relevant code snippets using the 100ms SDK  
