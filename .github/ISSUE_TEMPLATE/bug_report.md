@@ -26,7 +26,7 @@ A clear and concise description of what you expected to happen.
 ## Screenshots
 If applicable, add screenshots or videos to help explain your problem.
 
-## Device Details (please complete the following information):**
+## Device Details (please complete the following information):
 [*See Codename, Tags, and Build Numbers*](https://source.android.com/setup/start/build-numbers) 
 - Device: [e.g. Samsung Galaxy Note 10]
 - OS: [e.g Android 11]
