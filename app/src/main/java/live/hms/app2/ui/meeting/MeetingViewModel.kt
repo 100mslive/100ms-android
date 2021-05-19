@@ -12,12 +12,10 @@ import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.*
+import live.hms.video.sdk.HMSAudioListener
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.HMSUpdateListener
-import live.hms.video.sdk.models.HMSConfig
-import live.hms.video.sdk.models.HMSMessage
-import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.HMSRoom
+import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.enums.HMSTrackUpdate
@@ -68,6 +66,7 @@ class MeetingViewModel(
 
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
+  val speakers = MutableLiveData<Array<HMSSpeaker>>()
 
   // Dominant speaker
   val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
@@ -76,7 +75,6 @@ class MeetingViewModel(
 
   private val hmsSDK = HMSSDK
     .Builder(application)
-    .setLogLevel(HMSLogger.LogLevel.VERBOSE)
     .build()
 
   fun toggleLocalVideo() {
@@ -175,11 +173,18 @@ class MeetingViewModel(
 
             HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
               synchronized(_tracks) {
+                val prevSize = _tracks.size
                 val track = _tracks.find {
                   it.peer.peerID == peer.peerID &&
                       it.video?.trackId == peer.videoTrack?.trackId
                 }
-                if (track != null) dominantSpeaker.postValue(track)
+                if (track != null) {
+                  dominantSpeaker.postValue(track)
+                  _tracks.remove(track)
+                  _tracks.add(0, track)
+                  tracks.postValue(_tracks)
+                }
+                assert(prevSize == _tracks.size)
               }
             }
 
@@ -189,6 +194,19 @@ class MeetingViewModel(
 
             else -> Unit
           }
+        }
+
+        override fun onReconnected() {
+          state.postValue(MeetingState.Ongoing())
+        }
+
+        override fun onReconnecting(error: HMSException) {
+          state.postValue(
+            MeetingState.Reconnecting(
+              "Reconnecting",
+              error.message ?: "Re-establishing connection.."
+            )
+          )
         }
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
@@ -218,6 +236,13 @@ class MeetingViewModel(
               false
             )
           )
+        }
+      })
+
+      hmsSDK.addAudioObserver(object : HMSAudioListener {
+        override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
+          Log.v(TAG, "onAudioLevelUpdate: speakers=$speakers")
+          this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
     }
@@ -287,6 +312,8 @@ class MeetingViewModel(
   private fun addTrack(track: HMSTrack, peer: HMSPeer) {
     if (track is HMSAudioTrack) addAudioTrack(track, peer)
     else if (track is HMSVideoTrack) addVideoTrack(track, peer)
+
+    HMSLogger.v(TAG, "addTrack: count=${_tracks.size} track=$track, peer=$peer")
   }
 
   private fun removeTrack(track: HMSVideoTrack, peer: HMSPeer) {

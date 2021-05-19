@@ -17,6 +17,7 @@ import live.hms.app2.audio.HMSAudioManager
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
+import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
@@ -47,7 +48,7 @@ class MeetingFragment : Fragment() {
 
   private lateinit var audioManager: HMSAudioManager
 
-  private var meetingViewMode = MeetingViewMode.GRID
+  private var meetingViewMode = MeetingViewMode.ACTIVE_SPEAKER
 
   private var isMeetingOngoing = false
 
@@ -114,6 +115,10 @@ class MeetingFragment : Fragment() {
         requireContext().startActivity(
           EmailUtils.getCrashLogIntent(requireContext())
         )
+      }
+
+      R.id.active_speaker_view -> {
+        changeMeetingMode(MeetingViewMode.ACTIVE_SPEAKER)
       }
 
       R.id.action_grid_view -> {
@@ -260,6 +265,11 @@ class MeetingFragment : Fragment() {
           builder.create().show()
         }
 
+        is MeetingState.Reconnecting -> {
+          updateProgressBarUI(state.heading, state.message)
+          showProgressBar()
+        }
+
         is MeetingState.Connecting -> {
           updateProgressBarUI(state.heading, state.message)
           showProgressBar()
@@ -359,6 +369,7 @@ class MeetingFragment : Fragment() {
     val fragment = when (meetingViewMode) {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
+      MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
     }
 
     childFragmentManager

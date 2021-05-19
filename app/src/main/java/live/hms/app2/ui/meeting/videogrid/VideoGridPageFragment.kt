@@ -46,6 +46,8 @@ class VideoGridPageFragment : Fragment() {
 
   private val bindedVideoTrackIds = mutableSetOf<String>()
 
+  private lateinit var settings: SettingsStore
+
   private var binding by viewLifecycle<FragmentVideoGridPageBinding>()
   private val meetingViewModel by activityViewModels<MeetingViewModel>()
 
@@ -68,6 +70,7 @@ class VideoGridPageFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    settings = SettingsStore(requireContext())
     binding = FragmentVideoGridPageBinding.inflate(inflater, container, false)
 
     pageIndex = requireArguments()[BUNDLE_PAGE_INDEX] as Int
@@ -150,6 +153,41 @@ class VideoGridPageFragment : Fragment() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val videos = getCurrentPageVideos(tracks)
       updateVideos(videos)
+    }
+
+    meetingViewModel.speakers.observe(viewLifecycleOwner) { speakers ->
+      renderedViews.forEach { renderedView ->
+        val track = renderedView.video.audio
+        renderedView.binding.apply {
+          if (track == null || track.isMute) {
+            videoCard.audioLevel.apply {
+              visibility = View.GONE
+              text = "-"
+            }
+            container.strokeWidth = 0
+          } else {
+            val level = speakers.find { it.trackId == track.trackId }?.level ?: 0
+
+            videoCard.audioLevel.apply {
+              visibility = View.VISIBLE
+              text = "$level"
+            }
+
+            when {
+              level >= 70 -> {
+                container.strokeWidth = 6
+              }
+              70 > level && level >= settings.silenceAudioLevelThreshold -> {
+                container.strokeWidth = 4
+              }
+              else -> {
+                container.strokeWidth = 0
+              }
+            }
+          }
+
+        }
+      }
     }
   }
 
