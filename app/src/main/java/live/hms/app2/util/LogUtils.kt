@@ -64,10 +64,9 @@ object LogUtils {
       override fun onLogMessage(
         level: HMSLogger.LogLevel,
         tag: String,
-        message: String,
-        isWebRtCLog: Boolean
+        message: String
       ) {
-        val prefix = "[${if (isWebRtCLog) "RTC" else "HMS"}:$level:$tag]"
+        val prefix = "[${if (false) "RTC" else "HMS"}:$level:$tag]"
         fileWriter.write("$prefix\t\t${message.trimEnd()}\n")
       }
     })

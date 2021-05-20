@@ -95,6 +95,7 @@
         android:background="@drawable/circle_secondary_24"
         android:gravity="center"
         android:text="@string/_08"
+        android:visibility="gone"
         android:textColor="@android:color/white"
         android:textSize="10sp"
         android:textStyle="bold" />

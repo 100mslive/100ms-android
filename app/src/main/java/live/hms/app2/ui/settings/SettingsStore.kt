@@ -156,7 +156,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(LAST_USED_ROOM_ID, value)
 
   var environment: String
-    get() = sharedPreferences.getString(ENVIRONMENT, "qa-in2")!!
+    get() = sharedPreferences.getString(ENVIRONMENT, "prod")!!
     set(value) = putString(ENVIRONMENT, value)
 
 

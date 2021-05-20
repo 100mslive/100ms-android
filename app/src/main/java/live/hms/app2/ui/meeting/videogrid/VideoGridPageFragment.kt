@@ -9,6 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import live.hms.app2.databinding.FragmentVideoGridPageBinding
 import live.hms.app2.databinding.GridItemVideoBinding
 import live.hms.app2.ui.meeting.MeetingTrack
@@ -168,10 +169,10 @@ class VideoGridPageFragment : Fragment() {
           } else {
             val level = speakers.find { it.trackId == track.trackId }?.level ?: 0
 
-            videoCard.audioLevel.apply {
+            /*videoCard.audioLevel.apply {
               visibility = View.VISIBLE
               text = "$level"
-            }
+            }*/
 
             when {
               level >= 70 -> {

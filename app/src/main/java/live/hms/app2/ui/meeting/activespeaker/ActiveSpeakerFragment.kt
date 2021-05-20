@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.databinding.ListItemVideoBinding
 import live.hms.app2.model.RoomDetails
@@ -219,8 +220,11 @@ class ActiveSpeakerFragment : Fragment() {
         }
       }
 
-      changePinViewVideo(tracks.removeAt(0))
-      updateBottomTrayVideoText(tracks.toTypedArray())
+      if (tracks.size > 0) {
+        changePinViewVideo(tracks.removeAt(0))
+        updateBottomTrayVideoText(tracks.toTypedArray())
+      }
+
     }
   }
 }

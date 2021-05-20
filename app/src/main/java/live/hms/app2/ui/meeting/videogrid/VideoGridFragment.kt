@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentGridVideoBinding
@@ -96,17 +97,16 @@ class VideoGridFragment : Fragment() {
     }
 
     if (settings.detectDominantSpeaker) {
-      meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) { dominantSpeaker ->
-        if (dominantSpeaker == null) {
+      meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) { meetingTrack ->
+        if (meetingTrack == null) {
           binding.dominantSpeakerName.setText(R.string.no_one_speaking)
         } else {
-          binding.dominantSpeakerName.text = "Dominant Speaker: ${dominantSpeaker.peer.name}"
+          binding.dominantSpeakerName.text = "Dominant Speaker: ${meetingTrack.peer.name}"
         }
       }
     } else {
       binding.containerDominantSpeaker.visibility = View.GONE
     }
-
     binding.containerNetworkInfo.visibility = View.GONE
   }
 }

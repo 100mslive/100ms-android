@@ -139,7 +139,7 @@ class MeetingViewModel(
         roomDetails.username,
         roomDetails.authToken,
         info.toString(),
-        initEndpoint = "https://${roomDetails.env}.100ms.live/init"
+        initEndpoint = "https://${roomDetails.env}-init.100ms.live/init"
       )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
@@ -178,13 +178,14 @@ class MeetingViewModel(
                   it.peer.peerID == peer.peerID &&
                       it.video?.trackId == peer.videoTrack?.trackId
                 }
-                if (track != null) {
+                if (track != null) dominantSpeaker.postValue(track)
+/*                if (track != null) {
                   dominantSpeaker.postValue(track)
                   _tracks.remove(track)
                   _tracks.add(0, track)
                   tracks.postValue(_tracks)
                 }
-                assert(prevSize == _tracks.size)
+                assert(prevSize == _tracks.size)*/
               }
             }
 
@@ -196,18 +197,6 @@ class MeetingViewModel(
           }
         }
 
-        override fun onReconnected() {
-          state.postValue(MeetingState.Ongoing())
-        }
-
-        override fun onReconnecting(error: HMSException) {
-          state.postValue(
-            MeetingState.Reconnecting(
-              "Reconnecting",
-              error.message ?: "Re-establishing connection.."
-            )
-          )
-        }
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
           HMSLogger.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
