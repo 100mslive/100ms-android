@@ -77,7 +77,8 @@
             android:id="@+id/container_resolution_width"
             style="@style/TextInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_resolution_width"
@@ -92,7 +93,8 @@
             android:id="@+id/container_resolution_height"
             style="@style/TextInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_resolution_height"
@@ -108,7 +110,8 @@
             style="@style/AutoCompleteTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/auto_complete_codecs">
+            android:labelFor="@id/auto_complete_codecs"
+            android:visibility="gone">
 
             <AutoCompleteTextView
                 android:id="@+id/auto_complete_codecs"
@@ -124,7 +127,8 @@
             style="@style/AutoCompleteTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/auto_complete_video_bitrate">
+            android:labelFor="@id/auto_complete_video_bitrate"
+            android:visibility="gone">
 
             <AutoCompleteTextView
                 android:id="@+id/auto_complete_video_bitrate"
@@ -155,7 +159,8 @@
             android:id="@+id/container_video_framerate"
             style="@style/TextInputLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_video_framerate"
@@ -182,12 +187,43 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_log_levels_webrtc"
+            style="@style/AutoCompleteTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/auto_complete_log_levels_webrtc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_level_webrtc"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_log_levels_100ms_sdk"
+            style="@style/AutoCompleteTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/auto_complete_log_levels_100ms_sdk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_level_100ms_sdk"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_publish_video_on_join"
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/publish_video_while_joining" />
+            android:text="@string/publish_video_while_joining"
+            android:visibility="gone" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_publish_audio_on_join"
@@ -201,7 +237,8 @@
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/mirror_my_video" />
+            android:text="@string/mirror_my_video"
+            android:visibility="gone" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_show_preview_before_join"
@@ -228,7 +265,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/silence_audio_level_threshold"
-                android:inputType="numberDecimal" />
+                android:inputType="number" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

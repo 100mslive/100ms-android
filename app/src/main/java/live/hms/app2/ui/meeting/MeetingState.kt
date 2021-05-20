@@ -13,6 +13,7 @@ sealed class MeetingState {
   data class PublishingMedia(val heading: String, val message: String) : MeetingState()
   data class Ongoing(val message: String = "") : MeetingState()
   data class Disconnecting(val heading: String, val message: String) : MeetingState()
+  data class Reconnecting(val heading: String, val message: String) : MeetingState()
   data class Disconnected(val goToHome: Boolean = false) : MeetingState()
 
   data class Failure(val exception: HMSException) : MeetingState()

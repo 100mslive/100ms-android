@@ -16,6 +16,7 @@ import com.google.android.material.textfield.TextInputLayout
 import live.hms.app2.BuildConfig
 import live.hms.app2.databinding.FragmentSettingsBinding
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.utils.HMSLogger
 import java.util.*
 
 
@@ -58,6 +59,9 @@ class SettingsFragment : Fragment() {
       "Front Facing Camera" to FRONT_FACING_CAMERA,
       "Rear Facing Camera" to REAR_FACING_CAMERA,
     )
+
+    private val LOG_LEVELS_100MS = HMSLogger.LogLevel.values().map { it.toString() }.toTypedArray()
+
   }
 
   private var binding by viewLifecycle<FragmentSettingsBinding>()
@@ -247,7 +251,7 @@ class SettingsFragment : Fragment() {
         editTextSilenceAudioLevelThreshold,
         containerSilenceAudioLevelThreshold,
         "Silence Audio Level Threshold",
-        0.0f, 5.0f
+        0, 100
       ) { commitHelper.setSilenceAudioLevelThreshold(it) }
 
       initNonEmptyEditTextWithRange(
@@ -309,6 +313,22 @@ class SettingsFragment : Fragment() {
         settings.role,
         ROLES,
       ) { commitHelper.setRole(it) }
+
+      initAutoCompleteView(
+        EnumSet.of(SettingsMode.HOME),
+        containerLogLevelsWebrtc,
+        autoCompleteLogLevelsWebrtc,
+        settings.logLevelWebrtc.toString(),
+        LOG_LEVELS_100MS,
+      ) { commitHelper.setLogLevelWebRtc(it) }
+
+      initAutoCompleteView(
+        EnumSet.of(SettingsMode.HOME),
+        containerLogLevels100msSdk,
+        autoCompleteLogLevels100msSdk,
+        settings.logLevel100msSdk.toString(),
+        LOG_LEVELS_100MS,
+      ) { commitHelper.setLogLevel100msSdk(it) }
 
     }
   }

@@ -15,6 +15,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
@@ -27,6 +28,7 @@ import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.EmailUtils
+import live.hms.app2.util.LogUtils
 import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
 
@@ -158,9 +160,8 @@ class HomeFragment : Fragment() {
     homeViewModel.sendAuthTokenRequest(
       TokenRequest(
         roomId = settings.lastUsedRoomId,
-        username = username,
-        role = role,
-        environment = "qa-in"
+        userId = username,
+        role = role
       )
     )
   }
@@ -187,6 +188,7 @@ class HomeFragment : Fragment() {
 
           // Start the meeting activity
           Intent(requireContext(), MeetingActivity::class.java).apply {
+            LogUtils.staticFileWriterStart(requireContext(), roomDetails.roomId)
             putExtra(ROOM_DETAILS, roomDetails)
             startActivity(this)
           }

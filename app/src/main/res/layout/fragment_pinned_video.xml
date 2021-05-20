@@ -21,6 +21,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_videos"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/video_list_size" />
+        android:layout_height="@dimen/video_list_size"
+        tools:listitem="@layout/list_item_video" />
 
 </LinearLayout>

@@ -28,9 +28,6 @@ class GlobalApplication : Application() {
   override fun onCreate() {
     initSaveLogsOnCrash()
     super.onCreate()
-    LogUtils.staticFileWriterStart(applicationContext)
-
-    Log.v(TAG, "onCreate()")
 
     if (BuildConfig.DEBUG) {
       val settings = SettingsStore(applicationContext)

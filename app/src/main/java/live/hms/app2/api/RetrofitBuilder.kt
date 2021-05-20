@@ -19,7 +19,6 @@ private val okHttpClient = OkHttpClient.Builder()
   .writeTimeout(5, TimeUnit.SECONDS)
   .build()
 
-
 private fun getRetrofit() = Retrofit.Builder()
   .baseUrl(BuildConfig.TOKEN_ENDPOINT)
   .addConverterFactory(GsonConverterFactory.create())

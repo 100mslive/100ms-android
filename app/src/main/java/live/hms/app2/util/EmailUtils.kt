@@ -35,9 +35,15 @@ object EmailUtils {
     val to = BuildConfig.BUG_REPORT_EMAIL_TO.split(',').toTypedArray()
     val cc = BuildConfig.BUG_REPORT_EMAIL_CC.split(',').toTypedArray()
 
-    return Intent(Intent.ACTION_SEND).apply {
-      type = "vnd.android.cursor.dir/email"
-      putExtra(Intent.EXTRA_STREAM, logUri)
+    val files = arrayListOf(logUri)
+    LogUtils.currentSessionFile?.let { file ->
+      val uri = FileProvider.getUriForFile(context, "live.hms.app2.provider", file)
+      files.add(uri)
+    }
+
+    return Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+      type = "text/plain"
+      putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
       putExtra(Intent.EXTRA_EMAIL, to)
       putExtra(Intent.EXTRA_CC, cc)
       putExtra(Intent.EXTRA_SUBJECT, "Bug Report: 100ms Android App")

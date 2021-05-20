@@ -11,12 +11,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.audio.HMSAudioManager
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
+import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
@@ -114,6 +116,10 @@ class MeetingFragment : Fragment() {
         requireContext().startActivity(
           EmailUtils.getCrashLogIntent(requireContext())
         )
+      }
+
+      R.id.active_speaker_view -> {
+        changeMeetingMode(MeetingViewMode.ACTIVE_SPEAKER)
       }
 
       R.id.action_grid_view -> {
@@ -260,6 +266,11 @@ class MeetingFragment : Fragment() {
           builder.create().show()
         }
 
+        is MeetingState.Reconnecting -> {
+          updateProgressBarUI(state.heading, state.message)
+          showProgressBar()
+        }
+
         is MeetingState.Connecting -> {
           updateProgressBarUI(state.heading, state.message)
           showProgressBar()
@@ -359,6 +370,7 @@ class MeetingFragment : Fragment() {
     val fragment = when (meetingViewMode) {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
+      MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
     }
 
     childFragmentManager

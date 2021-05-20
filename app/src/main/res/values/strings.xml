@@ -58,6 +58,8 @@
     <string name="show_dominant_speaker">Show Dominant Speaker</string>
     <string name="video_resolution">Video Resolution</string>
     <string name="video_codec">Video Codec</string>
+    <string name="log_level_100ms_sdk">Log Level 100ms Sdk</string>
+    <string name="log_level_webrtc">Log Level WebRTC</string>
     <string name="video_bitrate">Video Bitrate</string>
     <string name="role">Role</string>
     <string name="video_framerate">Video Framerate</string>
@@ -101,10 +103,13 @@
     <string name="video_resolution_width">Video Resolution (Width)</string>
     <string name="hero_view">Hero View</string>
     <string name="grid_view">Grid View</string>
+    <string name="active_speaker_view">Active Speaker View</string>
     <string name="screen_share">Screen Share</string>
+    <string name="audio_level">Audio Level</string>
     <string name="meeting_name">Meeting Name</string>
     <string name="more">More</string>
     <string name="type_a_message">Type a message</string>
     <string name="_8">8</string>
+    <string name="_08">08</string>
     <string name="show_network_info">Show Network Info</string>
 </resources>

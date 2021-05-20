@@ -3,7 +3,9 @@ package live.hms.app2.util
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.video.utils.HMSLogger
+import live.hms.video.utils.HMSUtils
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -12,17 +14,6 @@ import java.util.*
 
 
 object LogUtils {
-  private const val TAG = "LogUtils"
-
-  fun staticFileWriterStart(context: Context) {
-    val logFile = saveLogsToFile(context, "v2-webrtc-log")
-    val fileWriter = FileWriter(logFile)
-    HMSLogger.injectLoggable(object : HMSLogger.Loggable {
-      override fun onLogMessage(level: HMSLogger.LogLevel, tag: String, message: String) {
-        fileWriter.write("$level:$tag\t\t${message.trimEnd()}\n")
-      }
-    })
-  }
 
   /** Information about the current build, taken from system properties.  */
   val DEVICE_INFO = arrayOf(
@@ -42,6 +33,43 @@ object LogUtils {
   @JvmStatic
   fun logDeviceInfo(tag: String?) {
     Log.d(tag, DEVICE_INFO.joinToString(", "))
+  }
+
+  private const val TAG = "LogUtils"
+
+  var currentSessionFile: File? = null
+  var currentSessionFileWriter: FileWriter? = null
+
+  fun staticFileWriterStart(context: Context, roomId: String) {
+    currentSessionFileWriter?.let { writer ->
+      HMSLogger.removeInjectedLoggable()
+      writer.close()
+      currentSessionFile = null
+      currentSessionFileWriter = null
+    }
+
+    val settings = SettingsStore(context)
+    HMSLogger.webRtcLogLevel = settings.logLevelWebrtc
+    HMSLogger.level = settings.logLevel100msSdk
+
+    currentSessionFile = saveLogsToFile(context, "session-log-${roomId}")
+    val fileWriter = FileWriter(currentSessionFile)
+    currentSessionFileWriter = fileWriter
+
+    fileWriter.write("Android Agent: ${HMSUtils.getUserAgent()}")
+    fileWriter.write("Device Info: ${DEVICE_INFO.joinToString("\n")}")
+
+    HMSLogger.webRtcLogLevel = HMSLogger.LogLevel.OFF
+    HMSLogger.injectLoggable(object : HMSLogger.Loggable {
+      override fun onLogMessage(
+        level: HMSLogger.LogLevel,
+        tag: String,
+        message: String
+      ) {
+        val prefix = "[${if (false) "RTC" else "HMS"}:$level:$tag]"
+        fileWriter.write("$prefix\t\t${message.trimEnd()}\n")
+      }
+    })
   }
 
   fun saveLogsToFile(context: Context, filename: String): File {

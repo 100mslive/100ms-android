@@ -2,7 +2,9 @@ package live.hms.app2.ui.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.nfc.tech.MifareUltralight
 import androidx.core.content.edit
+import live.hms.video.utils.HMSLogger
 
 class SettingsStore(context: Context) {
 
@@ -32,13 +34,16 @@ class SettingsStore(context: Context) {
     const val VIDEO_GRID_ROWS = "video-grid-rows"
     const val VIDEO_GRID_COLUMNS = "video-grid-columns"
 
+    const val LOG_LEVEL_WEBRTC = "log-level-webrtc"
+    const val LOG_LEVEL_100MS_SDK = "log-level-100ms"
+
     const val LEAK_CANARY = "leak-canary"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
-        VIDEO_FRAME_RATE,
-        VIDEO_BITRATE,
-        VIDEO_RESOLUTION_HEIGHT,
-        VIDEO_RESOLUTION_WIDTH
+      VIDEO_FRAME_RATE,
+      VIDEO_BITRATE,
+      VIDEO_RESOLUTION_HEIGHT,
+      VIDEO_RESOLUTION_WIDTH
     )
   }
 
@@ -138,9 +143,9 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getLong(AUDIO_POLL_INTERVAL, 1000)
     set(value) = putLong(AUDIO_POLL_INTERVAL, value)
 
-  var silenceAudioLevelThreshold: Float
-    get() = sharedPreferences.getFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, 0.01f)
-    set(value) = putFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
+  var silenceAudioLevelThreshold: Int
+    get() = sharedPreferences.getInt(SILENCE_AUDIO_LEVEL_THRESHOLD, 10)
+    set(value) = putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
 
   var showNetworkInfo: Boolean
     get() = sharedPreferences.getBoolean(SHOW_NETWORK_INFO, true)
@@ -151,7 +156,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(LAST_USED_ROOM_ID, value)
 
   var environment: String
-    get() = sharedPreferences.getString(ENVIRONMENT, "qa-in2")!!
+    get() = sharedPreferences.getString(ENVIRONMENT, "prod")!!
     set(value) = putString(ENVIRONMENT, value)
 
 
@@ -166,6 +171,26 @@ class SettingsStore(context: Context) {
   var isLeakCanaryEnabled: Boolean
     get() = sharedPreferences.getBoolean(LEAK_CANARY, false)
     set(value) = putBoolean(LEAK_CANARY, value)
+
+  var logLevelWebrtc: HMSLogger.LogLevel
+    get() {
+      val str = sharedPreferences.getString(
+        LOG_LEVEL_WEBRTC,
+        HMSLogger.LogLevel.OFF.toString()
+      )!!
+      return HMSLogger.LogLevel.valueOf(str)
+    }
+    set(value) = putString(LOG_LEVEL_WEBRTC, value.toString())
+
+  var logLevel100msSdk: HMSLogger.LogLevel
+    get() {
+      val str = sharedPreferences.getString(
+        LOG_LEVEL_100MS_SDK,
+        HMSLogger.LogLevel.VERBOSE.toString()
+      )!!
+      return HMSLogger.LogLevel.valueOf(str)
+    }
+    set(value) = putString(LOG_LEVEL_100MS_SDK, value.toString())
 
   inner class MultiCommitHelper {
 
@@ -236,8 +261,8 @@ class SettingsStore(context: Context) {
       return this
     }
 
-    fun setSilenceAudioLevelThreshold(value: Float): MultiCommitHelper {
-      editor.putFloat(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
+    fun setSilenceAudioLevelThreshold(value: Int): MultiCommitHelper {
+      editor.putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
       return this
     }
 
@@ -265,6 +290,27 @@ class SettingsStore(context: Context) {
       editor.putBoolean(LEAK_CANARY, value)
       return this
     }
+
+    fun setLogLevelWebRtc(value: String): MultiCommitHelper {
+      editor.putString(LOG_LEVEL_WEBRTC, value)
+      return this
+    }
+
+    fun setLogLevelWebRtc(value: HMSLogger.LogLevel): MultiCommitHelper {
+      editor.putString(LOG_LEVEL_WEBRTC, value.toString())
+      return this
+    }
+
+    fun setLogLevel100msSdk(value: String): MultiCommitHelper {
+      editor.putString(LOG_LEVEL_100MS_SDK, value)
+        return this
+    }
+
+    fun setLogLevel100msSdk(value: HMSLogger.LogLevel): MultiCommitHelper {
+      editor.putString(LOG_LEVEL_100MS_SDK, value.toString())
+      return this
+    }
+
 
     fun commit() {
       editor.commit()

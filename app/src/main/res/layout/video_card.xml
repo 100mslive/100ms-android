@@ -23,12 +23,13 @@
         android:visibility="invisible" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/container_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginStart="-8dp"
         android:layout_marginBottom="-8dp"
-        android:layout_alignParentBottom="true"
         android:backgroundTint="@color/black_faded_40"
         app:cardCornerRadius="5dp"
         app:cardElevation="0dp"
@@ -50,12 +51,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="12sp"
                 android:text="@string/john_doe" />
 
             <ImageView
                 android:id="@+id/icon_audio_off"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="8dp"
                 android:contentDescription="@string/screen_share"
@@ -64,8 +67,8 @@
 
             <ImageView
                 android:id="@+id/icon_screen_share"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="4dp"
                 android:contentDescription="@string/screen_share"
@@ -75,5 +78,27 @@
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/audio_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/container_name"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/circle_secondary_24"
+        android:gravity="center"
+        android:text="@string/_08"
+        android:visibility="gone"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        android:textStyle="bold" />
+
 
 </RelativeLayout>

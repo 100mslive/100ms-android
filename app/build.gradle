@@ -15,8 +15,8 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 61
-        versionName "2.0.8-rc1"
+        versionCode 73
+        versionName "2.0.16"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,6 +24,7 @@ android {
     buildTypes {
         debug {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+            buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
             buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
             buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled false
@@ -31,6 +32,7 @@ android {
 
         release {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+            buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
             buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
             buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled true
