@@ -156,7 +156,7 @@ To join a room created by following the steps described in the above section, cl
 val config = HMSConfig(
         roomDetails.username, // the name that the user wants to be displayed while in the room
         roomDetails.authToken, // the auth token to be used
-        info.toString(), // optional -- any  json string or metadata that user need to paas while joining
+        info.toString(), // optional -- any  json string or metadata that user need to pass while joining
         endpoint // optional -- to override the default endpoint (advanced)
       )
 
