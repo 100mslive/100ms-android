@@ -134,6 +134,12 @@ class MeetingFragment : Fragment() {
           MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
         )
       }
+
+      R.id.action_participants -> {
+        findNavController().navigate(
+          MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
+        )
+      }
     }
     return false
   }

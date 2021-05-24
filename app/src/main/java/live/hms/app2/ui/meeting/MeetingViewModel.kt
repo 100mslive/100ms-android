@@ -77,6 +77,9 @@ class MeetingViewModel(
     .Builder(application)
     .build()
 
+  val peers: Array<HMSPeer>
+    get() = hmsSDK.getPeers()
+
   fun <R> mapTracks(transform: (track: MeetingTrack) -> R?): List<R> = synchronized(_tracks) {
     return _tracks.mapNotNull(transform)
   }

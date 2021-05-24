@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_ParticipantsFragment"
+            app:destination="@id/ParticipantsFragment" />
 
     </fragment>
 
@@ -37,6 +40,14 @@
             app:nullable="false" />
 
     </dialog>
+
+    <fragment
+        android:id="@+id/ParticipantsFragment"
+        android:name="live.hms.app2.ui.meeting.participants.ParticipantsFragment"
+        android:label="@string/participants_fragment"
+        tools:layout="@layout/fragment_participants">
+
+    </fragment>
 
     <fragment
         android:id="@+id/SettingsFragment"
