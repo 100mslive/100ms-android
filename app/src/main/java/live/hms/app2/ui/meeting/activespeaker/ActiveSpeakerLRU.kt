@@ -1,6 +1,12 @@
 package live.hms.app2.ui.meeting.activespeaker
 
+import android.util.Log
+
 class ActiveSpeakerLRU<T>(private val capacity: Int) {
+  companion object {
+    private const val TAG = "ActiveSpeakerLRU"
+  }
+
   private var timer = 0L
 
   private data class Item<T>(
@@ -37,9 +43,18 @@ class ActiveSpeakerLRU<T>(private val capacity: Int) {
     return idx
   }
 
+  private fun normalize() {
+    Log.d(TAG, "normalize: START $queue")
+    timer = 0
+    queue.sortedBy { it.timestamp }.forEach {
+      it.timestamp = timer++
+    }
+    Log.d(TAG, "normalize: DONE $queue")
+  }
+
   fun update(items: List<T>) {
     var index = 0
-    for (item in items) {
+    for (item in items.take(capacity)) {
       val position = getItemIndex(item)
       if (position == -1) {
         // New entry
@@ -53,11 +68,15 @@ class ActiveSpeakerLRU<T>(private val capacity: Int) {
           queue.add(0, Item(item, timer++))
         }
       } else {
+        // Item already in the queue, simply update the timer
         queue[position].timestamp = timer++
       }
 
       index += 1
-      if (queue.size == capacity) break
+    }
+
+    if (timer > 10000) {
+      normalize()
     }
   }
 

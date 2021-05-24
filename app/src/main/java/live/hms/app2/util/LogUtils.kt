@@ -52,7 +52,7 @@ object LogUtils {
     HMSLogger.webRtcLogLevel = settings.logLevelWebrtc
     HMSLogger.level = settings.logLevel100msSdk
 
-    currentSessionFile = saveLogsToFile(context, "session-log-${roomId}")
+    currentSessionFile = makeLogFile(context, "session-log-${roomId}")
     val fileWriter = FileWriter(currentSessionFile)
     currentSessionFileWriter = fileWriter
 
@@ -73,10 +73,15 @@ object LogUtils {
     })
   }
 
-  fun saveLogsToFile(context: Context, filename: String): File {
+  private fun makeLogFile(context: Context, filename: String): File {
     val logsDir = File(context.getExternalFilesDir(null), "")
     val fileNameSuffix = Date().let { "${dateFormatter.format(it)}-${it.time}" }
-    val logFile = File(logsDir, "$filename-$fileNameSuffix.log")
+
+    return File(logsDir, "$filename-$fileNameSuffix.log")
+  }
+
+  fun saveLogsToFile(context: Context, filename: String): File {
+    val logFile = makeLogFile(context, filename)
 
     try {
       Runtime.getRuntime().exec(
