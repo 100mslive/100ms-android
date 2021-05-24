@@ -77,6 +77,14 @@ class MeetingViewModel(
     .Builder(application)
     .build()
 
+  fun <R> mapTracks(transform: (track: MeetingTrack) -> R?): List<R> = synchronized(_tracks) {
+    return _tracks.mapNotNull(transform)
+  }
+
+  fun getTrackByPeerId(peerId: String): MeetingTrack? = synchronized(_tracks) {
+    return _tracks.find { it.peer.peerID == peerId }
+  }
+
   fun toggleLocalVideo() {
     localVideoTrack?.apply {
       val isVideo = !isMute
@@ -139,7 +147,7 @@ class MeetingViewModel(
         roomDetails.username,
         roomDetails.authToken,
         info.toString(),
-        initEndpoint = "https://${roomDetails.env}.100ms.live/init"
+        initEndpoint = "https://${roomDetails.env}-init.100ms.live/init"
       )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
@@ -241,7 +249,7 @@ class MeetingViewModel(
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
         override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
-          Log.v(TAG, "onAudioLevelUpdate: speakers=$speakers")
+          Log.v(TAG, "onAudioLevelUpdate: speakers=${speakers.toList()}")
           this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
