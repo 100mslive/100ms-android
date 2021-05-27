@@ -6,7 +6,6 @@ plugins {
     id 'com.google.gms.google-services' // Google Services Gradle plugin
     id 'com.google.firebase.crashlytics'
 }
-
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"

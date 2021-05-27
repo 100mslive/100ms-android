@@ -67,7 +67,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         if (lru.size < lru.capacity) {
           val required = lru.capacity - lru.size
           val all = tracks.mapNotNull {
-            if (it.isScreen || it.audio != null) null
+            if (it.isScreen || it.audio == null) null
             else LruItem(it.peer.peerID)
           }
 

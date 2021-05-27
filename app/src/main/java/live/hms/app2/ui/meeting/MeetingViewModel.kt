@@ -155,7 +155,7 @@ class MeetingViewModel(
           state.postValue(MeetingState.Failure(error))
         }
 
-        override fun onJoin(hmsRoom: HMSRoom) {
+        override fun onJoin(room: HMSRoom) {
           val peer = hmsSDK.getLocalPeer()
           peer.audioTrack?.apply {
             localAudioTrack = (this as HMSLocalAudioTrack)
@@ -185,9 +185,7 @@ class MeetingViewModel(
                   it.peer.peerID == peer.peerID &&
                       it.video?.trackId == peer.videoTrack?.trackId
                 }
-                if (track != null) {
-                  dominantSpeaker.postValue(track)
-                }
+                if (track != null) dominantSpeaker.postValue(track)
               }
             }
 
@@ -200,17 +198,11 @@ class MeetingViewModel(
         }
 
         override fun onReconnected() {
-          state.postValue(MeetingState.Ongoing())
         }
 
         override fun onReconnecting(error: HMSException) {
-          state.postValue(
-            MeetingState.Reconnecting(
-              "Reconnecting",
-              error.message ?: "Re-establishing connection.."
-            )
-          )
         }
+
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
           HMSLogger.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
@@ -334,17 +326,6 @@ class MeetingViewModel(
       // Update the view as we have removed some views
       tracks.postValue(_tracks)
     }
-  }
-
-  private fun getLocalScreen() {
-    state.postValue(
-      MeetingState.LoadingMedia(
-        "Loading Media",
-        "Getting user local stream"
-      )
-    )
-
-    // onConnect -> Join -> getUserMedia
   }
 }
 
