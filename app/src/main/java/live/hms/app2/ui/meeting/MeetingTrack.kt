@@ -17,5 +17,6 @@ data class MeetingTrack(
   }
 
   val isLocal: Boolean = peer.isLocal
-  val isScreen: Boolean = video?.source == HMSTrackSource.SCREEN
+  val isScreen: Boolean
+    get() = video?.source == HMSTrackSource.SCREEN
 }

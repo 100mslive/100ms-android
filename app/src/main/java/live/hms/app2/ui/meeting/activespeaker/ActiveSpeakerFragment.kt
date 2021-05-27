@@ -1,6 +1,7 @@
 package live.hms.app2.ui.meeting.activespeaker
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,11 +9,12 @@ import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.util.viewLifecycle
+import org.webrtc.RendererCommon
 
 class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   companion object {
-    private const val TAG = "ActiveSpeakerFragment "
+    private const val TAG = "ActiveSpeakerFragment"
   }
 
   private data class LruItem(
@@ -38,7 +40,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   override fun onResume() {
     super.onResume()
     screenShareTrack?.let {
-      bindSurfaceView(binding.screenShare, it)
+      bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
     }
   }
 
@@ -52,7 +54,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   private fun update() {
     val order = lru.getItemsInOrder()
     val videos = Array(order.size) { idx ->
-      meetingViewModel.getTrackByPeerId(order[idx].peerId)
+      meetingViewModel.findTrack { it.peer.peerID == order[idx].peerId && it.isScreen.not() }
     }
     updateVideos(binding.container, videos)
   }
@@ -70,6 +72,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
             if (it.isScreen || it.audio == null) null
             else LruItem(it.peer.peerID)
           }
+          Log.i(TAG, "$all")
 
           val extra = ArrayList<LruItem>()
           val inLru = lru.getItemsInOrder()
@@ -104,12 +107,17 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
           screenShareTrack = screen
           if (isViewVisible) {
-            bindSurfaceView(binding.screenShare, screen)
+            bindSurfaceView(
+              binding.screenShare,
+              screen,
+              RendererCommon.ScalingType.SCALE_ASPECT_FIT
+            )
           }
           bindVideo(binding.screenShare, screen)
           binding.screenShare.apply {
             iconAudioOff.visibility = View.GONE
             iconScreenShare.visibility = View.GONE
+            audioLevel.visibility = View.GONE
           }
           binding.screenShareContainer.visibility = View.VISIBLE
         }

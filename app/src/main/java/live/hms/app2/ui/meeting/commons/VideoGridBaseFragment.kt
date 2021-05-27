@@ -8,7 +8,6 @@ import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.app2.databinding.GridItemVideoBinding
-import live.hms.app2.databinding.ListItemVideoBinding
 import live.hms.app2.databinding.VideoCardBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
@@ -111,11 +110,15 @@ abstract class VideoGridBaseFragment : Fragment() {
     )
   }
 
-  protected fun bindSurfaceView(binding: VideoCardBinding, item: MeetingTrack) {
+  protected fun bindSurfaceView(
+    binding: VideoCardBinding,
+    item: MeetingTrack,
+    scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
+  ) {
     if (item.video == null || item.video?.isMute == true) return
 
     binding.surfaceView.let { view ->
-      view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+      view.setScalingType(scalingType)
       view.setEnableHardwareScaler(true)
 
       SurfaceViewRendererUtil.bind(view, item).let {

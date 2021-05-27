@@ -85,6 +85,10 @@ class MeetingViewModel(
     return _tracks.find { it.peer.peerID == peerId }
   }
 
+  fun findTrack(predicate: (track: MeetingTrack) -> Boolean): MeetingTrack? = synchronized(_tracks) {
+    return _tracks.find(predicate)
+  }
+
   fun toggleLocalVideo() {
     localVideoTrack?.apply {
       val isVideo = !isMute
