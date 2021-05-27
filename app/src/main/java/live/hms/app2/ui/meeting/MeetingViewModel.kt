@@ -44,11 +44,8 @@ class MeetingViewModel(
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
   // Flag to keep track whether the incoming audio need's to be muted
-  private var _isAudioMuted = false
-
-  // Public variable which can be accessed by views
-  val isAudioMuted: Boolean
-    get() = _isAudioMuted
+  var isAudioMuted: Boolean = false
+    private set
 
   private val settings = SettingsStore(getApplication())
 
@@ -117,9 +114,9 @@ class MeetingViewModel(
    */
   fun toggleAudio() {
     synchronized(_tracks) {
-      _isAudioMuted = !_isAudioMuted
+      isAudioMuted = !isAudioMuted
 
-      val volume = if (_isAudioMuted) 0.0 else 1.0
+      val volume = if (isAudioMuted) 0.0 else 1.0
       _tracks.forEach { track ->
         if (track.audio != null && track.audio != localAudioTrack) {
           (track.audio as HMSRemoteAudioTrack).setVolume(volume)
@@ -150,7 +147,7 @@ class MeetingViewModel(
         roomDetails.username,
         roomDetails.authToken,
         info.toString(),
-        initEndpoint = "https://${roomDetails.env}-init.100ms.live/init"
+        initEndpoint = "https://${roomDetails.env}.100ms.live/init"
       )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
@@ -184,18 +181,13 @@ class MeetingViewModel(
 
             HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
               synchronized(_tracks) {
-                val prevSize = _tracks.size
                 val track = _tracks.find {
                   it.peer.peerID == peer.peerID &&
                       it.video?.trackId == peer.videoTrack?.trackId
                 }
                 if (track != null) {
                   dominantSpeaker.postValue(track)
-                  _tracks.remove(track)
-                  _tracks.add(0, track)
-                  tracks.postValue(_tracks)
                 }
-                assert(prevSize == _tracks.size)
               }
             }
 
@@ -281,6 +273,10 @@ class MeetingViewModel(
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
     synchronized(_tracks) {
       // Check if this track already exists
+      if (track is HMSRemoteAudioTrack) {
+        track.setVolume(if (isAudioMuted) 0.0 else 1.0)
+      }
+
       val _track = _tracks.find {
         it.audio == null &&
             it.peer.peerID == peer.peerID &&

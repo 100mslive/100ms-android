@@ -8,12 +8,15 @@ import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.app2.databinding.GridItemVideoBinding
+import live.hms.app2.databinding.ListItemVideoBinding
+import live.hms.app2.databinding.VideoCardBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
+import live.hms.app2.util.visibility
 import live.hms.video.sdk.models.HMSSpeaker
 import org.webrtc.RendererCommon
 import kotlin.math.max
@@ -35,7 +38,8 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected val meetingViewModel by activityViewModels<MeetingViewModel>()
 
   // Determined using the onResume() and onPause()
-  private var isViewVisible = false
+  var isViewVisible = false
+    private set
 
   protected data class RenderedViewPair(
     val binding: GridItemVideoBinding,
@@ -107,54 +111,58 @@ abstract class VideoGridBaseFragment : Fragment() {
     )
   }
 
-  protected fun bindSurfaceView(binding: GridItemVideoBinding, item: MeetingTrack) {
+  protected fun bindSurfaceView(binding: VideoCardBinding, item: MeetingTrack) {
     if (item.video == null || item.video?.isMute == true) return
 
-    SurfaceViewRendererUtil.bind(binding.videoCard.surfaceView, item).let {
-      if (it) {
-        binding.videoCard.surfaceView.visibility = View.VISIBLE
-        bindedVideoTrackIds.add(item.video!!.trackId)
+    binding.surfaceView.let { view ->
+      view.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+      view.setEnableHardwareScaler(true)
+
+      SurfaceViewRendererUtil.bind(view, item).let {
+        if (it) {
+          binding.surfaceView.visibility = View.VISIBLE
+          bindedVideoTrackIds.add(item.video!!.trackId)
+        }
       }
     }
   }
 
-  private fun bindVideo(binding: GridItemVideoBinding, item: MeetingTrack) {
+  protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
 
-    binding.videoCard.apply {
+    binding.apply {
       name.text = item.peer.name
       nameInitials.text = NameUtils.getInitials(item.peer.name)
       iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
-      iconAudioOff.visibility = if (
+      iconAudioOff.visibility = visibility(
         item.isScreen.not() &&
-        (item.audio == null || item.audio!!.isMute)
-      ) View.VISIBLE else View.GONE
+            (item.audio == null || item.audio!!.isMute)
+      )
 
-      if (item.video == null || item.video?.isMute == true) {
-        surfaceView.visibility = View.GONE
+      /** [View.setVisibility] */
+      val surfaceViewVisibility = if (item.video == null || item.video?.isMute == true) {
+        View.INVISIBLE
       } else {
-        surfaceView.visibility = View.VISIBLE
+        View.VISIBLE
       }
 
-      // TODO: Add listener for video stream on/off -> Change visibility of surface renderer
-      surfaceView.apply {
-        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
-        setEnableHardwareScaler(true)
+      if (surfaceView.visibility != surfaceViewVisibility) {
+        surfaceView.visibility = surfaceViewVisibility
       }
     }
   }
 
-  private fun unbindSurfaceView(
-    binding: GridItemVideoBinding,
+  protected fun unbindSurfaceView(
+    binding: VideoCardBinding,
     item: MeetingTrack,
     metadata: String = ""
   ) {
     if (!bindedVideoTrackIds.contains(item.video?.trackId ?: "")) return
 
-    SurfaceViewRendererUtil.unbind(binding.videoCard.surfaceView, item, metadata).let {
+    SurfaceViewRendererUtil.unbind(binding.surfaceView, item, metadata).let {
       if (it) {
-        binding.videoCard.surfaceView.visibility = View.INVISIBLE
+        binding.surfaceView.visibility = View.INVISIBLE
         bindedVideoTrackIds.remove(item.video!!.trackId)
       }
     }
@@ -167,6 +175,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
     )
 
+    var requiresGridLayoutUpdate = false
     val newRenderedViews = ArrayList<RenderedViewPair>()
 
     // Remove all the views which are not required now
@@ -177,11 +186,12 @@ abstract class VideoGridBaseFragment : Fragment() {
           TAG,
           "updateVideos: Removing view for video=${currentRenderedView.video} in fragment=$tag"
         )
+        requiresGridLayoutUpdate = true
 
         layout.apply {
           // Unbind only when view is visible to user
           if (isViewVisible) unbindSurfaceView(
-            currentRenderedView.binding,
+            currentRenderedView.binding.videoCard,
             currentRenderedView.video
           )
           removeViewInLayout(currentRenderedView.binding.root)
@@ -201,19 +211,20 @@ abstract class VideoGridBaseFragment : Fragment() {
           if (isViewVisible && !bindedVideoTrackIds.contains(newVideo.video?.trackId ?: "")) {
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
-            bindSurfaceView(renderedViewPair.binding, newVideo)
+            bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
           }
 
         } else {
           crashlyticsLog(TAG, "updateVideos: Creating view for video=${newVideo} in fragment=$tag")
+          requiresGridLayoutUpdate = true
 
           // Create a new view
           val videoBinding = createVideoView(layout)
-          bindVideo(videoBinding, newVideo)
+          bindVideo(videoBinding.videoCard, newVideo)
 
           // Bind surfaceView when view is visible to user
           if (isViewVisible) {
-            bindSurfaceView(videoBinding, newVideo)
+            bindSurfaceView(videoBinding.videoCard, newVideo)
           }
 
           layout.addView(videoBinding.root)
@@ -227,15 +238,18 @@ abstract class VideoGridBaseFragment : Fragment() {
       "updateVideos: Change grid items from ${renderedViews.size} -> ${newRenderedViews.size}"
     )
 
+
     renderedViews.clear()
     renderedViews.addAll(newRenderedViews)
 
     // Re-bind all the videos, this handles any changes made in isMute
     for (view in renderedViews) {
-      bindVideo(view.binding, view.video)
+      bindVideo(view.binding.videoCard, view.video)
     }
 
-    updateGridLayoutDimensions(layout)
+    if (requiresGridLayoutUpdate) {
+      updateGridLayoutDimensions(layout)
+    }
   }
 
   protected fun applySpeakerUpdates(speakers: Array<HMSSpeaker>) {
@@ -276,7 +290,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     isViewVisible = true
 
     renderedViews.forEach {
-      bindSurfaceView(it.binding, it.video)
+      bindSurfaceView(it.binding.videoCard, it.video)
     }
   }
 
@@ -286,7 +300,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     isViewVisible = false
 
     renderedViews.forEach {
-      unbindSurfaceView(it.binding, it.video)
+      unbindSurfaceView(it.binding.videoCard, it.video)
     }
   }
 

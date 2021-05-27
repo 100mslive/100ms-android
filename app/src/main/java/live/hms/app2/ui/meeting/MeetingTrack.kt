@@ -13,7 +13,6 @@ data class MeetingTrack(
     if (other is MeetingTrack) {
       return (other.peer.peerID == peer.peerID && other.video?.trackId == video?.trackId && other.audio?.trackId == audio?.trackId)
     }
-
     return super.equals(other)
   }
 

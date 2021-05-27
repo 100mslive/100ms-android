@@ -59,7 +59,6 @@ object LogUtils {
     fileWriter.write("Android Agent: ${HMSUtils.getUserAgent()}")
     fileWriter.write("Device Info: ${DEVICE_INFO.joinToString("\n")}")
 
-    HMSLogger.webRtcLogLevel = HMSLogger.LogLevel.OFF
     HMSLogger.injectLoggable(object : HMSLogger.Loggable {
       override fun onLogMessage(
         level: HMSLogger.LogLevel,

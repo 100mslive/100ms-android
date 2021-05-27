@@ -197,13 +197,13 @@ class MeetingFragment : Fragment() {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
 
-    savedInstanceState?.let { state ->
-      if (
-        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        && meetingViewMode != MeetingViewMode.PINNED
-      ) {
-        changeMeetingMode(MeetingViewMode.PINNED)
-      }
+    savedInstanceState?.let {
+//      if (
+//        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+//        && meetingViewMode != MeetingViewMode.PINNED
+//      ) {
+//        changeMeetingMode(MeetingViewMode.PINNED)
+//      }
     } ?: run {
       updateVideoView()
     }
@@ -264,6 +264,7 @@ class MeetingFragment : Fragment() {
           }
 
           builder.setNegativeButton(R.string.leave) { dialog, _ ->
+            meetingViewModel.leaveMeeting()
             goToHomePage()
             dialog.dismiss()
           }

@@ -2,7 +2,7 @@ package live.hms.app2.ui.meeting.activespeaker
 
 import android.util.Log
 
-class ActiveSpeakerLRU<T>(private val capacity: Int) {
+class ActiveSpeakerLRU<T>(val capacity: Int) {
   companion object {
     private const val TAG = "ActiveSpeakerLRU"
   }
@@ -15,6 +15,8 @@ class ActiveSpeakerLRU<T>(private val capacity: Int) {
   )
 
   private val queue = ArrayList<Item<T>>()
+  val size: Int
+    get() = queue.size
 
   private fun getItemIndex(value: T): Int {
     for ((i, item) in queue.withIndex()) {

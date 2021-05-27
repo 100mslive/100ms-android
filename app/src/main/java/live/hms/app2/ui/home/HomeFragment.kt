@@ -161,7 +161,11 @@ class HomeFragment : Fragment() {
         roomId = settings.lastUsedRoomId,
         username = username,
         role = role,
-        environment = "qa-in"
+        environment = when (settings.environment) {
+          "prod-init" -> "prod-in"
+          "qa-init" -> "qa-in"
+          else -> settings.environment
+        }
       )
     )
   }

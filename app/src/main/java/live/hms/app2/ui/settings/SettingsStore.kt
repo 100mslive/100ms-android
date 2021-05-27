@@ -176,7 +176,7 @@ class SettingsStore(context: Context) {
     get() {
       val str = sharedPreferences.getString(
         LOG_LEVEL_WEBRTC,
-        HMSLogger.LogLevel.OFF.toString()
+        HMSLogger.LogLevel.WARN.toString()
       )!!
       return HMSLogger.LogLevel.valueOf(str)
     }

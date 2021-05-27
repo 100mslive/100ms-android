@@ -35,6 +35,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentVideoGridPageBinding.inflate(inflater, container, false)
+    // (requireActivity() as AppCompatActivity).supportActionBar?.title = "Grid View"
 
     initViewModels()
     return binding.root
@@ -61,6 +62,6 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       updateVideos(binding.container, videos.map { it }.toTypedArray())
     }
 
-    meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
+    // meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
   }
 }

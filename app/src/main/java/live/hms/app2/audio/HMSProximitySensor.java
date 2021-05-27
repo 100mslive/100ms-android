@@ -13,7 +13,8 @@ import androidx.annotation.Nullable;
 import org.webrtc.ThreadUtils.ThreadChecker;
 
 import live.hms.app2.util.ThreadUtils;
-import live.hms.app2.util.Utils;
+
+import static live.hms.app2.util.UtilsKt.assertIsTrue;
 
 /**
  * HMSProximitySensor manages functions related to the proximity sensor in
@@ -89,7 +90,7 @@ public class HMSProximitySensor implements SensorEventListener {
   @Override
   public final void onAccuracyChanged(Sensor sensor, int accuracy) {
     threadChecker.checkIsOnValidThread();
-    Utils.assertIsTrue(sensor.getType() == Sensor.TYPE_PROXIMITY);
+    assertIsTrue(sensor.getType() == Sensor.TYPE_PROXIMITY);
     if (accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
       Log.e(TAG, "The values returned by this sensor cannot be trusted");
     }
@@ -98,7 +99,7 @@ public class HMSProximitySensor implements SensorEventListener {
   @Override
   public final void onSensorChanged(SensorEvent event) {
     threadChecker.checkIsOnValidThread();
-    Utils.assertIsTrue(event.sensor.getType() == Sensor.TYPE_PROXIMITY);
+    assertIsTrue(event.sensor.getType() == Sensor.TYPE_PROXIMITY);
     // As a best practice; do as little as possible within this method and
     // avoid blocking.
     float distanceInCentimeters = event.values[0];

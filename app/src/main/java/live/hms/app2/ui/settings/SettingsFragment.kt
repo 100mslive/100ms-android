@@ -52,6 +52,12 @@ class SettingsFragment : Fragment() {
       "Admin"
     )
 
+    private val ENVIRONMENTS = arrayOf(
+      "prod-init",
+      "qa-init",
+      "100ms-grpc"
+    )
+
     private const val FRONT_FACING_CAMERA = "user"
     private const val REAR_FACING_CAMERA = "environment"
 
@@ -212,14 +218,6 @@ class SettingsFragment : Fragment() {
         "Username"
       ) { commitHelper.setUsername(it) }
 
-      initNonEmptyEditText(
-        EnumSet.of(SettingsMode.HOME),
-        settings.environment,
-        editTextEnvironment, containerEnvironment,
-        "Environment"
-      ) { commitHelper.setEnvironment(it) }
-
-
       // TODO: Make rows, columns available in SettingsMode.MEETING
       initNonEmptyEditTextWithRange(
         EnumSet.of(SettingsMode.HOME),
@@ -329,6 +327,15 @@ class SettingsFragment : Fragment() {
         settings.logLevel100msSdk.toString(),
         LOG_LEVELS_100MS,
       ) { commitHelper.setLogLevel100msSdk(it) }
+
+      initAutoCompleteView(
+        EnumSet.of(SettingsMode.HOME),
+        containerEnvironment,
+        autoCompleteEnvironment,
+        settings.environment,
+        ENVIRONMENTS,
+      ) { commitHelper.setEnvironment(it) }
+
 
     }
   }
