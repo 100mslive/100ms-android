@@ -46,7 +46,7 @@ object SurfaceViewRendererUtil {
 
     crashlyticsLog(
       TAG,
-      "Initialized EglContext for item=$item (count=$initializedContextCount, $metadata)"
+      "[count=$initializedContextCount, $metadata] Initialized EglContext for item=$item"
     )
     return true
   }
@@ -74,7 +74,7 @@ object SurfaceViewRendererUtil {
 
     crashlyticsLog(
       TAG,
-      "Released EglContext for item=$item (count=$initializedContextCount, $metadata)"
+      "[count=$initializedContextCount, $metadata] Released EglContext for item=$item"
     )
     return true
   }

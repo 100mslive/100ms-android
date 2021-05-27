@@ -6,7 +6,6 @@ plugins {
     id 'com.google.gms.google-services' // Google Services Gradle plugin
     id 'com.google.firebase.crashlytics'
 }
-
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -15,8 +14,8 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 73
-        versionName "2.0.16"
+        versionCode 78
+        versionName "2.0.21-alpha1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,7 +23,6 @@ android {
     buildTypes {
         debug {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
             buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
             buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled false
@@ -32,7 +30,6 @@ android {
 
         release {
             buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
             buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
             buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled true

@@ -44,11 +44,8 @@ class MeetingViewModel(
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
   // Flag to keep track whether the incoming audio need's to be muted
-  private var _isAudioMuted = false
-
-  // Public variable which can be accessed by views
-  val isAudioMuted: Boolean
-    get() = _isAudioMuted
+  var isAudioMuted: Boolean = false
+    private set
 
   private val settings = SettingsStore(getApplication())
 
@@ -76,6 +73,21 @@ class MeetingViewModel(
   private val hmsSDK = HMSSDK
     .Builder(application)
     .build()
+
+  val peers: Array<HMSPeer>
+    get() = hmsSDK.getPeers()
+
+  fun <R> mapTracks(transform: (track: MeetingTrack) -> R?): List<R> = synchronized(_tracks) {
+    return _tracks.mapNotNull(transform)
+  }
+
+  fun getTrackByPeerId(peerId: String): MeetingTrack? = synchronized(_tracks) {
+    return _tracks.find { it.peer.peerID == peerId }
+  }
+
+  fun findTrack(predicate: (track: MeetingTrack) -> Boolean): MeetingTrack? = synchronized(_tracks) {
+    return _tracks.find(predicate)
+  }
 
   fun toggleLocalVideo() {
     localVideoTrack?.apply {
@@ -106,9 +118,9 @@ class MeetingViewModel(
    */
   fun toggleAudio() {
     synchronized(_tracks) {
-      _isAudioMuted = !_isAudioMuted
+      isAudioMuted = !isAudioMuted
 
-      val volume = if (_isAudioMuted) 0.0 else 1.0
+      val volume = if (isAudioMuted) 0.0 else 1.0
       _tracks.forEach { track ->
         if (track.audio != null && track.audio != localAudioTrack) {
           (track.audio as HMSRemoteAudioTrack).setVolume(volume)
@@ -139,7 +151,7 @@ class MeetingViewModel(
         roomDetails.username,
         roomDetails.authToken,
         info.toString(),
-        initEndpoint = "https://${roomDetails.env}-init.100ms.live/init"
+        initEndpoint = "https://${roomDetails.env}.100ms.live/init"
       )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
@@ -147,7 +159,7 @@ class MeetingViewModel(
           state.postValue(MeetingState.Failure(error))
         }
 
-        override fun onJoin(hmsRoom: HMSRoom) {
+        override fun onJoin(room: HMSRoom) {
           val peer = hmsSDK.getLocalPeer()
           peer.audioTrack?.apply {
             localAudioTrack = (this as HMSLocalAudioTrack)
@@ -173,19 +185,11 @@ class MeetingViewModel(
 
             HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
               synchronized(_tracks) {
-                val prevSize = _tracks.size
                 val track = _tracks.find {
                   it.peer.peerID == peer.peerID &&
                       it.video?.trackId == peer.videoTrack?.trackId
                 }
                 if (track != null) dominantSpeaker.postValue(track)
-/*                if (track != null) {
-                  dominantSpeaker.postValue(track)
-                  _tracks.remove(track)
-                  _tracks.add(0, track)
-                  tracks.postValue(_tracks)
-                }
-                assert(prevSize == _tracks.size)*/
               }
             }
 
@@ -195,6 +199,12 @@ class MeetingViewModel(
 
             else -> Unit
           }
+        }
+
+        override fun onReconnected() {
+        }
+
+        override fun onReconnecting(error: HMSException) {
         }
 
 
@@ -230,7 +240,7 @@ class MeetingViewModel(
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
         override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
-          Log.v(TAG, "onAudioLevelUpdate: speakers=$speakers")
+          Log.v(TAG, "onAudioLevelUpdate: speakers=${speakers.toList()}")
           this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
@@ -259,6 +269,10 @@ class MeetingViewModel(
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
     synchronized(_tracks) {
       // Check if this track already exists
+      if (track is HMSRemoteAudioTrack) {
+        track.setVolume(if (isAudioMuted) 0.0 else 1.0)
+      }
+
       val _track = _tracks.find {
         it.audio == null &&
             it.peer.peerID == peer.peerID &&
@@ -316,17 +330,6 @@ class MeetingViewModel(
       // Update the view as we have removed some views
       tracks.postValue(_tracks)
     }
-  }
-
-  private fun getLocalScreen() {
-    state.postValue(
-      MeetingState.LoadingMedia(
-        "Loading Media",
-        "Getting user local stream"
-      )
-    )
-
-    // onConnect -> Join -> getUserMedia
   }
 }
 

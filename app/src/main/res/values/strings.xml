@@ -4,6 +4,7 @@
     <string name="home_fragment">Home Fragment</string>
     <string name="meeting_fragment">Meeting Fragment</string>
     <string name="chat_fragment">Chat Fragment</string>
+    <string name="participants_fragment">Participants Fragment</string>
 
 
     <string name="environment">Environment</string>
@@ -43,6 +44,7 @@
     <string name="open_chat">Open Chat</string>
     <string name="share_screen">Share Screen</string>
     <string name="record_meeting">Record Meeting</string>
+    <string name="show_participants">Show Participants</string>
     <string name="settings_fragment">Settings Fragment</string>
     <string name="default_name">Default Name</string>
     <string name="default_video_source">Default Video Source</string>
@@ -60,6 +62,7 @@
     <string name="video_codec">Video Codec</string>
     <string name="log_level_100ms_sdk">Log Level 100ms Sdk</string>
     <string name="log_level_webrtc">Log Level WebRTC</string>
+    <string name="search_participants">Search Participants</string>
     <string name="video_bitrate">Video Bitrate</string>
     <string name="role">Role</string>
     <string name="video_framerate">Video Framerate</string>

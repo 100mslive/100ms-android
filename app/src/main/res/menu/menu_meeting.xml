@@ -56,6 +56,12 @@
             app:showAsAction="never" />
 
         <item
+            android:id="@+id/action_participants"
+            android:icon="@drawable/ic_people_24"
+            android:title="@string/show_participants"
+            app:showAsAction="never" />
+
+        <item
             android:id="@+id/action_share_link"
             android:icon="@drawable/ic_share_24"
             android:title="@string/share_link"

@@ -3,68 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:orientation="vertical"
-    tools:context=".ui.meeting.pinnedvideo.PinnedVideoFragment">
+    tools:context=".ui.meeting.activespeaker.ActiveSpeakerFragment">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/container_pin_video"
+        android:id="@+id/screen_share_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="4dp"
-        android:layout_weight="1">
+        android:layout_weight="4">
 
         <include
-            android:id="@+id/pin_video"
+            android:id="@+id/screen_share"
             layout="@layout/video_card" />
 
     </com.google.android.material.card.MaterialCardView>
 
-
-    <LinearLayout
-        android:id="@+id/container_bottom_tray"
+    <GridLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/video_list_size"
-        android:orientation="horizontal">
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/container_active_speaker_video_1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:layout_weight="1">
-
-            <include
-                android:id="@+id/active_speaker_video_1"
-                layout="@layout/list_item_video" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/container_active_speaker_video_2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:layout_weight="1">
-
-            <include
-                android:id="@+id/active_speaker_video_2"
-                layout="@layout/list_item_video" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/container_active_speaker_video_3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:layout_weight="1">
-
-            <include
-                android:id="@+id/active_speaker_video_3"
-                layout="@layout/list_item_video" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-    </LinearLayout>
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:animateLayoutChanges="false" />
 
 </LinearLayout>

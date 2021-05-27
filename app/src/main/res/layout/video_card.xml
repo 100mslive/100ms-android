@@ -51,9 +51,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textStyle="bold"
+                android:text="@string/john_doe"
                 android:textSize="12sp"
-                android:text="@string/john_doe" />
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/icon_audio_off"
@@ -95,7 +95,6 @@
         android:background="@drawable/circle_secondary_24"
         android:gravity="center"
         android:text="@string/_08"
-        android:visibility="gone"
         android:textColor="@android:color/white"
         android:textSize="10sp"
         android:textStyle="bold" />

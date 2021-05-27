@@ -15,7 +15,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
@@ -148,8 +147,13 @@ class HomeFragment : Fragment() {
     homeViewModel.sendAuthTokenRequest(
       TokenRequest(
         roomId = settings.lastUsedRoomId,
-        userId = username,
-        role = role
+        username = username,
+        role = role,
+        environment = when (settings.environment) {
+          "prod-init" -> "prod-in"
+          "qa-init" -> "qa-in"
+          else -> settings.environment
+        }
       )
     )
   }

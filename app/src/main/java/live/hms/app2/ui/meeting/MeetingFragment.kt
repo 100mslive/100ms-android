@@ -49,7 +49,7 @@ class MeetingFragment : Fragment() {
 
   private lateinit var audioManager: HMSAudioManager
 
-  private var meetingViewMode = MeetingViewMode.GRID
+  private var meetingViewMode = MeetingViewMode.ACTIVE_SPEAKER
 
   private var isMeetingOngoing = false
 
@@ -135,6 +135,12 @@ class MeetingFragment : Fragment() {
           MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
         )
       }
+
+      R.id.action_participants -> {
+        findNavController().navigate(
+          MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
+        )
+      }
     }
     return false
   }
@@ -192,16 +198,10 @@ class MeetingFragment : Fragment() {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
 
-    savedInstanceState?.let { state ->
-      if (
-        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        && meetingViewMode != MeetingViewMode.PINNED
-      ) {
-        changeMeetingMode(MeetingViewMode.PINNED)
-      }
-    } ?: run {
+    if (savedInstanceState == null) {
       updateVideoView()
     }
+
     initButtons()
     initOnBackPress()
 
@@ -259,6 +259,7 @@ class MeetingFragment : Fragment() {
           }
 
           builder.setNegativeButton(R.string.leave) { dialog, _ ->
+            meetingViewModel.leaveMeeting()
             goToHomePage()
             dialog.dismiss()
           }

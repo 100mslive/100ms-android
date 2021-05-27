@@ -156,7 +156,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(LAST_USED_ROOM_ID, value)
 
   var environment: String
-    get() = sharedPreferences.getString(ENVIRONMENT, "prod")!!
+    get() = sharedPreferences.getString(ENVIRONMENT, "prod-init")!!
     set(value) = putString(ENVIRONMENT, value)
 
 
@@ -176,7 +176,7 @@ class SettingsStore(context: Context) {
     get() {
       val str = sharedPreferences.getString(
         LOG_LEVEL_WEBRTC,
-        HMSLogger.LogLevel.OFF.toString()
+        HMSLogger.LogLevel.WARN.toString()
       )!!
       return HMSLogger.LogLevel.valueOf(str)
     }

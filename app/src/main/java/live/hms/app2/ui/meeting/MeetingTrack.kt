@@ -13,10 +13,10 @@ data class MeetingTrack(
     if (other is MeetingTrack) {
       return (other.peer.peerID == peer.peerID && other.video?.trackId == video?.trackId && other.audio?.trackId == audio?.trackId)
     }
-
     return super.equals(other)
   }
 
   val isLocal: Boolean = peer.isLocal
-  val isScreen: Boolean = video?.source == HMSTrackSource.SCREEN
+  val isScreen: Boolean
+    get() = video?.source == HMSTrackSource.SCREEN
 }
