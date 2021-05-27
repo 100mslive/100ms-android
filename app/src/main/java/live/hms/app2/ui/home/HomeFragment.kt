@@ -19,8 +19,6 @@ import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
-import live.hms.app2.model.CreateRoomRequest
-import live.hms.app2.model.RecordingInfo
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.model.TokenRequest
 import live.hms.app2.ui.meeting.MeetingActivity
@@ -119,33 +117,23 @@ class HomeFragment : Fragment() {
   }
 
   private fun showProgressBar() {
-    binding.buttonStartMeeting.visibility = View.GONE
     binding.buttonJoinMeeting.visibility = View.GONE
 
-    binding.containerCardStartMeeting.visibility = View.GONE
     binding.containerCardJoin.visibility = View.GONE
     binding.containerCardName.visibility = View.GONE
     binding.progressBar.root.visibility = View.VISIBLE
 
-    binding.containerRoomName.isEnabled = false
     binding.containerMeetingUrl.isEnabled = false
-    binding.containerRoomName.isEnabled = false
-    binding.switchRecord.isEnabled = false
   }
 
   private fun hideProgressBar() {
-    binding.buttonStartMeeting.visibility = View.VISIBLE
     binding.buttonJoinMeeting.visibility = View.VISIBLE
 
-    binding.containerCardStartMeeting.visibility = View.VISIBLE
     binding.containerCardJoin.visibility = View.VISIBLE
     binding.containerCardName.visibility = View.VISIBLE
     binding.progressBar.root.visibility = View.GONE
 
-    binding.containerRoomName.isEnabled = true
     binding.containerMeetingUrl.isEnabled = true
-    binding.containerRoomName.isEnabled = true
-    binding.switchRecord.isEnabled = true
   }
 
   private fun getUsername() = binding.editTextName.text.toString()
@@ -281,8 +269,7 @@ class HomeFragment : Fragment() {
 
     mapOf(
       binding.editTextName to binding.containerName,
-      binding.editTextMeetingUrl to binding.containerMeetingUrl,
-      binding.editTextRoomName to binding.containerRoomName
+      binding.editTextMeetingUrl to binding.containerMeetingUrl
     ).forEach {
       it.key.addTextChangedListener { text ->
         if (text.toString().isNotEmpty()) it.value.error = null
@@ -320,30 +307,6 @@ class HomeFragment : Fragment() {
       }
 
       if (allOk) tryJoiningRoomAs(SettingsStore(requireContext()).role)
-    }
-
-    binding.buttonStartMeeting.setOnClickListener {
-      var allOk = isValidUserName()
-      val enableRecording = binding.switchRecord.isChecked
-
-      val roomName = binding.editTextRoomName.text.toString()
-      if (roomName.isEmpty()) {
-        allOk = false
-        binding.containerRoomName.error = "Room Name cannot be empty"
-      } else if (!roomName.matches(Regex("^[a-zA-Z.-:_]+$"))) {
-        allOk = false
-        binding.containerRoomName.error = "Can contain only alphabets, numbers and . - : _"
-      }
-
-      if (allOk) {
-        homeViewModel.sendCreateRoomRequest(
-          CreateRoomRequest(
-            roomName,
-           "qa-in",
-            RecordingInfo(enableRecording)
-          )
-        )
-      }
     }
   }
 }

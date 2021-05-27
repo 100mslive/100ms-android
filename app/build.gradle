@@ -62,7 +62,7 @@ dependencies {
 
     //100ms.live SDK
     implementation 'org.webrtc:google-webrtc:1.0.32006'
-    implementation project(":lib")
+    implementation 'com.github.100mslive:android-sdk:2.0.0-alpha03'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
