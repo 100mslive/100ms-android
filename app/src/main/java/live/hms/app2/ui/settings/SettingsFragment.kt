@@ -328,17 +328,46 @@ class SettingsFragment : Fragment() {
         LOG_LEVELS_100MS,
       ) { commitHelper.setLogLevel100msSdk(it) }
 
-      initAutoCompleteView(
+      initEditableAutoCompleteView(
         EnumSet.of(SettingsMode.HOME),
         containerEnvironment,
         autoCompleteEnvironment,
         settings.environment,
+        "Environment",
         ENVIRONMENTS,
       ) { commitHelper.setEnvironment(it) }
-
-
     }
   }
+
+  private fun initEditableAutoCompleteView(
+    allowedMode: EnumSet<SettingsMode>,
+    container: TextInputLayout,
+    view: AutoCompleteTextView,
+    defaultText: String,
+    name: String,
+    items: Array<String>,
+    saveOnValid: (value: String) -> Unit
+  ) {
+    initAutoCompleteView(
+      allowedMode,
+      container,
+      view,
+      defaultText,
+      items,
+      saveOnValid,
+    )
+
+    view.addTextChangedListener { text ->
+      val value = text.toString()
+      if (value.isEmpty()) {
+        container.error = "$name cannot be empty"
+      } else {
+        container.error = null
+        saveOnValid(value)
+      }
+    }
+  }
+
 
   private fun initAutoCompleteView(
     allowedMode: EnumSet<SettingsMode>,

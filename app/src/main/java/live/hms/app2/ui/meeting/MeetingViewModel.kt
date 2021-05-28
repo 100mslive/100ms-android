@@ -223,7 +223,7 @@ class MeetingViewModel(
           broadcastsReceived.postValue(
             ChatMessage(
               message.sender.name,
-              message.time,
+              Date(),
               message.message,
               false
             )

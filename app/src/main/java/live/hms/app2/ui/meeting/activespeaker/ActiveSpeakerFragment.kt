@@ -64,6 +64,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     update()
 
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+      Log.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
       synchronized(tracks) {
         // Update lru just to keep it as much filled as possible
         if (lru.size < lru.capacity) {
@@ -129,6 +130,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
 
     meetingViewModel.speakers.observe(viewLifecycleOwner) { speakers ->
+      Log.v(TAG, "speakers update received 🎙 [size=${speakers.size}]")
       lru.update(speakers.map { LruItem(it.peerId) })
       update()
       applySpeakerUpdates(speakers)
