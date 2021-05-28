@@ -84,7 +84,7 @@ This guide provides an overview of the key objects you'll use with 100ms' androi
 
 - Add the JitPack repository to your build file. Add it in your root `build.gradle` at the end of repositories of `allprojects`:
 
-```java 
+```gradle 
 allprojects {
 		repositories {
 			...
@@ -95,7 +95,7 @@ allprojects {
 	
 - Add the dependency in your app-level `gradle`
 
-```java 
+```gradle 
 dependencies {
 		implementation 'com.github.100mslive:android-sdk:x.x.x'
 	}
@@ -133,7 +133,7 @@ To generate a client-side token, follow the steps described here - https://app.g
 
 This will instantiate an `HMSClient` object
 
-```
+```kotlin
 val hmsSDK = HMSSDK
     .Builder(application) // pass the application context
     .setTrackSettings(hmsTrackSettings) // optional -- to set a track settings different from default
@@ -151,7 +151,7 @@ val hmsSDK = HMSSDK
 
 To join a room created by following the steps described in the above section, clients need to create a `HMSConfig` instance and use that instance to call `join` method of `HMSSDK`
 
-```
+```kotlin
 // Create a new HMSConfig
 val config = HMSConfig(
         roomDetails.username, // the name that the user wants to be displayed while in the room
@@ -166,7 +166,7 @@ val config = HMSConfig(
 
 100ms SDK provides callbacks to the client app about any change or update happening in the room after a user has joined by implementing `HMSUpdateListener` . These updates can be used to render the video on screen or to display other info regarding the room.
 
-```
+```kotlin
       val hmsUpdateListener = object: HMSUpdateListener{
 
         override fun onJoin(room: HMSRoom) {
@@ -208,7 +208,7 @@ val config = HMSConfig(
 Use the HMSConfig and HMSUpdateListener instances to call join method on the instance of HMSSDK created above.
 Once Join succeeds, all the callbacks keep coming on every change in the room and the app can react accordingly
 
-```
+```kotlin
 hmsSDK.join(hmsConfig, hmsUpdateListener) // to join a room
 
 ```
@@ -217,7 +217,7 @@ hmsSDK.join(hmsConfig, hmsUpdateListener) // to join a room
 
 Call the leave method on the HMSSDK instance
 
-```
+```kotlin
 hmsSDK.leave() // to leave a room
 ```
 
@@ -226,7 +226,7 @@ hmsSDK.leave() // to leave a room
 `HMSSDK` has other methods which the client app can use to get more info about the `Room` , `Peer` and `Tracks`
 
 
-```
+```kotlin
     fun join(config: HMSConfig, hmsUpdateListener: HMSUpdateListener) {
         // to join a Room
     }
@@ -265,7 +265,7 @@ hmsSDK.leave() // to leave a room
 
 Use the `HMSLocalAudioTrack` and `HMSLocalVideoTrack` to mute/unmute tracks
 
-```
+```kotlin
     class HMSTrack {
         val trackId: String // This is the id of a given track
         val type: HMSTrackType // One of AUDIO or VIDEO
