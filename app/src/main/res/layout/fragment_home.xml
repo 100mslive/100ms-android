@@ -102,6 +102,6 @@
     <include
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

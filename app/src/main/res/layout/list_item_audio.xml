@@ -2,10 +2,14 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
-    android:layout_width="@dimen/video_list_size"
-    android:layout_height="@dimen/video_list_size"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/audio_item_size"
     android:layout_margin="4dp"
-    app:cardCornerRadius="4dp">
+    android:backgroundTint="@color/blue_2"
+    android:maxWidth="@dimen/audio_item_size"
+    app:cardCornerRadius="4dp"
+    app:strokeColor="@color/primary_blue"
+    app:strokeWidth="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,11 +28,13 @@
 
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/bottom_tray"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="-3dp"
+            android:layout_marginEnd="-3dp"
             android:layout_marginBottom="-3dp"
             app:cardCornerRadius="5dp">
 
@@ -58,7 +64,7 @@
                     android:layout_height="14dp"
                     android:layout_gravity="center"
                     android:layout_marginLeft="8dp"
-                    android:contentDescription="@string/screen_share"
+                    android:contentDescription="@string/audio_status"
                     android:src="@drawable/ic_mic_off_24"
                     app:tint="@color/white_faded_70" />
 

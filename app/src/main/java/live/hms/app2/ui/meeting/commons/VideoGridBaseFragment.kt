@@ -223,7 +223,6 @@ abstract class VideoGridBaseFragment : Fragment() {
 
           // Create a new view
           val videoBinding = createVideoView(layout)
-          bindVideo(videoBinding.videoCard, newVideo)
 
           // Bind surfaceView when view is visible to user
           if (isViewVisible) {

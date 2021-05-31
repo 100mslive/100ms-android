@@ -6,4 +6,4 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="false"
     tools:context=".ui.meeting.audiomode.AudioModeFragment"
-    tools:listitem="@layout/list_item_video" />
+    tools:listitem="@layout/list_item_audio_collection" />

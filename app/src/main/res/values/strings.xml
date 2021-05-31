@@ -107,6 +107,8 @@
     <string name="grid_view">Grid View</string>
     <string name="active_speaker_view">Active Speaker View</string>
     <string name="screen_share">Screen Share</string>
+    <string name="audio_status">Audio Status</string>
+    <string name="video_status">Video Status</string>
     <string name="audio_level">Audio Level</string>
     <string name="meeting_name">Meeting Name</string>
     <string name="more">More</string>
@@ -114,4 +116,6 @@
     <string name="_8">8</string>
     <string name="_08">08</string>
     <string name="show_network_info">Show Network Info</string>
+    <string name="speakers">Speakers</string>
+    <string name="toggle_visibility">Toggle Visibility</string>
 </resources>

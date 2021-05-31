@@ -33,7 +33,7 @@
         android:layout_height="18dp"
         android:layout_gravity="center"
         android:layout_marginLeft="8dp"
-        android:contentDescription="@string/screen_share"
+        android:contentDescription="@string/video_status"
         android:src="@drawable/ic_videocam_off_24"
         app:tint="@color/white_faded_70" />
 
@@ -43,7 +43,7 @@
         android:layout_height="18dp"
         android:layout_gravity="center"
         android:layout_marginLeft="8dp"
-        android:contentDescription="@string/screen_share"
+        android:contentDescription="@string/audio_status"
         android:src="@drawable/ic_mic_off_24"
         app:tint="@color/white_faded_70" />
 

@@ -2,7 +2,6 @@ package live.hms.app2.ui.meeting
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -19,6 +18,7 @@ import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
+import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
@@ -49,7 +49,7 @@ class MeetingFragment : Fragment() {
 
   private lateinit var audioManager: HMSAudioManager
 
-  private var meetingViewMode = MeetingViewMode.ACTIVE_SPEAKER
+  private var meetingViewMode = MeetingViewMode.AUDIO_ONLY
 
   private var isMeetingOngoing = false
 
@@ -118,10 +118,6 @@ class MeetingFragment : Fragment() {
         )
       }
 
-      R.id.active_speaker_view -> {
-        changeMeetingMode(MeetingViewMode.ACTIVE_SPEAKER)
-      }
-
       R.id.action_grid_view -> {
         changeMeetingMode(MeetingViewMode.GRID)
       }
@@ -129,6 +125,15 @@ class MeetingFragment : Fragment() {
       R.id.action_pinned_view -> {
         changeMeetingMode(MeetingViewMode.PINNED)
       }
+
+      R.id.active_speaker_view -> {
+        changeMeetingMode(MeetingViewMode.ACTIVE_SPEAKER)
+      }
+
+      R.id.audio_only_view -> {
+        changeMeetingMode(MeetingViewMode.AUDIO_ONLY)
+      }
+
 
       R.id.action_settings -> {
         findNavController().navigate(
@@ -372,6 +377,7 @@ class MeetingFragment : Fragment() {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
+      MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
     }
 
     childFragmentManager
