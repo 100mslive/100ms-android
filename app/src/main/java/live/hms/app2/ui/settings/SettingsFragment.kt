@@ -49,12 +49,17 @@ class SettingsFragment : Fragment() {
       "Teacher",
       "Student",
       "Viewer",
-      "Admin"
+      "Admin",
+      "Listener",
+      "Speaker"
     )
 
+    const val ENV_PROD = "prod-init"
+    const val ENV_QA = "qa-init"
+
     private val ENVIRONMENTS = arrayOf(
-      "prod-init",
-      "qa-init",
+      ENV_PROD,
+      ENV_QA,
       "100ms-grpc"
     )
 

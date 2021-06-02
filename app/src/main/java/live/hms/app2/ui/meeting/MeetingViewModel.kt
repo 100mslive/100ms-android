@@ -2,6 +2,7 @@ package live.hms.app2.ui.meeting
 
 import android.app.Application
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.JsonObject
@@ -85,9 +86,10 @@ class MeetingViewModel(
     return _tracks.find { it.peer.peerID == peerId }
   }
 
-  fun findTrack(predicate: (track: MeetingTrack) -> Boolean): MeetingTrack? = synchronized(_tracks) {
-    return _tracks.find(predicate)
-  }
+  fun findTrack(predicate: (track: MeetingTrack) -> Boolean): MeetingTrack? =
+    synchronized(_tracks) {
+      return _tracks.find(predicate)
+    }
 
   fun toggleLocalVideo() {
     localVideoTrack?.apply {
@@ -122,8 +124,10 @@ class MeetingViewModel(
 
       val volume = if (isAudioMuted) 0.0 else 1.0
       _tracks.forEach { track ->
-        if (track.audio != null && track.audio != localAudioTrack) {
-          (track.audio as HMSRemoteAudioTrack).setVolume(volume)
+        track.audio?.let {
+          if (it is HMSRemoteAudioTrack) {
+            it.setVolume(volume)
+          }
         }
       }
     }
@@ -255,7 +259,15 @@ class MeetingViewModel(
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
     HMSCoroutineScope.launch {
-      localVideoTrack!!.switchCamera()
+      try {
+        localVideoTrack?.switchCamera()
+      } catch (ex: Exception) {
+        Toast.makeText(
+          getApplication(),
+          "Cannot switch camera: $ex",
+          Toast.LENGTH_LONG
+        ).show()
+      }
     }
   }
 

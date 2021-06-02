@@ -35,7 +35,7 @@
         <item
             android:id="@+id/audio_only_view"
             android:icon="@drawable/ic_volume_up_24"
-            android:title="@string/active_speaker_view"
+            android:title="@string/audio_only_view"
             app:showAsAction="never" />
 
         <item

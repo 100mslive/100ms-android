@@ -22,6 +22,7 @@ import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.model.TokenRequest
 import live.hms.app2.ui.meeting.MeetingActivity
+import live.hms.app2.ui.settings.SettingsFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.EmailUtils
@@ -58,7 +59,7 @@ class HomeFragment : Fragment() {
       }
       R.id.action_email_logs -> {
         requireContext().startActivity(
-          EmailUtils.getCrashLogIntent(requireContext())
+          EmailUtils.getNonFatalLogIntent(requireContext())
         )
       }
     }
@@ -150,8 +151,9 @@ class HomeFragment : Fragment() {
         username = username,
         role = role,
         environment = when (settings.environment) {
-          "prod-init" -> "prod-in"
-          "qa-init" -> "qa-in"
+          SettingsFragment.ENV_PROD -> "prod-in"
+          SettingsFragment.ENV_QA -> "qa-in"
+          "100ms-grpc" -> "qa-in"
           else -> settings.environment
         }
       )
@@ -233,6 +235,15 @@ class HomeFragment : Fragment() {
       val roomId = uri.path!!.substring(lastSlashIndex + 1)
 
       settings.lastUsedRoomId = roomId
+
+      uri.host?.let { host ->
+//        if (host.contains("prod")) {
+//          settings.environment = SettingsFragment.ENV_PROD
+//        } else if (host.contains("qa")) {
+//          settings.environment = SettingsFragment.ENV_QA
+//        }
+      }
+
       binding.editTextMeetingUrl.setText(roomId)
     } catch (e: Exception) {
       Log.e(TAG, "Cannot update $url", e)

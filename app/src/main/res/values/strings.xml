@@ -118,4 +118,5 @@
     <string name="show_network_info">Show Network Info</string>
     <string name="speakers">Speakers</string>
     <string name="toggle_visibility">Toggle Visibility</string>
+    <string name="audio_only_view">Audio Only View</string>
 </resources>

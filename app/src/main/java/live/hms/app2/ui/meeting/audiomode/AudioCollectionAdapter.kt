@@ -72,6 +72,7 @@ class AudioCollectionAdapter : RecyclerView.Adapter<AudioCollectionAdapter.Audio
 
       collection.items.removeAll(toRemove)
       collection.items.addAll(toAdd)
+      collection.items.sortBy { it.name }
     }
 
     if (requiresUpdate) {
