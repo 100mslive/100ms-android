@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class TokenRequest(
   @SerializedName("room_id") val roomId: String,
-  @SerializedName("user_name") val username: String,
+  @SerializedName("user_id") val username: String,
   @SerializedName("role") val role: String,
-  @SerializedName("env") val environment: String
+  @Transient val environment: String
 )
