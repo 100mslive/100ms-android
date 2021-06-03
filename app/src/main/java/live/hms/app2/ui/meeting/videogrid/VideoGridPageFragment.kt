@@ -18,7 +18,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
     private const val BUNDLE_PAGE_INDEX = "bundle-page-index"
 
-    public fun newInstance(pageIndex: Int): VideoGridPageFragment {
+    fun newInstance(pageIndex: Int): VideoGridPageFragment {
       return VideoGridPageFragment().apply {
         arguments = bundleOf(BUNDLE_PAGE_INDEX to pageIndex)
       }
@@ -35,7 +35,6 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentVideoGridPageBinding.inflate(inflater, container, false)
-    // (requireActivity() as AppCompatActivity).supportActionBar?.title = "Grid View"
 
     initViewModels()
     return binding.root

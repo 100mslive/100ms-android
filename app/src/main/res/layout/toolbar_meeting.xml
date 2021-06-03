@@ -8,25 +8,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/meeting_name"
-                style="@style/MaterialTextViewHeading"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/meeting_name"
-                android:textSize="20sp" />
-
-        </LinearLayout>
-
-    </androidx.appcompat.widget.Toolbar>
+        android:background="?attr/colorPrimary" />
 
 </com.google.android.material.appbar.AppBarLayout>

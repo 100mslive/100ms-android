@@ -3,6 +3,7 @@ package live.hms.app2.ui.meeting
 import android.app.Application
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.JsonObject
@@ -43,6 +44,12 @@ class MeetingViewModel(
   }
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
+
+  // Title at the top of the meeting
+  val title = MutableLiveData<Int>()
+  fun setTitle(@StringRes resId: Int) {
+    this.title.postValue(resId)
+  }
 
   // Flag to keep track whether the incoming audio need's to be muted
   var isAudioMuted: Boolean = false

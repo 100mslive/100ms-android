@@ -398,6 +398,8 @@ class MeetingFragment : Fragment() {
       MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
     }
 
+    meetingViewModel.setTitle(meetingViewMode.titleResId)
+
     childFragmentManager
       .beginTransaction()
       .replace(R.id.fragment_container, fragment)
