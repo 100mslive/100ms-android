@@ -24,7 +24,6 @@ class VideoListAdapter(
 
   override fun getItemId(position: Int) = items[position].id
 
-
   override fun onViewAttachedToWindow(holder: VideoItemViewHolder) {
     super.onViewAttachedToWindow(holder)
     Log.d(TAG, "onViewAttachedToWindow($holder)")

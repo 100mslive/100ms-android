@@ -485,6 +485,8 @@ class SettingsFragment : Fragment() {
       ) { commitHelper.setShowNetworkInfo(it) }
 
       // Disable the switches not yet supported (TODO: Add support)
+      switchPublishAudioOnJoin.isEnabled = false
+      switchPublishVideoOnJoin.isEnabled = false
       switchMirrorVideo.isEnabled = false
       switchShowPreviewBeforeJoin.isEnabled = false
 
