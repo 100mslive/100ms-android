@@ -115,6 +115,7 @@
     <string name="type_a_message">Type a message</string>
     <string name="_8">8</string>
     <string name="_08">08</string>
+    <string name="time_12_45">12:45</string>
     <string name="show_network_info">Show Network Info</string>
     <string name="speakers">Speakers</string>
     <string name="toggle_visibility">Toggle Visibility</string>
