@@ -41,8 +41,8 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     return binding.root
   }
 
-  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): Array<MeetingTrack> {
-    val pageVideos = ArrayList<MeetingTrack>()
+  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): Array<MeetingTrack?> {
+    val pageVideos = ArrayList<MeetingTrack?>()
 
     // Range is [fromIndex, toIndex] -- Notice the bounds
     val itemsCount = maxItems
@@ -59,7 +59,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val videos = getCurrentPageVideos(tracks)
-      updateVideos(binding.container, videos.map { it }.toTypedArray())
+      updateVideos(binding.container, videos)
     }
 
     meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }

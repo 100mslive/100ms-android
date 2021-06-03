@@ -29,6 +29,7 @@ import live.hms.app2.util.EmailUtils
 import live.hms.app2.util.LogUtils
 import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
+import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -149,7 +150,7 @@ class HomeFragment : Fragment() {
       TokenRequest(
         roomId = settings.lastUsedRoomId,
         username = username,
-        role = role,
+        role = role.trim().toLowerCase(Locale.ENGLISH),
         environment = when (settings.environment) {
           SettingsFragment.ENV_PROD -> "prod-in"
           SettingsFragment.ENV_QA -> "qa-in"
