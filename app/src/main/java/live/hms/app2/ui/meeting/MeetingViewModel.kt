@@ -140,8 +140,8 @@ class MeetingViewModel(
     }
   }
 
-  fun sendChatMessage(message: ChatMessage) {
-    hmsSDK.sendMessage("chat", message.message)
+  fun sendChatMessage(message: String) {
+    hmsSDK.sendMessage("chat", message)
   }
 
   fun startMeeting() {
