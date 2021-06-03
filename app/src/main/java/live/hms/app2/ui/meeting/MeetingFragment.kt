@@ -444,7 +444,8 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    binding.buttonOpenChat.setOnClickListener {
+    binding.buttonOpenChat.setOnSingleClickListener(1000L) {
+      Log.d(TAG, "initButtons: Chat Button clicked")
       findNavController().navigate(
         MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
           roomDetails,
