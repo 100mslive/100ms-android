@@ -23,6 +23,7 @@ import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.model.TokenRequest
 import live.hms.app2.ui.meeting.MeetingActivity
+import live.hms.app2.ui.settings.SettingsFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
@@ -216,11 +217,11 @@ class HomeFragment : Fragment() {
       settings.lastUsedRoomId = roomId
 
       uri.host?.let { host ->
-//        if (host.contains("prod")) {
-//          settings.environment = SettingsFragment.ENV_PROD
-//        } else if (host.contains("qa")) {
-//          settings.environment = SettingsFragment.ENV_QA
-//        }
+        if (host.contains("prod2.100ms.live")) {
+          settings.environment = SettingsFragment.ENV_PROD
+        } else if (host.contains("qa2.100ms.live")) {
+          settings.environment = SettingsFragment.ENV_QA
+        }
       }
 
       binding.editTextMeetingUrl.setText(roomId)
