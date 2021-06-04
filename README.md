@@ -1,12 +1,12 @@
-<p align="center" >
-  <a href="https://100ms.live/">
-  <img src="assets/100ms-logo.png?raw=true" title="100ms logo" float=left>
-</p>
-
 [![](https://jitpack.io/v/100mslive/android-sdk.svg)](https://app.gitbook.com/@100ms/s/100ms-v2/release-notes)
 [![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.100ms.live/)
 [![Slack](https://img.shields.io/badge/Community-Join%20on%20Slack-blue)](https://join.slack.com/t/100mslive/shared_invite/zt-llwdnz11-vkb2RzptwacwXHO7UeY0CQ)
 [![Email](https://img.shields.io/badge/Contact-Know%20More-blue)](mailto:founders@100ms.live)
+
+<p align="center" >
+  <a href="https://100ms.live/">
+  <img src="assets/100ms-logo.png?raw=true" title="100ms logo" float=left>
+</p>
 
 # 🎉 100ms SDK ＆ Sample App 🚀
 
@@ -154,17 +154,17 @@ To create a room, follow the steps described here - https://app.gitbook.com/@100
 
 To generate a client-side token, follow the steps described here - https://app.gitbook.com/@100ms/s/100ms-v2/server-side/generate-client-side-token
 
-## Create and instantiate 100ms Client (HMSClient)
+### 💪🏻 Create and instantiate 100ms Client (`HMSSDK`)
 
 This will instantiate an `HMSClient` object
 
-```
+```kotlin
 val hmsSDK = HMSSDK
-    .Builder(application) // pass the application context
-    .setTrackSettings(hmsTrackSettings) // optional -- to set a track settings different from default
-    .setAnalyticEventLevel(HMSAnalyticsEventLevel.ERROR) // optional -- set the analytical level
-    .setLogLevel(HMSLogger.LogLevel.VERBOSE) // optional -- set the logging level
-    .build()
+  .Builder(application) // pass the application context
+  .setTrackSettings(hmsTrackSettings) // optional -- to set a track settings different from default
+  .setAnalyticEventLevel(HMSAnalyticsEventLevel.ERROR) // optional -- set the analytical level
+  .setLogLevel(HMSLogger.LogLevel.VERBOSE) // optional -- set the logging level
+  .build()
 
 ```
 
@@ -237,10 +237,6 @@ Use the HMSConfig and HMSUpdateListener instances to call join method on the ins
 Once Join succeeds, all the callbacks keep coming on every change in the room and the app can react accordingly
 
 ```kotlin
-val hmsSdk = HMSSDK
-  .Builder(application) // Pass the Application Context
-  .build()
-
 hmsSdk.join(config, hmsUpdateListener)
 
 // You've successfully joined the meeting, enjoy! 🚀
