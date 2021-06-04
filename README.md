@@ -195,7 +195,7 @@ This guide provides an overview of the key objects you'll use with 100ms' androi
 
 - Add the JitPack repository to your build file. Add it in your root `build.gradle` at the end of repositories of `allprojects`:
 
-```java
+```gradle 
 allprojects {
 		repositories {
 			...
@@ -206,7 +206,7 @@ allprojects {
 
 - Add the dependency in your app-level `gradle`
 
-```java
+```gradle 
 dependencies {
 		implementation 'com.github.100mslive:android-sdk:x.x.x'
 	}
@@ -263,7 +263,7 @@ val hmsSDK = HMSSDK
 
 To join a room created by following the steps described in the above section, clients need to create a `HMSConfig` instance and use that instance to call `join` method of `HMSSDK`
 
-```kotline
+```kotlin
 // Create a new HMSConfig
 val config = HMSConfig(
   // The name that the user wants to be displayed while in the room
