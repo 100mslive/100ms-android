@@ -27,9 +27,9 @@ The Android SDK supports Android API level 24 and higher. It is built for armeab
 
 - Clone this repository
 
-  ```bash
-  git clone --depth 1 https://github.com/100mslive/sample-app-android.git
-  ```
+```bash
+git clone --depth 1 https://github.com/100mslive/sample-app-android.git
+```
 
 - Host your token generation service [following this guide](https://app.gitbook.com/@100ms/s/100ms-v2/server-side/generate-client-side-token)
 
@@ -83,6 +83,12 @@ Each `Peer`'s VideoTile shows following updates in real-time:
 2. Audio/Video track's mute/unmute status
 3. Live Updates of `Peer`'s joining and leaving
 
+Related classes/files in this app:
+  1. [`ActiveSpeakerFragment`](src/main/java/live/hms/app2/ui/meeting/activespeaker/ActiveSpeakerFragment.kt)
+  2. [`ActiveSpeakerLRU`](src/main/java/live/hms/app2/ui/meeting/activespeaker/ActiveSpeakerLRU.kt)
+  3. [`fragment_active_speaker.xml`](src/main/res/layout/fragment_active_speaker.xml)
+  4. [`video_card.xml`](src/main/res/layout/video_card.xml)
+
 <img src="assets/active-speaker-screen-share.gif" width="300"/>
 <img src="assets/active-speaker.gif" width="300"/>
 
@@ -95,6 +101,18 @@ Each `Peer`'s AudioTile shows following updates in real-time:
 1. Blue border if speaking at that moment
 2. Audio/Video track's mute/unmute status
 3. Live Updates of `Peer`'s joining and leaving
+
+Related classes/files in this app:
+  1. [`AudioCollection`](src/main/java/live/hms/app2/ui/meeting/audiomode/AudioCollection.kt)
+  2. [`AudioCollectionAdapter`](src/main/java/live/hms/app2/ui/meeting/audiomode/AudioCollectionAdapter.kt)
+  3. [`AudioCollectionDiffUtil`](src/main/java/live/hms/app2/ui/meeting/audiomode/AudioCollectionDiffUtil.kt)
+  4. [`AudioItem`](src/main/java/live/hms/app2/ui/meeting/audiomode/AudioItem.kt)
+  5. [`AudioItemsAdapter`](src/main/java/live/hms/app2/ui/meeting/audiomode/AudioItemsAdapter.kt)
+  6. [`AudioItemsDiffUtil`](src/main/java/live/hms/app2/ui/meeting/audiomode/AudioItemsDiffUtil.kt)
+  7. [`AudioModeFragment`](src/main/java/live/hms/app2/ui/meeting/audiomode/AudioModeFragment.kt)
+  8. [`fragment_audio.xml`](src/main/res/layout/fragment_audio.xml)
+  9. [`list_item_audio.xml`](src/main/res/layout/list_item_audio.xml)
+  10. [`list_item_chat.xml`](src/main/res/layout/list_item_chat.xml)
 
 <p>
   <img src="assets/audio-only-mode.gif" width="300">
@@ -113,12 +131,33 @@ Each `Peer`'s VideoTile shows following updates in real-time:
 4. Subscribes/Unsubscribe videos which are not visible in the viewport
 5. Handles updating the peer tracks status and peer-list smoothly without causing any re-renders
 
+Related classes/files in this app:
+  1. [`VideoGridBaseFragment`](src/main/java/live/hms/app2/ui/meeting/commons/VideoGridBaseFragment.kt)
+  2. [`VideoGridAdapter`](src/main/java/live/hms/app2/ui/meeting/videogrid/VideoGridAdapter.kt)
+  3. [`VideoGridFragment`](src/main/java/live/hms/app2/ui/meeting/videogrid/VideoGridFragment.kt)
+  4. [`VideoGridPageFragment`](src/main/java/live/hms/app2/ui/meeting/videogrid/VideoGridPageFragment.kt)
+  5. [`VideoGridPageItem`](src/main/java/live/hms/app2/ui/meeting/videogrid/VideoGridPageItem.kt)
+  6. [`VideoGridPageDiffUtil`](src/main/java/live/hms/app2/ui/meeting/videogrid/VideoGridPagerDiffUtil.kt)
+  7. [`VideoGridPageViewModel`](src/main/java/live/hms/app2/ui/meeting/videogrid/VideoGridPageViewModel.kt)
+  8. [`fragment_video_grid_page.xml`](src/main/res/layout/fragment_video_grid_page.xml)
+  9. [`fragment_grid_video.xml`](src/main/res/layout/fragment_grid_video.xml)
+  10. [`grid_item_video.xml`](src/main/res/layout/grid_item_video.xml)
+
 <img src="assets/grid-view.gif" width="300"/>
 
 ### 🙋🙋‍♀️ Hero View (experimental support 🧪)
 
 Allows pinning any `Peer` video tile by clicking on respective `Peer`'s VideoTile from the 
 bottom tray. The bottom tray is implemented using a `RecyclerView`
+
+Related classes/files in this app:
+  1. [`PinnedVideoFragment`](src/main/java/live/hms/app2/ui/meeting/pinnedvideo/PinnedVideoFragment.kt)
+  2. [`VideoListAdapter`](src/main/java/live/hms/app2/ui/meeting/participants/VideoListAdapter.kt)
+  3. [`VideoListItem`](src/main/java/live/hms/app2/ui/meeting/pinnedvideo/VideoListItem.kt)
+  4. [`VideoListItemDiffUtil`](src/main/java/live/hms/app2/ui/meeting/pinnedvideo/VideoListItemDiffUtil.kt)
+  5. [`fragment_pinned_video.xml`](src/main/res/layout/fragment_pinned_video.xml)
+  6. [`fragment_pinned_video.xml`](src/main/res/layout-land/fragment_pinned_video.xml)
+  7. [`list_item_video.xml`](src/main/res/layout/list_item_video.xml)
 
 <img src="assets/hero-view.gif" width="300"/>
 
@@ -128,6 +167,12 @@ Shows a list of all `Peer`'s in the room.
   1. Entire list can be filter by `name` of the `Peer`
   2. Updates the list in real-time as `Peer`'s joins/leaves
   2. Show real-time status of `Peer` tracks and screen-share
+
+Related classes/files in this app:
+  1. [`ParticipantsAdapter`](src/main/java/live/hms/app2/ui/meeting/participants/ParticipantsAdapter.kt)
+  2. [`ParticipantsFragment`](src/main/java/live/hms/app2/ui/meeting/participants/ParticipantsFragment.kt)
+  3. [`fragment_participants.xml`](src/main/res/layout/fragment_participants.xml)
+  4. [`list_item_peer_list.xml`](src/main/res/layout/list_item_peer_list.xml)
 
 <img src="assets/particpants-list.gif" width="300"/>
 
