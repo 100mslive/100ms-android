@@ -62,8 +62,6 @@ On the first time of launch, user will be prompted with permissions. Then you ar
 
 In the launch screen, here we have `Enter Name` and `Join Room`:
 
-<img src="assets/home-page.jpg?raw=true" width="300">
-
 We have many examples for each mode in the sample app using [`RecyclerView`](https://developer.android.com/reference/androidx/recyclerview/widget/RecyclerView), [`ViewPage2`](https://developer.android.com/jetpack/androidx/releases/viewpager2), [`LiveData](https://developer.android.com/topic/libraries/architecture/livedata) handling all data the right way with smooth updates.
 
 ### 📞 Join meeting
@@ -73,23 +71,65 @@ We have many examples for each mode in the sample app using [`RecyclerView`](htt
 - Click `Join Now`.
 - Video Conversation will be started 🎉
 
+<img src="assets/home-page.jpg?raw=true" width="300">
+
 ### Active Speaker Mode
 
-![Active Speaker with Screen Share](assets/active-speaker-scree-share.gif)
-![Active Speaker](assets/active-speaker.gif)
+Shows the most actively speaking `Peer`'s in the room. Max number of peer's to be displayed can be configured be `Max Rows` and `Max Columns` setting in the Home Page.
+
+Each `Peer`'s VideoTile shows following updates in real-time:
+
+1. Blue border if speaking at that moment
+2. Audio/Video track's mute/unmute status
+3. Live Updates of `Peer`'s joining and leaving
+
+<img src="assets/active-speaker-screen-share.gif" width="300"/>
+<img src="assets/active-speaker.gif" width="300"/>
 
 ### 🎵 Audio Only Mode
 
-![Audio Only - Multiple Roles](assets/audio-only-mode.gif)
-![Audio Only - Large Room](assets/audio-only-large-room.gif)
+Groups all `Peer`'s by their `Peer::role` and shows them using a nested `RecyclerView`:
+
+Each `Peer`'s AudioTile shows following updates in real-time:
+
+1. Blue border if speaking at that moment
+2. Audio/Video track's mute/unmute status
+3. Live Updates of `Peer`'s joining and leaving
+
+<p>
+  <img src="assets/audio-only-mode.gif" width="300">
+  <img src="assets/audio-only-large-room.gif" width="300">
+</p>
 
 ### 📚 Grid View
 
-![Grid View](assets/grid-view.gif)
+Show's all `Peer`'s in a 2x2 (default) Grid paginated using a `ViewPager`.
 
-### 🙋🙋‍♀️ Hero View
+Each `Peer`'s VideoTile shows following updates in real-time:
 
-![Hero View](assets/hero-view.gif)
+1. Blue border if speaking at that moment
+2. Audio/Video track's mute/unmute status
+3. Live Updates of `Peer`'s joining and leaving
+4. Subscribes/Unsubscribe videos which are not visible in the viewport
+5. Handles updating the peer tracks status and peer-list smoothly without causing any re-renders
+
+<img src="assets/grid-view.gif" width="300"/>
+
+### 🙋🙋‍♀️ Hero View (experimental support 🧪)
+
+Allows pinning any `Peer` video tile by clicking on respective `Peer`'s VideoTile from the 
+bottom tray. The bottom tray is implemented using a `RecyclerView`
+
+<img src="assets/hero-view.gif" width="300"/>
+
+### ✋ Participant List View
+
+Shows a list of all `Peer`'s in the room. 
+  1. Entire list can be filter by `name` of the `Peer`
+  2. Updates the list in real-time as `Peer`'s joins/leaves
+  2. Show real-time status of `Peer` tracks and screen-share
+
+<img src="assets/particpants-list.gif" width="300"/>
 
 ## 📑 100ms SDK Documentation
 
