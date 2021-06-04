@@ -12,3 +12,4 @@ app/gradle.properties
 .cxx
 local.properties
 *.aar
+assets/*.mp4
