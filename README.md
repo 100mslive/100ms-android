@@ -89,8 +89,10 @@ Related classes/files in this app:
   3. [`fragment_active_speaker.xml`](src/main/res/layout/fragment_active_speaker.xml)
   4. [`video_card.xml`](src/main/res/layout/video_card.xml)
 
-<img src="assets/active-speaker-screen-share.gif" width="300"/>
-<img src="assets/active-speaker.gif" width="300"/>
+<p>
+  <img src="assets/active-speaker-screen-share.gif" width="300"/>
+  <img src="assets/active-speaker.gif" width="300"/>
+</p>
 
 ### 🎵 Audio Only Mode
 
