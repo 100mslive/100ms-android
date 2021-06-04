@@ -1,6 +1,6 @@
 <p align="center" >
   <a href="https://100ms.live/">
-  <img src="images/100ms-logo.png?raw=true" title="100ms logo" float=left>
+  <img src="assets/100ms-logo.png?raw=true" title="100ms logo" float=left>
 </p>
 
 [![](https://jitpack.io/v/100mslive/android-sdk.svg)](https://app.gitbook.com/@100ms/s/100ms-v2/release-notes)
