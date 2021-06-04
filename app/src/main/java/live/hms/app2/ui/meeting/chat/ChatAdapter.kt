@@ -5,11 +5,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemChatBinding
+import java.text.SimpleDateFormat
 import java.util.*
 
 class ChatAdapter(
   private val messages: ArrayList<ChatMessage>
 ) : RecyclerView.Adapter<ChatAdapter.ChatMessageViewHolder>() {
+
+  private val dateFormatter = SimpleDateFormat("EEE, d MMM HH:mm", Locale.getDefault())
 
   inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
     RecyclerView.ViewHolder(binding.root) {
@@ -18,6 +21,7 @@ class ChatAdapter(
       binding.name.text = message.senderName
       binding.message.text = message.message
       binding.blueBar.visibility = if (message.isSentByMe) View.VISIBLE else View.GONE
+      binding.time.text = dateFormatter.format(message.time)
     }
   }
 

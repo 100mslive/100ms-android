@@ -11,14 +11,14 @@ class ChatViewModel : ViewModel() {
   }
 
   private val _messages = ArrayList<ChatMessage>()
-  private var sendBroadcastCallback: ((ChatMessage) -> Unit)? = null
+  private var sendBroadcastCallback: ((String) -> Unit)? = null
 
   fun broadcast(message: ChatMessage) {
     addMessage(message)
-    sendBroadcastCallback?.invoke(message)
+    sendBroadcastCallback?.invoke(message.message)
   }
 
-  fun setSendBroadcastCallback(callback: ((message: ChatMessage) -> Unit)) {
+  fun setSendBroadcastCallback(callback: ((message: String) -> Unit)) {
     sendBroadcastCallback = callback
   }
 

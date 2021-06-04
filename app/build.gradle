@@ -6,7 +6,6 @@ plugins {
     id 'com.google.gms.google-services' // Google Services Gradle plugin
     id 'com.google.firebase.crashlytics'
 }
-
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -15,26 +14,23 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 73
-        versionName "2.0.16"
+        versionCode 88
+        versionName "2.0.30"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
+        buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+        buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
+        buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
     }
 
     buildTypes {
         debug {
-            buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
-            buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
-            buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled false
         }
 
         release {
-            buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
-            buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
-            buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
@@ -58,14 +54,14 @@ android {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     //100ms.live SDK
     implementation 'org.webrtc:google-webrtc:1.0.32006'
-    implementation 'com.github.100mslive:android-sdk:2.0.0-alpha03'
+    implementation 'com.github.100mslive:android-sdk:2.0.0-alpha04'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"

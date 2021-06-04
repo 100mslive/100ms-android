@@ -2,7 +2,6 @@ package live.hms.app2.ui.settings
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.nfc.tech.MifareUltralight
 import androidx.core.content.edit
 import live.hms.video.utils.HMSLogger
 
@@ -120,7 +119,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(CODEC, value)
 
   var role: String
-    get() = sharedPreferences.getString(ROLE, "Student")!!
+    get() = sharedPreferences.getString(ROLE, "student")!!
     set(value) = putString(ROLE, value)
 
   var videoBitrate: Int
@@ -156,7 +155,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(LAST_USED_ROOM_ID, value)
 
   var environment: String
-    get() = sharedPreferences.getString(ENVIRONMENT, "prod")!!
+    get() = sharedPreferences.getString(ENVIRONMENT, "prod-init")!!
     set(value) = putString(ENVIRONMENT, value)
 
 
@@ -176,7 +175,7 @@ class SettingsStore(context: Context) {
     get() {
       val str = sharedPreferences.getString(
         LOG_LEVEL_WEBRTC,
-        HMSLogger.LogLevel.OFF.toString()
+        HMSLogger.LogLevel.WARN.toString()
       )!!
       return HMSLogger.LogLevel.valueOf(str)
     }
@@ -196,121 +195,38 @@ class SettingsStore(context: Context) {
 
     private val editor = sharedPreferences.edit()
 
-    fun setPublishVideo(value: Boolean): MultiCommitHelper {
-      editor.putBoolean(PUBLISH_VIDEO, value)
-      return this
-    }
+    fun setPublishVideo(value: Boolean) = apply { editor.putBoolean(PUBLISH_VIDEO, value) }
+    fun setCamera(value: String) = apply { editor.putString(CAMERA, value) }
+    fun setPublishAudio(value: Boolean) = apply { editor.putBoolean(PUBLISH_AUDIO, value) }
+    fun setVideoResolutionWidth(value: Int) = apply { editor.putInt(VIDEO_RESOLUTION_WIDTH, value) }
+    fun setVideoResolutionHeight(value: Int) =
+      apply { editor.putInt(VIDEO_RESOLUTION_HEIGHT, value) }
 
-    fun setCamera(value: String): MultiCommitHelper {
-      editor.putString(CAMERA, value)
-      return this
-    }
+    fun setCodec(value: String) = apply { editor.putString(CODEC, value) }
+    fun setVideoBitrate(value: Int) = apply { editor.putInt(VIDEO_BITRATE, value) }
+    fun setRole(value: String) = apply { editor.putString(ROLE, value) }
+    fun setVideoFrameRate(value: Int) = apply { editor.putInt(VIDEO_FRAME_RATE, value) }
+    fun setUsername(value: String) = apply { editor.putString(USERNAME, value) }
+    fun setDetectDominantSpeaker(value: Boolean) =
+      apply { editor.putBoolean(DETECT_DOMINANT_SPEAKER, value) }
 
-    fun setPublishAudio(value: Boolean): MultiCommitHelper {
-      editor.putBoolean(PUBLISH_AUDIO, value)
-      return this
-    }
+    fun setShowNetworkInfo(value: Boolean) = apply { editor.putBoolean(SHOW_NETWORK_INFO, value) }
+    fun setAudioPollInterval(value: Long) = apply { editor.putLong(AUDIO_POLL_INTERVAL, value) }
+    fun setSilenceAudioLevelThreshold(value: Int) =
+      apply { editor.putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value) }
 
-    fun setVideoResolutionWidth(value: Int): MultiCommitHelper {
-      editor.putInt(VIDEO_RESOLUTION_WIDTH, value)
-      return this
-    }
+    fun setLastUsedRoomId(value: String) = apply { editor.putString(LAST_USED_ROOM_ID, value) }
+    fun setEnvironment(value: String) = apply { editor.putString(ENVIRONMENT, value) }
+    fun setVideoGridRows(value: Int) = apply { editor.putInt(VIDEO_GRID_ROWS, value) }
+    fun setVideoGridColumns(value: Int) = apply { editor.putInt(VIDEO_GRID_COLUMNS, value) }
+    fun setIsLeakCanaryEnabled(value: Boolean) = apply { editor.putBoolean(LEAK_CANARY, value) }
+    fun setLogLevelWebRtc(value: String) = apply { editor.putString(LOG_LEVEL_WEBRTC, value) }
+    fun setLogLevelWebRtc(value: HMSLogger.LogLevel) =
+      apply { editor.putString(LOG_LEVEL_WEBRTC, value.toString()) }
 
-    fun setVideoResolutionHeight(value: Int): MultiCommitHelper {
-      editor.putInt(VIDEO_RESOLUTION_HEIGHT, value)
-      return this
-    }
-
-    fun setCodec(value: String): MultiCommitHelper {
-      editor.putString(CODEC, value)
-      return this
-    }
-
-    fun setVideoBitrate(value: Int): MultiCommitHelper {
-      editor.putInt(VIDEO_BITRATE, value)
-      return this
-    }
-
-    fun setRole(value: String): MultiCommitHelper {
-      editor.putString(ROLE, value)
-      return this
-    }
-
-    fun setVideoFrameRate(value: Int): MultiCommitHelper {
-      editor.putInt(VIDEO_FRAME_RATE, value)
-      return this
-    }
-
-    fun setUsername(value: String): MultiCommitHelper {
-      editor.putString(USERNAME, value)
-      return this
-    }
-
-    fun setDetectDominantSpeaker(value: Boolean): MultiCommitHelper {
-      editor.putBoolean(DETECT_DOMINANT_SPEAKER, value)
-      return this
-    }
-
-    fun setShowNetworkInfo(value: Boolean): MultiCommitHelper {
-      editor.putBoolean(SHOW_NETWORK_INFO, value)
-      return this
-    }
-
-    fun setAudioPollInterval(value: Long): MultiCommitHelper {
-      editor.putLong(AUDIO_POLL_INTERVAL, value)
-      return this
-    }
-
-    fun setSilenceAudioLevelThreshold(value: Int): MultiCommitHelper {
-      editor.putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
-      return this
-    }
-
-    fun setLastUsedRoomId(value: String): MultiCommitHelper {
-      editor.putString(LAST_USED_ROOM_ID, value)
-      return this
-    }
-
-    fun setEnvironment(value: String): MultiCommitHelper {
-      editor.putString(ENVIRONMENT, value)
-      return this
-    }
-
-    fun setVideoGridRows(value: Int): MultiCommitHelper {
-      editor.putInt(VIDEO_GRID_ROWS, value)
-      return this
-    }
-
-    fun setVideoGridColumns(value: Int): MultiCommitHelper {
-      editor.putInt(VIDEO_GRID_COLUMNS, value)
-      return this
-    }
-
-    fun setIsLeakCanaryEnabled(value: Boolean): MultiCommitHelper {
-      editor.putBoolean(LEAK_CANARY, value)
-      return this
-    }
-
-    fun setLogLevelWebRtc(value: String): MultiCommitHelper {
-      editor.putString(LOG_LEVEL_WEBRTC, value)
-      return this
-    }
-
-    fun setLogLevelWebRtc(value: HMSLogger.LogLevel): MultiCommitHelper {
-      editor.putString(LOG_LEVEL_WEBRTC, value.toString())
-      return this
-    }
-
-    fun setLogLevel100msSdk(value: String): MultiCommitHelper {
-      editor.putString(LOG_LEVEL_100MS_SDK, value)
-        return this
-    }
-
-    fun setLogLevel100msSdk(value: HMSLogger.LogLevel): MultiCommitHelper {
-      editor.putString(LOG_LEVEL_100MS_SDK, value.toString())
-      return this
-    }
-
+    fun setLogLevel100msSdk(value: String) = apply { editor.putString(LOG_LEVEL_100MS_SDK, value) }
+    fun setLogLevel100msSdk(value: HMSLogger.LogLevel) =
+      apply { editor.putString(LOG_LEVEL_100MS_SDK, value.toString()) }
 
     fun commit() {
       editor.commit()

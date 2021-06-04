@@ -2,7 +2,6 @@ package live.hms.app2.ui.meeting
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -11,7 +10,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.audio.HMSAudioManager
@@ -19,12 +17,14 @@ import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
+import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.error.HMSException
 
 class MeetingFragment : Fragment() {
 
@@ -47,9 +47,12 @@ class MeetingFragment : Fragment() {
     )
   }
 
+  private var alertDialog: AlertDialog? = null
+  private val failures = ArrayList<HMSException>()
+
   private lateinit var audioManager: HMSAudioManager
 
-  private var meetingViewMode = MeetingViewMode.GRID
+  private var meetingViewMode = MeetingViewMode.ACTIVE_SPEAKER
 
   private var isMeetingOngoing = false
 
@@ -93,7 +96,7 @@ class MeetingFragment : Fragment() {
     when (item.itemId) {
       R.id.action_share_link -> {
         val meetingUrl = roomDetails.let {
-          "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}&role=Guest"
+          "https://${it.env}.100ms.live/meeting/${it.roomId}"
         }
         val sendIntent = Intent().apply {
           action = Intent.ACTION_SEND
@@ -114,12 +117,8 @@ class MeetingFragment : Fragment() {
 
       R.id.action_email_logs -> {
         requireContext().startActivity(
-          EmailUtils.getCrashLogIntent(requireContext())
+          EmailUtils.getNonFatalLogIntent(requireContext())
         )
-      }
-
-      R.id.active_speaker_view -> {
-        changeMeetingMode(MeetingViewMode.ACTIVE_SPEAKER)
       }
 
       R.id.action_grid_view -> {
@@ -130,9 +129,24 @@ class MeetingFragment : Fragment() {
         changeMeetingMode(MeetingViewMode.PINNED)
       }
 
+      R.id.active_speaker_view -> {
+        changeMeetingMode(MeetingViewMode.ACTIVE_SPEAKER)
+      }
+
+      R.id.audio_only_view -> {
+        changeMeetingMode(MeetingViewMode.AUDIO_ONLY)
+      }
+
+
       R.id.action_settings -> {
         findNavController().navigate(
           MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
+        )
+      }
+
+      R.id.action_participants -> {
+        findNavController().navigate(
+          MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
         )
       }
     }
@@ -192,16 +206,10 @@ class MeetingFragment : Fragment() {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
 
-    savedInstanceState?.let { state ->
-      if (
-        resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        && meetingViewMode != MeetingViewMode.PINNED
-      ) {
-        changeMeetingMode(MeetingViewMode.PINNED)
-      }
-    } ?: run {
+    if (savedInstanceState == null) {
       updateVideoView()
     }
+
     initButtons()
     initOnBackPress()
 
@@ -243,27 +251,43 @@ class MeetingFragment : Fragment() {
 
       when (state) {
         is MeetingState.Failure -> {
+          alertDialog?.dismiss()
+          alertDialog = null
+
+          failures.add(state.exception)
           cleanup()
           hideProgressBar()
           stopAudioManager()
 
           val builder = AlertDialog.Builder(requireContext())
-            .setMessage(state.exception.message)
+            .setMessage("${failures.size} failures: \n" + failures.joinToString("\n\n") { "$it" })
             .setTitle(R.string.error)
             .setCancelable(false)
 
 
           builder.setPositiveButton(R.string.retry) { dialog, _ ->
             meetingViewModel.startMeeting()
+            failures.clear()
             dialog.dismiss()
+            alertDialog = null
           }
 
           builder.setNegativeButton(R.string.leave) { dialog, _ ->
+            meetingViewModel.leaveMeeting()
             goToHomePage()
+            failures.clear()
             dialog.dismiss()
+            alertDialog = null
           }
 
-          builder.create().show()
+          builder.setNeutralButton(R.string.bug_report) { _, _ ->
+            requireContext().startActivity(
+              EmailUtils.getNonFatalLogIntent(requireContext())
+            )
+            alertDialog = null
+          }
+
+          alertDialog = builder.create().apply { show() }
         }
 
         is MeetingState.Reconnecting -> {
@@ -371,7 +395,10 @@ class MeetingFragment : Fragment() {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
+      MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
     }
+
+    meetingViewModel.setTitle(meetingViewMode.titleResId)
 
     childFragmentManager
       .beginTransaction()
@@ -417,7 +444,8 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    binding.buttonOpenChat.setOnClickListener {
+    binding.buttonOpenChat.setOnSingleClickListener(1000L) {
+      Log.d(TAG, "initButtons: Chat Button clicked")
       findNavController().navigate(
         MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
           roomDetails,

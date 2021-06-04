@@ -52,30 +52,35 @@ object LogUtils {
     HMSLogger.webRtcLogLevel = settings.logLevelWebrtc
     HMSLogger.level = settings.logLevel100msSdk
 
-    currentSessionFile = saveLogsToFile(context, "session-log-${roomId}")
+    currentSessionFile = makeLogFile(context, "session-log-${roomId}")
     val fileWriter = FileWriter(currentSessionFile)
     currentSessionFileWriter = fileWriter
 
     fileWriter.write("Android Agent: ${HMSUtils.getUserAgent()}")
     fileWriter.write("Device Info: ${DEVICE_INFO.joinToString("\n")}")
 
-    HMSLogger.webRtcLogLevel = HMSLogger.LogLevel.OFF
     HMSLogger.injectLoggable(object : HMSLogger.Loggable {
       override fun onLogMessage(
         level: HMSLogger.LogLevel,
         tag: String,
-        message: String
+        message: String,
+        isWebRtCLog: Boolean
       ) {
-        val prefix = "[${if (false) "RTC" else "HMS"}:$level:$tag]"
+        val prefix = "[${if (isWebRtCLog) "RTC" else "HMS"}:$level:$tag]"
         fileWriter.write("$prefix\t\t${message.trimEnd()}\n")
       }
     })
   }
 
-  fun saveLogsToFile(context: Context, filename: String): File {
+  private fun makeLogFile(context: Context, filename: String): File {
     val logsDir = File(context.getExternalFilesDir(null), "")
     val fileNameSuffix = Date().let { "${dateFormatter.format(it)}-${it.time}" }
-    val logFile = File(logsDir, "$filename-$fileNameSuffix.log")
+
+    return File(logsDir, "$filename-$fileNameSuffix.log")
+  }
+
+  fun saveLogsToFile(context: Context, filename: String): File {
+    val logFile = makeLogFile(context, filename)
 
     try {
       Runtime.getRuntime().exec(

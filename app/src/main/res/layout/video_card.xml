@@ -51,9 +51,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textStyle="bold"
+                android:text="@string/john_doe"
                 android:textSize="12sp"
-                android:text="@string/john_doe" />
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/icon_audio_off"
@@ -61,7 +61,7 @@
                 android:layout_height="14dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="8dp"
-                android:contentDescription="@string/screen_share"
+                android:contentDescription="@string/audio_status"
                 android:src="@drawable/ic_mic_off_24"
                 app:tint="@color/white_faded_70" />
 
@@ -94,8 +94,7 @@
         android:layout_marginBottom="4dp"
         android:background="@drawable/circle_secondary_24"
         android:gravity="center"
-        android:text="@string/_08"
-        android:visibility="gone"
+        android:text="@string/_hyphen"
         android:textColor="@android:color/white"
         android:textSize="10sp"
         android:textStyle="bold" />

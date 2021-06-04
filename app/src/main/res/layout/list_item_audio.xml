@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/audio_item_size"
+    android:layout_margin="4dp"
+    android:backgroundTint="@color/blue_2"
+    android:maxWidth="@dimen/audio_item_size"
+    app:cardCornerRadius="4dp"
+    app:strokeColor="@color/primary_blue"
+    app:strokeWidth="0dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/name_initials"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/circle_secondary_48"
+            android:gravity="center"
+            android:text="@string/john_doe_initials"
+            android:textColor="@android:color/white"
+            android:textSize="24sp" />
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/bottom_tray"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="-3dp"
+            android:layout_marginEnd="-3dp"
+            android:layout_marginBottom="-3dp"
+            app:cardCornerRadius="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="6dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/john_doe"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/icon_audio_off"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="8dp"
+                    android:contentDescription="@string/audio_status"
+                    android:src="@drawable/ic_mic_off_24"
+                    app:tint="@color/white_faded_70" />
+
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

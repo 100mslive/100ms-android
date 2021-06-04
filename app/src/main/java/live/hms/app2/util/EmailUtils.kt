@@ -11,7 +11,7 @@ object EmailUtils {
 
   const val TAG = "EmailUtils"
 
-  fun getCrashLogIntent(context: Context, throwable: Throwable? = null): Intent {
+  fun getNonFatalLogIntent(context: Context, throwable: Throwable? = null): Intent {
     val logFile = LogUtils.saveLogsToFile(context, "nonfatal-log")
     val logUri = FileProvider.getUriForFile(context, "live.hms.app2.provider", logFile)
 

@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.app2.databinding.FragmentPinnedVideoBinding
 import live.hms.app2.model.RoomDetails

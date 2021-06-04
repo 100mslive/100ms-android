@@ -4,6 +4,7 @@
     <string name="home_fragment">Home Fragment</string>
     <string name="meeting_fragment">Meeting Fragment</string>
     <string name="chat_fragment">Chat Fragment</string>
+    <string name="participants_fragment">Participants Fragment</string>
 
 
     <string name="environment">Environment</string>
@@ -30,7 +31,6 @@
     <string name="settings">Settings</string>
 
     <!--    <string name="default_endpoint"></string>-->
-    <string name="default_endpoint">qa-in</string>
     <string name="chat">Chat</string>
     <string name="server_message_log">Server Message Log</string>
     <string name="pin_video">Pin Video</string>
@@ -43,6 +43,7 @@
     <string name="open_chat">Open Chat</string>
     <string name="share_screen">Share Screen</string>
     <string name="record_meeting">Record Meeting</string>
+    <string name="show_participants">Show Participants</string>
     <string name="settings_fragment">Settings Fragment</string>
     <string name="default_name">Default Name</string>
     <string name="default_video_source">Default Video Source</string>
@@ -60,6 +61,7 @@
     <string name="video_codec">Video Codec</string>
     <string name="log_level_100ms_sdk">Log Level 100ms Sdk</string>
     <string name="log_level_webrtc">Log Level WebRTC</string>
+    <string name="search_participants">Search Participants</string>
     <string name="video_bitrate">Video Bitrate</string>
     <string name="role">Role</string>
     <string name="video_framerate">Video Framerate</string>
@@ -105,11 +107,17 @@
     <string name="grid_view">Grid View</string>
     <string name="active_speaker_view">Active Speaker View</string>
     <string name="screen_share">Screen Share</string>
+    <string name="audio_status">Audio Status</string>
+    <string name="video_status">Video Status</string>
     <string name="audio_level">Audio Level</string>
     <string name="meeting_name">Meeting Name</string>
     <string name="more">More</string>
     <string name="type_a_message">Type a message</string>
     <string name="_8">8</string>
-    <string name="_08">08</string>
+    <string name="_hyphen">-</string>
+    <string name="time_12_45">12:45</string>
     <string name="show_network_info">Show Network Info</string>
+    <string name="speakers">Speakers</string>
+    <string name="toggle_visibility">Toggle Visibility</string>
+    <string name="audio_only_view">Audio Only View</string>
 </resources>

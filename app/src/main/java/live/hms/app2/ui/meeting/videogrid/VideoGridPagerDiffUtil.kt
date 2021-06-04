@@ -3,11 +3,9 @@ package live.hms.app2.ui.meeting.videogrid
 import androidx.recyclerview.widget.DiffUtil
 
 class VideoGridPagerDiffUtil(
-    private val oldPageCount: Int,
-    private val newPageCount: Int
+  private val oldPageCount: Int,
+  private val newPageCount: Int
 ) : DiffUtil.Callback() {
-
-  enum class PayloadKey { VALUE }
 
   override fun getOldListSize() = oldPageCount
   override fun getNewListSize() = newPageCount
@@ -16,11 +14,10 @@ class VideoGridPagerDiffUtil(
     return (oldItemPosition < oldPageCount) && (newItemPosition < newPageCount) && (oldItemPosition == newItemPosition)
   }
 
+  /** We rely on the observers in [VideoGridPageFragment] to update the content.
+   * Hence, even if the content is not same, we know that the observers will
+   * handle the changes in tracks */
   override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-    return (oldItemPosition < oldPageCount) && (newItemPosition < newPageCount) && (oldItemPosition == newItemPosition)
-  }
-
-  override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any {
-    return listOf(PayloadKey.VALUE)
+    return true
   }
 }

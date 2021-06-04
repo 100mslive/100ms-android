@@ -1,70 +1,150 @@
 package live.hms.app2.ui.meeting.activespeaker
 
+import android.util.Log
 import java.util.*
-import kotlin.math.ceil
 
-class ActiveSpeakerLRU<T>(val capacity: Int) {
-  private val maxPushAtATime = ceil(capacity / 3.0).toInt()
+/**
+ * Active Speaker LRU - Aims to fetch the most active speakers
+ * in the order which requires minimum swaps from the previous
+ * state -- ensuring that the UI is not updated too frequently.
+ *
+ * @param capacity - Maximum number of items in the [queue]
+ */
+class ActiveSpeakerLRU<T>(
+  val capacity: Int
+) {
+  companion object {
+    private const val TAG = "ActiveSpeakerLRU"
+  }
 
-  private var entryIndex = 0L
+  /**
+   * Timer used to assign [Item.timestamp] values to each [Item]
+   */
+  private var timer = 0L
 
+  /**
+   * Wrapper over [T], adding [timestamp] to allow comparison
+   * between two [Item]'s
+   */
   private data class Item<T>(
     val value: T,
     var timestamp: Long
   )
 
-  private val queue = LinkedList<Item<T>>()
+  /**
+   * Thread-safe queue which stores each [Item] each representing the
+   * most active [T].
+   *
+   * When a new items needs to be pushed we follow algorithm defined in
+   * [update] method.
+   */
+  private val queue = Collections.synchronizedList(ArrayList<Item<T>>())
 
-  private fun getItemWithMinimumTime(): T {
-    var res = queue.first
-    for (item in queue) {
-      if (res.timestamp > item.timestamp) {
-        res = item
+  /**
+   * Gets the current number of elements in the queue
+   */
+  val size: Int
+    @Synchronized get() = queue.size
+
+  private fun getItemIndex(value: T): Int {
+    for ((i, item) in queue.withIndex()) {
+      if (value == item.value) {
+        return i
       }
+
     }
 
-    return res.value
+    return -1
   }
 
-  private fun getItem(value: T): Item<T>? {
-    for (item in queue) {
-      if (value == item.value) {
-        return item
+  private fun getMinTimestampIndex(): Int {
+    if (queue.isEmpty()) return -1
+
+    var idx = 0
+    var minTimeItem = queue.first()
+
+    for ((i, item) in queue.withIndex()) {
+      if (item.timestamp < minTimeItem.timestamp) {
+        minTimeItem = item
+        idx = i
       }
     }
 
-    return null
+    return idx
   }
 
   /**
-   * Iterate over the first [maxPushAtATime] items.
-   * For each item,
-   *  - Get the [Item] with lowest [Item.timestamp]
-   *  - Replace this item with the current one
-   *  - If current item is first, then swap with 1st element in queue
+   * Resets the [Item.timestamp] values starting with 0
+   * This prevents the overflow of [timer] values
    */
-  fun push(items: Array<T>) {
+  private fun normalize() {
+    Log.d(TAG, "normalize: START $queue")
+    timer = 0
+    queue.sortedBy { it.timestamp }.forEach {
+      it.timestamp = timer++
+    }
+    Log.d(TAG, "normalize: DONE $queue")
+  }
+
+  /**
+   *
+   * For each current item in [items]:
+   *  1. Check if current value exists already in the [queue] - update
+   *  the timestamp to [timer] + 1
+   *  2. Else if [size] < [capacity] - push the [Item] simply
+   *  into the [queue]
+   *  3. Else, find and replace the item with minimum [Item.timestamp]
+   *  in the queue with the current item
+   *
+   * @param items - List of items to be pushed / updated in the [queue]
+   *  The item are assumed to be sorted from loud -> silent
+   */
+  @Synchronized
+  fun update(items: List<T>) {
     var index = 0
-    for (item in items) {
-      var inQueueItem = getItem(item)
-      if (inQueueItem == null) {
+    for (item in items.take(capacity).asReversed()) {
+      val position = getItemIndex(item)
+      if (position == -1) {
+        // New entry
         if (queue.size == capacity) {
-          queue.removeLast()
+          // Replace the oldest item with this one
+          val idx = getMinTimestampIndex()
+          queue[idx] = Item(item, timer++)
+        } else {
+          // Consider this as loudest speaker, hence add it as
+          // first item
+          queue.add(0, Item(item, timer++))
         }
-
-        inQueueItem = Item(item, entryIndex++)
-        queue.addFirst(inQueueItem)
-
-      } else if (index == 0) {
-        queue.remove(inQueueItem)
-        inQueueItem.timestamp = entryIndex++
-        queue.addFirst(inQueueItem)
+      } else {
+        // Item already in the queue, simply update the timer
+        queue[position].timestamp = timer++
       }
 
       index += 1
-      if (index == maxPushAtATime) break
+    }
+
+    if (timer > 10000) {
+      normalize()
     }
   }
 
+  /**
+   * Removes any item from the [queue]
+   */
+  @Synchronized
+  fun remove(items: List<T>) {
+    for (item in items) {
+      val position = getItemIndex(item)
+      if (position != -1) {
+        queue.removeAt(position)
+      }
+    }
+  }
+
+  /**
+   * Simply get all the elements in the [queue] maintaining
+   * the order
+   */
+  @Synchronized
   fun getItemsInOrder() = queue.map { it.value }
 }

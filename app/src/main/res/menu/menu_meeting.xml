@@ -21,12 +21,6 @@
 
     <group>
         <item
-            android:id="@+id/active_speaker_view"
-            android:icon="@drawable/ic_person_pin_24"
-            android:title="@string/active_speaker_view"
-            app:showAsAction="never" />
-
-        <item
             android:id="@+id/action_grid_view"
             android:icon="@drawable/ic_grid_view_24"
             android:title="@string/grid_view"
@@ -36,6 +30,18 @@
             android:id="@+id/action_pinned_view"
             android:icon="@drawable/ic_pinned_view_24"
             android:title="@string/hero_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/audio_only_view"
+            android:icon="@drawable/ic_volume_up_24"
+            android:title="@string/audio_only_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/active_speaker_view"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/active_speaker_view"
             app:showAsAction="never" />
 
     </group>
@@ -53,6 +59,12 @@
             android:icon="@drawable/ic_record_button_24"
             android:title="@string/record_meeting"
             android:visible="false"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_participants"
+            android:icon="@drawable/ic_people_24"
+            android:title="@string/show_participants"
             app:showAsAction="never" />
 
         <item

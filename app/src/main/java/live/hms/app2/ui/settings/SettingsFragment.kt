@@ -52,6 +52,15 @@ class SettingsFragment : Fragment() {
       "Admin"
     )
 
+    const val ENV_PROD = "prod-init"
+    const val ENV_QA = "qa-init"
+
+    private val ENVIRONMENTS = arrayOf(
+      ENV_PROD,
+      ENV_QA,
+      "100ms-grpc"
+    )
+
     private const val FRONT_FACING_CAMERA = "user"
     private const val REAR_FACING_CAMERA = "environment"
 
@@ -212,14 +221,6 @@ class SettingsFragment : Fragment() {
         "Username"
       ) { commitHelper.setUsername(it) }
 
-      initNonEmptyEditText(
-        EnumSet.of(SettingsMode.HOME),
-        settings.environment,
-        editTextEnvironment, containerEnvironment,
-        "Environment"
-      ) { commitHelper.setEnvironment(it) }
-
-
       // TODO: Make rows, columns available in SettingsMode.MEETING
       initNonEmptyEditTextWithRange(
         EnumSet.of(SettingsMode.HOME),
@@ -330,8 +331,46 @@ class SettingsFragment : Fragment() {
         LOG_LEVELS_100MS,
       ) { commitHelper.setLogLevel100msSdk(it) }
 
+      initEditableAutoCompleteView(
+        EnumSet.of(SettingsMode.HOME),
+        containerEnvironment,
+        autoCompleteEnvironment,
+        settings.environment,
+        "Environment",
+        ENVIRONMENTS,
+      ) { commitHelper.setEnvironment(it) }
     }
   }
+
+  private fun initEditableAutoCompleteView(
+    allowedMode: EnumSet<SettingsMode>,
+    container: TextInputLayout,
+    view: AutoCompleteTextView,
+    defaultText: String,
+    name: String,
+    items: Array<String>,
+    saveOnValid: (value: String) -> Unit
+  ) {
+    initAutoCompleteView(
+      allowedMode,
+      container,
+      view,
+      defaultText,
+      items,
+      saveOnValid,
+    )
+
+    view.addTextChangedListener { text ->
+      val value = text.toString()
+      if (value.isEmpty()) {
+        container.error = "$name cannot be empty"
+      } else {
+        container.error = null
+        saveOnValid(value)
+      }
+    }
+  }
+
 
   private fun initAutoCompleteView(
     allowedMode: EnumSet<SettingsMode>,
@@ -444,6 +483,8 @@ class SettingsFragment : Fragment() {
       ) { commitHelper.setShowNetworkInfo(it) }
 
       // Disable the switches not yet supported (TODO: Add support)
+      switchPublishAudioOnJoin.isEnabled = false
+      switchPublishVideoOnJoin.isEnabled = false
       switchMirrorVideo.isEnabled = false
       switchShowPreviewBeforeJoin.isEnabled = false
 

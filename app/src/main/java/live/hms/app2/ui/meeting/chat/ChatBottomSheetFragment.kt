@@ -76,7 +76,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
       val messageStr = binding.editTextMessage.text.toString().trim()
       if (messageStr.isNotEmpty()) {
         val message = ChatMessage(
-            roomDetails.username,
+            "You",
             Date(),
             messageStr,
             true

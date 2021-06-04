@@ -8,15 +8,14 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:context=".ui.home.HomeFragment">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
-            android:layout_centerInParent="true"
             android:orientation="vertical">
 
             <com.google.android.material.card.MaterialCardView
@@ -38,8 +37,8 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edit_text_name"
                         android:layout_width="match_parent"
-                        android:hint="@string/enter_name"
                         android:layout_height="wrap_content"
+                        android:hint="@string/enter_name"
                         android:inputType="textNoSuggestions" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -102,6 +101,6 @@
     <include
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
