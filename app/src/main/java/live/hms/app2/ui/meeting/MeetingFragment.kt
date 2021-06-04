@@ -96,7 +96,7 @@ class MeetingFragment : Fragment() {
     when (item.itemId) {
       R.id.action_share_link -> {
         val meetingUrl = roomDetails.let {
-          "https://${it.env}.100ms.live/?room=${it.roomId}&env=${it.env}&role=Guest"
+          "https://${it.env}.100ms.live/meeting/${it.roomId}"
         }
         val sendIntent = Intent().apply {
           action = Intent.ACTION_SEND

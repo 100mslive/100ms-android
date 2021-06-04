@@ -16,19 +16,16 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import live.hms.app2.BuildConfig
 import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.model.TokenRequest
 import live.hms.app2.ui.meeting.MeetingActivity
-import live.hms.app2.ui.settings.SettingsFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
-import live.hms.app2.util.EmailUtils
-import live.hms.app2.util.LogUtils
-import live.hms.app2.util.ROOM_DETAILS
-import live.hms.app2.util.viewLifecycle
+import live.hms.app2.util.*
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -40,6 +37,15 @@ class HomeFragment : Fragment() {
   private var binding by viewLifecycle<FragmentHomeBinding>()
   private val homeViewModel: HomeViewModel by viewModels()
   private lateinit var settings: SettingsStore
+
+  private val endpoint: String
+    get() {
+      if (BuildConfig.TOKEN_ENDPOINT_QA.isNotBlank() && settings.environment != "prod-init") {
+        return BuildConfig.TOKEN_ENDPOINT_QA
+      }
+
+      return BuildConfig.TOKEN_ENDPOINT
+    }
 
   override fun onResume() {
     super.onResume()
@@ -147,16 +153,14 @@ class HomeFragment : Fragment() {
     settings.username = username
 
     homeViewModel.sendAuthTokenRequest(
+      endpoint,
       TokenRequest(
         roomId = settings.lastUsedRoomId,
-        username = username,
+        userId = UUID.randomUUID().toString() + username.replace(
+          " ",
+          ""
+        ), // Can be any customer facing userId
         role = role.trim().toLowerCase(Locale.ENGLISH),
-        environment = when (settings.environment) {
-          SettingsFragment.ENV_PROD -> "prod-in"
-          SettingsFragment.ENV_QA -> "qa-in"
-          "100ms-grpc" -> "qa-in"
-          else -> settings.environment
-        }
       )
     )
   }
@@ -200,32 +204,6 @@ class HomeFragment : Fragment() {
       }
     }
 
-    homeViewModel.createRoomResponse.observe(viewLifecycleOwner) { response ->
-      when (response.status) {
-        Status.LOADING -> {
-          updateProgressBarUI(true)
-          showProgressBar()
-        }
-        Status.SUCCESS -> {
-          val data = response.data!!
-          Toast.makeText(
-            requireContext(),
-            "Created room ${data.roomId} \uD83E\uDD73",
-            Toast.LENGTH_SHORT
-          ).show()
-          tryJoiningRoomAs(SettingsStore(requireContext()).role)
-        }
-
-        Status.ERROR -> {
-          hideProgressBar()
-          Toast.makeText(
-            requireContext(),
-            response.message,
-            Toast.LENGTH_SHORT
-          ).show()
-        }
-      }
-    }
   }
 
   private fun updateAndVerifyMeetingUrl(url: String): Boolean {

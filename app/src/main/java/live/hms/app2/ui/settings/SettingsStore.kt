@@ -120,7 +120,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(CODEC, value)
 
   var role: String
-    get() = sharedPreferences.getString(ROLE, "Student")!!
+    get() = sharedPreferences.getString(ROLE, "student")!!
     set(value) = putString(ROLE, value)
 
   var videoBitrate: Int

@@ -1,6 +1,5 @@
 package live.hms.app2.api
 
-import live.hms.app2.BuildConfig
 import live.hms.app2.util.crashlyticsLog
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -19,10 +18,11 @@ private val okHttpClient = OkHttpClient.Builder()
   .writeTimeout(5, TimeUnit.SECONDS)
   .build()
 
-private fun getRetrofit() = Retrofit.Builder()
-  .baseUrl(BuildConfig.TOKEN_ENDPOINT)
+private fun getRetrofit(url: String) = Retrofit.Builder()
+  .baseUrl(url)
   .addConverterFactory(GsonConverterFactory.create())
   .client(okHttpClient)
   .build()
 
-val TokenApiService: TokenService by lazy { getRetrofit().create(TokenService::class.java) }
+fun makeTokenService(endpoint: String): TokenService = getRetrofit(endpoint)
+  .create(TokenService::class.java)

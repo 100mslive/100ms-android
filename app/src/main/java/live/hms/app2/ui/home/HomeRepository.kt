@@ -1,19 +1,30 @@
 package live.hms.app2.ui.home
 
-import live.hms.app2.api.TokenApiService
-import live.hms.app2.model.CreateRoomRequest
-import live.hms.app2.model.CreateRoomResponse
+import live.hms.app2.api.TokenService
+import live.hms.app2.api.makeTokenService
 import live.hms.app2.model.TokenRequest
 import live.hms.app2.model.TokenResponse
 import retrofit2.Response
 
 class HomeRepository {
 
-  suspend fun fetchAuthToken(request: TokenRequest): Response<TokenResponse> {
-    return TokenApiService.fetchAuthToken(request)
+  private var service: TokenService? = null
+  private var currentServiceEndpoint: String = ""
+
+  @Synchronized
+  private fun getService(endpoint: String): TokenService {
+    if (service == null || currentServiceEndpoint != endpoint) {
+      service = makeTokenService(endpoint)
+    }
+
+    currentServiceEndpoint = endpoint
+    return service!!
   }
 
-  suspend fun createRoom(request: CreateRoomRequest): Response<CreateRoomResponse> {
-    return TokenApiService.createRoom(request)
+  suspend fun fetchAuthToken(
+    endpoint: String,
+    request: TokenRequest
+  ): Response<TokenResponse> {
+    return getService(endpoint).fetchAuthToken(request)
   }
 }
