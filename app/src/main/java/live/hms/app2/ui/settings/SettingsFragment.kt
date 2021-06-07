@@ -331,14 +331,18 @@ class SettingsFragment : Fragment() {
         LOG_LEVELS_100MS,
       ) { commitHelper.setLogLevel100msSdk(it) }
 
-      initEditableAutoCompleteView(
-        EnumSet.of(SettingsMode.HOME),
-        containerEnvironment,
-        autoCompleteEnvironment,
-        settings.environment,
-        "Environment",
-        ENVIRONMENTS,
-      ) { commitHelper.setEnvironment(it) }
+      if (BuildConfig.INTERNAL) {
+        initEditableAutoCompleteView(
+          EnumSet.of(SettingsMode.HOME),
+          containerEnvironment,
+          autoCompleteEnvironment,
+          settings.environment,
+          "Environment",
+          ENVIRONMENTS,
+        ) { commitHelper.setEnvironment(it) }
+      } else {
+        containerEnvironment.visibility = View.GONE
+      }
     }
   }
 
@@ -463,11 +467,16 @@ class SettingsFragment : Fragment() {
         switchPublishAudioOnJoin
       ) { commitHelper.setPublishAudio(it) }
 
-      initSwitch(
-        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-        settings.isLeakCanaryEnabled,
-        switchToggleLeakCanary
-      ) { handleLeakCanaryToggle(it) }
+      if (BuildConfig.INTERNAL) {
+        initSwitch(
+          EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+          settings.isLeakCanaryEnabled,
+          switchToggleLeakCanary
+        ) { handleLeakCanaryToggle(it) }
+      } else {
+        switchToggleLeakCanary.isEnabled = false
+        switchToggleLeakCanary.visibility = View.GONE
+      }
 
       // TODO: Make detectDominantSpeaker, audioLevel settings available in SettingsMode.MEETING
       initSwitch(

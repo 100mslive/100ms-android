@@ -14,12 +14,12 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 88
-        versionName "2.0.30"
+        versionCode 89
+        versionName "2.0.31"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "TOKEN_ENDPOINT_QA", TOKEN_ENDPOINT_QA
+        buildConfigField "boolean", "INTERNAL", INTERNAL
         buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
         buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
         buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
