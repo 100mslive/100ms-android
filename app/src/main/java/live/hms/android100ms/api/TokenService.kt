@@ -9,7 +9,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface TokenService {
-  @POST("?api=token")
+  @POST("token")
   suspend fun fetchAuthToken(@Body tokenRequest: TokenRequest): Response<TokenResponse>
 
   @POST("?api=room")

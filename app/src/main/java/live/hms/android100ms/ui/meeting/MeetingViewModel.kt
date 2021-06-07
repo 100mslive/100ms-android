@@ -235,6 +235,8 @@ class MeetingViewModel(
 
   private fun getConstraintsFromSettings(): HMSRTCMediaStreamConstraints {
     val constraints = HMSRTCMediaStreamConstraints(settings.publishAudio, settings.publishVideo)
+    constraints.isOptimiseForMusicStreaming = true
+    constraints.audioMaxBitRate = 510
 
     val resolution = "${settings.videoResolutionWidth}" +
         "x${settings.videoResolutionHeight}" +

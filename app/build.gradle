@@ -64,7 +64,8 @@ dependencies {
 
     //100ms.live SDK
     implementation 'org.webrtc:google-webrtc:1.0.32006'
-    implementation 'com.github.100mslive:android-sdk:0.9.17.2'
+    //implementation 'com.github.100mslive:android-sdk:0.9.17.2'
+    implementation project(':hmsvideo-android')
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.3"
