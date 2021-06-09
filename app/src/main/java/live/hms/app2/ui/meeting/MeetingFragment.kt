@@ -13,7 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
-import live.hms.app2.audio.HMSAudioManager
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
@@ -51,8 +50,6 @@ class MeetingFragment : Fragment() {
   private var alertDialog: AlertDialog? = null
   private val failures = ArrayList<HMSException>()
 
-  private lateinit var audioManager: HMSAudioManager
-
   private var meetingViewMode = MeetingViewMode.ACTIVE_SPEAKER
 
   private var isMeetingOngoing = false
@@ -66,7 +63,6 @@ class MeetingFragment : Fragment() {
 
   override fun onResume() {
     super.onResume()
-    audioManager.updateAudioDeviceState()
     settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
@@ -74,7 +70,6 @@ class MeetingFragment : Fragment() {
     super.onCreate(savedInstanceState)
 
     roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
-    audioManager = HMSAudioManager.create(requireContext())
 
     savedInstanceState?.let { state ->
       meetingViewMode = state.getSerializable(BUNDLE_MEETING_VIEW_MODE) as MeetingViewMode
@@ -88,7 +83,6 @@ class MeetingFragment : Fragment() {
 
   override fun onStop() {
     super.onStop()
-    stopAudioManager()
     chatViewModel.removeSendBroadcastCallback()
     settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
@@ -258,7 +252,6 @@ class MeetingFragment : Fragment() {
           failures.add(state.exception)
           cleanup()
           hideProgressBar()
-          stopAudioManager()
 
           val builder = AlertDialog.Builder(requireContext())
             .setMessage("${failures.size} failures: \n" + failures.joinToString("\n\n") { "$it" })
@@ -313,7 +306,6 @@ class MeetingFragment : Fragment() {
           showProgressBar()
         }
         is MeetingState.Ongoing -> {
-          //startAudioManager()
           hideProgressBar()
 
           isMeetingOngoing = true
@@ -325,7 +317,6 @@ class MeetingFragment : Fragment() {
         is MeetingState.Disconnected -> {
           cleanup()
           hideProgressBar()
-          stopAudioManager()
 
           if (state.goToHome) goToHomePage()
         }
@@ -349,23 +340,6 @@ class MeetingFragment : Fragment() {
         )
       }
     }
-  }
-
-  private fun startAudioManager() {
-    crashlyticsLog(TAG, "Starting Audio manager")
-
-    audioManager.start { selectedAudioDevice, availableAudioDevices ->
-      crashlyticsLog(
-        TAG,
-        "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
-      )
-    }
-  }
-
-  private fun stopAudioManager() {
-    val devices = audioManager.selectedAudioDevice
-    crashlyticsLog(TAG, "Stopping Audio Manager:selectedAudioDevice:${devices}")
-    //audioManager.stop()
   }
 
 
@@ -463,7 +437,6 @@ class MeetingFragment : Fragment() {
     // We need to perform a cleanup
     chatViewModel.clearMessages()
 
-    stopAudioManager()
     crashlyticsLog(TAG, "cleanup() done")
   }
 
