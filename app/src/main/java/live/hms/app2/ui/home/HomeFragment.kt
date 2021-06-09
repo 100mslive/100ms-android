@@ -231,26 +231,7 @@ class HomeFragment : Fragment() {
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
     binding.editTextName.setText(settings.username)
-
-    // TODO: Set text as a meeting URL obtained by parsing the TOKEN_ENDPOINT
-    // TODO: Will the meeting link always point to 100ms.live base url?
-
-
-    val data = requireActivity().intent.data
-
-    val url = when {
-      data != null -> {
-        Log.v(TAG, "Received Meeting URI via Intent: $data")
-        data.toString()
-      }
-
-      settings.lastUsedRoomId.isNotEmpty() -> {
-        "https://qa2.100ms.live/meeting/${settings.lastUsedRoomId}"
-      }
-      else -> ""
-    }
-
-    url.isNotBlank() && updateAndVerifyMeetingUrl(url)
+    binding.editTextMeetingUrl.setText(settings.lastUsedRoomId)
 
     mapOf(
       binding.editTextName to binding.containerName,

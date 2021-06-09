@@ -240,6 +240,14 @@ class MeetingViewModel(
             )
           )
         }
+
+        override fun onReconnected() {
+          state.postValue(MeetingState.Ongoing())
+        }
+
+        override fun onReconnecting(error: HMSException) {
+          state.postValue(MeetingState.Reconnecting("Reconnecting", error.toString()))
+        }
       })
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
