@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.audio.HMSAudioManager
@@ -312,7 +313,7 @@ class MeetingFragment : Fragment() {
           showProgressBar()
         }
         is MeetingState.Ongoing -> {
-          startAudioManager()
+          //startAudioManager()
           hideProgressBar()
 
           isMeetingOngoing = true
@@ -364,7 +365,7 @@ class MeetingFragment : Fragment() {
   private fun stopAudioManager() {
     val devices = audioManager.selectedAudioDevice
     crashlyticsLog(TAG, "Stopping Audio Manager:selectedAudioDevice:${devices}")
-    audioManager.stop()
+    //audioManager.stop()
   }
 
 
