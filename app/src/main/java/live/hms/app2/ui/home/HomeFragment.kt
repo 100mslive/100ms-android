@@ -25,10 +25,7 @@ import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
-import live.hms.app2.util.EmailUtils
-import live.hms.app2.util.LogUtils
-import live.hms.app2.util.ROOM_DETAILS
-import live.hms.app2.util.viewLifecycle
+import live.hms.app2.util.*
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -41,6 +38,9 @@ class HomeFragment : Fragment() {
   private val homeViewModel: HomeViewModel by viewModels()
   private lateinit var settings: SettingsStore
 
+  private val tokenEndpoint: String
+    get() = getTokenEndpoint(getTokenEnvironmentFromInitEnvironment(settings.environment))
+
   override fun onResume() {
     super.onResume()
     val data = requireActivity().intent.data
@@ -48,6 +48,7 @@ class HomeFragment : Fragment() {
 
     if (data != null && data.toString().isNotEmpty()) {
       updateAndVerifyMeetingUrl(data.toString())
+      requireActivity().intent.data = null
     }
   }
 
@@ -147,16 +148,14 @@ class HomeFragment : Fragment() {
     settings.username = username
 
     homeViewModel.sendAuthTokenRequest(
+      tokenEndpoint,
       TokenRequest(
         roomId = settings.lastUsedRoomId,
-        username = username,
+        userId = UUID.randomUUID().toString() + username.replace(
+          " ",
+          "-"
+        ), // Can be any customer facing userId
         role = role.trim().toLowerCase(Locale.ENGLISH),
-        environment = when (settings.environment) {
-          SettingsFragment.ENV_PROD -> "prod-in"
-          SettingsFragment.ENV_QA -> "qa-in"
-          "100ms-grpc" -> "qa-in"
-          else -> settings.environment
-        }
       )
     )
   }
@@ -200,49 +199,23 @@ class HomeFragment : Fragment() {
       }
     }
 
-    homeViewModel.createRoomResponse.observe(viewLifecycleOwner) { response ->
-      when (response.status) {
-        Status.LOADING -> {
-          updateProgressBarUI(true)
-          showProgressBar()
-        }
-        Status.SUCCESS -> {
-          val data = response.data!!
-          Toast.makeText(
-            requireContext(),
-            "Created room ${data.roomId} \uD83E\uDD73",
-            Toast.LENGTH_SHORT
-          ).show()
-          tryJoiningRoomAs(SettingsStore(requireContext()).role)
-        }
-
-        Status.ERROR -> {
-          hideProgressBar()
-          Toast.makeText(
-            requireContext(),
-            response.message,
-            Toast.LENGTH_SHORT
-          ).show()
-        }
-      }
-    }
   }
 
   private fun updateAndVerifyMeetingUrl(url: String): Boolean {
     var allOk = true
     try {
       val uri = Uri.parse(url)
-      val lastSlashIndex = uri.path!!.lastIndexOf("/")
-      val roomId = uri.path!!.substring(lastSlashIndex + 1)
+      val room = Regex("/[a-zA-Z0-9]+/([a-zA-Z0-9]+)/?.*").find(uri.path ?: "")
+      val roomId = room!!.groups[1]!!.value
 
       settings.lastUsedRoomId = roomId
 
       uri.host?.let { host ->
-//        if (host.contains("prod")) {
-//          settings.environment = SettingsFragment.ENV_PROD
-//        } else if (host.contains("qa")) {
-//          settings.environment = SettingsFragment.ENV_QA
-//        }
+        if (host.contains("prod2.100ms.live")) {
+          settings.environment = SettingsFragment.ENV_PROD
+        } else if (host.contains("qa2.100ms.live")) {
+          settings.environment = SettingsFragment.ENV_QA
+        }
       }
 
       binding.editTextMeetingUrl.setText(roomId)

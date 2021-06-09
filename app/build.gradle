@@ -14,24 +14,23 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 82
-        versionName "2.0.24"
+        versionCode 89
+        versionName "2.0.31"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "boolean", "INTERNAL", INTERNAL
+        buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+        buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
+        buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
     }
 
     buildTypes {
         debug {
-            buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
-            buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled false
         }
 
         release {
-            buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
-            buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
-            buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
@@ -62,8 +61,7 @@ dependencies {
 
     //100ms.live SDK
     implementation 'org.webrtc:google-webrtc:1.0.32006'
-    //implementation 'com.github.100mslive:android-sdk:2.0.0-alpha03'
-    implementation project(':lib')
+    implementation 'com.github.100mslive:android-sdk:2.0.0-alpha04'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"

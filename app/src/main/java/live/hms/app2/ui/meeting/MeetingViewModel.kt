@@ -212,12 +212,6 @@ class MeetingViewModel(
           }
         }
 
-        override fun onReconnected() {
-        }
-
-        override fun onReconnecting(error: HMSException) {
-        }
-
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
           HMSLogger.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
         }
