@@ -15,6 +15,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.app2.BuildConfig
 import live.hms.app2.databinding.FragmentSettingsBinding
+import live.hms.app2.ui.meeting.MeetingViewMode
 import live.hms.app2.util.viewLifecycle
 import live.hms.video.utils.HMSLogger
 import java.util.*
@@ -68,6 +69,8 @@ class SettingsFragment : Fragment() {
       "Front Facing Camera" to FRONT_FACING_CAMERA,
       "Rear Facing Camera" to REAR_FACING_CAMERA,
     )
+
+    private val MEETING_MODES = MeetingViewMode.values().map { it.toString() }.toTypedArray()
 
     private val LOG_LEVELS_100MS = HMSLogger.LogLevel.values().map { it.toString() }.toTypedArray()
 
@@ -317,6 +320,14 @@ class SettingsFragment : Fragment() {
 
       initAutoCompleteView(
         EnumSet.of(SettingsMode.HOME),
+        containerMeetingMode,
+        autoCompleteMeetingMode,
+        settings.meetingMode.toString(),
+        MEETING_MODES,
+      ) { commitHelper.setMeetingMode(it) }
+
+      initAutoCompleteView(
+        EnumSet.of(SettingsMode.HOME),
         containerLogLevelsWebrtc,
         autoCompleteLogLevelsWebrtc,
         settings.logLevelWebrtc.toString(),
@@ -467,6 +478,12 @@ class SettingsFragment : Fragment() {
         switchPublishAudioOnJoin
       ) { commitHelper.setPublishAudio(it) }
 
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.showReconnectingProgressBars,
+        switchShowProgressBars
+      ) { commitHelper.setReconnectingShowProgressBars(it) }
+
       if (BuildConfig.INTERNAL) {
         initSwitch(
           EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
@@ -485,13 +502,8 @@ class SettingsFragment : Fragment() {
         switchShowDominantSpeaker
       ) { commitHelper.setDetectDominantSpeaker(it) }
 
-      initSwitch(
-        EnumSet.of(SettingsMode.HOME),
-        settings.showNetworkInfo,
-        switchShowNetworkInfo
-      ) { commitHelper.setShowNetworkInfo(it) }
-
-      // Disable the switches not yet supported (TODO: Add support)
+      // Disable the switches not yet implemented
+      switchShowNetworkInfo.isEnabled = false
       switchPublishAudioOnJoin.isEnabled = false
       switchPublishVideoOnJoin.isEnabled = false
       switchMirrorVideo.isEnabled = false

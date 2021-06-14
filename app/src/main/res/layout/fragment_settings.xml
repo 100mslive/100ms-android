@@ -187,6 +187,21 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_meeting_mode"
+            style="@style/AutoCompleteTextInputLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <AutoCompleteTextView
+                android:id="@+id/auto_complete_meeting_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/meeting_mode"
+                android:inputType="textAutoComplete"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_log_levels_webrtc"
             style="@style/AutoCompleteTextInputLayout"
             android:layout_width="match_parent"
@@ -223,6 +238,14 @@
             android:layout_height="wrap_content"
             android:text="@string/publish_video_while_joining"
             android:visibility="gone" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_show_progress_bars"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show_retry_progress_bars" />
+
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_publish_audio_on_join"

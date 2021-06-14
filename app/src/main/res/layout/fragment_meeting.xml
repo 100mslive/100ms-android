@@ -22,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
         android:background="@color/blue_3"
         android:orientation="horizontal">
 
@@ -52,11 +53,11 @@
 
             <TextView
                 android:id="@+id/unread_message_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/button_open_chat"
                 android:layout_marginTop="2dp"
                 android:layout_marginEnd="18dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:background="@drawable/badge_circle_20"
                 android:gravity="center"
                 android:text="@string/_8"

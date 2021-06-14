@@ -10,7 +10,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingBinding
@@ -50,7 +49,7 @@ class MeetingFragment : Fragment() {
   private var alertDialog: AlertDialog? = null
   private val failures = ArrayList<HMSException>()
 
-  private var meetingViewMode = MeetingViewMode.ACTIVE_SPEAKER
+  private lateinit var meetingViewMode: MeetingViewMode
 
   private var isMeetingOngoing = false
 
@@ -68,8 +67,9 @@ class MeetingFragment : Fragment() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
+    settings = SettingsStore(requireContext())
     roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+    meetingViewMode = settings.meetingMode
 
     savedInstanceState?.let { state ->
       meetingViewMode = state.getSerializable(BUNDLE_MEETING_VIEW_MODE) as MeetingViewMode
@@ -199,7 +199,6 @@ class MeetingFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
-    settings = SettingsStore(requireContext())
 
     if (savedInstanceState == null) {
       updateVideoView()
@@ -285,8 +284,10 @@ class MeetingFragment : Fragment() {
         }
 
         is MeetingState.Reconnecting -> {
-          updateProgressBarUI(state.heading, state.message)
-          showProgressBar()
+          if (settings.showReconnectingProgressBars) {
+            updateProgressBarUI(state.heading, state.message)
+            showProgressBar()
+          }
         }
 
         is MeetingState.Connecting -> {
@@ -374,6 +375,12 @@ class MeetingFragment : Fragment() {
     }
 
     meetingViewModel.setTitle(meetingViewMode.titleResId)
+
+    if (meetingViewMode == MeetingViewMode.AUDIO_ONLY) {
+      binding.buttonToggleVideo.visibility = View.GONE
+    } else {
+      binding.buttonToggleVideo.visibility = View.VISIBLE
+    }
 
     childFragmentManager
       .beginTransaction()
