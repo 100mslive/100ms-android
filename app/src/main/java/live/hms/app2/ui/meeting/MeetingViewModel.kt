@@ -100,13 +100,18 @@ class MeetingViewModel(
 
   fun toggleLocalVideo() {
     localVideoTrack?.apply {
-      val isVideo = !isMute
-      setMute(isVideo)
+      val isVideo =!isMute
+      setLocalVideoMute(isVideo)
+    }
+  }
 
+  fun setLocalVideoMute(isMute: Boolean) {
+    localVideoTrack?.apply {
+      setMute(isMute)
+
+      // Update the UI
       tracks.postValue(_tracks)
-
-      isLocalVideoEnabled.postValue(!isVideo)
-      crashlyticsLog(TAG, "toggleUserVideo: enabled=$isVideo")
+      isLocalVideoEnabled.postValue(!isMute)
     }
   }
 
@@ -187,7 +192,7 @@ class MeetingViewModel(
         override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
           HMSLogger.d(TAG, "join:onPeerUpdate type=$type, peer=$peer")
           when (type) {
-            HMSPeerUpdate.PEER_LEFT -> {
+            HMSPeerUpdate. -> {
               synchronized(_tracks) {
                 _tracks.removeIf { it.peer.peerID == peer.peerID }
                 tracks.postValue(_tracks)

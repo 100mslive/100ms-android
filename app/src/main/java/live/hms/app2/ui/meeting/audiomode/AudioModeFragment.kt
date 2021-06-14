@@ -35,6 +35,8 @@ class AudioModeFragment : Fragment() {
     binding = FragmentAudioBinding.inflate(inflater, container, false)
     initViews()
     initViewModels()
+    // MUTE local video
+    meetingViewModel.setLocalVideoMute(true)
     return binding.root
   }
 
