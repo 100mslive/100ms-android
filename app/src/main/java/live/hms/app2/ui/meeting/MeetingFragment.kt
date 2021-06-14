@@ -453,7 +453,17 @@ class MeetingFragment : Fragment() {
       object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
           Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-          meetingViewModel.leaveMeeting()
+          AlertDialog.Builder(requireContext())
+            .setMessage("You're about to quit the meeting, are you sure?")
+            .setTitle(R.string.leave)
+            .setCancelable(false)
+            .setPositiveButton("Yes") { dialog, _ ->
+              dialog.dismiss()
+              meetingViewModel.leaveMeeting()
+            }.setNegativeButton("No") { dialog, _ ->
+              dialog.dismiss()
+            }.create()
+            .show()
         }
       })
   }
