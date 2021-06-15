@@ -2,7 +2,6 @@ package live.hms.app2.ui.meeting
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -45,6 +44,17 @@ class MeetingViewModel(
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
+  private val settings = SettingsStore(getApplication())
+
+  val meetingViewMode = MutableLiveData(settings.meetingMode)
+
+  fun setMeetingViewMode(mode: MeetingViewMode) {
+    if (mode != meetingViewMode.value) {
+      meetingViewMode.postValue(mode)
+    }
+
+  }
+
   // Title at the top of the meeting
   val title = MutableLiveData<Int>()
   fun setTitle(@StringRes resId: Int) {
@@ -55,7 +65,6 @@ class MeetingViewModel(
   var isAudioMuted: Boolean = false
     private set
 
-  private val settings = SettingsStore(getApplication())
 
   // Live data to define the overall UI
   val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
@@ -173,11 +182,11 @@ class MeetingViewModel(
         override fun onJoin(room: HMSRoom) {
           val peer = hmsSDK.getLocalPeer()
           peer.audioTrack?.apply {
-            localAudioTrack = (this as HMSLocalAudioTrack)
+            localAudioTrack = this
             addTrack(this, peer)
           }
           peer.videoTrack?.apply {
-            localVideoTrack = (this as HMSLocalVideoTrack)
+            localVideoTrack = this
             addTrack(this, peer)
           }
 
@@ -270,12 +279,8 @@ class MeetingViewModel(
     HMSCoroutineScope.launch {
       try {
         localVideoTrack?.switchCamera()
-      } catch (ex: Exception) {
-        Toast.makeText(
-          getApplication(),
-          "Cannot switch camera: $ex",
-          Toast.LENGTH_LONG
-        ).show()
+      } catch (ex: HMSException) {
+        Log.e(TAG, "flipCamera: ${ex.description}", ex)
       }
     }
   }
