@@ -31,7 +31,7 @@ The Android SDK supports Android API level 21 and higher. It is built for armeab
 git clone --depth 1 https://github.com/100mslive/sample-app-android.git
 ```
 
-- Host your token generation service [following this guide](https://app.gitbook.com/@100ms/s/100ms-v2/server-side/generate-client-side-token)
+- Get your token generation endpoint [following this guide](https://100ms.gitbook.io/100ms-v2/server-side/100ms-quickstart-app-server)
 
 - Create `app/gradle.properties`
 
