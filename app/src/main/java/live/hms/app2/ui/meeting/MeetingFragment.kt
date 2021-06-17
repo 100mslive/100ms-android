@@ -46,7 +46,6 @@ class MeetingFragment : Fragment() {
   }
 
   private var alertDialog: AlertDialog? = null
-  private val failures = ArrayList<HMSException>()
 
   private var isMeetingOngoing = false
 
@@ -236,18 +235,16 @@ class MeetingFragment : Fragment() {
           alertDialog?.dismiss()
           alertDialog = null
 
-          failures.add(state.exception)
           cleanup()
           hideProgressBar()
 
           val builder = AlertDialog.Builder(requireContext())
-            .setMessage("${failures.size} failures: \n" + failures.joinToString("\n\n") { "$it" })
+            .setMessage("${state.exceptions.size} failures: \n" + state.exceptions.joinToString("\n\n") { "$it" })
             .setTitle(R.string.error)
             .setCancelable(false)
 
           builder.setPositiveButton(R.string.retry) { dialog, _ ->
             meetingViewModel.startMeeting()
-            failures.clear()
             dialog.dismiss()
             alertDialog = null
           }
@@ -255,7 +252,6 @@ class MeetingFragment : Fragment() {
           builder.setNegativeButton(R.string.leave) { dialog, _ ->
             meetingViewModel.leaveMeeting()
             goToHomePage()
-            failures.clear()
             dialog.dismiss()
             alertDialog = null
           }
