@@ -41,8 +41,8 @@ git clone --depth 1 https://github.com/100mslive/sample-app-android.git
 
 - Put your endpoint URL as `TOKEN_ENDPOINT` in `app/gradle.properties`. Make sure it ends with a backslash (`/`) For example:
   ```env
-  TOKEN_ENDPOINT="https://example-tokenservice.runkit.sh/" # Valid
-  TOKEN_ENDPOINT="https://example-tokenservice.runkit.sh" # Invalid
+  TOKEN_ENDPOINT="https://prod-in.100ms.live/hmsapi/<your-subdomain>/" # Valid
+  TOKEN_ENDPOINT="https://prod-in.100ms.live/hmsapi/<your-subdomain>" # Invalid
   ```
 - Create [firebase project](https://firebase.google.com/docs/android/setup#console) and save the [`google-services.json`](https://support.google.com/firebase/answer/7015592?hl=en) in `app/google-services.json`
 
