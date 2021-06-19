@@ -185,7 +185,7 @@ class MeetingViewModel(
         roomDetails.username,
         roomDetails.authToken,
         info.toString(),
-        initEndpoint = "https://${roomDetails.env}.100ms.live/init"
+        //initEndpoint = "https://${roomDetails.env}.100ms.live/init"
       )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
