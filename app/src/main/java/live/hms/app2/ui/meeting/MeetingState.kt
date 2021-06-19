@@ -16,6 +16,6 @@ sealed class MeetingState {
   data class Reconnecting(val heading: String, val message: String) : MeetingState()
   data class Disconnected(val goToHome: Boolean = false) : MeetingState()
 
-  data class Failure(val exception: HMSException) : MeetingState()
+  data class Failure(val exceptions: ArrayList<HMSException>) : MeetingState()
 }
 

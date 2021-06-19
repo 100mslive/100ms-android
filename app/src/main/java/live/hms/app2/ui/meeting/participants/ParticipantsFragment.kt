@@ -41,6 +41,7 @@ class ParticipantsFragment : Fragment() {
   }
 
   private fun initViews() {
+    binding.participantCount.text = "0"
     binding.recyclerView.apply {
       layoutManager = LinearLayoutManager(requireContext())
       adapter = this@ParticipantsFragment.adapter
@@ -51,6 +52,7 @@ class ParticipantsFragment : Fragment() {
       android.R.layout.simple_list_item_1,
       emptyArray()
     )
+
     binding.textInputSearch.apply {
       addTextChangedListener { text ->
         val items = meetingViewModel
@@ -64,7 +66,9 @@ class ParticipantsFragment : Fragment() {
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) {
-      adapter.setItems(meetingViewModel.peers)
+      val peers = meetingViewModel.peers
+      adapter.setItems(peers)
+      binding.participantCount.text = "${peers.size}"
     }
   }
 }

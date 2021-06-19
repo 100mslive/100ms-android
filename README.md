@@ -21,7 +21,7 @@ Here you will find everything you need to build experiences with video using 100
 
 ## 📱 Supported Devices
 
-The Android SDK supports Android API level 24 and higher. It is built for armeabi-v7a, arm64-v8a, x86, and x86_64 architectures.
+The Android SDK supports Android API level 21 and higher. It is built for armeabi-v7a, arm64-v8a, x86, and x86_64 architectures.
 
 ## 🚂 Setup Guide
 
@@ -41,8 +41,8 @@ git clone --depth 1 https://github.com/100mslive/sample-app-android.git
 
 - Put your endpoint URL as `TOKEN_ENDPOINT` in `app/gradle.properties`. Make sure it ends with a backslash (`/`) For example:
   ```env
-  TOKEN_ENDPOINT="https://prod-in.100ms.live/hmsapi/example.app.100ms.live/" # Valid
-  TOKEN_ENDPOINT="https://prod-in.100ms.live/hmsapi/example.app.100ms.live" # Invalid
+  TOKEN_ENDPOINT="https://prod-in.100ms.live/hmsapi/<your-subdomain>/" # Valid
+  TOKEN_ENDPOINT="https://prod-in.100ms.live/hmsapi/<your-subdomain>" # Invalid
   ```
 - Create [firebase project](https://firebase.google.com/docs/android/setup#console) and save the [`google-services.json`](https://support.google.com/firebase/answer/7015592?hl=en) in `app/google-services.json`
 
@@ -176,7 +176,7 @@ Related classes/files in this app:
   3. [`fragment_participants.xml`](app/src/main/res/layout/fragment_participants.xml)
   4. [`list_item_peer_list.xml`](app/src/main/res/layout/list_item_peer_list.xml)
 
-<img src="assets/particpants-list.gif" width="300"/>
+<img src="assets/participants-list.gif" width="300"/>
 
 ## 📑 100ms SDK Documentation
 

@@ -16,7 +16,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import live.hms.app2.BuildConfig
 import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
@@ -39,14 +38,8 @@ class HomeFragment : Fragment() {
   private val homeViewModel: HomeViewModel by viewModels()
   private lateinit var settings: SettingsStore
 
-  private val endpoint: String
-    get() {
-      if (BuildConfig.TOKEN_ENDPOINT_QA.isNotBlank() && settings.environment != "prod-init") {
-        return BuildConfig.TOKEN_ENDPOINT_QA
-      }
-
-      return BuildConfig.TOKEN_ENDPOINT
-    }
+  private val tokenEndpoint: String
+    get() = getTokenEndpoint(getTokenEnvironmentFromInitEnvironment(settings.environment))
 
   override fun onResume() {
     super.onResume()
@@ -55,6 +48,7 @@ class HomeFragment : Fragment() {
 
     if (data != null && data.toString().isNotEmpty()) {
       updateAndVerifyMeetingUrl(data.toString())
+      requireActivity().intent.data = null
     }
   }
 
@@ -154,12 +148,12 @@ class HomeFragment : Fragment() {
     settings.username = username
 
     homeViewModel.sendAuthTokenRequest(
-      endpoint,
+      tokenEndpoint,
       TokenRequest(
         roomId = settings.lastUsedRoomId,
         userId = UUID.randomUUID().toString() + username.replace(
           " ",
-          ""
+          "-"
         ), // Can be any customer facing userId
         role = role.trim().toLowerCase(Locale.ENGLISH),
       )
@@ -211,8 +205,8 @@ class HomeFragment : Fragment() {
     var allOk = true
     try {
       val uri = Uri.parse(url)
-      val lastSlashIndex = uri.path!!.lastIndexOf("/")
-      val roomId = uri.path!!.substring(lastSlashIndex + 1)
+      val room = Regex("/[a-zA-Z0-9]+/([a-zA-Z0-9]+)/?.*").find(uri.path ?: "")
+      val roomId = room!!.groups[1]!!.value
 
       settings.lastUsedRoomId = roomId
 
@@ -237,26 +231,7 @@ class HomeFragment : Fragment() {
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
     binding.editTextName.setText(settings.username)
-
-    // TODO: Set text as a meeting URL obtained by parsing the TOKEN_ENDPOINT
-    // TODO: Will the meeting link always point to 100ms.live base url?
-
-
-    val data = requireActivity().intent.data
-
-    val url = when {
-      data != null -> {
-        Log.v(TAG, "Received Meeting URI via Intent: $data")
-        data.toString()
-      }
-
-      settings.lastUsedRoomId.isNotEmpty() -> {
-        "https://qa2.100ms.live/meeting/${settings.lastUsedRoomId}"
-      }
-      else -> ""
-    }
-
-    url.isNotBlank() && updateAndVerifyMeetingUrl(url)
+    binding.editTextMeetingUrl.setText(settings.lastUsedRoomId)
 
     mapOf(
       binding.editTextName to binding.containerName,

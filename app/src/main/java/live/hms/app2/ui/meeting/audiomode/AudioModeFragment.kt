@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.app2.databinding.FragmentAudioBinding
 import live.hms.app2.model.RoomDetails
@@ -52,6 +51,10 @@ class AudioModeFragment : Fragment() {
 
     meetingViewModel.speakers.observe(viewLifecycleOwner) {
       adapter.applySpeakerUpdates(it)
+    }
+
+    if (meetingViewModel.isLocalVideoEnabled.value != false) {
+      meetingViewModel.toggleLocalVideo()
     }
   }
 }

@@ -2,7 +2,6 @@ package live.hms.app2.ui.meeting
 
 import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -22,7 +21,6 @@ import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.utils.HMSCoroutineScope
-import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -45,6 +43,19 @@ class MeetingViewModel(
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
+  private val settings = SettingsStore(getApplication())
+
+  private val failures = ArrayList<HMSException>()
+
+  val meetingViewMode = MutableLiveData(settings.meetingMode)
+
+  fun setMeetingViewMode(mode: MeetingViewMode) {
+    if (mode != meetingViewMode.value) {
+      meetingViewMode.postValue(mode)
+    }
+
+  }
+
   // Title at the top of the meeting
   val title = MutableLiveData<Int>()
   fun setTitle(@StringRes resId: Int) {
@@ -55,7 +66,6 @@ class MeetingViewModel(
   var isAudioMuted: Boolean = false
     private set
 
-  private val settings = SettingsStore(getApplication())
 
   // Live data to define the overall UI
   val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
@@ -144,10 +154,23 @@ class MeetingViewModel(
     hmsSDK.sendMessage("chat", message)
   }
 
+  private fun cleanup() {
+    failures.clear()
+    _tracks.clear()
+    tracks.postValue(_tracks)
+
+    dominantSpeaker.postValue(null)
+
+    localVideoTrack = null
+    localAudioTrack = null
+  }
+
   fun startMeeting() {
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
+
+    cleanup()
 
     state.postValue(
       MeetingState.Connecting(
@@ -166,18 +189,20 @@ class MeetingViewModel(
       )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
-          Log.e(TAG, error.toString())
-          state.postValue(MeetingState.Failure(error))
+          Log.e(TAG, "onError: $error")
+          failures.add(error)
+          state.postValue(MeetingState.Failure(failures))
         }
 
         override fun onJoin(room: HMSRoom) {
+          failures.clear()
           val peer = hmsSDK.getLocalPeer()
           peer.audioTrack?.apply {
-            localAudioTrack = (this as HMSLocalAudioTrack)
+            localAudioTrack = this
             addTrack(this, peer)
           }
           peer.videoTrack?.apply {
-            localVideoTrack = (this as HMSLocalVideoTrack)
+            localVideoTrack = this
             addTrack(this, peer)
           }
 
@@ -185,7 +210,7 @@ class MeetingViewModel(
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
-          HMSLogger.d(TAG, "join:onPeerUpdate type=$type, peer=$peer")
+          Log.d(TAG, "join:onPeerUpdate type=$type, peer=$peer")
           when (type) {
             HMSPeerUpdate.PEER_LEFT -> {
               synchronized(_tracks) {
@@ -213,11 +238,11 @@ class MeetingViewModel(
         }
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
-          HMSLogger.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
+          Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
         }
 
         override fun onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer) {
-          HMSLogger.d(TAG, "join:onTrackUpdate type=$type, track=$track, peer=$peer")
+          Log.d(TAG, "join:onTrackUpdate type=$type, track=$track, peer=$peer")
           when (type) {
             HMSTrackUpdate.TRACK_ADDED -> addTrack(track, peer)
             HMSTrackUpdate.TRACK_REMOVED -> {
@@ -239,6 +264,15 @@ class MeetingViewModel(
               false
             )
           )
+        }
+
+        override fun onReconnected() {
+          failures.clear()
+          state.postValue(MeetingState.Ongoing())
+        }
+
+        override fun onReconnecting(error: HMSException) {
+          state.postValue(MeetingState.Reconnecting("Reconnecting", error.toString()))
         }
       })
 
@@ -262,12 +296,8 @@ class MeetingViewModel(
     HMSCoroutineScope.launch {
       try {
         localVideoTrack?.switchCamera()
-      } catch (ex: Exception) {
-        Toast.makeText(
-          getApplication(),
-          "Cannot switch camera: $ex",
-          Toast.LENGTH_LONG
-        ).show()
+      } catch (ex: HMSException) {
+        Log.e(TAG, "flipCamera: ${ex.description}", ex)
       }
     }
   }
@@ -275,6 +305,7 @@ class MeetingViewModel(
   fun leaveMeeting() {
     state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
     hmsSDK.leave()
+    cleanup()
     state.postValue(MeetingState.Disconnected(true))
   }
 
@@ -328,7 +359,7 @@ class MeetingViewModel(
     if (track is HMSAudioTrack) addAudioTrack(track, peer)
     else if (track is HMSVideoTrack) addVideoTrack(track, peer)
 
-    HMSLogger.v(TAG, "addTrack: count=${_tracks.size} track=$track, peer=$peer")
+    Log.v(TAG, "addTrack: count=${_tracks.size} track=$track, peer=$peer")
   }
 
   private fun removeTrack(track: HMSVideoTrack, peer: HMSPeer) {

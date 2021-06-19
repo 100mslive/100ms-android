@@ -3,6 +3,7 @@ package live.hms.app2.ui.settings
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import live.hms.app2.ui.meeting.MeetingViewMode
 import live.hms.video.utils.HMSLogger
 
 class SettingsStore(context: Context) {
@@ -33,10 +34,12 @@ class SettingsStore(context: Context) {
     const val VIDEO_GRID_ROWS = "video-grid-rows"
     const val VIDEO_GRID_COLUMNS = "video-grid-columns"
 
+    const val MEETING_MODE = "meeting-view-mode"
     const val LOG_LEVEL_WEBRTC = "log-level-webrtc"
     const val LOG_LEVEL_100MS_SDK = "log-level-100ms"
 
     const val LEAK_CANARY = "leak-canary"
+    const val SHOW_RECONNECTING_PROGRESS_BARS = "show-reconnecting-progress-bar"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -171,6 +174,20 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(LEAK_CANARY, false)
     set(value) = putBoolean(LEAK_CANARY, value)
 
+  var showReconnectingProgressBars: Boolean
+    get() = sharedPreferences.getBoolean(SHOW_RECONNECTING_PROGRESS_BARS, false)
+    set(value) = putBoolean(SHOW_RECONNECTING_PROGRESS_BARS, value)
+
+  var meetingMode: MeetingViewMode
+    get() {
+      val str = sharedPreferences.getString(
+        MEETING_MODE,
+        MeetingViewMode.ACTIVE_SPEAKER.toString()
+      )!!
+      return MeetingViewMode.valueOf(str)
+    }
+    set(value) = putString(MEETING_MODE, value.toString())
+
   var logLevelWebrtc: HMSLogger.LogLevel
     get() {
       val str = sharedPreferences.getString(
@@ -211,6 +228,9 @@ class SettingsStore(context: Context) {
       apply { editor.putBoolean(DETECT_DOMINANT_SPEAKER, value) }
 
     fun setShowNetworkInfo(value: Boolean) = apply { editor.putBoolean(SHOW_NETWORK_INFO, value) }
+    fun setReconnectingShowProgressBars(value: Boolean) =
+      apply { editor.putBoolean(SHOW_RECONNECTING_PROGRESS_BARS, value) }
+
     fun setAudioPollInterval(value: Long) = apply { editor.putLong(AUDIO_POLL_INTERVAL, value) }
     fun setSilenceAudioLevelThreshold(value: Int) =
       apply { editor.putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value) }
@@ -220,6 +240,7 @@ class SettingsStore(context: Context) {
     fun setVideoGridRows(value: Int) = apply { editor.putInt(VIDEO_GRID_ROWS, value) }
     fun setVideoGridColumns(value: Int) = apply { editor.putInt(VIDEO_GRID_COLUMNS, value) }
     fun setIsLeakCanaryEnabled(value: Boolean) = apply { editor.putBoolean(LEAK_CANARY, value) }
+    fun setMeetingMode(value: String) = apply { editor.putString(MEETING_MODE, value) }
     fun setLogLevelWebRtc(value: String) = apply { editor.putString(LOG_LEVEL_WEBRTC, value) }
     fun setLogLevelWebRtc(value: HMSLogger.LogLevel) =
       apply { editor.putString(LOG_LEVEL_WEBRTC, value.toString()) }

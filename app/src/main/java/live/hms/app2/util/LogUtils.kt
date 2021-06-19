@@ -28,7 +28,8 @@ object LogUtils {
     "Product: ${Build.PRODUCT}"
   )
 
-  private val dateFormatter = SimpleDateFormat("yyyy.MM.dd-HH:mm:ss", Locale.getDefault())
+  private val logFileNameDateFormatter = SimpleDateFormat("yyyy.MM.dd-HH:mm:ss.SSS", Locale.ENGLISH)
+  private val logDateFormatter = SimpleDateFormat("HH:mm:ss", Locale.ENGLISH)
 
   @JvmStatic
   fun logDeviceInfo(tag: String?) {
@@ -66,7 +67,8 @@ object LogUtils {
         message: String,
         isWebRtCLog: Boolean
       ) {
-        val prefix = "[${if (isWebRtCLog) "RTC" else "HMS"}:$level:$tag]"
+        val time = Date().let { logDateFormatter.format(it) }
+        val prefix = "[${if (isWebRtCLog) "RTC" else "HMS"}:$level:$tag:$time]"
         fileWriter.write("$prefix\t\t${message.trimEnd()}\n")
       }
     })
@@ -74,7 +76,7 @@ object LogUtils {
 
   private fun makeLogFile(context: Context, filename: String): File {
     val logsDir = File(context.getExternalFilesDir(null), "")
-    val fileNameSuffix = Date().let { "${dateFormatter.format(it)}-${it.time}" }
+    val fileNameSuffix = Date().let { "${logFileNameDateFormatter.format(it)}-${it.time}" }
 
     return File(logsDir, "$filename-$fileNameSuffix.log")
   }

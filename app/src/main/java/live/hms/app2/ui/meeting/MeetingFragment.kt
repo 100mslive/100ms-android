@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
-import live.hms.app2.audio.HMSAudioManager
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
@@ -30,7 +29,6 @@ class MeetingFragment : Fragment() {
 
   companion object {
     private const val TAG = "MeetingFragment"
-    private const val BUNDLE_MEETING_VIEW_MODE = "bundle-meeting-view-mode"
   }
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
@@ -48,11 +46,6 @@ class MeetingFragment : Fragment() {
   }
 
   private var alertDialog: AlertDialog? = null
-  private val failures = ArrayList<HMSException>()
-
-  private lateinit var audioManager: HMSAudioManager
-
-  private var meetingViewMode = MeetingViewMode.ACTIVE_SPEAKER
 
   private var isMeetingOngoing = false
 
@@ -65,29 +58,17 @@ class MeetingFragment : Fragment() {
 
   override fun onResume() {
     super.onResume()
-    audioManager.updateAudioDeviceState()
     settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
+    settings = SettingsStore(requireContext())
     roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
-    audioManager = HMSAudioManager.create(requireContext())
-
-    savedInstanceState?.let { state ->
-      meetingViewMode = state.getSerializable(BUNDLE_MEETING_VIEW_MODE) as MeetingViewMode
-    }
-  }
-
-  override fun onSaveInstanceState(outState: Bundle) {
-    super.onSaveInstanceState(outState)
-    outState.putSerializable(BUNDLE_MEETING_VIEW_MODE, meetingViewMode)
   }
 
   override fun onStop() {
     super.onStop()
-    stopAudioManager()
     chatViewModel.removeSendBroadcastCallback()
     settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
@@ -122,19 +103,19 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_grid_view -> {
-        changeMeetingMode(MeetingViewMode.GRID)
+        meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
       }
 
       R.id.action_pinned_view -> {
-        changeMeetingMode(MeetingViewMode.PINNED)
+        meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
       }
 
       R.id.active_speaker_view -> {
-        changeMeetingMode(MeetingViewMode.ACTIVE_SPEAKER)
+        meetingViewModel.setMeetingViewMode(MeetingViewMode.ACTIVE_SPEAKER)
       }
 
       R.id.audio_only_view -> {
-        changeMeetingMode(MeetingViewMode.AUDIO_ONLY)
+        meetingViewModel.setMeetingViewMode(MeetingViewMode.AUDIO_ONLY)
       }
 
 
@@ -165,6 +146,10 @@ class MeetingFragment : Fragment() {
 
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
+    menu.findItem(R.id.action_flip_camera).apply {
+      val ok = meetingViewModel.meetingViewMode.value != MeetingViewMode.AUDIO_ONLY
+      setVisible(ok)
+    }
 
     menu.findItem(R.id.action_volume).apply {
       updateActionVolumeMenuIcon(this)
@@ -179,16 +164,11 @@ class MeetingFragment : Fragment() {
     }
 
     menu.findItem(R.id.action_flip_camera).apply {
-      if (!settings.publishVideo) {
-        isVisible = false
-        isEnabled = false
-      } else {
-        isVisible = true
-        isEnabled = true
-        setOnMenuItemClickListener {
-          if (isMeetingOngoing) meetingViewModel.flipCamera()
-          true
+      setOnMenuItemClickListener {
+        if (isMeetingOngoing) {
+          meetingViewModel.flipCamera()
         }
+        true
       }
     }
   }
@@ -204,11 +184,6 @@ class MeetingFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentMeetingBinding.inflate(inflater, container, false)
-    settings = SettingsStore(requireContext())
-
-    if (savedInstanceState == null) {
-      updateVideoView()
-    }
 
     initButtons()
     initOnBackPress()
@@ -232,6 +207,12 @@ class MeetingFragment : Fragment() {
     meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
       chatViewModel.receivedMessage(it)
     }
+
+    meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
+      updateVideoView(it)
+      requireActivity().invalidateOptionsMenu()
+    }
+
     chatViewModel.setSendBroadcastCallback { meetingViewModel.sendChatMessage(it) }
 
     chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
@@ -254,20 +235,16 @@ class MeetingFragment : Fragment() {
           alertDialog?.dismiss()
           alertDialog = null
 
-          failures.add(state.exception)
           cleanup()
           hideProgressBar()
-          stopAudioManager()
 
           val builder = AlertDialog.Builder(requireContext())
-            .setMessage("${failures.size} failures: \n" + failures.joinToString("\n\n") { "$it" })
+            .setMessage("${state.exceptions.size} failures: \n" + state.exceptions.joinToString("\n\n") { "$it" })
             .setTitle(R.string.error)
             .setCancelable(false)
 
-
           builder.setPositiveButton(R.string.retry) { dialog, _ ->
             meetingViewModel.startMeeting()
-            failures.clear()
             dialog.dismiss()
             alertDialog = null
           }
@@ -275,7 +252,6 @@ class MeetingFragment : Fragment() {
           builder.setNegativeButton(R.string.leave) { dialog, _ ->
             meetingViewModel.leaveMeeting()
             goToHomePage()
-            failures.clear()
             dialog.dismiss()
             alertDialog = null
           }
@@ -291,8 +267,10 @@ class MeetingFragment : Fragment() {
         }
 
         is MeetingState.Reconnecting -> {
-          updateProgressBarUI(state.heading, state.message)
-          showProgressBar()
+          if (settings.showReconnectingProgressBars) {
+            updateProgressBarUI(state.heading, state.message)
+            showProgressBar()
+          }
         }
 
         is MeetingState.Connecting -> {
@@ -312,7 +290,6 @@ class MeetingFragment : Fragment() {
           showProgressBar()
         }
         is MeetingState.Ongoing -> {
-          startAudioManager()
           hideProgressBar()
 
           isMeetingOngoing = true
@@ -324,7 +301,6 @@ class MeetingFragment : Fragment() {
         is MeetingState.Disconnected -> {
           cleanup()
           hideProgressBar()
-          stopAudioManager()
 
           if (state.goToHome) goToHomePage()
         }
@@ -350,23 +326,6 @@ class MeetingFragment : Fragment() {
     }
   }
 
-  private fun startAudioManager() {
-    crashlyticsLog(TAG, "Starting Audio manager")
-
-    audioManager.start { selectedAudioDevice, availableAudioDevices ->
-      crashlyticsLog(
-        TAG,
-        "onAudioManagerDevicesChanged: $availableAudioDevices, selected: $selectedAudioDevice"
-      )
-    }
-  }
-
-  private fun stopAudioManager() {
-    val devices = audioManager.selectedAudioDevice
-    crashlyticsLog(TAG, "Stopping Audio Manager:selectedAudioDevice:${devices}")
-    audioManager.stop()
-  }
-
 
   private fun updateProgressBarUI(heading: String, description: String = "") {
     binding.progressBar.heading.text = heading
@@ -376,29 +335,21 @@ class MeetingFragment : Fragment() {
     }
   }
 
-  private fun changeMeetingMode(newMode: MeetingViewMode) {
-    if (meetingViewMode == newMode) {
-      Toast.makeText(
-        requireContext(),
-        "Already in ViewMode=$newMode",
-        Toast.LENGTH_SHORT
-      ).show()
-      return
-    }
-
-    meetingViewMode = newMode
-    updateVideoView()
-  }
-
-  private fun updateVideoView() {
-    val fragment = when (meetingViewMode) {
+  private fun updateVideoView(mode: MeetingViewMode) {
+    val fragment = when (mode) {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
       MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
     }
 
-    meetingViewModel.setTitle(meetingViewMode.titleResId)
+    meetingViewModel.setTitle(mode.titleResId)
+
+    if (mode == MeetingViewMode.AUDIO_ONLY) {
+      binding.buttonToggleVideo.visibility = View.GONE
+    } else {
+      binding.buttonToggleVideo.visibility = View.VISIBLE
+    }
 
     childFragmentManager
       .beginTransaction()
@@ -462,7 +413,6 @@ class MeetingFragment : Fragment() {
     // We need to perform a cleanup
     chatViewModel.clearMessages()
 
-    stopAudioManager()
     crashlyticsLog(TAG, "cleanup() done")
   }
 
@@ -472,7 +422,17 @@ class MeetingFragment : Fragment() {
       object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
           Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-          meetingViewModel.leaveMeeting()
+          AlertDialog.Builder(requireContext())
+            .setMessage("You're about to quit the meeting, are you sure?")
+            .setTitle(R.string.leave)
+            .setCancelable(false)
+            .setPositiveButton("Yes") { dialog, _ ->
+              dialog.dismiss()
+              meetingViewModel.leaveMeeting()
+            }.setNegativeButton("No") { dialog, _ ->
+              dialog.dismiss()
+            }.create()
+            .show()
         }
       })
   }

@@ -120,4 +120,6 @@
     <string name="speakers">Speakers</string>
     <string name="toggle_visibility">Toggle Visibility</string>
     <string name="audio_only_view">Audio Only View</string>
+    <string name="meeting_mode">Meeting Mode</string>
+    <string name="show_retry_progress_bars">Show Retry Progress Bars</string>
 </resources>
