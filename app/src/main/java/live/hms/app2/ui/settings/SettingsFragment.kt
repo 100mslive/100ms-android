@@ -50,7 +50,9 @@ class SettingsFragment : Fragment() {
       "Teacher",
       "Student",
       "Viewer",
-      "Admin"
+      "Admin",
+      "Host",
+      "Guest"
     )
 
     const val ENV_PROD = "prod-init"
