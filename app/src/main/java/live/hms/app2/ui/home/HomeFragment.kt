@@ -2,14 +2,12 @@ package live.hms.app2.ui.home
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
@@ -20,9 +18,7 @@ import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
-import live.hms.app2.model.TokenRequest
 import live.hms.app2.ui.meeting.MeetingActivity
-import live.hms.app2.ui.settings.SettingsFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
@@ -38,17 +34,16 @@ class HomeFragment : Fragment() {
   private val homeViewModel: HomeViewModel by viewModels()
   private lateinit var settings: SettingsStore
 
-  private val tokenEndpoint: String
-    get() = getTokenEndpoint(getTokenEnvironmentFromInitEnvironment(settings.environment))
-
   override fun onResume() {
     super.onResume()
     val data = requireActivity().intent.data
-    Log.v(TAG, "onResume(): Trying to update $data into EditTextMeetingUrl")
+    Log.v(TAG, "onResume: Trying to update $data into EditTextMeetingUrl")
 
-    if (data != null && data.toString().isNotEmpty()) {
-      updateAndVerifyMeetingUrl(data.toString())
-      requireActivity().intent.data = null
+    data?.let {
+      if (it.toString().isNotEmpty()) {
+        saveTokenEndpointUrlIfValid(data.toString())
+        requireActivity().intent.data = null
+      }
     }
   }
 
@@ -99,7 +94,6 @@ class HomeFragment : Fragment() {
     }
   }
 
-
   @SuppressLint("SetTextI18n")
   private fun updateProgressBarUI(isRoomCreator: Boolean) {
     val headingPrefix = if (isRoomCreator) "Creating room for" else "Joining as"
@@ -141,23 +135,8 @@ class HomeFragment : Fragment() {
 
   private fun getUsername() = binding.editTextName.text.toString()
 
-  private fun tryJoiningRoomAs(role: String) {
-    val username = getUsername()
-
-    // Update the name in local store
-    settings.username = username
-
-    homeViewModel.sendAuthTokenRequest(
-      tokenEndpoint,
-      TokenRequest(
-        roomId = settings.lastUsedRoomId,
-        userId = UUID.randomUUID().toString() + username.replace(
-          " ",
-          "-"
-        ), // Can be any customer facing userId
-        role = role.trim().toLowerCase(Locale.ENGLISH),
-      )
-    )
+  private fun joinRoom() {
+    homeViewModel.sendAuthTokenRequest(settings.lastUsedMeetingUrl)
   }
 
   private fun observeLiveData() {
@@ -174,15 +153,18 @@ class HomeFragment : Fragment() {
           val data = response.data!!
           val roomDetails = RoomDetails(
             env = settings.environment,
-            roomId = settings.lastUsedRoomId,
+            url = settings.lastUsedMeetingUrl,
             username = getUsername(),
             authToken = data.token
           )
-          Log.v(TAG, "Auth Token: ${roomDetails.authToken}")
+          Log.i(TAG, "Auth Token: ${roomDetails.authToken}")
 
           // Start the meeting activity
           Intent(requireContext(), MeetingActivity::class.java).apply {
-            LogUtils.staticFileWriterStart(requireContext(), roomDetails.roomId)
+            LogUtils.staticFileWriterStart(
+              requireContext(),
+              roomDetails.url.toUniqueRoomSpecifier()
+            )
             putExtra(ROOM_DETAILS, roomDetails)
             startActivity(this)
           }
@@ -198,40 +180,26 @@ class HomeFragment : Fragment() {
         }
       }
     }
-
   }
 
-  private fun updateAndVerifyMeetingUrl(url: String): Boolean {
-    var allOk = true
-    try {
-      val uri = Uri.parse(url)
-      val room = Regex("/[a-zA-Z0-9]+/([a-zA-Z0-9]+)/?.*").find(uri.path ?: "")
-      val roomId = room!!.groups[1]!!.value
-
-      settings.lastUsedRoomId = roomId
-
-      uri.host?.let { host ->
-        if (host.contains("prod2.100ms.live")) {
-          settings.environment = SettingsFragment.ENV_PROD
-        } else if (host.contains("qa2.100ms.live")) {
-          settings.environment = SettingsFragment.ENV_QA
-        }
-      }
-
-      binding.editTextMeetingUrl.setText(roomId)
-    } catch (e: Exception) {
-      Log.e(TAG, "Cannot update $url", e)
-      allOk = false
-      binding.containerMeetingUrl.error = "Meeting url do not have roomId and env"
+  private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
+    if (url.isValidMeetingUrl()) {
+      settings.lastUsedMeetingUrl = url
+      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
+      settings.environment = url.getInitEndpointEnvironment()
+      return true
     }
 
-    return allOk
+    return false
   }
 
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
     binding.editTextName.setText(settings.username)
-    binding.editTextMeetingUrl.setText(settings.lastUsedRoomId)
+    val url = settings.lastUsedMeetingUrl
+    if (url.isNotBlank()) {
+      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
+    }
 
     mapOf(
       binding.editTextName to binding.containerName,
@@ -254,25 +222,20 @@ class HomeFragment : Fragment() {
 
   private fun initConnectButton() {
     binding.buttonJoinMeeting.setOnClickListener {
-      var allOk = isValidUserName()
+      try {
+        val url = binding
+          .editTextMeetingUrl
+          .text
+          .toString()
+          .trim()
+          .toValidMeetingUrl(settings.environment, settings.role)
 
-      val meetingUrl = binding.editTextMeetingUrl.text.toString().trim()
-      val validUrl = URLUtil.isValidUrl(meetingUrl)
-      if (meetingUrl.isEmpty()) {
-        allOk = false
-        binding.containerMeetingUrl.error = "Meeting URL cannot be empty"
-      } else if (meetingUrl.contains(" ") && !validUrl) {
-        allOk = false
-        binding.containerMeetingUrl.error = "Meeting URL or Meeting ID is invalid"
-      } else if (validUrl) {
-        // Save both environment and room-id
-        allOk = allOk && updateAndVerifyMeetingUrl(meetingUrl)
-      } else {
-        // No spaces, and not a url -- could only be a room-id
-        settings.lastUsedRoomId = meetingUrl
+        if (saveTokenEndpointUrlIfValid(url) && isValidUserName()) {
+          joinRoom()
+        }
+      } catch (e: Exception) {
+        binding.containerMeetingUrl.error = e.message
       }
-
-      if (allOk) tryJoiningRoomAs(SettingsStore(requireContext()).role)
     }
   }
 }

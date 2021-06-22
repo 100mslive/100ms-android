@@ -1,28 +1,109 @@
 package live.hms.app2.api
 
+import kotlinx.coroutines.CompletableDeferred
+import live.hms.app2.BuildConfig
+import live.hms.app2.model.TokenRequestWithCode
+import live.hms.app2.model.TokenRequestWithRoomId
+import live.hms.app2.model.TokenResponse
 import live.hms.app2.util.crashlyticsLog
-import okhttp3.OkHttpClient
+import live.hms.app2.util.getTokenEndpointForCode
+import live.hms.app2.util.getTokenEndpointForRoomId
+import live.hms.app2.util.toSubdomain
+import live.hms.video.utils.GsonUtils
+import live.hms.video.utils.HMSLogger
+import live.hms.video.utils.toJson
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 private const val TAG = "RetrofitBuilder"
 
-private val okHttpClient = OkHttpClient.Builder()
-  .addInterceptor(HttpLoggingInterceptor { crashlyticsLog(TAG, it) }.apply {
-    level = HttpLoggingInterceptor.Level.BODY
-  })
-  .callTimeout(10, TimeUnit.SECONDS)
-  .readTimeout(5, TimeUnit.SECONDS)
-  .writeTimeout(5, TimeUnit.SECONDS)
-  .build()
+object RetrofitBuilder {
+  private val JSON = "application/json; charset=utf-8".toMediaType()
 
-private fun getRetrofit(url: String) = Retrofit.Builder()
-  .baseUrl(url)
-  .addConverterFactory(GsonConverterFactory.create())
-  .client(okHttpClient)
-  .build()
+  private val client: OkHttpClient by lazy { makeClient() }
 
-fun makeTokenService(endpoint: String): TokenService = getRetrofit(endpoint)
-  .create(TokenService::class.java)
+  private fun makeClient(): OkHttpClient {
+    return OkHttpClient.Builder()
+      .addInterceptor(HttpLoggingInterceptor { crashlyticsLog(TAG, it) }.apply {
+        level = HttpLoggingInterceptor.Level.BODY
+      })
+      .retryOnConnectionFailure(true)
+      .followRedirects(true)
+      .followSslRedirects(true)
+      .callTimeout(10, TimeUnit.SECONDS)
+      .connectTimeout(10, TimeUnit.SECONDS)
+      .readTimeout(10, TimeUnit.SECONDS)
+      .writeTimeout(10, TimeUnit.SECONDS)
+      .build()
+  }
+
+  fun makeTokenWithRoomIdRequest(
+    roomId: String,
+    role: String,
+    environment: String
+  ): Request {
+    val url = getTokenEndpointForRoomId(environment)
+    val body = TokenRequestWithRoomId(roomId, UUID.randomUUID().toString(), role)
+      .toJson()
+      .toRequestBody(JSON)
+
+    return Request.Builder()
+      .url(url)
+      .addHeader("Accept-Type", "application/json")
+      .post(body)
+      .build()
+  }
+
+  fun makeTokenWithCodeRequest(code: String, environment: String): Request {
+    val url = getTokenEndpointForCode(environment)
+    val body = TokenRequestWithCode(code, UUID.randomUUID().toString())
+      .toJson()
+      .toRequestBody(JSON)
+
+    val subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
+    return Request.Builder()
+      .url(url)
+      .addHeader("Accept-Type", "application/json")
+      .addHeader("subdomain", subdomain)
+      .post(body)
+      .build()
+  }
+
+  suspend fun fetchAuthToken(request: Request): TokenResponse {
+    val deferred = CompletableDeferred<TokenResponse>()
+
+    client.newCall(request).enqueue(object : Callback {
+      override fun onFailure(call: Call, e: IOException) {
+
+        HMSLogger.e(TAG, "fetchAuthToken: ${e.message}", e)
+        deferred.completeExceptionally(e)
+      }
+
+      override fun onResponse(call: Call, response: Response) {
+        HMSLogger.d(TAG, "fetchAuthToken: response=$response")
+        if (response.code != 200) {
+          val ex = Exception("Expected response code 200 but received ${response.code} [response=$response]")
+          deferred.completeExceptionally(ex)
+          return
+        }
+
+        val body = response.body?.string() ?: ""
+        try {
+          val token = GsonUtils.gson.fromJson(body, TokenResponse::class.java)
+          HMSLogger.d(TAG, "fetchAuthToken: token=$token")
+          deferred.complete(token)
+        } catch (e: Exception) {
+          HMSLogger.e(TAG, "fetchAuthToken: ${e.message}", e)
+          deferred.completeExceptionally(e)
+        }
+      }
+    })
+
+    return deferred.await()
+  }
+}

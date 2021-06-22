@@ -76,12 +76,9 @@ class MeetingFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_share_link -> {
-        val meetingUrl = roomDetails.let {
-          "https://${it.env}.100ms.live/meeting/${it.roomId}"
-        }
         val sendIntent = Intent().apply {
           action = Intent.ACTION_SEND
-          putExtra(Intent.EXTRA_TEXT, meetingUrl)
+          putExtra(Intent.EXTRA_TEXT, roomDetails.url)
           type = "text/plain"
         }
         val shareIntent = Intent.createChooser(sendIntent, null)

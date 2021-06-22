@@ -1,17 +1,25 @@
 package live.hms.app2.util
 
 import live.hms.app2.BuildConfig
-import live.hms.app2.ui.settings.SettingsFragment
 
-fun getTokenEnvironmentFromInitEnvironment(environment: String) = when (environment) {
-  SettingsFragment.ENV_QA -> "qa-in"
-  SettingsFragment.ENV_PROD -> "prod-in"
-  else -> "qa-in"
+
+fun String.containsSubdomain(): Boolean = this.matches(REGEX_TOKEN_ENDPOINT)
+
+fun String.toSubdomain(): String {
+  require(this.containsSubdomain()) {
+    "$this is not a valid base token endpoint"
+  }
+
+  val groups = REGEX_TOKEN_ENDPOINT.findAll(this)
+  return groups.toList()[0].groupValues[1]
 }
 
-fun getTokenEndpoint(environment: String): String {
-  val endpoint = BuildConfig.TOKEN_ENDPOINT
-  return if (BuildConfig.INTERNAL) {
-    endpoint.replace("{environment}", environment)
-  } else endpoint
+fun getTokenEndpointForRoomId(environment: String): String {
+  val subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
+  return "https://$environment.100ms.live/hmsapi/$subdomain/api/token"
 }
+
+fun getTokenEndpointForCode(environment: String): String {
+  return "https://$environment.100ms.live/hmsapi/get-token"
+}
+
