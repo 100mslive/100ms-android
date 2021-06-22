@@ -95,7 +95,7 @@ class MeetingViewModel(
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
 
-  fun <R> mapTracks(transform: (track: MeetingTrack) -> R?): List<R> = synchronized(_tracks) {
+  fun <R : Any> mapTracks(transform: (track: MeetingTrack) -> R?): List<R> = synchronized(_tracks) {
     return _tracks.mapNotNull(transform)
   }
 
@@ -185,7 +185,7 @@ class MeetingViewModel(
         roomDetails.username,
         roomDetails.authToken,
         info.toString(),
-        //initEndpoint = "https://${roomDetails.env}.100ms.live/init"
+        initEndpoint = "https://${roomDetails.env}.100ms.live/init"
       )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
