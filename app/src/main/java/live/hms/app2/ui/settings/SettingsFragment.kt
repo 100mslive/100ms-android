@@ -16,6 +16,8 @@ import com.google.android.material.textfield.TextInputLayout
 import live.hms.app2.BuildConfig
 import live.hms.app2.databinding.FragmentSettingsBinding
 import live.hms.app2.ui.meeting.MeetingViewMode
+import live.hms.app2.util.ENV_PROD
+import live.hms.app2.util.ENV_QA
 import live.hms.app2.util.viewLifecycle
 import live.hms.video.utils.HMSLogger
 import java.util.*
@@ -53,13 +55,9 @@ class SettingsFragment : Fragment() {
       "Admin"
     )
 
-    const val ENV_PROD = "prod-init"
-    const val ENV_QA = "qa-init"
-
     private val ENVIRONMENTS = arrayOf(
       ENV_PROD,
       ENV_QA,
-      "100ms-grpc"
     )
 
     private const val FRONT_FACING_CAMERA = "user"
@@ -224,6 +222,13 @@ class SettingsFragment : Fragment() {
         "Username"
       ) { commitHelper.setUsername(it) }
 
+      initNonEmptyEditText(
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.role,
+        editTextRole, containerRole,
+        "Role",
+      ) { commitHelper.setRole(it) }
+
       // TODO: Make rows, columns available in SettingsMode.MEETING
       initNonEmptyEditTextWithRange(
         EnumSet.of(SettingsMode.HOME),
@@ -309,14 +314,6 @@ class SettingsFragment : Fragment() {
         VIDEO_BITRATE.filterValues { it == settings.videoBitrate }.keys.first(),
         VIDEO_BITRATE.keys.toTypedArray(),
       ) { commitHelper.setVideoBitrate(VIDEO_BITRATE.getValue(it)) }
-
-      initAutoCompleteView(
-        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-        containerRole,
-        autoCompleteRole,
-        settings.role,
-        ROLES,
-      ) { commitHelper.setRole(it) }
 
       initAutoCompleteView(
         EnumSet.of(SettingsMode.HOME),

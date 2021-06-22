@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class RoomDetails(
   val env: String,
-  val roomId: String,
+  val url: String,
   val username: String,
   val authToken: String
 ) : Parcelable
