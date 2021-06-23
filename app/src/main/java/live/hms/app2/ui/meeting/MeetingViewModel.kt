@@ -108,6 +108,10 @@ class MeetingViewModel(
       return _tracks.find(predicate)
     }
 
+  fun startPreview() {
+    // call Preview api
+  }
+
   fun toggleLocalVideo() {
     localVideoTrack?.apply {
       val isVideo = !isMute

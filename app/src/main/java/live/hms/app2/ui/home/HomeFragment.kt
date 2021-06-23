@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
@@ -22,7 +23,6 @@ import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
-import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -159,15 +159,13 @@ class HomeFragment : Fragment() {
           )
           Log.i(TAG, "Auth Token: ${roomDetails.authToken}")
 
+          LogUtils.staticFileWriterStart(
+            requireContext(),
+            roomDetails.url.toUniqueRoomSpecifier()
+          )
+
           // Start the meeting activity
-          Intent(requireContext(), MeetingActivity::class.java).apply {
-            LogUtils.staticFileWriterStart(
-              requireContext(),
-              roomDetails.url.toUniqueRoomSpecifier()
-            )
-            putExtra(ROOM_DETAILS, roomDetails)
-            startActivity(this)
-          }
+          startMeetingActivity(roomDetails)
           requireActivity().finish()
         }
         Status.ERROR -> {
@@ -179,6 +177,13 @@ class HomeFragment : Fragment() {
           ).show()
         }
       }
+    }
+  }
+
+  private fun startMeetingActivity(roomDetails: RoomDetails) {
+    Intent(requireContext(), MeetingActivity::class.java).apply {
+      putExtra(ROOM_DETAILS, roomDetails)
+      startActivity(this)
     }
   }
 
