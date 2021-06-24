@@ -66,7 +66,7 @@ We have many examples for each mode in the sample app using [`RecyclerView`](htt
 
 ### 📞 Join meeting
 
-- Paste the exact Room ID as obtained from the [`create-room` API](https://app.gitbook.com/@100ms/s/100ms-v2/server-side/create-room)
+- Paste the exact Room ID as obtained from the [`create-room` API](https://docs.100ms.live/v2/server-side/Create-room)
 
 - Click `Join Now`.
 - Video Conversation will be started 🎉
@@ -231,15 +231,15 @@ Sign up on https://dashboard.100ms.live/register & visit Developer tab to get yo
 
 #### 4. Generate a server-side token
 
-To generate a server-side token, follow the steps described here - https://app.gitbook.com/@100ms/s/100ms-v2/server-side/generate-server-side-token
+To generate a server-side token, follow the steps described here - https://docs.100ms.live/v2/server-side/Generate-server-side-token
 
 #### 5. Create a room
 
-To create a room, follow the steps described here - https://app.gitbook.com/@100ms/s/100ms-v2/server-side/create-room
+To create a room, follow the steps described here - https://docs.100ms.live/v2/server-side/Create-room
 
 #### 6. Generate a client-side token
 
-To generate a client-side token, follow the steps described here - https://app.gitbook.com/@100ms/s/100ms-v2/server-side/generate-client-side-token
+To generate a client-side token, follow the steps described here - https://docs.100ms.live/v2/server-side/Generate-client-side-token
 
 ### 💪🏻 Create and instantiate 100ms Client (`HMSSDK`)
 
@@ -466,4 +466,4 @@ HMSTrack
 
 ### 📖 Details Docs
 
-Refer the [Getting Started - Android](https://app.gitbook.com/@100ms/s/100ms-v2/android/getting-started-v2-android/@comments/b0013555092c48558d59c8e70e6474ca) guide in 100ms Gitbook.
+Refer the [Getting Started - Android](https://docs.100ms.live/v2/client-sdks/Getting-Started-v2-Android) guide in 100ms Gitbook.
