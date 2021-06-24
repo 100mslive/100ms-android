@@ -12,6 +12,7 @@
     <string name="room_id">Room Id</string>
     <string name="room_name">Room Name</string>
     <string name="username">Username</string>
+    <string name="start">Start</string>
     <string name="join_now">Join Now</string>
     <string name="create_room">Create Room</string>
     <string name="end_call">End Call</string>
@@ -97,6 +98,7 @@
     <string name="pref_speakerphone_dlg">Speakerphone.</string>
     <string name="pref_speakerphone_default">auto</string>
     <string name="bug_report">Bug Report</string>
+    <string name="ok">ok</string>
     <string name="leak_canary">Leak Canary</string>
 
     <string name="retry">Retry</string>

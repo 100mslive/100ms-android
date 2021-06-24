@@ -95,8 +95,8 @@ class HomeFragment : Fragment() {
   }
 
   @SuppressLint("SetTextI18n")
-  private fun updateProgressBarUI(isRoomCreator: Boolean) {
-    val headingPrefix = if (isRoomCreator) "Creating room for" else "Joining as"
+  private fun updateProgressBarUI() {
+    val headingPrefix = "Fetching Token"
     binding.progressBar.heading.text = "$headingPrefix ${getUsername()}..."
 
     val descriptionDefaults = if (settings.publishVideo && settings.publishAudio) {
@@ -143,7 +143,7 @@ class HomeFragment : Fragment() {
     homeViewModel.authTokenResponse.observe(viewLifecycleOwner) { response ->
       when (response.status) {
         Status.LOADING -> {
-          updateProgressBarUI(false)
+          updateProgressBarUI()
           showProgressBar()
         }
         Status.SUCCESS -> {
@@ -170,10 +170,12 @@ class HomeFragment : Fragment() {
         }
         Status.ERROR -> {
           hideProgressBar()
+          Log.e(TAG, "observeLiveData: $response")
+
           Toast.makeText(
             requireContext(),
             response.message,
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_LONG
           ).show()
         }
       }
@@ -192,6 +194,12 @@ class HomeFragment : Fragment() {
       settings.lastUsedMeetingUrl = url
       binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
       settings.environment = url.getInitEndpointEnvironment()
+
+      if (REGEX_MEETING_URL_ROOM_ID.matches(url)) {
+        val groups = REGEX_MEETING_URL_ROOM_ID.findAll(url).toList()[0].groupValues
+        settings.role = groups[2]
+      }
+
       return true
     }
 
