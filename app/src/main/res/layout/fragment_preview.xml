@@ -47,6 +47,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/blue_2"
                 android:contentDescription="@string/audio_status"
+                android:enabled="false"
                 android:src="@drawable/ic_mic_off_24"
                 app:fabSize="mini" />
 
@@ -59,10 +60,11 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:text="@string/join_now"
                 android:enabled="false"
+                android:text="@string/join_now"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/preview_card" />
+                app:layout_constraintTop_toBottomOf="@+id/preview_card"/>
+
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/button_toggle_video"
@@ -72,6 +74,7 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/blue_2"
                 android:contentDescription="@string/toggle_video"
+                android:enabled="false"
                 android:src="@drawable/ic_videocam_off_24"
                 app:fabSize="mini" />
 
