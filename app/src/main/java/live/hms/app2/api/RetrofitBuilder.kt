@@ -1,5 +1,6 @@
 package live.hms.app2.api
 
+import android.util.Log
 import kotlinx.coroutines.CompletableDeferred
 import live.hms.app2.BuildConfig
 import live.hms.app2.model.TokenRequestWithCode
@@ -80,12 +81,12 @@ object RetrofitBuilder {
     client.newCall(request).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
 
-        HMSLogger.e(TAG, "fetchAuthToken: ${e.message}", e)
+        Log.e(TAG, "fetchAuthToken: ${e.message}", e)
         deferred.completeExceptionally(e)
       }
 
       override fun onResponse(call: Call, response: Response) {
-        HMSLogger.d(TAG, "fetchAuthToken: response=$response")
+        Log.d(TAG, "fetchAuthToken: response=$response")
         if (response.code != 200) {
           val ex = Exception("Expected response code 200 but received ${response.code} [response=$response]")
           deferred.completeExceptionally(ex)

@@ -141,7 +141,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_role"
-            style="@style/AutoCompleteTextInputLayout"
+            style="@style/TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:labelFor="@id/auto_complete_video_bitrate">
@@ -151,7 +151,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/role"
-                android:inputType="none" />
+                android:inputType="textNoSuggestions" />
 
         </com.google.android.material.textfield.TextInputLayout>
 

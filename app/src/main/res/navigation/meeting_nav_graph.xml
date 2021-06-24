@@ -3,7 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/MeetingFragment">
+    app:startDestination="@id/PreviewFragment">
+
+    <fragment
+        android:id="@+id/PreviewFragment"
+        android:name="live.hms.app2.ui.meeting.PreviewFragment"
+        android:label="@string/preview_fragment"
+        tools:layout="@layout/fragment_preview">
+
+        <action
+            android:id="@+id/action_PreviewFragment_to_MeetingFragment"
+            app:destination="@id/MeetingFragment"
+            app:popUpTo="@id/MeetingFragment"
+            app:popUpToInclusive="@id/MeetingFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/MeetingFragment"

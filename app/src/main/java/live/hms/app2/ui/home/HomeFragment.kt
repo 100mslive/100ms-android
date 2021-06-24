@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
@@ -22,7 +23,6 @@ import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
-import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -95,8 +95,8 @@ class HomeFragment : Fragment() {
   }
 
   @SuppressLint("SetTextI18n")
-  private fun updateProgressBarUI(isRoomCreator: Boolean) {
-    val headingPrefix = if (isRoomCreator) "Creating room for" else "Joining as"
+  private fun updateProgressBarUI() {
+    val headingPrefix = "Fetching Token"
     binding.progressBar.heading.text = "$headingPrefix ${getUsername()}..."
 
     val descriptionDefaults = if (settings.publishVideo && settings.publishAudio) {
@@ -143,7 +143,7 @@ class HomeFragment : Fragment() {
     homeViewModel.authTokenResponse.observe(viewLifecycleOwner) { response ->
       when (response.status) {
         Status.LOADING -> {
-          updateProgressBarUI(false)
+          updateProgressBarUI()
           showProgressBar()
         }
         Status.SUCCESS -> {
@@ -159,26 +159,33 @@ class HomeFragment : Fragment() {
           )
           Log.i(TAG, "Auth Token: ${roomDetails.authToken}")
 
+          LogUtils.staticFileWriterStart(
+            requireContext(),
+            roomDetails.url.toUniqueRoomSpecifier()
+          )
+
           // Start the meeting activity
-          Intent(requireContext(), MeetingActivity::class.java).apply {
-            LogUtils.staticFileWriterStart(
-              requireContext(),
-              roomDetails.url.toUniqueRoomSpecifier()
-            )
-            putExtra(ROOM_DETAILS, roomDetails)
-            startActivity(this)
-          }
+          startMeetingActivity(roomDetails)
           requireActivity().finish()
         }
         Status.ERROR -> {
           hideProgressBar()
+          Log.e(TAG, "observeLiveData: $response")
+
           Toast.makeText(
             requireContext(),
             response.message,
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_LONG
           ).show()
         }
       }
+    }
+  }
+
+  private fun startMeetingActivity(roomDetails: RoomDetails) {
+    Intent(requireContext(), MeetingActivity::class.java).apply {
+      putExtra(ROOM_DETAILS, roomDetails)
+      startActivity(this)
     }
   }
 
@@ -187,6 +194,12 @@ class HomeFragment : Fragment() {
       settings.lastUsedMeetingUrl = url
       binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
       settings.environment = url.getInitEndpointEnvironment()
+
+      if (REGEX_MEETING_URL_ROOM_ID.matches(url)) {
+        val groups = REGEX_MEETING_URL_ROOM_ID.findAll(url).toList()[0].groupValues
+        settings.role = groups[2]
+      }
+
       return true
     }
 

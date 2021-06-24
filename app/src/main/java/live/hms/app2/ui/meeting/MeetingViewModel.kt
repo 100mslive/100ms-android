@@ -14,6 +14,7 @@ import live.hms.app2.util.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.HMSAudioListener
+import live.hms.video.sdk.HMSPreviewListener
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.HMSUpdateListener
 import live.hms.video.sdk.models.*
@@ -31,6 +32,13 @@ class MeetingViewModel(
   companion object {
     private const val TAG = "MeetingViewModel"
   }
+
+  private val config = HMSConfig(
+    roomDetails.username,
+    roomDetails.authToken,
+    JsonObject().apply { addProperty("name", roomDetails.username) }.toString(),
+    initEndpoint = "https://${roomDetails.env}.100ms.live/init"
+  )
 
   init {
     roomDetails.apply {
@@ -64,8 +72,20 @@ class MeetingViewModel(
 
   // Flag to keep track whether the incoming audio need's to be muted
   var isAudioMuted: Boolean = false
-    private set
+    set(value) {
+      synchronized(_tracks) {
+        field = value
 
+        val volume = if (isAudioMuted) 0.0 else 1.0
+        _tracks.forEach { track ->
+          track.audio?.let {
+            if (it is HMSRemoteAudioTrack) {
+              it.setVolume(volume)
+            }
+          }
+        }
+      }
+    }
 
   // Live data to define the overall UI
   val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
@@ -108,6 +128,11 @@ class MeetingViewModel(
       return _tracks.find(predicate)
     }
 
+  fun startPreview(listener: HMSPreviewListener) {
+    // call Preview api
+    hmsSDK.preview(config, listener)
+  }
+
   fun toggleLocalVideo() {
     localVideoTrack?.apply {
       val isVideo = !isMute
@@ -136,18 +161,7 @@ class MeetingViewModel(
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    synchronized(_tracks) {
-      isAudioMuted = !isAudioMuted
-
-      val volume = if (isAudioMuted) 0.0 else 1.0
-      _tracks.forEach { track ->
-        track.audio?.let {
-          if (it is HMSRemoteAudioTrack) {
-            it.setVolume(volume)
-          }
-        }
-      }
-    }
+    isAudioMuted = !isAudioMuted
   }
 
   fun sendChatMessage(message: String) {
@@ -180,13 +194,6 @@ class MeetingViewModel(
     )
 
     HMSCoroutineScope.launch {
-      val info = JsonObject().apply { addProperty("name", roomDetails.username) }
-      val config = HMSConfig(
-        roomDetails.username,
-        roomDetails.authToken,
-        info.toString(),
-        initEndpoint = "https://${roomDetails.env}.100ms.live/init"
-      )
       hmsSDK.join(config, object : HMSUpdateListener {
         override fun onError(error: HMSException) {
           Log.e(TAG, "onError: $error")
@@ -199,10 +206,12 @@ class MeetingViewModel(
           val peer = hmsSDK.getLocalPeer()
           peer.audioTrack?.apply {
             localAudioTrack = this
+            isLocalAudioEnabled.postValue(!isMute)
             addTrack(this, peer)
           }
           peer.videoTrack?.apply {
             localVideoTrack = this
+            isLocalVideoEnabled.postValue(!isMute)
             addTrack(this, peer)
           }
 
