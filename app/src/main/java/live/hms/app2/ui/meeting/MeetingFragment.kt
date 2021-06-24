@@ -10,7 +10,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
@@ -23,7 +25,6 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
-import live.hms.video.error.HMSException
 
 class MeetingFragment : Fragment() {
 
@@ -76,12 +77,9 @@ class MeetingFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_share_link -> {
-        val meetingUrl = roomDetails.let {
-          "https://${it.env}.100ms.live/meeting/${it.roomId}"
-        }
         val sendIntent = Intent().apply {
           action = Intent.ACTION_SEND
-          putExtra(Intent.EXTRA_TEXT, meetingUrl)
+          putExtra(Intent.EXTRA_TEXT, roomDetails.url)
           type = "text/plain"
         }
         val shareIntent = Intent.createChooser(sendIntent, null)

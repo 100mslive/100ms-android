@@ -28,7 +28,7 @@ class SettingsStore(context: Context) {
     const val AUDIO_POLL_INTERVAL = "audio-poll-interval"
     const val SILENCE_AUDIO_LEVEL_THRESHOLD = "silence-audio-level-threshold"
 
-    const val LAST_USED_ROOM_ID = "last-used-room-id"
+    const val LAST_USED_MEETING_URL = "last-used-meeting-url"
     const val ENVIRONMENT = "last-used-env"
 
     const val VIDEO_GRID_ROWS = "video-grid-rows"
@@ -153,9 +153,9 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(SHOW_NETWORK_INFO, true)
     set(value) = putBoolean(SHOW_NETWORK_INFO, value)
 
-  var lastUsedRoomId: String
-    get() = sharedPreferences.getString(LAST_USED_ROOM_ID, "")!!
-    set(value) = putString(LAST_USED_ROOM_ID, value)
+  var lastUsedMeetingUrl: String
+    get() = sharedPreferences.getString(LAST_USED_MEETING_URL, "")!!
+    set(value) = putString(LAST_USED_MEETING_URL, value)
 
   var environment: String
     get() = sharedPreferences.getString(ENVIRONMENT, "prod-init")!!
@@ -235,7 +235,7 @@ class SettingsStore(context: Context) {
     fun setSilenceAudioLevelThreshold(value: Int) =
       apply { editor.putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value) }
 
-    fun setLastUsedRoomId(value: String) = apply { editor.putString(LAST_USED_ROOM_ID, value) }
+    fun setLastUsedMeetingUrl(value: String) = apply { editor.putString(LAST_USED_MEETING_URL, value) }
     fun setEnvironment(value: String) = apply { editor.putString(ENVIRONMENT, value) }
     fun setVideoGridRows(value: Int) = apply { editor.putInt(VIDEO_GRID_ROWS, value) }
     fun setVideoGridColumns(value: Int) = apply { editor.putInt(VIDEO_GRID_COLUMNS, value) }

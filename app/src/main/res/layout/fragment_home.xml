@@ -87,7 +87,7 @@
                         style="@style/MaterialButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/join_now"
+                        android:text="@string/start"
                         android:textAllCaps="false" />
 
                 </LinearLayout>

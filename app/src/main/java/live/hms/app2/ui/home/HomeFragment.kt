@@ -2,31 +2,27 @@ package live.hms.app2.ui.home
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
-import live.hms.app2.model.TokenRequest
 import live.hms.app2.ui.meeting.MeetingActivity
-import live.hms.app2.ui.settings.SettingsFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
-import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -38,17 +34,16 @@ class HomeFragment : Fragment() {
   private val homeViewModel: HomeViewModel by viewModels()
   private lateinit var settings: SettingsStore
 
-  private val tokenEndpoint: String
-    get() = getTokenEndpoint(getTokenEnvironmentFromInitEnvironment(settings.environment))
-
   override fun onResume() {
     super.onResume()
     val data = requireActivity().intent.data
-    Log.v(TAG, "onResume(): Trying to update $data into EditTextMeetingUrl")
+    Log.v(TAG, "onResume: Trying to update $data into EditTextMeetingUrl")
 
-    if (data != null && data.toString().isNotEmpty()) {
-      updateAndVerifyMeetingUrl(data.toString())
-      requireActivity().intent.data = null
+    data?.let {
+      if (it.toString().isNotEmpty()) {
+        saveTokenEndpointUrlIfValid(data.toString())
+        requireActivity().intent.data = null
+      }
     }
   }
 
@@ -99,10 +94,9 @@ class HomeFragment : Fragment() {
     }
   }
 
-
   @SuppressLint("SetTextI18n")
-  private fun updateProgressBarUI(isRoomCreator: Boolean) {
-    val headingPrefix = if (isRoomCreator) "Creating room for" else "Joining as"
+  private fun updateProgressBarUI() {
+    val headingPrefix = "Fetching Token"
     binding.progressBar.heading.text = "$headingPrefix ${getUsername()}..."
 
     val descriptionDefaults = if (settings.publishVideo && settings.publishAudio) {
@@ -141,30 +135,15 @@ class HomeFragment : Fragment() {
 
   private fun getUsername() = binding.editTextName.text.toString()
 
-  private fun tryJoiningRoomAs(role: String) {
-    val username = getUsername()
-
-    // Update the name in local store
-    settings.username = username
-
-    homeViewModel.sendAuthTokenRequest(
-      tokenEndpoint,
-      TokenRequest(
-        roomId = settings.lastUsedRoomId,
-        userId = UUID.randomUUID().toString() + username.replace(
-          " ",
-          "-"
-        ), // Can be any customer facing userId
-        role = role.trim().toLowerCase(Locale.ENGLISH),
-      )
-    )
+  private fun joinRoom() {
+    homeViewModel.sendAuthTokenRequest(settings.lastUsedMeetingUrl)
   }
 
   private fun observeLiveData() {
     homeViewModel.authTokenResponse.observe(viewLifecycleOwner) { response ->
       when (response.status) {
         Status.LOADING -> {
-          updateProgressBarUI(false)
+          updateProgressBarUI()
           showProgressBar()
         }
         Status.SUCCESS -> {
@@ -174,64 +153,66 @@ class HomeFragment : Fragment() {
           val data = response.data!!
           val roomDetails = RoomDetails(
             env = settings.environment,
-            roomId = settings.lastUsedRoomId,
+            url = settings.lastUsedMeetingUrl,
             username = getUsername(),
             authToken = data.token
           )
-          Log.v(TAG, "Auth Token: ${roomDetails.authToken}")
+          Log.i(TAG, "Auth Token: ${roomDetails.authToken}")
+
+          LogUtils.staticFileWriterStart(
+            requireContext(),
+            roomDetails.url.toUniqueRoomSpecifier()
+          )
 
           // Start the meeting activity
-          Intent(requireContext(), MeetingActivity::class.java).apply {
-            LogUtils.staticFileWriterStart(requireContext(), roomDetails.roomId)
-            putExtra(ROOM_DETAILS, roomDetails)
-            startActivity(this)
-          }
+          startMeetingActivity(roomDetails)
           requireActivity().finish()
         }
         Status.ERROR -> {
           hideProgressBar()
+          Log.e(TAG, "observeLiveData: $response")
+
           Toast.makeText(
             requireContext(),
             response.message,
-            Toast.LENGTH_SHORT
+            Toast.LENGTH_LONG
           ).show()
         }
       }
     }
-
   }
 
-  private fun updateAndVerifyMeetingUrl(url: String): Boolean {
-    var allOk = true
-    try {
-      val uri = Uri.parse(url)
-      val room = Regex("/[a-zA-Z0-9]+/([a-zA-Z0-9]+)/?.*").find(uri.path ?: "")
-      val roomId = room!!.groups[1]!!.value
+  private fun startMeetingActivity(roomDetails: RoomDetails) {
+    Intent(requireContext(), MeetingActivity::class.java).apply {
+      putExtra(ROOM_DETAILS, roomDetails)
+      startActivity(this)
+    }
+  }
 
-      settings.lastUsedRoomId = roomId
+  private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
+    if (url.isValidMeetingUrl()) {
+      settings.lastUsedMeetingUrl = url
+      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
+      settings.environment = url.getInitEndpointEnvironment()
 
-      uri.host?.let { host ->
-        if (host.contains("prod2.100ms.live")) {
-          settings.environment = SettingsFragment.ENV_PROD
-        } else if (host.contains("qa2.100ms.live")) {
-          settings.environment = SettingsFragment.ENV_QA
-        }
+      if (REGEX_MEETING_URL_ROOM_ID.matches(url)) {
+        val groups = REGEX_MEETING_URL_ROOM_ID.findAll(url).toList()[0].groupValues
+        settings.role = groups[2]
       }
 
-      binding.editTextMeetingUrl.setText(roomId)
-    } catch (e: Exception) {
-      Log.e(TAG, "Cannot update $url", e)
-      allOk = false
-      binding.containerMeetingUrl.error = "Meeting url do not have roomId and env"
+      return true
     }
 
-    return allOk
+    return false
   }
 
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
     binding.editTextName.setText(settings.username)
-    binding.editTextMeetingUrl.setText(settings.lastUsedRoomId)
+    val url = settings.lastUsedMeetingUrl
+    if (url.isNotBlank()) {
+      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
+    }
 
     mapOf(
       binding.editTextName to binding.containerName,
@@ -254,25 +235,20 @@ class HomeFragment : Fragment() {
 
   private fun initConnectButton() {
     binding.buttonJoinMeeting.setOnClickListener {
-      var allOk = isValidUserName()
+      try {
+        val url = binding
+          .editTextMeetingUrl
+          .text
+          .toString()
+          .trim()
+          .toValidMeetingUrl(settings.environment, settings.role)
 
-      val meetingUrl = binding.editTextMeetingUrl.text.toString().trim()
-      val validUrl = URLUtil.isValidUrl(meetingUrl)
-      if (meetingUrl.isEmpty()) {
-        allOk = false
-        binding.containerMeetingUrl.error = "Meeting URL cannot be empty"
-      } else if (meetingUrl.contains(" ") && !validUrl) {
-        allOk = false
-        binding.containerMeetingUrl.error = "Meeting URL or Meeting ID is invalid"
-      } else if (validUrl) {
-        // Save both environment and room-id
-        allOk = allOk && updateAndVerifyMeetingUrl(meetingUrl)
-      } else {
-        // No spaces, and not a url -- could only be a room-id
-        settings.lastUsedRoomId = meetingUrl
+        if (saveTokenEndpointUrlIfValid(url) && isValidUserName()) {
+          joinRoom()
+        }
+      } catch (e: Exception) {
+        binding.containerMeetingUrl.error = e.message
       }
-
-      if (allOk) tryJoiningRoomAs(SettingsStore(requireContext()).role)
     }
   }
 }
