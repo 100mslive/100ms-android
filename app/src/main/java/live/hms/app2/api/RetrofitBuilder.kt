@@ -44,11 +44,12 @@ object RetrofitBuilder {
   }
 
   fun makeTokenWithRoomIdRequest(
+    subdomain: String,
     roomId: String,
     role: String,
     environment: String
   ): Request {
-    val url = getTokenEndpointForRoomId(environment)
+    val url = getTokenEndpointForRoomId(environment, subdomain)
     val body = TokenRequestWithRoomId(roomId, UUID.randomUUID().toString(), role)
       .toJson()
       .toRequestBody(JSON)
@@ -60,13 +61,12 @@ object RetrofitBuilder {
       .build()
   }
 
-  fun makeTokenWithCodeRequest(code: String, environment: String): Request {
+  fun makeTokenWithCodeRequest(subdomain: String, code: String, environment: String): Request {
     val url = getTokenEndpointForCode(environment)
     val body = TokenRequestWithCode(code, UUID.randomUUID().toString())
       .toJson()
       .toRequestBody(JSON)
 
-    val subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
     return Request.Builder()
       .url(url)
       .addHeader("Accept-Type", "application/json")

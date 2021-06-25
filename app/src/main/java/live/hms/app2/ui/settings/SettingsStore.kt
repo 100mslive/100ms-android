@@ -19,7 +19,6 @@ class SettingsStore(context: Context) {
     const val VIDEO_RESOLUTION_HEIGHT = "video-resolution-height"
     const val CODEC = "codec"
     const val VIDEO_BITRATE = "video-bitrate"
-    const val ROLE = "role"
     const val VIDEO_FRAME_RATE = "video-frame-rate"
     const val USERNAME = "username"
 
@@ -121,10 +120,6 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getString(CODEC, "VP8")!!
     set(value) = putString(CODEC, value)
 
-  var role: String
-    get() = sharedPreferences.getString(ROLE, "student")!!
-    set(value) = putString(ROLE, value)
-
   var videoBitrate: Int
     get() = sharedPreferences.getInt(VIDEO_BITRATE, 256)
     set(value) = putInt(VIDEO_BITRATE, value)
@@ -221,7 +216,6 @@ class SettingsStore(context: Context) {
 
     fun setCodec(value: String) = apply { editor.putString(CODEC, value) }
     fun setVideoBitrate(value: Int) = apply { editor.putInt(VIDEO_BITRATE, value) }
-    fun setRole(value: String) = apply { editor.putString(ROLE, value) }
     fun setVideoFrameRate(value: Int) = apply { editor.putInt(VIDEO_FRAME_RATE, value) }
     fun setUsername(value: String) = apply { editor.putString(USERNAME, value) }
     fun setDetectDominantSpeaker(value: Boolean) =
