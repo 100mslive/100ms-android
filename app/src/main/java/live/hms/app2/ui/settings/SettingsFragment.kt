@@ -224,13 +224,6 @@ class SettingsFragment : Fragment() {
         "Username"
       ) { commitHelper.setUsername(it) }
 
-      initNonEmptyEditText(
-        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-        settings.role,
-        editTextRole, containerRole,
-        "Role",
-      ) { commitHelper.setRole(it) }
-
       // TODO: Make rows, columns available in SettingsMode.MEETING
       initNonEmptyEditTextWithRange(
         EnumSet.of(SettingsMode.HOME),

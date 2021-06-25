@@ -162,7 +162,7 @@ class HomeFragment : Fragment() {
           LogUtils.staticFileWriterStart(
             requireContext(),
             roomDetails.url.toUniqueRoomSpecifier()
-          )
+         )
 
           // Start the meeting activity
           startMeetingActivity(roomDetails)
@@ -192,14 +192,8 @@ class HomeFragment : Fragment() {
   private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
     if (url.isValidMeetingUrl()) {
       settings.lastUsedMeetingUrl = url
-      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
+      binding.editTextMeetingUrl.setText(url)
       settings.environment = url.getInitEndpointEnvironment()
-
-      if (REGEX_MEETING_URL_ROOM_ID.matches(url)) {
-        val groups = REGEX_MEETING_URL_ROOM_ID.findAll(url).toList()[0].groupValues
-        settings.role = groups[2]
-      }
-
       return true
     }
 
@@ -209,10 +203,7 @@ class HomeFragment : Fragment() {
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
     binding.editTextName.setText(settings.username)
-    val url = settings.lastUsedMeetingUrl
-    if (url.isNotBlank()) {
-      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
-    }
+    binding.editTextMeetingUrl.setText(settings.lastUsedMeetingUrl)
 
     mapOf(
       binding.editTextName to binding.containerName,
@@ -236,15 +227,11 @@ class HomeFragment : Fragment() {
   private fun initConnectButton() {
     binding.buttonJoinMeeting.setOnClickListener {
       try {
-        val url = binding
-          .editTextMeetingUrl
-          .text
-          .toString()
-          .trim()
-          .toValidMeetingUrl(settings.environment, settings.role)
-
+        val url = binding.editTextMeetingUrl.text.toString()
         if (saveTokenEndpointUrlIfValid(url) && isValidUserName()) {
           joinRoom()
+        } else {
+          binding.containerMeetingUrl.error = "Invalid Meeting URL"
         }
       } catch (e: Exception) {
         binding.containerMeetingUrl.error = e.message
