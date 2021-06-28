@@ -18,6 +18,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.IOException
+import java.lang.NullPointerException
+import java.lang.RuntimeException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -96,6 +98,16 @@ object RetrofitBuilder {
         val body = response.body?.string() ?: ""
         try {
           val token = GsonUtils.gson.fromJson(body, TokenResponse::class.java)
+
+          // In case the `token` field is absent or null we raise an exception here
+          try {
+            if (token.token == "null" || token.token.isBlank()) {
+              throw Exception("Could not fetch token, check if your environment is correct.")
+            }
+          } catch (ex: NullPointerException) {
+            throw Exception("Could not fetch token, check if your environment is correct.")
+          }
+
           HMSLogger.d(TAG, "fetchAuthToken: token=$token")
           deferred.complete(token)
         } catch (e: Exception) {
