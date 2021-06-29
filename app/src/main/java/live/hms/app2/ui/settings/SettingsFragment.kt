@@ -48,15 +48,6 @@ class SettingsFragment : Fragment() {
       "LAN (4 mbps)" to 4096
     )
 
-    private val ROLES = arrayOf(
-      "Teacher",
-      "Student",
-      "Viewer",
-      "Admin",
-      "Host",
-      "Guest"
-    )
-
     private val ENVIRONMENTS = arrayOf(
       ENV_PROD,
       ENV_QA,

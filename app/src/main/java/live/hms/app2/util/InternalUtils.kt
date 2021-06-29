@@ -3,8 +3,10 @@ package live.hms.app2.util
 
 fun String.toSubdomain(): String {
   // ------------------ IGNORE BLOCK START ------------------
-  if (this.contains("prod2.100ms.live") || this.contains("qa2.100ms.live")) {
+  if (this.contains("prod2.100ms.live")) {
     return "internal.app.100ms.live"
+  } else if (this.contains("qa2.100ms.live")) {
+    return "internal.qa-app.100ms.live"
   }
   // ------------------ IGNORE BLOCK END --------------------
 
