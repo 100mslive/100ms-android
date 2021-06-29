@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -47,7 +49,22 @@ class MeetingViewModel(
       crashlytics.setCustomKey(ENVIRONMENT, env)
       crashlytics.setCustomKey(AUTH_TOKEN, authToken)
     }
+
+    viewModelScope.launch {
+
+      // TODO possibly consider an interface for is/set audio and video
+      PhoneMutingUseCase().init(getApplication<Application>(),
+        ::isLocalAudioEnabled,
+        ::isLocalVideoEnabled,
+        ::isPeerAudioEnabled,
+
+        ::setLocalAudioEnabled,
+        ::setLocalVideoEnabled,
+        ::setAudioEnabled
+      ).collect()
+    }
   }
+
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
