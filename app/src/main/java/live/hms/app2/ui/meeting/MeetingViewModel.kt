@@ -133,35 +133,58 @@ class MeetingViewModel(
     hmsSDK.preview(config, listener)
   }
 
-  fun toggleLocalVideo() {
+  private fun setLocalVideoEnabled(enabled : Boolean) {
+
     localVideoTrack?.apply {
-      val isVideo = !isMute
-      setMute(isVideo)
+
+      setMute(!enabled)
 
       tracks.postValue(_tracks)
 
-      isLocalVideoEnabled.postValue(!isVideo)
-      crashlyticsLog(TAG, "toggleUserVideo: enabled=$isVideo")
+      isLocalVideoEnabled.postValue(enabled)
+      crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
     }
+  }
+
+  private fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute
+
+  fun toggleLocalVideo() {
+      localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
+  }
+
+  private fun setLocalAudioEnabled(enabled: Boolean) {
+
+    localAudioTrack?.apply {
+      setMute(!enabled)
+
+      tracks.postValue(_tracks)
+
+      isLocalAudioEnabled.postValue(enabled)
+      crashlyticsLog(TAG, "toggleUserMic: enabled=$enabled")
+    }
+
+  }
+
+  private fun isLocalAudioEnabled() : Boolean? {
+    return localAudioTrack?.isMute
   }
 
   fun toggleLocalAudio() {
-    localAudioTrack?.apply {
-      val isAudio = !isMute
-      setMute(isAudio)
-
-      tracks.postValue(_tracks)
-
-      isLocalAudioEnabled.postValue(!isAudio)
-      crashlyticsLog(TAG, "toggleUserMic: enabled=$isAudio")
-    }
+    // If mute then enable audio, if not mute, disable it
+    localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
+
+  private fun isPeerAudioEnabled() : Boolean = isAudioMuted
 
   /**
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    isAudioMuted = !isAudioMuted
+    setAudioEnabled(!isAudioMuted)
+  }
+
+  private fun setAudioEnabled(enabled : Boolean) {
+    isAudioMuted = enabled
   }
 
   fun sendChatMessage(message: String) {
