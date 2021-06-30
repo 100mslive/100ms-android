@@ -3,6 +3,7 @@ package live.hms.app2.ui.meeting
 import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import live.hms.app2.helpers.PhoneCallEvents
 import live.hms.app2.helpers.getPhoneStateFlow
@@ -23,7 +24,9 @@ class PhoneMutingUseCase {
                 localMc: ILocalMediaControl,
                 peerMc: IPeerMediaControl): Flow<PhoneCallEvents> {
 
-        return getPhoneStateFlow(context).onEach { phoneInterruptEvents ->
+        return getPhoneStateFlow(context)
+            .distinctUntilChanged() // Will go from ringing to offhook so mute would be called twice, ignore second mute event.
+            .onEach { phoneInterruptEvents ->
             when (phoneInterruptEvents) {
 
                 PhoneCallEvents.MUTE_ALL -> {
