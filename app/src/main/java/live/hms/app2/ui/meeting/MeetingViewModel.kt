@@ -160,7 +160,7 @@ class MeetingViewModel(
     }
   }
 
-  override fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute
+  override fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute?.not()
 
   fun toggleLocalVideo() {
       localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
@@ -180,7 +180,7 @@ class MeetingViewModel(
   }
 
   override fun isLocalAudioEnabled() : Boolean? {
-    return localAudioTrack?.isMute
+    return localAudioTrack?.isMute?.not()
   }
 
   fun toggleLocalAudio() {

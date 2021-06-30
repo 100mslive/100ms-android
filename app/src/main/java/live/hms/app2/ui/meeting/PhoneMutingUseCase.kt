@@ -38,19 +38,16 @@ class PhoneMutingUseCase {
 
                 PhoneCallEvents.UNMUTE_ALL -> {
                     Log.d("PhoneMutingUseCase","Un: $prevLocalVideoState $prevLocalAudioState $prevPeerAudioState")
-                    localMc.setLocalAudioEnabled(true)
-                    localMc.setLocalVideoEnabled(true)
-                    peerMc.setPeerAudioEnabled(true)
-                    // TODO we should really restore people's state, not blank turn on.
-//                    prevLocalAudioState?.let {
-//                        setLocalAudio(it)
-//                    }
-//                    prevLocalVideoState?.let{
-//                        setLocalVideo(it)
-//                    }
-//                    prevPeerAudioState?.let {
-//                        setPeerAudio(it)
-//                    }
+                    // Restore the previous states
+                    prevLocalAudioState?.let {
+                        localMc.setLocalAudioEnabled(it)
+                    }
+                    prevLocalVideoState?.let{
+                        localMc.setLocalVideoEnabled(it)
+                    }
+                    prevPeerAudioState?.let {
+                        peerMc.setPeerAudioEnabled(it)
+                    }
                 }
             }
         }
