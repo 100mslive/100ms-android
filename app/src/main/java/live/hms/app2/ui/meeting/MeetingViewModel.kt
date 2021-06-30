@@ -241,12 +241,12 @@ class MeetingViewModel(
         override fun onJoin(room: HMSRoom) {
           failures.clear()
           val peer = hmsSDK.getLocalPeer()
-          peer.audioTrack?.apply {
+          peer?.audioTrack?.apply {
             localAudioTrack = this
             isLocalAudioEnabled.postValue(!isMute)
             addTrack(this, peer)
           }
-          peer.videoTrack?.apply {
+          peer?.videoTrack?.apply {
             localVideoTrack = this
             isLocalVideoEnabled.postValue(!isMute)
             addTrack(this, peer)

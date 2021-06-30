@@ -233,10 +233,10 @@ class PreviewFragment : Fragment() {
         // We assume  here that localTracks has at-most 2 tracks
         // containing one video & one audio track
         requireActivity().runOnUiThread {
-          binding.nameInitials.text = NameUtils.getInitials(room.localPeer.name)
+          binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
           binding.buttonJoinMeeting.isEnabled = true
 
-          track = MeetingTrack(room.localPeer, null, null)
+          track = MeetingTrack(room.localPeer!!, null, null)
           localTracks.forEach {
             when (it) {
               is HMSLocalAudioTrack -> {
