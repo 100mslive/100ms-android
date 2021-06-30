@@ -206,11 +206,13 @@ class MeetingViewModel(
           val peer = hmsSDK.getLocalPeer()
           peer.audioTrack?.apply {
             localAudioTrack = this
+            setMute(!isMute)
             isLocalAudioEnabled.postValue(!isMute)
             addTrack(this, peer)
           }
           peer.videoTrack?.apply {
             localVideoTrack = this
+            setMute(!isMute)
             isLocalVideoEnabled.postValue(!isMute)
             addTrack(this, peer)
           }
