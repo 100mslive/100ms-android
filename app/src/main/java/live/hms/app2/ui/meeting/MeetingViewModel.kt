@@ -30,7 +30,7 @@ import kotlin.collections.ArrayList
 class MeetingViewModel(
   application: Application,
   private val roomDetails: RoomDetails
-) : AndroidViewModel(application) {
+) : AndroidViewModel(application), IPeerMediaControl, ILocalMediaControl {
   companion object {
     private const val TAG = "MeetingViewModel"
   }
@@ -53,15 +53,8 @@ class MeetingViewModel(
     viewModelScope.launch {
 
       // TODO possibly consider an interface for is/set audio and video
-      PhoneMutingUseCase().init(getApplication<Application>(),
-        ::isLocalAudioEnabled,
-        ::isLocalVideoEnabled,
-        ::isPeerAudioEnabled,
-
-        ::setLocalAudioEnabled,
-        ::setLocalVideoEnabled,
-        ::setAudioEnabled
-      ).collect()
+      PhoneMutingUseCase().execute(getApplication<Application>(),
+        this@MeetingViewModel, this@MeetingViewModel).collect()
     }
   }
 
@@ -150,7 +143,7 @@ class MeetingViewModel(
     hmsSDK.preview(config, listener)
   }
 
-  private fun setLocalVideoEnabled(enabled : Boolean) {
+  override fun setLocalVideoEnabled(enabled : Boolean) {
 
     localVideoTrack?.apply {
 
@@ -163,13 +156,13 @@ class MeetingViewModel(
     }
   }
 
-  private fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute
+  override fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute
 
   fun toggleLocalVideo() {
       localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
   }
 
-  private fun setLocalAudioEnabled(enabled: Boolean) {
+  override fun setLocalAudioEnabled(enabled: Boolean) {
 
     localAudioTrack?.apply {
       setMute(!enabled)
@@ -182,7 +175,7 @@ class MeetingViewModel(
 
   }
 
-  private fun isLocalAudioEnabled() : Boolean? {
+  override fun isLocalAudioEnabled() : Boolean? {
     return localAudioTrack?.isMute
   }
 
@@ -191,16 +184,16 @@ class MeetingViewModel(
     localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
 
-  private fun isPeerAudioEnabled() : Boolean = isAudioMuted
+  override fun isPeerAudioEnabled() : Boolean = isAudioMuted
 
   /**
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    setAudioEnabled(!isAudioMuted)
+    setPeerAudioEnabled(!isAudioMuted)
   }
 
-  private fun setAudioEnabled(enabled : Boolean) {
+  override fun setPeerAudioEnabled(enabled : Boolean) {
     isAudioMuted = enabled
   }
 

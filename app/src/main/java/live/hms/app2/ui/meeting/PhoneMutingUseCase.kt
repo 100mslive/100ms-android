@@ -19,32 +19,28 @@ class PhoneMutingUseCase {
     private var prevLocalVideoState : Boolean? = null
     private var prevPeerAudioState : Boolean? = null
 
-    fun init(context: Context,
-             getLocalAudioEnabled : () -> Boolean?,
-             getLocalVideoEnabled : () -> Boolean?,
-             getPeerAudioEnabled : () -> Boolean?,
-             setLocalAudio : (Boolean) -> Unit,
-             setLocalVideo : (Boolean) -> Unit,
-             setPeerAudio : (Boolean) -> Unit ): Flow<PhoneCallEvents> {
+    fun execute(context: Context,
+                localMc: ILocalMediaControl,
+                peerMc: IPeerMediaControl): Flow<PhoneCallEvents> {
 
         return getPhoneStateFlow(context).onEach { phoneInterruptEvents ->
             when (phoneInterruptEvents) {
 
                 PhoneCallEvents.MUTE_ALL -> {
-                    prevLocalAudioState = getLocalAudioEnabled()
-                    prevLocalVideoState = getLocalVideoEnabled()
-                    prevPeerAudioState = getPeerAudioEnabled()
+                    prevLocalAudioState = localMc.isLocalAudioEnabled()
+                    prevLocalVideoState = localMc.isLocalVideoEnabled()
+                    prevPeerAudioState = peerMc.isPeerAudioEnabled()
                     Log.d("PhoneMutingUseCase","Muting: $prevLocalVideoState $prevLocalAudioState $prevPeerAudioState")
-                    setLocalAudio(false)
-                    setLocalVideo(false)
-                    setPeerAudio(false)
+                    localMc.setLocalAudioEnabled(false)
+                    localMc.setLocalVideoEnabled(false)
+                    peerMc.setPeerAudioEnabled(false)
                 }
 
                 PhoneCallEvents.UNMUTE_ALL -> {
                     Log.d("PhoneMutingUseCase","Un: $prevLocalVideoState $prevLocalAudioState $prevPeerAudioState")
-                    setLocalAudio(true)
-                    setLocalVideo(true)
-                    setPeerAudio(true)
+                    localMc.setLocalAudioEnabled(true)
+                    localMc.setLocalVideoEnabled(true)
+                    peerMc.setPeerAudioEnabled(true)
                     // TODO we should really restore people's state, not blank turn on.
 //                    prevLocalAudioState?.let {
 //                        setLocalAudio(it)
