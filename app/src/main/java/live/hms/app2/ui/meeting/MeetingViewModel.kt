@@ -80,8 +80,11 @@ class MeetingViewModel(
     this.title.postValue(resId)
   }
 
+  var showAudioMuted = MutableLiveData(false)
+    private set
+
   // Flag to keep track whether the incoming audio need's to be muted
-  var isAudioMuted: Boolean = false
+  private var isAudioMuted: Boolean = false
     set(value) {
       synchronized(_tracks) {
         field = value
@@ -94,6 +97,7 @@ class MeetingViewModel(
             }
           }
         }
+        showAudioMuted.postValue(value)
       }
     }
 
@@ -184,17 +188,17 @@ class MeetingViewModel(
     localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
 
-  override fun isPeerAudioEnabled() : Boolean = isAudioMuted
+  override fun isPeerAudioEnabled() : Boolean = !isAudioMuted
 
   /**
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    setPeerAudioEnabled(!isAudioMuted)
+    setPeerAudioEnabled(isAudioMuted)
   }
 
   override fun setPeerAudioEnabled(enabled : Boolean) {
-    isAudioMuted = enabled
+    isAudioMuted = !enabled
   }
 
   fun sendChatMessage(message: String) {
