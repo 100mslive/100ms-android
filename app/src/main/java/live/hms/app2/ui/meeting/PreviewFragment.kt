@@ -168,10 +168,10 @@ class PreviewFragment : Fragment() {
 
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
     item.apply {
-      if (meetingViewModel.isAudioMuted) {
-        setIcon(R.drawable.ic_volume_off_24)
-      } else {
+      if (meetingViewModel.isPeerAudioEnabled()) {
         setIcon(R.drawable.ic_volume_up_24)
+      } else {
+        setIcon(R.drawable.ic_volume_off_24)
       }
     }
   }

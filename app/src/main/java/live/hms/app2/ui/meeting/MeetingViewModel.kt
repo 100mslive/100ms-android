@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -28,7 +30,7 @@ import kotlin.collections.ArrayList
 class MeetingViewModel(
   application: Application,
   private val roomDetails: RoomDetails
-) : AndroidViewModel(application) {
+) : AndroidViewModel(application), IPeerMediaControl, ILocalMediaControl {
   companion object {
     private const val TAG = "MeetingViewModel"
   }
@@ -47,7 +49,15 @@ class MeetingViewModel(
       crashlytics.setCustomKey(ENVIRONMENT, env)
       crashlytics.setCustomKey(AUTH_TOKEN, authToken)
     }
+
+    viewModelScope.launch {
+
+      // TODO possibly consider an interface for is/set audio and video
+      PhoneMutingUseCase().execute(getApplication<Application>(),
+        this@MeetingViewModel, this@MeetingViewModel).collect()
+    }
   }
+
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
@@ -70,8 +80,11 @@ class MeetingViewModel(
     this.title.postValue(resId)
   }
 
+  var showAudioMuted = MutableLiveData(false)
+    private set
+
   // Flag to keep track whether the incoming audio need's to be muted
-  var isAudioMuted: Boolean = false
+  private var isAudioMuted: Boolean = false
     set(value) {
       synchronized(_tracks) {
         field = value
@@ -84,6 +97,7 @@ class MeetingViewModel(
             }
           }
         }
+        showAudioMuted.postValue(value)
       }
     }
 
@@ -133,35 +147,58 @@ class MeetingViewModel(
     hmsSDK.preview(config, listener)
   }
 
-  fun toggleLocalVideo() {
+  override fun setLocalVideoEnabled(enabled : Boolean) {
+
     localVideoTrack?.apply {
-      val isVideo = !isMute
-      setMute(isVideo)
+
+      setMute(!enabled)
 
       tracks.postValue(_tracks)
 
-      isLocalVideoEnabled.postValue(!isVideo)
-      crashlyticsLog(TAG, "toggleUserVideo: enabled=$isVideo")
+      isLocalVideoEnabled.postValue(enabled)
+      crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
     }
+  }
+
+  override fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute?.not()
+
+  fun toggleLocalVideo() {
+      localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
+  }
+
+  override fun setLocalAudioEnabled(enabled: Boolean) {
+
+    localAudioTrack?.apply {
+      setMute(!enabled)
+
+      tracks.postValue(_tracks)
+
+      isLocalAudioEnabled.postValue(enabled)
+      crashlyticsLog(TAG, "toggleUserMic: enabled=$enabled")
+    }
+
+  }
+
+  override fun isLocalAudioEnabled() : Boolean? {
+    return localAudioTrack?.isMute?.not()
   }
 
   fun toggleLocalAudio() {
-    localAudioTrack?.apply {
-      val isAudio = !isMute
-      setMute(isAudio)
-
-      tracks.postValue(_tracks)
-
-      isLocalAudioEnabled.postValue(!isAudio)
-      crashlyticsLog(TAG, "toggleUserMic: enabled=$isAudio")
-    }
+    // If mute then enable audio, if not mute, disable it
+    localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
+
+  override fun isPeerAudioEnabled() : Boolean = !isAudioMuted
 
   /**
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    isAudioMuted = !isAudioMuted
+    setPeerAudioEnabled(isAudioMuted)
+  }
+
+  override fun setPeerAudioEnabled(enabled : Boolean) {
+    isAudioMuted = !enabled
   }
 
   fun sendChatMessage(message: String) {
