@@ -27,18 +27,19 @@ class PhoneMutingUseCase {
             when (phoneInterruptEvents) {
 
                 PhoneCallEvents.MUTE_ALL -> {
+                    // Store all the existing states of peer volume, local audio and video
+                    //  when we restore it on unmuting it should get the original values back.
+                    //  note we aren't taking into account any values that were modified in the interim.
                     prevLocalAudioState = localMc.isLocalAudioEnabled()
                     prevLocalVideoState = localMc.isLocalVideoEnabled()
                     prevPeerAudioState = peerMc.isPeerAudioEnabled()
-                    Log.d("PhoneMutingUseCase","Muting: $prevLocalVideoState $prevLocalAudioState $prevPeerAudioState")
                     localMc.setLocalAudioEnabled(false)
                     localMc.setLocalVideoEnabled(false)
                     peerMc.setPeerAudioEnabled(false)
                 }
 
                 PhoneCallEvents.UNMUTE_ALL -> {
-                    Log.d("PhoneMutingUseCase","Un: $prevLocalVideoState $prevLocalAudioState $prevPeerAudioState")
-                    // Restore the previous states
+                    // Restore the previous states of audio, video and peer volume
                     prevLocalAudioState?.let {
                         localMc.setLocalAudioEnabled(it)
                     }
