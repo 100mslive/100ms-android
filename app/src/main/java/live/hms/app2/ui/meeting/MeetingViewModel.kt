@@ -5,9 +5,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -30,7 +28,7 @@ import kotlin.collections.ArrayList
 class MeetingViewModel(
   application: Application,
   private val roomDetails: RoomDetails
-) : AndroidViewModel(application), IPeerMediaControl, ILocalMediaControl {
+) : AndroidViewModel(application) {
   companion object {
     private const val TAG = "MeetingViewModel"
   }
@@ -50,12 +48,6 @@ class MeetingViewModel(
       crashlytics.setCustomKey(AUTH_TOKEN, authToken)
     }
 
-    viewModelScope.launch {
-
-      // TODO possibly consider an interface for is/set audio and video
-      PhoneMutingUseCase().execute(getApplication<Application>(),
-        this@MeetingViewModel, this@MeetingViewModel).collect()
-    }
   }
 
 
@@ -147,7 +139,7 @@ class MeetingViewModel(
     hmsSDK.preview(config, listener)
   }
 
-  override fun setLocalVideoEnabled(enabled : Boolean) {
+  fun setLocalVideoEnabled(enabled : Boolean) {
 
     localVideoTrack?.apply {
 
@@ -160,13 +152,13 @@ class MeetingViewModel(
     }
   }
 
-  override fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute?.not()
+  fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute?.not()
 
   fun toggleLocalVideo() {
       localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
   }
 
-  override fun setLocalAudioEnabled(enabled: Boolean) {
+  fun setLocalAudioEnabled(enabled: Boolean) {
 
     localAudioTrack?.apply {
       setMute(!enabled)
@@ -179,7 +171,7 @@ class MeetingViewModel(
 
   }
 
-  override fun isLocalAudioEnabled() : Boolean? {
+  fun isLocalAudioEnabled() : Boolean? {
     return localAudioTrack?.isMute?.not()
   }
 
@@ -188,7 +180,7 @@ class MeetingViewModel(
     localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
 
-  override fun isPeerAudioEnabled() : Boolean = !isAudioMuted
+  fun isPeerAudioEnabled() : Boolean = !isAudioMuted
 
   /**
    * Helper function to toggle others audio tracks
@@ -197,7 +189,7 @@ class MeetingViewModel(
     setPeerAudioEnabled(isAudioMuted)
   }
 
-  override fun setPeerAudioEnabled(enabled : Boolean) {
+  fun setPeerAudioEnabled(enabled : Boolean) {
     isAudioMuted = !enabled
   }
 
