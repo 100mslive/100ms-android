@@ -48,7 +48,6 @@ private class PhoneCallMonitor(private val onEvent: (PhoneCallEvents) -> Unit) :
     BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("Call", "intent?.action")
 
         when (intent?.getStringExtra(TelephonyManager.EXTRA_STATE)) {
             TelephonyManager.EXTRA_STATE_IDLE -> onEvent(PhoneCallEvents.UNMUTE_ALL)
