@@ -1,3 +1,4 @@
+include ':libwebrtc'
 include ':lib'
 include ':app'
 rootProject.name = "Android 100ms"
