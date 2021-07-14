@@ -37,7 +37,7 @@ class MeetingViewModel(
     roomDetails.username,
     roomDetails.authToken,
     JsonObject().apply { addProperty("name", roomDetails.username) }.toString(),
-    initEndpoint = "https://${roomDetails.env}.100ms.live/init"
+    initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
   init {
