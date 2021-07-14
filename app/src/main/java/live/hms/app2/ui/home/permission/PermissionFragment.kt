@@ -22,7 +22,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private const val TAG = "PermissionFragment"
 
     private const val RC_CALL = 111
-    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE)
+    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
