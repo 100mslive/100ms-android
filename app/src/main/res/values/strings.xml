@@ -79,7 +79,7 @@
     <string name="join_a_meeting">Join a meeting</string>
     <string name="start_a_meeting">Start a meeting</string>
     <string name="get_started">Get Started</string>
-    <string name="meeting_url_hint">Enter meeting ID or paste joining link</string>
+    <string name="meeting_url_hint">Enter meeting url or code</string>
     <string name="enter_name">Enter Name</string>
     <string name="use_as_default">Use as default</string>
 

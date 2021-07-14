@@ -7,10 +7,7 @@ import kotlinx.coroutines.launch
 import live.hms.app2.api.Resource
 import live.hms.app2.api.RetrofitBuilder
 import live.hms.app2.model.TokenResponse
-import live.hms.app2.util.REGEX_MEETING_URL_CODE
-import live.hms.app2.util.REGEX_MEETING_URL_ROOM_ID
-import live.hms.app2.util.crashlytics
-import live.hms.app2.util.getTokenEndpointEnvironment
+import live.hms.app2.util.*
 import okhttp3.Request
 
 class HomeViewModel : ViewModel() {
@@ -21,19 +18,20 @@ class HomeViewModel : ViewModel() {
   fun sendAuthTokenRequest(url: String) {
     try {
       val env = url.getTokenEndpointEnvironment()
+      val subdomain = url.toSubdomain()
 
       when {
         REGEX_MEETING_URL_CODE.matches(url) -> {
           val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
-          val code = groups[1]
-          sendAuthTokenRequest(code, env)
+          val code = groups[2]
+          sendAuthTokenRequest(subdomain, code, env)
 
         }
         REGEX_MEETING_URL_ROOM_ID.matches(url) -> {
           val groups = REGEX_MEETING_URL_ROOM_ID.findAll(url).toList()[0].groupValues
-          val roomId = groups[1]
-          val role = groups[2]
-          sendAuthTokenRequest(roomId, role, env)
+          val roomId = groups[2]
+          val role = groups[3]
+          sendAuthTokenRequest(subdomain, roomId, role, env)
 
         }
         else -> {
@@ -46,19 +44,21 @@ class HomeViewModel : ViewModel() {
   }
 
   private fun sendAuthTokenRequest(
+    subdomain: String,
     roomId: String,
     role: String,
     environment: String
   ) {
-    val request = RetrofitBuilder.makeTokenWithRoomIdRequest(roomId, role, environment)
+    val request = RetrofitBuilder.makeTokenWithRoomIdRequest(subdomain, roomId, role, environment)
     sendAuthTokenRequest(request)
   }
 
   private fun sendAuthTokenRequest(
+    subdomain: String,
     code: String,
     environment: String
   ) {
-    val request = RetrofitBuilder.makeTokenWithCodeRequest(code, environment)
+    val request = RetrofitBuilder.makeTokenWithCodeRequest(subdomain, code, environment)
     sendAuthTokenRequest(request)
   }
 

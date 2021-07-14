@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -134,10 +135,10 @@ class MeetingFragment : Fragment() {
 
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
     item.apply {
-      if (meetingViewModel.isAudioMuted) {
-        setIcon(R.drawable.ic_volume_off_24)
-      } else {
+      if (meetingViewModel.isPeerAudioEnabled()) {
         setIcon(R.drawable.ic_volume_up_24)
+      } else {
+        setIcon(R.drawable.ic_volume_off_24)
       }
     }
   }
@@ -175,6 +176,7 @@ class MeetingFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     initViewModel()
     setHasOptionsMenu(true)
+    meetingViewModel.showAudioMuted.observe(viewLifecycleOwner, Observer { activity?.invalidateOptionsMenu() })
   }
 
   override fun onCreateView(

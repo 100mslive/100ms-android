@@ -51,7 +51,6 @@
             android:id="@+id/action_share_screen"
             android:icon="@drawable/ic_mobile_screen_share_24"
             android:title="@string/share_screen"
-            android:visible="false"
             app:showAsAction="never" />
 
         <item

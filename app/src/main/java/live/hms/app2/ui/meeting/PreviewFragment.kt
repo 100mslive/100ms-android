@@ -168,10 +168,10 @@ class PreviewFragment : Fragment() {
 
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
     item.apply {
-      if (meetingViewModel.isAudioMuted) {
-        setIcon(R.drawable.ic_volume_off_24)
-      } else {
+      if (meetingViewModel.isPeerAudioEnabled()) {
         setIcon(R.drawable.ic_volume_up_24)
+      } else {
+        setIcon(R.drawable.ic_volume_off_24)
       }
     }
   }
@@ -233,10 +233,10 @@ class PreviewFragment : Fragment() {
         // We assume  here that localTracks has at-most 2 tracks
         // containing one video & one audio track
         requireActivity().runOnUiThread {
-          binding.nameInitials.text = NameUtils.getInitials(room.localPeer.name)
+          binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
           binding.buttonJoinMeeting.isEnabled = true
 
-          track = MeetingTrack(room.localPeer, null, null)
+          track = MeetingTrack(room.localPeer!!, null, null)
           localTracks.forEach {
             when (it) {
               is HMSLocalAudioTrack -> {

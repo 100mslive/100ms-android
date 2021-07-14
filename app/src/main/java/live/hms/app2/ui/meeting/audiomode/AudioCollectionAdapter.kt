@@ -37,7 +37,7 @@ class AudioCollectionAdapter : RecyclerView.Adapter<AudioCollectionAdapter.Audio
   fun setItems(newItems: Array<HMSPeer>) {
     // NOTE: Make sure that the ordering of items is same
     //  Otherwise the UI is updated randomly
-    val itemsMap = newItems.groupBy { it.role }
+    val itemsMap = newItems.groupBy { it.hmsRole.name }
     val newCollections = ArrayList<AudioCollection>()
 
     for (item in itemsMap) {

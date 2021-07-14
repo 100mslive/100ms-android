@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import live.hms.app2.BuildConfig
 import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
@@ -41,8 +42,11 @@ class HomeFragment : Fragment() {
 
     data?.let {
       if (it.toString().isNotEmpty()) {
-        saveTokenEndpointUrlIfValid(data.toString())
+        val url = it.toString()
         requireActivity().intent.data = null
+        if (saveTokenEndpointUrlIfValid(url) && isValidUserName()) {
+          joinRoom()
+        }
       }
     }
   }
@@ -162,7 +166,7 @@ class HomeFragment : Fragment() {
           LogUtils.staticFileWriterStart(
             requireContext(),
             roomDetails.url.toUniqueRoomSpecifier()
-          )
+         )
 
           // Start the meeting activity
           startMeetingActivity(roomDetails)
@@ -192,14 +196,8 @@ class HomeFragment : Fragment() {
   private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
     if (url.isValidMeetingUrl()) {
       settings.lastUsedMeetingUrl = url
-      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
+      binding.editTextMeetingUrl.setText(url)
       settings.environment = url.getInitEndpointEnvironment()
-
-      if (REGEX_MEETING_URL_ROOM_ID.matches(url)) {
-        val groups = REGEX_MEETING_URL_ROOM_ID.findAll(url).toList()[0].groupValues
-        settings.role = groups[2]
-      }
-
       return true
     }
 
@@ -209,10 +207,7 @@ class HomeFragment : Fragment() {
   private fun initEditTextViews() {
     // Load the data if saved earlier (easy debugging)
     binding.editTextName.setText(settings.username)
-    val url = settings.lastUsedMeetingUrl
-    if (url.isNotBlank()) {
-      binding.editTextMeetingUrl.setText(url.toUniqueRoomSpecifier())
-    }
+    binding.editTextMeetingUrl.setText(settings.lastUsedMeetingUrl)
 
     mapOf(
       binding.editTextName to binding.containerName,
@@ -236,15 +231,23 @@ class HomeFragment : Fragment() {
   private fun initConnectButton() {
     binding.buttonJoinMeeting.setOnClickListener {
       try {
-        val url = binding
-          .editTextMeetingUrl
-          .text
-          .toString()
-          .trim()
-          .toValidMeetingUrl(settings.environment, settings.role)
-
-        if (saveTokenEndpointUrlIfValid(url) && isValidUserName()) {
+        val input = binding.editTextMeetingUrl.text.toString()
+        if (saveTokenEndpointUrlIfValid(input) && isValidUserName()) {
           joinRoom()
+        } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName()) {
+          var subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
+          if (BuildConfig.INTERNAL) {
+            val env = when (settings.environment) {
+              ENV_PROD -> "prod2"
+              else -> "qa2"
+            }
+            subdomain = "$env.100ms.live"
+          }
+          val url = "https://$subdomain/meeting/$input"
+          saveTokenEndpointUrlIfValid(url)
+          joinRoom()
+        } else {
+          binding.containerMeetingUrl.error = "Invalid Meeting URL"
         }
       } catch (e: Exception) {
         binding.containerMeetingUrl.error = e.message

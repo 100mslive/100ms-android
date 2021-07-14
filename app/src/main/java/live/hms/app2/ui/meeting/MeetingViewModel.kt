@@ -37,7 +37,7 @@ class MeetingViewModel(
     roomDetails.username,
     roomDetails.authToken,
     JsonObject().apply { addProperty("name", roomDetails.username) }.toString(),
-    initEndpoint = "https://${roomDetails.env}.100ms.live/init"
+    initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
   init {
@@ -47,7 +47,9 @@ class MeetingViewModel(
       crashlytics.setCustomKey(ENVIRONMENT, env)
       crashlytics.setCustomKey(AUTH_TOKEN, authToken)
     }
+
   }
+
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
@@ -70,8 +72,11 @@ class MeetingViewModel(
     this.title.postValue(resId)
   }
 
+  var showAudioMuted = MutableLiveData(false)
+    private set
+
   // Flag to keep track whether the incoming audio need's to be muted
-  var isAudioMuted: Boolean = false
+  private var isAudioMuted: Boolean = false
     set(value) {
       synchronized(_tracks) {
         field = value
@@ -84,6 +89,7 @@ class MeetingViewModel(
             }
           }
         }
+        showAudioMuted.postValue(value)
       }
     }
 
@@ -133,35 +139,58 @@ class MeetingViewModel(
     hmsSDK.preview(config, listener)
   }
 
-  fun toggleLocalVideo() {
+  fun setLocalVideoEnabled(enabled : Boolean) {
+
     localVideoTrack?.apply {
-      val isVideo = !isMute
-      setMute(isVideo)
+
+      setMute(!enabled)
 
       tracks.postValue(_tracks)
 
-      isLocalVideoEnabled.postValue(!isVideo)
-      crashlyticsLog(TAG, "toggleUserVideo: enabled=$isVideo")
+      isLocalVideoEnabled.postValue(enabled)
+      crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
     }
+  }
+
+  fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute?.not()
+
+  fun toggleLocalVideo() {
+      localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
+  }
+
+  fun setLocalAudioEnabled(enabled: Boolean) {
+
+    localAudioTrack?.apply {
+      setMute(!enabled)
+
+      tracks.postValue(_tracks)
+
+      isLocalAudioEnabled.postValue(enabled)
+      crashlyticsLog(TAG, "toggleUserMic: enabled=$enabled")
+    }
+
+  }
+
+  fun isLocalAudioEnabled() : Boolean? {
+    return localAudioTrack?.isMute?.not()
   }
 
   fun toggleLocalAudio() {
-    localAudioTrack?.apply {
-      val isAudio = !isMute
-      setMute(isAudio)
-
-      tracks.postValue(_tracks)
-
-      isLocalAudioEnabled.postValue(!isAudio)
-      crashlyticsLog(TAG, "toggleUserMic: enabled=$isAudio")
-    }
+    // If mute then enable audio, if not mute, disable it
+    localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
+
+  fun isPeerAudioEnabled() : Boolean = !isAudioMuted
 
   /**
    * Helper function to toggle others audio tracks
    */
   fun toggleAudio() {
-    isAudioMuted = !isAudioMuted
+    setPeerAudioEnabled(isAudioMuted)
+  }
+
+  fun setPeerAudioEnabled(enabled : Boolean) {
+    isAudioMuted = !enabled
   }
 
   fun sendChatMessage(message: String) {
@@ -204,12 +233,12 @@ class MeetingViewModel(
         override fun onJoin(room: HMSRoom) {
           failures.clear()
           val peer = hmsSDK.getLocalPeer()
-          peer.audioTrack?.apply {
+          peer?.audioTrack?.apply {
             localAudioTrack = this
             isLocalAudioEnabled.postValue(!isMute)
             addTrack(this, peer)
           }
-          peer.videoTrack?.apply {
+          peer?.videoTrack?.apply {
             localVideoTrack = this
             isLocalVideoEnabled.postValue(!isMute)
             addTrack(this, peer)

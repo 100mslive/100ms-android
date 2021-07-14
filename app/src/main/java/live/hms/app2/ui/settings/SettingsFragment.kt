@@ -48,15 +48,6 @@ class SettingsFragment : Fragment() {
       "LAN (4 mbps)" to 4096
     )
 
-    private val ROLES = arrayOf(
-      "Teacher",
-      "Student",
-      "Viewer",
-      "Admin",
-      "Host",
-      "Guest"
-    )
-
     private val ENVIRONMENTS = arrayOf(
       ENV_PROD,
       ENV_QA,
@@ -223,13 +214,6 @@ class SettingsFragment : Fragment() {
         editTextName, containerName,
         "Username"
       ) { commitHelper.setUsername(it) }
-
-      initNonEmptyEditText(
-        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
-        settings.role,
-        editTextRole, containerRole,
-        "Role",
-      ) { commitHelper.setRole(it) }
 
       // TODO: Make rows, columns available in SettingsMode.MEETING
       initNonEmptyEditTextWithRange(

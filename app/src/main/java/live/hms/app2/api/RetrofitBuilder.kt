@@ -18,6 +18,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.IOException
+import java.lang.NullPointerException
+import java.lang.RuntimeException
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -44,11 +46,12 @@ object RetrofitBuilder {
   }
 
   fun makeTokenWithRoomIdRequest(
+    subdomain: String,
     roomId: String,
     role: String,
     environment: String
   ): Request {
-    val url = getTokenEndpointForRoomId(environment)
+    val url = getTokenEndpointForRoomId(environment, subdomain)
     val body = TokenRequestWithRoomId(roomId, UUID.randomUUID().toString(), role)
       .toJson()
       .toRequestBody(JSON)
@@ -60,13 +63,12 @@ object RetrofitBuilder {
       .build()
   }
 
-  fun makeTokenWithCodeRequest(code: String, environment: String): Request {
+  fun makeTokenWithCodeRequest(subdomain: String, code: String, environment: String): Request {
     val url = getTokenEndpointForCode(environment)
     val body = TokenRequestWithCode(code, UUID.randomUUID().toString())
       .toJson()
       .toRequestBody(JSON)
 
-    val subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
     return Request.Builder()
       .url(url)
       .addHeader("Accept-Type", "application/json")
@@ -96,6 +98,16 @@ object RetrofitBuilder {
         val body = response.body?.string() ?: ""
         try {
           val token = GsonUtils.gson.fromJson(body, TokenResponse::class.java)
+
+          // In case the `token` field is absent or null we raise an exception here
+          try {
+            if (token.token == "null" || token.token.isBlank()) {
+              throw Exception("Could not fetch token, check if your environment is correct.")
+            }
+          } catch (ex: NullPointerException) {
+            throw Exception("Could not fetch token, check if your environment is correct.")
+          }
+
           HMSLogger.d(TAG, "fetchAuthToken: token=$token")
           deferred.complete(token)
         } catch (e: Exception) {
