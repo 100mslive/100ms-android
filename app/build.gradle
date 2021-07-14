@@ -61,7 +61,7 @@ dependencies {
 
     //100ms.live SDK
     implementation 'org.webrtc:google-webrtc:1.0.32006'
-    //implementation 'com.github.100mslive:android-sdk:2.0.0-beta01'
+    implementation 'com.github.100mslive:android-sdk:2.0.4'
     implementation project(':lib')
 
     // Navigation
