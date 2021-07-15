@@ -22,10 +22,13 @@ class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHol
   ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: HMSPeer) {
-      binding.name.text = item.name
-      binding.iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
-      binding.iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
-      binding.iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
+      with(binding) {
+        name.text = item.name
+        iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
+        iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
+        iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
+      }
+
     }
 
   }
