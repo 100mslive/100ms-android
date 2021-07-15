@@ -4,8 +4,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
+import live.hms.app2.R
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
 
@@ -19,7 +22,25 @@ class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHol
 
   inner class PeerViewHolder(
     private val binding: ListItemPeerListBinding
-  ) : RecyclerView.ViewHolder(binding.root) {
+  ) : RecyclerView.ViewHolder(binding.root), AdapterView.OnItemSelectedListener {
+    init {
+      with(binding) {
+        ArrayAdapter.createFromResource(
+          root.context,
+          R.array.custom_role_names,
+          android.R.layout.simple_list_item_1
+        ).also { adapter ->
+          // Specify the layout to use when the list of choices appears
+          adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+          // Apply the adapter to the spinner
+          participantChangeRoleSpinner.adapter = adapter
+        }
+        participantChangeRoleSpinner.onItemSelectedListener = this@PeerViewHolder
+        participantKick.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} kick!") }
+        participantMuteToggle.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} mute!") }
+      }
+
+    }
 
     fun bind(item: HMSPeer) {
       with(binding) {
@@ -29,6 +50,14 @@ class ParticipantsAdapter : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHol
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
       }
 
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+      Log.d(TAG, "Role $position selected for ${items[position]} ")
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+      Log.d(TAG, "Nothing selected")
     }
 
   }
