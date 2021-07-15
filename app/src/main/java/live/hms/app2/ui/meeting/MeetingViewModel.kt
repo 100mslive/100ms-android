@@ -316,6 +316,9 @@ class MeetingViewModel(
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
         override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
+          Log.d(
+            TAG,
+            speakers.fold("Customer_User_IDs:") { cur: String, sp: HMSSpeaker -> cur + " ${sp.peer?.customerUserID}" })
           Log.v(TAG, "onAudioLevelUpdate: speakers=${speakers.toList()}")
           this@MeetingViewModel.speakers.postValue(speakers)
         }
