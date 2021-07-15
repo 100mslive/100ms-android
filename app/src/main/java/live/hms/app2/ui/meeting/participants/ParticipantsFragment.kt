@@ -19,7 +19,6 @@ import live.hms.app2.util.viewLifecycle
 class ParticipantsFragment : Fragment() {
 
   private val adapter = ParticipantsAdapter()
-  private lateinit var searchAdapter: ArrayAdapter<String>
   private var binding by viewLifecycle<FragmentParticipantsBinding>()
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
@@ -47,17 +46,11 @@ class ParticipantsFragment : Fragment() {
       adapter = this@ParticipantsFragment.adapter
     }
 
-    searchAdapter = ArrayAdapter<String>(
-      requireContext(),
-      android.R.layout.simple_list_item_1,
-      emptyArray()
-    )
-
     binding.textInputSearch.apply {
       addTextChangedListener { text ->
         val items = meetingViewModel
           .peers
-          .filter { text == null || text.isEmpty() || it.name.contains(text.toString(), true) }
+          .filter { text.isNullOrEmpty() || it.name.contains(text.toString(), true) }
           .toTypedArray()
         adapter.setItems(items)
       }
