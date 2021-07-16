@@ -16,10 +16,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ParticipantsAdapter(
-  private val availableRoles: () -> List<HMSRole>,
+  private val availableRoles: List<HMSRole>,
   private val changeRole: (remotePeer: HMSRemotePeer, toRole: HMSRole) -> Unit,
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
+  private val availableRoleStrings = availableRoles.map { it.name }
   companion object {
     private const val TAG = "ParticipantsAdapter"
   }
@@ -31,32 +32,24 @@ class ParticipantsAdapter(
   ) : RecyclerView.ViewHolder(binding.root), AdapterView.OnItemSelectedListener {
     init {
       with(binding) {
-        Log.d(TAG, "SizeRoles: checking")
-        val roles = availableRoles()
-        Log.d(TAG, "SizeRoles: ${roles.size}")
-        val a = 2
-        ArrayAdapter<CharSequence>(
+
+        ArrayAdapter(
           root.context,
           android.R.layout.simple_list_item_1,
-          availableRoles().map { it.name })
+          availableRoleStrings
+        )
           .also { adapter ->
             // Specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             // Apply the adapter to the spinner
             participantChangeRoleSpinner.adapter = adapter
           }
-
-//        ArrayAdapter.createFromResource(
-//          root.context,
-//          R.array.custom_role_names,
-//          android.R.layout.simple_list_item_1
-//        ).also { adapter ->
-//          // Specify the layout to use when the list of choices appears
-//          adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//          // Apply the adapter to the spinner
-//          participantChangeRoleSpinner.adapter = adapter
-//        }
-        participantChangeRoleSpinner.onItemSelectedListener = this@PeerViewHolder
+        // Set the listener without triggering it
+        with(participantChangeRoleSpinner) {
+          isSelected = false
+          setSelection(0, true)
+          onItemSelectedListener = this@PeerViewHolder
+        }
         participantKick.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} kick!") }
         participantMuteToggle.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} mute!") }
       }
@@ -69,17 +62,18 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
+        remotePeerOptions.visibility = if (item.isLocal) View.GONE else View.VISIBLE
       }
 
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-      Log.d(TAG, "Role $position selected for ${items[position]} is $id with position $position")
-//      changeRole(items[position], availableRoles().find { it.name })
+      changeRole(items[adapterPosition] as HMSRemotePeer, availableRoles[position])
+      Log.d("catsas", "Running the change role to ${availableRoles[position]}")
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-      Log.d(TAG, "Nothing selected")
+      Log.d("catsas", "NO change role item selected")
     }
 
   }

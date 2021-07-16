@@ -41,7 +41,8 @@ class ParticipantsFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    adapter = ParticipantsAdapter(meetingViewModel::getAvailableRoles, meetingViewModel::changeRole)
+    adapter =
+      ParticipantsAdapter(meetingViewModel.getAvailableRoles(), meetingViewModel::changeRole)
     initViews()
   }
 
