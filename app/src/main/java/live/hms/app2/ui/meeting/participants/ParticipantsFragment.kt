@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,7 +17,7 @@ import live.hms.app2.util.viewLifecycle
 
 class ParticipantsFragment : Fragment() {
 
-  private val adapter = ParticipantsAdapter()
+
   private var binding by viewLifecycle<FragmentParticipantsBinding>()
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
@@ -28,15 +27,22 @@ class ParticipantsFragment : Fragment() {
     )
   }
 
+  lateinit var adapter: ParticipantsAdapter
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentParticipantsBinding.inflate(inflater, container, false)
-    initViews()
     initViewModels()
     return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    adapter = ParticipantsAdapter(meetingViewModel::getAvailableRoles, meetingViewModel::changeRole)
+    initViews()
   }
 
   private fun initViews() {
@@ -64,4 +70,5 @@ class ParticipantsFragment : Fragment() {
       binding.participantCount.text = "${peers.size}"
     }
   }
+
 }

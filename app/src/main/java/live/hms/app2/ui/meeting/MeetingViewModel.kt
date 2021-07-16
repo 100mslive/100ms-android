@@ -21,6 +21,7 @@ import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.enums.HMSTrackUpdate
+import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.utils.HMSCoroutineScope
 import java.util.*
 import kotlin.collections.ArrayList
@@ -33,6 +34,7 @@ class MeetingViewModel(
     private const val TAG = "MeetingViewModel"
   }
 
+  private var pendingRoleChange: HMSRoleChangeRequest? = null
   private val config = HMSConfig(
     roomDetails.username,
     roomDetails.authToken,
@@ -312,6 +314,11 @@ class MeetingViewModel(
         override fun onReconnecting(error: HMSException) {
           state.postValue(MeetingState.Reconnecting("Reconnecting", error.toString()))
         }
+
+        override fun onRoleChangeRequest(request: HMSRoleChangeRequest) {
+          pendingRoleChange = request
+          // Show a dialog to the user about it. TODO
+        }
       })
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
@@ -404,7 +411,7 @@ class MeetingViewModel(
     synchronized(_tracks) {
       val trackToRemove = _tracks.find {
         it.peer.peerID == peer.peerID &&
-            it.video?.trackId == track.trackId
+                it.video?.trackId == track.trackId
       }
       _tracks.remove(trackToRemove)
 
@@ -412,5 +419,14 @@ class MeetingViewModel(
       tracks.postValue(_tracks)
     }
   }
+
+  fun getAvailableRoles(): List<HMSRole> = hmsSDK.getRoles()
+
+  fun changeRole(remotePeer: HMSRemotePeer, toRole: HMSRole) =
+    hmsSDK.changeRole(remotePeer, toRole, false)
+
+  fun acceptNewRole(request: HMSRoleChangeRequest) = hmsSDK.acceptChangeRole(request)
+
+
 }
 
