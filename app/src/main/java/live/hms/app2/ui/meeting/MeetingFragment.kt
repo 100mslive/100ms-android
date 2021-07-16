@@ -13,7 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
@@ -260,6 +259,30 @@ class MeetingFragment : Fragment() {
             requireContext().startActivity(
               EmailUtils.getNonFatalLogIntent(requireContext())
             )
+            alertDialog = null
+          }
+
+          alertDialog = builder.create().apply { show() }
+        }
+
+        is MeetingState.RoleChangeRequest -> {
+          alertDialog?.dismiss()
+          alertDialog = null
+          hideProgressBar()
+
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage("${state.hmsRoleChangeRequest.requestedBy?.name} wants to change your role to : \n" + state.hmsRoleChangeRequest.suggestedRole.name)
+            .setTitle(R.string.change_role_request)
+            .setCancelable(false)
+
+          builder.setPositiveButton(R.string.accept) { dialog, _ ->
+            meetingViewModel.changeRoleAccept(state.hmsRoleChangeRequest)
+            dialog.dismiss()
+            alertDialog = null
+          }
+
+          builder.setNegativeButton(R.string.reject) { dialog, _ ->
+            dialog.dismiss()
             alertDialog = null
           }
 
