@@ -109,7 +109,10 @@ class MeetingViewModel(
 
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
+  // Live data containing the current Speaker in the meeting
   val speakers = MutableLiveData<Array<HMSSpeaker>>()
+  // Live data which changes on any change of peer
+  val peerLiveDate = MutableLiveData<HMSPeer>()
 
   // Dominant speaker
   val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
@@ -237,21 +240,26 @@ class MeetingViewModel(
           state.postValue(MeetingState.Ongoing())
         }
 
-        override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
-          Log.d(TAG, "join:onPeerUpdate type=$type, peer=$peer")
+        override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
+          Log.d(TAG, "join:onPeerUpdate type=$type, peer=$hmsPeer")
           when (type) {
             HMSPeerUpdate.PEER_LEFT -> {
               synchronized(_tracks) {
-                _tracks.removeIf { it.peer.peerID == peer.peerID }
+                _tracks.removeIf { it.peer.peerID == hmsPeer.peerID }
                 tracks.postValue(_tracks)
+                peerLiveDate.postValue(hmsPeer)
               }
+            }
+
+            HMSPeerUpdate.PEER_JOINED -> {
+              peerLiveDate.postValue(hmsPeer)
             }
 
             HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
               synchronized(_tracks) {
                 val track = _tracks.find {
-                  it.peer.peerID == peer.peerID &&
-                          it.video?.trackId == peer.videoTrack?.trackId
+                  it.peer.peerID == hmsPeer.peerID &&
+                          it.video?.trackId == hmsPeer.videoTrack?.trackId
                 }
                 if (track != null) dominantSpeaker.postValue(track)
               }

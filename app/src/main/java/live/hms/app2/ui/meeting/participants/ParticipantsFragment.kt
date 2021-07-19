@@ -65,7 +65,7 @@ class ParticipantsFragment : Fragment() {
   }
 
   private fun initViewModels() {
-    meetingViewModel.tracks.observe(viewLifecycleOwner) {
+    meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
       val peers = meetingViewModel.peers
       adapter.setItems(peers)
       binding.participantCount.text = "${peers.size}"
