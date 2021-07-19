@@ -62,16 +62,23 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        participantChangeRoleSpinner.setSelection(availableRoleStrings.indexOf(item.name))
+        participantChangeRoleSpinner.apply {
+          val itemPosition = availableRoleStrings.indexOf(item.name)
+          tag = itemPosition
+          setSelection(itemPosition)
+        }
         remotePeerOptions.visibility = if (item.isLocal) View.GONE else View.VISIBLE
       }
 
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-      if (items[adapterPosition] is HMSRemotePeer) {
+      val userAction = view?.tag != position
+      Log.d(TAG, "About to run the change role, user action is: $userAction")
+
+      if (userAction && items[adapterPosition] is HMSRemotePeer) {
         changeRole(items[adapterPosition] as HMSRemotePeer, availableRoles[position])
-        Log.d("catsas", "Running the change role to ${availableRoles[position]}")
+        Log.d(TAG, "Running the change role to ${availableRoles[position]}")
       }
     }
 
