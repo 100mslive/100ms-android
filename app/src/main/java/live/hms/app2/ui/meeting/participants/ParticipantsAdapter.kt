@@ -46,8 +46,8 @@ class ParticipantsAdapter(
           }
         // Set the listener without triggering it
         with(participantChangeRoleSpinner) {
-          //isSelected = false
-          //setSelection(0, true)
+          isSelected = false
+          setSelection(0, true)
           onItemSelectedListener = this@PeerViewHolder
         }
         participantKick.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} kick!") }
