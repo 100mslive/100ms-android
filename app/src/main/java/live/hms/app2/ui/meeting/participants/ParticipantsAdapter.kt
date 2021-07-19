@@ -46,9 +46,10 @@ class ParticipantsAdapter(
           }
         // Set the listener without triggering it
         with(participantChangeRoleSpinner) {
-          //isSelected = false
-          //setSelection(0, true)
-          onItemSelectedListener = this@PeerViewHolder
+          isSelected = false
+          setSelection(0, true)
+          post { onItemSelectedListener = this@PeerViewHolder }
+
         }
         participantKick.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} kick!") }
         participantMuteToggle.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} mute!") }
@@ -62,10 +63,9 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        participantChangeRoleSpinner.setSelection(availableRoleStrings.indexOf(item.name))
+        participantChangeRoleSpinner.setSelection(availableRoleStrings.indexOf(item.hmsRole.name))
         remotePeerOptions.visibility = if (item.isLocal) View.GONE else View.VISIBLE
       }
-
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

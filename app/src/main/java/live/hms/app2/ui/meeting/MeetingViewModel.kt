@@ -234,18 +234,6 @@ class MeetingViewModel(
 
         override fun onJoin(room: HMSRoom) {
           failures.clear()
-/*          val hmsLocalPeer = hmsSDK.getLocalPeer()
-          hmsLocalPeer?.audioTrack?.apply {
-            localAudioTrack = this
-            isLocalAudioEnabled.postValue(!isMute)
-            addTrack(this, hmsLocalPeer)
-          }
-          hmsLocalPeer?.videoTrack?.apply {
-            localVideoTrack = this
-            isLocalVideoEnabled.postValue(!isMute)
-            addTrack(this, hmsLocalPeer)
-          }*/
-
           state.postValue(MeetingState.Ongoing())
         }
 
@@ -332,7 +320,6 @@ class MeetingViewModel(
         override fun onRoleChangeRequest(request: HMSRoleChangeRequest) {
           pendingRoleChange = request
           state.postValue(MeetingState.RoleChangeRequest(request))
-
         }
       })
 
@@ -343,6 +330,10 @@ class MeetingViewModel(
         }
       })
     }
+  }
+
+  fun setStatetoOngoing() {
+    state.postValue(MeetingState.Ongoing())
   }
 
   fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {

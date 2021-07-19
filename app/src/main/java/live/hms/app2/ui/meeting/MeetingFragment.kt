@@ -279,11 +279,13 @@ class MeetingFragment : Fragment() {
             meetingViewModel.changeRoleAccept(state.hmsRoleChangeRequest)
             dialog.dismiss()
             alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
           }
 
           builder.setNegativeButton(R.string.reject) { dialog, _ ->
             dialog.dismiss()
             alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
           }
 
           alertDialog = builder.create().apply { show() }
