@@ -66,6 +66,7 @@
     <string name="search_participants">Search Participants</string>
     <string name="video_bitrate">Video Bitrate</string>
     <string name="role">Role</string>
+    <string name="change_role_request">Change Role Request</string>
     <string name="video_framerate">Video Framerate</string>
     <string name="advanced_settings">Advanced Settings</string>
 
@@ -104,6 +105,8 @@
     <string name="retry">Retry</string>
     <string name="leave">Leave</string>
     <string name="error">Error</string>
+    <string name="accept">Accept</string>
+    <string name="reject">Reject</string>
     <string name="video_resolution_height">Video Resolution (Height)</string>
     <string name="video_resolution_width">Video Resolution (Width)</string>
     <string name="hero_view">Hero View</string>
@@ -125,4 +128,6 @@
     <string name="audio_only_view">Audio Only View</string>
     <string name="meeting_mode">Meeting Mode</string>
     <string name="show_retry_progress_bars">Show Retry Progress Bars</string>
+    <string name="participant_mute_unmute">Mute/Unmute</string>
+    <string name="participant_kick">Kick</string>
 </resources>
