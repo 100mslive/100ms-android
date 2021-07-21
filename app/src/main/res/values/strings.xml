@@ -130,4 +130,5 @@
     <string name="show_retry_progress_bars">Show Retry Progress Bars</string>
     <string name="participant_mute_unmute">Mute/Unmute</string>
     <string name="participant_kick">Kick</string>
+    <string name="switch_enable_subscribe_degradation">Enable subscribe degradation</string>
 </resources>
