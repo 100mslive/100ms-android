@@ -451,7 +451,7 @@ class SettingsFragment : Fragment() {
     binding.apply {
 
       initSwitch(
-        EnumSet.of(SettingsMode.MEETING),
+        EnumSet.of(SettingsMode.HOME),
         settings.enableSubscribeDegradation,
         switchSubscribeDegradationEnabled
       ) {commitHelper.setSubscribeDegradation(it)}
