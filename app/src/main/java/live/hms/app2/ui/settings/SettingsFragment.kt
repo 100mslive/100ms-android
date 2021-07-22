@@ -450,11 +450,11 @@ class SettingsFragment : Fragment() {
   private fun initSwitches() {
     binding.apply {
 
-      initSwitch(
-        EnumSet.of(SettingsMode.HOME),
-        settings.enableSubscribeDegradation,
-        switchSubscribeDegradationEnabled
-      ) {commitHelper.setSubscribeDegradation(it)}
+//      initSwitch(
+//        EnumSet.of(SettingsMode.HOME),
+//        settings.enableSubscribeDegradation,
+//        switchSubscribeDegradationEnabled
+//      ) {commitHelper.setSubscribeDegradation(it)}
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

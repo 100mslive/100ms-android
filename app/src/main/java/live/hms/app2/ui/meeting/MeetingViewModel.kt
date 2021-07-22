@@ -121,7 +121,7 @@ class MeetingViewModel(
 
   private val hmsSDK = HMSSDK
     .Builder(application)
-    .setSubscribeDegradation(settings.enableSubscribeDegradation)
+//    .setSubscribeDegradation(settings.enableSubscribeDegradation)
     .build()
 
   val peers: Array<HMSPeer>
