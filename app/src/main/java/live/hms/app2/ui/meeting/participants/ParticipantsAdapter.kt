@@ -16,8 +16,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class ParticipantsAdapter(
+  val isAllowedToChangeRole: Boolean,
   private val availableRoles: List<HMSRole>,
-  private val changeRole: (remotePeer: HMSRemotePeer, toRole: HMSRole) -> Unit,
+  private val showDialog: (remotePeer: HMSRemotePeer, toRole: HMSRole) -> Unit,
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   private val availableRoleStrings = availableRoles.map { it.name }
@@ -65,12 +66,14 @@ class ParticipantsAdapter(
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
         participantChangeRoleSpinner.setSelection(availableRoleStrings.indexOf(item.hmsRole.name))
         remotePeerOptions.visibility = if (item.isLocal) View.GONE else View.VISIBLE
+        // Show change role option only if the role of the local peer allows
+        participantChangeRoleSpinner.visibility = if (isAllowedToChangeRole) View.VISIBLE else View.GONE
       }
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-      if (items[adapterPosition] is HMSRemotePeer) {
-        changeRole(items[adapterPosition] as HMSRemotePeer, availableRoles[position])
+      if (items[adapterPosition] is HMSRemotePeer && availableRoles[position].name != items[adapterPosition].hmsRole.name) {
+        showDialog(items[adapterPosition] as HMSRemotePeer, availableRoles[position])
         Log.d("catsas", "Running the change role to ${availableRoles[position]}")
       }
     }

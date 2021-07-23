@@ -440,9 +440,13 @@ class MeetingViewModel(
 
   fun getAvailableRoles(): List<HMSRole> = hmsSDK.getRoles()
 
-  fun changeRole(remotePeer: HMSRemotePeer, toRole: HMSRole) {
+  fun isAllowedToChangeRole() : Boolean {
+    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
+  }
+
+  fun changeRole(remotePeer: HMSRemotePeer, toRole: HMSRole, force: Boolean) {
     if (remotePeer.hmsRole.name != toRole.name)
-      hmsSDK.changeRole(remotePeer, toRole, false)
+      hmsSDK.changeRole(remotePeer, toRole, force)
   }
 }
 
