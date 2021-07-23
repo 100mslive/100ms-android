@@ -2,6 +2,7 @@ package live.hms.app2.ui.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.core.content.edit
 import live.hms.app2.ui.meeting.MeetingViewMode
 import live.hms.video.utils.HMSLogger
@@ -134,7 +135,7 @@ class SettingsStore(context: Context) {
     set(value) = putInt(VIDEO_FRAME_RATE, value)
 
   var username: String
-    get() = sharedPreferences.getString(USERNAME, "Android User")!!
+    get() = sharedPreferences.getString(USERNAME, Build.MODEL)!!
     set(value) = putString(USERNAME, value)
 
   var detectDominantSpeaker: Boolean
