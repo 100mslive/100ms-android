@@ -130,4 +130,7 @@
     <string name="show_retry_progress_bars">Show Retry Progress Bars</string>
     <string name="participant_mute_unmute">Mute/Unmute</string>
     <string name="participant_kick">Kick</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
+    <string name="role_change">Role Change</string>
 </resources>
