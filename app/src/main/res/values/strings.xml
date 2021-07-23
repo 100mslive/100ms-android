@@ -133,4 +133,5 @@
     <string name="yes">YES</string>
     <string name="no">NO</string>
     <string name="role_change">Role Change</string>
+    <string name="switch_enable_subscribe_degradation">Enable subscribe degradation</string>
 </resources>
