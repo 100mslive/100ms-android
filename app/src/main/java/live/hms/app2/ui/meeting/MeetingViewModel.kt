@@ -104,6 +104,10 @@ class MeetingViewModel(
   val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
   val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
+  // Live data for enabling/disabling mute buttons
+  val isLocalAudioPublishingAllowed = MutableLiveData(false)
+  val isLocalVideoPublishingAllowed = MutableLiveData(false)
+
   private var localAudioTrack: HMSLocalAudioTrack? = null
   private var localVideoTrack: HMSLocalVideoTrack? = null
 
@@ -285,10 +289,12 @@ class MeetingViewModel(
                 when (track.type) {
                   HMSTrackType.AUDIO -> {
                     localAudioTrack = track as HMSLocalAudioTrack
+                    isLocalAudioPublishingAllowed.postValue(true)
                     isLocalAudioEnabled.postValue(!track.isMute)
                   }
                   HMSTrackType.VIDEO -> {
                     localVideoTrack = track as HMSLocalVideoTrack
+                    isLocalVideoPublishingAllowed.postValue(true)
                     isLocalVideoEnabled.postValue(!track.isMute)
                   }
                 }
@@ -296,6 +302,16 @@ class MeetingViewModel(
               addTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_REMOVED -> {
+              if (peer is HMSLocalPeer) {
+                when (track.type) {
+                  HMSTrackType.AUDIO -> {
+                    isLocalAudioPublishingAllowed.postValue(false)
+                  }
+                  HMSTrackType.VIDEO -> {
+                    isLocalVideoPublishingAllowed.postValue(false)
+                  }
+                }
+              }
               removeTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_MUTED -> tracks.postValue(_tracks)

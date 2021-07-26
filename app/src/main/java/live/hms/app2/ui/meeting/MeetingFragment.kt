@@ -332,6 +332,15 @@ class MeetingFragment : Fragment() {
       }
     }
 
+    meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+      binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
+
+    }
+
+    meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+      binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
+    }
+
     meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
       binding.buttonToggleVideo.apply {
         setIconResource(
