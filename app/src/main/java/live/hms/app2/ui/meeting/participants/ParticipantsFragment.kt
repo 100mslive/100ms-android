@@ -56,18 +56,18 @@ class ParticipantsFragment : Fragment() {
 
   private fun showDialog(remotePeer: HMSRemotePeer, toRole: HMSRole) {
     val builder = AlertDialog.Builder(requireContext())
-      .setMessage("Do you want to FORCE this change role?")
+      .setMessage("Changing role of \"${remotePeer.name}\" from ${remotePeer.hmsRole.name} to ${toRole.name}")
       .setTitle(R.string.role_change)
       .setCancelable(false)
 
-    builder.setPositiveButton(R.string.yes) { dialog, _ ->
-      meetingViewModel.changeRole(remotePeer, toRole, true)
+    builder.setPositiveButton("Request Change") { dialog, _ ->
+      meetingViewModel.changeRole(remotePeer, toRole, false)
       dialog.dismiss()
       alertDialog = null
     }
 
-    builder.setNegativeButton(R.string.no) { dialog, _ ->
-      meetingViewModel.changeRole(remotePeer, toRole, false)
+    builder.setNegativeButton("Force Change") { dialog, _ ->
+      meetingViewModel.changeRole(remotePeer, toRole, true)
       dialog.dismiss()
       alertDialog = null
     }
