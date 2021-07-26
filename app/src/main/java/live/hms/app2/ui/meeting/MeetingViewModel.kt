@@ -296,7 +296,7 @@ class MeetingViewModel(
               addTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_REMOVED -> {
-              if (track.type == HMSTrackType.VIDEO) removeTrack(track as HMSVideoTrack, peer)
+              removeTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_MUTED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_UNMUTED -> tracks.postValue(_tracks)
@@ -425,12 +425,23 @@ class MeetingViewModel(
     Log.v(TAG, "addTrack: count=${_tracks.size} track=$track, peer=$peer")
   }
 
-  private fun removeTrack(track: HMSVideoTrack, peer: HMSPeer) {
+  private fun removeTrack(track: HMSTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      val trackToRemove = _tracks.find {
-        it.peer.peerID == peer.peerID &&
-                it.video?.trackId == track.trackId
+      val trackToRemove = when (track.type) {
+        HMSTrackType.AUDIO -> {
+          _tracks.find {
+            it.peer.peerID == peer.peerID &&
+                    it.audio?.trackId == track.trackId
+          }
+        }
+        HMSTrackType.VIDEO -> {
+          _tracks.find {
+            it.peer.peerID == peer.peerID &&
+                    it.video?.trackId == track.trackId
+          }
+        }
       }
+
       _tracks.remove(trackToRemove)
 
       // Update the view as we have removed some views
