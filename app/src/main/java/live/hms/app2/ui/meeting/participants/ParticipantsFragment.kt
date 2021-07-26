@@ -55,7 +55,7 @@ class ParticipantsFragment : Fragment() {
   private var alertDialog: AlertDialog? = null
 
   private fun showDialog(remotePeer: HMSRemotePeer, toRole: HMSRole) {
-    val builder = AlertDialog.Builder(requireContext())
+    val builder = AlertDialog.Builder(requireContext(), R.style.RoleChangeAlertDialogTheme)
       .setMessage("Changing role of \"${remotePeer.name}\" from ${remotePeer.hmsRole.name} to ${toRole.name}")
       .setTitle(R.string.role_change)
       .setCancelable(false)
