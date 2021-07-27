@@ -24,6 +24,7 @@
         android:layout_alignParentBottom="true"
         android:animateLayoutChanges="true"
         android:background="@color/blue_3"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
@@ -42,7 +43,9 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_weight="1">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_open_chat"
