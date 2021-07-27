@@ -42,7 +42,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   protected data class RenderedViewPair(
     val binding: GridItemVideoBinding,
-    val video: MeetingTrack
+    val meetingTrack: MeetingTrack
   )
 
   private val bindedVideoTrackIds = mutableSetOf<String>()
@@ -56,7 +56,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       val maxColumns = settings.videoGridColumns
       val result = max(1, (renderedViews.size + rows - 1) / rows)
       if (result > maxColumns) {
-        val videos = renderedViews.map { it.video }
+        val videos = renderedViews.map { it.meetingTrack }
         throw IllegalStateException(
           "At most ${settings.videoGridRows * maxColumns} videos are allowed. Provided $videos"
         )
@@ -184,11 +184,11 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     // Remove all the views which are not required now
     for (currentRenderedView in renderedViews) {
-      val newVideo = newVideos.find { it == currentRenderedView.video }
+      val newVideo = newVideos.find { it == currentRenderedView.meetingTrack }
       if (newVideo == null) {
         crashlyticsLog(
           TAG,
-          "updateVideos: Removing view for video=${currentRenderedView.video} in fragment=$tag"
+          "updateVideos: Removing view for video=${currentRenderedView.meetingTrack} in fragment=$tag"
         )
         requiresGridLayoutUpdate = true
 
@@ -196,7 +196,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           // Unbind only when view is visible to user
           if (isViewVisible) unbindSurfaceView(
             currentRenderedView.binding.videoCard,
-            currentRenderedView.video
+            currentRenderedView.meetingTrack
           )
           removeViewInLayout(currentRenderedView.binding.root)
         }
@@ -207,7 +207,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       _newVideo?.also { newVideo ->
 
         // Check if video already rendered
-        val renderedViewPair = renderedViews.find { it.video == newVideo }
+        val renderedViewPair = renderedViews.find { it.meetingTrack == newVideo }
         if (renderedViewPair != null) {
           crashlyticsLog(TAG, "updateVideos: Keeping view for video=$newVideo  in fragment=$tag")
           newRenderedViews.add(renderedViewPair)
@@ -247,7 +247,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     // Re-bind all the videos, this handles any changes made in isMute
     for (view in renderedViews) {
-      bindVideo(view.binding.videoCard, view.video)
+      bindVideo(view.binding.videoCard, view.meetingTrack)
     }
 
     if (requiresGridLayoutUpdate) {
@@ -257,7 +257,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   protected fun applySpeakerUpdates(speakers: Array<HMSSpeaker>) {
     renderedViews.forEach { renderedView ->
-      val track = renderedView.video.audio
+      val track = renderedView.meetingTrack.audio
       renderedView.binding.apply {
         if (track == null || track.isMute) {
           videoCard.audioLevel.apply {
@@ -293,7 +293,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     isViewVisible = true
 
     renderedViews.forEach {
-      bindSurfaceView(it.binding.videoCard, it.video)
+      bindSurfaceView(it.binding.videoCard, it.meetingTrack)
     }
   }
 
@@ -303,7 +303,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     isViewVisible = false
 
     renderedViews.forEach {
-      unbindSurfaceView(it.binding.videoCard, it.video)
+      unbindSurfaceView(it.binding.videoCard, it.meetingTrack)
     }
   }
 
