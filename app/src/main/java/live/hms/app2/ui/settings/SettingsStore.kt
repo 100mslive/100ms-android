@@ -2,6 +2,7 @@ package live.hms.app2.ui.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.core.content.edit
 import live.hms.app2.ui.meeting.MeetingViewMode
 import live.hms.video.utils.HMSLogger
@@ -39,6 +40,7 @@ class SettingsStore(context: Context) {
 
     const val LEAK_CANARY = "leak-canary"
     const val SHOW_RECONNECTING_PROGRESS_BARS = "show-reconnecting-progress-bar"
+    const val SUBSCRIBE_DEGRADATION = "subscribe-degradation-enabling"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -95,6 +97,10 @@ class SettingsStore(context: Context) {
     }
   }
 
+  var enableSubscribeDegradation : Boolean
+      get() = sharedPreferences.getBoolean(SUBSCRIBE_DEGRADATION, true)
+      set(value) = putBoolean(SUBSCRIBE_DEGRADATION, value)
+
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
     set(value) = putBoolean(PUBLISH_VIDEO, value)
@@ -129,7 +135,7 @@ class SettingsStore(context: Context) {
     set(value) = putInt(VIDEO_FRAME_RATE, value)
 
   var username: String
-    get() = sharedPreferences.getString(USERNAME, "Android User")!!
+    get() = sharedPreferences.getString(USERNAME, Build.MODEL)!!
     set(value) = putString(USERNAME, value)
 
   var detectDominantSpeaker: Boolean
@@ -242,6 +248,8 @@ class SettingsStore(context: Context) {
     fun setLogLevel100msSdk(value: String) = apply { editor.putString(LOG_LEVEL_100MS_SDK, value) }
     fun setLogLevel100msSdk(value: HMSLogger.LogLevel) =
       apply { editor.putString(LOG_LEVEL_100MS_SDK, value.toString()) }
+
+    fun setSubscribeDegradation(value: Boolean) = apply { editor.putBoolean(SUBSCRIBE_DEGRADATION, value) }
 
     fun commit() {
       editor.commit()

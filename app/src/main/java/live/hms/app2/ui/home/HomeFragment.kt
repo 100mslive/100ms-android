@@ -234,6 +234,7 @@ class HomeFragment : Fragment() {
         val input = binding.editTextMeetingUrl.text.toString()
         if (saveTokenEndpointUrlIfValid(input) && isValidUserName()) {
           joinRoom()
+          settings.username = binding.editTextName.text.toString()
         } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName()) {
           var subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
           if (BuildConfig.INTERNAL) {

@@ -13,7 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
@@ -266,6 +265,32 @@ class MeetingFragment : Fragment() {
           alertDialog = builder.create().apply { show() }
         }
 
+        is MeetingState.RoleChangeRequest -> {
+          alertDialog?.dismiss()
+          alertDialog = null
+          hideProgressBar()
+
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage("${state.hmsRoleChangeRequest.requestedBy?.name} wants to change your role to : \n" + state.hmsRoleChangeRequest.suggestedRole.name)
+            .setTitle(R.string.change_role_request)
+            .setCancelable(false)
+
+          builder.setPositiveButton(R.string.accept) { dialog, _ ->
+            meetingViewModel.changeRoleAccept(state.hmsRoleChangeRequest)
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+          builder.setNegativeButton(R.string.reject) { dialog, _ ->
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+          alertDialog = builder.create().apply { show() }
+        }
+
         is MeetingState.Reconnecting -> {
           if (settings.showReconnectingProgressBars) {
             updateProgressBarUI(state.heading, state.message)
@@ -305,6 +330,15 @@ class MeetingFragment : Fragment() {
           if (state.goToHome) goToHomePage()
         }
       }
+    }
+
+    meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+      binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
+
+    }
+
+    meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+      binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
     }
 
     meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->

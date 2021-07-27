@@ -4,22 +4,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import live.hms.app2.R
 import live.hms.app2.databinding.FragmentParticipantsBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
 import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.models.HMSRemotePeer
+import live.hms.video.sdk.models.role.HMSRole
 
 class ParticipantsFragment : Fragment() {
 
-  private val adapter = ParticipantsAdapter()
-  private lateinit var searchAdapter: ArrayAdapter<String>
+
   private var binding by viewLifecycle<FragmentParticipantsBinding>()
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
@@ -29,15 +31,48 @@ class ParticipantsFragment : Fragment() {
     )
   }
 
+  lateinit var adapter: ParticipantsAdapter
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
     binding = FragmentParticipantsBinding.inflate(inflater, container, false)
-    initViews()
     initViewModels()
     return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    adapter =
+      ParticipantsAdapter(meetingViewModel.isAllowedToChangeRole(),
+        meetingViewModel.getAvailableRoles(),
+        this::showDialog)
+    initViews()
+  }
+
+  private var alertDialog: AlertDialog? = null
+
+  private fun showDialog(remotePeer: HMSRemotePeer, toRole: HMSRole) {
+    val builder = AlertDialog.Builder(requireContext(), R.style.RoleChangeAlertDialogTheme)
+      .setMessage("Changing role of \"${remotePeer.name}\" from ${remotePeer.hmsRole.name} to ${toRole.name}")
+      .setTitle(R.string.role_change)
+      .setCancelable(false)
+
+    builder.setPositiveButton("Request Change") { dialog, _ ->
+      meetingViewModel.changeRole(remotePeer, toRole, false)
+      dialog.dismiss()
+      alertDialog = null
+    }
+
+    builder.setNegativeButton("Force Change") { dialog, _ ->
+      meetingViewModel.changeRole(remotePeer, toRole, true)
+      dialog.dismiss()
+      alertDialog = null
+    }
+
+    alertDialog = builder.create().apply { show() }
   }
 
   private fun initViews() {
@@ -47,17 +82,11 @@ class ParticipantsFragment : Fragment() {
       adapter = this@ParticipantsFragment.adapter
     }
 
-    searchAdapter = ArrayAdapter<String>(
-      requireContext(),
-      android.R.layout.simple_list_item_1,
-      emptyArray()
-    )
-
     binding.textInputSearch.apply {
       addTextChangedListener { text ->
         val items = meetingViewModel
           .peers
-          .filter { text == null || text.isEmpty() || it.name.contains(text.toString(), true) }
+          .filter { text.isNullOrEmpty() || it.name.contains(text.toString(), true) }
           .toTypedArray()
         adapter.setItems(items)
       }
@@ -65,10 +94,11 @@ class ParticipantsFragment : Fragment() {
   }
 
   private fun initViewModels() {
-    meetingViewModel.tracks.observe(viewLifecycleOwner) {
+    meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
       val peers = meetingViewModel.peers
       adapter.setItems(peers)
       binding.participantCount.text = "${peers.size}"
     }
   }
+
 }

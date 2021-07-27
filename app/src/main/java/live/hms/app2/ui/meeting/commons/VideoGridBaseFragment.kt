@@ -142,6 +142,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         item.isScreen.not() &&
             (item.audio == null || item.audio!!.isMute)
       )
+      icDegraded.visibility = if(item.video?.isDegraded == true) View.VISIBLE else View.GONE
 
       /** [View.setVisibility] */
       val surfaceViewVisibility = if (item.video == null || item.video?.isMute == true) {
