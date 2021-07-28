@@ -1,20 +1,13 @@
 package live.hms.app2.ui.meeting.participants
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.role.HMSRole
-import java.util.*
-import kotlin.collections.ArrayList
 
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
@@ -22,7 +15,6 @@ class ParticipantsAdapter(
   private val showSheet : (HMSPeer) -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
-  private val availableRoleStrings = availableRoles.map { it.name }
   companion object {
     private const val TAG = "ParticipantsAdapter"
   }
