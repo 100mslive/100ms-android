@@ -22,11 +22,13 @@
             android:text="Select action" />
 
         <Button
+            android:id="@+id/promptChangeRole"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Prompt to change role" />
 
         <Button
+            android:id="@+id/forceChangeRole"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Force change role" />
@@ -37,6 +39,7 @@
             />
 
         <Button
+            android:id="@+id/cancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Cancel"
