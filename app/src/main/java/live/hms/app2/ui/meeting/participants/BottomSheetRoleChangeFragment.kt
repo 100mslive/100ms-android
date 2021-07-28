@@ -16,16 +16,16 @@ import live.hms.app2.databinding.LayoutFragmentBottomSheetChangeRoleBinding
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
 import android.widget.Spinner
-
-
+import androidx.navigation.fragment.navArgs
 
 
 class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
     private val TAG = BottomSheetRoleChangeFragment::class.java.simpleName
     private val meetingViewModel: MeetingViewModel by activityViewModels()
+    private val args : BottomSheetRoleChangeFragmentArgs by navArgs()
+    private var isForce : Boolean? = null
 
     private var binding by viewLifecycle<LayoutFragmentBottomSheetChangeRoleBinding>()
-    private val availableRoleStrings = listOf("a","b","c")
     private lateinit var popupSpinner : Spinner
 
     override fun onCreateView(
@@ -49,7 +49,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
         ArrayAdapter(
             requireActivity(),
             android.R.layout.simple_list_item_1,
-            availableRoleStrings
+            args.availableRoles
         ).also { arrayAdapter ->
             popupSpinner.adapter = arrayAdapter
             popupSpinner.prompt = "Choose"
@@ -62,7 +62,14 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
     private fun initListeners() {
         with(binding) {
             cancel.setOnClickListener { findNavController().popBackStack() }
-            forceChangeRole.setOnClickListener { spinnerDialog() }
+            forceChangeRole.setOnClickListener {
+                isForce = true
+                spinnerDialog()
+            }
+            promptChangeRole.setOnClickListener {
+                isForce = false
+                spinnerDialog()
+            }
         }
     }
 
@@ -71,8 +78,10 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        val stringRole = parent?.adapter?.getItem(position)
+        val stringRole = parent?.adapter?.getItem(position) as String
         Log.d(TAG, "Selected role: $stringRole")
+        meetingViewModel.changeRole(args.remotePeerId, stringRole, isForce!!)
+        findNavController().popBackStack()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {

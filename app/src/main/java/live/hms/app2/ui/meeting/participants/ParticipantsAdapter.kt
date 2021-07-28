@@ -19,8 +19,7 @@ import kotlin.collections.ArrayList
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   private val availableRoles: List<HMSRole>,
-  private val showDialog: (remotePeer: HMSRemotePeer, toRole: HMSRole) -> Unit,
-  private val showSheet : () -> Unit
+  private val showSheet : (HMSPeer) -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   private val availableRoleStrings = availableRoles.map { it.name }
@@ -32,10 +31,10 @@ class ParticipantsAdapter(
 
   inner class PeerViewHolder(
     private val binding: ListItemPeerListBinding
-  ) : RecyclerView.ViewHolder(binding.root), AdapterView.OnItemSelectedListener {
+  ) : RecyclerView.ViewHolder(binding.root) {
     init {
       with(binding) {
-        roleChange.setOnClickListener { showSheet() }
+        roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
       }
 //      with(binding) {
 //
@@ -74,17 +73,17 @@ class ParticipantsAdapter(
 //        participantChangeRoleSpinner.visibility = if (isAllowedToChangeRole) View.VISIBLE else View.GONE
       }
     }
-
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-      if (items[adapterPosition] is HMSRemotePeer && availableRoles[position].name != items[adapterPosition].hmsRole.name) {
-        showDialog(items[adapterPosition] as HMSRemotePeer, availableRoles[position])
-        Log.d("catsas", "Running the change role to ${availableRoles[position]}")
-      }
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-      Log.d("catsas", "NO change role item selected")
-    }
+//
+//    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//      if (items[adapterPosition] is HMSRemotePeer && availableRoles[position].name != items[adapterPosition].hmsRole.name) {
+//        showDialog(items[adapterPosition] as HMSRemotePeer, availableRoles[position])
+//        Log.d("catsas", "Running the change role to ${availableRoles[position]}")
+//      }
+//    }
+//
+//    override fun onNothingSelected(parent: AdapterView<*>?) {
+//      Log.d("catsas", "NO change role item selected")
+//    }
 
   }
 

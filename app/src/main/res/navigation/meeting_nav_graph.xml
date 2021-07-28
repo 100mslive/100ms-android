@@ -82,6 +82,13 @@
     <dialog
         android:id="@+id/BottomSheetRoleChange"
         android:name="live.hms.app2.ui.meeting.participants.BottomSheetRoleChangeFragment"
-        tools:layout="@layout/layout_fragment_bottom_sheet_change_role" />
+        tools:layout="@layout/layout_fragment_bottom_sheet_change_role" >
+        <argument
+            android:name="remotePeerId"
+            app:argType="string" />
+        <argument
+            android:name="availableRoles"
+            app:argType="string[]" />
+    </dialog>
 
 </navigation>
