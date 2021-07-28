@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentParticipantsBinding
 import live.hms.app2.model.RoomDetails
@@ -23,6 +25,7 @@ class ParticipantsFragment : Fragment() {
 
 
   private var binding by viewLifecycle<FragmentParticipantsBinding>()
+  private lateinit var sheetBehaviour : BottomSheetBehavior<FrameLayout>
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
@@ -48,7 +51,8 @@ class ParticipantsFragment : Fragment() {
     adapter =
       ParticipantsAdapter(meetingViewModel.isAllowedToChangeRole(),
         meetingViewModel.getAvailableRoles(),
-        this::showDialog)
+        this::showDialog,
+      this::onSheetClicked)
     initViews()
   }
 
@@ -91,6 +95,17 @@ class ParticipantsFragment : Fragment() {
         adapter.setItems(items)
       }
     }
+
+    sheetBehaviour = BottomSheetBehavior.from<FrameLayout>(binding.standardBottomSheet)
+  }
+
+  fun onSheetClicked() {
+    if(sheetBehaviour.state != BottomSheetBehavior.STATE_EXPANDED) {
+      sheetBehaviour.state = BottomSheetBehavior.STATE_EXPANDED
+    } else if (sheetBehaviour.state != BottomSheetBehavior.STATE_COLLAPSED) {
+      sheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
   }
 
   private fun initViewModels() {

@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
@@ -19,6 +20,7 @@ class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   private val availableRoles: List<HMSRole>,
   private val showDialog: (remotePeer: HMSRemotePeer, toRole: HMSRole) -> Unit,
+  private val showSheet : () -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   private val availableRoleStrings = availableRoles.map { it.name }
@@ -33,7 +35,7 @@ class ParticipantsAdapter(
   ) : RecyclerView.ViewHolder(binding.root), AdapterView.OnItemSelectedListener {
     init {
       with(binding) {
-        roleChange.setOnClickListener {  }
+        roleChange.setOnClickListener { showSheet() }
       }
 //      with(binding) {
 //
