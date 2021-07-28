@@ -96,18 +96,10 @@ class ParticipantsFragment : Fragment() {
         adapter.setItems(items)
       }
     }
-
-//    sheetBehaviour = BottomSheetBehavior.from<FrameLayout>(binding.standardBottomSheet)
   }
 
   private fun onSheetClicked() {
-//    if(sheetBehaviour.state != BottomSheetBehavior.STATE_EXPANDED) {
-//      sheetBehaviour.state = BottomSheetBehavior.STATE_EXPANDED
-//    } else if (sheetBehaviour.state != BottomSheetBehavior.STATE_COLLAPSED) {
-//      sheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-//    }
-
-    findNavController().navigate(R.id.action_ParticipantsFragment_to_bottomSheet)
+    findNavController().navigate(R.id.action_ParticipantsFragment_to_BottomSheetRoleChange)
   }
 
   private fun initViewModels() {
