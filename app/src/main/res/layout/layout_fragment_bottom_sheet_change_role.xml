@@ -44,5 +44,13 @@
             android:layout_height="wrap_content"
             android:text="Cancel"
             />
+
+        <Spinner
+            android:id="@+id/retroSpinner"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:spinnerMode="dialog"
+            />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </FrameLayout>
