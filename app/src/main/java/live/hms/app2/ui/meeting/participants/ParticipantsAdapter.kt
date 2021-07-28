@@ -33,26 +33,29 @@ class ParticipantsAdapter(
   ) : RecyclerView.ViewHolder(binding.root), AdapterView.OnItemSelectedListener {
     init {
       with(binding) {
-
-        ArrayAdapter(
-          root.context,
-          android.R.layout.simple_list_item_1,
-          availableRoleStrings
-        )
-          .also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            participantChangeRoleSpinner.adapter = adapter
-          }
-        // Set the listener without triggering it
-        with(participantChangeRoleSpinner) {
-          isSelected = false
-          setSelection(0, true)
-          post { onItemSelectedListener = this@PeerViewHolder }
-
-        }
+        roleChange.setOnClickListener {  }
       }
+//      with(binding) {
+//
+//        ArrayAdapter(
+//          root.context,
+//          android.R.layout.simple_list_item_1,
+//          availableRoleStrings
+//        )
+//          .also { adapter ->
+//            // Specify the layout to use when the list of choices appears
+//            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            // Apply the adapter to the spinner
+//            participantChangeRoleSpinner.adapter = adapter
+//          }
+//        // Set the listener without triggering it
+//        with(participantChangeRoleSpinner) {
+//          isSelected = false
+//          setSelection(0, true)
+//          post { onItemSelectedListener = this@PeerViewHolder }
+//
+//        }
+//      }
 
     }
 
@@ -62,10 +65,11 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        participantChangeRoleSpinner.setSelection(availableRoleStrings.indexOf(item.hmsRole.name))
-        remotePeerOptions.visibility = if (item.isLocal) View.GONE else View.VISIBLE
+        roleChange.text = item.hmsRole.name
+//        participantChangeRoleSpinner.setSelection(availableRoleStrings.indexOf(item.hmsRole.name))
+//        remotePeerOptions.visibility = if (item.isLocal) View.GONE else View.VISIBLE
         // Show change role option only if the role of the local peer allows
-        participantChangeRoleSpinner.visibility = if (isAllowedToChangeRole) View.VISIBLE else View.GONE
+//        participantChangeRoleSpinner.visibility = if (isAllowedToChangeRole) View.VISIBLE else View.GONE
       }
     }
 
