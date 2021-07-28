@@ -52,7 +52,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
             args.availableRoles
         ).also { arrayAdapter ->
             popupSpinner.adapter = arrayAdapter
-            popupSpinner.prompt = "Choose"
+            popupSpinner.prompt = "Role Change Request"
             popupSpinner.setSelection(0, true)
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             popupSpinner.onItemSelectedListener = this
