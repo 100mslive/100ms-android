@@ -52,8 +52,6 @@ class ParticipantsAdapter(
           post { onItemSelectedListener = this@PeerViewHolder }
 
         }
-        participantKick.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} kick!") }
-        participantMuteToggle.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} mute!") }
       }
 
     }
