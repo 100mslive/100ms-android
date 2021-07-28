@@ -1,28 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"        android:id="@+id/standardBottomSheet"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/standardBottomSheet"
+    style="?attr/bottomSheetStyle"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:behavior_hideable="true"
+    app:behavior_peekHeight="0dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="?attr/bottomSheetStyle"
-        app:behavior_hideable="true"
-        app:behavior_peekHeight="0dp"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-        <androidx.appcompat.widget.LinearLayoutCompat
+        android:orientation="vertical">
+
+        <TextView
+            android:padding="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Prompt to change role"
-                />
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Force change role"
-                />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </FrameLayout>
+            android:gravity="center"
+            android:text="Select action" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Prompt to change role" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Force change role" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</FrameLayout>
