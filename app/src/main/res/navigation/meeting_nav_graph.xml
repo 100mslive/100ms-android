@@ -61,6 +61,9 @@
         android:label="@string/participants_fragment"
         tools:layout="@layout/fragment_participants">
 
+        <action
+            android:id="@+id/action_ParticipantsFragment_to_bottomSheet"
+            app:destination="@id/bottomSheet" />
     </fragment>
 
     <fragment
@@ -75,5 +78,10 @@
             app:nullable="false" />
 
     </fragment>
+
+    <dialog
+        android:id="@+id/bottomSheet"
+        android:name="live.hms.app2.ui.meeting.participants.BottomSheetRoleChangeFragment"
+        tools:layout="@layout/layout_fragment_bottom_sheet_change_role" />
 
 </navigation>

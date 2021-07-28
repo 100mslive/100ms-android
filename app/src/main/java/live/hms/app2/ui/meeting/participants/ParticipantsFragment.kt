@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import live.hms.app2.R
@@ -96,16 +97,17 @@ class ParticipantsFragment : Fragment() {
       }
     }
 
-    sheetBehaviour = BottomSheetBehavior.from<FrameLayout>(binding.standardBottomSheet)
+//    sheetBehaviour = BottomSheetBehavior.from<FrameLayout>(binding.standardBottomSheet)
   }
 
-  fun onSheetClicked() {
-    if(sheetBehaviour.state != BottomSheetBehavior.STATE_EXPANDED) {
-      sheetBehaviour.state = BottomSheetBehavior.STATE_EXPANDED
-    } else if (sheetBehaviour.state != BottomSheetBehavior.STATE_COLLAPSED) {
-      sheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
+  private fun onSheetClicked() {
+//    if(sheetBehaviour.state != BottomSheetBehavior.STATE_EXPANDED) {
+//      sheetBehaviour.state = BottomSheetBehavior.STATE_EXPANDED
+//    } else if (sheetBehaviour.state != BottomSheetBehavior.STATE_COLLAPSED) {
+//      sheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+//    }
 
+    findNavController().navigate(R.id.action_ParticipantsFragment_to_bottomSheet)
   }
 
   private fun initViewModels() {
