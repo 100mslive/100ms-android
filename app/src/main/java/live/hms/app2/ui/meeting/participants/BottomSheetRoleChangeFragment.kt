@@ -53,9 +53,8 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
         ).also { arrayAdapter ->
             popupSpinner.adapter = arrayAdapter
             popupSpinner.prompt = "Role Change Request"
-            popupSpinner.setSelection(0, true)
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            popupSpinner.onItemSelectedListener = this
+            popupSpinner.post { popupSpinner.onItemSelectedListener = this }
         }
     }
 
@@ -86,5 +85,6 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         Log.d(TAG, "Nothing selected")
+        findNavController().popBackStack()
     }
 }
