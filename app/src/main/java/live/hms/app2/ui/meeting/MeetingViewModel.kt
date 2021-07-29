@@ -480,6 +480,8 @@ class MeetingViewModel(
     if( remotePeer != null && toRole != null) {
       if (remotePeer.hmsRole.name != toRole.name)
         hmsSDK.changeRole(remotePeer, toRole, force)
+      // Update the peer in participants
+        peerLiveDate.postValue(remotePeer)
       }
   }
 }
