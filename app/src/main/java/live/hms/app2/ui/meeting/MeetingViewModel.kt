@@ -273,6 +273,10 @@ class MeetingViewModel(
               dominantSpeaker.postValue(null)
             }
 
+            HMSPeerUpdate.ROLE_CHANGED -> {
+              peerLiveDate.postValue(hmsPeer)
+            }
+
             else -> Unit
           }
         }

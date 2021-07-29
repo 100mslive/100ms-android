@@ -74,7 +74,8 @@ class ParticipantsFragment : Fragment() {
   }
 
   private fun onSheetClicked(peer : HMSPeer) {
-    val action = ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(peer.peerID, meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray())
+    val action = ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(peer.peerID,
+      meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray())
     findNavController().navigate(action)
   }
 
