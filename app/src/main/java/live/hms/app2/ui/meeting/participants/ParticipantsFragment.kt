@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentParticipantsBinding
 import live.hms.app2.model.RoomDetails
@@ -16,11 +19,11 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
 import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.role.HMSRole
 
 class ParticipantsFragment : Fragment() {
-
 
   private var binding by viewLifecycle<FragmentParticipantsBinding>()
 
@@ -48,31 +51,8 @@ class ParticipantsFragment : Fragment() {
     adapter =
       ParticipantsAdapter(meetingViewModel.isAllowedToChangeRole(),
         meetingViewModel.getAvailableRoles(),
-        this::showDialog)
+      this::onSheetClicked)
     initViews()
-  }
-
-  private var alertDialog: AlertDialog? = null
-
-  private fun showDialog(remotePeer: HMSRemotePeer, toRole: HMSRole) {
-    val builder = AlertDialog.Builder(requireContext(), R.style.RoleChangeAlertDialogTheme)
-      .setMessage("Changing role of \"${remotePeer.name}\" from ${remotePeer.hmsRole.name} to ${toRole.name}")
-      .setTitle(R.string.role_change)
-      .setCancelable(false)
-
-    builder.setPositiveButton("Request Change") { dialog, _ ->
-      meetingViewModel.changeRole(remotePeer, toRole, false)
-      dialog.dismiss()
-      alertDialog = null
-    }
-
-    builder.setNegativeButton("Force Change") { dialog, _ ->
-      meetingViewModel.changeRole(remotePeer, toRole, true)
-      dialog.dismiss()
-      alertDialog = null
-    }
-
-    alertDialog = builder.create().apply { show() }
   }
 
   private fun initViews() {
@@ -91,6 +71,11 @@ class ParticipantsFragment : Fragment() {
         adapter.setItems(items)
       }
     }
+  }
+
+  private fun onSheetClicked(peer : HMSPeer) {
+    val action = ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(peer.peerID, meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray())
+    findNavController().navigate(action)
   }
 
   private fun initViewModels() {

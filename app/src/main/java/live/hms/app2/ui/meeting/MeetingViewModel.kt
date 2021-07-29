@@ -474,9 +474,13 @@ class MeetingViewModel(
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
   }
 
-  fun changeRole(remotePeer: HMSRemotePeer, toRole: HMSRole, force: Boolean) {
-    if (remotePeer.hmsRole.name != toRole.name)
-      hmsSDK.changeRole(remotePeer, toRole, force)
+  fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
+    val remotePeer = hmsSDK.getRemotePeers().find { it.peerID == remotePeerId }
+    val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
+    if( remotePeer != null && toRole != null) {
+      if (remotePeer.hmsRole.name != toRole.name)
+        hmsSDK.changeRole(remotePeer, toRole, force)
+      }
   }
 }
 
