@@ -4,15 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import live.hms.app2.R
 import live.hms.app2.databinding.FragmentParticipantsBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.MeetingViewModel
@@ -20,8 +16,6 @@ import live.hms.app2.ui.meeting.MeetingViewModelFactory
 import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.HMSRemotePeer
-import live.hms.video.sdk.models.role.HMSRole
 
 class ParticipantsFragment : Fragment() {
 
@@ -74,7 +68,7 @@ class ParticipantsFragment : Fragment() {
   }
 
   private fun onSheetClicked(peer : HMSPeer) {
-    val action = ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(peer.peerID, meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray())
+    val action = ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(peer.peerID, meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray(), peer.name)
     findNavController().navigate(action)
   }
 

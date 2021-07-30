@@ -89,6 +89,10 @@
         <argument
             android:name="availableRoles"
             app:argType="string[]" />
+        <argument
+            android:name="remotePeerName"
+            app:argType="string"
+            android:defaultValue='""' />
     </dialog>
 
 </navigation>
