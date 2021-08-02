@@ -321,6 +321,8 @@ class MeetingViewModel(
             HMSTrackUpdate.TRACK_MUTED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_UNMUTED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_DEGRADED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_RESTORED -> tracks.postValue(_tracks)
           }
         }
 
