@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.observe
 import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
@@ -68,24 +67,22 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       Log.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
       synchronized(tracks) {
         // Update lru just to keep it as much filled as possible
-        if (lru.size < lru.capacity) {
-          val required = lru.capacity - lru.size
-          val all = tracks.mapNotNull {
-            if (it.isScreen || it.audio == null) null
-            else LruItem(it.peer.peerID)
-          }
-          Log.i(TAG, "$all")
 
-          val extra = ArrayList<LruItem>()
-          val inLru = lru.getItemsInOrder()
-          for (item in all) {
-            if (inLru.find { item.peerId == it.peerId } == null) {
-              extra.add(item)
+        val required = lru.capacity // We'd always want enough to fill the lru
+        val all = tracks
+          .sortedByDescending {
+            if(it.audio == null || it.isScreen){
+              it.peer.name.hashCode() - 100
             }
-            if (extra.size == required) break
+            else
+              it.peer.name.hashCode()
+          }.take(required)
+          .map {
+            LruItem(it.peer.peerID)
           }
-          lru.update(extra)
-        }
+        Log.i(TAG, "$all")
+
+        lru.update(all)
 
         // Check for tracks not present
         val order = lru.getItemsInOrder()
