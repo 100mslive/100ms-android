@@ -72,7 +72,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         val all = tracks
           .sortedByDescending {
             if(it.audio == null || it.isScreen){
-              it.peer.name.hashCode() - 100
+              it.peer.name.hashCode() * -1 // Drop these ids really low.
             }
             else
               it.peer.name.hashCode()
