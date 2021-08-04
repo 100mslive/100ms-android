@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.observe
 import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
