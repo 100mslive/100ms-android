@@ -404,17 +404,21 @@ class MeetingViewModel(
         track.setVolume(if (isAudioMuted) 0.0 else 1.0)
       }
 
-      val _track = _tracks.find {
+      val peerTracks = _tracks.filter { it.peer.peerID == peer.peerID }
+      val _track = peerTracks.find {
         it.audio == null &&
-            it.peer.peerID == peer.peerID &&
-            it.isScreen.not()
+                it.isScreen.not()
       }
 
+      val maybeDuplicate = peerTracks.find { it.audio != null && it.isScreen.not() } != null
+
       if (_track == null) {
-        if (peer.isLocal) {
-          _tracks.add(0, MeetingTrack(peer, null, track))
-        } else {
-          _tracks.add(MeetingTrack(peer, null, track))
+        if(!maybeDuplicate) {
+          if (peer.isLocal) {
+            _tracks.add(0, MeetingTrack(peer, null, track))
+          } else {
+            _tracks.add(MeetingTrack(peer, null, track))
+          }
         }
       } else {
         _track.audio = track
@@ -427,16 +431,23 @@ class MeetingViewModel(
 
   private fun addVideoTrack(track: HMSVideoTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      // Check if this track already exists
-      val _track = _tracks.find { it.video == null && it.peer.peerID == peer.peerID }
-      if (_track == null) {
-        if (peer.isLocal) {
-          _tracks.add(0, MeetingTrack(peer, track, null))
-        } else {
-          _tracks.add(MeetingTrack(peer, track, null))
+
+      // If the track existed but had no video, add the video.
+      val existingPeerTracks = _tracks.filter { it.peer.peerID == peer.peerID }
+      // Among these there may be a duplicate
+      val isDuplicate = existingPeerTracks.find { it.video?.trackId == track.trackId } != null
+      // Among these, there may be a track with no video.
+      val unassignedTrack = existingPeerTracks.find { it.video == null && it.peer.peerID == peer.peerID }
+      if (unassignedTrack == null ) {
+        if(!isDuplicate) {
+          if (peer.isLocal) {
+            _tracks.add(0, MeetingTrack(peer, track, null))
+          } else {
+            _tracks.add(MeetingTrack(peer, track, null))
+          }
         }
       } else {
-        _track.video = track
+        unassignedTrack.video = track
       }
     }
 
@@ -487,8 +498,8 @@ class MeetingViewModel(
       if (remotePeer.hmsRole.name != toRole.name)
         hmsSDK.changeRole(remotePeer, toRole, force)
       // Update the peer in participants
-        peerLiveDate.postValue(remotePeer)
-      }
+      peerLiveDate.postValue(remotePeer)
+    }
   }
 }
 
