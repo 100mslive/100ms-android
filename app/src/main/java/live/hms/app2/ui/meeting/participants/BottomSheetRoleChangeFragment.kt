@@ -32,7 +32,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = LayoutFragmentBottomSheetChangeRoleBinding.inflate(inflater,container,false)
         return binding.root
@@ -52,7 +52,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
             spinnerRoles
         ).also { arrayAdapter ->
             popupSpinner.adapter = arrayAdapter
-            popupSpinner.prompt = "Role Change Request"
+            popupSpinner.prompt = "Changing ${args.remotePeerName}'s role to:"
             popupSpinner.setSelection(spinnerRoles.size - 1, false)
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             popupSpinner.post { popupSpinner.onItemSelectedListener = this }
