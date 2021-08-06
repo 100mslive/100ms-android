@@ -135,7 +135,7 @@ class SettingsStore(context: Context) {
     set(value) = putInt(VIDEO_FRAME_RATE, value)
 
   var username: String
-    get() = sharedPreferences.getString(USERNAME, Build.MODEL)!!
+    get() = sharedPreferences.getString(USERNAME, "Android " + Build.MODEL)!!
     set(value) = putString(USERNAME, value)
 
   var detectDominantSpeaker: Boolean
@@ -176,7 +176,7 @@ class SettingsStore(context: Context) {
     set(value) = putBoolean(LEAK_CANARY, value)
 
   var showReconnectingProgressBars: Boolean
-    get() = sharedPreferences.getBoolean(SHOW_RECONNECTING_PROGRESS_BARS, false)
+    get() = sharedPreferences.getBoolean(SHOW_RECONNECTING_PROGRESS_BARS, true)
     set(value) = putBoolean(SHOW_RECONNECTING_PROGRESS_BARS, value)
 
   var meetingMode: MeetingViewMode
