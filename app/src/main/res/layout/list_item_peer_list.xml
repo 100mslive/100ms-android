@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
@@ -19,8 +20,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/john_doe"
+            tools:text="@string/john_doe"
             android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/role_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="host"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:drawableEnd="@drawable/ic_settings_24"
+            />
 
         <ImageView
             android:id="@+id/icon_screen_share"
@@ -51,32 +62,6 @@
             android:contentDescription="@string/audio_status"
             android:src="@drawable/ic_mic_off_24"
             app:tint="@color/white_faded_70" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/remotePeerOptions"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/participant_mute_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/participant_mute_unmute" />
-
-        <Button
-            android:id="@+id/participant_kick"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/participant_kick" />
-
-        <Spinner
-            android:id="@+id/participant_change_role_spinner"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

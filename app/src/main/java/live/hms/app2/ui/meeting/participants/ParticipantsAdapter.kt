@@ -1,27 +1,20 @@
 package live.hms.app2.ui.meeting.participants
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.role.HMSRole
-import java.util.*
-import kotlin.collections.ArrayList
 
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   private val availableRoles: List<HMSRole>,
-  private val showDialog: (remotePeer: HMSRemotePeer, toRole: HMSRole) -> Unit,
+  private val showSheet : (HMSPeer) -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
-  private val availableRoleStrings = availableRoles.map { it.name }
   companion object {
     private const val TAG = "ParticipantsAdapter"
   }
@@ -30,32 +23,11 @@ class ParticipantsAdapter(
 
   inner class PeerViewHolder(
     private val binding: ListItemPeerListBinding
-  ) : RecyclerView.ViewHolder(binding.root), AdapterView.OnItemSelectedListener {
+  ) : RecyclerView.ViewHolder(binding.root) {
     init {
       with(binding) {
-
-        ArrayAdapter(
-          root.context,
-          android.R.layout.simple_list_item_1,
-          availableRoleStrings
-        )
-          .also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            participantChangeRoleSpinner.adapter = adapter
-          }
-        // Set the listener without triggering it
-        with(participantChangeRoleSpinner) {
-          isSelected = false
-          setSelection(0, true)
-          post { onItemSelectedListener = this@PeerViewHolder }
-
-        }
-        participantKick.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} kick!") }
-        participantMuteToggle.setOnClickListener { Log.d(TAG, "${items[adapterPosition]} mute!") }
+        roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
       }
-
     }
 
     fun bind(item: HMSPeer) {
@@ -64,22 +36,11 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        participantChangeRoleSpinner.setSelection(availableRoleStrings.indexOf(item.hmsRole.name))
-        remotePeerOptions.visibility = if (item.isLocal) View.GONE else View.VISIBLE
+        roleChange.text = item.hmsRole.name
         // Show change role option only if the role of the local peer allows
-        participantChangeRoleSpinner.visibility = if (isAllowedToChangeRole) View.VISIBLE else View.GONE
+        //  and if it's not the local peer itself.
+        roleChange.isEnabled = isAllowedToChangeRole && !item.isLocal
       }
-    }
-
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-      if (items[adapterPosition] is HMSRemotePeer && availableRoles[position].name != items[adapterPosition].hmsRole.name) {
-        showDialog(items[adapterPosition] as HMSRemotePeer, availableRoles[position])
-        Log.d("catsas", "Running the change role to ${availableRoles[position]}")
-      }
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-      Log.d("catsas", "NO change role item selected")
     }
 
   }

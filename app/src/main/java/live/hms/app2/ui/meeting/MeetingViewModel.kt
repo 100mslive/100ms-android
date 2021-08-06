@@ -273,6 +273,10 @@ class MeetingViewModel(
               dominantSpeaker.postValue(null)
             }
 
+            HMSPeerUpdate.ROLE_CHANGED -> {
+              peerLiveDate.postValue(hmsPeer)
+            }
+
             else -> Unit
           }
         }
@@ -317,6 +321,8 @@ class MeetingViewModel(
             HMSTrackUpdate.TRACK_MUTED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_UNMUTED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_DEGRADED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_RESTORED -> tracks.postValue(_tracks)
           }
         }
 
@@ -349,6 +355,9 @@ class MeetingViewModel(
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
         override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
+          Log.d(
+            TAG,
+            speakers.fold("Customer_User_IDs:") { cur: String, sp: HMSSpeaker -> cur + " ${sp.peer?.customerUserID}" })
           Log.v(TAG, "onAudioLevelUpdate: speakers=${speakers.toList()}")
           this@MeetingViewModel.speakers.postValue(speakers)
         }
@@ -471,9 +480,15 @@ class MeetingViewModel(
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
   }
 
-  fun changeRole(remotePeer: HMSRemotePeer, toRole: HMSRole, force: Boolean) {
-    if (remotePeer.hmsRole.name != toRole.name)
-      hmsSDK.changeRole(remotePeer, toRole, force)
+  fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
+    val remotePeer = hmsSDK.getRemotePeers().find { it.peerID == remotePeerId }
+    val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
+    if( remotePeer != null && toRole != null) {
+      if (remotePeer.hmsRole.name != toRole.name)
+        hmsSDK.changeRole(remotePeer, toRole, force)
+      // Update the peer in participants
+        peerLiveDate.postValue(remotePeer)
+      }
   }
 }
 

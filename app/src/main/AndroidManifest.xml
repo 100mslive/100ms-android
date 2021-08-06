@@ -20,7 +20,6 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.App2">
 
         <activity
