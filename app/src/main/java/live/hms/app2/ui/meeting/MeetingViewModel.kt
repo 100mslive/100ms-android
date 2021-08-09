@@ -490,5 +490,9 @@ class MeetingViewModel(
         peerLiveDate.postValue(remotePeer)
       }
   }
+
+  fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason : String) {
+    hmsSDK.removePeerRequest(hmsPeer, reason)
+  }
 }
 
