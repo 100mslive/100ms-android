@@ -146,6 +146,25 @@ class MeetingFragment : Fragment() {
 
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
+
+    menu.findItem(R.id.end_room).apply {
+      isVisible = meetingViewModel.isAllowedToEndMeeting()
+
+        setOnMenuItemClickListener {
+          meetingViewModel.endRoom(false)
+          true
+        }
+    }
+
+    menu.findItem(R.id.end_and_lock_room).apply {
+      isVisible = meetingViewModel.isAllowedToEndMeeting()
+
+      setOnMenuItemClickListener {
+        meetingViewModel.endRoom(true)
+        true
+      }
+    }
+
     menu.findItem(R.id.action_flip_camera).apply {
       val ok = meetingViewModel.meetingViewMode.value != MeetingViewMode.AUDIO_ONLY
       setVisible(ok)

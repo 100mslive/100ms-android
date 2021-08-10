@@ -485,6 +485,14 @@ class MeetingViewModel(
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
   }
 
+  fun isAllowedToEndMeeting() : Boolean {
+    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true
+  }
+
+  fun isAllowedToRemovePeers() : Boolean {
+    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.removeOthers == true
+  }
+
   fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
     val remotePeer = hmsSDK.getRemotePeers().find { it.peerID == remotePeerId }
     val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
@@ -498,6 +506,10 @@ class MeetingViewModel(
 
   fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason : String) {
     hmsSDK.removePeerRequest(hmsPeer, reason)
+  }
+
+  fun endRoom(lock : Boolean){
+    hmsSDK.endRoom("Closing time", lock)
   }
 }
 
