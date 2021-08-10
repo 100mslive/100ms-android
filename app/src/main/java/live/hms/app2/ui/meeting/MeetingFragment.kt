@@ -28,6 +28,7 @@ import live.hms.app2.util.*
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
 val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
+val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 class MeetingFragment : Fragment() {
 
   companion object {
@@ -221,6 +222,7 @@ class MeetingFragment : Fragment() {
       if(details != null) {
         putExtra(LEAVE_INFORMATION_PERSON, details.peerWhoRemoved?.name ?: "Someone")
         putExtra(LEAVE_INFORMATION_REASON, details.reason)
+        putExtra(LEAVE_INFROMATION_WAS_END_ROOM, details.roomWasEnded)
       }
       startActivity(this)
     }
