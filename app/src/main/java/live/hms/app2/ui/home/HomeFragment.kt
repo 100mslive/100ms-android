@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,6 +21,8 @@ import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.LEAVE_INFORMATION_PERSON
+import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
@@ -48,6 +51,15 @@ class HomeFragment : Fragment() {
           joinRoom()
         }
       }
+    }
+
+    val person = requireActivity().intent.getStringExtra(LEAVE_INFORMATION_PERSON)
+    val reason = requireActivity().intent.getStringExtra(LEAVE_INFORMATION_REASON)
+
+    if(person != null && reason != null){
+      requireActivity().intent.removeExtra(LEAVE_INFORMATION_PERSON)
+      requireActivity().intent.removeExtra(LEAVE_INFORMATION_REASON)
+      createForceLeaveDialog(person, reason)
     }
   }
 
@@ -229,6 +241,7 @@ class HomeFragment : Fragment() {
   }
 
   private fun initConnectButton() {
+
     binding.buttonJoinMeeting.setOnClickListener {
       try {
         val input = binding.editTextMeetingUrl.text.toString()
@@ -254,5 +267,19 @@ class HomeFragment : Fragment() {
         binding.containerMeetingUrl.error = e.message
       }
     }
+  }
+
+  private fun createForceLeaveDialog(removedBy : String, reason : String) {
+    val builder = AlertDialog.Builder(requireContext())
+      .setMessage("You were removed from the room by ${removedBy}.\nThe reason was: $reason")
+      .setTitle("Removed from the room.")
+      .setCancelable(false)
+
+    builder.setPositiveButton(R.string.ok) { dialog, _ ->
+      dialog.dismiss()
+    }
+
+    builder.create().apply { show() }
+
   }
 }

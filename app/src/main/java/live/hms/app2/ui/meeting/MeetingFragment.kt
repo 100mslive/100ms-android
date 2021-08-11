@@ -25,7 +25,9 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
-
+import live.hms.video.sdk.models.HMSRemovedFromRoom
+val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
+val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
 class MeetingFragment : Fragment() {
 
   companion object {
@@ -194,9 +196,13 @@ class MeetingFragment : Fragment() {
     return binding.root
   }
 
-  private fun goToHomePage() {
+  private fun goToHomePage(details : HMSRemovedFromRoom? = null) {
     Intent(requireContext(), HomeActivity::class.java).apply {
       crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
+      if(details != null) {
+        putExtra(LEAVE_INFORMATION_PERSON, details.peerWhoRemoved?.name ?: "Someone")
+        putExtra(LEAVE_INFORMATION_REASON, details.reason)
+      }
       startActivity(this)
     }
     requireActivity().finish()
@@ -327,8 +333,13 @@ class MeetingFragment : Fragment() {
           cleanup()
           hideProgressBar()
 
-          if (state.goToHome) goToHomePage()
+          if (state.goToHome) goToHomePage(state.removedFromRoom)
         }
+
+        is MeetingState.ForceLeave -> {
+          meetingViewModel.leaveMeeting(state.details)
+        }
+
       }
     }
 

@@ -7,12 +7,14 @@ import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.role.HMSRole
 
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   private val availableRoles: List<HMSRole>,
-  private val showSheet : (HMSPeer) -> Unit
+  private val showSheet : (HMSPeer) -> Unit,
+  private val requestPeerLeave : (HMSRemotePeer, String) -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   companion object {
@@ -27,6 +29,7 @@ class ParticipantsAdapter(
     init {
       with(binding) {
         roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
+        removePeer.setOnClickListener { requestPeerLeave(items[adapterPosition] as HMSRemotePeer, "Bye") }
       }
     }
 
@@ -40,6 +43,7 @@ class ParticipantsAdapter(
         // Show change role option only if the role of the local peer allows
         //  and if it's not the local peer itself.
         roleChange.isEnabled = isAllowedToChangeRole && !item.isLocal
+        removePeer.isEnabled == !item.isLocal
       }
     }
 

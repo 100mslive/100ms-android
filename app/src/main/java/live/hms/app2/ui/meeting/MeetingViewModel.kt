@@ -347,6 +347,11 @@ class MeetingViewModel(
           state.postValue(MeetingState.Reconnecting("Reconnecting", error.toString()))
         }
 
+        override fun onRemovedFromRoom(notification: HMSRemovedFromRoom) {
+          // Display a dialog that says they've been removed by X for Y with an ok button.
+          state.postValue(MeetingState.ForceLeave(notification))
+        }
+
         override fun onRoleChangeRequest(request: HMSRoleChangeRequest) {
           pendingRoleChange = request
           state.postValue(MeetingState.RoleChangeRequest(request))
@@ -390,11 +395,11 @@ class MeetingViewModel(
     }
   }
 
-  fun leaveMeeting() {
+  fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
     state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
     hmsSDK.leave()
     cleanup()
-    state.postValue(MeetingState.Disconnected(true))
+    state.postValue(MeetingState.Disconnected(true, details))
   }
 
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
@@ -489,6 +494,10 @@ class MeetingViewModel(
       // Update the peer in participants
         peerLiveDate.postValue(remotePeer)
       }
+  }
+
+  fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason : String) {
+    hmsSDK.removePeerRequest(hmsPeer, reason)
   }
 }
 

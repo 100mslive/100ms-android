@@ -24,6 +24,16 @@
             android:textSize="16sp" />
 
         <Button
+            android:id="@+id/removePeer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            />
+
+
+        <Button
             android:id="@+id/role_change"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

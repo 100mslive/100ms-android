@@ -45,7 +45,8 @@ class ParticipantsFragment : Fragment() {
     adapter =
       ParticipantsAdapter(meetingViewModel.isAllowedToChangeRole(),
         meetingViewModel.getAvailableRoles(),
-      this::onSheetClicked)
+      this::onSheetClicked,
+      meetingViewModel::requestPeerLeave)
     initViews()
   }
 
