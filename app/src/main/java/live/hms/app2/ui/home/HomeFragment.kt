@@ -274,15 +274,15 @@ class HomeFragment : Fragment() {
 
   private fun createForceLeaveDialog(removedBy : String, reason : String, wasRoomEnded : Boolean) {
     val message = if(wasRoomEnded) {
-      "You were removed from the room by ${removedBy}.\nThe reason was: $reason."
-    } else {
       "The room was ended by ${removedBy}.\nThe reason was $reason."
+    } else {
+      "You were removed from the room by ${removedBy}.\nThe reason was: $reason."
     }
 
     val title = if(wasRoomEnded) {
-      "Removed from the room"
-    } else {
       "Room Ended"
+    } else {
+      "Removed from the room"
     }
 
     val builder = AlertDialog.Builder(requireContext())
