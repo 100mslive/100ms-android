@@ -31,7 +31,7 @@ The Android SDK supports Android API level 21 and higher. It is built for armeab
 git clone --depth 1 https://github.com/100mslive/sample-app-android.git
 ```
 
-- Get your token generation endpoint [following this guide](https://100ms.gitbook.io/100ms-v2/server-side/100ms-quickstart-app-server)
+- Get your token generation endpoint [following this guide](https://docs.100ms.live/server-side/v2/foundation/authentication-and-tokensr)
 
 - Create `app/gradle.properties`
 
@@ -66,7 +66,7 @@ We have many examples for each mode in the sample app using [`RecyclerView`](htt
 
 ### 📞 Join meeting
 
-- Paste the exact Room ID as obtained from the [`create-room` API](https://docs.100ms.live/v2/server-side/Create-room)
+- Paste the exact Room ID as obtained after signing up for the [100ms Dashboard] (https://dashboard.100ms.live/register)
 
 - Click `Join Now`.
 - Video Conversation will be started 🎉
@@ -180,4 +180,4 @@ Related classes/files in this app:
 
 ## 📑 100ms SDK Documentation
 
-Refer the [Getting Started - Android](https://docs.100ms.live/v2/client-sdks/Getting-Started-v2-Android) guide to get detailed SDK information
+Refer the [Getting Started - Android](https://docs.100ms.live/android/v2/foundation/Basics) guide to get detailed SDK information
