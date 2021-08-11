@@ -534,6 +534,7 @@ class MeetingViewModel(
 
   fun endRoom(lock: Boolean) {
     hmsSDK.endRoom("Closing time", lock)
+    leaveMeeting()
   }
 
   fun togglePeerMute(hmsPeer: HMSRemotePeer) {
