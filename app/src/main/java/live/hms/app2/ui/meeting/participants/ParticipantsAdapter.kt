@@ -12,8 +12,11 @@ import live.hms.video.sdk.models.HMSRemotePeer
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   val isAllowedToKickPeer : Boolean,
+  val isAllowedToMutePeer : Boolean,
+  val isAllowedToAskUnmutePeer : Boolean,
   private val showSheet : (HMSPeer) -> Unit,
-  private val requestPeerLeave : (HMSRemotePeer, String) -> Unit
+  private val requestPeerLeave : (HMSRemotePeer, String) -> Unit,
+  private val togglePeerMute : (HMSRemotePeer) -> Unit,
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   companion object {
@@ -29,6 +32,7 @@ class ParticipantsAdapter(
       with(binding) {
         roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
         removePeer.setOnClickListener { requestPeerLeave(items[adapterPosition] as HMSRemotePeer, "Bye") }
+        muteUnmute.setOnClickListener { togglePeerMute(items[adapterPosition] as HMSRemotePeer) }
       }
     }
 
@@ -42,7 +46,19 @@ class ParticipantsAdapter(
         // Show change role option only if the role of the local peer allows
         //  and if it's not the local peer itself.
         roleChange.isEnabled = isAllowedToChangeRole && !item.isLocal
-        removePeer.isEnabled == !item.isLocal && isAllowedToKickPeer
+        removePeer.isEnabled = !item.isLocal && isAllowedToKickPeer
+        item.audioTrack?.let {
+          val isMute = it.isMute
+          muteUnmute.visibility = v(!item.isLocal &&
+                  (
+                          ( isAllowedToMutePeer && !isMute) ||
+                        (isAllowedToAskUnmutePeer && isMute)
+                          )
+          )
+          muteUnmute.text = if(isMute) "Unmute" else "Mute"
+        }
+
+
       }
     }
 

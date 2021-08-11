@@ -22,6 +22,7 @@ import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
+import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.utils.HMSCoroutineScope
 import java.util.*
 import kotlin.collections.ArrayList
@@ -51,7 +52,6 @@ class MeetingViewModel(
     }
 
   }
-
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
@@ -113,8 +113,10 @@ class MeetingViewModel(
 
   // Live data containing all the current tracks in a meeting
   val tracks = MutableLiveData(_tracks)
+
   // Live data containing the current Speaker in the meeting
   val speakers = MutableLiveData<Array<HMSSpeaker>>()
+
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
 
@@ -148,7 +150,7 @@ class MeetingViewModel(
     hmsSDK.preview(config, listener)
   }
 
-  fun setLocalVideoEnabled(enabled : Boolean) {
+  fun setLocalVideoEnabled(enabled: Boolean) {
 
     localVideoTrack?.apply {
 
@@ -161,10 +163,10 @@ class MeetingViewModel(
     }
   }
 
-  fun isLocalVideoEnabled() : Boolean? = localVideoTrack?.isMute?.not()
+  fun isLocalVideoEnabled(): Boolean? = localVideoTrack?.isMute?.not()
 
   fun toggleLocalVideo() {
-      localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
+    localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
   }
 
   fun setLocalAudioEnabled(enabled: Boolean) {
@@ -180,7 +182,7 @@ class MeetingViewModel(
 
   }
 
-  fun isLocalAudioEnabled() : Boolean? {
+  fun isLocalAudioEnabled(): Boolean? {
     return localAudioTrack?.isMute?.not()
   }
 
@@ -189,7 +191,7 @@ class MeetingViewModel(
     localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
 
-  fun isPeerAudioEnabled() : Boolean = !isAudioMuted
+  fun isPeerAudioEnabled(): Boolean = !isAudioMuted
 
   /**
    * Helper function to toggle others audio tracks
@@ -198,7 +200,7 @@ class MeetingViewModel(
     setPeerAudioEnabled(isAudioMuted)
   }
 
-  fun setPeerAudioEnabled(enabled : Boolean) {
+  fun setPeerAudioEnabled(enabled: Boolean) {
     isAudioMuted = !enabled
   }
 
@@ -233,6 +235,7 @@ class MeetingViewModel(
 
     HMSCoroutineScope.launch {
       hmsSDK.join(config, object : HMSUpdateListener {
+
         override fun onError(error: HMSException) {
           Log.e(TAG, "onError: $error")
           failures.add(error)
@@ -318,7 +321,16 @@ class MeetingViewModel(
               }
               removeTrack(track, peer)
             }
-            HMSTrackUpdate.TRACK_MUTED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_MUTED -> {
+              tracks.postValue(_tracks)
+              if (peer.isLocal) {
+                if(track.type == HMSTrackType.AUDIO)
+                  isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
+                else if(track.type == HMSTrackType.VIDEO){
+                  isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
+                }
+              }
+            }
             HMSTrackUpdate.TRACK_UNMUTED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_DEGRADED -> tracks.postValue(_tracks)
@@ -355,6 +367,10 @@ class MeetingViewModel(
         override fun onRoleChangeRequest(request: HMSRoleChangeRequest) {
           pendingRoleChange = request
           state.postValue(MeetingState.RoleChangeRequest(request))
+        }
+
+        override fun onChangeTrackStateRequest(details: HMSChangeTrackStateRequest) {
+          state.postValue(MeetingState.TrackChangeRequest(details))
         }
       })
 
@@ -411,8 +427,8 @@ class MeetingViewModel(
 
       val _track = _tracks.find {
         it.audio == null &&
-            it.peer.peerID == peer.peerID &&
-            it.isScreen.not()
+                it.peer.peerID == peer.peerID &&
+                it.isScreen.not()
       }
 
       if (_track == null) {
@@ -481,35 +497,57 @@ class MeetingViewModel(
 
   fun getAvailableRoles(): List<HMSRole> = hmsSDK.getRoles()
 
-  fun isAllowedToChangeRole() : Boolean {
+  fun isAllowedToChangeRole(): Boolean {
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
   }
 
-  fun isAllowedToEndMeeting() : Boolean {
+  fun isAllowedToEndMeeting(): Boolean {
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true
   }
 
-  fun isAllowedToRemovePeers() : Boolean {
+  fun isAllowedToRemovePeers(): Boolean {
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.removeOthers == true
+  }
+
+  fun isAllowedToMutePeers(): Boolean {
+    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.muteSelective == true
+  }
+
+  fun isAllowedToAskUnmutePeers(): Boolean {
+    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.askToUnmute == true
   }
 
   fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
     val remotePeer = hmsSDK.getRemotePeers().find { it.peerID == remotePeerId }
     val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
-    if( remotePeer != null && toRole != null) {
+    if (remotePeer != null && toRole != null) {
       if (remotePeer.hmsRole.name != toRole.name)
         hmsSDK.changeRole(remotePeer, toRole, force)
       // Update the peer in participants
-        peerLiveDate.postValue(remotePeer)
-      }
+      peerLiveDate.postValue(remotePeer)
+    }
   }
 
-  fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason : String) {
+  fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason: String) {
     hmsSDK.removePeerRequest(hmsPeer, reason)
   }
 
-  fun endRoom(lock : Boolean){
+  fun endRoom(lock: Boolean) {
     hmsSDK.endRoom("Closing time", lock)
   }
+
+  fun togglePeerMute(hmsPeer: HMSRemotePeer) {
+    val audioTrack = hmsPeer.audioTrack
+
+    if (audioTrack != null) {
+      val isMute = audioTrack.isMute
+      if (isAllowedToAskUnmutePeers() && isMute) {
+        hmsSDK.changeTrackState(audioTrack, false)
+      } else if (isAllowedToMutePeers() && !isMute) {
+        hmsSDK.changeTrackState(audioTrack, true)
+      }
+    }
+  }
+
 }
 

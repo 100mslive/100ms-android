@@ -25,6 +25,8 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.media.tracks.HMSLocalAudioTrack
+import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
 val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
@@ -291,6 +293,43 @@ class MeetingFragment : Fragment() {
 
           alertDialog = builder.create().apply { show() }
         }
+
+        is MeetingState.TrackChangeRequest -> {
+          alertDialog?.dismiss()
+          alertDialog = null
+          hideProgressBar()
+
+          val message = if(state.trackChangeRequest.track is HMSLocalAudioTrack) {
+            "${state.trackChangeRequest.requestedBy.name} is asking you to unmute."
+          } else {
+            "${state.trackChangeRequest.requestedBy.name} is asking you to turn on video."
+          }
+
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage(message)
+            .setTitle(R.string.track_change_request)
+            .setCancelable(false)
+
+          builder.setPositiveButton(R.string.turn_on) { dialog, _ ->
+            if(state.trackChangeRequest.track is HMSLocalAudioTrack) {
+              meetingViewModel.setLocalAudioEnabled(true)
+            } else if (state.trackChangeRequest.track is HMSLocalVideoTrack) {
+              meetingViewModel.toggleLocalVideo()
+            }
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+          builder.setNegativeButton(R.string.reject) { dialog, _ ->
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+          alertDialog = builder.create().apply { show() }
+        }
+
 
         is MeetingState.RoleChangeRequest -> {
           alertDialog?.dismiss()
