@@ -473,7 +473,7 @@ class MeetingViewModel(
 
   private fun removeTrack(track: HMSTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      val trackToRemove = when (track.type) {
+      val meetingTrack = when (track.type) {
         HMSTrackType.AUDIO -> {
           _tracks.find {
             it.peer.peerID == peer.peerID &&
@@ -488,7 +488,16 @@ class MeetingViewModel(
         }
       }
 
-      _tracks.remove(trackToRemove)
+      if (track.type == HMSTrackType.AUDIO) {
+        meetingTrack?.audio = null
+      } else if (track.type == HMSTrackType.VIDEO) {
+        meetingTrack?.video = null
+      }
+
+      if (meetingTrack?.audio == null &&  meetingTrack?.video == null) {
+        // Remove tile from view since both audio and video track are null
+        _tracks.remove(meetingTrack)
+      }
 
       // Update the view as we have removed some views
       tracks.postValue(_tracks)
