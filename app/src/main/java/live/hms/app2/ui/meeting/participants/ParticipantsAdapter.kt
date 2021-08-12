@@ -40,7 +40,7 @@ class ParticipantsAdapter(
         peerRole.text = item.hmsRole.name
         // Show change role option only if the role of the local peer allows
         //  and if it's not the local peer itself.
-        peerSettings.isEnabled = !item.isLocal && (isAllowedToChangeRole || isAllowedToAskUnmutePeer || isAllowedToMutePeer || isAllowedToKickPeer )
+        peerSettings.visibility = v(!item.isLocal && (isAllowedToChangeRole || isAllowedToAskUnmutePeer || isAllowedToMutePeer || isAllowedToKickPeer ))
       }
     }
 

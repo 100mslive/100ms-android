@@ -86,10 +86,14 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                     }
                 }
 
+                Log.d(TAG, "Peer video null? ${peer.videoTrack == null}")
+
                 peer.videoTrack?.let {
                     setTrackMuteButtonVisibility(it, peer, muteUnmuteVideo, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
-                    muteUnmuteVideo.setOnClickListener { meetingViewModel.togglePeerMute(peer, HMSTrackType.VIDEO)
-                        findNavController().popBackStack()}
+                    muteUnmuteVideo.setOnClickListener {
+                        meetingViewModel.togglePeerMute(peer, HMSTrackType.VIDEO)
+                        findNavController().popBackStack()
+                    }
                 }
 
                 if(meetingViewModel.isAllowedToRemovePeers()) {

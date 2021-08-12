@@ -551,6 +551,8 @@ class MeetingViewModel(
       } else if (isAllowedToMutePeers() && !isMute) {
         hmsSDK.changeTrackState(track, true)
       }
+    } else {
+      Log.d(TAG, "track was null")
     }
   }
 
