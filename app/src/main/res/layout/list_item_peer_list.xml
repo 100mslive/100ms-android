@@ -67,9 +67,21 @@
 
 
             <Button
-                android:id="@+id/muteUnmute"
+                android:id="@+id/muteUnmuteVideo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                tools:text="Mute"
+                android:drawableLeft="@drawable/ic_videocam_24"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                />
+
+
+            <Button
+                android:id="@+id/muteUnmuteAudio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_mic_24"
                 tools:text="Mute"
                 android:layout_marginEnd="4dp"
                 android:layout_marginStart="4dp"

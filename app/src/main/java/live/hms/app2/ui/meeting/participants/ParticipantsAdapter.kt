@@ -3,9 +3,12 @@ package live.hms.app2.ui.meeting.participants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemPeerListBinding
+import live.hms.video.media.tracks.HMSTrack
+import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
 
@@ -16,7 +19,7 @@ class ParticipantsAdapter(
   val isAllowedToAskUnmutePeer : Boolean,
   private val showSheet : (HMSPeer) -> Unit,
   private val requestPeerLeave : (HMSRemotePeer, String) -> Unit,
-  private val togglePeerMute : (HMSRemotePeer) -> Unit,
+  private val togglePeerMute : (HMSRemotePeer, HMSTrackType) -> Unit,
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   companion object {
@@ -32,7 +35,8 @@ class ParticipantsAdapter(
       with(binding) {
         roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
         removePeer.setOnClickListener { requestPeerLeave(items[adapterPosition] as HMSRemotePeer, "Bye") }
-        muteUnmute.setOnClickListener { togglePeerMute(items[adapterPosition] as HMSRemotePeer) }
+        muteUnmuteAudio.setOnClickListener { togglePeerMute(items[adapterPosition] as HMSRemotePeer, HMSTrackType.AUDIO) }
+        muteUnmuteVideo.setOnClickListener { togglePeerMute(items[adapterPosition] as HMSRemotePeer, HMSTrackType.VIDEO) }
       }
     }
 
@@ -48,20 +52,26 @@ class ParticipantsAdapter(
         roleChange.isEnabled = isAllowedToChangeRole && !item.isLocal
         removePeer.isEnabled = !item.isLocal && isAllowedToKickPeer
         item.audioTrack?.let {
-          val isMute = it.isMute
-          muteUnmute.visibility = v(!item.isLocal &&
-                  (
-                          ( isAllowedToMutePeer && !isMute) ||
-                        (isAllowedToAskUnmutePeer && isMute)
-                          )
-          )
-          muteUnmute.text = if(isMute) "Unmute" else "Mute"
+          setTrackMuteButtonVisibility(it, item, muteUnmuteAudio)
         }
 
-
+        item.videoTrack?.let {
+          setTrackMuteButtonVisibility(it, item, muteUnmuteVideo)
+        }
       }
     }
 
+  }
+
+  fun setTrackMuteButtonVisibility(it: HMSTrack, item: HMSPeer, button : Button) {
+    val isMute = it.isMute
+    button.visibility = v(!item.isLocal &&
+            (
+                    ( isAllowedToMutePeer && !isMute) ||
+                            (isAllowedToAskUnmutePeer && isMute)
+                    )
+    )
+    button.text = if(isMute) "Unmute" else "Mute"
   }
 
   private val items = ArrayList<HMSPeer>()
