@@ -81,16 +81,21 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
 
                 peer.audioTrack?.let {
                     setTrackMuteButtonVisibility(it, peer, muteUnmuteAudio, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
-                    muteUnmuteAudio.setOnClickListener { meetingViewModel.togglePeerMute(peer, HMSTrackType.AUDIO) }
+                    muteUnmuteAudio.setOnClickListener { meetingViewModel.togglePeerMute(peer, HMSTrackType.AUDIO)
+                        findNavController().popBackStack()
+                    }
                 }
 
                 peer.videoTrack?.let {
                     setTrackMuteButtonVisibility(it, peer, muteUnmuteVideo, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
-                    muteUnmuteVideo.setOnClickListener { meetingViewModel.togglePeerMute(peer, HMSTrackType.VIDEO) }
+                    muteUnmuteVideo.setOnClickListener { meetingViewModel.togglePeerMute(peer, HMSTrackType.VIDEO)
+                        findNavController().popBackStack()}
                 }
 
                 if(meetingViewModel.isAllowedToRemovePeers()) {
-                    removePeer.setOnClickListener { meetingViewModel.requestPeerLeave(peer, "Bye") }
+                    removePeer.setOnClickListener { meetingViewModel.requestPeerLeave(peer, "Bye")
+                        findNavController().popBackStack()
+                    }
                     removePeer.visibility = View.VISIBLE
                 } else {
                     removePeer.visibility = View.GONE
@@ -113,7 +118,8 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                                 (isAllowedToAskUnmutePeer && isMute)
                         )
         )
-        val text = if(isMute) "Unmute" else "Mute" + " " + if(it.type == HMSTrackType.VIDEO) "Video" else "Audio"
+        var text = if(isMute) "Unmute" else "Mute"
+        text += " " + if(it.type == HMSTrackType.VIDEO) "Video" else "Audio"
 
         button.text = text
     }
