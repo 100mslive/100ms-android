@@ -554,5 +554,9 @@ class MeetingViewModel(
     }
   }
 
+  fun getPeerForId(peerId : String) : HMSPeer? {
+    return hmsSDK.getPeers().find { it.peerID == peerId }
+  }
+
 }
 

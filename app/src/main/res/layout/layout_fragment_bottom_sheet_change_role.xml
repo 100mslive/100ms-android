@@ -27,12 +27,34 @@
             android:layout_height="wrap_content"
             android:text="Prompt to change role" />
 
+
         <Button
             android:id="@+id/forceChangeRole"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Force change role" />
 
+
+        <Button
+            android:id="@+id/muteUnmuteVideo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_videocam_24"
+            android:text="Ask to unmute" />
+
+        <Button
+            android:id="@+id/muteUnmuteAudio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_mic_24"
+            android:text="Ask to unmute" />
+
+
+        <Button
+            android:id="@+id/removePeer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Remove Peer" />
         <Space
             android:layout_width="0dp"
             android:layout_height="24dp"

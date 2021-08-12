@@ -65,43 +65,18 @@
             android:paddingTop="4dp"
             android:orientation="horizontal">
 
-
-            <Button
-                android:id="@+id/muteUnmuteVideo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="Mute"
-                android:drawableLeft="@drawable/ic_videocam_24"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                />
-
-
-            <Button
-                android:id="@+id/muteUnmuteAudio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_mic_24"
-                tools:text="Mute"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                />
-
-
-            <Button
-                android:id="@+id/removePeer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Remove"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                />
-
-            <Button
-                android:id="@+id/role_change"
+            <TextView
+                android:id="@+id/peerRole"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 tools:text="host"
+                android:layout_marginStart="4dp"
+                />
+
+            <ImageButton
+                android:id="@+id/peerSettings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="4dp"
                 android:layout_marginStart="4dp"
                 android:drawableEnd="@drawable/ic_settings_24"

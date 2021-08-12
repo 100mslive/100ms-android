@@ -3,23 +3,17 @@ package live.hms.app2.ui.meeting.participants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemPeerListBinding
-import live.hms.video.media.tracks.HMSTrack
-import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.HMSRemotePeer
 
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   val isAllowedToKickPeer : Boolean,
   val isAllowedToMutePeer : Boolean,
   val isAllowedToAskUnmutePeer : Boolean,
-  private val showSheet : (HMSPeer) -> Unit,
-  private val requestPeerLeave : (HMSRemotePeer, String) -> Unit,
-  private val togglePeerMute : (HMSRemotePeer, HMSTrackType) -> Unit,
+  private val showSheet : (HMSPeer) -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   companion object {
@@ -33,10 +27,7 @@ class ParticipantsAdapter(
   ) : RecyclerView.ViewHolder(binding.root) {
     init {
       with(binding) {
-        roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
-        removePeer.setOnClickListener { requestPeerLeave(items[adapterPosition] as HMSRemotePeer, "Bye") }
-        muteUnmuteAudio.setOnClickListener { togglePeerMute(items[adapterPosition] as HMSRemotePeer, HMSTrackType.AUDIO) }
-        muteUnmuteVideo.setOnClickListener { togglePeerMute(items[adapterPosition] as HMSRemotePeer, HMSTrackType.VIDEO) }
+        peerSettings.setOnClickListener { showSheet(items[adapterPosition]) }
       }
     }
 
@@ -46,32 +37,13 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        roleChange.text = item.hmsRole.name
+        peerRole.text = item.hmsRole.name
         // Show change role option only if the role of the local peer allows
         //  and if it's not the local peer itself.
-        roleChange.isEnabled = isAllowedToChangeRole && !item.isLocal
-        removePeer.isEnabled = !item.isLocal && isAllowedToKickPeer
-        item.audioTrack?.let {
-          setTrackMuteButtonVisibility(it, item, muteUnmuteAudio)
-        }
-
-        item.videoTrack?.let {
-          setTrackMuteButtonVisibility(it, item, muteUnmuteVideo)
-        }
+        peerSettings.isEnabled = !item.isLocal && (isAllowedToChangeRole || isAllowedToAskUnmutePeer || isAllowedToMutePeer || isAllowedToKickPeer )
       }
     }
 
-  }
-
-  fun setTrackMuteButtonVisibility(it: HMSTrack, item: HMSPeer, button : Button) {
-    val isMute = it.isMute
-    button.visibility = v(!item.isLocal &&
-            (
-                    ( isAllowedToMutePeer && !isMute) ||
-                            (isAllowedToAskUnmutePeer && isMute)
-                    )
-    )
-    button.text = if(isMute) "Unmute" else "Mute"
   }
 
   private val items = ArrayList<HMSPeer>()
