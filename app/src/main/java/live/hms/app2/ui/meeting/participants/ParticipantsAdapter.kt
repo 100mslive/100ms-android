@@ -7,16 +7,13 @@ import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.HMSRemotePeer
 
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   val isAllowedToKickPeer : Boolean,
   val isAllowedToMutePeer : Boolean,
   val isAllowedToAskUnmutePeer : Boolean,
-  private val showSheet : (HMSPeer) -> Unit,
-  private val requestPeerLeave : (HMSRemotePeer, String) -> Unit,
-  private val togglePeerMute : (HMSRemotePeer) -> Unit,
+  private val showSheet : (HMSPeer) -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   companion object {
@@ -30,9 +27,7 @@ class ParticipantsAdapter(
   ) : RecyclerView.ViewHolder(binding.root) {
     init {
       with(binding) {
-        roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
-        removePeer.setOnClickListener { requestPeerLeave(items[adapterPosition] as HMSRemotePeer, "Bye") }
-        muteUnmute.setOnClickListener { togglePeerMute(items[adapterPosition] as HMSRemotePeer) }
+        peerSettings.setOnClickListener { showSheet(items[adapterPosition]) }
       }
     }
 
@@ -42,23 +37,10 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        roleChange.text = item.hmsRole.name
+        peerRole.text = item.hmsRole.name
         // Show change role option only if the role of the local peer allows
         //  and if it's not the local peer itself.
-        roleChange.isEnabled = isAllowedToChangeRole && !item.isLocal
-        removePeer.isEnabled = !item.isLocal && isAllowedToKickPeer
-        item.audioTrack?.let {
-          val isMute = it.isMute
-          muteUnmute.visibility = v(!item.isLocal &&
-                  (
-                          ( isAllowedToMutePeer && !isMute) ||
-                        (isAllowedToAskUnmutePeer && isMute)
-                          )
-          )
-          muteUnmute.text = if(isMute) "Unmute" else "Mute"
-        }
-
-
+        peerSettings.visibility = v(!item.isLocal && (isAllowedToChangeRole || isAllowedToAskUnmutePeer || isAllowedToMutePeer || isAllowedToKickPeer ))
       }
     }
 

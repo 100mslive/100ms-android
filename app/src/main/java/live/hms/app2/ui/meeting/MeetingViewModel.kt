@@ -537,17 +537,27 @@ class MeetingViewModel(
     leaveMeeting()
   }
 
-  fun togglePeerMute(hmsPeer: HMSRemotePeer) {
-    val audioTrack = hmsPeer.audioTrack
+  fun togglePeerMute(hmsPeer: HMSRemotePeer, type: HMSTrackType) {
 
-    if (audioTrack != null) {
-      val isMute = audioTrack.isMute
-      if (isAllowedToAskUnmutePeers() && isMute) {
-        hmsSDK.changeTrackState(audioTrack, false)
-      } else if (isAllowedToMutePeers() && !isMute) {
-        hmsSDK.changeTrackState(audioTrack, true)
-      }
+    val track = when(type) {
+      HMSTrackType.AUDIO -> hmsPeer.audioTrack
+      HMSTrackType.VIDEO -> hmsPeer.videoTrack
     }
+
+    if (track != null) {
+      val isMute = track.isMute
+      if (isAllowedToAskUnmutePeers() && isMute) {
+        hmsSDK.changeTrackState(track, false)
+      } else if (isAllowedToMutePeers() && !isMute) {
+        hmsSDK.changeTrackState(track, true)
+      }
+    } else {
+      Log.d(TAG, "track was null")
+    }
+  }
+
+  fun getPeerForId(peerId : String) : HMSPeer? {
+    return hmsSDK.getPeers().find { it.peerID == peerId }
   }
 
 }

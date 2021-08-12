@@ -47,9 +47,7 @@ class ParticipantsFragment : Fragment() {
         meetingViewModel.isAllowedToRemovePeers(),
         meetingViewModel.isAllowedToMutePeers(),
         meetingViewModel.isAllowedToAskUnmutePeers(),
-      this::onSheetClicked,
-      meetingViewModel::requestPeerLeave,
-      meetingViewModel::togglePeerMute)
+      this::onSheetClicked)
     initViews()
   }
 
