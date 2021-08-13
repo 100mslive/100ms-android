@@ -98,7 +98,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun convertPeersToChatMembers(listOfParticipants : Array<HMSPeer>) : List<Recipient> {
     return listOf(Recipient.Everyone)
-      .plus(listOfParticipants.map { Recipient.Role(it.hmsRole) }.toSet())
+      .plus(listOfParticipants.distinctBy { it.hmsRole.name }.map { Recipient.Role(it.hmsRole) })
       .plus(listOfParticipants.map { Recipient.Peer(it) })
   }
 
