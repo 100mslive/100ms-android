@@ -13,10 +13,7 @@ import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.*
-import live.hms.video.sdk.HMSAudioListener
-import live.hms.video.sdk.HMSPreviewListener
-import live.hms.video.sdk.HMSSDK
-import live.hms.video.sdk.HMSUpdateListener
+import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.enums.HMSRoomUpdate
@@ -205,7 +202,15 @@ class MeetingViewModel(
   }
 
   fun sendChatMessage(message: String) {
-    hmsSDK.sendMessage("chat", message)
+    hmsSDK.sendBroadcastMessage(message, "chat", object : HMSCallback{
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess() {
+        // Request Successfully sent to server
+      }
+    })
   }
 
   private fun cleanup() {
@@ -343,7 +348,7 @@ class MeetingViewModel(
           broadcastsReceived.postValue(
             ChatMessage(
               message.sender.name,
-              Date(),
+              message.time,
               message.message,
               false
             )
@@ -538,11 +543,27 @@ class MeetingViewModel(
   }
 
   fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason: String) {
-    hmsSDK.removePeerRequest(hmsPeer, reason)
+    hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSCallback{
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess() {
+        // Request Successfully sent to server
+      }
+    })
   }
 
   fun endRoom(lock: Boolean) {
-    hmsSDK.endRoom("Closing time", lock)
+    hmsSDK.endRoom("Closing time", lock, object : HMSCallback{
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess() {
+        // Request Successfully sent to server
+      }
+    })
     leaveMeeting()
   }
 
@@ -556,9 +577,25 @@ class MeetingViewModel(
     if (track != null) {
       val isMute = track.isMute
       if (isAllowedToAskUnmutePeers() && isMute) {
-        hmsSDK.changeTrackState(track, false)
+        hmsSDK.changeTrackState(track, false, object : HMSCallback{
+          override fun onError(error: HMSException) {
+            Log.e(TAG, error.message)
+          }
+
+          override fun onSuccess() {
+            // Request Successfully sent to server
+          }
+        })
       } else if (isAllowedToMutePeers() && !isMute) {
-        hmsSDK.changeTrackState(track, true)
+        hmsSDK.changeTrackState(track, true, object : HMSCallback{
+          override fun onError(error: HMSException) {
+            Log.e(TAG, error.message)
+          }
+
+          override fun onSuccess() {
+            // Request Successfully sent to server
+          }
+        })
       }
     } else {
       Log.d(TAG, "track was null")
