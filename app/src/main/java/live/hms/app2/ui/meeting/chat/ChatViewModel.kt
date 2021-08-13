@@ -10,6 +10,7 @@ import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.HMSMessage
 import live.hms.video.sdk.models.HMSMessageRecipient
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.role.HMSRole
 import java.util.*
@@ -114,14 +115,14 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   }
 
   fun peersUpdate() {
-    _chatMembers.postValue(convertPeersToChatMembers(hmssdk.getPeers()))
+    _chatMembers.postValue(convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles()))
   }
 
-  private fun convertPeersToChatMembers(listOfParticipants : Array<HMSPeer>) : List<Recipient> {
+  private fun convertPeersToChatMembers(listOfParticipants : Array<HMSRemotePeer>, roles : List<HMSRole>) : List<Recipient> {
     return listOf(Recipient.Everyone)
-      .plus(listOfParticipants.distinctBy { it.hmsRole.name }.map { Recipient.Role(it.hmsRole) })
+      .plus(roles.map { Recipient.Role(it) })
       // Remove local peers (yourself) from the list of people you can message.
-      .plus(listOfParticipants.filterNot { it.isLocal }.map { Recipient.Peer(it) })
+      .plus(listOfParticipants.map { Recipient.Peer(it) })
   }
 
   fun recipientSelected(recipient: Recipient) {
