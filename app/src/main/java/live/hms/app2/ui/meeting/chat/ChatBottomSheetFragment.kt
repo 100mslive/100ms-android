@@ -99,7 +99,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
             messageStr,
             true
         )
-        chatViewModel.broadcast(message)
+        chatViewModel.sendMessage(message)
         binding.editTextMessage.setText("")
       }
     }

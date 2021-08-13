@@ -8,6 +8,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSCallback
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.role.HMSRole
 
 class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
@@ -20,7 +21,43 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   val chatMembers : LiveData<List<Recipient>> = _chatMembers
   private var currentSelectedRecipient : Recipient = Recipient.Everyone
 
-  fun broadcast(message: ChatMessage) {
+  fun sendMessage(message : ChatMessage) {
+    // Decide where it should go.
+    when(val recipient = currentSelectedRecipient) {
+      Recipient.Everyone -> broadcast(message)
+      is Recipient.Peer -> directMessage(message, recipient.peer)
+      is Recipient.Role -> groupMessage(message, recipient.role)
+    }
+  }
+
+  private fun directMessage(message : ChatMessage, peer : HMSPeer) {
+    hmssdk.sendDirectMessage(message.message, "chat", peer, object : HMSCallback {
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess() {
+        // Request Successfully sent to server
+      }
+
+    })
+  }
+
+  private fun groupMessage(message: ChatMessage, role : HMSRole) {
+    addMessage(message)
+    hmssdk.sendGroupMessage(message.message, "chat", listOf(role), object : HMSCallback {
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess() {
+        // Request Successfully sent to server
+      }
+
+    })
+  }
+
+  private fun broadcast(message: ChatMessage) {
     addMessage(message)
     hmssdk.sendBroadcastMessage(message.message, "chat", object : HMSCallback {
       override fun onError(error: HMSException) {
@@ -61,8 +98,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun convertPeersToChatMembers(listOfParticipants : Array<HMSPeer>) : List<Recipient> {
     return listOf(Recipient.Everyone)
-      .plus(listOfParticipants.map { Recipient.Role(it.hmsRole.name) }.toSet())
-      .plus(listOfParticipants.map { Recipient.Peer(it.peerID, it.name) })
+      .plus(listOfParticipants.map { Recipient.Role(it.hmsRole) }.toSet())
+      .plus(listOfParticipants.map { Recipient.Peer(it) })
   }
 
   fun recipientSelected(recipient: Recipient) {
