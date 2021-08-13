@@ -9,6 +9,7 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.chat.ChatMessage
+import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
@@ -339,7 +340,7 @@ class MeetingViewModel(
               message.serverReceiveTime,
               message.message,
               false,
-              recipient = message.recipient
+              recipient = Recipient.toRecipient(message.recipient)
             )
           )
         }

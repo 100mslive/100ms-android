@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemChatBinding
-import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,10 +25,10 @@ class ChatAdapter(
     }
 
     private fun getRecipientText(message: ChatMessage): String =
-      when(message.recipient.recipientType) {
-        HMSMessageRecipientType.BROADCAST -> ""
-        HMSMessageRecipientType.PEER -> " (to ${message.recipient.recipientPeer?.name})"
-        HMSMessageRecipientType.ROLES -> " (to ${message.recipient.recipientRoles.firstOrNull()?.name})"
+      when(message.recipient) {
+        Recipient.Everyone -> ""
+        is Recipient.Peer -> " (to ${message.recipient.peer.name})"
+        is Recipient.Role -> " (to ${message.recipient.role.name})"
       }
   }
 

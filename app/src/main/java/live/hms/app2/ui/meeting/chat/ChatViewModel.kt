@@ -8,10 +8,8 @@ import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSMessageResultListener
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.HMSMessage
-import live.hms.video.sdk.models.HMSMessageRecipient
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
-import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
 import java.util.*
@@ -35,19 +33,17 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
       Date(),
       messageStr,
       true,
-      HMSMessageRecipient()
+      Recipient.Everyone
     )
 
     // Decide where it should go.
     when(val recipient = currentSelectedRecipient) {
-      Recipient.Everyone -> broadcast(message.copy(recipient = HMSMessageRecipient()))
+      Recipient.Everyone -> broadcast( message )
       is Recipient.Peer -> directMessage(
-        message.copy(recipient = HMSMessageRecipient(recipientPeer = recipient.peer,
-                                                  recipientType = HMSMessageRecipientType.PEER)),
+        message.copy(recipient = Recipient.Peer(recipient.peer)),
         recipient.peer)
       is Recipient.Role -> groupMessage(
-        message.copy(recipient = HMSMessageRecipient(recipientRoles = listOf(recipient.role),
-          recipientType = HMSMessageRecipientType.ROLES)),
+        message.copy(recipient = Recipient.Role(recipient.role)),
         recipient.role)
     }
   }
