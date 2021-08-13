@@ -12,6 +12,7 @@ import live.hms.video.sdk.models.HMSMessageRecipient
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
+import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
 import java.util.*
 import kotlin.collections.ArrayList
@@ -53,7 +54,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun directMessage(message : ChatMessage, peer : HMSPeer) {
     addMessage(message)
-    hmssdk.sendDirectMessage(message.message, "chat", peer, object : HMSMessageResultListener {
+    hmssdk.sendDirectMessage(message.message, HMSMessageType.CHAT, peer, object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
@@ -67,7 +68,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun groupMessage(message: ChatMessage, role : HMSRole) {
     addMessage(message)
-    hmssdk.sendGroupMessage(message.message, "chat", listOf(role), object : HMSMessageResultListener {
+    hmssdk.sendGroupMessage(message.message, HMSMessageType.CHAT, listOf(role), object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
@@ -81,7 +82,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun broadcast(message: ChatMessage) {
     addMessage(message)
-    hmssdk.sendBroadcastMessage(message.message, "chat", object : HMSMessageResultListener {
+    hmssdk.sendBroadcastMessage(message.message, HMSMessageType.CHAT, object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
