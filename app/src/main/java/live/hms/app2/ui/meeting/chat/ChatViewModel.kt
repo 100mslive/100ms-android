@@ -5,8 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import live.hms.video.error.HMSException
-import live.hms.video.sdk.HMSCallback
+import live.hms.video.sdk.HMSMessageResultListener
 import live.hms.video.sdk.HMSSDK
+import live.hms.video.sdk.models.HMSMessage
 import live.hms.video.sdk.models.HMSMessageRecipient
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
@@ -51,12 +52,12 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun directMessage(message : ChatMessage, peer : HMSPeer) {
     addMessage(message)
-    hmssdk.sendDirectMessage(message.message, "chat", peer, object : HMSCallback {
+    hmssdk.sendDirectMessage(message.message, "chat", peer, object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
 
-      override fun onSuccess() {
+      override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
       }
 
@@ -65,12 +66,12 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun groupMessage(message: ChatMessage, role : HMSRole) {
     addMessage(message)
-    hmssdk.sendGroupMessage(message.message, "chat", listOf(role), object : HMSCallback {
+    hmssdk.sendGroupMessage(message.message, "chat", listOf(role), object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
 
-      override fun onSuccess() {
+      override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
       }
 
@@ -79,12 +80,12 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun broadcast(message: ChatMessage) {
     addMessage(message)
-    hmssdk.sendBroadcastMessage(message.message, "chat", object : HMSCallback {
+    hmssdk.sendBroadcastMessage(message.message, "chat", object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
 
-      override fun onSuccess() {
+      override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
       }
 

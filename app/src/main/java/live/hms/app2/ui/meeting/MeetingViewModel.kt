@@ -201,18 +201,6 @@ class MeetingViewModel(
     isAudioMuted = !enabled
   }
 
-  fun sendChatMessage(message: String) {
-    hmsSDK.sendBroadcastMessage(message, "chat", object : HMSCallback{
-      override fun onError(error: HMSException) {
-        Log.e(TAG, error.message)
-      }
-
-      override fun onSuccess() {
-        // Request Successfully sent to server
-      }
-    })
-  }
-
   private fun cleanup() {
     failures.clear()
     _tracks.clear()
@@ -348,7 +336,7 @@ class MeetingViewModel(
           broadcastsReceived.postValue(
             ChatMessage(
               message.sender.name,
-              message.time,
+              message.serverReceiveTime,
               message.message,
               false,
               recipient = message.recipient
@@ -544,7 +532,7 @@ class MeetingViewModel(
   }
 
   fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason: String) {
-    hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSCallback{
+    hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSActionResultListener{
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
@@ -556,7 +544,7 @@ class MeetingViewModel(
   }
 
   fun endRoom(lock: Boolean) {
-    hmsSDK.endRoom("Closing time", lock, object : HMSCallback{
+    hmsSDK.endRoom("Closing time", lock, object : HMSActionResultListener{
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
       }
@@ -578,7 +566,7 @@ class MeetingViewModel(
     if (track != null) {
       val isMute = track.isMute
       if (isAllowedToAskUnmutePeers() && isMute) {
-        hmsSDK.changeTrackState(track, false, object : HMSCallback{
+        hmsSDK.changeTrackState(track, false, object : HMSActionResultListener{
           override fun onError(error: HMSException) {
             Log.e(TAG, error.message)
           }
@@ -586,9 +574,10 @@ class MeetingViewModel(
           override fun onSuccess() {
             // Request Successfully sent to server
           }
+
         })
       } else if (isAllowedToMutePeers() && !isMute) {
-        hmsSDK.changeTrackState(track, true, object : HMSCallback{
+        hmsSDK.changeTrackState(track, true, object : HMSActionResultListener{
           override fun onError(error: HMSException) {
             Log.e(TAG, error.message)
           }
