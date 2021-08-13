@@ -7,8 +7,12 @@ import androidx.lifecycle.ViewModel
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSCallback
 import live.hms.video.sdk.HMSSDK
+import live.hms.video.sdk.models.HMSMessageRecipient
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.role.HMSRole
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
@@ -21,16 +25,32 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   val chatMembers : LiveData<List<Recipient>> = _chatMembers
   private var currentSelectedRecipient : Recipient = Recipient.Everyone
 
-  fun sendMessage(message : ChatMessage) {
+  fun sendMessage(messageStr : String) {
+
+    val message = ChatMessage(
+      "You",
+      Date(),
+      messageStr,
+      true,
+      HMSMessageRecipient()
+    )
+
     // Decide where it should go.
     when(val recipient = currentSelectedRecipient) {
-      Recipient.Everyone -> broadcast(message)
-      is Recipient.Peer -> directMessage(message, recipient.peer)
-      is Recipient.Role -> groupMessage(message, recipient.role)
+      Recipient.Everyone -> broadcast(message.copy(recipient = HMSMessageRecipient()))
+      is Recipient.Peer -> directMessage(
+        message.copy(recipient = HMSMessageRecipient(recipientPeer = recipient.peer,
+                                                  recipientType = HMSMessageRecipientType.PEER)),
+        recipient.peer)
+      is Recipient.Role -> groupMessage(
+        message.copy(recipient = HMSMessageRecipient(recipientRoles = listOf(recipient.role),
+          recipientType = HMSMessageRecipientType.ROLES)),
+        recipient.role)
     }
   }
 
   private fun directMessage(message : ChatMessage, peer : HMSPeer) {
+    addMessage(message)
     hmssdk.sendDirectMessage(message.message, "chat", peer, object : HMSCallback {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)

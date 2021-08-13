@@ -350,7 +350,8 @@ class MeetingViewModel(
               message.sender.name,
               message.time,
               message.message,
-              false
+              false,
+              recipient = message.recipient
             )
           )
         }

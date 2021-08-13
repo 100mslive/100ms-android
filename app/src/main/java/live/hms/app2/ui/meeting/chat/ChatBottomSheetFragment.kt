@@ -14,8 +14,6 @@ import live.hms.app2.R
 import live.hms.app2.databinding.DialogBottomSheetChatBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.util.viewLifecycle
-import java.util.*
-import kotlin.collections.ArrayList
 
 class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
 
@@ -93,13 +91,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     binding.containerMessage.setEndIconOnClickListener {
       val messageStr = binding.editTextMessage.text.toString().trim()
       if (messageStr.isNotEmpty()) {
-        val message = ChatMessage(
-            "You",
-            Date(),
-            messageStr,
-            true
-        )
-        chatViewModel.sendMessage(message)
+        chatViewModel.sendMessage(messageStr)
         binding.editTextMessage.setText("")
       }
     }
