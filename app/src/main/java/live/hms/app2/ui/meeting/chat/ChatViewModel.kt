@@ -15,6 +15,9 @@ import live.hms.video.sdk.models.role.HMSRole
 import java.util.*
 import kotlin.collections.ArrayList
 
+data class SelectedRecipient(val recipients: List<Recipient>,
+                             val index : Int)
+
 class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   companion object {
@@ -22,8 +25,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   }
 
   private val _messages = ArrayList<ChatMessage>()
-  private val _chatMembers = MutableLiveData<List<Recipient>>(emptyList())
-  val chatMembers : LiveData<List<Recipient>> = _chatMembers
+  private val _chatMembers = MutableLiveData<SelectedRecipient>()
+  val chatMembers : LiveData<SelectedRecipient> = _chatMembers
   private var currentSelectedRecipient : Recipient = Recipient.Everyone
 
   fun sendMessage(messageStr : String) {
@@ -112,7 +115,12 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   }
 
   fun peersUpdate() {
-    _chatMembers.postValue(convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles()))
+    val list = convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles())
+    val currentIndex = when(val num = list.indexOf(currentSelectedRecipient)) {
+      -1 -> 0
+      else -> num
+    }
+    _chatMembers.postValue(SelectedRecipient(list, currentIndex))
   }
 
   private fun convertPeersToChatMembers(listOfParticipants : Array<HMSRemotePeer>, roles : List<HMSRole>) : List<Recipient> {
