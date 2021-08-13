@@ -125,7 +125,7 @@ class MeetingViewModel(
 
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
-  private val hmsSDK = HMSSDK
+  val hmsSDK = HMSSDK
     .Builder(application)
     .build()
 
