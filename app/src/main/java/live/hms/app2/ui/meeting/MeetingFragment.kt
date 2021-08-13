@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingBinding
@@ -42,13 +41,15 @@ class MeetingFragment : Fragment() {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  private val chatViewModel: ChatViewModel by activityViewModels()
-
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
       requireActivity().application,
       requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
     )
+  }
+
+  private val chatViewModel: ChatViewModel by activityViewModels{
+    ChatViewModelFactory(meetingViewModel.hmsSDK)
   }
 
   private var alertDialog: AlertDialog? = null
@@ -75,7 +76,6 @@ class MeetingFragment : Fragment() {
 
   override fun onStop() {
     super.onStop()
-    chatViewModel.removeSendBroadcastCallback()
     settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
@@ -240,8 +240,6 @@ class MeetingFragment : Fragment() {
       updateVideoView(it)
       requireActivity().invalidateOptionsMenu()
     }
-
-    chatViewModel.setSendBroadcastCallback { meetingViewModel.sendChatMessage(it) }
 
     chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
       if (count > 0) {
@@ -428,6 +426,10 @@ class MeetingFragment : Fragment() {
           else R.drawable.ic_mic_off_24
         )
       }
+    }
+
+    meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
+      chatViewModel.peersUpdate()
     }
   }
 

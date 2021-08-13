@@ -1,29 +1,37 @@
 package live.hms.app2.ui.meeting.chat
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSCallback
+import live.hms.video.sdk.HMSSDK
+import live.hms.video.sdk.models.HMSPeer
 
-class ChatViewModel : ViewModel() {
+class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   companion object {
     private const val TAG = "ChatViewModel"
   }
 
   private val _messages = ArrayList<ChatMessage>()
-  private var sendBroadcastCallback: ((String) -> Unit)? = null
+  private val _chatMembers = MutableLiveData<List<Recipient>>(emptyList())
+  val chatMembers : LiveData<List<Recipient>> = _chatMembers
+  private var currentSelectedRecipient : Recipient = Recipient.Everyone
 
   fun broadcast(message: ChatMessage) {
     addMessage(message)
-    sendBroadcastCallback?.invoke(message.message)
-  }
+    hmssdk.sendBroadcastMessage(message.message, "chat", object : HMSCallback {
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
 
-  fun setSendBroadcastCallback(callback: ((message: String) -> Unit)) {
-    sendBroadcastCallback = callback
-  }
+      override fun onSuccess() {
+        // Request Successfully sent to server
+      }
 
-  fun removeSendBroadcastCallback() {
-    sendBroadcastCallback = null
+    })
   }
 
   val messages = MutableLiveData<ArrayList<ChatMessage>>()
@@ -45,5 +53,19 @@ class ChatViewModel : ViewModel() {
     Log.v(TAG, "receivedMessage: $message")
     unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
     addMessage(message)
+  }
+
+  fun peersUpdate() {
+    _chatMembers.postValue(convertPeersToChatMembers(hmssdk.getPeers()))
+  }
+
+  private fun convertPeersToChatMembers(listOfParticipants : Array<HMSPeer>) : List<Recipient> {
+    return listOf(Recipient.Everyone)
+      .plus(listOfParticipants.map { Recipient.Role(it.hmsRole.name) }.toSet())
+      .plus(listOfParticipants.map { Recipient.Peer(it.peerID, it.name) })
+  }
+
+  fun recipientSelected(recipient: Recipient) {
+    currentSelectedRecipient = recipient
   }
 }
