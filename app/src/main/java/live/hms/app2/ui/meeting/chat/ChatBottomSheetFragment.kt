@@ -1,7 +1,11 @@
 package live.hms.app2.ui.meeting.chat
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -10,10 +14,8 @@ import live.hms.app2.R
 import live.hms.app2.databinding.DialogBottomSheetChatBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.util.viewLifecycle
-import java.util.*
-import kotlin.collections.ArrayList
 
-class ChatBottomSheetFragment : BottomSheetDialogFragment() {
+class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
 
   companion object {
     private const val TAG = "ChatFragment"
@@ -32,6 +34,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     initViewModels()
+    initSpinnerUpdates()
   }
 
   override fun onCreateView(
@@ -45,11 +48,27 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     initToolbar()
     initRecyclerView()
     initButtons()
-
     // Once we open the chat, assume that all messages will be seen
     chatViewModel.unreadMessagesCount.postValue(0)
 
     return binding.root
+  }
+
+  private fun initSpinnerUpdates() {
+    chatViewModel.chatMembers.observe(viewLifecycleOwner) {
+      refreshSpinner(it)
+    }
+  }
+
+  private fun refreshSpinner(recipientList :List<Recipient>) {
+    val participantSpinner = binding.recipientSpinner
+    ArrayAdapter(requireContext(), R.layout.layout_chat_recipient_selector_item, recipientList)
+      .also { recipientsAdapter ->
+        participantSpinner.adapter = recipientsAdapter
+        participantSpinner.setSelection(0, false)
+        recipientsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        participantSpinner.post { participantSpinner.onItemSelectedListener = this }
+      }
   }
 
   private fun initRecyclerView() {
@@ -75,13 +94,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
     binding.containerMessage.setEndIconOnClickListener {
       val messageStr = binding.editTextMessage.text.toString().trim()
       if (messageStr.isNotEmpty()) {
-        val message = ChatMessage(
-            "You",
-            Date(),
-            messageStr,
-            true
-        )
-        chatViewModel.broadcast(message)
+        chatViewModel.sendMessage(messageStr)
         binding.editTextMessage.setText("")
       }
     }
@@ -94,5 +107,13 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment() {
       }
       true
     }
+  }
+
+  override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+    chatViewModel.recipientSelected(parent?.getItemAtPosition(position) as Recipient)
+  }
+
+  override fun onNothingSelected(parent: AdapterView<*>?) {
+    // Ignore it.
   }
 }

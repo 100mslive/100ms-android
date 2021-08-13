@@ -21,7 +21,17 @@
             android:background="@color/blue_3"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:menu="@menu/menu_chat"
-            app:title="@string/chat" />
+            app:title="@string/chat" >
+
+        <Spinner
+            android:id="@+id/recipientSpinner"
+            android:layout_width="wrap_content"
+            android:layout_gravity="end"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/layout_chat_recipient_selector_item"
+            />
+        </com.google.android.material.appbar.MaterialToolbar>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
