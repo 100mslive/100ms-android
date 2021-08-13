@@ -55,17 +55,20 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
   }
 
   private fun initSpinnerUpdates() {
-
-    val participantSpinner = binding.recipientSpinner
     chatViewModel.chatMembers.observe(viewLifecycleOwner) {
-      ArrayAdapter(requireContext(), R.layout.layout_chat_recipient_selector_item, it)
-        .also { recipientsAdapter ->
+      refreshSpinner(it)
+    }
+  }
+
+  private fun refreshSpinner(recipientList :List<Recipient>) {
+    val participantSpinner = binding.recipientSpinner
+    ArrayAdapter(requireContext(), R.layout.layout_chat_recipient_selector_item, recipientList)
+      .also { recipientsAdapter ->
         participantSpinner.adapter = recipientsAdapter
         participantSpinner.setSelection(0, false)
         recipientsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         participantSpinner.post { participantSpinner.onItemSelectedListener = this }
       }
-    }
   }
 
   private fun initRecyclerView() {

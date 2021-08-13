@@ -120,7 +120,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   private fun convertPeersToChatMembers(listOfParticipants : Array<HMSPeer>) : List<Recipient> {
     return listOf(Recipient.Everyone)
       .plus(listOfParticipants.distinctBy { it.hmsRole.name }.map { Recipient.Role(it.hmsRole) })
-      .plus(listOfParticipants.map { Recipient.Peer(it) })
+      // Remove local peers (yourself) from the list of people you can message.
+      .plus(listOfParticipants.filter { it.isLocal }.map { Recipient.Peer(it) })
   }
 
   fun recipientSelected(recipient: Recipient) {
