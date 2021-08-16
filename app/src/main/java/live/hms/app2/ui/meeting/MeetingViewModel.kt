@@ -483,14 +483,11 @@ class MeetingViewModel(
         }
       }
 
-      if (track.type == HMSTrackType.AUDIO) {
-        meetingTrack?.audio = null
-      } else if (track.type == HMSTrackType.VIDEO) {
-        meetingTrack?.video = null
-      }
-
-      if (meetingTrack?.audio == null &&  meetingTrack?.video == null) {
+      if (peer.audioTrack == null &&  peer.videoTrack == null) {
         // Remove tile from view since both audio and video track are null
+        _tracks.remove(meetingTrack)
+      } else if (track.source == HMSTrackSource.SCREEN && peer.auxiliaryTracks.size == 0){
+        // Remove screenshare tile from view
         _tracks.remove(meetingTrack)
       }
 
@@ -514,11 +511,11 @@ class MeetingViewModel(
   }
 
   fun isAllowedToMutePeers(): Boolean {
-    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.muteSelective == true
+    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.mute == true
   }
 
   fun isAllowedToAskUnmutePeers(): Boolean {
-    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.askToUnmute == true
+    return hmsSDK.getLocalPeer()?.hmsRole?.permission?.unmute == true
   }
 
   fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
