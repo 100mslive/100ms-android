@@ -79,21 +79,29 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
             val peer = meetingViewModel.getPeerForId(args.remotePeerId) as HMSRemotePeer?
             if(peer != null) {
 
-                peer.audioTrack?.let {
-                    setTrackMuteButtonVisibility(it, peer, muteUnmuteAudio, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
+                val audioTrack = peer.audioTrack
+                if(audioTrack != null)
+                {
+                    setTrackMuteButtonVisibility(audioTrack, peer, muteUnmuteAudio, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
                     muteUnmuteAudio.setOnClickListener { meetingViewModel.togglePeerMute(peer, HMSTrackType.AUDIO)
                         findNavController().popBackStack()
                     }
+                } else {
+                    muteUnmuteAudio.visibility = View.GONE
                 }
 
                 Log.d(TAG, "Peer video null? ${peer.videoTrack == null}")
 
-                peer.videoTrack?.let {
-                    setTrackMuteButtonVisibility(it, peer, muteUnmuteVideo, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
+                val videoTrack = peer.videoTrack
+                if(videoTrack != null)
+                {
+                    setTrackMuteButtonVisibility(videoTrack, peer, muteUnmuteVideo, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
                     muteUnmuteVideo.setOnClickListener {
                         meetingViewModel.togglePeerMute(peer, HMSTrackType.VIDEO)
                         findNavController().popBackStack()
                     }
+                } else {
+                    muteUnmuteVideo.visibility = View.GONE
                 }
 
                 if(meetingViewModel.isAllowedToRemovePeers()) {
