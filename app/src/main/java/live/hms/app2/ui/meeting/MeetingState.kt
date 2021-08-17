@@ -23,6 +23,7 @@ sealed class MeetingState {
   data class RoleChangeRequest(val hmsRoleChangeRequest: HMSRoleChangeRequest) : MeetingState()
   data class ForceLeave(val details : HMSRemovedFromRoom) : MeetingState()
   data class TrackChangeRequest(val trackChangeRequest: HMSChangeTrackStateRequest) : MeetingState()
+  data class NonFatalFailure(val exception: HMSException) : MeetingState()
 
 }
 

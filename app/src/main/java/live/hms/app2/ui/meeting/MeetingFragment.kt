@@ -257,6 +257,29 @@ class MeetingFragment : Fragment() {
       isMeetingOngoing = false
 
       when (state) {
+
+        is MeetingState.NonFatalFailure -> {
+          alertDialog?.dismiss()
+          alertDialog = null
+          hideProgressBar()
+
+          val message = state.exception.message
+
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage(message)
+            .setTitle(R.string.non_fatal_error_dialog_title)
+            .setCancelable(true)
+
+          builder.setPositiveButton(R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+
+          alertDialog = builder.create().apply { show() }
+        }
+
         is MeetingState.Failure -> {
           alertDialog?.dismiss()
           alertDialog = null
