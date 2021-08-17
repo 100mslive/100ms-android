@@ -68,6 +68,7 @@
     <string name="role">Role</string>
     <string name="change_role_request">Change Role Request</string>
     <string name="track_change_request">Request</string>
+    <string name="non_fatal_error_dialog_title">Error</string>
     <string name="video_framerate">Video Framerate</string>
     <string name="advanced_settings">Advanced Settings</string>
 

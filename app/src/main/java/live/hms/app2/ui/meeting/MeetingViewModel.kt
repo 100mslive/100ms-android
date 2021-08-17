@@ -393,6 +393,7 @@ class MeetingViewModel(
 
       override fun onError(error: HMSException) {
         Log.e(TAG, "Error while accepting change role request :: ${error.description}")
+        state.postValue(MeetingState.NonFatalFailure(error))
       }
     })
   }
@@ -538,6 +539,7 @@ class MeetingViewModel(
 
           override fun onError(error: HMSException) {
             Log.e(TAG, "Error while sending change role request :: ${error.description}")
+            state.postValue(MeetingState.NonFatalFailure(error))
           }
         })
       // Update the peer in participants
@@ -548,7 +550,7 @@ class MeetingViewModel(
   fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason: String) {
     hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSActionResultListener{
       override fun onError(error: HMSException) {
-        Log.e(TAG, error.message)
+        state.postValue(MeetingState.NonFatalFailure(error))
       }
 
       override fun onSuccess() {
@@ -560,7 +562,7 @@ class MeetingViewModel(
   fun endRoom(lock: Boolean) {
     hmsSDK.endRoom("Closing time", lock, object : HMSActionResultListener{
       override fun onError(error: HMSException) {
-        Log.e(TAG, error.message)
+        state.postValue(MeetingState.NonFatalFailure(error))
       }
 
       override fun onSuccess() {
@@ -582,7 +584,7 @@ class MeetingViewModel(
       if (isAllowedToAskUnmutePeers() && isMute) {
         hmsSDK.changeTrackState(track, false, object : HMSActionResultListener{
           override fun onError(error: HMSException) {
-            Log.e(TAG, error.message)
+            state.postValue(MeetingState.NonFatalFailure(error))
           }
 
           override fun onSuccess() {
@@ -593,7 +595,7 @@ class MeetingViewModel(
       } else if (isAllowedToMutePeers() && !isMute) {
         hmsSDK.changeTrackState(track, true, object : HMSActionResultListener{
           override fun onError(error: HMSException) {
-            Log.e(TAG, error.message)
+            state.postValue(MeetingState.NonFatalFailure(error))
           }
 
           override fun onSuccess() {
