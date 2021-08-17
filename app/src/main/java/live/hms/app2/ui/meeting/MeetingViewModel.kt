@@ -386,7 +386,15 @@ class MeetingViewModel(
   }
 
   fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {
-    hmsSDK.acceptChangeRole(hmsRoleChangeRequest)
+    hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener{
+      override fun onSuccess() {
+        Log.i(TAG, "Successfully accepted change role request for $hmsRoleChangeRequest")
+      }
+
+      override fun onError(error: HMSException) {
+        Log.e(TAG, "Error while accepting change role request :: ${error.description}")
+      }
+    })
   }
 
 
@@ -523,7 +531,15 @@ class MeetingViewModel(
     val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
     if (remotePeer != null && toRole != null) {
       if (remotePeer.hmsRole.name != toRole.name)
-        hmsSDK.changeRole(remotePeer, toRole, force)
+        hmsSDK.changeRole(remotePeer, toRole, force,object : HMSActionResultListener{
+          override fun onSuccess() {
+            Log.i(TAG, "Successfully sent change role request for $remotePeer")
+          }
+
+          override fun onError(error: HMSException) {
+            Log.e(TAG, "Error while sending change role request :: ${error.description}")
+          }
+        })
       // Update the peer in participants
       peerLiveDate.postValue(remotePeer)
     }
