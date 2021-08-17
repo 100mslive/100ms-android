@@ -1,5 +1,6 @@
 package live.hms.app2.ui.meeting.commons
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,7 +38,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected val meetingViewModel by activityViewModels<MeetingViewModel>()
 
   // Determined using the onResume() and onPause()
-  var isViewVisible = false
+  var isFragmentVisible = false
     private set
 
   protected data class RenderedViewPair(
@@ -115,6 +116,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     item: MeetingTrack,
     scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
   ) {
+    Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     if (item.video == null || item.video?.isMute == true) return
 
     binding.surfaceView.let { view ->
@@ -162,6 +164,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     item: MeetingTrack,
     metadata: String = ""
   ) {
+    Log.d(TAG,"unbindSurfaceView for :: ${item.peer.name}")
     if (!bindedVideoTrackIds.contains(item.video?.trackId ?: "")) return
 
     SurfaceViewRendererUtil.unbind(binding.surfaceView, item, metadata).let {
@@ -194,7 +197,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
         layout.apply {
           // Unbind only when view is visible to user
-          if (isViewVisible) unbindSurfaceView(
+          if (isFragmentVisible) unbindSurfaceView(
             currentRenderedView.binding.videoCard,
             currentRenderedView.meetingTrack
           )
@@ -212,7 +215,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           crashlyticsLog(TAG, "updateVideos: Keeping view for video=$newVideo  in fragment=$tag")
           newRenderedViews.add(renderedViewPair)
 
-          if (isViewVisible && !bindedVideoTrackIds.contains(newVideo.video?.trackId ?: "")) {
+          if (isFragmentVisible && !bindedVideoTrackIds.contains(newVideo.video?.trackId ?: "")) {
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
@@ -226,7 +229,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           val videoBinding = createVideoView(layout)
 
           // Bind surfaceView when view is visible to user
-          if (isViewVisible) {
+          if (isFragmentVisible) {
             bindSurfaceView(videoBinding.videoCard, newVideo)
           }
 
@@ -290,7 +293,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   override fun onResume() {
     super.onResume()
     crashlyticsLog(TAG, "Fragment=$tag onResume()")
-    isViewVisible = true
+    isFragmentVisible = true
 
     renderedViews.forEach {
       bindSurfaceView(it.binding.videoCard, it.meetingTrack)
@@ -300,7 +303,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   override fun onPause() {
     super.onPause()
     crashlyticsLog(TAG, "Fragment=$tag onPause()")
-    isViewVisible = false
+    isFragmentVisible = false
 
     renderedViews.forEach {
       unbindSurfaceView(it.binding.videoCard, it.meetingTrack)

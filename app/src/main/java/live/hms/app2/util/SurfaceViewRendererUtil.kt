@@ -1,5 +1,6 @@
 package live.hms.app2.util
 
+import android.util.Log
 import android.view.View
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.video.utils.SharedEglContext
@@ -34,6 +35,8 @@ object SurfaceViewRendererUtil {
   ): Boolean {
     if (item.video == null) return false
 
+    Log.v(TAG, "bind called :: ${item.peer.name}")
+
     view.apply {
       View.VISIBLE
       val context: EglBase.Context = SharedEglContext.context
@@ -63,6 +66,7 @@ object SurfaceViewRendererUtil {
   fun unbind(view: SurfaceViewRenderer, item: MeetingTrack, metadata: String = ""): Boolean {
     if (item.video == null) return false
 
+    Log.v(TAG, "unbind called :: ${item.peer.name}")
     view.apply {
       // NOTE: We don't dispose off the MediaStreamTrack here as it can
       // be re-used by the any other view
