@@ -117,7 +117,11 @@ abstract class VideoGridBaseFragment : Fragment() {
     scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
   ) {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
-    if (item.video == null || item.video?.isMute == true) return
+    if (item.peer.videoTrack == null
+      || item.video == null
+      || item.video?.isMute == true
+      || item.video?.isDegraded == true
+      || binding.surfaceView.visibility == View.VISIBLE) return
 
     binding.surfaceView.let { view ->
       view.setScalingType(scalingType)
@@ -147,14 +151,20 @@ abstract class VideoGridBaseFragment : Fragment() {
       icDegraded.visibility = if(item.video?.isDegraded == true) View.VISIBLE else View.GONE
 
       /** [View.setVisibility] */
-      val surfaceViewVisibility = if (item.video == null || item.video?.isMute == true || item.video?.isDegraded == true) {
+      val surfaceViewVisibility = if (item.peer.videoTrack == null
+        || item.video == null
+        || item.video?.isMute == true
+        || item.video?.isDegraded == true) {
         View.INVISIBLE
       } else {
         View.VISIBLE
       }
 
       if (surfaceView.visibility != surfaceViewVisibility) {
-        surfaceView.visibility = surfaceViewVisibility
+        if (surfaceViewVisibility == View.VISIBLE)
+          bindSurfaceView(binding, item)
+        else
+          unbindSurfaceView(binding, item)
       }
     }
   }
