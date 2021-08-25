@@ -430,7 +430,6 @@ class MeetingViewModel(
       }
 
       val _track = _tracks.find {
-        it.audio == null &&
                 it.peer.peerID == peer.peerID &&
                 it.isScreen.not()
       }
@@ -453,7 +452,7 @@ class MeetingViewModel(
   private fun addVideoTrack(track: HMSVideoTrack, peer: HMSPeer) {
     synchronized(_tracks) {
       // Check if this track already exists
-      val _track = _tracks.find { it.video == null && it.peer.peerID == peer.peerID }
+      val _track = _tracks.find {track.source != HMSTrackSource.SCREEN && it.peer.peerID == peer.peerID }
       if (_track == null) {
         if (peer.isLocal) {
           _tracks.add(0, MeetingTrack(peer, track, null))
