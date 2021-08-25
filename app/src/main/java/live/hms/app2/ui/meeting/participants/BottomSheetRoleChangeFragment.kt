@@ -71,16 +71,6 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
         with(binding) {
             cancel.setOnClickListener { findNavController().popBackStack() }
 
-            // Do not show other options for local peer
-            if (peer?.isLocal == true) {
-                forceChangeRole.visibility = View.GONE
-                muteUnmuteVideo.visibility = View.GONE
-                muteUnmuteAudio.visibility = View.GONE
-                removePeer.visibility = View.GONE
-                promptChangeRole.visibility = View.VISIBLE
-                promptChangeRole.text = "Change Self Role"
-            }
-
             forceChangeRole.setOnClickListener {
                 isForce = true
                 spinnerDialog()
@@ -123,6 +113,16 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                     removePeer.visibility = View.VISIBLE
                 } else {
                     removePeer.visibility = View.GONE
+                }
+
+                // Self Role UI changes
+                if (peer.isLocal) {
+                    promptChangeRole.visibility = View.GONE
+                    muteUnmuteVideo.visibility = View.GONE
+                    muteUnmuteAudio.visibility = View.GONE
+                    removePeer.visibility = View.GONE
+                    forceChangeRole.visibility = View.VISIBLE
+                    forceChangeRole.text = "Change Self Role"
                 }
 
             } else {
