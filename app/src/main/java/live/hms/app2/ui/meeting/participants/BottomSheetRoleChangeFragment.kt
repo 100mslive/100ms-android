@@ -65,8 +65,22 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
     }
 
     private fun initListeners() {
+        val peer = meetingViewModel.getPeerForId(args.remotePeerId)
+
+
         with(binding) {
             cancel.setOnClickListener { findNavController().popBackStack() }
+
+            // Do not show other options for local peer
+            if (peer?.isLocal == true) {
+                forceChangeRole.visibility = View.GONE
+                muteUnmuteVideo.visibility = View.GONE
+                muteUnmuteAudio.visibility = View.GONE
+                removePeer.visibility = View.GONE
+                promptChangeRole.visibility = View.VISIBLE
+                promptChangeRole.text = "Change Self Role"
+            }
+
             forceChangeRole.setOnClickListener {
                 isForce = true
                 spinnerDialog()
@@ -76,14 +90,12 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                 spinnerDialog()
             }
 
-            val peer = meetingViewModel.getPeerForId(args.remotePeerId) as HMSRemotePeer?
             if(peer != null) {
-
                 val audioTrack = peer.audioTrack
                 if(audioTrack != null)
                 {
                     setTrackMuteButtonVisibility(audioTrack, peer, muteUnmuteAudio, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
-                    muteUnmuteAudio.setOnClickListener { meetingViewModel.togglePeerMute(peer, HMSTrackType.AUDIO)
+                    muteUnmuteAudio.setOnClickListener { meetingViewModel.togglePeerMute(peer as HMSRemotePeer, HMSTrackType.AUDIO)
                         findNavController().popBackStack()
                     }
                 } else {
@@ -97,7 +109,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                 {
                     setTrackMuteButtonVisibility(videoTrack, peer, muteUnmuteVideo, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
                     muteUnmuteVideo.setOnClickListener {
-                        meetingViewModel.togglePeerMute(peer, HMSTrackType.VIDEO)
+                        meetingViewModel.togglePeerMute(peer as HMSRemotePeer, HMSTrackType.VIDEO)
                         findNavController().popBackStack()
                     }
                 } else {
@@ -105,7 +117,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                 }
 
                 if(meetingViewModel.isAllowedToRemovePeers()) {
-                    removePeer.setOnClickListener { meetingViewModel.requestPeerLeave(peer, "Bye")
+                    removePeer.setOnClickListener { meetingViewModel.requestPeerLeave(peer as HMSRemotePeer, "Bye")
                         findNavController().popBackStack()
                     }
                     removePeer.visibility = View.VISIBLE
