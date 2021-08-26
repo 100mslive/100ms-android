@@ -26,4 +26,9 @@ class NameUtilsTest {
     fun `handles double spaced names`() {
         MatcherAssert.assertThat(NameUtils.getInitials("Praveen  Jaiswal"), equalTo("PJ"))
     }
+
+    @Test
+    fun `empty returns --`() {
+        MatcherAssert.assertThat(NameUtils.getInitials(""), equalTo("--"))
+    }
 }
