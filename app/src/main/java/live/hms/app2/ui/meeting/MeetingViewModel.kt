@@ -527,13 +527,13 @@ class MeetingViewModel(
   }
 
   fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
-    val remotePeer = hmsSDK.getRemotePeers().find { it.peerID == remotePeerId }
+    val hmsPeer = hmsSDK.getPeers().find { it.peerID == remotePeerId }
     val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
-    if (remotePeer != null && toRole != null) {
-      if (remotePeer.hmsRole.name != toRole.name)
-        hmsSDK.changeRole(remotePeer, toRole, force,object : HMSActionResultListener{
+    if (hmsPeer != null && toRole != null) {
+      if (hmsPeer.hmsRole.name != toRole.name)
+        hmsSDK.changeRole(hmsPeer, toRole, force,object : HMSActionResultListener{
           override fun onSuccess() {
-            Log.i(TAG, "Successfully sent change role request for $remotePeer")
+            Log.i(TAG, "Successfully sent change role request for $hmsPeer")
           }
 
           override fun onError(error: HMSException) {
@@ -542,7 +542,7 @@ class MeetingViewModel(
           }
         })
       // Update the peer in participants
-      peerLiveDate.postValue(remotePeer)
+      peerLiveDate.postValue(hmsPeer)
     }
   }
 
