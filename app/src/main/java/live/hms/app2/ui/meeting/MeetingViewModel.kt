@@ -491,11 +491,11 @@ class MeetingViewModel(
         }
       }
 
-      if (peer.audioTrack == null &&  peer.videoTrack == null) {
+      if (
         // Remove tile from view since both audio and video track are null
-        _tracks.remove(meetingTrack)
-      } else if (track.source == HMSTrackSource.SCREEN && peer.auxiliaryTracks.size == 0){
+        (peer.audioTrack == null &&  peer.videoTrack == null) ||
         // Remove screenshare tile from view
+        (track.type == HMSTrackType.VIDEO && meetingTrack?.audio == null)) {
         _tracks.remove(meetingTrack)
       }
 
