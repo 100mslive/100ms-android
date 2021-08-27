@@ -67,6 +67,8 @@
     <string name="video_bitrate">Video Bitrate</string>
     <string name="role">Role</string>
     <string name="change_role_request">Change Role Request</string>
+    <string name="track_change_request">Request</string>
+    <string name="non_fatal_error_dialog_title">Error</string>
     <string name="video_framerate">Video Framerate</string>
     <string name="advanced_settings">Advanced Settings</string>
 
@@ -107,6 +109,7 @@
     <string name="error">Error</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
+    <string name="turn_on">Turn On</string>
     <string name="video_resolution_height">Video Resolution (Height)</string>
     <string name="video_resolution_width">Video Resolution (Width)</string>
     <string name="hero_view">Hero View</string>
@@ -134,4 +137,6 @@
     <string name="no">NO</string>
     <string name="role_change">Role Change</string>
     <string name="switch_enable_subscribe_degradation">Enable subscribe degradation</string>
+    <string name="end_room">End room</string>
+    <string name="end_and_lock_room">Lock and end room</string>
 </resources>

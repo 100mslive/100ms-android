@@ -7,11 +7,12 @@ import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.role.HMSRole
 
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
-  private val availableRoles: List<HMSRole>,
+  val isAllowedToKickPeer : Boolean,
+  val isAllowedToMutePeer : Boolean,
+  val isAllowedToAskUnmutePeer : Boolean,
   private val showSheet : (HMSPeer) -> Unit
 ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
@@ -26,7 +27,7 @@ class ParticipantsAdapter(
   ) : RecyclerView.ViewHolder(binding.root) {
     init {
       with(binding) {
-        roleChange.setOnClickListener { showSheet(items[adapterPosition]) }
+        peerSettings.setOnClickListener { showSheet(items[adapterPosition]) }
       }
     }
 
@@ -36,10 +37,10 @@ class ParticipantsAdapter(
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
         iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
         iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        roleChange.text = item.hmsRole.name
+        peerRole.text = item.hmsRole.name
         // Show change role option only if the role of the local peer allows
         //  and if it's not the local peer itself.
-        roleChange.isEnabled = isAllowedToChangeRole && !item.isLocal
+        peerSettings.visibility = v(isAllowedToChangeRole || isAllowedToAskUnmutePeer || isAllowedToMutePeer || isAllowedToKickPeer )
       }
     }
 

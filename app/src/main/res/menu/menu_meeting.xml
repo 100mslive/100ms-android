@@ -19,6 +19,18 @@
         android:title="@string/settings"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/end_room"
+        android:title="@string/end_room"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/end_and_lock_room"
+        android:title="@string/end_and_lock_room"
+        app:showAsAction="ifRoom"
+        />
+
     <group>
         <item
             android:id="@+id/action_grid_view"

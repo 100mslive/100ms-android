@@ -105,7 +105,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         // Check for screen share
         if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
           screenShareTrack = screen
-          if (isViewVisible) {
+          if (isFragmentVisible) {
             bindSurfaceView(
               binding.screenShare,
               screen,

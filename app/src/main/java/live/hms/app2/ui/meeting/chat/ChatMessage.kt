@@ -7,5 +7,6 @@ data class ChatMessage(
   val time: Date,
   val message: String,
   val isSentByMe: Boolean,
+  val recipient: Recipient
 )
 

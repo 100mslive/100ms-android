@@ -1,29 +1,96 @@
 package live.hms.app2.ui.meeting.chat
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSMessageResultListener
+import live.hms.video.sdk.HMSSDK
+import live.hms.video.sdk.models.HMSMessage
+import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSRemotePeer
+import live.hms.video.sdk.models.enums.HMSMessageType
+import live.hms.video.sdk.models.role.HMSRole
+import java.util.*
+import kotlin.collections.ArrayList
 
-class ChatViewModel : ViewModel() {
+data class SelectedRecipient(val recipients: List<Recipient>,
+                             val index : Int)
+
+class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   companion object {
     private const val TAG = "ChatViewModel"
   }
 
   private val _messages = ArrayList<ChatMessage>()
-  private var sendBroadcastCallback: ((String) -> Unit)? = null
+  private val _chatMembers = MutableLiveData<SelectedRecipient>()
+  val chatMembers : LiveData<SelectedRecipient> = _chatMembers
+  private var currentSelectedRecipient : Recipient = Recipient.Everyone
 
-  fun broadcast(message: ChatMessage) {
+  fun sendMessage(messageStr : String) {
+
+    val message = ChatMessage(
+      "You",
+      Date(),
+      messageStr,
+      true,
+      Recipient.Everyone
+    )
+
+    // Decide where it should go.
+    when(val recipient = currentSelectedRecipient) {
+      Recipient.Everyone -> broadcast( message )
+      is Recipient.Peer -> directMessage(
+        message.copy(recipient = Recipient.Peer(recipient.peer)),
+        recipient.peer)
+      is Recipient.Role -> groupMessage(
+        message.copy(recipient = Recipient.Role(recipient.role)),
+        recipient.role)
+    }
+  }
+
+  private fun directMessage(message : ChatMessage, peer : HMSPeer) {
     addMessage(message)
-    sendBroadcastCallback?.invoke(message.message)
+    hmssdk.sendDirectMessage(message.message, HMSMessageType.CHAT, peer, object : HMSMessageResultListener {
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess(hmsMessage: HMSMessage) {
+        // Request Successfully sent to server
+      }
+
+    })
   }
 
-  fun setSendBroadcastCallback(callback: ((message: String) -> Unit)) {
-    sendBroadcastCallback = callback
+  private fun groupMessage(message: ChatMessage, role : HMSRole) {
+    addMessage(message)
+    hmssdk.sendGroupMessage(message.message, HMSMessageType.CHAT, listOf(role), object : HMSMessageResultListener {
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess(hmsMessage: HMSMessage) {
+        // Request Successfully sent to server
+      }
+
+    })
   }
 
-  fun removeSendBroadcastCallback() {
-    sendBroadcastCallback = null
+  private fun broadcast(message: ChatMessage) {
+    addMessage(message)
+    hmssdk.sendBroadcastMessage(message.message, HMSMessageType.CHAT, object : HMSMessageResultListener {
+      override fun onError(error: HMSException) {
+        Log.e(TAG, error.message)
+      }
+
+      override fun onSuccess(hmsMessage: HMSMessage) {
+        // Request Successfully sent to server
+      }
+
+    })
   }
 
   val messages = MutableLiveData<ArrayList<ChatMessage>>()
@@ -45,5 +112,29 @@ class ChatViewModel : ViewModel() {
     Log.v(TAG, "receivedMessage: $message")
     unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
     addMessage(message)
+  }
+
+  fun peersUpdate() {
+    val list = convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles())
+    val currentIndex = when(val num = list.indexOf(currentSelectedRecipient)) {
+      -1 -> 0
+      else -> num
+    }
+    _chatMembers.postValue(SelectedRecipient(list, currentIndex))
+  }
+
+  private fun convertPeersToChatMembers(listOfParticipants : Array<HMSRemotePeer>, roles : List<HMSRole>) : List<Recipient> {
+    return listOf(Recipient.Everyone)
+      .plus(roles.map { Recipient.Role(it) })
+      // Remove local peers (yourself) from the list of people you can message.
+      .plus(listOfParticipants.map { Recipient.Peer(it) })
+  }
+
+  fun recipientSelected(recipient: Recipient) {
+    currentSelectedRecipient = recipient
+  }
+
+  init {
+    peersUpdate() // Load up local peers into the chat members.
   }
 }

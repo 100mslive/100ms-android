@@ -23,14 +23,27 @@
             tools:text="@string/john_doe"
             android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/role_change"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/peerRole"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="host"
+            android:textStyle="bold"
+            android:layout_gravity="center"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
-            android:drawableEnd="@drawable/ic_settings_24"
+            android:src="@drawable/ic_settings_24"
+            />
+
+        <ImageButton
+            android:id="@+id/peerSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:src="@drawable/ic_settings_24"
             />
 
         <ImageView

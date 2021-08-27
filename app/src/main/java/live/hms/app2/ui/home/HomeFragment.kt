@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,6 +21,9 @@ import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.LEAVE_INFORMATION_PERSON
+import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
+import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
 import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
@@ -48,6 +52,17 @@ class HomeFragment : Fragment() {
           joinRoom()
         }
       }
+    }
+
+    val person = requireActivity().intent.getStringExtra(LEAVE_INFORMATION_PERSON)
+    val reason = requireActivity().intent.getStringExtra(LEAVE_INFORMATION_REASON)
+    val roomWasEnded = requireActivity().intent.getBooleanExtra(LEAVE_INFROMATION_WAS_END_ROOM, false)
+
+    if(person != null && reason != null){
+      requireActivity().intent.removeExtra(LEAVE_INFORMATION_PERSON)
+      requireActivity().intent.removeExtra(LEAVE_INFORMATION_REASON)
+      requireActivity().intent.removeExtra(LEAVE_INFROMATION_WAS_END_ROOM)
+      createForceLeaveDialog(person, reason, roomWasEnded)
     }
   }
 
@@ -229,6 +244,7 @@ class HomeFragment : Fragment() {
   }
 
   private fun initConnectButton() {
+
     binding.buttonJoinMeeting.setOnClickListener {
       try {
         val input = binding.editTextMeetingUrl.text.toString()
@@ -254,5 +270,31 @@ class HomeFragment : Fragment() {
         binding.containerMeetingUrl.error = e.message
       }
     }
+  }
+
+  private fun createForceLeaveDialog(removedBy : String, reason : String, wasRoomEnded : Boolean) {
+    val message = if(wasRoomEnded) {
+      "The room was ended by ${removedBy}.\nThe reason was $reason."
+    } else {
+      "You were removed from the room by ${removedBy}.\nThe reason was: $reason."
+    }
+
+    val title = if(wasRoomEnded) {
+      "Room Ended"
+    } else {
+      "Removed from the room"
+    }
+
+    val builder = AlertDialog.Builder(requireContext())
+      .setMessage(message)
+      .setTitle(title)
+      .setCancelable(false)
+
+    builder.setPositiveButton(R.string.ok) { dialog, _ ->
+      dialog.dismiss()
+    }
+
+    builder.create().apply { show() }
+
   }
 }

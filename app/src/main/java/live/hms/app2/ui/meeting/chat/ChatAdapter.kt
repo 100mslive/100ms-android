@@ -18,11 +18,18 @@ class ChatAdapter(
     RecyclerView.ViewHolder(binding.root) {
 
     fun bind(message: ChatMessage) {
-      binding.name.text = message.senderName
+      binding.name.text = "${message.senderName}${getRecipientText(message)}"
       binding.message.text = message.message
       binding.blueBar.visibility = if (message.isSentByMe) View.VISIBLE else View.GONE
       binding.time.text = dateFormatter.format(message.time)
     }
+
+    private fun getRecipientText(message: ChatMessage): String =
+      when(message.recipient) {
+        Recipient.Everyone -> ""
+        is Recipient.Peer -> " (to ${message.recipient.peer.name})"
+        is Recipient.Role -> " (to ${message.recipient.role.name})"
+      }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {

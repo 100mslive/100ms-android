@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingBinding
@@ -25,7 +24,12 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
-
+import live.hms.video.media.tracks.HMSLocalAudioTrack
+import live.hms.video.media.tracks.HMSLocalVideoTrack
+import live.hms.video.sdk.models.HMSRemovedFromRoom
+val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
+val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
+val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 class MeetingFragment : Fragment() {
 
   companion object {
@@ -37,13 +41,15 @@ class MeetingFragment : Fragment() {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
-  private val chatViewModel: ChatViewModel by activityViewModels()
-
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
       requireActivity().application,
       requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
     )
+  }
+
+  private val chatViewModel: ChatViewModel by activityViewModels{
+    ChatViewModelFactory(meetingViewModel.hmsSDK)
   }
 
   private var alertDialog: AlertDialog? = null
@@ -70,7 +76,6 @@ class MeetingFragment : Fragment() {
 
   override fun onStop() {
     super.onStop()
-    chatViewModel.removeSendBroadcastCallback()
     settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
@@ -144,6 +149,25 @@ class MeetingFragment : Fragment() {
 
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
+
+    menu.findItem(R.id.end_room).apply {
+      isVisible = meetingViewModel.isAllowedToEndMeeting()
+
+        setOnMenuItemClickListener {
+          meetingViewModel.endRoom(false)
+          true
+        }
+    }
+
+    menu.findItem(R.id.end_and_lock_room).apply {
+      isVisible = meetingViewModel.isAllowedToEndMeeting()
+
+      setOnMenuItemClickListener {
+        meetingViewModel.endRoom(true)
+        true
+      }
+    }
+
     menu.findItem(R.id.action_flip_camera).apply {
       val ok = meetingViewModel.meetingViewMode.value != MeetingViewMode.AUDIO_ONLY
       setVisible(ok)
@@ -194,9 +218,14 @@ class MeetingFragment : Fragment() {
     return binding.root
   }
 
-  private fun goToHomePage() {
+  private fun goToHomePage(details : HMSRemovedFromRoom? = null) {
     Intent(requireContext(), HomeActivity::class.java).apply {
       crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
+      if(details != null) {
+        putExtra(LEAVE_INFORMATION_PERSON, details.peerWhoRemoved?.name ?: "Someone")
+        putExtra(LEAVE_INFORMATION_REASON, details.reason)
+        putExtra(LEAVE_INFROMATION_WAS_END_ROOM, details.roomWasEnded)
+      }
       startActivity(this)
     }
     requireActivity().finish()
@@ -211,8 +240,6 @@ class MeetingFragment : Fragment() {
       updateVideoView(it)
       requireActivity().invalidateOptionsMenu()
     }
-
-    chatViewModel.setSendBroadcastCallback { meetingViewModel.sendChatMessage(it) }
 
     chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
       if (count > 0) {
@@ -230,6 +257,29 @@ class MeetingFragment : Fragment() {
       isMeetingOngoing = false
 
       when (state) {
+
+        is MeetingState.NonFatalFailure -> {
+          alertDialog?.dismiss()
+          alertDialog = null
+          hideProgressBar()
+
+          val message = state.exception.message
+
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage(message)
+            .setTitle(R.string.non_fatal_error_dialog_title)
+            .setCancelable(true)
+
+          builder.setPositiveButton(R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+
+          alertDialog = builder.create().apply { show() }
+        }
+
         is MeetingState.Failure -> {
           alertDialog?.dismiss()
           alertDialog = null
@@ -264,6 +314,43 @@ class MeetingFragment : Fragment() {
 
           alertDialog = builder.create().apply { show() }
         }
+
+        is MeetingState.TrackChangeRequest -> {
+          alertDialog?.dismiss()
+          alertDialog = null
+          hideProgressBar()
+
+          val message = if(state.trackChangeRequest.track is HMSLocalAudioTrack) {
+            "${state.trackChangeRequest.requestedBy.name} is asking you to unmute."
+          } else {
+            "${state.trackChangeRequest.requestedBy.name} is asking you to turn on video."
+          }
+
+          val builder = AlertDialog.Builder(requireContext())
+            .setMessage(message)
+            .setTitle(R.string.track_change_request)
+            .setCancelable(false)
+
+          builder.setPositiveButton(R.string.turn_on) { dialog, _ ->
+            if(state.trackChangeRequest.track is HMSLocalAudioTrack) {
+              meetingViewModel.setLocalAudioEnabled(true)
+            } else if (state.trackChangeRequest.track is HMSLocalVideoTrack) {
+              meetingViewModel.toggleLocalVideo()
+            }
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+          builder.setNegativeButton(R.string.reject) { dialog, _ ->
+            dialog.dismiss()
+            alertDialog = null
+            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
+          }
+
+          alertDialog = builder.create().apply { show() }
+        }
+
 
         is MeetingState.RoleChangeRequest -> {
           alertDialog?.dismiss()
@@ -327,8 +414,13 @@ class MeetingFragment : Fragment() {
           cleanup()
           hideProgressBar()
 
-          if (state.goToHome) goToHomePage()
+          if (state.goToHome) goToHomePage(state.removedFromRoom)
         }
+
+        is MeetingState.ForceLeave -> {
+          meetingViewModel.leaveMeeting(state.details)
+        }
+
       }
     }
 
@@ -357,6 +449,10 @@ class MeetingFragment : Fragment() {
           else R.drawable.ic_mic_off_24
         )
       }
+    }
+
+    meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
+      chatViewModel.peersUpdate()
     }
   }
 
