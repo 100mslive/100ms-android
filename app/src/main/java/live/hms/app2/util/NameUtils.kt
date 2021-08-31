@@ -17,9 +17,10 @@ object NameUtils {
 
   private fun privateGetInitials(name: String) : String {
     val upperCased = name.trim().uppercase(Locale.ROOT)
-    val words = findWordsRegex.split(upperCased)
+    val words = findWordsRegex.split(upperCased).filterNot { it.isNullOrBlank() }
 
     return when (words.size) {
+        0 -> "--"
         1 -> {
           if(words[0].isEmpty()) {
             "--"

@@ -31,4 +31,9 @@ class NameUtilsTest {
     fun `empty returns --`() {
         MatcherAssert.assertThat(NameUtils.getInitials(""), equalTo("--"))
     }
+
+    @Test
+    fun `-- does not crash`(){
+        MatcherAssert.assertThat(NameUtils.getInitials("--"), equalTo("--"))
+    }
 }
