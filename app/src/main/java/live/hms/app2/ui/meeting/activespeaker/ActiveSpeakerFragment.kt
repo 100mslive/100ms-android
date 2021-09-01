@@ -71,7 +71,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         val required = lru.capacity // We'd always want enough to fill the lru
         val all = tracks
           .sortedByDescending {
-            if(it.audio == null || it.isScreen){
+            if(it.audio == null || it.audio?.isMute == true || it.isScreen){
               it.peer.name.hashCode() * -1 // Drop these ids really low.
             }
             else
