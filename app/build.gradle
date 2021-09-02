@@ -14,8 +14,8 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 152
-        versionName "2.0.93"
+        versionCode 157
+        versionName "2.0.98"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -61,8 +61,7 @@ dependencies {
 
     //100ms.live SDK
     implementation "com.github.100mslive:webrtc:WebRTC-source-stamp-2021-08-20T04_05_25"
-    //implementation 'com.github.100mslive:android-sdk:2.0.8'
-    implementation project(':lib')
+    implementation 'com.github.100mslive:android-sdk:2.0.9'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
