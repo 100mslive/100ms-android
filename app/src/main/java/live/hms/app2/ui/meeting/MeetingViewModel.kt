@@ -424,23 +424,25 @@ class MeetingViewModel(
 
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      // Check if this track already exists
       if (track is HMSRemoteAudioTrack) {
         track.setVolume(if (isAudioMuted) 0.0 else 1.0)
       }
 
+      // Check if this track already exists
       val _track = _tracks.find {
                 it.peer.peerID == peer.peerID &&
                 it.isScreen.not()
       }
 
       if (_track == null) {
+        // No existing MeetingTrack found, add a new tile
         if (peer.isLocal) {
           _tracks.add(0, MeetingTrack(peer, null, track))
         } else {
           _tracks.add(MeetingTrack(peer, null, track))
         }
       } else {
+        // Existing MeetingTrack, update its audio track
         _track.audio = track
       }
 
@@ -448,19 +450,25 @@ class MeetingViewModel(
     }
   }
 
-
   private fun addVideoTrack(track: HMSVideoTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      // Check if this track already exists
-      val _track = _tracks.find {track.source != HMSTrackSource.SCREEN && it.peer.peerID == peer.peerID }
-      if (_track == null) {
-        if (peer.isLocal) {
-          _tracks.add(0, MeetingTrack(peer, track, null))
-        } else {
-          _tracks.add(MeetingTrack(peer, track, null))
-        }
+      if (track.source == HMSTrackSource.SCREEN) {
+        // Add a new tile to show screen share
+        _tracks.add(MeetingTrack(peer, track, null))
       } else {
-        _track.video = track
+        // First check if this track already exists
+        val _track = _tracks.find { it.peer.peerID == peer.peerID && it.isScreen.not() }
+        if (_track == null) {
+          // No existing MeetingTrack found, add a new tile
+          if (peer.isLocal) {
+            _tracks.add(0, MeetingTrack(peer, track, null))
+          } else {
+            _tracks.add(MeetingTrack(peer, track, null))
+          }
+        } else {
+          // Existing MeetingTrack, update its video track
+          _track.video = track
+        }
       }
     }
 
@@ -492,14 +500,14 @@ class MeetingViewModel(
       }
 
       if (
-        // Remove tile from view since both audio and video track are null
+        // Remove tile from view since both audio and video track are null for the peer
         (peer.audioTrack == null &&  peer.videoTrack == null) ||
         // Remove screenshare tile from view
-        (track.type == HMSTrackType.VIDEO && meetingTrack?.audio == null)) {
+        track.source == HMSTrackSource.SCREEN) {
         _tracks.remove(meetingTrack)
       }
 
-      // Update the view as we have removed some views
+      // Update the view as some track has been removed
       tracks.postValue(_tracks)
     }
   }
