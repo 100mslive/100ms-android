@@ -428,6 +428,10 @@ class MeetingViewModel(
         track.setVolume(if (isAudioMuted) 0.0 else 1.0)
       }
 
+      // Check if this track is of screenshare type, then we dont need to show a tile
+      if (track.source == HMSTrackSource.SCREEN)
+        return
+
       // Check if this track already exists
       val _track = _tracks.find {
                 it.peer.peerID == peer.peerID &&
@@ -502,8 +506,8 @@ class MeetingViewModel(
       if (
         // Remove tile from view since both audio and video track are null for the peer
         (peer.audioTrack == null &&  peer.videoTrack == null) ||
-        // Remove screenshare tile from view
-        track.source == HMSTrackSource.SCREEN) {
+        // Remove video screenshare tile from view
+        (track.source == HMSTrackSource.SCREEN && track.type == HMSTrackType.VIDEO)) {
         _tracks.remove(meetingTrack)
       }
 
