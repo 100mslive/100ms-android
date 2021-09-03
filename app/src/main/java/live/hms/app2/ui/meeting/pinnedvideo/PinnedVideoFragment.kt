@@ -16,6 +16,7 @@ import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
 import live.hms.app2.util.*
+import live.hms.video.media.tracks.HMSVideoTrack
 import org.webrtc.RendererCommon
 
 class PinnedVideoFragment : Fragment() {
@@ -112,7 +113,7 @@ class PinnedVideoFragment : Fragment() {
       binding.pinVideo.surfaceView.apply {
         if (isViewVisible) {
           SurfaceViewRendererUtil.bind(this, track).let { success ->
-            if (success) visibility = View.VISIBLE
+            if (success) visibility = if ((track as HMSVideoTrack).isDegraded) View.INVISIBLE else View.VISIBLE
           }
         } else {
           SurfaceViewRendererUtil.unbind(this, track)
@@ -139,7 +140,7 @@ class PinnedVideoFragment : Fragment() {
         }
 
         SurfaceViewRendererUtil.bind(this, track).let { success ->
-          if (success) visibility = View.VISIBLE
+          if (success) visibility = if ((track as HMSVideoTrack).isDegraded) View.INVISIBLE else View.VISIBLE
         }
       }
     }

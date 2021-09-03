@@ -12,6 +12,7 @@ import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
+import live.hms.video.media.tracks.HMSVideoTrack
 import org.webrtc.RendererCommon
 
 class VideoListAdapter(
@@ -78,7 +79,7 @@ class VideoListAdapter(
           "VideoItemViewHolder::bindSurfaceView"
         ).let { success ->
           if (success) {
-            binding.surfaceView.visibility = View.VISIBLE
+            binding.surfaceView.visibility = if ((item.track as HMSVideoTrack).isDegraded) View.INVISIBLE else View.VISIBLE
             isSurfaceViewBinded = true
           }
         }
