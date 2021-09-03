@@ -44,6 +44,22 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/container_jitter"
+            style="@style/LabelledText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/edit_text_jitter">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_jitter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/jitter"
+                android:inputType="numberDecimal" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_rows"
             style="@style/TextInputLayout"
             android:layout_width="match_parent"
@@ -214,14 +230,6 @@
                 android:inputType="none" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_subscribe_degradation_enabled"
-            style="@style/MaterialSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/switch_enable_subscribe_degradation"
-            android:visibility="visible" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_publish_video_on_join"
