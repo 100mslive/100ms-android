@@ -119,8 +119,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     if (item.peer.videoTrack == null
       || item.video == null
-      || item.video?.isMute == true
-      || binding.surfaceView.visibility == View.VISIBLE) return
+      || item.video?.isMute == true) return
 
     binding.surfaceView.let { view ->
       view.setScalingType(scalingType)
