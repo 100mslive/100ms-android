@@ -160,10 +160,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       }
 
       if (surfaceView.visibility != surfaceViewVisibility) {
-        if (surfaceViewVisibility == View.VISIBLE)
-          bindSurfaceView(binding, item)
-        else
-          unbindSurfaceView(binding, item)
+        surfaceView.visibility = surfaceViewVisibility
       }
     }
   }
