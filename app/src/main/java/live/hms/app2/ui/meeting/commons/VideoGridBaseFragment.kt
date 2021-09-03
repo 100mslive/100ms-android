@@ -120,7 +120,6 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (item.peer.videoTrack == null
       || item.video == null
       || item.video?.isMute == true
-      || item.video?.isDegraded == true
       || binding.surfaceView.visibility == View.VISIBLE) return
 
     binding.surfaceView.let { view ->
@@ -129,7 +128,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
       SurfaceViewRendererUtil.bind(view, item).let {
         if (it) {
-          binding.surfaceView.visibility = View.VISIBLE
+          binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
           bindedVideoTrackIds.add(item.video!!.trackId)
         }
       }
