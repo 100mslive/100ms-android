@@ -109,11 +109,11 @@ class PinnedVideoFragment : Fragment() {
   private fun handleOnPinVideoVisibilityChange() {
     crashlyticsLog(TAG, "handleOnPinVideoVisibilityChange: isViewVisible=${isViewVisible}")
 
-    pinnedTrack?.let { track ->
+    pinnedTrack?.let { track : MeetingTrack ->
       binding.pinVideo.surfaceView.apply {
         if (isViewVisible) {
           SurfaceViewRendererUtil.bind(this, track).let { success ->
-            if (success) visibility = if ((track as HMSVideoTrack).isDegraded) View.INVISIBLE else View.VISIBLE
+            if (success) visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
           }
         } else {
           SurfaceViewRendererUtil.unbind(this, track)
