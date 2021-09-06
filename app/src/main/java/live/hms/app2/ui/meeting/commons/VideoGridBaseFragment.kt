@@ -125,8 +125,8 @@ abstract class VideoGridBaseFragment : Fragment() {
       view.setScalingType(scalingType)
       view.setEnableHardwareScaler(true)
 
-      SurfaceViewRendererUtil.bind(view, item).let {
-        if (it) {
+      SurfaceViewRendererUtil.bind(view, item).let { success ->
+        if (success) {
           binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
           bindedVideoTrackIds.add(item.video!!.trackId)
         }
