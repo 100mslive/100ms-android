@@ -53,9 +53,6 @@ class VideoListAdapter(
         setEnableHardwareScaler(true)
         setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
 
-        // Meanwhile until the video is not binded, hide the view.
-        visibility = View.GONE
-
         // Update the reference such that when view is attached to window
         // surface view is initialized with correct [VideoTrack]
         itemRef = item
@@ -133,27 +130,29 @@ class VideoListAdapter(
 
   override fun onBindViewHolder(holder: VideoItemViewHolder, position: Int) {
     crashlyticsLog(TAG, "onBindViewHolder: ${items[position]}")
-    holder.bind(items[position])
-  }
-
-  override fun onBindViewHolder(
-    holder: VideoItemViewHolder,
-    position: Int,
-    payloads: MutableList<Any>
-  ) {
-    if (payloads.isEmpty()) {
-      return super.onBindViewHolder(holder, position, payloads)
-    }
-
-    crashlyticsLog(
-      TAG,
-      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
-          "[payloads=$payloads]"
-    )
-    holder.unbindSurfaceView() // Free the context initialized for the previous item
+    holder.unbindSurfaceView()
     holder.bind(items[position])
     holder.bindSurfaceView()
   }
+
+//  override fun onBindViewHolder(
+//    holder: VideoItemViewHolder,
+//    position: Int,
+//    payloads: MutableList<Any>
+//  ) {
+//    if (payloads.isEmpty()) {
+//      return super.onBindViewHolder(holder, position, payloads)
+//    }
+//
+//    crashlyticsLog(
+//      TAG,
+//      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
+//          "[payloads=$payloads]"
+//    )
+//    holder.unbindSurfaceView() // Free the context initialized for the previous item
+//    holder.bind(items[position])
+//    holder.bindSurfaceView()
+//  }
 
   override fun getItemCount() = items.size
 }

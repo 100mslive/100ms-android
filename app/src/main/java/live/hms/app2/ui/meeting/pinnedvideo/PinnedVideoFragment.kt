@@ -111,12 +111,9 @@ class PinnedVideoFragment : Fragment() {
     pinnedTrack?.let { track : MeetingTrack ->
       binding.pinVideo.surfaceView.apply {
         if (isViewVisible) {
-          SurfaceViewRendererUtil.bind(this, track).let { success ->
-            if (success) visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-          }
+          SurfaceViewRendererUtil.bind(this, track)
         } else {
           SurfaceViewRendererUtil.unbind(this, track)
-          visibility = View.GONE
         }
       }
     }
@@ -135,12 +132,9 @@ class PinnedVideoFragment : Fragment() {
         // Unbind and Bind only when the view is only released() / init() respectively
         pinnedTrack?.let {
           SurfaceViewRendererUtil.unbind(this, it)
-          visibility = View.GONE
         }
 
-        SurfaceViewRendererUtil.bind(this, track).let { success ->
-          if (success) visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-        }
+        SurfaceViewRendererUtil.bind(this, track)
       }
     }
 

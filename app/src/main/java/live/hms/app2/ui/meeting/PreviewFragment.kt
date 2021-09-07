@@ -67,14 +67,10 @@ class PreviewFragment : Fragment() {
   private fun bindVideo() {
     if (this::track.isInitialized && track.video?.isMute == false) {
       SurfaceViewRendererUtil.bind(binding.previewView, track)
-      binding.previewView.visibility = View.VISIBLE
-    } else {
-      binding.previewView.visibility = View.GONE
     }
   }
 
   private fun unbindVideo() {
-    binding.previewView.visibility = View.GONE
 
     if (this::track.isInitialized) {
       SurfaceViewRendererUtil.unbind(binding.previewView, track)

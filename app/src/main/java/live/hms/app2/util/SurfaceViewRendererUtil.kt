@@ -2,14 +2,20 @@ package live.hms.app2.util
 
 import android.util.Log
 import android.view.View
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import live.hms.app2.ui.meeting.MeetingTrack
+import live.hms.video.utils.HMSLogger
 import live.hms.video.utils.SharedEglContext
 import org.webrtc.EglBase
+import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 
 object SurfaceViewRendererUtil {
 
   private const val TAG = "SurfaceViewRendererUtil"
+  private val scope = CoroutineScope(Dispatchers.Main)
 
   /**
    * Counter used to analyse the number of [EglBase.Context] allocated in
@@ -38,10 +44,27 @@ object SurfaceViewRendererUtil {
     Log.v(TAG, "bind called :: ${item.peer.name}")
 
     view.apply {
-      View.VISIBLE
+
       val context: EglBase.Context = SharedEglContext.context
 
-      init(context, null)
+      init(context, object : RendererCommon.RendererEvents {
+        override fun onFirstFrameRendered() {
+          HMSLogger.d(
+            TAG,
+            "First frame rendered for ${item.peer.name}. Screen? ${item.isScreen} Mute? ${item.video?.isMute} Degraded? ${item.video?.isDegraded}"
+          )
+          scope.launch {
+            visibility = if (item.video?.isDegraded == true ||
+              item.video?.isMute == true
+            ) View.INVISIBLE else View.VISIBLE
+          }
+        }
+
+        override fun onFrameResolutionChanged(p0: Int, p1: Int, p2: Int) {
+
+        }
+
+      })
       ++initializedContextCount
 
       item.video!!.addSink(this)
@@ -74,6 +97,9 @@ object SurfaceViewRendererUtil {
       item.video!!.removeSink(this)
       release()
       --initializedContextCount
+      scope.launch {
+        view.visibility = View.INVISIBLE
+      }
     }
 
     crashlyticsLog(

@@ -127,7 +127,6 @@ abstract class VideoGridBaseFragment : Fragment() {
 
       SurfaceViewRendererUtil.bind(view, item).let { success ->
         if (success) {
-          binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
           bindedVideoTrackIds.add(item.video!!.trackId)
         }
       }
@@ -144,15 +143,15 @@ abstract class VideoGridBaseFragment : Fragment() {
       iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
       iconAudioOff.visibility = visibility(
         item.isScreen.not() &&
-            (item.audio == null || item.audio!!.isMute)
+                (item.audio == null || item.audio!!.isMute)
       )
-      icDegraded.visibility = if(item.video?.isDegraded == true) View.VISIBLE else View.GONE
+      icDegraded.visibility = if (item.video?.isDegraded == true) View.VISIBLE else View.GONE
 
-      /** [View.setVisibility] */
-      val surfaceViewVisibility = if (item.peer.videoTrack == null
-        || item.video == null
-        || item.video?.isMute == true
-        || item.video?.isDegraded == true) {
+      // Null tracks are made invisible by not being bound.
+      val surfaceViewVisibility = if (
+        item.video?.isMute == true ||
+        item.video?.isDegraded == true
+      ) {
         View.INVISIBLE
       } else {
         View.VISIBLE
@@ -174,7 +173,6 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     SurfaceViewRendererUtil.unbind(binding.surfaceView, item, metadata).let {
       if (it) {
-        binding.surfaceView.visibility = View.INVISIBLE
         bindedVideoTrackIds.remove(item.video!!.trackId)
       }
     }
