@@ -119,17 +119,15 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     if (item.peer.videoTrack == null
       || item.video == null
-      || item.video?.isMute == true
-      || item.video?.isDegraded == true
-      || binding.surfaceView.visibility == View.VISIBLE) return
+      || item.video?.isMute == true) return
 
     binding.surfaceView.let { view ->
       view.setScalingType(scalingType)
       view.setEnableHardwareScaler(true)
 
-      SurfaceViewRendererUtil.bind(view, item).let {
-        if (it) {
-          binding.surfaceView.visibility = View.VISIBLE
+      SurfaceViewRendererUtil.bind(view, item).let { success ->
+        if (success) {
+          binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
           bindedVideoTrackIds.add(item.video!!.trackId)
         }
       }
@@ -161,10 +159,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       }
 
       if (surfaceView.visibility != surfaceViewVisibility) {
-        if (surfaceViewVisibility == View.VISIBLE)
-          bindSurfaceView(binding, item)
-        else
-          unbindSurfaceView(binding, item)
+        surfaceView.visibility = surfaceViewVisibility
       }
     }
   }

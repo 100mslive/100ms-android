@@ -78,7 +78,7 @@ class VideoListAdapter(
           "VideoItemViewHolder::bindSurfaceView"
         ).let { success ->
           if (success) {
-            binding.surfaceView.visibility = View.VISIBLE
+            binding.surfaceView.visibility = if (item.track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
             isSurfaceViewBinded = true
           }
         }
