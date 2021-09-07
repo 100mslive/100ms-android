@@ -147,8 +147,8 @@ abstract class VideoGridBaseFragment : Fragment() {
       )
       icDegraded.visibility = if (item.video?.isDegraded == true) View.VISIBLE else View.GONE
 
-      // Null tracks are made invisible by not being bound.
       val surfaceViewVisibility = if (
+        item.video == null ||
         item.video?.isMute == true ||
         item.video?.isDegraded == true
       ) {
