@@ -22,6 +22,7 @@ import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.utils.HMSCoroutineScope
+import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -376,10 +377,10 @@ class MeetingViewModel(
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
         override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
-          Log.d(
+          HMSLogger.v(
             TAG,
-            speakers.fold("Customer_User_IDs:") { cur: String, sp: HMSSpeaker -> cur + " ${sp.peer?.customerUserID}" })
-          Log.v(TAG, "onAudioLevelUpdate: speakers=${speakers.toList()}")
+            "onAudioLevelUpdate: speakers=${speakers.map { Pair(it.peer?.name, it.level) }}"
+          )
           this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
