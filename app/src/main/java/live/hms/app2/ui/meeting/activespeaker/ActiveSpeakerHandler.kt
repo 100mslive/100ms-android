@@ -6,7 +6,7 @@ import live.hms.video.utils.HMSLogger
 
 class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
     private val TAG = ActiveSpeakerHandler::class.java.simpleName
-    private val lru = ActiveSpeakerCache<ActiveSpeakerFragment.LruItem>(4)
+    private val lru = ActiveSpeakerCache<LruItem>(4)
 
     fun trackUpdateLruTrigger(tracks: List<MeetingTrack>): List<MeetingTrack> {
         synchronized(tracks) {
@@ -20,7 +20,7 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
                         it.peer.name.hashCode()
                 }
                 .map {
-                    ActiveSpeakerFragment.LruItem(it.peer.peerID, it.peer.name)
+                    LruItem(it.peer.peerID, it.peer.name)
                 }
 
             lru.update(all, false)
@@ -36,7 +36,7 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
         )
 
         lru.update(
-            speakers.map { ActiveSpeakerFragment.LruItem(it.peer!!.peerID, it.peer!!.name) },
+            speakers.map { LruItem(it.peer!!.peerID, it.peer!!.name) },
             true
         )
         return Pair(update(), speakers)
@@ -53,6 +53,15 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
         return videos
         // TODO call the update videos function
 //        updateVideos(binding.container, videos)
+    }
+
+    data class LruItem(
+        val peerId: String,
+        val peerName: String
+    ) {
+        override fun toString(): String {
+            return peerName
+        }
     }
 
 }

@@ -17,15 +17,6 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     private const val TAG = "ActiveSpeakerFragment"
   }
 
-  data class LruItem(
-    val peerId: String,
-    val peerName: String
-  ) {
-    override fun toString(): String {
-      return peerName
-    }
-  }
-
   private var binding by viewLifecycle<FragmentActiveSpeakerBinding>()
 
   private var screenShareTrack: MeetingTrack? = null
