@@ -89,14 +89,13 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     synchronized(tracks) {
       // Update lru just to keep it as much filled as possible
 
-      val required = lru.capacity // We'd always want enough to fill the lru
       val all = tracks
         .sortedByDescending {
           if (it.audio == null || it.audio?.isMute == true || it.isScreen) {
             it.peer.name.hashCode() * -1 // Drop these ids really low.
           } else
             it.peer.name.hashCode()
-        }.take(required)
+        }
         .map {
           LruItem(it.peer.peerID, it.peer.name)
         }
