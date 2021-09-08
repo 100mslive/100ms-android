@@ -181,7 +181,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
 
-  protected fun updateVideos(layout: GridLayout, newVideos: Array<MeetingTrack?>) {
+  protected fun updateVideos(layout: GridLayout, newVideos: List<MeetingTrack?>) {
     crashlyticsLog(
       TAG,
       "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
