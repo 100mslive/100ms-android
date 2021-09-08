@@ -22,12 +22,16 @@ class ActiveSpeakerCache<T>(val capacity: Int) {
             }
             HMSLogger.v(TAG, "--------run finished---------")
         } else {
+            HMSLogger.v(TAG, "Only removing tracks, track update.")
             // First remove any tracks that have gotten removed.
             //  Which are the tracks present in speakers but not in items
+            HMSLogger.v(TAG, "Current $items")
             val excludeRemovedTracks = speakers.intersect(items)
+            HMSLogger.v(TAG, "New $excludeRemovedTracks")
 
             // Only fill items, not remove any further items.
             val update = (excludeRemovedTracks union items.take(capacity)).take(capacity)
+            HMSLogger.v(TAG, "After filling $update,\nwith available options $items")
 
             speakers.clear()
             speakers.addAll(update)
