@@ -17,7 +17,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     private const val TAG = "ActiveSpeakerFragment"
   }
 
-  private data class LruItem(
+  data class LruItem(
     val peerId: String,
     val peerName: String
   ) {
@@ -26,7 +26,6 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-  private val lru by lazy { ActiveSpeakerCache<LruItem>(4) }
   private var binding by viewLifecycle<FragmentActiveSpeakerBinding>()
 
   private var screenShareTrack: MeetingTrack? = null
@@ -56,53 +55,22 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-  private fun update() {
-    val order = lru.getAllItems()
-    val videos = Array(order.size) { idx ->
-      meetingViewModel.findTrack { it.peer.peerID == order[idx].peerId && it.isScreen.not() }
-    }
-    updateVideos(binding.container, videos)
-  }
-
   private fun initViewModels() {
 
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
-      trackUpdateLruTrigger(tracks)
       updateScreenshareTracks(tracks)
     }
 
-    meetingViewModel.speakers.observe(viewLifecycleOwner) { speakers ->
-      HMSLogger.v(
-        TAG,
-        "speakers update received 🎙 [size=${speakers.size}, names=${speakers.map { it.peer?.name }}] "
-      )
+    meetingViewModel.activeSpeakersUpdatedTracks.observe(viewLifecycleOwner) { tracks ->
+      HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
+      updateVideos(binding.container, tracks.toTypedArray())
+    }
 
-      lru.update(speakers.map { LruItem(it.peer!!.peerID, it.peer!!.name) }, true)
-      update()
+    meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
+      updateVideos(binding.container, videos.toTypedArray())
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
-    }
-  }
-
-  private fun trackUpdateLruTrigger(tracks: List<MeetingTrack>) {
-    synchronized(tracks) {
-      // Update lru just to keep it as much filled as possible
-
-      val all = tracks
-        .sortedByDescending {
-          if (it.audio == null || it.audio?.isMute == true || it.isScreen) {
-            it.peer.name.hashCode() * -1 // Drop these ids really low.
-          } else
-            it.peer.name.hashCode()
-        }
-        .map {
-          LruItem(it.peer.peerID, it.peer.name)
-        }
-
-      lru.update(all, false)
-
-      update()
     }
   }
 
@@ -139,4 +107,6 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       binding.screenShareContainer.visibility = View.GONE
     }
   }
+
+
 }

@@ -3,11 +3,11 @@ package live.hms.app2.ui.meeting
 import android.app.Application
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
@@ -114,6 +114,11 @@ class MeetingViewModel(
 
   // Live data containing the current Speaker in the meeting
   val speakers = MutableLiveData<Array<HMSSpeaker>>()
+
+  private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
+  val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
+    speakers.map(activeSpeakerHandler::speakerUpdate)
+  val activeSpeakersUpdatedTracks = tracks.map(activeSpeakerHandler::trackUpdateLruTrigger)
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
