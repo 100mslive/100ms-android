@@ -6,7 +6,7 @@ import live.hms.video.utils.HMSLogger
 
 class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
     private val TAG = ActiveSpeakerHandler::class.java.simpleName
-    private val lru = ActiveSpeakerCache<SpeakerItem>(4)
+    private val speakerCache = ActiveSpeakerCache<SpeakerItem>(4)
 
     fun trackUpdateTrigger(tracks: List<MeetingTrack>): List<MeetingTrack> {
         synchronized(tracks) {
@@ -23,7 +23,7 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
                     SpeakerItem(it.peer.peerID, it.peer.name)
                 }
 
-            lru.update(all, false)
+            speakerCache.update(all, false)
 
             return update()
         }
@@ -35,7 +35,7 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
             "speakers update received 🎙 [size=${speakers.size}, names=${speakers.map { it.peer?.name }}] "
         )
 
-        lru.update(
+        speakerCache.update(
             speakers.filter { it.peer != null } // Sometimes the peer which the server says is speaking, might be missing.
                 .map { SpeakerItem(it.peer!!.peerID, it.peer!!.name) },
             true
@@ -46,7 +46,7 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
     private fun update(): List<MeetingTrack> {
         // Update all the videos which aren't screenshares
 
-        val order = lru.getAllItems()
+        val order = speakerCache.getAllItems()
         val videos = order.mapNotNull { orderedItem ->
             getTracks().find { givenTrack ->
                 givenTrack.peer.peerID == orderedItem.peerId && givenTrack.isScreen.not()
