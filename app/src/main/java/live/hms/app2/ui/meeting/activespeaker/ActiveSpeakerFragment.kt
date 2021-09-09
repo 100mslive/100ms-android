@@ -69,7 +69,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     // Check if the currently shared screen-share track is removed
     screenShareTrack?.let { screen ->
-      if (tracks.find { screen == it } == null) {
+      if (!tracks.contains(screen)) {
         screenShareTrack?.let { unbindSurfaceView(binding.screenShare, it) }
         screenShareTrack = null
       }
