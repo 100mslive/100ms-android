@@ -36,7 +36,8 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
         )
 
         lru.update(
-            speakers.map { LruItem(it.peer!!.peerID, it.peer!!.name) },
+            speakers.filter { it.peer != null } // Sometimes the peer which the server says is speaking, might be missing.
+                .map { LruItem(it.peer!!.peerID, it.peer!!.name) },
             true
         )
         return Pair(update(), speakers)
