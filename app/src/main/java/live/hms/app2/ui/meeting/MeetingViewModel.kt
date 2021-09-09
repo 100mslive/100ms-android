@@ -119,7 +119,7 @@ class MeetingViewModel(
   private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
   val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
     speakers.map(activeSpeakerHandler::speakerUpdate)
-  val activeSpeakersUpdatedTracks = tracks.map(activeSpeakerHandler::trackUpdateLruTrigger)
+  val activeSpeakersUpdatedTracks = tracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
