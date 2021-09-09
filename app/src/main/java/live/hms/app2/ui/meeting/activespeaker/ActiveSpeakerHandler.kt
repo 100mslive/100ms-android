@@ -44,16 +44,17 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
     }
 
     private fun update(): List<MeetingTrack> {
+        // Update all the videos which aren't screenshares
+
         val order = lru.getAllItems()
         val videos = order.mapNotNull { orderedItem ->
             getTracks().find { givenTrack ->
                 givenTrack.peer.peerID == orderedItem.peerId && givenTrack.isScreen.not()
             }
         }
-        // Update all the videos which aren't screenshares
         return videos
-        // TODO call the update videos function
-//        updateVideos(binding.container, videos)
+        // Always bind videos after this function is called
+        // updateVideos(binding.container, videos)
     }
 
     data class LruItem(
