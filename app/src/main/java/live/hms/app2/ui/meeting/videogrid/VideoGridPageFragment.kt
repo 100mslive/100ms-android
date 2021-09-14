@@ -61,6 +61,6 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       updateVideos(binding.container, videos)
     }
 
-    meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
+    //meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
   }
 }
