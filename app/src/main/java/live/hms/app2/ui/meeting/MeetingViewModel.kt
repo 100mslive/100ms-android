@@ -3,11 +3,11 @@ package live.hms.app2.ui.meeting
 import android.app.Application
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
@@ -22,6 +22,7 @@ import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.utils.HMSCoroutineScope
+import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -114,6 +115,11 @@ class MeetingViewModel(
 
   // Live data containing the current Speaker in the meeting
   val speakers = MutableLiveData<Array<HMSSpeaker>>()
+
+  private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
+  val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
+    speakers.map(activeSpeakerHandler::speakerUpdate)
+  val activeSpeakersUpdatedTracks = tracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
@@ -371,10 +377,10 @@ class MeetingViewModel(
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
         override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
-          Log.d(
+          HMSLogger.v(
             TAG,
-            speakers.fold("Customer_User_IDs:") { cur: String, sp: HMSSpeaker -> cur + " ${sp.peer?.customerUserID}" })
-          Log.v(TAG, "onAudioLevelUpdate: speakers=${speakers.toList()}")
+            "onAudioLevelUpdate: speakers=${speakers.map { Pair(it.peer?.name, it.level) }}"
+          )
           this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
