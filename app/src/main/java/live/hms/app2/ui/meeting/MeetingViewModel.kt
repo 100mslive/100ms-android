@@ -324,14 +324,23 @@ class MeetingViewModel(
             HMSTrackUpdate.TRACK_MUTED -> {
               tracks.postValue(_tracks)
               if (peer.isLocal) {
-                if(track.type == HMSTrackType.AUDIO)
+                if (track.type == HMSTrackType.AUDIO)
                   isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
-                else if(track.type == HMSTrackType.VIDEO){
+                else if (track.type == HMSTrackType.VIDEO) {
                   isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
                 }
               }
             }
-            HMSTrackUpdate.TRACK_UNMUTED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_UNMUTED -> {
+              tracks.postValue(_tracks)
+              if (peer.isLocal) {
+                if (track.type == HMSTrackType.AUDIO)
+                  isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
+                else if (track.type == HMSTrackType.VIDEO) {
+                  isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
+                }
+              }
+            }
             HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_DEGRADED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_RESTORED -> tracks.postValue(_tracks)
@@ -430,9 +439,9 @@ class MeetingViewModel(
 
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      if (track is HMSRemoteAudioTrack) {
-        track.setVolume(if (isAudioMuted) 0.0 else 1.0)
-      }
+//      if (track is HMSRemoteAudioTrack) {
+//        track.setVolume(if (isAudioMuted) 0.0 else 1.0)
+//      }
 
       // Check if this track is of screenshare type, then we dont need to show a tile
       if (track.source == HMSTrackSource.SCREEN)
@@ -440,7 +449,7 @@ class MeetingViewModel(
 
       // Check if this track already exists
       val _track = _tracks.find {
-                it.peer.peerID == peer.peerID &&
+        it.peer.peerID == peer.peerID &&
                 it.isScreen.not()
       }
 
