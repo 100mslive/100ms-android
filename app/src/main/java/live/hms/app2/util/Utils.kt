@@ -18,3 +18,9 @@ fun visibility(show: Boolean) = if (show) {
 } else {
   View.GONE
 }
+
+fun visibilityOpacity(show: Boolean) = if (show) {
+  1.0f
+} else {
+  0.0f
+}
