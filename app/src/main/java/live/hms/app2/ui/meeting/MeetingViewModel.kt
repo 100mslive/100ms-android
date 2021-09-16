@@ -439,9 +439,9 @@ class MeetingViewModel(
 
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-//      if (track is HMSRemoteAudioTrack) {
-//        track.setVolume(if (isAudioMuted) 0.0 else 1.0)
-//      }
+      if (track is HMSRemoteAudioTrack) {
+        track.setVolume(if (isAudioMuted) 0.0 else 1.0)
+      }
 
       // Check if this track is of screenshare type, then we dont need to show a tile
       if (track.source == HMSTrackSource.SCREEN)
