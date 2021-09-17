@@ -13,9 +13,7 @@ import live.hms.app2.databinding.VideoCardBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.settings.SettingsStore
-import live.hms.app2.util.NameUtils
-import live.hms.app2.util.SurfaceViewRendererUtil
-import live.hms.app2.util.crashlyticsLog
+import live.hms.app2.util.*
 import live.hms.app2.util.visibility
 import live.hms.video.sdk.models.HMSSpeaker
 import org.webrtc.RendererCommon
@@ -138,14 +136,18 @@ abstract class VideoGridBaseFragment : Fragment() {
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
 
     binding.apply {
-      name.text = item.peer.name
-      nameInitials.text = NameUtils.getInitials(item.peer.name)
-      iconScreenShare.visibility = if (item.isScreen) View.VISIBLE else View.GONE
-      iconAudioOff.visibility = visibility(
+      // Donot update the text view if not needed, this causes redraw of the entire view leading to  flicker
+      if (name.text.equals(item.peer.name).not()) {
+        name.text = item.peer.name
+        nameInitials.text = NameUtils.getInitials(item.peer.name)
+      }
+      // Using alpha instead of visibility to stop redraw of the entire view to stop flickering
+      iconScreenShare.alpha = visibilityOpacity( (item.isScreen) )
+      iconAudioOff.alpha = visibilityOpacity(
         item.isScreen.not() &&
                 (item.audio == null || item.audio!!.isMute)
       )
-      icDegraded.visibility = if (item.video?.isDegraded == true) View.VISIBLE else View.GONE
+      icDegraded.alpha = visibilityOpacity(item.video?.isDegraded == true)
 
       val surfaceViewVisibility = if ( item.peer.videoTrack == null ||
         item.video == null ||
@@ -179,7 +181,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
 
-  protected fun updateVideos(layout: GridLayout, newVideos: Array<MeetingTrack?>) {
+  protected fun updateVideos(layout: GridLayout, newVideos: List<MeetingTrack?>) {
     crashlyticsLog(
       TAG,
       "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
