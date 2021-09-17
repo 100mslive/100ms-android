@@ -29,7 +29,6 @@ The Android SDK supports Android API level 21 and higher. It is built for armeab
 - Clone this repository
 
 ```bash
-  
 git clone --depth 1 https://github.com/100mslive/sample-app-android.git
 ```
 
