@@ -6,6 +6,7 @@
 <p align="center" >
   <a href="https://100ms.live/">
   <img src="assets/100ms-logo.png?raw=true" title="100ms logo" float=left>
+  </a>
 </p>
 
 # 🎉 100ms SDK ＆ Sample App 🚀
@@ -28,11 +29,11 @@ The Android SDK supports Android API level 21 and higher. It is built for armeab
 - Clone this repository
 
 ```bash
+  
 git clone --depth 1 https://github.com/100mslive/sample-app-android.git
 ```
 
-- Get your token generation
-  endpoint [following this guide](https://docs.100ms.live/server-side/v2/foundation/authentication-and-tokens)
+- Get your token generation endpoint [by following this guide](https://docs.100ms.live/server-side/v2/foundation/authentication-and-tokens)
 
 - Create `app/gradle.properties`
 
