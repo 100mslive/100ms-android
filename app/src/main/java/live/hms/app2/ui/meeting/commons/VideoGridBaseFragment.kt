@@ -147,7 +147,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       )
       icDegraded.visibility = if (item.video?.isDegraded == true) View.VISIBLE else View.GONE
 
-      val surfaceViewVisibility = if (
+      val surfaceViewVisibility = if ( item.peer.videoTrack == null ||
         item.video == null ||
         item.video?.isMute == true ||
         item.video?.isDegraded == true
