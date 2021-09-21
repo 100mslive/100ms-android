@@ -27,7 +27,8 @@
 # https://developer.android.com/guide/navigation/navigation-pass-data#proguard_considerations
 -keepnames class live.hms.app2.model.RoomDetails
 -keepnames class live.hms.app2.ui.settings.SettingsMode
+-keep class * extends androidx.fragment.app.Fragment{}
 
-# Video libs
--keep class org.webrtc.** { *; }
--keep class live.hms.video.** { *; }
+# Previously required proguard rules for sdk, now included in the library.
+#-keep class org.webrtc.** { *; }
+#-keep class live.hms.video.** { *; }

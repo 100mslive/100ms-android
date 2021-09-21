@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.lifecycle.observe
 import live.hms.app2.databinding.FragmentVideoGridPageBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
@@ -41,7 +40,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     return binding.root
   }
 
-  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): Array<MeetingTrack?> {
+  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): List<MeetingTrack?> {
     val pageVideos = ArrayList<MeetingTrack?>()
 
     // Range is [fromIndex, toIndex] -- Notice the bounds
@@ -53,7 +52,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       pageVideos.add(tracks[idx])
     }
 
-    return pageVideos.toTypedArray()
+    return pageVideos
   }
 
   private fun initViewModels() {
@@ -62,6 +61,6 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       updateVideos(binding.container, videos)
     }
 
-    meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
+    //meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
   }
 }

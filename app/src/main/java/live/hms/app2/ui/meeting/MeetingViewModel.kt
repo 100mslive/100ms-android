@@ -3,11 +3,11 @@ package live.hms.app2.ui.meeting
 import android.app.Application
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
@@ -22,6 +22,7 @@ import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.utils.HMSCoroutineScope
+import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -114,6 +115,11 @@ class MeetingViewModel(
 
   // Live data containing the current Speaker in the meeting
   val speakers = MutableLiveData<Array<HMSSpeaker>>()
+
+  private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
+  val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
+    speakers.map(activeSpeakerHandler::speakerUpdate)
+  val activeSpeakersUpdatedTracks = tracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
@@ -318,14 +324,23 @@ class MeetingViewModel(
             HMSTrackUpdate.TRACK_MUTED -> {
               tracks.postValue(_tracks)
               if (peer.isLocal) {
-                if(track.type == HMSTrackType.AUDIO)
+                if (track.type == HMSTrackType.AUDIO)
                   isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
-                else if(track.type == HMSTrackType.VIDEO){
+                else if (track.type == HMSTrackType.VIDEO) {
                   isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
                 }
               }
             }
-            HMSTrackUpdate.TRACK_UNMUTED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_UNMUTED -> {
+              tracks.postValue(_tracks)
+              if (peer.isLocal) {
+                if (track.type == HMSTrackType.AUDIO)
+                  isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
+                else if (track.type == HMSTrackType.VIDEO) {
+                  isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
+                }
+              }
+            }
             HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_DEGRADED -> tracks.postValue(_tracks)
             HMSTrackUpdate.TRACK_RESTORED -> tracks.postValue(_tracks)
@@ -371,10 +386,10 @@ class MeetingViewModel(
 
       hmsSDK.addAudioObserver(object : HMSAudioListener {
         override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
-          Log.d(
+          HMSLogger.v(
             TAG,
-            speakers.fold("Customer_User_IDs:") { cur: String, sp: HMSSpeaker -> cur + " ${sp.peer?.customerUserID}" })
-          Log.v(TAG, "onAudioLevelUpdate: speakers=${speakers.toList()}")
+            "onAudioLevelUpdate: speakers=${speakers.map { Pair(it.peer?.name, it.level) }}"
+          )
           this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
@@ -424,8 +439,8 @@ class MeetingViewModel(
 
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      if (track is HMSRemoteAudioTrack) {
-        track.setVolume(if (isAudioMuted) 0.0 else 1.0)
+      if (isAudioMuted && track is HMSRemoteAudioTrack) {
+        track.setVolume(0.0) // Only keep people muted. Don't unmute those who come in add track because it might break SDK level muting.
       }
 
       // Check if this track is of screenshare type, then we dont need to show a tile
@@ -434,7 +449,7 @@ class MeetingViewModel(
 
       // Check if this track already exists
       val _track = _tracks.find {
-                it.peer.peerID == peer.peerID &&
+        it.peer.peerID == peer.peerID &&
                 it.isScreen.not()
       }
 

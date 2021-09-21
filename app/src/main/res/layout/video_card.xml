@@ -76,7 +76,6 @@
                 app:tint="@color/white_faded_70" />
 
             <ImageView
-                android:visibility="gone"
                 android:id="@+id/ic_degraded"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
