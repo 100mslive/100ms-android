@@ -40,7 +40,6 @@ class SettingsStore(context: Context) {
 
     const val LEAK_CANARY = "leak-canary"
     const val SHOW_RECONNECTING_PROGRESS_BARS = "show-reconnecting-progress-bar"
-    const val JITTER = "jitter-testing"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -96,10 +95,6 @@ class SettingsStore(context: Context) {
       commit()
     }
   }
-
-  var jitter : Float
-      get() = sharedPreferences.getFloat(JITTER, 1f)
-      set(value) = putFloat(JITTER, value)
 
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
@@ -248,8 +243,6 @@ class SettingsStore(context: Context) {
     fun setLogLevel100msSdk(value: String) = apply { editor.putString(LOG_LEVEL_100MS_SDK, value) }
     fun setLogLevel100msSdk(value: HMSLogger.LogLevel) =
       apply { editor.putString(LOG_LEVEL_100MS_SDK, value.toString()) }
-
-    fun setJitter(value: Float) = apply { editor.putFloat(JITTER, value) }
 
     fun commit() {
       editor.commit()

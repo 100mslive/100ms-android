@@ -215,14 +215,6 @@ class SettingsFragment : Fragment() {
         "Username"
       ) { commitHelper.setUsername(it) }
 
-      initNonEmptyEditTextWithRange(
-        EnumSet.of(SettingsMode.HOME),
-        settings.jitter,
-        editTextJitter, containerJitter,
-        "Jitter",
-        0.0f, 100f,
-      ) { commitHelper.setJitter(it) }
-
       // TODO: Make rows, columns available in SettingsMode.MEETING
       initNonEmptyEditTextWithRange(
         EnumSet.of(SettingsMode.HOME),

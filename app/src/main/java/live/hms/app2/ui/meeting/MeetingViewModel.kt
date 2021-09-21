@@ -131,7 +131,6 @@ class MeetingViewModel(
 
   val hmsSDK = HMSSDK
     .Builder(application)
-    .setJitter(settings.jitter)
     .build()
 
   val peers: Array<HMSPeer>

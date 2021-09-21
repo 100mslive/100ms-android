@@ -139,5 +139,4 @@
     <string name="switch_enable_subscribe_degradation">Enable subscribe degradation</string>
     <string name="end_room">End room</string>
     <string name="end_and_lock_room">Lock and end room</string>
-    <string name="jitter">Jitter</string>
 </resources>
