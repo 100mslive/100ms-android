@@ -60,7 +60,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
 
     //100ms.live SDK
-    implementation 'com.github.100mslive:android-sdk:2.1.1-alpha'
+    implementation 'com.github.100mslive:android-sdk:2.1.2-alpha'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
