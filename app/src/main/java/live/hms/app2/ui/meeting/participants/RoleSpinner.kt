@@ -13,6 +13,7 @@ class RoleSpinner @JvmOverloads constructor(
 
     fun initAdapters(
         spinnerRoles: List<String>,
+        givenPrompt: String,
         listener: AdapterView.OnItemSelectedListener
     ) {
         this.actualRoles = spinnerRoles
@@ -23,7 +24,7 @@ class RoleSpinner @JvmOverloads constructor(
             spinnerRoles // add an extra element at the end for cancel
         ).also { arrayAdapter ->
             adapter = arrayAdapter
-            prompt = "Remote Mute Role:"
+            prompt = givenPrompt
             setSelection(
                 spinnerRoles.size - 1,
                 false
