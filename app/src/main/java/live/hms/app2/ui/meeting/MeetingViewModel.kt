@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -96,6 +98,9 @@ class MeetingViewModel(
 
   // Live data to define the overall UI
   val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
+
+  private val _changeTrackMuteRequest = MutableStateFlow<HMSChangeTrackStateRequest?>(null)
+  val changeTrackMuteRequest: Flow<HMSChangeTrackStateRequest?> = _changeTrackMuteRequest
 
   // TODO: Listen to changes in publishVideo & publishAudio
   //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
@@ -380,7 +385,9 @@ class MeetingViewModel(
         }
 
         override fun onChangeTrackStateRequest(details: HMSChangeTrackStateRequest) {
-          state.postValue(MeetingState.TrackChangeRequest(details))
+          viewModelScope.launch {
+            _changeTrackMuteRequest.emit(details)
+          }
         }
       })
 
@@ -634,9 +641,66 @@ class MeetingViewModel(
     }
   }
 
-  fun getPeerForId(peerId : String) : HMSPeer? {
+  fun getPeerForId(peerId: String): HMSPeer? {
     return hmsSDK.getPeers().find { it.peerID == peerId }
   }
 
+  fun remoteMute(mute: Boolean, roles: List<String>?) {
+    if (isAllowedToMutePeers()) {
+      val selectedRoles = if (roles == null) null else {
+        hmsSDK.getRoles().filter { roles.contains(it.name) }
+      }
+      hmsSDK.changeTrackState(mute, null, null, selectedRoles, object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          Log.d(TAG, "remote mute Error $error")
+        }
+
+        override fun onSuccess() {
+          Log.d(TAG, "remote mute Suceeded")
+        }
+
+      })
+    }
+  }
+
+  /**
+   * Returns true if audio tracks exist and are muted.
+   * Returns false if audio tracks exist and are unmuted.
+   * Returns null if no audio tracks or no remote peers exist.
+   * Can check audio or video tracks. If nothing
+   *  is specified it returns the || of audio mute and video mute
+   */
+  fun areAllRemotePeersMute(type: HMSTrackType? = null): Boolean? {
+    val allPeerResults = hmsSDK.getRemotePeers().mapNotNull {
+      when (type) {
+        HMSTrackType.AUDIO -> {
+          it.audioTrack?.isMute
+        }
+        HMSTrackType.VIDEO -> {
+          it.videoTrack?.isMute
+        }
+        else -> {
+          val audioMute = it.audioTrack?.isMute
+          val videoMute = it.videoTrack?.isMute
+          when {
+            audioMute == null -> {
+              videoMute
+            }
+            videoMute == null -> {
+              audioMute
+            }
+            else -> {
+              videoMute || audioMute
+            }
+          }
+        }
+      }
+    }
+    return if (allPeerResults.isEmpty()) {
+      null
+    } else {
+      allPeerResults.reduce { acc, isMute -> acc && isMute }
+    }
+  }
 }
 
