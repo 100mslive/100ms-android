@@ -77,8 +77,8 @@
             android:id="@+id/action_record_meeting"
             android:icon="@drawable/ic_record_button_24"
             android:title="@string/record_meeting"
-            android:visible="false"
-            app:showAsAction="never" />
+            app:actionLayout="@layout/layout_menu_switch"
+            app:showAsAction="ifRoom" />
 
         <item
             android:id="@+id/action_participants"

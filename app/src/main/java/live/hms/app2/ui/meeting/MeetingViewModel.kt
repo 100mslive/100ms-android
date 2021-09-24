@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import live.hms.app2.BuildConfig
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -701,6 +702,41 @@ class MeetingViewModel(
     } else {
       allPeerResults.reduce { acc, isMute -> acc && isMute }
     }
+  }
+
+  fun recordMeeting() {
+    Log.d(TAG, "Starting recording")
+    val meetingUrl = "https://aniket.qa-app.100ms.live/meeting/hasty-corn-tamarin"
+
+    hmsSDK.startRtmpOrRecording(
+      HMSRecordingConfig(
+        meetingUrl,
+        listOf(BuildConfig.RTMP_INJEST_URL),
+        true
+      ), object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          Log.d(TAG, "error: $error")
+        }
+
+        override fun onSuccess() {
+          Log.d(TAG, "Success")
+        }
+
+      })
+  }
+
+  fun stopRecording() {
+    Log.d(TAG, "Stopping recording")
+    hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.d(TAG, "stop. error: $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "stop. Success")
+      }
+
+    })
   }
 }
 

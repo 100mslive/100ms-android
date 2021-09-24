@@ -99,7 +99,11 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_record_meeting -> {
-        Toast.makeText(requireContext(), "Recording Not Supported", Toast.LENGTH_SHORT).show()
+        if (item.isChecked) {
+          meetingViewModel.recordMeeting()
+        } else {
+          meetingViewModel.stopRecording()
+        }
       }
 
       R.id.action_share_screen -> {
