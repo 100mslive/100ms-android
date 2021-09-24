@@ -354,7 +354,7 @@ class MeetingFragment : Fragment() {
             if (trackChangeRequest.track is HMSLocalAudioTrack) {
               meetingViewModel.setLocalAudioEnabled(true)
             } else if (trackChangeRequest.track is HMSLocalVideoTrack) {
-              meetingViewModel.toggleLocalVideo()
+              meetingViewModel.setLocalVideoEnabled(true)
             }
             dialog.dismiss()
           }
