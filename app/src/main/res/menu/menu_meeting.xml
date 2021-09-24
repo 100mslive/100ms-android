@@ -22,14 +22,22 @@
     <item
         android:id="@+id/end_room"
         android:title="@string/end_room"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/end_and_lock_room"
         android:title="@string/end_and_lock_room"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/remote_mute_all"
+        android:title="@string/remote_mute_all_desc"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/remote_mute_role"
+        android:title="@string/remote_mute_role_desc"
+        app:showAsAction="ifRoom" />
 
     <group>
         <item
