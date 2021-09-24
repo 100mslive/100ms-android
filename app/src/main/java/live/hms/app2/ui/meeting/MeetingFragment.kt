@@ -335,39 +335,42 @@ class MeetingFragment : Fragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      withContext(Dispatchers.Main) {
         meetingViewModel.changeTrackMuteRequest.collect { trackChangeRequest ->
-          if (trackChangeRequest == null) return@collect
+          withContext(Dispatchers.Main) {
+            if (trackChangeRequest != null) {
 
-          val message = if (trackChangeRequest.track is HMSLocalAudioTrack) {
-            "${trackChangeRequest.requestedBy.name} is asking you to unmute."
-          } else {
-            "${trackChangeRequest.requestedBy.name} is asking you to turn on video."
-          }
+              val message = if (trackChangeRequest.track is HMSLocalAudioTrack) {
+                "${trackChangeRequest.requestedBy.name} is asking you to unmute."
+              } else {
+                "${trackChangeRequest.requestedBy.name} is asking you to turn on video."
+              }
 
-          val builder = AlertDialog.Builder(requireContext())
-            .setMessage(message)
-            .setTitle(R.string.track_change_request)
-            .setCancelable(false)
+              val builder = AlertDialog.Builder(requireContext())
+                .setMessage(message)
+                .setTitle(R.string.track_change_request)
+                .setCancelable(false)
 
-          builder.setPositiveButton(R.string.turn_on) { dialog, _ ->
-            if (trackChangeRequest.track is HMSLocalAudioTrack) {
-              meetingViewModel.setLocalAudioEnabled(true)
-            } else if (trackChangeRequest.track is HMSLocalVideoTrack) {
-              meetingViewModel.setLocalVideoEnabled(true)
+              builder.setPositiveButton(R.string.turn_on) { dialog, _ ->
+                if (trackChangeRequest.track is HMSLocalAudioTrack) {
+                  meetingViewModel.setLocalAudioEnabled(true)
+                } else if (trackChangeRequest.track is HMSLocalVideoTrack) {
+                  meetingViewModel.setLocalVideoEnabled(true)
+                }
+                dialog.dismiss()
+              }
+
+              builder.setNegativeButton(R.string.reject) { dialog, _ ->
+                dialog.dismiss()
+              }
+
+              builder.create().apply { show() }
+
             }
-            dialog.dismiss()
           }
-
-          builder.setNegativeButton(R.string.reject) { dialog, _ ->
-            dialog.dismiss()
-          }
-
-          builder.create().apply { show() }
-
+          return@collect
         }
-      }
     }
+
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
       Log.v(TAG, "Meeting State: $state")
       isMeetingOngoing = false
