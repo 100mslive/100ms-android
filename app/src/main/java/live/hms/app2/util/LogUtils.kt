@@ -6,6 +6,7 @@ import android.util.Log
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.video.utils.HMSLogger
 import live.hms.video.utils.HMSUtils
+import org.webrtc.RTCStats
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
@@ -70,6 +71,15 @@ object LogUtils {
         val time = Date().let { logDateFormatter.format(it) }
         val prefix = "[${if (isWebRtCLog) "RTC" else "HMS"}:$level:$tag:$time]"
         fileWriter.write("$prefix\t\t${message.trimEnd()}\n")
+      }
+
+      override fun onLogToFile(
+        fileName: HMSLogger.LogFiles,
+        tag: String,
+        message: MutableMap<String, RTCStats>
+      ) {
+        super.onLogToFile(fileName, tag, message)
+
       }
     })
   }
