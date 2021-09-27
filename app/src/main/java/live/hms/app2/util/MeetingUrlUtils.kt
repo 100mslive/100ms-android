@@ -9,7 +9,7 @@ fun String.isValidMeetingUrl(): Boolean =
 fun String.getTokenEndpointEnvironment(): String = when {
   this.contains("prod2.100ms.live") -> "prod-in"
   this.contains(".app.100ms.live") -> "prod-in"
-  else -> "qa-in"
+  else -> "qa-in2"
 }
 
 fun String.getInitEndpointEnvironment(): String = when {
