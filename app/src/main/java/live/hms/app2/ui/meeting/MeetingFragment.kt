@@ -99,11 +99,15 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_record_meeting -> {
-        val toggledCheckState = meetingViewModel.isRecording.value == true
-        if (toggledCheckState) {
-          meetingViewModel.recordMeeting()
-        } else {
+
+        // The check state is determined by
+        //  the success or failure calls for start stop recording
+        //  and also the recording state reported in the onJoin and onRoomUpdate methods.
+        //  So here we just read those values.
+        if (item.isChecked) {
           meetingViewModel.stopRecording()
+        } else {
+          meetingViewModel.recordMeeting()
         }
       }
 
