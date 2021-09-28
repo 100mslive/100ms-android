@@ -36,4 +36,14 @@ class InternalUtilsKtTest() {
         val tokenEndpoint = getTokenEndpointForCode(meetingUrl.getTokenEndpointEnvironment())
         assertThat(tokenEndpoint, equalTo("https://prod-in.100ms.live/hmsapi/get-token"))
     }
+
+    @Test
+    fun `beam bot urls are correctly constructed`() {
+        val beamJoiningUrl =
+            getBeamBotJoiningUrl(meetingUrl, "61407fd3d91703e09854b8562", "beambot")
+        assertThat(
+            beamJoiningUrl,
+            equalTo("https://aniket.app.100ms.live/preview/61407fd3d91703e09854b8562/beambot?token=beam_recording")
+        )
+    }
 }

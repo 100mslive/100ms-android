@@ -111,6 +111,7 @@ class MeetingViewModel(
 
   private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING)
   val isRecording: LiveData<RecordingState> = _isRecording
+  private var roomId: String? = null
 
   // Live data for enabling/disabling mute buttons
   val isLocalAudioPublishingAllowed = MutableLiveData(false)
@@ -255,6 +256,7 @@ class MeetingViewModel(
           failures.clear()
           state.postValue(MeetingState.Ongoing())
           updateRecordingState(room)
+          roomId = room.roomId // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
         }
 
@@ -726,7 +728,12 @@ class MeetingViewModel(
   }
 
   fun recordMeeting() {
-    val meetingUrl = BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
+
+    val meetingUrl = getBeamBotJoiningUrl(
+      roomDetails.url,
+      roomId!!,
+      "host"
+    ) //BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
     val rtmpInjectUrls = listOf(BuildConfig.RTMP_INJEST_URL)
     _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITIONING_TO_RECORDING)
 

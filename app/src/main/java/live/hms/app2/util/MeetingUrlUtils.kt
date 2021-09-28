@@ -31,3 +31,7 @@ fun String.toUniqueRoomSpecifier(): String {
     groups[2]
   }
 }
+
+fun getBeamBotJoiningUrl(meetingUrl: String, roomId: String, beamBotUser: String): String {
+  return "https://${meetingUrl.toSubdomain()}/preview/$roomId/$beamBotUser?token=beam_recording"
+}
