@@ -1,0 +1,8 @@
+package live.hms.app2.ui.meeting
+
+enum class RecordingState {
+    RECORDING,
+    NOT_RECORDING,
+    RECORDING_TRANSITIONING_TO_NOT_RECORDING,
+    NOT_RECORDING_TRANSITIONING_TO_RECORDING
+}

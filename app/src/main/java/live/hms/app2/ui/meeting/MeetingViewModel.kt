@@ -109,6 +109,9 @@ class MeetingViewModel(
   val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
   val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
+  private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING)
+  val isRecording: LiveData<RecordingState> = _isRecording
+
   // Live data for enabling/disabling mute buttons
   val isLocalAudioPublishingAllowed = MutableLiveData(false)
   val isLocalVideoPublishingAllowed = MutableLiveData(false)
@@ -707,6 +710,7 @@ class MeetingViewModel(
   fun recordMeeting() {
     val meetingUrl = BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
     val rtmpInjectUrls = listOf(BuildConfig.RTMP_INJEST_URL)
+    _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITIONING_TO_RECORDING)
 
     Log.v(TAG, "Starting recording")
     hmsSDK.startRtmpOrRecording(
@@ -721,6 +725,7 @@ class MeetingViewModel(
 
         override fun onSuccess() {
           Log.d(TAG, "RTMP recording Success")
+          _isRecording.postValue(RecordingState.RECORDING)
         }
 
       })
@@ -728,6 +733,8 @@ class MeetingViewModel(
 
   fun stopRecording() {
     Log.v(TAG, "Stopping recording")
+    _isRecording.postValue(RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING)
+
     hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         Log.v(TAG, "RTMP recording stop. error: $error")
@@ -735,6 +742,7 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         Log.d(TAG, "RTMP recording stop. Success")
+        _isRecording.postValue(RecordingState.NOT_RECORDING)
       }
 
     })
