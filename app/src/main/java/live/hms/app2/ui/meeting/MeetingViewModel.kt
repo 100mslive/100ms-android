@@ -254,6 +254,8 @@ class MeetingViewModel(
         override fun onJoin(room: HMSRoom) {
           failures.clear()
           state.postValue(MeetingState.Ongoing())
+          updateRecordingState(room)
+          Log.d("onRoomUpdate", "$room")
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -295,6 +297,14 @@ class MeetingViewModel(
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
           Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
+
+          when (type) {
+            HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
+            HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
+            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> updateRecordingState(hmsRoom)
+            else -> {
+            }
+          }
         }
 
         override fun onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer) {
@@ -407,12 +417,20 @@ class MeetingViewModel(
     }
   }
 
+  private fun updateRecordingState(room: HMSRoom) {
+    val recording = room.browserRecordingState?.running == true ||
+            room.serverRecordingState?.running == true ||
+            room.rtmpHMSRTMPStreamingState?.running == true
+    val recordingState = if (recording) RecordingState.RECORDING else RecordingState.NOT_RECORDING
+    _isRecording.postValue(recordingState)
+  }
+
   fun setStatetoOngoing() {
     state.postValue(MeetingState.Ongoing())
   }
 
   fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {
-    hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener{
+    hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener {
       override fun onSuccess() {
         Log.i(TAG, "Successfully accepted change role request for $hmsRoleChangeRequest")
       }
