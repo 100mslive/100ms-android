@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import live.hms.app2.BuildConfig
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -107,6 +108,10 @@ class MeetingViewModel(
   // Live data for user media controls
   val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
   val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
+
+  private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING)
+  val isRecording: LiveData<RecordingState> = _isRecording
+  private var roomId: String? = null
 
   // Live data for enabling/disabling mute buttons
   val isLocalAudioPublishingAllowed = MutableLiveData(false)
@@ -250,6 +255,9 @@ class MeetingViewModel(
         override fun onJoin(room: HMSRoom) {
           failures.clear()
           state.postValue(MeetingState.Ongoing())
+          updateRecordingState(room)
+          roomId = room.roomId // Just storing the room id for the beam bot.
+          Log.d("onRoomUpdate", "$room")
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -291,6 +299,14 @@ class MeetingViewModel(
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
           Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
+
+          when (type) {
+            HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
+            HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
+            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> updateRecordingState(hmsRoom)
+            else -> {
+            }
+          }
         }
 
         override fun onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer) {
@@ -403,12 +419,20 @@ class MeetingViewModel(
     }
   }
 
+  private fun updateRecordingState(room: HMSRoom) {
+    val recording = room.browserRecordingState?.running == true ||
+            room.serverRecordingState?.running == true ||
+            room.rtmpHMSRTMPStreamingState?.running == true
+    val recordingState = if (recording) RecordingState.RECORDING else RecordingState.NOT_RECORDING
+    _isRecording.postValue(recordingState)
+  }
+
   fun setStatetoOngoing() {
     state.postValue(MeetingState.Ongoing())
   }
 
   fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {
-    hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener{
+    hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener {
       override fun onSuccess() {
         Log.i(TAG, "Successfully accepted change role request for $hmsRoleChangeRequest")
       }
@@ -703,6 +727,52 @@ class MeetingViewModel(
     } else {
       allPeerResults.reduce { acc, isMute -> acc && isMute }
     }
+  }
+
+  fun recordMeeting() {
+
+    val meetingUrl = getBeamBotJoiningUrl(
+      roomDetails.url,
+      roomId!!,
+      "host"
+    ) //BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
+    val rtmpInjectUrls = listOf(BuildConfig.RTMP_INJEST_URL)
+    _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITIONING_TO_RECORDING)
+
+    Log.v(TAG, "Starting recording")
+    hmsSDK.startRtmpOrRecording(
+      HMSRecordingConfig(
+        meetingUrl,
+        rtmpInjectUrls,
+        true
+      ), object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          Log.d(TAG, "RTMP recording error: $error")
+        }
+
+        override fun onSuccess() {
+          Log.d(TAG, "RTMP recording Success")
+          _isRecording.postValue(RecordingState.RECORDING)
+        }
+
+      })
+  }
+
+  fun stopRecording() {
+    Log.v(TAG, "Stopping recording")
+    _isRecording.postValue(RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING)
+
+    hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.v(TAG, "RTMP recording stop. error: $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "RTMP recording stop. Success")
+        _isRecording.postValue(RecordingState.NOT_RECORDING)
+      }
+
+    })
   }
 }
 

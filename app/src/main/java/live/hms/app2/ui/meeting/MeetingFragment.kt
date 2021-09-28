@@ -99,7 +99,16 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_record_meeting -> {
-        Toast.makeText(requireContext(), "Recording Not Supported", Toast.LENGTH_SHORT).show()
+
+        // The check state is determined by
+        //  the success or failure calls for start stop recording
+        //  and also the recording state reported in the onJoin and onRoomUpdate methods.
+        //  So here we just read those values.
+        if (item.isChecked) {
+          meetingViewModel.stopRecording()
+        } else {
+          meetingViewModel.recordMeeting()
+        }
       }
 
       R.id.action_share_screen -> {
@@ -157,13 +166,40 @@ class MeetingFragment : Fragment() {
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
 
+    menu.findItem(R.id.action_record_meeting).apply {
+      isVisible = true
+
+      // If we're in a transitioning state, we prevent further clicks.
+      // Checked or not checked depends on if it's currently recording or not. Checked if recording.
+      when (meetingViewModel.isRecording.value) {
+        RecordingState.RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = true
+        }
+        RecordingState.NOT_RECORDING -> {
+          this.isChecked = false
+          this.isEnabled = true
+        }
+        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = false
+        }
+        RecordingState.NOT_RECORDING_TRANSITIONING_TO_RECORDING -> {
+          this.isChecked = false
+          this.isEnabled = false
+        }
+        else -> {
+        } // Nothing
+      }
+    }
+
     menu.findItem(R.id.end_room).apply {
       isVisible = meetingViewModel.isAllowedToEndMeeting()
 
-        setOnMenuItemClickListener {
-          meetingViewModel.endRoom(false)
-          true
-        }
+      setOnMenuItemClickListener {
+        meetingViewModel.endRoom(false)
+        true
+      }
     }
 
     menu.findItem(R.id.end_and_lock_room).apply {
