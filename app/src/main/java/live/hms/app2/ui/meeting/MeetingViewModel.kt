@@ -705,35 +705,36 @@ class MeetingViewModel(
   }
 
   fun recordMeeting() {
-    Log.d(TAG, "Starting recording")
-    val meetingUrl = "https://aniket.qa-app.100ms.live/meeting/hasty-corn-tamarin"
+    val meetingUrl = BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
+    val rtmpInjectUrls = listOf(BuildConfig.RTMP_INJEST_URL)
 
+    Log.v(TAG, "Starting recording")
     hmsSDK.startRtmpOrRecording(
       HMSRecordingConfig(
         meetingUrl,
-        listOf(BuildConfig.RTMP_INJEST_URL),
+        rtmpInjectUrls,
         true
       ), object : HMSActionResultListener {
         override fun onError(error: HMSException) {
-          Log.d(TAG, "error: $error")
+          Log.d(TAG, "RTMP recording error: $error")
         }
 
         override fun onSuccess() {
-          Log.d(TAG, "Success")
+          Log.d(TAG, "RTMP recording Success")
         }
 
       })
   }
 
   fun stopRecording() {
-    Log.d(TAG, "Stopping recording")
+    Log.v(TAG, "Stopping recording")
     hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
       override fun onError(error: HMSException) {
-        Log.d(TAG, "stop. error: $error")
+        Log.v(TAG, "RTMP recording stop. error: $error")
       }
 
       override fun onSuccess() {
-        Log.d(TAG, "stop. Success")
+        Log.d(TAG, "RTMP recording stop. Success")
       }
 
     })

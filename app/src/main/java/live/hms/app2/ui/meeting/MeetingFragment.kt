@@ -99,11 +99,13 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_record_meeting -> {
-        if (item.isChecked) {
+        val toggledCheckState = !item.isChecked
+        if (toggledCheckState) {
           meetingViewModel.recordMeeting()
         } else {
           meetingViewModel.stopRecording()
         }
+        item.isChecked = toggledCheckState
       }
 
       R.id.action_share_screen -> {

@@ -75,9 +75,8 @@
 
         <item
             android:id="@+id/action_record_meeting"
-            android:icon="@drawable/ic_record_button_24"
             android:title="@string/record_meeting"
-            app:actionLayout="@layout/layout_menu_switch"
+            android:checkable="true"
             app:showAsAction="ifRoom" />
 
         <item
