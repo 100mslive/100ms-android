@@ -385,8 +385,10 @@ class MeetingFragment : Fragment() {
 
     viewLifecycleOwner.lifecycleScope.launch {
       meetingViewModel.rtmpErrors.collect { rtmpException ->
-        withContext(Dispatchers.Main) {
-          Toast.makeText(context, "RTMP error $rtmpException", Toast.LENGTH_LONG).show()
+        if (rtmpException != null) {
+          withContext(Dispatchers.Main) {
+            Toast.makeText(context, "RTMP error $rtmpException", Toast.LENGTH_LONG).show()
+          }
         }
       }
     }
