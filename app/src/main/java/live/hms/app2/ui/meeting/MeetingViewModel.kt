@@ -748,6 +748,8 @@ class MeetingViewModel(
       ), object : HMSActionResultListener {
         override fun onError(error: HMSException) {
           Log.d(TAG, "RTMP recording error: $error")
+          // restore the current state
+          _isRecording.postValue(getRecordingState(hmsRoom!!))
         }
 
         override fun onSuccess() {
@@ -765,6 +767,7 @@ class MeetingViewModel(
     hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         Log.v(TAG, "RTMP recording stop. error: $error")
+        _isRecording.postValue(getRecordingState(hmsRoom!!))
       }
 
       override fun onSuccess() {
