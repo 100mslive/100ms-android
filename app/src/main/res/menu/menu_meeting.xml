@@ -5,12 +5,12 @@
         android:id="@+id/action_record"
         android:icon="@drawable/recording"
         android:visible="false"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_volume"
         android:icon="@drawable/ic_volume_up_24"
         android:title="@string/toggle_volume"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_flip_camera"
