@@ -288,7 +288,15 @@ class MeetingFragment : Fragment() {
 
     menu.findItem(R.id.action_flip_camera).apply {
       val ok = meetingViewModel.meetingViewMode.value != MeetingViewMode.AUDIO_ONLY
-      setVisible(ok)
+      isVisible = ok
+    }
+
+    menu.findItem(R.id.action_record).apply {
+      isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING
+      setOnMenuItemClickListener {
+        meetingViewModel.stopRecording()
+        true
+      }
     }
 
     menu.findItem(R.id.action_volume).apply {
@@ -317,7 +325,12 @@ class MeetingFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     initViewModel()
     setHasOptionsMenu(true)
-    meetingViewModel.showAudioMuted.observe(viewLifecycleOwner, Observer { activity?.invalidateOptionsMenu() })
+    meetingViewModel.showAudioMuted.observe(
+      viewLifecycleOwner,
+      Observer { activity?.invalidateOptionsMenu() })
+    meetingViewModel.isRecording.observe(
+      viewLifecycleOwner,
+      Observer { activity?.invalidateOptionsMenu() })
   }
 
   override fun onCreateView(
