@@ -425,7 +425,7 @@ class MeetingViewModel(
   private fun getRecordingState(room: HMSRoom): RecordingState {
     val recording = room.browserRecordingState?.running == true ||
             room.serverRecordingState?.running == true ||
-            room.rtmpHMSRTMPStreamingState?.running == true
+            room.rtmpHMSRtmpStreamingState?.running == true
     val recordingState = if (recording) RecordingState.RECORDING else RecordingState.NOT_RECORDING
     return recordingState
   }
