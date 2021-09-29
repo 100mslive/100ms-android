@@ -111,7 +111,7 @@ class MeetingViewModel(
 
   private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING)
   val isRecording: LiveData<RecordingState> = _isRecording
-  private var roomId: String? = null
+  private var hmsRoom: HMSRoom? = null
 
   // Live data for enabling/disabling mute buttons
   val isLocalAudioPublishingAllowed = MutableLiveData(false)
@@ -255,8 +255,8 @@ class MeetingViewModel(
         override fun onJoin(room: HMSRoom) {
           failures.clear()
           state.postValue(MeetingState.Ongoing())
-          updateRecordingState(room)
-          roomId = room.roomId // Just storing the room id for the beam bot.
+          _isRecording.postValue(getRecordingState(room))
+          hmsRoom = room // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
         }
 
@@ -303,7 +303,9 @@ class MeetingViewModel(
           when (type) {
             HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
             HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
-            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> updateRecordingState(hmsRoom)
+            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> _isRecording.postValue(
+              getRecordingState(hmsRoom)
+            )
             else -> {
             }
           }
@@ -419,12 +421,12 @@ class MeetingViewModel(
     }
   }
 
-  private fun updateRecordingState(room: HMSRoom) {
+  private fun getRecordingState(room: HMSRoom): RecordingState {
     val recording = room.browserRecordingState?.running == true ||
             room.serverRecordingState?.running == true ||
             room.rtmpHMSRTMPStreamingState?.running == true
     val recordingState = if (recording) RecordingState.RECORDING else RecordingState.NOT_RECORDING
-    _isRecording.postValue(recordingState)
+    return recordingState
   }
 
   fun setStatetoOngoing() {
@@ -731,7 +733,7 @@ class MeetingViewModel(
 
     val meetingUrl = getBeamBotJoiningUrl(
       roomDetails.url,
-      roomId!!,
+      hmsRoom?.roomId!!,
       "host"
     ) //BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
     val rtmpInjectUrls = listOf(BuildConfig.RTMP_INJEST_URL)
