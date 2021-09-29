@@ -384,14 +384,22 @@ class MeetingFragment : Fragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-        meetingViewModel.changeTrackMuteRequest.collect { trackChangeRequest ->
-          withContext(Dispatchers.Main) {
-            if (trackChangeRequest != null) {
+      meetingViewModel.rtmpErrors.collect { rtmpException ->
+        withContext(Dispatchers.Main) {
+          Toast.makeText(context, "RTMP error $rtmpException", Toast.LENGTH_LONG).show()
+        }
+      }
+    }
 
-              val message = if (trackChangeRequest.track is HMSLocalAudioTrack) {
-                "${trackChangeRequest.requestedBy.name} is asking you to unmute."
-              } else {
-                "${trackChangeRequest.requestedBy.name} is asking you to turn on video."
+    viewLifecycleOwner.lifecycleScope.launch {
+      meetingViewModel.changeTrackMuteRequest.collect { trackChangeRequest ->
+        withContext(Dispatchers.Main) {
+          if (trackChangeRequest != null) {
+
+            val message = if (trackChangeRequest.track is HMSLocalAudioTrack) {
+              "${trackChangeRequest.requestedBy.name} is asking you to unmute."
+            } else {
+              "${trackChangeRequest.requestedBy.name} is asking you to turn on video."
               }
 
               val builder = AlertDialog.Builder(requireContext())

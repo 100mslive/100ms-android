@@ -7,6 +7,7 @@ import androidx.lifecycle.*
 import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.BuildConfig
 import live.hms.app2.model.RoomDetails
@@ -777,5 +778,8 @@ class MeetingViewModel(
 
     })
   }
+
+  private val _rtmpErrors = MutableStateFlow<HMSException?>(null)
+  val rtmpErrors: StateFlow<HMSException?> = _rtmpErrors
 }
 
