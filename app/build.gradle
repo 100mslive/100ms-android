@@ -12,10 +12,10 @@ android {
 
     defaultConfig {
         applicationId "live.hms.app2"
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 30
-        versionCode 157
-        versionName "2.0.98"
+        versionCode 172
+        versionName "2.1.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
