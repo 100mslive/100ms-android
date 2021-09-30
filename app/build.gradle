@@ -23,6 +23,7 @@ android {
         buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
         buildConfigField "String", "BUG_REPORT_EMAIL_TO", BUG_REPORT_EMAIL_TO
         buildConfigField "String", "BUG_REPORT_EMAIL_CC", BUG_REPORT_EMAIL_CC
+        buildConfigField "String", "RTMP_INJEST_URL", RTMP_INJEST_URL
     }
 
     buildTypes {

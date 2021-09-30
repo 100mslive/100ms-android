@@ -2,6 +2,7 @@ package live.hms.app2.ui.meeting
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -99,7 +100,16 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_record_meeting -> {
-        Toast.makeText(requireContext(), "Recording Not Supported", Toast.LENGTH_SHORT).show()
+
+        // The check state is determined by
+        //  the success or failure calls for start stop recording
+        //  and also the recording state reported in the onJoin and onRoomUpdate methods.
+        //  So here we just read those values.
+        if (item.isChecked) {
+          meetingViewModel.stopRecording()
+        } else {
+          meetingViewModel.recordMeeting(isStreaming = true, isRecording = true)
+        }
       }
 
       R.id.action_share_screen -> {
@@ -157,13 +167,40 @@ class MeetingFragment : Fragment() {
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
 
+    menu.findItem(R.id.action_record_meeting).apply {
+      isVisible = true
+
+      // If we're in a transitioning state, we prevent further clicks.
+      // Checked or not checked depends on if it's currently recording or not. Checked if recording.
+      when (meetingViewModel.isRecording.value) {
+        RecordingState.RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = true
+        }
+        RecordingState.NOT_RECORDING_OR_STREAMING -> {
+          this.isChecked = false
+          this.isEnabled = true
+        }
+        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = false
+        }
+        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS -> {
+          this.isChecked = false
+          this.isEnabled = false
+        }
+        else -> {
+        } // Nothing
+      }
+    }
+
     menu.findItem(R.id.end_room).apply {
       isVisible = meetingViewModel.isAllowedToEndMeeting()
 
-        setOnMenuItemClickListener {
-          meetingViewModel.endRoom(false)
-          true
-        }
+      setOnMenuItemClickListener {
+        meetingViewModel.endRoom(false)
+        true
+      }
     }
 
     menu.findItem(R.id.end_and_lock_room).apply {
@@ -252,7 +289,42 @@ class MeetingFragment : Fragment() {
 
     menu.findItem(R.id.action_flip_camera).apply {
       val ok = meetingViewModel.meetingViewMode.value != MeetingViewMode.AUDIO_ONLY
-      setVisible(ok)
+      isVisible = ok
+    }
+
+    menu.findItem(R.id.action_record).apply {
+      when (meetingViewModel.isRecording.value) {
+        RecordingState.RECORDING -> {
+          // red
+          isVisible = true
+          this.icon.setTint(Color.parseColor("#e04848"))
+        }
+        RecordingState.NOT_RECORDING_OR_STREAMING -> {
+          isVisible = false
+        }
+        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS,
+        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
+          // White
+          isVisible = true
+          // change the colour to transitioning
+          this.icon.setTint(Color.parseColor("#FFFFFF"))
+        }
+        RecordingState.STREAMING -> {
+          // Blue
+          isVisible = true
+          this.icon.setTint(Color.parseColor("#2832c2"))
+        }
+        RecordingState.STREAMING_AND_RECORDING -> {
+          // Orange
+          this.icon.setTint(Color.parseColor("#FFC107"))
+        }
+        null -> TODO()
+      }
+
+      setOnMenuItemClickListener {
+        meetingViewModel.stopRecording()
+        true
+      }
     }
 
     menu.findItem(R.id.action_volume).apply {
@@ -281,7 +353,12 @@ class MeetingFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     initViewModel()
     setHasOptionsMenu(true)
-    meetingViewModel.showAudioMuted.observe(viewLifecycleOwner, Observer { activity?.invalidateOptionsMenu() })
+    meetingViewModel.showAudioMuted.observe(
+      viewLifecycleOwner,
+      Observer { activity?.invalidateOptionsMenu() })
+    meetingViewModel.isRecording.observe(
+      viewLifecycleOwner,
+      Observer { activity?.invalidateOptionsMenu() })
   }
 
   override fun onCreateView(
@@ -335,14 +412,24 @@ class MeetingFragment : Fragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-        meetingViewModel.changeTrackMuteRequest.collect { trackChangeRequest ->
+      meetingViewModel.rtmpErrors.collect { rtmpException ->
+        if (rtmpException != null) {
           withContext(Dispatchers.Main) {
-            if (trackChangeRequest != null) {
+            Toast.makeText(context, "RTMP error $rtmpException", Toast.LENGTH_LONG).show()
+          }
+        }
+      }
+    }
 
-              val message = if (trackChangeRequest.track is HMSLocalAudioTrack) {
-                "${trackChangeRequest.requestedBy.name} is asking you to unmute."
-              } else {
-                "${trackChangeRequest.requestedBy.name} is asking you to turn on video."
+    viewLifecycleOwner.lifecycleScope.launch {
+      meetingViewModel.changeTrackMuteRequest.collect { trackChangeRequest ->
+        withContext(Dispatchers.Main) {
+          if (trackChangeRequest != null) {
+
+            val message = if (trackChangeRequest.track is HMSLocalAudioTrack) {
+              "${trackChangeRequest.requestedBy.name} is asking you to unmute."
+            } else {
+              "${trackChangeRequest.requestedBy.name} is asking you to turn on video."
               }
 
               val builder = AlertDialog.Builder(requireContext())

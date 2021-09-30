@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import live.hms.app2.BuildConfig
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -108,6 +108,10 @@ class MeetingViewModel(
   val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
   val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
+  private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING_OR_STREAMING)
+  val isRecording: LiveData<RecordingState> = _isRecording
+  private var hmsRoom: HMSRoom? = null
+
   // Live data for enabling/disabling mute buttons
   val isLocalAudioPublishingAllowed = MutableLiveData(false)
   val isLocalVideoPublishingAllowed = MutableLiveData(false)
@@ -140,19 +144,6 @@ class MeetingViewModel(
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
-
-  fun <R : Any> mapTracks(transform: (track: MeetingTrack) -> R?): List<R> = synchronized(_tracks) {
-    return _tracks.mapNotNull(transform)
-  }
-
-  fun getTrackByPeerId(peerId: String): MeetingTrack? = synchronized(_tracks) {
-    return _tracks.find { it.peer.peerID == peerId }
-  }
-
-  fun findTrack(predicate: (track: MeetingTrack) -> Boolean): MeetingTrack? =
-    synchronized(_tracks) {
-      return _tracks.find(predicate)
-    }
 
   fun startPreview(listener: HMSPreviewListener) {
     // call Preview api
@@ -250,6 +241,9 @@ class MeetingViewModel(
         override fun onJoin(room: HMSRoom) {
           failures.clear()
           state.postValue(MeetingState.Ongoing())
+          _isRecording.postValue(getRecordingState(room))
+          hmsRoom = room // Just storing the room id for the beam bot.
+          Log.d("onRoomUpdate", "$room")
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -291,6 +285,16 @@ class MeetingViewModel(
 
         override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
           Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
+
+          when (type) {
+            HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
+            HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
+            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> _isRecording.postValue(
+              getRecordingState(hmsRoom)
+            )
+            else -> {
+            }
+          }
         }
 
         override fun onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer) {
@@ -403,12 +407,28 @@ class MeetingViewModel(
     }
   }
 
+  private fun getRecordingState(room: HMSRoom): RecordingState {
+
+    val recording = room.browserRecordingState?.running == true ||
+            room.serverRecordingState?.running == true
+    val streaming = room.rtmpHMSRtmpStreamingState?.running == true
+    return if (recording && streaming) {
+      RecordingState.STREAMING_AND_RECORDING
+    } else if (recording) {
+      RecordingState.RECORDING
+    } else if (streaming) {
+      RecordingState.STREAMING
+    } else {
+      RecordingState.NOT_RECORDING_OR_STREAMING
+    }
+  }
+
   fun setStatetoOngoing() {
     state.postValue(MeetingState.Ongoing())
   }
 
   fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {
-    hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener{
+    hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener {
       override fun onSuccess() {
         Log.i(TAG, "Successfully accepted change role request for $hmsRoleChangeRequest")
       }
@@ -704,5 +724,62 @@ class MeetingViewModel(
       allPeerResults.reduce { acc, isMute -> acc && isMute }
     }
   }
+
+  fun recordMeeting(isRecording: Boolean, isStreaming: Boolean) {
+
+    val meetingUrl = getBeamBotJoiningUrl(
+      roomDetails.url,
+      hmsRoom?.roomId!!,
+      "host"
+    ) //BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
+    val rtmpInjectUrls = if (isStreaming) listOf(BuildConfig.RTMP_INJEST_URL) else emptyList()
+    _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS)
+    val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
+    else if (isStreaming) RecordingState.STREAMING
+    else RecordingState.RECORDING
+
+    Log.v(TAG, "Starting recording")
+    hmsSDK.startRtmpOrRecording(
+      HMSRecordingConfig(
+        meetingUrl,
+        rtmpInjectUrls,
+        isRecording
+      ), object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          Log.d(TAG, "RTMP recording error: $error")
+          // restore the current state
+          viewModelScope.launch { _rtmpErrors.emit(error) }
+          _isRecording.postValue(getRecordingState(hmsRoom!!))
+        }
+
+        override fun onSuccess() {
+          Log.d(TAG, "RTMP recording Success")
+          _isRecording.postValue(successResult)
+        }
+
+      })
+  }
+
+  fun stopRecording() {
+    Log.v(TAG, "Stopping recording")
+    _isRecording.postValue(RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING)
+
+    hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.v(TAG, "RTMP recording stop. error: $error")
+        viewModelScope.launch { _rtmpErrors.emit(error) }
+        _isRecording.postValue(getRecordingState(hmsRoom!!))
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "RTMP recording stop. Success")
+        _isRecording.postValue(RecordingState.NOT_RECORDING_OR_STREAMING)
+      }
+
+    })
+  }
+
+  private val _rtmpErrors = MutableSharedFlow<HMSException?>()
+  val rtmpErrors: SharedFlow<HMSException?> = _rtmpErrors
 }
 
