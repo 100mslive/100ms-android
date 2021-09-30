@@ -2,6 +2,7 @@ package live.hms.app2.ui.meeting
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -107,7 +108,7 @@ class MeetingFragment : Fragment() {
         if (item.isChecked) {
           meetingViewModel.stopRecording()
         } else {
-          meetingViewModel.recordMeeting()
+          meetingViewModel.recordMeeting(isStreaming = true, isRecording = true)
         }
       }
 
@@ -176,7 +177,7 @@ class MeetingFragment : Fragment() {
           this.isChecked = true
           this.isEnabled = true
         }
-        RecordingState.NOT_RECORDING -> {
+        RecordingState.NOT_RECORDING_OR_STREAMING -> {
           this.isChecked = false
           this.isEnabled = true
         }
@@ -184,7 +185,7 @@ class MeetingFragment : Fragment() {
           this.isChecked = true
           this.isEnabled = false
         }
-        RecordingState.NOT_RECORDING_TRANSITIONING_TO_RECORDING -> {
+        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS -> {
           this.isChecked = false
           this.isEnabled = false
         }
@@ -292,7 +293,34 @@ class MeetingFragment : Fragment() {
     }
 
     menu.findItem(R.id.action_record).apply {
-      isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING
+      when (meetingViewModel.isRecording.value) {
+        RecordingState.RECORDING -> {
+          // red
+          isVisible = true
+          this.icon.setTint(Color.parseColor("#e04848"))
+        }
+        RecordingState.NOT_RECORDING_OR_STREAMING -> {
+          isVisible = false
+        }
+        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS,
+        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
+          // White
+          isVisible = true
+          // change the colour to transitioning
+          this.icon.setTint(Color.parseColor("#FFFFFF"))
+        }
+        RecordingState.STREAMING -> {
+          // Blue
+          isVisible = true
+          this.icon.setTint(Color.parseColor("#2832c2"))
+        }
+        RecordingState.STREAMING_AND_RECORDING -> {
+          // Orange
+          this.icon.setTint(Color.parseColor("#FFC107"))
+        }
+        null -> TODO()
+      }
+
       setOnMenuItemClickListener {
         meetingViewModel.stopRecording()
         true

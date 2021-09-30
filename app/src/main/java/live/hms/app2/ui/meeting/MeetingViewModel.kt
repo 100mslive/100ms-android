@@ -5,9 +5,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.google.gson.JsonObject
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import live.hms.app2.BuildConfig
 import live.hms.app2.model.RoomDetails
@@ -110,7 +108,7 @@ class MeetingViewModel(
   val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
   val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
-  private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING)
+  private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING_OR_STREAMING)
   val isRecording: LiveData<RecordingState> = _isRecording
   private var hmsRoom: HMSRoom? = null
 
@@ -146,19 +144,6 @@ class MeetingViewModel(
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
-
-  fun <R : Any> mapTracks(transform: (track: MeetingTrack) -> R?): List<R> = synchronized(_tracks) {
-    return _tracks.mapNotNull(transform)
-  }
-
-  fun getTrackByPeerId(peerId: String): MeetingTrack? = synchronized(_tracks) {
-    return _tracks.find { it.peer.peerID == peerId }
-  }
-
-  fun findTrack(predicate: (track: MeetingTrack) -> Boolean): MeetingTrack? =
-    synchronized(_tracks) {
-      return _tracks.find(predicate)
-    }
 
   fun startPreview(listener: HMSPreviewListener) {
     // call Preview api
@@ -423,11 +408,19 @@ class MeetingViewModel(
   }
 
   private fun getRecordingState(room: HMSRoom): RecordingState {
+
     val recording = room.browserRecordingState?.running == true ||
-            room.serverRecordingState?.running == true ||
-            room.rtmpHMSRtmpStreamingState?.running == true
-    val recordingState = if (recording) RecordingState.RECORDING else RecordingState.NOT_RECORDING
-    return recordingState
+            room.serverRecordingState?.running == true
+    val streaming = room.rtmpHMSRtmpStreamingState?.running == true
+    return if (recording && streaming) {
+      RecordingState.STREAMING_AND_RECORDING
+    } else if (recording) {
+      RecordingState.RECORDING
+    } else if (streaming) {
+      RecordingState.STREAMING
+    } else {
+      RecordingState.NOT_RECORDING_OR_STREAMING
+    }
   }
 
   fun setStatetoOngoing() {
@@ -730,22 +723,25 @@ class MeetingViewModel(
     }
   }
 
-  fun recordMeeting() {
+  fun recordMeeting(isRecording: Boolean, isStreaming: Boolean) {
 
     val meetingUrl = getBeamBotJoiningUrl(
       roomDetails.url,
       hmsRoom?.roomId!!,
       "host"
     ) //BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
-    val rtmpInjectUrls = listOf(BuildConfig.RTMP_INJEST_URL)
-    _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITIONING_TO_RECORDING)
+    val rtmpInjectUrls = if (isStreaming) listOf(BuildConfig.RTMP_INJEST_URL) else emptyList()
+    _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS)
+    val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
+    else if (isStreaming) RecordingState.STREAMING
+    else RecordingState.RECORDING
 
     Log.v(TAG, "Starting recording")
     hmsSDK.startRtmpOrRecording(
       HMSRecordingConfig(
         meetingUrl,
         rtmpInjectUrls,
-        true
+        isRecording
       ), object : HMSActionResultListener {
         override fun onError(error: HMSException) {
           Log.d(TAG, "RTMP recording error: $error")
@@ -756,7 +752,7 @@ class MeetingViewModel(
 
         override fun onSuccess() {
           Log.d(TAG, "RTMP recording Success")
-          _isRecording.postValue(RecordingState.RECORDING)
+          _isRecording.postValue(successResult)
         }
 
       })
@@ -775,13 +771,13 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         Log.d(TAG, "RTMP recording stop. Success")
-        _isRecording.postValue(RecordingState.NOT_RECORDING)
+        _isRecording.postValue(RecordingState.NOT_RECORDING_OR_STREAMING)
       }
 
     })
   }
 
-  private val _rtmpErrors = MutableStateFlow<HMSException?>(null)
-  val rtmpErrors: StateFlow<HMSException?> = _rtmpErrors
+  private val _rtmpErrors = MutableSharedFlow<HMSException?>()
+  val rtmpErrors: SharedFlow<HMSException?> = _rtmpErrors
 }
 
