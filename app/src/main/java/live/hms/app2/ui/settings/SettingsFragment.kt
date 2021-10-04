@@ -458,6 +458,12 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
+        settings.enableHardwareAEC,
+        switchUseHardwareEchoCancellation
+      ) {commitHelper.setUseHardwareAEC(it)}
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
         settings.publishVideo,
         switchPublishVideoOnJoin
       ) { commitHelper.setPublishVideo(it) }

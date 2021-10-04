@@ -10,6 +10,10 @@
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar" />
 
+    <include
+        android:id="@+id/role_spinner"
+        layout="@layout/layout_role_spinner" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"

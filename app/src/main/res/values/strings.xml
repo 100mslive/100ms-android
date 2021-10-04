@@ -139,4 +139,7 @@
     <string name="switch_enable_subscribe_degradation">Enable subscribe degradation</string>
     <string name="end_room">End room</string>
     <string name="end_and_lock_room">Lock and end room</string>
+    <string name="remote_mute_all_desc">Remote Mute All</string>
+    <string name="remote_mute_role_desc">Remote Mute Role</string>
+    <string name="use_hardware_AEC">Use Harware AEC</string>
 </resources>
