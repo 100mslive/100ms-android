@@ -15,6 +15,8 @@ import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
+import live.hms.video.media.settings.HMSAudioTrackSettings
+import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
@@ -138,8 +140,14 @@ class MeetingViewModel(
 
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
+  private val hmsTrackSettings = HMSTrackSettings.Builder()
+    .audio(HMSAudioTrackSettings.Builder()
+      .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build())
+    .build()
+
   val hmsSDK = HMSSDK
     .Builder(application)
+    .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
 
   val peers: Array<HMSPeer>
