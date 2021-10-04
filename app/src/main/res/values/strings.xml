@@ -141,4 +141,6 @@
     <string name="end_and_lock_room">Lock and end room</string>
     <string name="remote_mute_all_desc">Remote Mute All</string>
     <string name="remote_mute_role_desc">Remote Mute Role</string>
+    <string name="record">Record</string>
+    <string name="stop_recording_stream">Stop Recording/Stream</string>
 </resources>

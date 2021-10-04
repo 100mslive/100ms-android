@@ -7,7 +7,6 @@ import androidx.lifecycle.*
 import com.google.gson.JsonObject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import live.hms.app2.BuildConfig
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -723,14 +722,15 @@ class MeetingViewModel(
     }
   }
 
-  fun recordMeeting(isRecording: Boolean, isStreaming: Boolean) {
-
+  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>) {
+    // It's streaming if there are rtmp urls present.
+    val isStreaming = rtmpInjectUrls.isNotEmpty()
     val meetingUrl = getBeamBotJoiningUrl(
       roomDetails.url,
       hmsRoom?.roomId!!,
       "host"
-    ) //BuildConfig.RTMP_URL_FOR_BOT_TO_JOIN_FROM
-    val rtmpInjectUrls = if (isStreaming) listOf(BuildConfig.RTMP_INJEST_URL) else emptyList()
+    )
+
     _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS)
     val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
     else if (isStreaming) RecordingState.STREAMING

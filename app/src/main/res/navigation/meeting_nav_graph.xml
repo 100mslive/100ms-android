@@ -34,6 +34,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_ParticipantsFragment"
             app:destination="@id/ParticipantsFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_rtmpRecordFragment"
+            app:destination="@id/rtmpRecordFragment" />
 
     </fragment>
 
@@ -94,5 +97,10 @@
             app:argType="string"
             android:defaultValue='""' />
     </dialog>
+    <fragment
+        android:id="@+id/rtmpRecordFragment"
+        android:name="live.hms.app2.ui.meeting.participants.RtmpRecordFragment"
+        android:label="RtmpRecordFragment"
+        tools:layout="@layout/layout_rtmp_recording" />
 
 </navigation>
