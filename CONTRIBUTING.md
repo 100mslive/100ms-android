@@ -12,17 +12,17 @@ Read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing
 
 ## Getting started guides
 
-The readme for this project contains information on how to get started. You may want to also look up
-the [quickstart guide](https://docs.100ms.live/android/v2/guides/Quickstart) and how to get a
-free [token](https://docs.100ms.live/android/v2/guides/Token) for 10,000 free minutes of video so
-you can try out 100ms at your leisure.
+The [readme](README.md) for this project contains information on how to get started. You may want to
+also look up the [quickstart guide](https://docs.100ms.live/android/v2/guides/Quickstart) and how to
+get a free [token](https://docs.100ms.live/android/v2/guides/Token) for 10,000 free minutes of video
+so you can try out 100ms at your leisure.
 
 ### Issues
 
 #### Create a new issue
 
 If you spot a problem with the
-docs, [search if an issue already exists](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/searching-issues-and-pull-requests#search-by-the-title-body-or-comments)
+app, [search if an issue already exists](https://docs.github.com/en/github/searching-for-information-on-github/searching-on-github/searching-issues-and-pull-requests#search-by-the-title-body-or-comments)
 . If a related issue doesn't exist, you can open
 a [new issue](https://github.com/100mslive/100ms-android//issues/new).
 
