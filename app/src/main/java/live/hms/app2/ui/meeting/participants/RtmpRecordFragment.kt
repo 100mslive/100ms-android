@@ -23,7 +23,6 @@ class RtmpRecordFragment : Fragment() {
     private lateinit var settings: SettingsStore
     private val rtmpUrladapter: RtmpRecordAdapter = RtmpRecordAdapter(::removeItem)
 
-
     private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -52,26 +51,23 @@ class RtmpRecordFragment : Fragment() {
 
     private fun addItem() {
         val urlToAdd = binding.newRtmpUrl.editableText.toString()
-        when {
-            urlToAdd.isEmpty() -> {
-                Toast.makeText(context, "Invalid url", Toast.LENGTH_LONG).show()
-            }
-            checkValidUrl(urlToAdd) -> {
-                Toast.makeText(context, "Invalid url, must start with RTMP", Toast.LENGTH_LONG)
-                    .show()
-            }
-            else -> {
-                // URI is a valid rtmp url
-                rtmpUrladapter.submitList(rtmpUrladapter.currentList.plus(urlToAdd))
-                settings.rtmpUrlsList = rtmpUrladapter.currentList.toSet()
-
-            }
+        if (urlToAdd.isEmpty()) {
+            Toast.makeText(context, "Invalid url", Toast.LENGTH_LONG).show()
+        } else if (!checkValidUrl(urlToAdd)) {
+            Toast.makeText(context, "Invalid url, must start with RTMP", Toast.LENGTH_LONG)
+                .show()
+        } else {
+            // URI is a valid rtmp url
+            val newList = rtmpUrladapter.currentList.plus(urlToAdd)
+            rtmpUrladapter.submitList(newList)
+            settings.rtmpUrlsList = newList.toSet()
         }
+
     }
 
     private fun checkValidUrl(url: String): Boolean = try {
         val uri = URI(url)
-        uri.host == "rtmp"
+        uri.scheme == "rtmp"
     } catch (e: URISyntaxException) {
         false
     }
@@ -87,8 +83,9 @@ class RtmpRecordFragment : Fragment() {
     private fun removeItem(url: String) {
         Log.d("rtmprecord", "clicked $url")
         // Remove this item from the adapter.
-        rtmpUrladapter.submitList(rtmpUrladapter.currentList.minus(url))
+        val newList = rtmpUrladapter.currentList.minus(url)
+        rtmpUrladapter.submitList(newList)
         // Actually remove it from preferences
-        settings.rtmpUrlsList = rtmpUrladapter.currentList.toSet()
+        settings.rtmpUrlsList = newList.toSet()
     }
 }

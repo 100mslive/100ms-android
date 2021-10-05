@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="RTMP Settings"
+        android:text="@string/rtmp_settings"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -31,13 +31,13 @@
         android:id="@+id/rtmpUrlContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="32dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/newRtmpUrl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Add RTMP streaming url"
+            android:hint="@string/add_new_rtmp_streaming_url"
             android:text="" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -47,8 +47,17 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_round_add_circle_24" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="Existing RTMP Urls"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rtmpUrls"
+        android:layout_marginBottom="6dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:itemCount="3"
@@ -59,9 +68,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/record"
+        android:layout_marginTop="32dp"
         android:textAlignment="viewStart" />
 
     <Button
+        android:layout_marginTop="16dp"
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
