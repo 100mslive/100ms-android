@@ -219,7 +219,10 @@ class SettingsStore(context: Context) {
     set(value) = putString(LOG_LEVEL_100MS_SDK, value.toString())
 
   var rtmpUrlsList: Set<String>
-    get() = sharedPreferences.getStringSet(RTMP_URL_LIST, setOf(BuildConfig.RTMP_INJEST_URL))!!
+    get() = sharedPreferences.getStringSet(
+      RTMP_URL_LIST,
+      if (BuildConfig.RTMP_INJEST_URL.isEmpty()) emptySet<String>() else setOf(BuildConfig.RTMP_INJEST_URL)
+    )!!
       .toSet()
     set(value) = putStringSet(RTMP_URL_LIST, value)
 
