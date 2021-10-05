@@ -14,6 +14,8 @@ import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
+import live.hms.video.media.settings.HMSAudioTrackSettings
+import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
@@ -137,8 +139,14 @@ class MeetingViewModel(
 
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
+  private val hmsTrackSettings = HMSTrackSettings.Builder()
+    .audio(HMSAudioTrackSettings.Builder()
+      .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build())
+    .build()
+
   val hmsSDK = HMSSDK
     .Builder(application)
+    .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
 
   val peers: Array<HMSPeer>
@@ -497,7 +505,8 @@ class MeetingViewModel(
 
   private fun addVideoTrack(track: HMSVideoTrack, peer: HMSPeer) {
     synchronized(_tracks) {
-      if (track.source == HMSTrackSource.SCREEN) {
+      if (track.source == HMSTrackSource.SCREEN ||
+              track.source == "videoplaylist") {
         // Add a new tile to show screen share
         _tracks.add(MeetingTrack(peer, track, null))
       } else {
@@ -547,8 +556,9 @@ class MeetingViewModel(
       if (
         // Remove tile from view since both audio and video track are null for the peer
         (peer.audioTrack == null &&  peer.videoTrack == null) ||
-        // Remove video screenshare tile from view
-        (track.source == HMSTrackSource.SCREEN && track.type == HMSTrackType.VIDEO)) {
+        // Remove video screenshare/playlist tile from view
+        ((track.source == HMSTrackSource.SCREEN || track.source == "videoplaylist")
+                && track.type == HMSTrackType.VIDEO)) {
         _tracks.remove(meetingTrack)
       }
 

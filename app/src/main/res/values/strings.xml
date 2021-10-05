@@ -145,4 +145,5 @@
     <string name="stop_recording_stream">Stop Recording/Stream</string>
     <string name="add_new_rtmp_streaming_url">Add new RTMP streaming url</string>
     <string name="rtmp_settings">RTMP Settings</string>
+    <string name="use_hardware_AEC">Use Harware AEC</string>
 </resources>
