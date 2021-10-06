@@ -141,5 +141,9 @@
     <string name="end_and_lock_room">Lock and end room</string>
     <string name="remote_mute_all_desc">Remote Mute All</string>
     <string name="remote_mute_role_desc">Remote Mute Role</string>
+    <string name="record">Record</string>
+    <string name="stop_recording_stream">Stop Recording/Stream</string>
+    <string name="add_new_rtmp_streaming_url">Add new RTMP streaming url</string>
+    <string name="rtmp_settings">RTMP Settings</string>
     <string name="use_hardware_AEC">Use Harware AEC</string>
 </resources>

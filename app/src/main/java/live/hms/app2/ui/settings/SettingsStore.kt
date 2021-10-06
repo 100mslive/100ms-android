@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.edit
+import live.hms.app2.BuildConfig
 import live.hms.app2.ui.meeting.MeetingViewMode
 import live.hms.video.utils.HMSLogger
 
@@ -41,8 +42,8 @@ class SettingsStore(context: Context) {
     const val LEAK_CANARY = "leak-canary"
     const val SHOW_RECONNECTING_PROGRESS_BARS = "show-reconnecting-progress-bar"
     const val SUBSCRIBE_DEGRADATION = "subscribe-degradation-enabling"
+    const val RTMP_URL_LIST = "rtmp-url-list"
     const val USE_HARDWARE_AEC = "use-hardware-aec"
-
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -62,6 +63,13 @@ class SettingsStore(context: Context) {
 
   fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
     sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
+  }
+
+  private fun putStringSet(key: String, value: Set<String>) {
+    sharedPreferences.edit {
+      putStringSet(key, value)
+      apply()
+    }
   }
 
   private fun putString(key: String, value: String) {
@@ -215,6 +223,15 @@ class SettingsStore(context: Context) {
       return HMSLogger.LogLevel.valueOf(str)
     }
     set(value) = putString(LOG_LEVEL_100MS_SDK, value.toString())
+
+  var rtmpUrlsList: Set<String>
+    get() = sharedPreferences.getStringSet(
+      RTMP_URL_LIST,
+      if (BuildConfig.RTMP_INJEST_URL.isEmpty()) emptySet<String>() else setOf(BuildConfig.RTMP_INJEST_URL)
+    )!!
+      .toSet()
+    set(value) = putStringSet(RTMP_URL_LIST, value)
+
 
   inner class MultiCommitHelper {
 

@@ -101,16 +101,10 @@ class MeetingFragment : Fragment() {
 
       R.id.action_record_meeting -> {
 
-        // The check state is determined by
-        //  the success or failure calls for start stop recording
-        //  and also the recording state reported in the onJoin and onRoomUpdate methods.
-        //  So here we just read those values.
-        if (item.isChecked) {
-          meetingViewModel.stopRecording()
-        } else {
-          meetingViewModel.recordMeeting(isStreaming = true, isRecording = true)
-        }
+        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment())
       }
+
+      R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
 
       R.id.action_share_screen -> {
         Toast.makeText(requireContext(), "Screen Share Not Supported", Toast.LENGTH_SHORT).show()
@@ -166,6 +160,12 @@ class MeetingFragment : Fragment() {
 
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
+
+    menu.findItem(R.id.action_stop_streaming_and_recording).apply {
+      isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING ||
+              meetingViewModel.isRecording.value == RecordingState.STREAMING ||
+              meetingViewModel.isRecording.value == RecordingState.STREAMING_AND_RECORDING
+    }
 
     menu.findItem(R.id.action_record_meeting).apply {
       isVisible = true
@@ -316,6 +316,7 @@ class MeetingFragment : Fragment() {
         }
         RecordingState.STREAMING_AND_RECORDING -> {
           // Orange
+          isVisible = true
           this.icon.setTint(Color.parseColor("#FFC107"))
         }
         null -> TODO()
