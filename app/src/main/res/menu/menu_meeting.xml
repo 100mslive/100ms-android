@@ -85,6 +85,12 @@
             app:showAsAction="ifRoom" />
 
         <item
+            android:id="@+id/action_stop_streaming_and_recording"
+            android:title="@string/stop_recording_stream"
+            app:showAsAction="ifRoom" />
+
+
+        <item
             android:id="@+id/action_participants"
             android:icon="@drawable/ic_people_24"
             android:title="@string/show_participants"

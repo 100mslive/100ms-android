@@ -52,7 +52,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   }
 
   private fun directMessage(message : ChatMessage, peer : HMSPeer) {
-    addMessage(message)
+
     hmssdk.sendDirectMessage(message.message, HMSMessageType.CHAT, peer, object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
@@ -60,13 +60,14 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
   }
 
   private fun groupMessage(message: ChatMessage, role : HMSRole) {
-    addMessage(message)
+
     hmssdk.sendGroupMessage(message.message, HMSMessageType.CHAT, listOf(role), object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
@@ -74,13 +75,14 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
   }
 
   private fun broadcast(message: ChatMessage) {
-    addMessage(message)
+
     hmssdk.sendBroadcastMessage(message.message, HMSMessageType.CHAT, object : HMSMessageResultListener {
       override fun onError(error: HMSException) {
         Log.e(TAG, error.message)
@@ -88,6 +90,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
@@ -105,7 +108,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   private fun addMessage(message: ChatMessage) {
     // Check if the last sender was also the same person
     _messages.add(message)
-    messages.value = _messages
+    messages.postValue(_messages)
   }
 
   fun receivedMessage(message: ChatMessage) {
