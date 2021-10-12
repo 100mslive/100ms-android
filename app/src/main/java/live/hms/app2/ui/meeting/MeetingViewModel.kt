@@ -238,6 +238,7 @@ class MeetingViewModel(
     )
 
     HMSCoroutineScope.launch {
+      Log.v(TAG, "~~ hmsSDK.join called ~~")
       hmsSDK.join(config, object : HMSUpdateListener {
 
         override fun onError(error: HMSException) {
@@ -247,6 +248,7 @@ class MeetingViewModel(
         }
 
         override fun onJoin(room: HMSRoom) {
+          Log.v(TAG, "~~ onJoin called ~~")
           failures.clear()
           state.postValue(MeetingState.Ongoing())
           _isRecording.postValue(getRecordingState(room))
