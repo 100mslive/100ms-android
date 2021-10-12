@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.app2.util.viewLifecycle
 import live.hms.video.utils.HMSLogger
 import org.webrtc.RendererCommon
@@ -33,17 +34,27 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   }
 
   override fun onResume() {
-    super.onResume()
+
     screenShareTrack?.let {
+      screenShareStats.initiateStats(
+        meetingViewModel.getStats(),
+        it.video,
+        it.audio, it.peer.isLocal
+      ) { statsString ->
+        binding.screenShare.statsView.text = statsString
+      }
       bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
     }
+    super.onResume()
   }
 
   override fun onPause() {
-    super.onPause()
+
     screenShareTrack?.let {
       unbindSurfaceView(binding.screenShare, it)
     }
+    screenShareStats.close()
+    super.onPause()
   }
 
   private fun initViewModels() {
@@ -55,28 +66,41 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     meetingViewModel.activeSpeakersUpdatedTracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
-      updateVideos(binding.container, tracks)
+      updateVideos(binding.container, tracks, false)
     }
 
     meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
-      updateVideos(binding.container, videos)
+      updateVideos(binding.container, videos, false)
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
     }
+
+
   }
 
+  private val screenShareStats = StatsInterpreter()
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
 
     // Check if the currently shared screen-share track is removed
     screenShareTrack?.let { screen ->
       if (!tracks.contains(screen)) {
         screenShareTrack?.let { unbindSurfaceView(binding.screenShare, it) }
+        screenShareStats.close()
         screenShareTrack = null
       }
     }
 
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
+      screenShareStats.close()
+      screenShareStats.initiateStats(
+        meetingViewModel.getStats(),
+        screen.video,
+        screen.audio,
+        screen.peer.isLocal
+      ) {
+        binding.screenShare.statsView.text = it
+      }
       screenShareTrack = screen
       if (isFragmentVisible) {
         bindSurfaceView(

@@ -58,7 +58,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       val videos = getCurrentPageVideos(tracks)
-      updateVideos(binding.container, videos)
+      updateVideos(binding.container, videos, true)
     }
 
     //meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }

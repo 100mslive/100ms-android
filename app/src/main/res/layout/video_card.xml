@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -85,8 +86,14 @@
                 app:tint="@color/white_faded_70" />
 
         </LinearLayout>
-
     </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/statsView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        tools:text="hi this is stats" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/audio_level"
