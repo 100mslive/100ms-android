@@ -245,7 +245,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           val videoBinding = createVideoView(layout)
           var statsInterpreter: StatsInterpreter? = null
           if (!isVideoGrid) {
-            statsInterpreter = StatsInterpreter()
+            statsInterpreter = StatsInterpreter(settings.showStats)
             statsInterpreter.initiateStats(
               meetingViewModel.getStats(),
               newVideo.video,

@@ -18,7 +18,8 @@ import org.webrtc.RendererCommon
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit,
-  private val itemStats: Flow<Map<String, WebrtcStats>>
+  private val itemStats: Flow<Map<String, WebrtcStats>>,
+  private val statsActive: Boolean
 ) : RecyclerView.Adapter<VideoListAdapter.VideoItemViewHolder>() {
 
   companion object {
@@ -45,7 +46,7 @@ class VideoListAdapter(
   ) : RecyclerView.ViewHolder(binding.root) {
 
     private var itemRef: VideoListItem? = null
-    private val statsInterpreter = StatsInterpreter()
+    private val statsInterpreter = StatsInterpreter(statsActive)
 
     private var isSurfaceViewBinded = false
 

@@ -12,7 +12,7 @@ import live.hms.video.media.tracks.HMSAudioTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import java.io.Closeable
 
-class StatsInterpreter : Closeable {
+class StatsInterpreter(val active: Boolean) : Closeable {
     private val dispatcher = CoroutineScope(Dispatchers.Default)
     private var statsJob: Job? = null
     // For this to happen in n time rather than n^x times for a video, they'll have to
@@ -25,34 +25,36 @@ class StatsInterpreter : Closeable {
         isLocal: Boolean,
         setText: (String) -> Unit
     ) {
-        statsJob = dispatcher.launch {
+        if (active) {
+            statsJob = dispatcher.launch {
 
-            itemStats.map { allStats ->
+                itemStats.map { allStats ->
 
-                val relevantStats = mutableListOf<WebrtcStats?>().apply {
-                    add(allStats[currentAudioTrack?.trackId])
-                    add(allStats[currentVideoTrack?.trackId])
-                    if (isLocal) {
-                        add(allStats[Peer.LOCAL_PEER])
-                    }
-                }
-                return@map (relevantStats.filterNotNull())
-            }
-                .map {
-                    it.fold("") { acc, webrtcStats ->
-                        acc + when (webrtcStats) {
-                            is Audio -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nConcealment Events:${webrtcStats.concealmentEvents}"
-                            is Video -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.framesPerSecond}\nFD:${webrtcStats.framesDropped}"
-                            is Peer -> "\nPeer:\n\tIncoming: ${webrtcStats.availableIncomingBitrate}\nOutgoing: ${webrtcStats.availableOutgoingBitrate}\n${webrtcStats.currentRoundTripTime}"
-                            else -> acc
+                    val relevantStats = mutableListOf<WebrtcStats?>().apply {
+                        add(allStats[currentAudioTrack?.trackId])
+                        add(allStats[currentVideoTrack?.trackId])
+                        if (isLocal) {
+                            add(allStats[Peer.LOCAL_PEER])
                         }
                     }
+                    return@map (relevantStats.filterNotNull())
                 }
-                .collect {
-                    withContext(Dispatchers.Main) {
-                        setText(it)
+                    .map {
+                        it.fold("") { acc, webrtcStats ->
+                            acc + when (webrtcStats) {
+                                is Audio -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nConcealment Events:${webrtcStats.concealmentEvents}"
+                                is Video -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.framesPerSecond}\nFD:${webrtcStats.framesDropped}\nPLI:${webrtcStats.pliCount}\nNACK:${webrtcStats.nackCount}"
+                                is Peer -> "\nPeer:\n\tIncoming: ${webrtcStats.availableIncomingBitrate}\nOutgoing: ${webrtcStats.availableOutgoingBitrate}\n${webrtcStats.currentRoundTripTime}"
+                                else -> acc
+                            }
+                        }
                     }
-                }
+                    .collect {
+                        withContext(Dispatchers.Main) {
+                            setText(it)
+                        }
+                    }
+            }
         }
     }
 

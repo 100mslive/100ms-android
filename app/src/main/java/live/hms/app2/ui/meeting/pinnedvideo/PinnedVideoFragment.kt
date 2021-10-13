@@ -15,6 +15,7 @@ import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import org.webrtc.RendererCommon
 
@@ -25,6 +26,7 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private var pinnedTrack: MeetingTrack? = null
+  protected val settings: SettingsStore by lazy { SettingsStore(requireContext()) }
 
   private var binding by viewLifecycle<FragmentPinnedVideoBinding>()
 
@@ -36,8 +38,11 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private val videoListAdapter by lazy {
-    VideoListAdapter({ changePinViewVideo(it) },
-      meetingViewModel.getStats())
+    VideoListAdapter(
+      { changePinViewVideo(it) },
+      meetingViewModel.getStats(),
+      settings.showStats
+    )
   }
 
   // Determined using the onResume() and onPause()

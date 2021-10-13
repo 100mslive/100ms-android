@@ -78,7 +78,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   }
 
-  private val screenShareStats = StatsInterpreter()
+  private val screenShareStats by lazy { StatsInterpreter(settings.showStats) }
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
 
     // Check if the currently shared screen-share track is removed
