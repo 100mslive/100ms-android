@@ -275,7 +275,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
           container.strokeWidth = 0
         } else {
-          val level = speakers.find { it.trackId == track.trackId }?.level ?: 0
+          val level = speakers.find { it.hmsTrack.trackId == track.trackId }?.level ?: 0
 
           videoCard.audioLevel.apply {
             text = "$level"
