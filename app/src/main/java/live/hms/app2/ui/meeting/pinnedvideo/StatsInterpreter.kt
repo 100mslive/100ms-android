@@ -43,8 +43,8 @@ class StatsInterpreter(val active: Boolean) : Closeable {
                         it.fold("") { acc, webrtcStats ->
                             acc + when (webrtcStats) {
                                 is Audio -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nConcealment Events:${webrtcStats.concealmentEvents}"
-                                is Video -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.framesPerSecond}\nFD:${webrtcStats.framesDropped}\nPLI:${webrtcStats.pliCount}\nNACK:${webrtcStats.nackCount}"
-                                is Peer -> "\nPeer:\n\tIncoming: ${webrtcStats.availableIncomingBitrate}\nOutgoing: ${webrtcStats.availableOutgoingBitrate}\n${webrtcStats.currentRoundTripTime}"
+                                is Video -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.framesPerSecond}\nFD:${webrtcStats.framesDropped}\nPLI:${webrtcStats.pliCount}\nNACK:${webrtcStats.nackCount}\nWidth:${webrtcStats.frameWidth}\nHeight:${webrtcStats.frameHeight}"
+                                is Peer -> "\nPeer:\n\tIncoming: ${webrtcStats.availableIncomingBitrate}\nOutgoing: ${webrtcStats.availableOutgoingBitrate}\nRTT${webrtcStats.currentRoundTripTime}"
                                 else -> acc
                             }
                         }
