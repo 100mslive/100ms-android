@@ -74,7 +74,6 @@ class RtmpRecordFragment : Fragment() {
 
     private fun startClicked() {
         // Create a config and start
-        val rtmpStreamingUrls = settings.rtmpUrlsList
         val isRecording = binding.shouldRecord.isChecked
         meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList())
         findNavController().popBackStack()
