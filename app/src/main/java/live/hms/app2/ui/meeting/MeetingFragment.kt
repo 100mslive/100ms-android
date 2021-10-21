@@ -411,7 +411,7 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch {
       meetingViewModel.events.collect { event ->
         when (event) {
           is MeetingViewModel.Event.RTMPError -> {
