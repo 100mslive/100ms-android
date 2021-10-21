@@ -413,24 +413,19 @@ class MeetingFragment : Fragment() {
     }
 
     viewLifecycleOwner.lifecycleScope.launch {
-      meetingViewModel.rtmpErrors.collect { rtmpException ->
-        if (rtmpException != null) {
-          withContext(Dispatchers.Main) {
-            Toast.makeText(context, "RTMP error $rtmpException", Toast.LENGTH_LONG).show()
+      meetingViewModel.events.collect { event ->
+        when (event) {
+          is MeetingViewModel.Event.RTMPError -> {
+            withContext(Dispatchers.Main) {
+              Toast.makeText(context, "RTMP error ${event.exception}", Toast.LENGTH_LONG).show()
+            }
           }
-        }
-      }
-    }
-
-    viewLifecycleOwner.lifecycleScope.launch {
-      meetingViewModel.changeTrackMuteRequest.collect { trackChangeRequest ->
-        withContext(Dispatchers.Main) {
-          if (trackChangeRequest != null) {
-
-            val message = if (trackChangeRequest.track is HMSLocalAudioTrack) {
-              "${trackChangeRequest.requestedBy.name} is asking you to unmute."
-            } else {
-              "${trackChangeRequest.requestedBy.name} is asking you to turn on video."
+          is MeetingViewModel.Event.ChangeTrackMuteRequest -> {
+            withContext(Dispatchers.Main) {
+              val message = if (event.request.track is HMSLocalAudioTrack) {
+                "${event.request.requestedBy.name} is asking you to unmute."
+              } else {
+                "${event.request.requestedBy.name} is asking you to turn on video."
               }
 
               val builder = AlertDialog.Builder(requireContext())
@@ -439,9 +434,9 @@ class MeetingFragment : Fragment() {
                 .setCancelable(false)
 
               builder.setPositiveButton(R.string.turn_on) { dialog, _ ->
-                if (trackChangeRequest.track is HMSLocalAudioTrack) {
+                if (event.request.track is HMSLocalAudioTrack) {
                   meetingViewModel.setLocalAudioEnabled(true)
-                } else if (trackChangeRequest.track is HMSLocalVideoTrack) {
+                } else if (event.request.track is HMSLocalVideoTrack) {
                   meetingViewModel.setLocalVideoEnabled(true)
                 }
                 dialog.dismiss()
@@ -454,9 +449,10 @@ class MeetingFragment : Fragment() {
               builder.create().apply { show() }
 
             }
+            return@collect
           }
-          return@collect
         }
+      }
     }
 
     meetingViewModel.state.observe(viewLifecycleOwner) { state ->
