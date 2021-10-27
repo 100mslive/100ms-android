@@ -396,7 +396,9 @@ class MeetingViewModel(
 
         override fun onChangeTrackStateRequest(details: HMSChangeTrackStateRequest) {
           viewModelScope.launch {
-            _events.emit(Event.ChangeTrackMuteRequest(details))
+            if (details.track.isMute != details.mute) {
+              _events.emit(Event.ChangeTrackMuteRequest(details))
+            }
           }
         }
       })
