@@ -423,9 +423,9 @@ class MeetingFragment : Fragment() {
           is MeetingViewModel.Event.ChangeTrackMuteRequest -> {
             withContext(Dispatchers.Main) {
               val message = if (event.request.track is HMSLocalAudioTrack) {
-                "${event.request.requestedBy.name} is asking you to unmute."
+                "${event.request.requestedBy?.name ?: "A peer"} is asking you to unmute."
               } else {
-                "${event.request.requestedBy.name} is asking you to turn on video."
+                "${event.request.requestedBy?.name ?: "A peer"} is asking you to turn on video."
               }
 
               val builder = AlertDialog.Builder(requireContext())
