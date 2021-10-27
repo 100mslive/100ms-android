@@ -1,8 +1,11 @@
 package live.hms.app2.ui.meeting
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -48,6 +51,8 @@ class MeetingFragment : Fragment() {
 
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
+
+  private val CAPTURE_PERMISSION_REQUEST_CODE = 1
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
@@ -106,10 +111,6 @@ class MeetingFragment : Fragment() {
 
       R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
 
-      R.id.action_share_screen -> {
-        Toast.makeText(requireContext(), "Screen Share Not Supported", Toast.LENGTH_SHORT).show()
-      }
-
       R.id.action_email_logs -> {
         requireContext().startActivity(
           EmailUtils.getNonFatalLogIntent(requireContext())
@@ -144,8 +145,34 @@ class MeetingFragment : Fragment() {
           MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
         )
       }
+
+      R.id.action_share_screen -> {
+        val mediaProjectionManager: MediaProjectionManager? = requireContext().getSystemService(
+          Context.MEDIA_PROJECTION_SERVICE
+        ) as MediaProjectionManager
+        startActivityForResult(
+          mediaProjectionManager?.createScreenCaptureIntent(),
+          CAPTURE_PERMISSION_REQUEST_CODE
+        )
+      }
+
+      R.id.action_stop_share_screen -> {
+        meetingViewModel.stopScreenshare()
+      }
+
     }
     return false
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    if (requestCode != CAPTURE_PERMISSION_REQUEST_CODE) return
+
+    if (resultCode != Activity.RESULT_OK) {
+      Log.e(TAG, "User Didnt give access to record screen")
+      return
+    }
+
+    meetingViewModel.startScreenshare(data)
   }
 
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
@@ -378,7 +405,7 @@ class MeetingFragment : Fragment() {
     return binding.root
   }
 
-  private fun goToHomePage(details : HMSRemovedFromRoom? = null) {
+  private fun goToHomePage(details: HMSRemovedFromRoom? = null) {
     Intent(requireContext(), HomeActivity::class.java).apply {
       crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
       if(details != null) {
