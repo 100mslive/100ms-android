@@ -12,6 +12,7 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -92,6 +93,14 @@ class MeetingFragment : Fragment() {
     settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
+  var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    if (result.resultCode == Activity.RESULT_OK) {
+      // There are no request codes
+      val data: Intent? = result.data
+      meetingViewModel.startScreenshare(data)
+    }
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_share_link -> {
@@ -150,10 +159,7 @@ class MeetingFragment : Fragment() {
         val mediaProjectionManager: MediaProjectionManager? = requireContext().getSystemService(
           Context.MEDIA_PROJECTION_SERVICE
         ) as MediaProjectionManager
-        startActivityForResult(
-          mediaProjectionManager?.createScreenCaptureIntent(),
-          CAPTURE_PERMISSION_REQUEST_CODE
-        )
+        resultLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
       }
 
       R.id.action_stop_share_screen -> {
@@ -162,17 +168,6 @@ class MeetingFragment : Fragment() {
 
     }
     return false
-  }
-
-  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    if (requestCode != CAPTURE_PERMISSION_REQUEST_CODE) return
-
-    if (resultCode != Activity.RESULT_OK) {
-      Log.e(TAG, "User Didnt give access to record screen")
-      return
-    }
-
-    meetingViewModel.startScreenshare(data)
   }
 
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
