@@ -101,9 +101,6 @@ class MeetingViewModel(
   // Live data to define the overall UI
   val state = MutableLiveData<MeetingState>(MeetingState.Disconnected())
 
-  private val _changeTrackMuteRequest = MutableStateFlow<HMSChangeTrackStateRequest?>(null)
-  val changeTrackMuteRequest: Flow<HMSChangeTrackStateRequest?> = _changeTrackMuteRequest
-
   // TODO: Listen to changes in publishVideo & publishAudio
   //  when it is possible to switch from Audio/Video only to Audio+Video/Audio/Video/etc
   // Live data for user media controls
@@ -402,7 +399,9 @@ class MeetingViewModel(
 
         override fun onChangeTrackStateRequest(details: HMSChangeTrackStateRequest) {
           viewModelScope.launch {
-            _changeTrackMuteRequest.emit(details)
+            if (details.track.isMute != details.mute) {
+              _events.emit(Event.ChangeTrackMuteRequest(details))
+            }
           }
         }
       })
@@ -761,7 +760,7 @@ class MeetingViewModel(
         override fun onError(error: HMSException) {
           Log.d(TAG, "RTMP recording error: $error")
           // restore the current state
-          viewModelScope.launch { _rtmpErrors.emit(error) }
+          viewModelScope.launch { _events.emit(Event.RTMPError(error) ) }
           _isRecording.postValue(getRecordingState(hmsRoom!!))
         }
 
@@ -780,7 +779,7 @@ class MeetingViewModel(
     hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         Log.v(TAG, "RTMP recording stop. error: $error")
-        viewModelScope.launch { _rtmpErrors.emit(error) }
+        viewModelScope.launch { _events.emit(Event.RTMPError(error)) }
         _isRecording.postValue(getRecordingState(hmsRoom!!))
       }
 
@@ -818,7 +817,12 @@ class MeetingViewModel(
     })
   }
 
-  private val _rtmpErrors = MutableSharedFlow<HMSException?>()
-  val rtmpErrors: SharedFlow<HMSException?> = _rtmpErrors
+  private val _events = MutableSharedFlow<Event?>()
+  val events: SharedFlow<Event?> = _events
+
+  sealed class Event {
+    class RTMPError(val exception: HMSException) : Event()
+    class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
+  }
 }
 
