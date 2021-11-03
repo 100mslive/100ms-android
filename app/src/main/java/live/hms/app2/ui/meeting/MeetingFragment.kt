@@ -173,23 +173,38 @@ class MeetingFragment : Fragment() {
       // If we're in a transitioning state, we prevent further clicks.
       // Checked or not checked depends on if it's currently recording or not. Checked if recording.
       when (meetingViewModel.isRecording.value) {
+        RecordingState.STREAMING -> {
+          this.isChecked = true
+          this.isEnabled = true
+          this.title = "Streaming"
+        }
+        RecordingState.STREAMING_AND_RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = true
+          this.title = "Rec+Stream"
+        }
         RecordingState.RECORDING -> {
           this.isChecked = true
           this.isEnabled = true
+          this.title = "Recording"
         }
         RecordingState.NOT_RECORDING_OR_STREAMING -> {
           this.isChecked = false
           this.isEnabled = true
+          this.title = "Rec+Stream"
         }
         RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
           this.isChecked = true
           this.isEnabled = false
+          this.title = "Recording"
         }
         RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS -> {
           this.isChecked = false
           this.isEnabled = false
+          this.title = "Recording"
         }
         else -> {
+          this.title = "Recording"
         } // Nothing
       }
     }
