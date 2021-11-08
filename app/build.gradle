@@ -65,7 +65,7 @@ dependencies {
     implementation "com.github.100mslive:webrtc:m94-4606"
 
     //100ms.live SDK
-    implementation 'com.github.100mslive:android-sdk:2.1.6'
+//    implementation 'com.github.100mslive:android-sdk:2.1.6'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
