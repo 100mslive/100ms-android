@@ -61,6 +61,7 @@ class MeetingActivity : AppCompatActivity() {
   override fun onDestroy() {
     super.onDestroy()
     _binding = null
+    meetingViewModel.stopScreenshare()
   }
 
   private fun initViewModels() {
