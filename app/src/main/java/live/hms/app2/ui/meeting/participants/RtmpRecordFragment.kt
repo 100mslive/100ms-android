@@ -76,8 +76,16 @@ class RtmpRecordFragment : Fragment() {
         // Create a config and start
         val rtmpStreamingUrls = settings.rtmpUrlsList
         val isRecording = binding.shouldRecord.isChecked
-        meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList())
-        findNavController().popBackStack()
+        if (settings.rtmpUrlsList.toList().isEmpty() && !isRecording) {
+            Toast.makeText(
+                requireContext(),
+                "Turn on recording, or provide rtmp urls",
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList())
+            findNavController().popBackStack()
+        }
     }
 
     private fun removeItem(url: String) {
