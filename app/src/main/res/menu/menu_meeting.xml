@@ -69,6 +69,19 @@
             android:title="@string/active_speaker_view"
             app:showAsAction="never" />
 
+        <item
+            android:id="@+id/start_background"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/start_background"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/stop_background"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/stop_background"
+            app:showAsAction="never" />
+
+
     </group>
 
     <group>

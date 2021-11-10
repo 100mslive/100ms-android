@@ -1,6 +1,10 @@
 package live.hms.app2.ui.meeting
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
@@ -26,6 +30,8 @@ import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
+import java.io.IOException
+import java.io.InputStream
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -36,6 +42,8 @@ class MeetingViewModel(
   companion object {
     private const val TAG = "MeetingViewModel"
   }
+
+//  private var context = application.applicationContext
 
   private var pendingRoleChange: HMSRoleChangeRequest? = null
   private val config = HMSConfig(
@@ -786,6 +794,34 @@ class MeetingViewModel(
       }
 
     })
+  }
+
+  fun getBitmapFromAsset(context: Context, filename: String): Bitmap? {
+    val assetManager = context.assets
+    val istr: InputStream
+    var bitmap: Bitmap? = null
+    try {
+      HMSLogger.d(TAG,"on reading image")
+      istr = assetManager.open(filename)
+      HMSLogger.d(TAG,istr.toString())
+      bitmap = BitmapFactory.decodeStream(istr)
+    } catch (e: IOException) {
+      HMSLogger.e(TAG, e.message + "error reading virtual background image")
+    }
+    return bitmap
+  }
+
+  fun startVB(context: Context?) {
+    Log.v(TAG, "Start Virtual Background")
+    val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"2.jpeg")
+    if (imageBitmap != null) {
+      hmsSDK.startVirtualBackground(imageBitmap, 15)
+    }
+  }
+
+  fun stopVB() {
+    Log.v(TAG, "Stop Virtual Background")
+    hmsSDK.stopVirtualBackground()
   }
 
   private val _events = MutableSharedFlow<Event?>()

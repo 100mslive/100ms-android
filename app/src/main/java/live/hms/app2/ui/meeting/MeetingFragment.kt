@@ -218,6 +218,29 @@ class MeetingFragment : Fragment() {
       }
     }
 
+    menu.findItem(R.id.end_room).apply {
+      isVisible = meetingViewModel.isAllowedToEndMeeting()
+
+      setOnMenuItemClickListener {
+        meetingViewModel.endRoom(false)
+        true
+      }
+    }
+
+    menu.findItem(R.id.start_background).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.startVB(context)
+        true
+      }
+    }
+
+    menu.findItem(R.id.stop_background).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.stopVB()
+        true
+      }
+    }
+
     menu.findItem(R.id.end_and_lock_room).apply {
       isVisible = meetingViewModel.isAllowedToEndMeeting()
 

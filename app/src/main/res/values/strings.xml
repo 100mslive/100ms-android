@@ -146,4 +146,6 @@
     <string name="add_new_rtmp_streaming_url">Add new RTMP streaming url</string>
     <string name="rtmp_settings">RTMP Settings</string>
     <string name="use_hardware_AEC">Use Harware AEC</string>
+    <string name="start_background">Start Background</string>
+    <string name="stop_background">Stop Background</string>
 </resources>
