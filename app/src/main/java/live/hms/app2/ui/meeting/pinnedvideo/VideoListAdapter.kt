@@ -110,7 +110,7 @@ class VideoListAdapter(
    *  to be updated in the VideoGrid
    */
   @MainThread
-  fun setItems(newItems: MutableList<MeetingTrack>) {
+  fun setItems(newItems: List<MeetingTrack>) {
     val newVideoItems = newItems.mapIndexed { index, track -> VideoListItem(index.toLong(), track) }
 
     val callback = VideoListItemDiffUtil(items, newVideoItems)

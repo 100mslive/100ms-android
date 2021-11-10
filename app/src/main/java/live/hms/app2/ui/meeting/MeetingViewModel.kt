@@ -126,7 +126,8 @@ class MeetingViewModel(
   private var localVideoTrack: HMSLocalVideoTrack? = null
 
   // Live data containing all the current tracks in a meeting
-  val tracks = MutableLiveData(_tracks)
+  private val _liveDataTracks = MutableLiveData(_tracks)
+  val tracks: LiveData<List<MeetingTrack>> = _liveDataTracks
 
   // Live data containing the current Speaker in the meeting
   val speakers = MutableLiveData<Array<HMSSpeaker>>()
@@ -134,7 +135,7 @@ class MeetingViewModel(
   private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
   val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
     speakers.map(activeSpeakerHandler::speakerUpdate)
-  val activeSpeakersUpdatedTracks = tracks.map(activeSpeakerHandler::trackUpdateTrigger)
+  val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
@@ -168,7 +169,7 @@ class MeetingViewModel(
 
       setMute(!enabled)
 
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
 
       isLocalVideoEnabled.postValue(enabled)
       crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
@@ -186,7 +187,7 @@ class MeetingViewModel(
     localAudioTrack?.apply {
       setMute(!enabled)
 
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
 
       isLocalAudioEnabled.postValue(enabled)
       crashlyticsLog(TAG, "toggleUserMic: enabled=$enabled")
@@ -219,7 +220,7 @@ class MeetingViewModel(
   private fun cleanup() {
     failures.clear()
     _tracks.clear()
-    tracks.postValue(_tracks)
+    _liveDataTracks.postValue(_tracks)
 
     dominantSpeaker.postValue(null)
 
@@ -266,7 +267,7 @@ class MeetingViewModel(
             HMSPeerUpdate.PEER_LEFT -> {
               synchronized(_tracks) {
                 _tracks.removeIf { it.peer.peerID == hmsPeer.peerID }
-                tracks.postValue(_tracks)
+                _liveDataTracks.postValue(_tracks)
                 peerLiveDate.postValue(hmsPeer)
               }
             }
@@ -345,7 +346,7 @@ class MeetingViewModel(
               removeTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_MUTED -> {
-              tracks.postValue(_tracks)
+              _liveDataTracks.postValue(_tracks)
               if (peer.isLocal) {
                 if (track.type == HMSTrackType.AUDIO)
                   isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
@@ -355,7 +356,7 @@ class MeetingViewModel(
               }
             }
             HMSTrackUpdate.TRACK_UNMUTED -> {
-              tracks.postValue(_tracks)
+              _liveDataTracks.postValue(_tracks)
               if (peer.isLocal) {
                 if (track.type == HMSTrackType.AUDIO)
                   isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
@@ -364,9 +365,9 @@ class MeetingViewModel(
                 }
               }
             }
-            HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> tracks.postValue(_tracks)
-            HMSTrackUpdate.TRACK_DEGRADED -> tracks.postValue(_tracks)
-            HMSTrackUpdate.TRACK_RESTORED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> _liveDataTracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_DEGRADED -> _liveDataTracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_RESTORED -> _liveDataTracks.postValue(_tracks)
           }
         }
 
@@ -508,7 +509,7 @@ class MeetingViewModel(
         _track.audio = track
       }
 
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
     }
   }
 
@@ -535,7 +536,7 @@ class MeetingViewModel(
       }
     }
 
-    tracks.postValue(_tracks)
+    _liveDataTracks.postValue(_tracks)
   }
 
   private fun addTrack(track: HMSTrack, peer: HMSPeer) {
@@ -572,7 +573,7 @@ class MeetingViewModel(
       }
 
       // Update the view as some track has been removed
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
     }
   }
 
