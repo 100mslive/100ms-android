@@ -790,15 +790,14 @@ class MeetingViewModel(
 
     })
   }
-
   fun startScreenshare(mediaProjectionPermissionResultData: Intent?) {
-    hmsSDK.startScreenshare(object : HMSActionResultListener{
+    hmsSDK.startScreenshare(object : HMSActionResultListener {
       override fun onError(error: HMSException) {
-        HMSLogger.d(TAG,  "onError : ${error.name}")
+        HMSLogger.d(TAG, "onError : ${error.name}")
       }
 
       override fun onSuccess() {
-        HMSLogger.d(TAG, "onSuccess")
+        HMSLogger.d(TAG, "startScreenshare :: onSuccess")
       }
 
     } ,mediaProjectionPermissionResultData)
