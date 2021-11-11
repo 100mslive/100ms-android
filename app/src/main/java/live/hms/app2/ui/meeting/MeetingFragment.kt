@@ -1,14 +1,18 @@
 package live.hms.app2.ui.meeting
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -49,6 +53,8 @@ class MeetingFragment : Fragment() {
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
 
+  private val CAPTURE_PERMISSION_REQUEST_CODE = 1
+
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
       requireActivity().application,
@@ -63,6 +69,7 @@ class MeetingFragment : Fragment() {
   private var alertDialog: AlertDialog? = null
 
   private var isMeetingOngoing = false
+  private var isScreenShared = false
 
   private val onSettingsChangeListener =
     SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -87,6 +94,20 @@ class MeetingFragment : Fragment() {
     settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
   }
 
+  var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    if (result.resultCode == Activity.RESULT_OK) {
+      // There are no request codes
+      val data: Intent? = result.data
+      meetingViewModel.startScreenshare(data)
+      isScreenShared = true
+    }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    meetingViewModel.stopScreenshare()
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_share_link -> {
@@ -105,10 +126,6 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
-
-      R.id.action_share_screen -> {
-        Toast.makeText(requireContext(), "Screen Share Not Supported", Toast.LENGTH_SHORT).show()
-      }
 
       R.id.action_email_logs -> {
         requireContext().startActivity(
@@ -144,6 +161,24 @@ class MeetingFragment : Fragment() {
           MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
         )
       }
+
+      R.id.action_share_screen -> {
+        if (!isScreenShared) {
+          val mediaProjectionManager: MediaProjectionManager? = requireContext().getSystemService(
+            Context.MEDIA_PROJECTION_SERVICE
+          ) as MediaProjectionManager
+          resultLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
+          isScreenShared = true
+        } else {
+          Toast.makeText(activity, "ScreenShare already running!", Toast.LENGTH_SHORT).show()
+        }
+      }
+
+      R.id.action_stop_share_screen -> {
+        meetingViewModel.stopScreenshare()
+        isScreenShared = false
+      }
+
     }
     return false
   }
@@ -393,7 +428,7 @@ class MeetingFragment : Fragment() {
     return binding.root
   }
 
-  private fun goToHomePage(details : HMSRemovedFromRoom? = null) {
+  private fun goToHomePage(details: HMSRemovedFromRoom? = null) {
     Intent(requireContext(), HomeActivity::class.java).apply {
       crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
       if(details != null) {

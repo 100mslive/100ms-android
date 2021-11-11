@@ -44,6 +44,7 @@
     <string name="meeting">Meeting</string>
     <string name="open_chat">Open Chat</string>
     <string name="share_screen">Share Screen</string>
+    <string name="stop_share_screen">Stop Share Screen</string>
     <string name="record_meeting">Record Meeting</string>
     <string name="show_participants">Show Participants</string>
     <string name="settings_fragment">Settings Fragment</string>
