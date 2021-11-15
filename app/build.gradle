@@ -109,9 +109,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    // Add the selfie segmentation dependency
-    implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta2'
-
-    implementation 'io.github.zncmn.libyuv:core:0.0.7'
+//    // Add the selfie segmentation dependency
+//    implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta2'
+//
+//    implementation 'io.github.zncmn.libyuv:core:0.0.7'
 
 }
