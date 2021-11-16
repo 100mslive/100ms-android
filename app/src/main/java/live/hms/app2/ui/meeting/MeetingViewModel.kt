@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
-import com.google.gson.JsonObject
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
@@ -42,7 +42,7 @@ class MeetingViewModel(
   private val config = HMSConfig(
     roomDetails.username,
     roomDetails.authToken,
-    JsonObject().apply { addProperty("name", roomDetails.username) }.toString(),
+    Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username)).toString(),
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
@@ -823,6 +823,25 @@ class MeetingViewModel(
   sealed class Event {
     class RTMPError(val exception: HMSException) : Event()
     class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
+  }
+
+  private val _isHandRaised = MutableLiveData<Boolean>(false)
+  val isHandRaised: LiveData<Boolean> = _isHandRaised
+
+  fun raiseHand() {
+    val localPeer = hmsSDK.getLocalPeer()!!
+    val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
+    val newMetadataJson = currentMetadata!!.copy(isHandRaised = true).toJson()
+
+    hmsSDK.changeMetadata(localPeer, newMetadataJson, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.d(TAG, "There was an error $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "Metadata update succeeded")
+      }
+    })
   }
 }
 
