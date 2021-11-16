@@ -179,6 +179,10 @@ class MeetingFragment : Fragment() {
         isScreenShared = false
       }
 
+      R.id.raise_hand -> {
+        meetingViewModel.toggleRaiseHand()
+      }
+
     }
     return false
   }
@@ -200,6 +204,14 @@ class MeetingFragment : Fragment() {
       isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING_AND_RECORDING
+    }
+
+    menu.findItem(R.id.raise_hand).apply {
+      if (meetingViewModel.isHandRaised.value == true) {
+        title = getString(R.string.lower_hand)
+      } else {
+        title = getString(R.string.raise_hand)
+      }
     }
 
     menu.findItem(R.id.action_record_meeting).apply {

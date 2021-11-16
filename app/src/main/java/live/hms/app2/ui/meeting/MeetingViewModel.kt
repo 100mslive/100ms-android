@@ -289,6 +289,14 @@ class MeetingViewModel(
               peerLiveDate.postValue(hmsPeer)
             }
 
+            HMSPeerUpdate.METADATA_CHANGED -> {
+              if (hmsPeer.isLocal) {
+                updateSelfHandRaised(hmsPeer as HMSLocalPeer)
+              } else {
+                peerLiveDate.postValue(hmsPeer)
+              }
+            }
+
             else -> Unit
           }
         }
@@ -417,6 +425,11 @@ class MeetingViewModel(
         }
       })
     }
+  }
+
+  private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
+    val isSelfHandRaised = CustomPeerMetadata.fromJson(hmsPeer.metadata)?.isHandRaised == true
+    _isHandRaised.postValue(isSelfHandRaised)
   }
 
   private fun getRecordingState(room: HMSRoom): RecordingState {
@@ -828,10 +841,11 @@ class MeetingViewModel(
   private val _isHandRaised = MutableLiveData<Boolean>(false)
   val isHandRaised: LiveData<Boolean> = _isHandRaised
 
-  fun raiseHand() {
+  fun toggleRaiseHand() {
     val localPeer = hmsSDK.getLocalPeer()!!
     val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
-    val newMetadataJson = currentMetadata!!.copy(isHandRaised = true).toJson()
+    val isHandRaised = currentMetadata!!.isHandRaised
+    val newMetadataJson = currentMetadata.copy(isHandRaised = !isHandRaised).toJson()
 
     hmsSDK.changeMetadata(localPeer, newMetadataJson, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
@@ -840,6 +854,7 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         Log.d(TAG, "Metadata update succeeded")
+        updateSelfHandRaised(localPeer)
       }
     })
   }
