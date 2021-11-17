@@ -21,7 +21,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
-import live.hms.video.plugin.video.HMSVideoProcessor
+import com.example.virtualbackground.HMSVirtualBackground
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -43,8 +43,6 @@ class MeetingViewModel(
   companion object {
     private const val TAG = "MeetingViewModel"
   }
-
-//  private var context = application.applicationContext
 
   private var pendingRoleChange: HMSRoleChangeRequest? = null
   private val config = HMSConfig(
@@ -155,6 +153,8 @@ class MeetingViewModel(
     .Builder(application)
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
+
+  val processor = HMSVirtualBackground(application.applicationContext, hmsSDK)
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
@@ -817,13 +817,13 @@ class MeetingViewModel(
     Log.v(TAG, "Start Virtual Background")
     val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"2.jpeg")
     if (imageBitmap != null) {
-      hmsSDK.startVirtualBackground(imageBitmap, 15)
+      processor.start(imageBitmap,15)
     }
   }
 
   fun stopVB() {
     Log.v(TAG, "Stop Virtual Background")
-    hmsSDK.stopVirtualBackground()
+    processor.stop()
   }
 
   private val _events = MutableSharedFlow<Event?>()
