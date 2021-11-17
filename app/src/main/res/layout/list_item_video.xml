@@ -88,9 +88,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:padding="16dp"
+            android:padding="4dp"
             android:text="✋"
-            android:textSize="36sp" />
+            android:textSize="24sp" />
 
     </RelativeLayout>
 
