@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
+import androidx.annotation.CallSuper
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -272,7 +273,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  fun applyMetadataUpdates(peer: HMSPeer) {
+  private fun applyMetadataUpdates(peer: HMSPeer) {
     val isUpdatedPeerRendered = renderedViews.find { it.meetingTrack.peer.peerID == peer.peerID }
     if (isUpdatedPeerRendered != null) {
       val isHandRaised =
@@ -339,5 +340,12 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     // Release all references to views
     renderedViews.clear()
+  }
+
+  @CallSuper
+  open fun initViewModels() {
+    meetingViewModel.peerRaisedHandUpdate.observe(viewLifecycleOwner) {
+      applyMetadataUpdates(it)
+    }
   }
 }

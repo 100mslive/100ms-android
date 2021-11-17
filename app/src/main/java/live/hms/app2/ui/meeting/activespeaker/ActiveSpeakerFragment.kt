@@ -46,8 +46,8 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-  private fun initViewModels() {
-
+  override fun initViewModels() {
+    super.initViewModels()
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
       updateScreenshareTracks(tracks)
@@ -64,9 +64,6 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       applySpeakerUpdates(speakers)
     }
 
-    meetingViewModel.peerRaisedHandUpdate.observe(viewLifecycleOwner) {
-      applyMetadataUpdates(it)
-    }
   }
 
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
