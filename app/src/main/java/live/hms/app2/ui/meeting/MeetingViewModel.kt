@@ -292,9 +292,6 @@ class MeetingViewModel(
             }
 
             HMSPeerUpdate.METADATA_CHANGED -> {
-              if (hmsPeer.isLocal) {
-                updateSelfHandRaised(hmsPeer as HMSLocalPeer)
-              }
               _peerRaisedHandUpdate.postValue(hmsPeer)
             }
 
@@ -431,6 +428,7 @@ class MeetingViewModel(
   private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
     val isSelfHandRaised = CustomPeerMetadata.fromJson(hmsPeer.metadata)?.isHandRaised == true
     _isHandRaised.postValue(isSelfHandRaised)
+    _peerRaisedHandUpdate.postValue(hmsPeer)
   }
 
   private fun getRecordingState(room: HMSRoom): RecordingState {
