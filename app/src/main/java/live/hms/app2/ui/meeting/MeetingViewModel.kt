@@ -132,6 +132,8 @@ class MeetingViewModel(
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
+  private val _peerRaisedHandUpdate = MutableLiveData<HMSPeer>()
+  val peerRaisedHandUpdate: LiveData<HMSPeer> = _peerRaisedHandUpdate
 
   // Dominant speaker
   val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
@@ -292,9 +294,8 @@ class MeetingViewModel(
             HMSPeerUpdate.METADATA_CHANGED -> {
               if (hmsPeer.isLocal) {
                 updateSelfHandRaised(hmsPeer as HMSLocalPeer)
-              } else {
-                peerLiveDate.postValue(hmsPeer)
               }
+              _peerRaisedHandUpdate.postValue(hmsPeer)
             }
 
             else -> Unit
