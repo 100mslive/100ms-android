@@ -8,10 +8,13 @@ import androidx.annotation.MainThread
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemVideoBinding
+import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
+import live.hms.app2.util.visibilityOpacity
+import live.hms.video.sdk.models.HMSPeer
 import org.webrtc.RendererCommon
 
 class VideoListAdapter(
@@ -48,6 +51,9 @@ class VideoListAdapter(
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.name)
       binding.name.text = item.track.peer.name
       binding.iconScreenShare.visibility = if (item.track.isScreen) View.VISIBLE else View.GONE
+      val isHandRaised: Boolean =
+        CustomPeerMetadata.fromJson(item.track.peer.metadata)?.isHandRaised == true
+      binding.raisedHand.alpha = visibilityOpacity(isHandRaised)
 
       binding.surfaceView.apply {
         setEnableHardwareScaler(true)
@@ -148,7 +154,7 @@ class VideoListAdapter(
     crashlyticsLog(
       TAG,
       "onBindViewHolder: Manually updating $holder with ${items[position]} " +
-          "[payloads=$payloads]"
+              "[payloads=$payloads]"
     )
     holder.unbindSurfaceView() // Free the context initialized for the previous item
     holder.bind(items[position])
@@ -156,4 +162,13 @@ class VideoListAdapter(
   }
 
   override fun getItemCount() = items.size
+
+  fun itemChanged(changedPeer: HMSPeer) {
+
+    val updatedItemId = items.find { it.track.peer.peerID == changedPeer.peerID }?.id
+
+    updatedItemId?.toInt()?.let { notifyItemChanged(it) }
+  }
+
+
 }

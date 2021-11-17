@@ -172,13 +172,17 @@ class PinnedVideoFragment : Fragment() {
 
     // This will change the raised hand state if the person does it while in this view.
     meetingViewModel.peerRaisedHandUpdate.observe(viewLifecycleOwner) { handUpdatePeer ->
+      // Check if it's the pinned video's hand raised.
       if (handUpdatePeer.peerID == pinnedTrack?.peer?.peerID) {
         changePinnedRaiseHandState()
       }
+      // Since the pinned person's video can also appear in the sublist, this has to be checked too
+      videoListAdapter.itemChanged(handUpdatePeer)
+
     }
   }
 
-  fun changePinnedRaiseHandState() {
+  private fun changePinnedRaiseHandState() {
     val customData = CustomPeerMetadata.fromJson(pinnedTrack?.peer?.metadata)
     if (customData != null) {
       binding.pinVideo.raisedHand.alpha = visibilityOpacity(customData.isHandRaised)
