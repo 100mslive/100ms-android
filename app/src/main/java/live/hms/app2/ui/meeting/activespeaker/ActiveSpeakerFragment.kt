@@ -63,6 +63,10 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
     }
+
+    meetingViewModel.peerRaisedHandUpdate.observe(viewLifecycleOwner) {
+      applyMetadataUpdates(it)
+    }
   }
 
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
