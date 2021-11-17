@@ -61,13 +61,10 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation project(':lib')
-//    implementation "com.github.100mslive:webrtc:WebRTC-source-stamp-2021-08-20T04_05_25"
-    implementation "com.github.100mslive:webrtc:m94-4606"
-
-    api (':virtualbackground')
 
     //100ms.live SDK
-//    implementation 'com.github.100mslive:android-sdk:2.1.6'
+    implementation 'com.github.100mslive:android-sdk:2.1.8-capturer'
+    implementation 'com.github.100mslive:android-sdk-virtual-background:2.1.8-capturer'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
