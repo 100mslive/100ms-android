@@ -13,7 +13,7 @@ import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
-import live.hms.app2.util.visibilityOpacity
+import live.hms.app2.util.visibility
 import live.hms.video.sdk.models.HMSPeer
 import org.webrtc.RendererCommon
 
@@ -51,9 +51,6 @@ class VideoListAdapter(
       binding.nameInitials.text = NameUtils.getInitials(item.track.peer.name)
       binding.name.text = item.track.peer.name
       binding.iconScreenShare.visibility = if (item.track.isScreen) View.VISIBLE else View.GONE
-      val isHandRaised: Boolean =
-        CustomPeerMetadata.fromJson(item.track.peer.metadata)?.isHandRaised == true
-      binding.raisedHand.alpha = visibilityOpacity(isHandRaised)
 
       binding.surfaceView.apply {
         setEnableHardwareScaler(true)
@@ -68,8 +65,13 @@ class VideoListAdapter(
         isSurfaceViewBinded = false
       }
 
+      val isHandRaised: Boolean =
+        CustomPeerMetadata.fromJson(item.track.peer.metadata)?.isHandRaised == true
+      binding.raisedHand.visibility = visibility(isHandRaised)
+
       binding.root.setOnClickListener { onVideoItemClick(item.track) }
     }
+
 
     fun bindSurfaceView() {
       if (isSurfaceViewBinded) {
@@ -149,16 +151,20 @@ class VideoListAdapter(
   ) {
     if (payloads.isEmpty()) {
       return super.onBindViewHolder(holder, position, payloads)
-    }
+    } else if (payloads[0] is CustomPeerMetadata) {
+      holder.binding.raisedHand.visibility =
+        visibility((payloads[0] as CustomPeerMetadata).isHandRaised)
+    } else {
 
-    crashlyticsLog(
-      TAG,
-      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
-              "[payloads=$payloads]"
-    )
-    holder.unbindSurfaceView() // Free the context initialized for the previous item
-    holder.bind(items[position])
-    holder.bindSurfaceView()
+      crashlyticsLog(
+        TAG,
+        "onBindViewHolder: Manually updating $holder with ${items[position]} " +
+                "[payloads=$payloads]"
+      )
+      holder.unbindSurfaceView() // Free the context initialized for the previous item
+      holder.bind(items[position])
+      holder.bindSurfaceView()
+    }
   }
 
   override fun getItemCount() = items.size
@@ -167,7 +173,9 @@ class VideoListAdapter(
 
     val updatedItemId = items.find { it.track.peer.peerID == changedPeer.peerID }?.id
 
-    updatedItemId?.toInt()?.let { notifyItemChanged(it) }
+
+    updatedItemId?.toInt()
+      ?.let { notifyItemChanged(it, CustomPeerMetadata.fromJson(changedPeer.metadata)) }
   }
 
 
