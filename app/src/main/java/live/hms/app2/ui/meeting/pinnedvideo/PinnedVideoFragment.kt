@@ -12,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.app2.databinding.FragmentPinnedVideoBinding
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
@@ -146,6 +147,7 @@ class PinnedVideoFragment : Fragment() {
 
     pinnedTrack = track
     updatePinnedVideoText()
+    changePinnedRaiseHandState()
   }
 
   private fun initViewModels() {
@@ -166,6 +168,20 @@ class PinnedVideoFragment : Fragment() {
           changePinViewVideo(it)
         }
       }
+    }
+
+    // This will change the raised hand state if the person does it while in this view.
+    meetingViewModel.peerRaisedHandUpdate.observe(viewLifecycleOwner) { handUpdatePeer ->
+      if (handUpdatePeer.peerID == pinnedTrack?.peer?.peerID) {
+        changePinnedRaiseHandState()
+      }
+    }
+  }
+
+  fun changePinnedRaiseHandState() {
+    val customData = CustomPeerMetadata.fromJson(pinnedTrack?.peer?.metadata)
+    if (customData != null) {
+      binding.pinVideo.raisedHand.alpha = visibilityOpacity(customData.isHandRaised)
     }
   }
 }

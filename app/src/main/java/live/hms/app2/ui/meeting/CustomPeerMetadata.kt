@@ -12,8 +12,11 @@ data class CustomPeerMetadata(
     }
 
     companion object {
-        fun fromJson(metadata: String): CustomPeerMetadata? {
-            return Gson().fromJson(metadata, CustomPeerMetadata::class.java)
+        fun fromJson(metadata: String?): CustomPeerMetadata? {
+            return if (metadata == null) {
+                null
+            } else
+                Gson().fromJson(metadata, CustomPeerMetadata::class.java)
         }
     }
 
