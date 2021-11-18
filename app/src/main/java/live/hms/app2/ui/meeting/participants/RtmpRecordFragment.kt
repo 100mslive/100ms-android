@@ -84,7 +84,7 @@ class RtmpRecordFragment : Fragment() {
                 Toast.LENGTH_LONG
             ).show()
         } else if (botRoleName.isNullOrBlank() || meetingViewModel.getAvailableRoles()
-                .find { it.name == botRoleName } != null
+                .find { it.name == botRoleName } == null
         ) {
             Toast.makeText(
                 requireContext(),
