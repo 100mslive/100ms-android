@@ -149,4 +149,6 @@
     <string name="use_hardware_AEC">Use Harware AEC</string>
     <string name="raise_hand">✋ Raise Hand</string>
     <string name="lower_hand">Lower Hand</string>
+    <string name="name_change_dialog">Type in the new name</string>
+    <string name="submit">Submit</string>
 </resources>

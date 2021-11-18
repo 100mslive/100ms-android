@@ -840,6 +840,7 @@ class MeetingViewModel(
   sealed class Event {
     class RTMPError(val exception: HMSException) : Event()
     class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
+    object OpenChangeNameDialog : Event()
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -861,6 +862,13 @@ class MeetingViewModel(
         updateSelfHandRaised(localPeer)
       }
     })
+
+  }
+
+  fun requestNameChange() {
+    viewModelScope.launch {
+      _events.emit(Event.OpenChangeNameDialog)
+    }
   }
 
   fun changeName(name: String) {

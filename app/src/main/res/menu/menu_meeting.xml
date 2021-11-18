@@ -73,6 +73,13 @@
         <item
             android:id="@+id/raise_hand"
             android:title="@string/raise_hand"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/change_name"
+            android:title="Change Name"
+            android:visible="false"
             app:showAsAction="ifRoom" />
 
     </group>
