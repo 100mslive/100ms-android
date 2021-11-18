@@ -156,16 +156,16 @@ class VideoListAdapter(
       // Only if all the payloads are of type peer udpate it makes sense to individually update.
       // If they weren't the non-payload type will result in a full redraw anyway so we let
       // it go to the full redraw in the else clause.
-      payloads.forEach {
-        if (it is PeerUpdatePayloads) {
-          when (it) {
+      payloads.forEach { payload ->
+        if (payload is PeerUpdatePayloads) {
+          when (payload) {
             is PeerUpdatePayloads.MetadataChanged -> {
               holder.binding.raisedHand.visibility =
-                visibility(it.metadata?.isHandRaised == true)
+                visibility(payload.metadata?.isHandRaised == true)
             }
             is PeerUpdatePayloads.NameChanged -> {
-              holder.binding.nameInitials.text = NameUtils.getInitials(it.name)
-              holder.binding.name.text = it.name
+              holder.binding.nameInitials.text = NameUtils.getInitials(payload.name)
+              holder.binding.name.text = payload.name
             }
           }
         }
