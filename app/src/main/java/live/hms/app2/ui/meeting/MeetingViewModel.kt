@@ -220,6 +220,7 @@ class MeetingViewModel(
 
   private fun cleanup() {
     failures.clear()
+    processor?.clean()
     _tracks.clear()
     _liveDataTracks.postValue(_tracks)
 
@@ -798,31 +799,24 @@ class MeetingViewModel(
     })
   }
 
-  fun getBitmapFromAsset(context: Context, filename: String): Bitmap? {
-    val assetManager = context.assets
-    val istr: InputStream
-    var bitmap: Bitmap? = null
-    try {
-      HMSLogger.d(TAG,"on reading image")
-      istr = assetManager.open(filename)
-      HMSLogger.d(TAG,istr.toString())
-      bitmap = BitmapFactory.decodeStream(istr)
-    } catch (e: IOException) {
-      HMSLogger.e(TAG, e.message + "error reading virtual background image")
-    }
-    return bitmap
-  }
+  fun addPlugin(context: Context?) {
+    Log.v(TAG, "Adding Plugin")
 
-  fun startVB(context: Context?) {
-    Log.v(TAG, "Start Virtual Background")
-    val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"2.jpeg")
-    if (imageBitmap != null) {
-      processor.start(imageBitmap,15)
+    if(processor.init()){
+      val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"2.jpeg")
+      if(imageBitmap != null){
+        processor.setBackground(imageBitmap)
+        processor.start(15) //TODO: sending fps=15 has to be changed
+      }else {
+        Log.v(TAG, "Invalid Background Image")
+      }
+    }else{
+      Log.v(TAG, "Plugin not able to initialized")
     }
   }
 
-  fun stopVB() {
-    Log.v(TAG, "Stop Virtual Background")
+  fun removePlugin() {
+    Log.v(TAG, "Removing Plugin")
     processor.stop()
   }
 
