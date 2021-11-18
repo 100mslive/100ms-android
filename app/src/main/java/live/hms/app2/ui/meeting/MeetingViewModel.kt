@@ -1,7 +1,7 @@
 package live.hms.app2.ui.meeting
 
-import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Intent
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -145,8 +145,10 @@ class MeetingViewModel(
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
   private val hmsTrackSettings = HMSTrackSettings.Builder()
-    .audio(HMSAudioTrackSettings.Builder()
-      .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build())
+    .audio(
+      HMSAudioTrackSettings.Builder()
+        .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build()
+    )
     .build()
 
   val hmsSDK = HMSSDK
@@ -606,7 +608,7 @@ class MeetingViewModel(
     val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
     if (hmsPeer != null && toRole != null) {
       if (hmsPeer.hmsRole.name != toRole.name)
-        hmsSDK.changeRole(hmsPeer, toRole, force,object : HMSActionResultListener{
+        hmsSDK.changeRole(hmsPeer, toRole, force, object : HMSActionResultListener {
           override fun onSuccess() {
             Log.i(TAG, "Successfully sent change role request for $hmsPeer")
           }
@@ -622,7 +624,7 @@ class MeetingViewModel(
   }
 
   fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason: String) {
-    hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSActionResultListener{
+    hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         state.postValue(MeetingState.NonFatalFailure(error))
       }
@@ -634,7 +636,7 @@ class MeetingViewModel(
   }
 
   fun endRoom(lock: Boolean) {
-    hmsSDK.endRoom("Closing time", lock, object : HMSActionResultListener{
+    hmsSDK.endRoom("Closing time", lock, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         state.postValue(MeetingState.NonFatalFailure(error))
       }
@@ -656,7 +658,7 @@ class MeetingViewModel(
     if (track != null) {
       val isMute = track.isMute
       if (isAllowedToAskUnmutePeers() && isMute) {
-        hmsSDK.changeTrackState(track, false, object : HMSActionResultListener{
+        hmsSDK.changeTrackState(track, false, object : HMSActionResultListener {
           override fun onError(error: HMSException) {
             state.postValue(MeetingState.NonFatalFailure(error))
           }
@@ -667,7 +669,7 @@ class MeetingViewModel(
 
         })
       } else if (isAllowedToMutePeers() && !isMute) {
-        hmsSDK.changeTrackState(track, true, object : HMSActionResultListener{
+        hmsSDK.changeTrackState(track, true, object : HMSActionResultListener {
           override fun onError(error: HMSException) {
             state.postValue(MeetingState.NonFatalFailure(error))
           }
@@ -794,6 +796,31 @@ class MeetingViewModel(
       override fun onSuccess() {
         Log.d(TAG, "RTMP recording stop. Success")
         _isRecording.postValue(RecordingState.NOT_RECORDING_OR_STREAMING)
+      }
+
+    })
+  }
+  fun startScreenshare(mediaProjectionPermissionResultData: Intent?) {
+    hmsSDK.startScreenshare(object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        HMSLogger.d(TAG, "onError : ${error.name}")
+      }
+
+      override fun onSuccess() {
+        HMSLogger.d(TAG, "startScreenshare :: onSuccess")
+      }
+
+    } ,mediaProjectionPermissionResultData)
+  }
+
+  fun stopScreenshare() {
+    hmsSDK.stopScreenshare(object : HMSActionResultListener{
+      override fun onError(error: HMSException) {
+        HMSLogger.d(TAG,  "onError : ${error.name}")
+      }
+
+      override fun onSuccess() {
+        HMSLogger.d(TAG, "onSuccess")
       }
 
     })
