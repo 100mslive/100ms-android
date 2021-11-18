@@ -15,8 +15,14 @@ data class CustomPeerMetadata(
         fun fromJson(metadata: String?): CustomPeerMetadata? {
             return if (metadata == null) {
                 null
-            } else
-                Gson().fromJson(metadata, CustomPeerMetadata::class.java)
+            } else {
+                return try {
+                    Gson().fromJson(metadata, CustomPeerMetadata::class.java)
+                } catch (ex: Exception) {
+                    // If there's any error during deserialization just return null
+                    null
+                }
+            }
         }
     }
 
