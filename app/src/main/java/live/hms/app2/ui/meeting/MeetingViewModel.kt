@@ -432,6 +432,10 @@ class MeetingViewModel(
     _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.METADATA_CHANGED))
   }
 
+  private fun updateNameChange(hmsPeer: HMSLocalPeer) {
+    _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.NAME_CHANGED))
+  }
+
   private fun getRecordingState(room: HMSRoom): RecordingState {
 
     val recording = room.browserRecordingState?.running == true ||
@@ -855,6 +859,20 @@ class MeetingViewModel(
       override fun onSuccess() {
         Log.d(TAG, "Metadata update succeeded")
         updateSelfHandRaised(localPeer)
+      }
+    })
+  }
+
+  fun changeName(name: String) {
+    val localPeer = hmsSDK.getLocalPeer()!!
+    hmsSDK.changeName(localPeer, name, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.d(TAG, "There was an error $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "Name update succeeded")
+        updateNameChange(localPeer)
       }
     })
   }
