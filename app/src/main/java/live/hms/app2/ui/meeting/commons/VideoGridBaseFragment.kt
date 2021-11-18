@@ -21,6 +21,7 @@ import live.hms.app2.util.crashlyticsLog
 import live.hms.app2.util.visibilityOpacity
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 import kotlin.math.max
 import kotlin.math.min
@@ -273,12 +274,23 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  private fun applyMetadataUpdates(peer: HMSPeer) {
-    val isUpdatedPeerRendered = renderedViews.find { it.meetingTrack.peer.peerID == peer.peerID }
+  private fun applyMetadataUpdates(peerTypePair: Pair<HMSPeer, HMSPeerUpdate>) {
+    val isUpdatedPeerRendered =
+      renderedViews.find { it.meetingTrack.peer.peerID == peerTypePair.first.peerID }
     if (isUpdatedPeerRendered != null) {
-      val isHandRaised =
-        CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isHandRaised == true
-      isUpdatedPeerRendered.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
+      when (peerTypePair.second) {
+        HMSPeerUpdate.METADATA_CHANGED -> {
+          val isHandRaised =
+            CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isHandRaised == true
+          isUpdatedPeerRendered.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
+        }
+        HMSPeerUpdate.NAME_CHANGED -> {
+          with(isUpdatedPeerRendered.binding.videoCard) {
+            name.text = isUpdatedPeerRendered.meetingTrack.peer.name
+            nameInitials.text = NameUtils.getInitials(isUpdatedPeerRendered.meetingTrack.peer.name)
+          }
+        }
+      }
     }
   }
 
@@ -344,7 +356,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   @CallSuper
   open fun initViewModels() {
-    meetingViewModel.peerRaisedHandUpdate.observe(viewLifecycleOwner) {
+    meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) {
       applyMetadataUpdates(it)
     }
   }

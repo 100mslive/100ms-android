@@ -132,8 +132,8 @@ class MeetingViewModel(
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
-  private val _peerRaisedHandUpdate = MutableLiveData<HMSPeer>()
-  val peerRaisedHandUpdate: LiveData<HMSPeer> = _peerRaisedHandUpdate
+  private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
+  val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
   // Dominant speaker
   val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
@@ -291,8 +291,9 @@ class MeetingViewModel(
               peerLiveDate.postValue(hmsPeer)
             }
 
-            HMSPeerUpdate.METADATA_CHANGED -> {
-              _peerRaisedHandUpdate.postValue(hmsPeer)
+            HMSPeerUpdate.METADATA_CHANGED,
+            HMSPeerUpdate.NAME_CHANGED -> {
+              _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
             }
 
             else -> Unit
@@ -428,7 +429,7 @@ class MeetingViewModel(
   private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
     val isSelfHandRaised = CustomPeerMetadata.fromJson(hmsPeer.metadata)?.isHandRaised == true
     _isHandRaised.postValue(isSelfHandRaised)
-    _peerRaisedHandUpdate.postValue(hmsPeer)
+    _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.METADATA_CHANGED))
   }
 
   private fun getRecordingState(room: HMSRoom): RecordingState {

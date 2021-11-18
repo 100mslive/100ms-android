@@ -17,6 +17,7 @@ import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
 import live.hms.app2.util.*
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 
 class PinnedVideoFragment : Fragment() {
@@ -171,13 +172,16 @@ class PinnedVideoFragment : Fragment() {
     }
 
     // This will change the raised hand state if the person does it while in this view.
-    meetingViewModel.peerRaisedHandUpdate.observe(viewLifecycleOwner) { handUpdatePeer ->
+    meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) { metadataNameChangedPeer ->
       // Check if it's the pinned video's hand raised.
-      if (handUpdatePeer.peerID == pinnedTrack?.peer?.peerID) {
-        changePinnedRaiseHandState()
+      if (metadataNameChangedPeer.first.peerID == pinnedTrack?.peer?.peerID) {
+        when (metadataNameChangedPeer.second) {
+          HMSPeerUpdate.METADATA_CHANGED -> changePinnedRaiseHandState()
+          HMSPeerUpdate.NAME_CHANGED -> changePinnedName()
+        }
       }
       // Since the pinned person's video can also appear in the sublist, this has to be checked too
-      videoListAdapter.itemChanged(handUpdatePeer)
+      videoListAdapter.itemChanged(metadataNameChangedPeer)
 
     }
   }
@@ -186,6 +190,16 @@ class PinnedVideoFragment : Fragment() {
     val customData = CustomPeerMetadata.fromJson(pinnedTrack?.peer?.metadata)
     if (customData != null) {
       binding.pinVideo.raisedHand.alpha = visibilityOpacity(customData.isHandRaised)
+    }
+  }
+
+  private fun changePinnedName() {
+    val newName = pinnedTrack?.peer?.name
+    if (newName != null) {
+      with(binding.pinVideo) {
+        name.text = newName
+        nameInitials.text = NameUtils.getInitials(newName)
+      }
     }
   }
 }

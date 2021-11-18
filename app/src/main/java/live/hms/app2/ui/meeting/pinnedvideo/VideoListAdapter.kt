@@ -15,6 +15,7 @@ import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
 import live.hms.app2.util.visibility
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 
 class VideoListAdapter(
@@ -151,9 +152,24 @@ class VideoListAdapter(
   ) {
     if (payloads.isEmpty()) {
       return super.onBindViewHolder(holder, position, payloads)
-    } else if (payloads[0] is CustomPeerMetadata) {
-      holder.binding.raisedHand.visibility =
-        visibility((payloads[0] as CustomPeerMetadata).isHandRaised)
+    } else if (payloads.all { it is PeerUpdatePayloads }) {
+      // Only if all the payloads are of type peer udpate it makes sense to individually update.
+      // If they weren't the non-payload type will result in a full redraw anyway so we let
+      // it go to the full redraw in the else clause.
+      payloads.forEach {
+        if (it is PeerUpdatePayloads) {
+          when (it) {
+            is PeerUpdatePayloads.MetadataChanged -> {
+              holder.binding.raisedHand.visibility =
+                visibility(it.metadata?.isHandRaised == true)
+            }
+            is PeerUpdatePayloads.NameChanged -> {
+              holder.binding.nameInitials.text = NameUtils.getInitials(it.name)
+              holder.binding.name.text = it.name
+            }
+          }
+        }
+      }
     } else {
 
       crashlyticsLog(
@@ -169,14 +185,27 @@ class VideoListAdapter(
 
   override fun getItemCount() = items.size
 
-  fun itemChanged(changedPeer: HMSPeer) {
+  fun itemChanged(changedPeer: Pair<HMSPeer, HMSPeerUpdate>) {
 
-    val updatedItemId = items.find { it.track.peer.peerID == changedPeer.peerID }?.id
+    val updatedItemId = items.find { it.track.peer.peerID == changedPeer.first.peerID }?.id
 
+    val payload = when (changedPeer.second) {
+      HMSPeerUpdate.METADATA_CHANGED -> PeerUpdatePayloads.MetadataChanged(
+        CustomPeerMetadata.fromJson(
+          changedPeer.first.metadata
+        )
+      )
+      HMSPeerUpdate.NAME_CHANGED -> PeerUpdatePayloads.NameChanged(changedPeer.first.name)
+      else -> null
+    }
 
     updatedItemId?.toInt()
-      ?.let { notifyItemChanged(it, CustomPeerMetadata.fromJson(changedPeer.metadata)) }
+      ?.let { notifyItemChanged(it, payload) }
   }
 
+  sealed class PeerUpdatePayloads {
+    data class NameChanged(val name: String) : PeerUpdatePayloads()
+    data class MetadataChanged(val metadata: CustomPeerMetadata?) : PeerUpdatePayloads()
+  }
 
 }
