@@ -852,7 +852,7 @@ class MeetingViewModel(
     val isHandRaised = currentMetadata!!.isHandRaised
     val newMetadataJson = currentMetadata.copy(isHandRaised = !isHandRaised).toJson()
 
-    hmsSDK.changeMetadata(localPeer, newMetadataJson, object : HMSActionResultListener {
+    hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         Log.d(TAG, "There was an error $error")
       }
@@ -873,7 +873,7 @@ class MeetingViewModel(
 
   fun changeName(name: String) {
     val localPeer = hmsSDK.getLocalPeer()!!
-    hmsSDK.changeName(localPeer, name, object : HMSActionResultListener {
+    hmsSDK.changeName(name, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         Log.d(TAG, "There was an error $error")
       }
