@@ -76,14 +76,23 @@ class RtmpRecordFragment : Fragment() {
         // Create a config and start
         val rtmpStreamingUrls = settings.rtmpUrlsList
         val isRecording = binding.shouldRecord.isChecked
+        val botRoleName = binding.botRoleName.text.toString()
         if (settings.rtmpUrlsList.toList().isEmpty() && !isRecording) {
             Toast.makeText(
                 requireContext(),
                 "Turn on recording, or provide rtmp urls",
                 Toast.LENGTH_LONG
             ).show()
+        } else if (botRoleName.isNullOrBlank() || meetingViewModel.getAvailableRoles()
+                .find { it.name == botRoleName } == null
+        ) {
+            Toast.makeText(
+                requireContext(),
+                "A valid bot role is required. $botRoleName is invalid or not a role name",
+                Toast.LENGTH_LONG
+            ).show()
         } else {
-            meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList())
+            meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList(), botRoleName)
             findNavController().popBackStack()
         }
     }
