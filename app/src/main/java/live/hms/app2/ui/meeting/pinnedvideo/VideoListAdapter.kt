@@ -135,24 +135,24 @@ class VideoListAdapter(
     holder.bindSurfaceView()
   }
 
-//  override fun onBindViewHolder(
-//    holder: VideoItemViewHolder,
-//    position: Int,
-//    payloads: MutableList<Any>
-//  ) {
-//    if (payloads.isEmpty()) {
-//      return super.onBindViewHolder(holder, position, payloads)
-//    }
-//
-//    crashlyticsLog(
-//      TAG,
-//      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
-//          "[payloads=$payloads]"
-//    )
-//    holder.unbindSurfaceView() // Free the context initialized for the previous item
-//    holder.bind(items[position])
-//    holder.bindSurfaceView()
-//  }
+  override fun onBindViewHolder(
+    holder: VideoItemViewHolder,
+    position: Int,
+    payloads: MutableList<Any>
+  ) {
+    if (payloads.isEmpty()) {
+      return super.onBindViewHolder(holder, position, payloads)
+    }
+
+    crashlyticsLog(
+      TAG,
+      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
+          "[payloads=$payloads]"
+    )
+    holder.unbindSurfaceView() // Free the context initialized for the previous item
+    holder.bind(items[position])
+    holder.bindSurfaceView()
+  }
 
   override fun getItemCount() = items.size
 }
