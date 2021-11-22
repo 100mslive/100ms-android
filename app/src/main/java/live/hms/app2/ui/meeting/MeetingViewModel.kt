@@ -746,14 +746,9 @@ class MeetingViewModel(
     }
   }
 
-  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>) {
+  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>, meetingUrl: String) {
     // It's streaming if there are rtmp urls present.
     val isStreaming = rtmpInjectUrls.isNotEmpty()
-    val meetingUrl = getBeamBotJoiningUrl(
-      roomDetails.url,
-      hmsRoom?.roomId!!,
-      "host"
-    )
 
     _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS)
     val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
