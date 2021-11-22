@@ -264,14 +264,14 @@ class MeetingFragment : Fragment() {
 
     menu.findItem(R.id.start_background).apply {
       setOnMenuItemClickListener {
-        meetingViewModel.addPlugin(context)
+        meetingViewModel.startPlugin(context)
         true
       }
     }
 
     menu.findItem(R.id.stop_background).apply {
       setOnMenuItemClickListener {
-        meetingViewModel.removePlugin()
+        meetingViewModel.stopPlugin()
         true
       }
     }
