@@ -179,6 +179,12 @@ class MeetingFragment : Fragment() {
         isScreenShared = false
       }
 
+      R.id.raise_hand -> {
+        meetingViewModel.toggleRaiseHand()
+      }
+
+      R.id.change_name -> meetingViewModel.requestNameChange()
+
     }
     return false
   }
@@ -196,10 +202,21 @@ class MeetingFragment : Fragment() {
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
 
+    menu.findItem(R.id.raise_hand).isVisible = true
+    menu.findItem(R.id.change_name).isVisible = true
+
     menu.findItem(R.id.action_stop_streaming_and_recording).apply {
       isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING_AND_RECORDING
+    }
+
+    menu.findItem(R.id.raise_hand).apply {
+      if (meetingViewModel.isHandRaised.value == true) {
+        title = getString(R.string.lower_hand)
+      } else {
+        title = getString(R.string.raise_hand)
+      }
     }
 
     menu.findItem(R.id.action_record_meeting).apply {
@@ -501,6 +518,13 @@ class MeetingFragment : Fragment() {
             }
             return@collect
           }
+          MeetingViewModel.Event.OpenChangeNameDialog -> {
+            withContext(Dispatchers.Main) {
+              ChangeNameDialogFragment().show(childFragmentManager, ChangeNameDialogFragment.TAG)
+            }
+            return@collect
+          }
+          null -> {}
         }
       }
     }

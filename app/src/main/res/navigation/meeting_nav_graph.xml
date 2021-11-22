@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_rtmpRecordFragment"
             app:destination="@id/rtmpRecordFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_changeNameDialogFragment"
+            app:destination="@id/changeNameDialogFragment" />
 
     </fragment>
 
@@ -102,5 +105,10 @@
         android:name="live.hms.app2.ui.meeting.participants.RtmpRecordFragment"
         android:label="RtmpRecordFragment"
         tools:layout="@layout/layout_rtmp_recording" />
+    <fragment
+        android:id="@+id/changeNameDialogFragment"
+        android:name="live.hms.app2.ui.meeting.ChangeNameDialogFragment"
+        android:label="ChangeNameDialogFragment"
+        tools:layout="@layout/change_name_fragment" />
 
 </navigation>

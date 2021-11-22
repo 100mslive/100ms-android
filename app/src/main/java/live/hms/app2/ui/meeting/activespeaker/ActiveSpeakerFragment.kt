@@ -46,8 +46,8 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-  private fun initViewModels() {
-
+  override fun initViewModels() {
+    super.initViewModels()
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
       updateScreenshareTracks(tracks)
@@ -63,6 +63,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
     }
+
   }
 
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {

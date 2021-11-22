@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
-import com.google.gson.JsonObject
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
@@ -42,7 +42,7 @@ class MeetingViewModel(
   private val config = HMSConfig(
     roomDetails.username,
     roomDetails.authToken,
-    JsonObject().apply { addProperty("name", roomDetails.username) }.toString(),
+    Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username)).toString(),
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
@@ -132,6 +132,8 @@ class MeetingViewModel(
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
+  private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
+  val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
   // Dominant speaker
   val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
@@ -289,6 +291,11 @@ class MeetingViewModel(
               peerLiveDate.postValue(hmsPeer)
             }
 
+            HMSPeerUpdate.METADATA_CHANGED,
+            HMSPeerUpdate.NAME_CHANGED -> {
+              _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+            }
+
             else -> Unit
           }
         }
@@ -417,6 +424,16 @@ class MeetingViewModel(
         }
       })
     }
+  }
+
+  private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
+    val isSelfHandRaised = CustomPeerMetadata.fromJson(hmsPeer.metadata)?.isHandRaised == true
+    _isHandRaised.postValue(isSelfHandRaised)
+    _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.METADATA_CHANGED))
+  }
+
+  private fun updateNameChange(hmsPeer: HMSLocalPeer) {
+    _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.NAME_CHANGED))
   }
 
   private fun getRecordingState(room: HMSRoom): RecordingState {
@@ -818,6 +835,49 @@ class MeetingViewModel(
   sealed class Event {
     class RTMPError(val exception: HMSException) : Event()
     class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
+    object OpenChangeNameDialog : Event()
+  }
+
+  private val _isHandRaised = MutableLiveData<Boolean>(false)
+  val isHandRaised: LiveData<Boolean> = _isHandRaised
+
+  fun toggleRaiseHand() {
+    val localPeer = hmsSDK.getLocalPeer()!!
+    val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
+    val isHandRaised = currentMetadata!!.isHandRaised
+    val newMetadataJson = currentMetadata.copy(isHandRaised = !isHandRaised).toJson()
+
+    hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.d(TAG, "There was an error $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "Metadata update succeeded")
+        updateSelfHandRaised(localPeer)
+      }
+    })
+
+  }
+
+  fun requestNameChange() {
+    viewModelScope.launch {
+      _events.emit(Event.OpenChangeNameDialog)
+    }
+  }
+
+  fun changeName(name: String) {
+    val localPeer = hmsSDK.getLocalPeer()!!
+    hmsSDK.changeName(name, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.d(TAG, "There was an error $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "Name update succeeded")
+        updateNameChange(localPeer)
+      }
+    })
   }
 }
 
