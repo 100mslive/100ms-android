@@ -21,7 +21,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
-//import com.example.virtualbackground.HMSVirtualBackground
+import com.example.virtualbackground.HMSVirtualBackground
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -156,7 +156,7 @@ class MeetingViewModel(
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
 
-//  val processor = HMSVirtualBackground(application.applicationContext, hmsSDK)
+  val plugin = HMSVirtualBackground(application.applicationContext, hmsSDK)
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
@@ -222,7 +222,7 @@ class MeetingViewModel(
 
   private fun cleanup() {
     failures.clear()
-//    processor?.clean()
+    plugin?.clean()
     _tracks.clear()
     _liveDataTracks.postValue(_tracks)
 
@@ -825,30 +825,20 @@ class MeetingViewModel(
     Log.v(TAG, "Adding Plugin")
     //Create Plugin, can be decalred on top as global variable
     val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"2.jpeg")
-//    processor.setbackground(imageBitmap)
-
-    //add Plugin from sdk,
-//    hmsSDK.addPlugin(plugin, pluginFrameRate)
-//
-//
-//    if(processor.init()){
-//
-//      if(imageBitmap != null){
-//        processor.setBackground(imageBitmap)
-//        processor.start(15) //TODO: sending fps=15 has to be changed
-//      }else {
-//        Log.v(TAG, "Invalid Background Image")
-//      }
-//    }else{
-//      Log.v(TAG, "Plugin not able to initialized")
-//    }
+    plugin.setBackground(imageBitmap)
+//    add Plugin from sdk,
+    hmsSDK.addPlugin(plugin, 15)
   }
 
   fun stopPlugin() {
-
     //sdk.removePlugin(plugin) in try catch
-    Log.v(TAG, "Removing Plugin")
-//    processor.stop()
+    try{
+      Log.v(TAG, "Removing Plugin")
+      hmsSDK.removePlugin(plugin)
+    }
+    catch(err: HMSException){
+      Log.v(TAG, "Removing Plugin, which doesn't exist", err)
+    }
   }
 
   private val _events = MutableSharedFlow<Event?>()
