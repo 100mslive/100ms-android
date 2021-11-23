@@ -843,7 +843,7 @@ class MeetingViewModel(
     val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"2.jpeg")
     plugin.setBackground(imageBitmap)
 //    add Plugin from sdk,
-    hmsSDK.addPlugin(plugin, 15)
+    hmsSDK.addPlugin(plugin, 30)
   }
 
   fun stopPlugin() {
