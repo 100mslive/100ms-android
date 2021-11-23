@@ -147,8 +147,8 @@
     <string name="add_new_rtmp_streaming_url">Add new RTMP streaming url</string>
     <string name="rtmp_settings">RTMP Settings</string>
     <string name="use_hardware_AEC">Use Harware AEC</string>
-    <string name="start_background">Start Background</string>
-    <string name="stop_background">Stop Background</string>
+    <string name="enable_background">Enable Background</string>
+    <string name="disable_background">Disable Background</string>
     <string name="raise_hand">✋ Raise Hand</string>
     <string name="lower_hand">Lower Hand</string>
     <string name="name_change_dialog">Type in the new name</string>
