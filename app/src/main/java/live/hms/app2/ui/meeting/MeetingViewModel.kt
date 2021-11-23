@@ -158,7 +158,7 @@ class MeetingViewModel(
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
 
-  val plugin = HMSVirtualBackground(application.applicationContext, hmsSDK)
+  val plugin = HMSVirtualBackground(hmsSDK)
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
@@ -224,7 +224,6 @@ class MeetingViewModel(
 
   private fun cleanup() {
     failures.clear()
-    plugin?.clean()
     _tracks.clear()
     _liveDataTracks.postValue(_tracks)
 
