@@ -1,5 +1,7 @@
 package live.hms.app2.util
 
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import java.util.*
 
 private class Memoize1<in T, out R>(val f: (T) -> R) : (T) -> R {
@@ -22,13 +24,23 @@ object NameUtils {
     return when (words.size) {
         0 -> "--"
         1 -> {
-          if(words[0].isEmpty()) {
-            "--"
-          } else words[0].take(2)
+            if (words[0].isEmpty()) {
+                "--"
+            } else words[0].take(2)
         }
         else -> {
-          "${words[0][0]}${words[1][0]}"
+            "${words[0][0]}${words[1][0]}"
         }
     }
   }
+
+    fun isValidUserName(container: TextInputLayout, editText: TextInputEditText): Boolean {
+        val username = editText.text.toString()
+        if (username.isEmpty()) {
+            container.error = "Username cannot be empty"
+            return false
+        }
+        return true
+    }
+
 }

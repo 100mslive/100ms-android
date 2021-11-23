@@ -108,5 +108,15 @@
         android:textSize="10sp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/raised_hand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:padding="16dp"
+        android:text="✋"
+        android:textSize="36sp" />
+
 
 </RelativeLayout>
