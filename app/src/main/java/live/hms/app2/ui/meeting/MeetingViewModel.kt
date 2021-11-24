@@ -291,9 +291,19 @@ class MeetingViewModel(
               peerLiveDate.postValue(hmsPeer)
             }
 
-            HMSPeerUpdate.METADATA_CHANGED,
+            HMSPeerUpdate.METADATA_CHANGED -> {
+              if(hmsPeer.isLocal) {
+                updateSelfHandRaised(hmsPeer as HMSLocalPeer)
+              } else {
+                _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              }
+            }
             HMSPeerUpdate.NAME_CHANGED -> {
-              _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              if(hmsPeer.isLocal) {
+                updateNameChange(hmsPeer as HMSLocalPeer)
+              } else {
+                _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              }
             }
 
             else -> Unit
@@ -854,7 +864,6 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         Log.d(TAG, "Metadata update succeeded")
-        updateSelfHandRaised(localPeer)
       }
     })
 
@@ -875,7 +884,6 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         Log.d(TAG, "Name update succeeded")
-        updateNameChange(localPeer)
       }
     })
   }
