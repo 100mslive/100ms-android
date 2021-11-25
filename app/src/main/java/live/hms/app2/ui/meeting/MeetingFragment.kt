@@ -168,7 +168,6 @@ class MeetingFragment : Fragment() {
             Context.MEDIA_PROJECTION_SERVICE
           ) as MediaProjectionManager
           resultLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
-          isScreenShared = true
         } else {
           Toast.makeText(activity, "ScreenShare already running!", Toast.LENGTH_SHORT).show()
         }
