@@ -784,12 +784,10 @@ class MeetingViewModel(
           Log.d(TAG, "RTMP recording error: $error")
           // restore the current state
           viewModelScope.launch { _events.emit(Event.RTMPError(error) ) }
-          _isRecording.postValue(getRecordingState(hmsRoom!!))
         }
 
         override fun onSuccess() {
           Log.d(TAG, "RTMP recording Success")
-          _isRecording.postValue(successResult)
         }
 
       })
