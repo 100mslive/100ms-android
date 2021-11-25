@@ -86,7 +86,7 @@ class MeetingViewModel(
       synchronized(_tracks) {
         field = value
 
-        val volume = if (isAudioMuted) 0.0 else 1.0
+        val volume = if (isAudioMuted) 0.0 else 10.0
         _tracks.forEach { track ->
           track.audio?.let {
             if (it is HMSRemoteAudioTrack) {
@@ -803,30 +803,12 @@ class MeetingViewModel(
 
     })
   }
-  fun startScreenshare(mediaProjectionPermissionResultData: Intent?) {
-    hmsSDK.startScreenshare(object : HMSActionResultListener {
-      override fun onError(error: HMSException) {
-        HMSLogger.d(TAG, "onError : ${error.name}")
-      }
-
-      override fun onSuccess() {
-        HMSLogger.d(TAG, "startScreenshare :: onSuccess")
-      }
-
-    } ,mediaProjectionPermissionResultData)
+  fun startScreenshare(mediaProjectionPermissionResultData: Intent?, actionListener: HMSActionResultListener) {
+    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
   }
 
-  fun stopScreenshare() {
-    hmsSDK.stopScreenshare(object : HMSActionResultListener{
-      override fun onError(error: HMSException) {
-        HMSLogger.d(TAG,  "onError : ${error.name}")
-      }
-
-      override fun onSuccess() {
-        HMSLogger.d(TAG, "onSuccess")
-      }
-
-    })
+  fun stopScreenshare(actionListener: HMSActionResultListener) {
+    hmsSDK.stopScreenshare(actionListener)
   }
 
   private val _events = MutableSharedFlow<Event?>()
