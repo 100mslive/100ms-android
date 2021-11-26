@@ -232,47 +232,52 @@ class PreviewFragment : Fragment() {
       override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
         // We assume  here that localTracks has at-most 2 tracks
         // containing one video & one audio track
-        requireActivity().runOnUiThread {
-          binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
-          binding.buttonJoinMeeting.isEnabled = true
+        val activity = activity
+        if (activity != null) {
+          activity.runOnUiThread {
+            binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
+            binding.buttonJoinMeeting.isEnabled = true
 
-          track = MeetingTrack(room.localPeer!!, null, null)
-          localTracks.forEach {
-            when (it) {
-              is HMSLocalAudioTrack -> {
-                track.audio = it
-              }
-              is HMSLocalVideoTrack -> {
-                track.video = it
+            track = MeetingTrack(room.localPeer!!, null, null)
+            localTracks.forEach {
+              when (it) {
+                is HMSLocalAudioTrack -> {
+                  track.audio = it
+                }
+                is HMSLocalVideoTrack -> {
+                  track.video = it
 
-                if (isViewVisible) {
-                  bindVideo()
+                  if (isViewVisible) {
+                    bindVideo()
+                  }
                 }
               }
             }
-          }
 
-          // Disable buttons
-          binding.buttonToggleVideo.apply {
-            isEnabled = (track.video != null)
+            // Disable buttons
+            binding.buttonToggleVideo.apply {
+              isEnabled = (track.video != null)
 
-            track.video?.let {
-              setImageResource(
-                if (it.isMute) R.drawable.ic_videocam_off_24
-                else R.drawable.ic_videocam_24
-              )
+              track.video?.let {
+                setImageResource(
+                  if (it.isMute) R.drawable.ic_videocam_off_24
+                  else R.drawable.ic_videocam_24
+                )
+              }
+            }
+            binding.buttonToggleAudio.apply {
+              isEnabled = (track.audio != null)
+
+              track.audio?.let {
+                setImageResource(
+                  if (it.isMute) R.drawable.ic_mic_off_24
+                  else R.drawable.ic_mic_24
+                )
+              }
             }
           }
-          binding.buttonToggleAudio.apply {
-            isEnabled = (track.audio != null)
-
-            track.audio?.let {
-              setImageResource(
-                if (it.isMute) R.drawable.ic_mic_off_24
-                else R.drawable.ic_mic_24
-              )
-            }
-          }
+        } else {
+          Log.e(TAG, "Attempted to show preview when activity was null")
         }
       }
     })

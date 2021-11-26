@@ -5,9 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import live.hms.app2.databinding.FragmentActiveSpeakerBinding
+import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.util.viewLifecycle
+import live.hms.app2.util.visibilityOpacity
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.utils.HMSLogger
 import org.webrtc.RendererCommon
 
@@ -35,6 +38,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   override fun onResume() {
     super.onResume()
     screenShareTrack?.let {
+      binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.peer.metadata)?.isHandRaised == true)
       bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
     }
   }
@@ -46,8 +50,8 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-  private fun initViewModels() {
-
+  override fun initViewModels() {
+    super.initViewModels()
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
       updateScreenshareTracks(tracks)
@@ -62,6 +66,21 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       updateVideos(binding.container, videos)
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
+    }
+
+    meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) {
+      if( screenShareTrack?.peer?.peerID == it.first.peerID) {
+        when(it.second) {
+          HMSPeerUpdate.METADATA_CHANGED -> {
+            binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.first.metadata)?.isHandRaised == true)
+          }
+
+          HMSPeerUpdate.NAME_CHANGED -> {
+            binding.screenShare.name.text = it.first.name
+          }
+          else -> {}
+        }
+      }
     }
   }
 
@@ -90,6 +109,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         iconAudioOff.visibility = View.GONE
         iconScreenShare.visibility = View.GONE
         audioLevel.visibility = View.GONE
+        raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(screen.peer.metadata)?.isHandRaised == true)
       }
       binding.screenShareContainer.visibility = View.VISIBLE
     }
