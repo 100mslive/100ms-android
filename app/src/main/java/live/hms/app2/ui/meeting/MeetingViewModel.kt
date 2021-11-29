@@ -843,7 +843,7 @@ class MeetingViewModel(
   fun startPlugin(context: Context?) {
     Log.v(TAG, "Adding Plugin")
     //Create Plugin, can be decalred on top as global variable
-    val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"2.jpeg")
+    val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"mountains.jpg")
     plugin.setBackground(imageBitmap)
 //    add Plugin from sdk,
     hmsSDK.addPlugin(plugin, 15)

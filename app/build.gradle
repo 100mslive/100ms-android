@@ -14,8 +14,8 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 189
-        versionName "2.3.2"
+        versionCode 212
+        versionName "2.5.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
