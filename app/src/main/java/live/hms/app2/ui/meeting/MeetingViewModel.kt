@@ -86,7 +86,10 @@ class MeetingViewModel(
       synchronized(_tracks) {
         field = value
 
-        val volume = if (isAudioMuted) 0.0 else 10.0
+        // Setting of volume greater than 1 is causing to increase the gain, rather
+        // than volume
+        // 1.0 is the default value of webrtc
+        val volume = if (isAudioMuted) 0.0 else 1.0
         _tracks.forEach { track ->
           track.audio?.let {
             if (it is HMSRemoteAudioTrack) {
