@@ -62,10 +62,10 @@ dependencies {
 
     //100ms.live SDK
     implementation 'com.github.100mslive:android-sdk:2.2.2'
-    implementation 'com.github.100mslive:android-sdk:2.1.8-capturer'
+//    implementation 'com.github.100mslive:android-sdk:2.1.8-capturer'
 //    implementation 'com.github.100mslive:android-sdk:2.2.0'
 
-    implementation 'com.github.100mslive:android-sdk-virtual-background:2.1.8-capturer'
+    implementation 'com.github.100mslive:android-sdk-virtual-background:2.2.2-capturer'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
