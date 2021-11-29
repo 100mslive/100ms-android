@@ -261,7 +261,6 @@ class MeetingViewModel(
           Log.v(TAG, "~~ onJoin called ~~")
           failures.clear()
           state.postValue(MeetingState.Ongoing())
-          _isRecording.postValue(getRecordingState(room))
           hmsRoom = room // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
         }
@@ -299,9 +298,19 @@ class MeetingViewModel(
               peerLiveDate.postValue(hmsPeer)
             }
 
-            HMSPeerUpdate.METADATA_CHANGED,
+            HMSPeerUpdate.METADATA_CHANGED -> {
+              if(hmsPeer.isLocal) {
+                updateSelfHandRaised(hmsPeer as HMSLocalPeer)
+              } else {
+                _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              }
+            }
             HMSPeerUpdate.NAME_CHANGED -> {
-              _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              if(hmsPeer.isLocal) {
+                updateNameChange(hmsPeer as HMSLocalPeer)
+              } else {
+                _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              }
             }
 
             else -> Unit
@@ -766,7 +775,6 @@ class MeetingViewModel(
     // It's streaming if there are rtmp urls present.
     val isStreaming = rtmpInjectUrls.isNotEmpty()
 
-    _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS)
     val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
     else if (isStreaming) RecordingState.STREAMING
     else RecordingState.RECORDING
@@ -782,12 +790,10 @@ class MeetingViewModel(
           Log.d(TAG, "RTMP recording error: $error")
           // restore the current state
           viewModelScope.launch { _events.emit(Event.RTMPError(error) ) }
-          _isRecording.postValue(getRecordingState(hmsRoom!!))
         }
 
         override fun onSuccess() {
           Log.d(TAG, "RTMP recording Success")
-          _isRecording.postValue(successResult)
         }
 
       })
@@ -795,18 +801,15 @@ class MeetingViewModel(
 
   fun stopRecording() {
     Log.v(TAG, "Stopping recording")
-    _isRecording.postValue(RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING)
 
     hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         Log.v(TAG, "RTMP recording stop. error: $error")
         viewModelScope.launch { _events.emit(Event.RTMPError(error)) }
-        _isRecording.postValue(getRecordingState(hmsRoom!!))
       }
 
       override fun onSuccess() {
         Log.d(TAG, "RTMP recording stop. Success")
-        _isRecording.postValue(RecordingState.NOT_RECORDING_OR_STREAMING)
       }
 
     })
@@ -882,7 +885,6 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         Log.d(TAG, "Metadata update succeeded")
-        updateSelfHandRaised(localPeer)
       }
     })
 
@@ -903,7 +905,6 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         Log.d(TAG, "Name update succeeded")
-        updateNameChange(localPeer)
       }
     })
   }
