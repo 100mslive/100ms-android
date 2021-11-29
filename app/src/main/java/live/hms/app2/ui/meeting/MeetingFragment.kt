@@ -35,8 +35,10 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
+import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 
 val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
@@ -98,14 +100,31 @@ class MeetingFragment : Fragment() {
     if (result.resultCode == Activity.RESULT_OK) {
       // There are no request codes
       val data: Intent? = result.data
-      meetingViewModel.startScreenshare(data)
-      isScreenShared = true
+      meetingViewModel.startScreenshare(data, object : HMSActionResultListener{
+        override fun onError(error: HMSException) {
+          // error
+        }
+
+        override fun onSuccess() {
+          // success
+          isScreenShared = true
+        }
+      })
     }
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    meetingViewModel.stopScreenshare()
+    meetingViewModel.stopScreenshare(object : HMSActionResultListener{
+      override fun onError(error: HMSException) {
+        // onError
+      }
+
+      override fun onSuccess() {
+        // onSuccess
+      }
+
+    })
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -174,8 +193,17 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_stop_share_screen -> {
-        meetingViewModel.stopScreenshare()
-        isScreenShared = false
+        meetingViewModel.stopScreenshare(object : HMSActionResultListener{
+          override fun onError(error: HMSException) {
+            Toast.makeText(activity, " stop screenshare :: $error.description", Toast.LENGTH_LONG).show()
+          }
+
+          override fun onSuccess() {
+            //success
+            isScreenShared = false
+          }
+        })
+
       }
 
       R.id.raise_hand -> {
