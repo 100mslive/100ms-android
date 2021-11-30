@@ -35,6 +35,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 class MeetingViewModel(
   application: Application,
@@ -840,12 +841,24 @@ class MeetingViewModel(
     })
   }
 
+  private fun getRandomVirtualBackgroundBitmap(context: Context?) : Bitmap {
+
+    val imageList = ArrayList<String>()
+    imageList.add("2.jpeg")
+    imageList.add("mountains.jpg")
+    imageList.add("tree.jpg")
+
+    val randomIndex = Random.nextInt(imageList.size);
+    return getBitmapFromAsset(context!!.applicationContext,imageList[randomIndex])!!
+  }
+
+
   fun startPlugin(context: Context?) {
     Log.v(TAG, "Adding Plugin")
-    //Create Plugin, can be decalred on top as global variable
-    val imageBitmap = getBitmapFromAsset(context!!.applicationContext,"mountains.jpg")
+    //Create Plugin, can be declared on top as global variable
+    val imageBitmap = getRandomVirtualBackgroundBitmap(context)
     plugin.setBackground(imageBitmap)
-//    add Plugin from sdk,
+    // add Plugin from sdk,
     hmsSDK.addPlugin(plugin, 15)
   }
 
