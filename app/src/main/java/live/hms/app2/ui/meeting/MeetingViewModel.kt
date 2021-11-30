@@ -93,6 +93,9 @@ class MeetingViewModel(
       synchronized(_tracks) {
         field = value
 
+        // Setting of volume greater than 1 is causing to increase the gain, rather
+        // than volume
+        // 1.0 is the default value of webrtc
         val volume = if (isAudioMuted) 0.0 else 1.0
         _tracks.forEach { track ->
           track.audio?.let {
@@ -815,30 +818,12 @@ class MeetingViewModel(
 
     })
   }
-  fun startScreenshare(mediaProjectionPermissionResultData: Intent?) {
-    hmsSDK.startScreenshare(object : HMSActionResultListener {
-      override fun onError(error: HMSException) {
-        HMSLogger.d(TAG, "onError : ${error.name}")
-      }
-
-      override fun onSuccess() {
-        HMSLogger.d(TAG, "startScreenshare :: onSuccess")
-      }
-
-    } ,mediaProjectionPermissionResultData)
+  fun startScreenshare(mediaProjectionPermissionResultData: Intent?, actionListener: HMSActionResultListener) {
+    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
   }
 
-  fun stopScreenshare() {
-    hmsSDK.stopScreenshare(object : HMSActionResultListener{
-      override fun onError(error: HMSException) {
-        HMSLogger.d(TAG,  "onError : ${error.name}")
-      }
-
-      override fun onSuccess() {
-        HMSLogger.d(TAG, "onSuccess")
-      }
-
-    })
+  fun stopScreenshare(actionListener: HMSActionResultListener) {
+    hmsSDK.stopScreenshare(actionListener)
   }
 
   private fun getRandomVirtualBackgroundBitmap(context: Context?) : Bitmap {
