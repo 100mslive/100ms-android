@@ -78,7 +78,7 @@
 
         <item
             android:id="@+id/action_disable_background"
-            android:icon="@drawable/ic_white_svg"
+            android:icon="@drawable/ic_black_svg"
             android:title="@string/disable_background"
             app:showAsAction="never" />
 
