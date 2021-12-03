@@ -589,7 +589,7 @@ class MeetingViewModel(
 
       if (
         // Remove tile from view since both audio and video track are null for the peer
-        (peer.audioTrack == null &&  peer.videoTrack == null) ||
+        (peer.audioTrack == null ) ||
         // Remove video screenshare/playlist tile from view
         ((track.source == HMSTrackSource.SCREEN || track.source == "videoplaylist")
                 && track.type == HMSTrackType.VIDEO)) {
