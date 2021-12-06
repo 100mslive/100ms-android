@@ -596,6 +596,10 @@ class MeetingViewModel(
         _tracks.remove(meetingTrack)
       }
 
+      if(peer.videoTrack == null) {
+        meetingTrack?.video = null
+      }
+
       // Update the view as some track has been removed
       _liveDataTracks.postValue(_tracks)
     }
