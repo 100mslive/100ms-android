@@ -489,12 +489,10 @@ class MeetingViewModel(
 
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
-    HMSCoroutineScope.launch {
-      try {
-        localVideoTrack?.switchCamera()
-      } catch (ex: HMSException) {
-        Log.e(TAG, "flipCamera: ${ex.description}", ex)
-      }
+    try {
+      localVideoTrack?.switchCamera()
+    } catch (ex: HMSException) {
+      Log.e(TAG, "flipCamera: ${ex.description}", ex)
     }
   }
 
