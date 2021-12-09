@@ -1,9 +1,11 @@
 package live.hms.app2.ui.meeting
 
+import android.R
 import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.annotation.StringRes
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.*
@@ -25,10 +27,12 @@ import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
+import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class MeetingViewModel(
   application: Application,
@@ -490,7 +494,9 @@ class MeetingViewModel(
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
     try {
+      HMSCoroutineScope.launch {
       localVideoTrack?.switchCamera()
+      }
     } catch (ex: HMSException) {
       Log.e(TAG, "flipCamera: ${ex.description}", ex)
     }
@@ -808,7 +814,17 @@ class MeetingViewModel(
     })
   }
   fun startScreenshare(mediaProjectionPermissionResultData: Intent?, actionListener: HMSActionResultListener) {
-    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
+    // Without custom notification
+//    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
+
+    // With custom notification
+    val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
+      .setContentText("Screenshare running for roomId: ${hmsRoom?.roomId}")
+      .setSmallIcon(R.drawable.arrow_up_float)
+      .addAction(R.drawable.ic_menu_close_clear_cancel, "Stop Screenshare", HMSScreenCaptureService.getStopScreenSharePendingIntent(getApplication()))
+      .build()
+
+    hmsSDK.startScreenshare(actionListener, mediaProjectionPermissionResultData, notification)
   }
 
   fun stopScreenshare(actionListener: HMSActionResultListener) {
