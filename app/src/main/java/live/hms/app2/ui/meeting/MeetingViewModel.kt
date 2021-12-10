@@ -1,9 +1,10 @@
 package live.hms.app2.ui.meeting
 import android.app.Application
+import android.content.Intent
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
-import com.google.gson.JsonObject
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
@@ -41,7 +42,7 @@ class MeetingViewModel(
   private val config = HMSConfig(
     roomDetails.username,
     roomDetails.authToken,
-    JsonObject().apply { addProperty("name", roomDetails.username) }.toString(),
+    Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username)).toString(),
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
@@ -85,6 +86,9 @@ class MeetingViewModel(
       synchronized(_tracks) {
         field = value
 
+        // Setting of volume greater than 1 is causing to increase the gain, rather
+        // than volume
+        // 1.0 is the default value of webrtc
         val volume = if (isAudioMuted) 0.0 else 1.0
         _tracks.forEach { track ->
           track.audio?.let {
@@ -118,7 +122,8 @@ class MeetingViewModel(
   private var localVideoTrack: HMSLocalVideoTrack? = null
 
   // Live data containing all the current tracks in a meeting
-  val tracks = MutableLiveData(_tracks)
+  private val _liveDataTracks = MutableLiveData(_tracks)
+  val tracks: LiveData<List<MeetingTrack>> = _liveDataTracks
 
   // Live data containing the current Speaker in the meeting
   val speakers = MutableLiveData<Array<HMSSpeaker>>()
@@ -126,10 +131,12 @@ class MeetingViewModel(
   private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
   val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
     speakers.map(activeSpeakerHandler::speakerUpdate)
-  val activeSpeakersUpdatedTracks = tracks.map(activeSpeakerHandler::trackUpdateTrigger)
+  val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
   // Live data which changes on any change of peer
   val peerLiveDate = MutableLiveData<HMSPeer>()
+  private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
+  val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
   // Dominant speaker
   val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
@@ -137,8 +144,10 @@ class MeetingViewModel(
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
   private val hmsTrackSettings = HMSTrackSettings.Builder()
-    .audio(HMSAudioTrackSettings.Builder()
-      .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build())
+    .audio(
+      HMSAudioTrackSettings.Builder()
+        .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build()
+    )
     .build()
 
   val hmsSDK = HMSSDK
@@ -160,7 +169,7 @@ class MeetingViewModel(
 
       setMute(!enabled)
 
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
 
       isLocalVideoEnabled.postValue(enabled)
       crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
@@ -178,7 +187,7 @@ class MeetingViewModel(
     localAudioTrack?.apply {
       setMute(!enabled)
 
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
 
       isLocalAudioEnabled.postValue(enabled)
       crashlyticsLog(TAG, "toggleUserMic: enabled=$enabled")
@@ -211,7 +220,7 @@ class MeetingViewModel(
   private fun cleanup() {
     failures.clear()
     _tracks.clear()
-    tracks.postValue(_tracks)
+    _liveDataTracks.postValue(_tracks)
 
     dominantSpeaker.postValue(null)
 
@@ -247,7 +256,6 @@ class MeetingViewModel(
           Log.v(TAG, "~~ onJoin called ~~")
           failures.clear()
           state.postValue(MeetingState.Ongoing())
-          _isRecording.postValue(getRecordingState(room))
           hmsRoom = room // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
         }
@@ -258,7 +266,7 @@ class MeetingViewModel(
             HMSPeerUpdate.PEER_LEFT -> {
               synchronized(_tracks) {
                 _tracks.removeIf { it.peer.peerID == hmsPeer.peerID }
-                tracks.postValue(_tracks)
+                _liveDataTracks.postValue(_tracks)
                 peerLiveDate.postValue(hmsPeer)
               }
             }
@@ -283,6 +291,21 @@ class MeetingViewModel(
 
             HMSPeerUpdate.ROLE_CHANGED -> {
               peerLiveDate.postValue(hmsPeer)
+            }
+
+            HMSPeerUpdate.METADATA_CHANGED -> {
+              if(hmsPeer.isLocal) {
+                updateSelfHandRaised(hmsPeer as HMSLocalPeer)
+              } else {
+                _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              }
+            }
+            HMSPeerUpdate.NAME_CHANGED -> {
+              if(hmsPeer.isLocal) {
+                updateNameChange(hmsPeer as HMSLocalPeer)
+              } else {
+                _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+              }
             }
 
             else -> Unit
@@ -337,7 +360,7 @@ class MeetingViewModel(
               removeTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_MUTED -> {
-              tracks.postValue(_tracks)
+              _liveDataTracks.postValue(_tracks)
               if (peer.isLocal) {
                 if (track.type == HMSTrackType.AUDIO)
                   isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
@@ -347,7 +370,7 @@ class MeetingViewModel(
               }
             }
             HMSTrackUpdate.TRACK_UNMUTED -> {
-              tracks.postValue(_tracks)
+              _liveDataTracks.postValue(_tracks)
               if (peer.isLocal) {
                 if (track.type == HMSTrackType.AUDIO)
                   isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
@@ -356,9 +379,9 @@ class MeetingViewModel(
                 }
               }
             }
-            HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> tracks.postValue(_tracks)
-            HMSTrackUpdate.TRACK_DEGRADED -> tracks.postValue(_tracks)
-            HMSTrackUpdate.TRACK_RESTORED -> tracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> _liveDataTracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_DEGRADED -> _liveDataTracks.postValue(_tracks)
+            HMSTrackUpdate.TRACK_RESTORED -> _liveDataTracks.postValue(_tracks)
           }
         }
 
@@ -415,6 +438,16 @@ class MeetingViewModel(
     }
   }
 
+  private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
+    val isSelfHandRaised = CustomPeerMetadata.fromJson(hmsPeer.metadata)?.isHandRaised == true
+    _isHandRaised.postValue(isSelfHandRaised)
+    _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.METADATA_CHANGED))
+  }
+
+  private fun updateNameChange(hmsPeer: HMSLocalPeer) {
+    _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.NAME_CHANGED))
+  }
+
   private fun getRecordingState(room: HMSRoom): RecordingState {
 
     val recording = room.browserRecordingState?.running == true ||
@@ -456,12 +489,10 @@ class MeetingViewModel(
 
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
-    HMSCoroutineScope.launch {
-      try {
-        localVideoTrack?.switchCamera()
-      } catch (ex: HMSException) {
-        Log.e(TAG, "flipCamera: ${ex.description}", ex)
-      }
+    try {
+      localVideoTrack?.switchCamera()
+    } catch (ex: HMSException) {
+      Log.e(TAG, "flipCamera: ${ex.description}", ex)
     }
   }
 
@@ -500,7 +531,7 @@ class MeetingViewModel(
         _track.audio = track
       }
 
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
     }
   }
 
@@ -527,7 +558,7 @@ class MeetingViewModel(
       }
     }
 
-    tracks.postValue(_tracks)
+    _liveDataTracks.postValue(_tracks)
   }
 
   private fun addTrack(track: HMSTrack, peer: HMSPeer) {
@@ -564,7 +595,7 @@ class MeetingViewModel(
       }
 
       // Update the view as some track has been removed
-      tracks.postValue(_tracks)
+      _liveDataTracks.postValue(_tracks)
     }
   }
 
@@ -595,7 +626,7 @@ class MeetingViewModel(
     val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
     if (hmsPeer != null && toRole != null) {
       if (hmsPeer.hmsRole.name != toRole.name)
-        hmsSDK.changeRole(hmsPeer, toRole, force,object : HMSActionResultListener{
+        hmsSDK.changeRole(hmsPeer, toRole, force, object : HMSActionResultListener {
           override fun onSuccess() {
             Log.i(TAG, "Successfully sent change role request for $hmsPeer")
           }
@@ -611,7 +642,7 @@ class MeetingViewModel(
   }
 
   fun requestPeerLeave(hmsPeer: HMSRemotePeer, reason: String) {
-    hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSActionResultListener{
+    hmsSDK.removePeerRequest(hmsPeer, reason, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         state.postValue(MeetingState.NonFatalFailure(error))
       }
@@ -623,7 +654,7 @@ class MeetingViewModel(
   }
 
   fun endRoom(lock: Boolean) {
-    hmsSDK.endRoom("Closing time", lock, object : HMSActionResultListener{
+    hmsSDK.endRoom("Closing time", lock, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         state.postValue(MeetingState.NonFatalFailure(error))
       }
@@ -645,7 +676,7 @@ class MeetingViewModel(
     if (track != null) {
       val isMute = track.isMute
       if (isAllowedToAskUnmutePeers() && isMute) {
-        hmsSDK.changeTrackState(track, false, object : HMSActionResultListener{
+        hmsSDK.changeTrackState(track, false, object : HMSActionResultListener {
           override fun onError(error: HMSException) {
             state.postValue(MeetingState.NonFatalFailure(error))
           }
@@ -656,7 +687,7 @@ class MeetingViewModel(
 
         })
       } else if (isAllowedToMutePeers() && !isMute) {
-        hmsSDK.changeTrackState(track, true, object : HMSActionResultListener{
+        hmsSDK.changeTrackState(track, true, object : HMSActionResultListener {
           override fun onError(error: HMSException) {
             state.postValue(MeetingState.NonFatalFailure(error))
           }
@@ -733,16 +764,10 @@ class MeetingViewModel(
     }
   }
 
-  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>) {
+  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>, meetingUrl: String) {
     // It's streaming if there are rtmp urls present.
     val isStreaming = rtmpInjectUrls.isNotEmpty()
-    val meetingUrl = getBeamBotJoiningUrl(
-      roomDetails.url,
-      hmsRoom?.roomId!!,
-      "host"
-    )
 
-    _isRecording.postValue(RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS)
     val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
     else if (isStreaming) RecordingState.STREAMING
     else RecordingState.RECORDING
@@ -758,12 +783,10 @@ class MeetingViewModel(
           Log.d(TAG, "RTMP recording error: $error")
           // restore the current state
           viewModelScope.launch { _events.emit(Event.RTMPError(error) ) }
-          _isRecording.postValue(getRecordingState(hmsRoom!!))
         }
 
         override fun onSuccess() {
           Log.d(TAG, "RTMP recording Success")
-          _isRecording.postValue(successResult)
         }
 
       })
@@ -771,21 +794,25 @@ class MeetingViewModel(
 
   fun stopRecording() {
     Log.v(TAG, "Stopping recording")
-    _isRecording.postValue(RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING)
 
     hmsSDK.stopRtmpAndRecording(object : HMSActionResultListener {
       override fun onError(error: HMSException) {
         Log.v(TAG, "RTMP recording stop. error: $error")
         viewModelScope.launch { _events.emit(Event.RTMPError(error)) }
-        _isRecording.postValue(getRecordingState(hmsRoom!!))
       }
 
       override fun onSuccess() {
         Log.d(TAG, "RTMP recording stop. Success")
-        _isRecording.postValue(RecordingState.NOT_RECORDING_OR_STREAMING)
       }
 
     })
+  }
+  fun startScreenshare(mediaProjectionPermissionResultData: Intent?, actionListener: HMSActionResultListener) {
+    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
+  }
+
+  fun stopScreenshare(actionListener: HMSActionResultListener) {
+    hmsSDK.stopScreenshare(actionListener)
   }
 
   private val _events = MutableSharedFlow<Event?>()
@@ -794,6 +821,47 @@ class MeetingViewModel(
   sealed class Event {
     class RTMPError(val exception: HMSException) : Event()
     class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
+    object OpenChangeNameDialog : Event()
+  }
+
+  private val _isHandRaised = MutableLiveData<Boolean>(false)
+  val isHandRaised: LiveData<Boolean> = _isHandRaised
+
+  fun toggleRaiseHand() {
+    val localPeer = hmsSDK.getLocalPeer()!!
+    val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
+    val isHandRaised = currentMetadata!!.isHandRaised
+    val newMetadataJson = currentMetadata.copy(isHandRaised = !isHandRaised).toJson()
+
+    hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.d(TAG, "There was an error $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "Metadata update succeeded")
+      }
+    })
+
+  }
+
+  fun requestNameChange() {
+    viewModelScope.launch {
+      _events.emit(Event.OpenChangeNameDialog)
+    }
+  }
+
+  fun changeName(name: String) {
+    val localPeer = hmsSDK.getLocalPeer()!!
+    hmsSDK.changeName(name, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        Log.d(TAG, "There was an error $error")
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG, "Name update succeeded")
+      }
+    })
   }
 
   fun getStats(): Flow<Map<String, WebrtcStats>> = hmsSDK.getStats()

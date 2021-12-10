@@ -83,12 +83,20 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-
         <TextView
             android:id="@+id/stats"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Hi" />
+        <TextView
+            android:id="@+id/raised_hand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:padding="4dp"
+            android:text="✋"
+            android:textSize="24sp" />
     </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -233,8 +233,7 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getStringSet(
       RTMP_URL_LIST,
       if (BuildConfig.RTMP_INJEST_URL.isEmpty()) emptySet<String>() else setOf(BuildConfig.RTMP_INJEST_URL)
-    )!!
-      .toSet()
+    )?.toSet() ?: emptySet()
     set(value) = putStringSet(RTMP_URL_LIST, value)
 
 
