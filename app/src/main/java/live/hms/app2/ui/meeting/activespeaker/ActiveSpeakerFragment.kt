@@ -40,6 +40,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     screenShareTrack?.let {
       screenShareStats.initiateStats(
+        this,
         meetingViewModel.getStats(),
         it.video,
         it.audio, it.peer.isLocal
@@ -57,7 +58,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     screenShareTrack?.let {
       unbindSurfaceView(binding.screenShare, it)
     }
-    screenShareStats.close()
+//    screenShareStats.close()
     super.onPause()
   }
 
@@ -102,15 +103,15 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     screenShareTrack?.let { screen ->
       if (!tracks.contains(screen)) {
         screenShareTrack?.let { unbindSurfaceView(binding.screenShare, it) }
-        screenShareStats.close()
+//        screenShareStats.close()
         screenShareTrack = null
       }
     }
 
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
-      screenShareStats.close()
       screenShareStats.initiateStats(
+        this,
         meetingViewModel.getStats(),
         screen.video,
         screen.audio,

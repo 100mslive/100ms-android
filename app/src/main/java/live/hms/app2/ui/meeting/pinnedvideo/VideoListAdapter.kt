@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
@@ -14,8 +15,8 @@ import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
-import live.hms.video.connection.degredation.WebrtcStats
 import live.hms.app2.util.visibility
+import live.hms.video.connection.degredation.WebrtcStats
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
@@ -86,6 +87,7 @@ class VideoListAdapter(
         return
       }
       statsInterpreter.initiateStats(
+        binding.root.findViewTreeLifecycleOwner()!!,
         itemStats, itemRef?.track?.video,
         itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
       ) { binding.stats.text = it }
@@ -107,7 +109,7 @@ class VideoListAdapter(
 
     fun unbindSurfaceView() {
       if (!isSurfaceViewBinded) return
-      statsInterpreter.close()
+//      statsInterpreter.close()
       itemRef?.let { item ->
         SurfaceViewRendererUtil.unbind(
           binding.surfaceView,

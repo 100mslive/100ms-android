@@ -220,7 +220,7 @@ abstract class VideoGridBaseFragment : Fragment() {
             currentRenderedView.binding.videoCard,
             currentRenderedView.meetingTrack
           )
-          currentRenderedView.statsInterpreter?.close()
+//          currentRenderedView.statsInterpreter?.close()
           removeViewInLayout(currentRenderedView.binding.root)
         }
       }
@@ -252,6 +252,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           if (!isVideoGrid) {
             statsInterpreter = StatsInterpreter(settings.showStats)
             statsInterpreter.initiateStats(
+              this,
               meetingViewModel.getStats(),
               newVideo.video,
               newVideo.audio,
@@ -351,6 +352,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     renderedViews.forEach {
       bindSurfaceView(it.binding.videoCard, it.meetingTrack)
       it.statsInterpreter?.initiateStats(
+        this,
         meetingViewModel.getStats(),
         it.meetingTrack.video,
         it.meetingTrack.audio,
@@ -366,7 +368,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     renderedViews.forEach {
       unbindSurfaceView(it.binding.videoCard, it.meetingTrack)
-      it.statsInterpreter?.close()
+//      it.statsInterpreter?.close()
     }
   }
 
