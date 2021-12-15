@@ -1,6 +1,7 @@
 package live.hms.app2.ui.home.permission
 
 import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,79 +17,95 @@ import pub.devrel.easypermissions.EasyPermissions
 
 class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
-  private var binding by viewLifecycle<FragmentPermissionBinding>()
+    private var binding by viewLifecycle<FragmentPermissionBinding>()
 
-  companion object {
-    private const val TAG = "PermissionFragment"
+    companion object {
+        private const val TAG = "PermissionFragment"
 
-    private const val RC_CALL = 111
-    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
-    Manifest.permission.FOREGROUND_SERVICE)
-  }
+        private const val RC_CALL = 111
+        private val PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.FOREGROUND_SERVICE
+        )
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    checkAlreadyGrantedPermissions()
-  }
-
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    binding = FragmentPermissionBinding.inflate(inflater, container, false)
-    initButtons()
-    return binding.root
-  }
-
-  private fun checkAlreadyGrantedPermissions() {
-    if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
-      findNavController().navigate(
-        PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
-      )
+        private val PERMISSIONS_MINIMAL =
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
     }
-  }
 
-  private fun initButtons() {
-    binding.buttonGrantPermission.setOnClickListener { gotoHomePage() }
-
-    binding.buttonDoItLater.setOnClickListener {
-      // TODO: Integrate no-camera permission flow
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        checkAlreadyGrantedPermissions()
     }
-  }
 
-  @AfterPermissionGranted(RC_CALL)
-  private fun gotoHomePage() {
-    if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
-      Log.v(TAG, "Permission=$PERMISSIONS granted, moving to HomeFragment")
-      findNavController().navigate(
-        PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
-      )
-    } else {
-      EasyPermissions.requestPermissions(
-        this,
-        resources.getString(R.string.permission_description),
-        RC_CALL,
-        *PERMISSIONS
-      )
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentPermissionBinding.inflate(inflater, container, false)
+        initButtons()
+        return binding.root
     }
-  }
 
-  override fun onRequestPermissionsResult(
-    requestCode: Int,
-    permissions: Array<out String>,
-    grantResults: IntArray
-  ) {
-    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-  }
+    private fun checkAlreadyGrantedPermissions() {
+        if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
+            findNavController().navigate(
+                PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
+            )
+        }
+    }
 
-  // Permission Callbacks
-  override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-    Log.v(TAG, "onPermissionsGranted($requestCode, $perms)")
-  }
+    private fun initButtons() {
+        binding.buttonGrantPermission.setOnClickListener { gotoHomePage() }
 
-  override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-    Log.v(TAG, "onPermissionsDenied($requestCode, $perms)")
-  }
+        binding.buttonDoItLater.setOnClickListener {
+            // TODO: Integrate no-camera permission flow
+        }
+    }
+
+    @AfterPermissionGranted(RC_CALL)
+    private fun gotoHomePage() {
+        if (hasPermissions()) {
+            Log.v(TAG, "Permission=$PERMISSIONS granted, moving to HomeFragment")
+            findNavController().navigate(
+                PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
+            )
+        } else {
+            EasyPermissions.requestPermissions(
+                this,
+                resources.getString(R.string.permission_description),
+                RC_CALL,
+                *PERMISSIONS
+            )
+        }
+    }
+
+    private fun hasPermissions(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS_MINIMAL)) {
+                return true
+            }
+        } else if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
+            return true
+        }
+        return false
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    // Permission Callbacks
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+        Log.v(TAG, "onPermissionsGranted($requestCode, $perms)")
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        Log.v(TAG, "onPermissionsDenied($requestCode, $perms)")
+    }
 }
