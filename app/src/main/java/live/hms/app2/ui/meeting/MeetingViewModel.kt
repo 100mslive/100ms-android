@@ -494,8 +494,24 @@ class MeetingViewModel(
     meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
 
   private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
-    if(isHlsPeer(role) && streamUrl != null) {
+    var started = false
+    val isHlsPeer = isHlsPeer(role)
+    if( isHlsPeer && streamUrl != null) {
+      started = true
       switchToHlsView(streamUrl)
+    }
+
+    if(!started) {
+      val reasons = mutableListOf<String>()
+      if(!isHlsPeer) {
+        reasons.add("Role does not start with hls-")
+      }
+      if(streamUrl == null) {
+        reasons.add("Stream url was null")
+      }
+      HMSCoroutineScope.launch {
+        _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
+      }
     }
   }
 
@@ -843,6 +859,7 @@ class MeetingViewModel(
     class RTMPError(val exception: HMSException) : Event()
     class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
     object OpenChangeNameDialog : Event()
+    class HlsNotStarted(val reason : String) : Event()
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)

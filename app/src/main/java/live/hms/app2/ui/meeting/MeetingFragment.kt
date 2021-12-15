@@ -557,6 +557,7 @@ class MeetingFragment : Fragment() {
             return@collect
           }
           null -> {}
+          is MeetingViewModel.Event.HlsNotStarted -> Toast.makeText(requireContext(), event.reason, Toast.LENGTH_LONG).show()
         }
       }
     }
