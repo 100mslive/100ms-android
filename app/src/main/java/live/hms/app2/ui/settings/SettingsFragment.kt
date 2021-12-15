@@ -61,7 +61,7 @@ class SettingsFragment : Fragment() {
       "Rear Facing Camera" to REAR_FACING_CAMERA,
     )
 
-    private val MEETING_MODES = MeetingViewMode.values().map { it.toString() }.toTypedArray()
+    private val MEETING_MODES = MeetingViewMode::class.nestedClasses.mapNotNull { it.simpleName }.toTypedArray()
 
     private val LOG_LEVELS_100MS = HMSLogger.LogLevel.values().map { it.toString() }.toTypedArray()
 

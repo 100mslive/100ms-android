@@ -23,15 +23,16 @@ class HlsPlayer {
 
     }
 
-    fun getPlayer(context : Context, url : String = "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8") : Player {
+    fun getPlayer(context : Context, url : String, playWhenready : Boolean = true) : Player {
 
         val hlsMediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
+            .setAllowChunklessPreparation(true)
             .createMediaSource(MediaItem.fromUri(url))
 
         val player = ExoPlayer.Builder(context).build()
         with(player) {
             setMediaSource(hlsMediaSource)
-            playWhenReady = playWhenReady
+            playWhenReady = playWhenready
             seekTo(currentWindow, playbackPosition)
             prepare()
         }

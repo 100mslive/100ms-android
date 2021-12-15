@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -170,7 +171,7 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.hls_view -> {
-        meetingViewModel.setMeetingViewMode(MeetingViewMode.HLS)
+        meetingViewModel.switchToHlsViewIfRequired()
       }
 
       R.id.action_settings -> {
@@ -742,7 +743,12 @@ class MeetingFragment : Fragment() {
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
       MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
-      MeetingViewMode.HLS -> HlsFragment()
+      is MeetingViewMode.HLS -> HlsFragment().apply {
+        arguments = bundleOf(
+              "hlsStreamUrl" to mode.url
+      )
+      }
+
     }
 
     meetingViewModel.setTitle(mode.titleResId)

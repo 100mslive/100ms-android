@@ -258,6 +258,8 @@ class MeetingViewModel(
           state.postValue(MeetingState.Ongoing())
           hmsRoom = room // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
+
+          switchToHlsViewIfRequired(room.localPeer?.hmsRole, room.hlsStreamingState?.hlsStreamUrl)
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -291,6 +293,9 @@ class MeetingViewModel(
 
             HMSPeerUpdate.ROLE_CHANGED -> {
               peerLiveDate.postValue(hmsPeer)
+              if(hmsPeer.isLocal) {
+                switchToHlsViewIfRequired(hmsPeer.hmsRole, hmsRoom?.hlsStreamingState?.hlsStreamUrl)
+              }
             }
 
             HMSPeerUpdate.METADATA_CHANGED -> {
@@ -321,6 +326,7 @@ class MeetingViewModel(
             HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> _isRecording.postValue(
               getRecordingState(hmsRoom)
             )
+            HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> switchToHlsViewIfRequired()
             else -> {
             }
           }
@@ -481,6 +487,21 @@ class MeetingViewModel(
     })
   }
 
+  private fun isHlsPeer(role : HMSRole?) : Boolean =
+    role?.name?.startsWith("hls-") == true
+
+  private fun switchToHlsView(streamUrl : String) =
+    meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
+
+  private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
+    if(isHlsPeer(role) && streamUrl != null) {
+      switchToHlsView(streamUrl)
+    }
+  }
+
+  fun switchToHlsViewIfRequired() {
+    switchToHlsViewIfRequired(hmsSDK.getLocalPeer()?.hmsRole, hmsSDK.getRoom()?.hlsStreamingState?.hlsStreamUrl)
+  }
 
   fun flipCamera() {
     if (!settings.publishVideo) {

@@ -200,7 +200,7 @@ class SettingsStore(context: Context) {
         MEETING_MODE,
         MeetingViewMode.ACTIVE_SPEAKER.toString()
       )!!
-      return MeetingViewMode.valueOf(str)
+      return MeetingViewMode::class.nestedClasses.find { it.simpleName == str }?.objectInstance as MeetingViewMode? ?: MeetingViewMode.ACTIVE_SPEAKER
     }
     set(value) = putString(MEETING_MODE, value.toString())
 
