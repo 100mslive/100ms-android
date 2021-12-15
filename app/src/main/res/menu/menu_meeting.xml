@@ -71,6 +71,12 @@
             app:showAsAction="never" />
 
         <item
+            android:id="@+id/hls_view"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/hls_view"
+            app:showAsAction="never" />
+
+        <item
             android:id="@+id/raise_hand"
             android:title="@string/raise_hand"
             android:visible="false"

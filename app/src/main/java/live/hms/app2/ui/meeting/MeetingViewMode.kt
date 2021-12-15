@@ -6,7 +6,8 @@ enum class MeetingViewMode {
   GRID,
   PINNED,
   ACTIVE_SPEAKER,
-  AUDIO_ONLY;
+  AUDIO_ONLY,
+  HLS;
 
   val titleResId: Int
     get() = when (this) {
@@ -14,5 +15,6 @@ enum class MeetingViewMode {
       PINNED -> R.string.hero_view
       ACTIVE_SPEAKER -> R.string.active_speaker_view
       AUDIO_ONLY -> R.string.audio_only_view
+      HLS -> R.string.hls_view
     }
 }

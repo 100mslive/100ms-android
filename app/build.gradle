@@ -7,7 +7,7 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
@@ -61,7 +61,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     //100ms.live SDK
-    implementation 'com.github.100mslive:android-sdk:2.2.2'
+    implementation 'com.github.100mslive:android-sdk:2.2.3'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
@@ -105,4 +105,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     testImplementation 'org.hamcrest:hamcrest:2.2'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.16.1'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.16.1'
 }

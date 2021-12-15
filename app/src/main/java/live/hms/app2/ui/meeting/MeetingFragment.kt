@@ -28,6 +28,7 @@ import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
+import live.hms.app2.ui.meeting.activespeaker.HlsFragment
 import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
@@ -168,6 +169,9 @@ class MeetingFragment : Fragment() {
         meetingViewModel.setMeetingViewMode(MeetingViewMode.AUDIO_ONLY)
       }
 
+      R.id.hls_view -> {
+        meetingViewModel.setMeetingViewMode(MeetingViewMode.HLS)
+      }
 
       R.id.action_settings -> {
         findNavController().navigate(
@@ -738,6 +742,7 @@ class MeetingFragment : Fragment() {
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
       MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
+      MeetingViewMode.HLS -> HlsFragment()
     }
 
     meetingViewModel.setTitle(mode.titleResId)
