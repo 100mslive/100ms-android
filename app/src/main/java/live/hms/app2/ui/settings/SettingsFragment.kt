@@ -454,13 +454,19 @@ class SettingsFragment : Fragment() {
         EnumSet.of(SettingsMode.HOME),
         settings.enableSubscribeDegradation,
         switchSubscribeDegradationEnabled
-      ) {commitHelper.setSubscribeDegradation(it)}
+      ) { commitHelper.setSubscribeDegradation(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
         settings.enableHardwareAEC,
         switchUseHardwareEchoCancellation
-      ) {commitHelper.setUseHardwareAEC(it)}
+      ) { commitHelper.setUseHardwareAEC(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.showStats,
+        showStats
+      ) { commitHelper.setShowStats(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

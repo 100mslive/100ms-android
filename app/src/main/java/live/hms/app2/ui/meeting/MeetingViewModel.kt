@@ -1,5 +1,4 @@
 package live.hms.app2.ui.meeting
-
 import android.app.Application
 import android.content.Intent
 import android.util.Log
@@ -14,6 +13,7 @@ import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.connection.degredation.WebrtcStats
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
@@ -491,12 +491,10 @@ class MeetingViewModel(
 
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
-    HMSCoroutineScope.launch {
-      try {
-        localVideoTrack?.switchCamera()
-      } catch (ex: HMSException) {
-        Log.e(TAG, "flipCamera: ${ex.description}", ex)
-      }
+    try {
+      localVideoTrack?.switchCamera()
+    } catch (ex: HMSException) {
+      Log.e(TAG, "flipCamera: ${ex.description}", ex)
     }
   }
 
@@ -867,5 +865,8 @@ class MeetingViewModel(
       }
     })
   }
+
+  fun getStats(): Flow<Map<String, WebrtcStats>> = hmsSDK.getStats()
+
 }
 
