@@ -108,4 +108,5 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.16.1'
     implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
     implementation 'com.google.android.exoplayer:exoplayer-ui:2.16.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
