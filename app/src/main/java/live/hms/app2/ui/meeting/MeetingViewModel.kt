@@ -399,11 +399,13 @@ class MeetingViewModel(
         }
 
         override fun onReconnected() {
+          HMSLogger.d(TAG, "~~ onReconnected ~~")
           failures.clear()
           state.postValue(MeetingState.Ongoing())
         }
 
         override fun onReconnecting(error: HMSException) {
+          HMSLogger.d(TAG, "~~ onReconnecting :: $error ~~")
           state.postValue(MeetingState.Reconnecting("Reconnecting", error.toString()))
         }
 
