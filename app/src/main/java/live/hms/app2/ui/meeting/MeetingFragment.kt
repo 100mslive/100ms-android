@@ -217,6 +217,9 @@ class MeetingFragment : Fragment() {
 
       R.id.change_name -> meetingViewModel.requestNameChange()
 
+      R.id.hls_start -> meetingViewModel.startHls()
+
+      R.id.hls_stop -> meetingViewModel.stopHls()
     }
     return false
   }

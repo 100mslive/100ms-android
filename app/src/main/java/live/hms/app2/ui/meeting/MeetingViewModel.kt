@@ -852,6 +852,7 @@ class MeetingViewModel(
 
     })
   }
+
   fun startScreenshare(mediaProjectionPermissionResultData: Intent?, actionListener: HMSActionResultListener) {
     hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
   }
@@ -867,6 +868,9 @@ class MeetingViewModel(
     class RTMPError(val exception: HMSException) : Event()
     class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
     object OpenChangeNameDialog : Event()
+    sealed class Hls : Event() {
+      data class HlsError(val throwable: HMSException) : Hls()
+    }
     class HlsNotStarted(val reason : String) : Event()
   }
 
@@ -910,7 +914,41 @@ class MeetingViewModel(
     })
   }
 
-  fun getStats(): Flow<Map<String, WebrtcStats>> = hmsSDK.getStats()
+  fun getStats(): Flow<Map<String, WebrtcStats>> = emptyFlow()//hmsSDK.getStats()
 
+  fun startHls() {
+
+//    https://app-dashboard.qa-app.100ms.live/preview/err-ybu-czs?token=beam_recording
+    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant("${roomDetails.url}?token=beam_recording")))
+
+    hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+            _events.emit(Event.Hls.HlsError(error))
+        }
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG,"Hls streaming started successfully")
+      }
+
+    })
+  }
+
+  fun stopHls() {
+    val config = HMSHLSConfig(emptyList())
+    hmsSDK.stopHLSStreaming(config, object :  HMSActionResultListener {
+      override fun onSuccess() {
+        Log.d(TAG,"Hls streaming stopped successfully")
+      }
+
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+          _events.emit(Event.Hls.HlsError(error))
+        }
+
+      }
+    })
+  }
 }
 
