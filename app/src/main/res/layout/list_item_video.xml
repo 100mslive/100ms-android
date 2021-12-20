@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="@dimen/video_list_size"
@@ -83,6 +84,11 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
+            android:id="@+id/stats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Hi" />
+        <TextView
             android:id="@+id/raised_hand"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -91,7 +97,6 @@
             android:padding="4dp"
             android:text="✋"
             android:textSize="24sp" />
-
     </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

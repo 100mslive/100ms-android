@@ -1,5 +1,4 @@
 package live.hms.app2.ui.meeting
-
 import android.app.Application
 import android.content.Intent
 import android.util.Log
@@ -14,6 +13,7 @@ import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.connection.degredation.WebrtcStats
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
@@ -405,11 +405,13 @@ class MeetingViewModel(
         }
 
         override fun onReconnected() {
+          HMSLogger.d(TAG, "~~ onReconnected ~~")
           failures.clear()
           state.postValue(MeetingState.Ongoing())
         }
 
         override fun onReconnecting(error: HMSException) {
+          HMSLogger.d(TAG, "~~ onReconnecting :: $error ~~")
           state.postValue(MeetingState.Reconnecting("Reconnecting", error.toString()))
         }
 
@@ -901,5 +903,8 @@ class MeetingViewModel(
       }
     })
   }
+
+  fun getStats(): Flow<Map<String, WebrtcStats>> = hmsSDK.getStats()
+
 }
 
