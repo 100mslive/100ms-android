@@ -919,7 +919,7 @@ class MeetingViewModel(
   fun startHls() {
 
 //    https://app-dashboard.qa-app.100ms.live/preview/err-ybu-czs?token=beam_recording
-    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant("${roomDetails.url}?token=beam_recording")))
+    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant("${roomDetails.url.replace("meeting","preview")}?token=beam_recording")))
 
     hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
