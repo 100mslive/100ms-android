@@ -16,6 +16,7 @@ import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
@@ -27,8 +28,7 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private var pinnedTrack: MeetingTrack? = null
-
-  private val videoListAdapter = VideoListAdapter() { changePinViewVideo(it) }
+  protected val settings: SettingsStore by lazy { SettingsStore(requireContext()) }
 
   private var binding by viewLifecycle<FragmentPinnedVideoBinding>()
 
@@ -36,6 +36,14 @@ class PinnedVideoFragment : Fragment() {
     MeetingViewModelFactory(
       requireActivity().application,
       requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+    )
+  }
+
+  private val videoListAdapter by lazy {
+    VideoListAdapter(
+      { changePinViewVideo(it) },
+      meetingViewModel.getStats(),
+      settings.showStats
     )
   }
 
@@ -53,7 +61,7 @@ class PinnedVideoFragment : Fragment() {
   }
 
   override fun onPause() {
-    super.onPause()
+
     Log.d(TAG, "onPause()")
 
     isViewVisible = false
@@ -62,6 +70,7 @@ class PinnedVideoFragment : Fragment() {
     // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
     // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
     binding.recyclerViewVideos.adapter = null
+    super.onPause()
   }
 
   override fun onCreateView(
