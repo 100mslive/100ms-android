@@ -261,7 +261,7 @@ class MeetingViewModel(
 
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
-          switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl )
+          switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl, true )
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -499,7 +499,7 @@ class MeetingViewModel(
   private fun switchToHlsView(streamUrl : String) =
     meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
 
-  private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
+  private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?, optional : Boolean = false) {
     var started = false
     val isHlsPeer = isHlsPeer(role)
     if( isHlsPeer && streamUrl != null) {
@@ -507,7 +507,7 @@ class MeetingViewModel(
       switchToHlsView(streamUrl)
     }
 
-    if(!started) {
+    if(!started && !optional) {
       val reasons = mutableListOf<String>()
       if(!isHlsPeer) {
         reasons.add("Role does not start with hls-")
