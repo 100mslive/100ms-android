@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -28,6 +29,7 @@ import live.hms.app2.databinding.FragmentMeetingBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
+import live.hms.app2.ui.meeting.activespeaker.HlsFragment
 import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
@@ -166,6 +168,9 @@ class MeetingFragment : Fragment() {
         meetingViewModel.setMeetingViewMode(MeetingViewMode.AUDIO_ONLY)
       }
 
+      R.id.hls_view -> {
+        meetingViewModel.switchToHlsViewIfRequired()
+      }
 
       R.id.action_settings -> {
         findNavController().navigate(
@@ -206,6 +211,9 @@ class MeetingFragment : Fragment() {
 
       R.id.change_name -> meetingViewModel.requestNameChange()
 
+      R.id.hls_start -> meetingViewModel.startHls()
+
+      R.id.hls_stop -> meetingViewModel.stopHls()
     }
     return false
   }
@@ -546,6 +554,7 @@ class MeetingFragment : Fragment() {
             return@collect
           }
           null -> {}
+          is MeetingViewModel.Event.HlsNotStarted -> Toast.makeText(requireContext(), event.reason, Toast.LENGTH_LONG).show()
         }
       }
     }
@@ -732,6 +741,12 @@ class MeetingFragment : Fragment() {
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
       MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
+      is MeetingViewMode.HLS -> HlsFragment().apply {
+        arguments = bundleOf(
+              "hlsStreamUrl" to mode.url
+      )
+      }
+
     }
 
     meetingViewModel.setTitle(mode.titleResId)
