@@ -73,7 +73,6 @@ class MeetingFragment : Fragment() {
   private var alertDialog: AlertDialog? = null
 
   private var isMeetingOngoing = false
-  private var isScreenShared = false
 
   private val onSettingsChangeListener =
     SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -109,7 +108,6 @@ class MeetingFragment : Fragment() {
 
         override fun onSuccess() {
           // success
-          isScreenShared = true
         }
       })
     }
@@ -187,14 +185,11 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.action_share_screen -> {
-        if (!isScreenShared) {
-          val mediaProjectionManager: MediaProjectionManager? = requireContext().getSystemService(
-            Context.MEDIA_PROJECTION_SERVICE
-          ) as MediaProjectionManager
-          resultLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
-        } else {
-          Toast.makeText(activity, "ScreenShare already running!", Toast.LENGTH_SHORT).show()
-        }
+        val mediaProjectionManager: MediaProjectionManager? = requireContext().getSystemService(
+          Context.MEDIA_PROJECTION_SERVICE
+        ) as MediaProjectionManager
+        resultLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
+
       }
 
       R.id.action_stop_share_screen -> {
@@ -205,7 +200,6 @@ class MeetingFragment : Fragment() {
 
           override fun onSuccess() {
             //success
-            isScreenShared = false
           }
         })
 
