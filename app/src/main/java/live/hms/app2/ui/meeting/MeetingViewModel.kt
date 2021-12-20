@@ -259,7 +259,9 @@ class MeetingViewModel(
           hmsRoom = room // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
 
-          switchToHlsViewIfRequired(room.localPeer?.hmsRole, room.hlsStreamingState?.hlsStreamUrl)
+          // get the hls URL from the Room, if it exists
+          val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+          switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl )
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -294,7 +296,9 @@ class MeetingViewModel(
             HMSPeerUpdate.ROLE_CHANGED -> {
               peerLiveDate.postValue(hmsPeer)
               if(hmsPeer.isLocal) {
-                switchToHlsViewIfRequired(hmsPeer.hmsRole, hmsRoom?.hlsStreamingState?.hlsStreamUrl)
+                // get the hls URL from the Room, if it exists
+                val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+                switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
               }
             }
 
@@ -518,7 +522,9 @@ class MeetingViewModel(
   }
 
   fun switchToHlsViewIfRequired() {
-    switchToHlsViewIfRequired(hmsSDK.getLocalPeer()?.hmsRole, hmsSDK.getRoom()?.hlsStreamingState?.hlsStreamUrl)
+    // get the hls URL from the Room, if it exists
+    val hlsUrl = hmsSDK.getRoom()?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+    switchToHlsViewIfRequired(hmsSDK.getLocalPeer()?.hmsRole, hlsUrl)
   }
 
   fun flipCamera() {
