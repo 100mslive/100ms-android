@@ -261,7 +261,7 @@ class MeetingViewModel(
 
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
-          switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl, true )
+          switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -499,7 +499,7 @@ class MeetingViewModel(
   private fun switchToHlsView(streamUrl : String) =
     meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
 
-  private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?, optional : Boolean = false) {
+  private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
     var started = false
     val isHlsPeer = isHlsPeer(role)
     if( isHlsPeer && streamUrl != null) {
@@ -507,11 +507,9 @@ class MeetingViewModel(
       switchToHlsView(streamUrl)
     }
 
-    if(!started && !optional) {
+    // Only send errors for those who are hls peers
+    if(!started && isHlsPeer) {
       val reasons = mutableListOf<String>()
-      if(!isHlsPeer) {
-        reasons.add("Role does not start with hls-")
-      }
       if(streamUrl == null) {
         reasons.add("Stream url was null")
       }
@@ -916,10 +914,9 @@ class MeetingViewModel(
 
   fun getStats(): Flow<Map<String, WebrtcStats>> = emptyFlow()//hmsSDK.getStats()
 
-  fun startHls() {
+  fun startHls(hlsUrl : String) {
 
-//    https://app-dashboard.qa-app.100ms.live/preview/err-ybu-czs?token=beam_recording
-    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant("${roomDetails.url.replace("meeting","preview")}?token=beam_recording")))
+    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)))
 
     hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
