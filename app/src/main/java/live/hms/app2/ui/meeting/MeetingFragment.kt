@@ -139,7 +139,7 @@ class MeetingFragment : Fragment() {
         startActivity(shareIntent)
       }
 
-      R.id.action_record_meeting -> {
+      R.id.action_record_meeting, R.id.hls_start -> {
 
         findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment())
       }
@@ -210,8 +210,6 @@ class MeetingFragment : Fragment() {
       }
 
       R.id.change_name -> meetingViewModel.requestNameChange()
-
-      R.id.hls_start -> meetingViewModel.startHls()
 
       R.id.hls_stop -> meetingViewModel.stopHls()
     }
