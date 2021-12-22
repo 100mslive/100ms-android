@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_changeNameDialogFragment"
             app:destination="@id/changeNameDialogFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_hlsViewFragment"
+            app:destination="@id/hlsViewFragment" />
 
     </fragment>
 
@@ -111,4 +114,14 @@
         android:label="ChangeNameDialogFragment"
         tools:layout="@layout/change_name_fragment" />
 
+    <fragment
+        android:id="@+id/hlsViewFragment"
+        android:name="live.hms.app2.ui.meeting.activespeaker.HlsFragment"
+        android:label="HlsFragment"
+        tools:layout="@layout/hls_fragment_layout"
+        >
+        <argument
+            android:name="hlsStreamUrl"
+            app:argType="string" />
+    </fragment>
 </navigation>
