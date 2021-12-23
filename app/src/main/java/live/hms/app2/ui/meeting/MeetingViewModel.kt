@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
@@ -119,7 +120,6 @@ class MeetingViewModel(
   val isLocalVideoPublishingAllowed = MutableLiveData(false)
 
   private var localAudioTrack: HMSLocalAudioTrack? = null
-  private var localVideoTrack: HMSLocalVideoTrack? = null
 
   // Live data containing all the current tracks in a meeting
   private val _liveDataTracks = MutableLiveData(_tracks)
@@ -165,7 +165,7 @@ class MeetingViewModel(
 
   fun setLocalVideoEnabled(enabled: Boolean) {
 
-    localVideoTrack?.apply {
+    hmsSDK.getLocalPeer()?.videoTrack?.apply {
 
       setMute(!enabled)
 
@@ -176,10 +176,12 @@ class MeetingViewModel(
     }
   }
 
-  fun isLocalVideoEnabled(): Boolean? = localVideoTrack?.isMute?.not()
+  fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
 
   fun toggleLocalVideo() {
-    localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
+    hmsSDK.getLocalPeer()?.videoTrack?.let {
+      setLocalVideoEnabled(it.isMute)
+    }
   }
 
   fun setLocalAudioEnabled(enabled: Boolean) {
@@ -224,7 +226,6 @@ class MeetingViewModel(
 
     dominantSpeaker.postValue(null)
 
-    localVideoTrack = null
     localAudioTrack = null
   }
 
@@ -338,7 +339,6 @@ class MeetingViewModel(
                     isLocalAudioEnabled.postValue(!track.isMute)
                   }
                   HMSTrackType.VIDEO -> {
-                    localVideoTrack = track as HMSLocalVideoTrack
                     isLocalVideoPublishingAllowed.postValue(true)
                     isLocalVideoEnabled.postValue(!track.isMute)
                   }
@@ -490,7 +490,9 @@ class MeetingViewModel(
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
     try {
-      localVideoTrack?.switchCamera()
+      HMSCoroutineScope.launch(Dispatchers.Main) {
+        hmsSDK.getLocalPeer()?.videoTrack?.switchCamera()
+      }
     } catch (ex: HMSException) {
       Log.e(TAG, "flipCamera: ${ex.description}", ex)
     }

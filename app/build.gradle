@@ -7,13 +7,13 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "live.hms.app2"
         minSdkVersion 24
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 189
         versionName "2.3.2"
 
@@ -61,7 +61,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     //100ms.live SDK
-    implementation 'com.github.100mslive:android-sdk:2.2.2'
+//    implementation 'com.github.100mslive:android-sdk:2.2.4'
+    implementation project(':lib')
+    implementation 'com.github.100mslive:webrtc:m94-4606'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
