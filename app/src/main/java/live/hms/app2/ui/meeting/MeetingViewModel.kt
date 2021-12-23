@@ -1,8 +1,10 @@
 package live.hms.app2.ui.meeting
+import android.R
 import android.app.Application
 import android.content.Intent
 import android.util.Log
 import androidx.annotation.StringRes
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -26,10 +28,12 @@ import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
+import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class MeetingViewModel(
   application: Application,
@@ -259,6 +263,10 @@ class MeetingViewModel(
           state.postValue(MeetingState.Ongoing())
           hmsRoom = room // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
+
+          // get the hls URL from the Room, if it exists
+          val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+          switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -292,6 +300,11 @@ class MeetingViewModel(
 
             HMSPeerUpdate.ROLE_CHANGED -> {
               peerLiveDate.postValue(hmsPeer)
+              if(hmsPeer.isLocal) {
+                // get the hls URL from the Room, if it exists
+                val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+                switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
+              }
             }
 
             HMSPeerUpdate.METADATA_CHANGED -> {
@@ -322,6 +335,7 @@ class MeetingViewModel(
             HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> _isRecording.postValue(
               getRecordingState(hmsRoom)
             )
+            HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> switchToHlsViewIfRequired()
             else -> {
             }
           }
@@ -399,11 +413,13 @@ class MeetingViewModel(
         }
 
         override fun onReconnected() {
+          HMSLogger.d(TAG, "~~ onReconnected ~~")
           failures.clear()
           state.postValue(MeetingState.Ongoing())
         }
 
         override fun onReconnecting(error: HMSException) {
+          HMSLogger.d(TAG, "~~ onReconnecting :: $error ~~")
           state.postValue(MeetingState.Reconnecting("Reconnecting", error.toString()))
         }
 
@@ -481,6 +497,37 @@ class MeetingViewModel(
     })
   }
 
+  private fun isHlsPeer(role : HMSRole?) : Boolean =
+    role?.name?.startsWith("hls-") == true
+
+  private fun switchToHlsView(streamUrl : String) =
+    meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
+
+  private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
+    var started = false
+    val isHlsPeer = isHlsPeer(role)
+    if( isHlsPeer && streamUrl != null) {
+      started = true
+      switchToHlsView(streamUrl)
+    }
+
+    // Only send errors for those who are hls peers
+    if(!started && isHlsPeer) {
+      val reasons = mutableListOf<String>()
+      if(streamUrl == null) {
+        reasons.add("Stream url was null")
+      }
+      HMSCoroutineScope.launch {
+        _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
+      }
+    }
+  }
+
+  fun switchToHlsViewIfRequired() {
+    // get the hls URL from the Room, if it exists
+    val hlsUrl = hmsSDK.getRoom()?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+    switchToHlsViewIfRequired(hmsSDK.getLocalPeer()?.hmsRole, hlsUrl)
+  }
 
   fun flipCamera() {
     if (!settings.publishVideo) {
@@ -809,8 +856,19 @@ class MeetingViewModel(
 
     })
   }
+
   fun startScreenshare(mediaProjectionPermissionResultData: Intent?, actionListener: HMSActionResultListener) {
-    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
+    // Without custom notification
+//    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
+
+    // With custom notification
+    val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
+      .setContentText("Screenshare running for roomId: ${hmsRoom?.roomId}")
+      .setSmallIcon(R.drawable.arrow_up_float)
+      .addAction(R.drawable.ic_menu_close_clear_cancel, "Stop Screenshare", HMSScreenCaptureService.getStopScreenSharePendingIntent(getApplication()))
+      .build()
+
+    hmsSDK.startScreenshare(actionListener, mediaProjectionPermissionResultData, notification)
   }
 
   fun stopScreenshare(actionListener: HMSActionResultListener) {
@@ -824,6 +882,10 @@ class MeetingViewModel(
     class RTMPError(val exception: HMSException) : Event()
     class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
     object OpenChangeNameDialog : Event()
+    sealed class Hls : Event() {
+      data class HlsError(val throwable: HMSException) : Hls()
+    }
+    class HlsNotStarted(val reason : String) : Event()
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -866,7 +928,40 @@ class MeetingViewModel(
     })
   }
 
-  fun getStats(): Flow<Map<String, WebrtcStats>> = hmsSDK.getStats()
+  fun getStats(): Flow<Map<String, WebrtcStats>> = emptyFlow()//hmsSDK.getStats()
 
+  fun startHls(hlsUrl : String) {
+
+    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)))
+
+    hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+            _events.emit(Event.Hls.HlsError(error))
+        }
+      }
+
+      override fun onSuccess() {
+        Log.d(TAG,"Hls streaming started successfully")
+      }
+
+    })
+  }
+
+  fun stopHls() {
+    val config = HMSHLSConfig(emptyList())
+    hmsSDK.stopHLSStreaming(config, object :  HMSActionResultListener {
+      override fun onSuccess() {
+        Log.d(TAG,"Hls streaming stopped successfully")
+      }
+
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+          _events.emit(Event.Hls.HlsError(error))
+        }
+
+      }
+    })
+  }
 }
 
