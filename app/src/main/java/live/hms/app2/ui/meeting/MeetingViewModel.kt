@@ -361,7 +361,7 @@ class MeetingViewModel(
               addTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_REMOVED -> {
-              if (peer is HMSLocalPeer) {
+              if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                 when (track.type) {
                   HMSTrackType.AUDIO -> {
                     isLocalAudioPublishingAllowed.postValue(false)
