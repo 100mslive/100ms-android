@@ -123,8 +123,6 @@ class MeetingViewModel(
   val isLocalAudioPublishingAllowed = MutableLiveData(false)
   val isLocalVideoPublishingAllowed = MutableLiveData(false)
 
-  private var localAudioTrack: HMSLocalAudioTrack? = null
-
   // Live data containing all the current tracks in a meeting
   private val _liveDataTracks = MutableLiveData(_tracks)
   val tracks: LiveData<List<MeetingTrack>> = _liveDataTracks
@@ -190,7 +188,7 @@ class MeetingViewModel(
 
   fun setLocalAudioEnabled(enabled: Boolean) {
 
-    localAudioTrack?.apply {
+    hmsSDK.getLocalPeer()?.audioTrack?.apply {
       setMute(!enabled)
 
       _liveDataTracks.postValue(_tracks)
@@ -202,12 +200,12 @@ class MeetingViewModel(
   }
 
   fun isLocalAudioEnabled(): Boolean? {
-    return localAudioTrack?.isMute?.not()
+    return hmsSDK.getLocalPeer()?.audioTrack?.isMute?.not()
   }
 
   fun toggleLocalAudio() {
     // If mute then enable audio, if not mute, disable it
-    localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
+    hmsSDK.getLocalPeer()?.audioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
 
   fun isPeerAudioEnabled(): Boolean = !isAudioMuted
@@ -229,8 +227,6 @@ class MeetingViewModel(
     _liveDataTracks.postValue(_tracks)
 
     dominantSpeaker.postValue(null)
-
-    localAudioTrack = null
   }
 
   fun startMeeting() {
@@ -345,10 +341,9 @@ class MeetingViewModel(
           Log.d(TAG, "join:onTrackUpdate type=$type, track=$track, peer=$peer")
           when (type) {
             HMSTrackUpdate.TRACK_ADDED -> {
-              if (peer is HMSLocalPeer) {
+              if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                 when (track.type) {
                   HMSTrackType.AUDIO -> {
-                    localAudioTrack = track as HMSLocalAudioTrack
                     isLocalAudioPublishingAllowed.postValue(true)
                     isLocalAudioEnabled.postValue(!track.isMute)
                   }
