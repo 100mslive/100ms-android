@@ -1,6 +1,7 @@
 package live.hms.app2.ui.home.permission
 
 import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,6 +25,8 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private const val RC_CALL = 111
     private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
     Manifest.permission.FOREGROUND_SERVICE)
+      private val PERMISSIONS_MINIMAL =
+          arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +62,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
   @AfterPermissionGranted(RC_CALL)
   private fun gotoHomePage() {
-    if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
+    if (hasPermissions()) {
       Log.v(TAG, "Permission=$PERMISSIONS granted, moving to HomeFragment")
       findNavController().navigate(
         PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
@@ -72,6 +75,17 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         *PERMISSIONS
       )
     }
+  }
+
+  private fun hasPermissions(): Boolean {
+       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+           if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS_MINIMAL)) {
+               return true
+           }
+       } else if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
+            return true
+       }
+       return false
   }
 
   override fun onRequestPermissionsResult(

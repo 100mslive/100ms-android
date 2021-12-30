@@ -74,13 +74,14 @@ class RtmpRecordFragment : Fragment() {
 
     private fun startClicked() {
         // Create a config and start
-        val rtmpStreamingUrls = settings.rtmpUrlsList
         val isRecording = binding.shouldRecord.isChecked
+        val isHls = binding.shouldStartHls.isChecked
         val meetingUrl = binding.meetingUrl.text.toString()
-        if (settings.rtmpUrlsList.toList().isEmpty() && !isRecording) {
+        val isRtmp = settings.rtmpUrlsList.toList().isNotEmpty()
+        if (isRtmp && !isRecording && !isHls) {
             Toast.makeText(
                 requireContext(),
-                "Turn on recording, or provide rtmp urls",
+                "Turn on recording, or provide rtmp urls, or start hls",
                 Toast.LENGTH_LONG
             ).show()
         } else if (meetingUrl.isNullOrBlank()) {
@@ -89,8 +90,18 @@ class RtmpRecordFragment : Fragment() {
                 "A valid meeting url is required. $meetingUrl is invalid or not a role name",
                 Toast.LENGTH_LONG
             ).show()
-        } else {
+        } else if((isRecording || isRtmp) && isHls) {
+            Toast.makeText(
+                requireContext(),
+                "Recording/Rtmp and HLS can't be started together. Only recording/rtmp streams can be started or just HLS.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        else if(isRecording || isRtmp) {
             meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList(), meetingUrl)
+            findNavController().popBackStack()
+        } else if(isHls) {
+            meetingViewModel.startHls(meetingUrl)
             findNavController().popBackStack()
         }
     }

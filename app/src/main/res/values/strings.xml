@@ -130,6 +130,7 @@
     <string name="speakers">Speakers</string>
     <string name="toggle_visibility">Toggle Visibility</string>
     <string name="audio_only_view">Audio Only View</string>
+    <string name="hls_view">HLS View</string>
     <string name="meeting_mode">Meeting Mode</string>
     <string name="show_retry_progress_bars">Show Retry Progress Bars</string>
     <string name="participant_mute_unmute">Mute/Unmute</string>
@@ -147,8 +148,11 @@
     <string name="add_new_rtmp_streaming_url">Add new RTMP streaming url</string>
     <string name="rtmp_settings">RTMP Settings</string>
     <string name="use_hardware_AEC">Use Harware AEC</string>
+    <string name="show_stats">Show stats</string>
     <string name="raise_hand">✋ Raise Hand</string>
     <string name="lower_hand">Lower Hand</string>
     <string name="name_change_dialog">Type in the new name</string>
     <string name="submit">Submit</string>
+    <string name="hls_start">HLS Start</string>
+    <string name="hls_stop">HLS Stop</string>
 </resources>

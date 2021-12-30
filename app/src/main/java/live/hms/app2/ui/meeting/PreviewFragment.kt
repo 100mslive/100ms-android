@@ -179,8 +179,10 @@ class PreviewFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_flip_camera -> {
-        HMSCoroutineScope.launch {
-          (track.video as HMSLocalVideoTrack?)?.switchCamera()
+        if (this::track.isInitialized) {
+          HMSCoroutineScope.launch {
+            (track.video as HMSLocalVideoTrack?)?.switchCamera()
+          }
         }
       }
       R.id.action_volume -> {

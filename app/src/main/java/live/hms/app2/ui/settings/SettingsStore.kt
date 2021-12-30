@@ -44,6 +44,7 @@ class SettingsStore(context: Context) {
     const val SUBSCRIBE_DEGRADATION = "subscribe-degradation-enabling"
     const val RTMP_URL_LIST = "rtmp-url-list"
     const val USE_HARDWARE_AEC = "use-hardware-aec"
+    const val SHOW_STATS = "show-video-stats"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -107,14 +108,18 @@ class SettingsStore(context: Context) {
     }
   }
 
-  var enableSubscribeDegradation : Boolean
-      get() = sharedPreferences.getBoolean(SUBSCRIBE_DEGRADATION, true)
-      set(value) = putBoolean(SUBSCRIBE_DEGRADATION, value)
+  var enableSubscribeDegradation: Boolean
+    get() = sharedPreferences.getBoolean(SUBSCRIBE_DEGRADATION, true)
+    set(value) = putBoolean(SUBSCRIBE_DEGRADATION, value)
 
   // Set to true to enable Hardware echo cancellation else set to false to enable SW based
-  var enableHardwareAEC : Boolean
+  var enableHardwareAEC: Boolean
     get() = sharedPreferences.getBoolean(USE_HARDWARE_AEC, true)
     set(value) = putBoolean(USE_HARDWARE_AEC, value)
+
+  var showStats: Boolean
+    get() = sharedPreferences.getBoolean(SHOW_STATS, true)
+    set(value) = putBoolean(SHOW_STATS, value)
 
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
@@ -200,7 +205,7 @@ class SettingsStore(context: Context) {
         MEETING_MODE,
         MeetingViewMode.ACTIVE_SPEAKER.toString()
       )!!
-      return MeetingViewMode.valueOf(str)
+      return MeetingViewMode::class.nestedClasses.find { it.simpleName == str }?.objectInstance as MeetingViewMode? ?: MeetingViewMode.ACTIVE_SPEAKER
     }
     set(value) = putString(MEETING_MODE, value.toString())
 
@@ -274,6 +279,7 @@ class SettingsStore(context: Context) {
 
     fun setSubscribeDegradation(value: Boolean) = apply { editor.putBoolean(SUBSCRIBE_DEGRADATION, value) }
     fun setUseHardwareAEC(value: Boolean) = apply { editor.putBoolean(USE_HARDWARE_AEC, value) }
+    fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
 
 
     fun commit() {
