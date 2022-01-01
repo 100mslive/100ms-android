@@ -10,6 +10,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
@@ -129,9 +130,6 @@ class MeetingViewModel(
   val isLocalAudioPublishingAllowed = MutableLiveData(false)
   val isLocalVideoPublishingAllowed = MutableLiveData(false)
 
-  private var localAudioTrack: HMSLocalAudioTrack? = null
-  private var localVideoTrack: HMSLocalVideoTrack? = null
-
   // Live data containing all the current tracks in a meeting
   private val _liveDataTracks = MutableLiveData(_tracks)
   val tracks: LiveData<List<MeetingTrack>> = _liveDataTracks
@@ -178,7 +176,7 @@ class MeetingViewModel(
 
   fun setLocalVideoEnabled(enabled: Boolean) {
 
-    localVideoTrack?.apply {
+    hmsSDK.getLocalPeer()?.videoTrack?.apply {
 
       setMute(!enabled)
 
@@ -189,15 +187,17 @@ class MeetingViewModel(
     }
   }
 
-  fun isLocalVideoEnabled(): Boolean? = localVideoTrack?.isMute?.not()
+  fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
 
   fun toggleLocalVideo() {
-    localVideoTrack?.let { setLocalVideoEnabled(it.isMute) }
+    hmsSDK.getLocalPeer()?.videoTrack?.let {
+      setLocalVideoEnabled(it.isMute)
+    }
   }
 
   fun setLocalAudioEnabled(enabled: Boolean) {
 
-    localAudioTrack?.apply {
+    hmsSDK.getLocalPeer()?.audioTrack?.apply {
       setMute(!enabled)
 
       _liveDataTracks.postValue(_tracks)
@@ -209,12 +209,12 @@ class MeetingViewModel(
   }
 
   fun isLocalAudioEnabled(): Boolean? {
-    return localAudioTrack?.isMute?.not()
+    return hmsSDK.getLocalPeer()?.audioTrack?.isMute?.not()
   }
 
   fun toggleLocalAudio() {
     // If mute then enable audio, if not mute, disable it
-    localAudioTrack?.let { setLocalAudioEnabled(it.isMute) }
+    hmsSDK.getLocalPeer()?.audioTrack?.let { setLocalAudioEnabled(it.isMute) }
   }
 
   fun isPeerAudioEnabled(): Boolean = !isAudioMuted
@@ -236,9 +236,6 @@ class MeetingViewModel(
     _liveDataTracks.postValue(_tracks)
 
     dominantSpeaker.postValue(null)
-
-    localVideoTrack = null
-    localAudioTrack = null
   }
 
   fun startMeeting() {
@@ -353,15 +350,13 @@ class MeetingViewModel(
           Log.d(TAG, "join:onTrackUpdate type=$type, track=$track, peer=$peer")
           when (type) {
             HMSTrackUpdate.TRACK_ADDED -> {
-              if (peer is HMSLocalPeer) {
+              if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                 when (track.type) {
                   HMSTrackType.AUDIO -> {
-                    localAudioTrack = track as HMSLocalAudioTrack
                     isLocalAudioPublishingAllowed.postValue(true)
                     isLocalAudioEnabled.postValue(!track.isMute)
                   }
                   HMSTrackType.VIDEO -> {
-                    localVideoTrack = track as HMSLocalVideoTrack
                     isLocalVideoPublishingAllowed.postValue(true)
                     isLocalVideoEnabled.postValue(!track.isMute)
                   }
@@ -370,7 +365,7 @@ class MeetingViewModel(
               addTrack(track, peer)
             }
             HMSTrackUpdate.TRACK_REMOVED -> {
-              if (peer is HMSLocalPeer) {
+              if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                 when (track.type) {
                   HMSTrackType.AUDIO -> {
                     isLocalAudioPublishingAllowed.postValue(false)
@@ -546,8 +541,8 @@ class MeetingViewModel(
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
     try {
-      HMSCoroutineScope.launch {
-      localVideoTrack?.switchCamera()
+      HMSCoroutineScope.launch(Dispatchers.Main) {
+        hmsSDK.getLocalPeer()?.videoTrack?.switchCamera()
       }
     } catch (ex: HMSException) {
       Log.e(TAG, "flipCamera: ${ex.description}", ex)
