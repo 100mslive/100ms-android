@@ -164,7 +164,7 @@ class MeetingViewModel(
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
 
-  val plugin = HMSVirtualBackground(hmsSDK)
+  val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK)
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
@@ -891,24 +891,17 @@ class MeetingViewModel(
   }
 
 
-  fun startPlugin(context: Context?) {
+  fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
     Log.v(TAG, "Adding Plugin")
-    //Create Plugin, can be declared on top as global variable
+    //First create a bitmap of the background required to be added
     val imageBitmap = getRandomVirtualBackgroundBitmap(context)
-    plugin.setBackground(imageBitmap)
-    // add Plugin from sdk,
-    hmsSDK.addPlugin(plugin, 15)
+    virtualBackgroundPlugin.setBackground(imageBitmap)
+    val pluginFrameRate = 15
+    hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener, pluginFrameRate)
   }
 
-  fun stopPlugin() {
-    //sdk.removePlugin(plugin) in try catch
-    try{
-      Log.v(TAG, "Removing Plugin")
-      hmsSDK.removePlugin(plugin)
-    }
-    catch(err: HMSException){
-      Log.v(TAG, "Removing Plugin, which doesn't exist", err)
-    }
+  fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
+    hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
   }
 
   private val _events = MutableSharedFlow<Event?>()
