@@ -892,15 +892,17 @@ class MeetingViewModel(
 
 
   fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
-    Log.v(TAG, "Adding Plugin")
-    //First create a bitmap of the background required to be added
+    Log.v(TAG, "Starting virtual background Plugin, First create a bitmap of the background required to be added")
     val imageBitmap = getRandomVirtualBackgroundBitmap(context)
+
+    Log.v(TAG, "Add the bitmap to background")
     virtualBackgroundPlugin.setBackground(imageBitmap)
-    val pluginFrameRate = 15
-    hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener, pluginFrameRate)
+
+    hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener)
   }
 
   fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
+    Log.v(TAG, "Stopping virtual background Plugin")
     hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
   }
 
