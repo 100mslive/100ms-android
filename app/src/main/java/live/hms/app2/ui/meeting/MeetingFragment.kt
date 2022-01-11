@@ -297,15 +297,6 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    menu.findItem(R.id.end_room).apply {
-      isVisible = meetingViewModel.isAllowedToEndMeeting()
-
-      setOnMenuItemClickListener {
-        meetingViewModel.endRoom(false)
-        true
-      }
-    }
-
     menu.findItem(R.id.action_enable_background).apply {
       setOnMenuItemClickListener {
         meetingViewModel.startVirtualBackgroundPlugin(context, object : HMSActionResultListener{
