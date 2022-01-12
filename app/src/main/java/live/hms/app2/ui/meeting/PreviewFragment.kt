@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.forEach
@@ -211,23 +212,27 @@ class PreviewFragment : Fragment() {
     meetingViewModel.startPreview(object : HMSPreviewListener {
       override fun onError(error: HMSException) {
         requireActivity().runOnUiThread {
-          binding.buttonJoinMeeting.isEnabled = false
-          AlertDialog.Builder(requireContext())
-            .setTitle(error.name)
-            .setMessage(error.toString())
-            .setCancelable(false)
-            .setPositiveButton(R.string.ok) { dialog, _ ->
-              dialog.dismiss()
-              goToHomePage()
-            }
-            .setNeutralButton(R.string.bug_report) { _, _ ->
-              requireContext().startActivity(
-                EmailUtils.getNonFatalLogIntent(requireContext())
-              )
-              alertDialog = null
-            }
-            .create()
-            .show()
+          if (error.isTerminal) {
+            binding.buttonJoinMeeting.isEnabled = false
+            AlertDialog.Builder(requireContext())
+                    .setTitle(error.name)
+                    .setMessage(error.toString())
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                      dialog.dismiss()
+                      goToHomePage()
+                    }
+                    .setNeutralButton(R.string.bug_report) { _, _ ->
+                      requireContext().startActivity(
+                              EmailUtils.getNonFatalLogIntent(requireContext())
+                      )
+                      alertDialog = null
+                    }
+                    .create()
+                    .show()
+          } else {
+            Toast.makeText(context, error.description, Toast.LENGTH_LONG).show()
+          }
         }
       }
 
@@ -262,8 +267,8 @@ class PreviewFragment : Fragment() {
 
               track.video?.let {
                 setImageResource(
-                  if (it.isMute) R.drawable.ic_videocam_off_24
-                  else R.drawable.ic_videocam_24
+                        if (it.isMute) R.drawable.ic_videocam_off_24
+                        else R.drawable.ic_videocam_24
                 )
               }
             }
@@ -272,8 +277,8 @@ class PreviewFragment : Fragment() {
 
               track.audio?.let {
                 setImageResource(
-                  if (it.isMute) R.drawable.ic_mic_off_24
-                  else R.drawable.ic_mic_24
+                        if (it.isMute) R.drawable.ic_mic_off_24
+                        else R.drawable.ic_mic_24
                 )
               }
             }

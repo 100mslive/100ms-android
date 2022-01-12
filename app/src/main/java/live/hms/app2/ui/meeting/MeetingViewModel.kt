@@ -249,8 +249,13 @@ class MeetingViewModel(
 
         override fun onError(error: HMSException) {
           Log.e(TAG, "onError: $error")
-          failures.add(error)
-          state.postValue(MeetingState.Failure(failures))
+          // Show a different dialog if error is terminal else a dismissible dialog
+          if (error.isTerminal) {
+            failures.add(error)
+            state.postValue(MeetingState.Failure(failures))
+          } else {
+            state.postValue(MeetingState.NonFatalFailure(error))
+          }
         }
 
         override fun onJoin(room: HMSRoom) {
@@ -296,7 +301,7 @@ class MeetingViewModel(
 
             HMSPeerUpdate.ROLE_CHANGED -> {
               peerLiveDate.postValue(hmsPeer)
-              if(hmsPeer.isLocal) {
+              if (hmsPeer.isLocal) {
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
                 switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
@@ -304,14 +309,14 @@ class MeetingViewModel(
             }
 
             HMSPeerUpdate.METADATA_CHANGED -> {
-              if(hmsPeer.isLocal) {
+              if (hmsPeer.isLocal) {
                 updateSelfHandRaised(hmsPeer as HMSLocalPeer)
               } else {
                 _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
               }
             }
             HMSPeerUpdate.NAME_CHANGED -> {
-              if(hmsPeer.isLocal) {
+              if (hmsPeer.isLocal) {
                 updateNameChange(hmsPeer as HMSLocalPeer)
               } else {
                 _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
@@ -329,7 +334,7 @@ class MeetingViewModel(
             HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
             HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
             HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> _isRecording.postValue(
-              getRecordingState(hmsRoom)
+                    getRecordingState(hmsRoom)
             )
             HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> switchToHlsViewIfRequired()
             else -> {
@@ -397,13 +402,13 @@ class MeetingViewModel(
         override fun onMessageReceived(message: HMSMessage) {
           Log.v(TAG, "onMessageReceived: $message")
           broadcastsReceived.postValue(
-            ChatMessage(
-              message.sender.name,
-              message.serverReceiveTime,
-              message.message,
-              false,
-              recipient = Recipient.toRecipient(message.recipient)
-            )
+                  ChatMessage(
+                          message.sender.name,
+                          message.serverReceiveTime,
+                          message.message,
+                          false,
+                          recipient = Recipient.toRecipient(message.recipient)
+                  )
           )
         }
 
