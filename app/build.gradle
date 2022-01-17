@@ -14,8 +14,8 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 239
-        versionName "2.8.1"
+        versionCode 240
+        versionName "2.8.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -63,7 +63,7 @@ dependencies {
     //100ms.live SDK
     implementation 'com.github.100mslive:android-sdk:2.2.5'
 
-    implementation 'com.github.100mslive:android-sdk-virtual-background:2.2.2-capturer'
+    implementation 'com.github.100mslive:virtual-background:2.2.2-capturer'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
