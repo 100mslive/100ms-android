@@ -24,7 +24,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
-import com.example.virtualbackground.HMSVirtualBackground
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
