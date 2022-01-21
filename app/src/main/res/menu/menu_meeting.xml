@@ -26,6 +26,18 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/hls_start"
+        android:title="@string/hls_start"
+        app:showAsAction="ifRoom"
+    />
+
+    <item
+        android:id="@+id/hls_stop"
+        android:title="@string/hls_stop"
+        app:showAsAction="ifRoom"
+    />
+
+    <item
         android:id="@+id/end_room"
         android:title="@string/end_room"
         app:showAsAction="ifRoom" />
@@ -68,6 +80,12 @@
             android:id="@+id/active_speaker_view"
             android:icon="@drawable/ic_person_pin_24"
             android:title="@string/active_speaker_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/hls_view"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/hls_view"
             app:showAsAction="never" />
 
         <item

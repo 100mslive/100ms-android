@@ -8,6 +8,7 @@ import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.app2.util.viewLifecycle
 import live.hms.app2.util.visibilityOpacity
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -36,18 +37,29 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   }
 
   override fun onResume() {
-    super.onResume()
+
     screenShareTrack?.let {
+      screenShareStats.initiateStats(
+        this,
+        meetingViewModel.getStats(),
+        it.video,
+        it.audio, it.peer.isLocal
+      ) { statsString ->
+        binding.screenShare.statsView.text = statsString
+      }
       binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.peer.metadata)?.isHandRaised == true)
       bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
     }
+    super.onResume()
   }
 
   override fun onPause() {
-    super.onPause()
+
     screenShareTrack?.let {
       unbindSurfaceView(binding.screenShare, it)
     }
+//    screenShareStats.close()
+    super.onPause()
   }
 
   override fun initViewModels() {
@@ -59,11 +71,11 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     meetingViewModel.activeSpeakersUpdatedTracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
-      updateVideos(binding.container, tracks)
+      updateVideos(binding.container, tracks, false)
     }
 
     meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
-      updateVideos(binding.container, videos)
+      updateVideos(binding.container, videos, false)
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
     }
@@ -84,18 +96,29 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
+  private val screenShareStats by lazy { StatsInterpreter(settings.showStats) }
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
 
     // Check if the currently shared screen-share track is removed
     screenShareTrack?.let { screen ->
       if (!tracks.contains(screen)) {
         screenShareTrack?.let { unbindSurfaceView(binding.screenShare, it) }
+//        screenShareStats.close()
         screenShareTrack = null
       }
     }
 
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
+      screenShareStats.initiateStats(
+        this,
+        meetingViewModel.getStats(),
+        screen.video,
+        screen.audio,
+        screen.peer.isLocal
+      ) {
+        binding.screenShare.statsView.text = it
+      }
       screenShareTrack = screen
       if (isFragmentVisible) {
         bindSurfaceView(

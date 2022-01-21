@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.flow.Flow
 import live.hms.app2.databinding.ListItemVideoBinding
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
@@ -14,12 +16,15 @@ import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
 import live.hms.app2.util.visibility
+import live.hms.video.connection.degredation.WebrtcStats
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 
 class VideoListAdapter(
-  private val onVideoItemClick: (item: MeetingTrack) -> Unit
+  private val onVideoItemClick: (item: MeetingTrack) -> Unit,
+  private val itemStats: Flow<Map<String, WebrtcStats>>,
+  private val statsActive: Boolean
 ) : RecyclerView.Adapter<VideoListAdapter.VideoItemViewHolder>() {
 
   companion object {
@@ -41,10 +46,12 @@ class VideoListAdapter(
   }
 
   inner class VideoItemViewHolder(
-    val binding: ListItemVideoBinding
+    val binding: ListItemVideoBinding,
+    val itemStats: Flow<Map<String, WebrtcStats>>
   ) : RecyclerView.ViewHolder(binding.root) {
 
     private var itemRef: VideoListItem? = null
+    private val statsInterpreter = StatsInterpreter(statsActive)
 
     private var isSurfaceViewBinded = false
 
@@ -79,6 +86,11 @@ class VideoListAdapter(
         Log.d(TAG, "bindSurfaceView: Surface view already initialized")
         return
       }
+      statsInterpreter.initiateStats(
+        binding.root.findViewTreeLifecycleOwner()!!,
+        itemStats, itemRef?.track?.video,
+        itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
+      ) { binding.stats.text = it }
 
       itemRef?.let { item ->
         SurfaceViewRendererUtil.bind(
@@ -87,7 +99,8 @@ class VideoListAdapter(
           "VideoItemViewHolder::bindSurfaceView"
         ).let { success ->
           if (success) {
-            binding.surfaceView.visibility = if (item.track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+            binding.surfaceView.visibility =
+              if (item.track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
             isSurfaceViewBinded = true
           }
         }
@@ -96,7 +109,7 @@ class VideoListAdapter(
 
     fun unbindSurfaceView() {
       if (!isSurfaceViewBinded) return
-
+//      statsInterpreter.close()
       itemRef?.let { item ->
         SurfaceViewRendererUtil.unbind(
           binding.surfaceView,
@@ -137,7 +150,7 @@ class VideoListAdapter(
       parent,
       false
     )
-    return VideoItemViewHolder(binding)
+    return VideoItemViewHolder(binding, itemStats)
   }
 
   override fun onBindViewHolder(holder: VideoItemViewHolder, position: Int) {
