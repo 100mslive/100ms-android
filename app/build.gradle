@@ -14,8 +14,8 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 213
-        versionName "2.5.4"
+        versionCode 242
+        versionName "2.8.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -61,11 +61,10 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     //100ms.live SDK
-    implementation 'com.github.100mslive:android-sdk:2.2.2'
-//    implementation 'com.github.100mslive:android-sdk:2.1.8-capturer'
-//    implementation 'com.github.100mslive:android-sdk:2.2.0'
-
-    implementation 'com.github.100mslive:android-sdk-virtual-background:2.2.2-capturer'
+    implementation 'com.github.100mslive:android-sdk:2.2.7.2'
+    implementation 'com.github.100mslive:virtual-background:1.0.0'
+//    implementation project(":lib")
+//    implementation 'com.github.100mslive:webrtc:m94-4606'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
@@ -109,4 +108,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     testImplementation 'org.hamcrest:hamcrest:2.2'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.16.1'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.16.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
