@@ -164,7 +164,8 @@ class MeetingViewModel(
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
 
-  val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK)
+  val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
+  private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
