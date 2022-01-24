@@ -2,6 +2,9 @@ package live.hms.app2.ui.meeting
 import android.R
 import android.app.Application
 import android.content.Intent
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
@@ -21,6 +24,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -31,8 +35,11 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
+import java.io.IOException
+import java.io.InputStream
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.random.Random
 
 
 class MeetingViewModel(
@@ -156,6 +163,9 @@ class MeetingViewModel(
     .Builder(application)
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
     .build()
+
+  val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
+  private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
@@ -873,6 +883,33 @@ class MeetingViewModel(
 
   fun stopScreenshare(actionListener: HMSActionResultListener) {
     hmsSDK.stopScreenshare(actionListener)
+  }
+
+  private fun getRandomVirtualBackgroundBitmap(context: Context?) : Bitmap {
+
+    val imageList = ArrayList<String>()
+    imageList.add("2.jpeg")
+    imageList.add("mountains.jpg")
+    imageList.add("tree.jpg")
+
+    val randomIndex = Random.nextInt(imageList.size);
+    return getBitmapFromAsset(context!!.applicationContext,imageList[randomIndex])!!
+  }
+
+
+  fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
+    Log.v(TAG, "Starting virtual background Plugin, First create a bitmap of the background required to be added")
+    val imageBitmap = getRandomVirtualBackgroundBitmap(context)
+
+    Log.v(TAG, "Add the bitmap to background")
+    virtualBackgroundPlugin.setBackground(imageBitmap)
+
+    hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener)
+  }
+
+  fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
+    Log.v(TAG, "Stopping virtual background Plugin")
+    hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
   }
 
   private val _events = MutableSharedFlow<Event?>()

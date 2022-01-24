@@ -89,6 +89,19 @@
             app:showAsAction="never" />
 
         <item
+            android:id="@+id/action_enable_background"
+            android:icon="@drawable/ic_white_svg"
+            android:title="@string/enable_background"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_disable_background"
+            android:icon="@drawable/ic_black_svg"
+            android:title="@string/disable_background"
+            app:showAsAction="never" />
+
+
+        <item
             android:id="@+id/raise_hand"
             android:title="@string/raise_hand"
             android:visible="false"
