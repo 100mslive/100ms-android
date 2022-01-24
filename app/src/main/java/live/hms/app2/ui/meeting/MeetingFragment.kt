@@ -297,6 +297,36 @@ class MeetingFragment : Fragment() {
       }
     }
 
+    menu.findItem(R.id.action_enable_background).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.startVirtualBackgroundPlugin(context, object : HMSActionResultListener{
+          override fun onError(error: HMSException) {
+            // error
+          }
+
+          override fun onSuccess() {
+            // success
+          }
+        })
+        true
+      }
+    }
+
+    menu.findItem(R.id.action_disable_background).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.stopVirtualBackgroundPlugin(object : HMSActionResultListener{
+          override fun onError(error: HMSException) {
+            // error
+          }
+
+          override fun onSuccess() {
+            // success
+          }
+        })
+        true
+      }
+    }
+
     menu.findItem(R.id.end_and_lock_room).apply {
       isVisible = meetingViewModel.isAllowedToEndMeeting()
 
