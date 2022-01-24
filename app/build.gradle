@@ -61,10 +61,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     //100ms.live SDK
-    implementation 'com.github.100mslive.android-sdk:lib:2.2.7.2'
-    implementation 'com.github.100mslive.android-sdk:virtualBackground:2.2.7.2'
-//    implementation project(":lib")
-//    implementation 'com.github.100mslive:webrtc:m94-4606'
+    implementation 'com.github.100mslive.android-sdk:lib:2.2.7.3'
+    implementation 'com.github.100mslive.android-sdk:virtualBackground:2.2.7.3'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.5"
