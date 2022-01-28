@@ -4,13 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.View
-import live.hms.app2.BuildConfig
-import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.video.utils.HMSLogger
 import java.io.IOException
 import java.io.InputStream
-import android.R.id
-import live.hms.app2.R
 
 
 /**
@@ -45,10 +41,6 @@ fun getBitmapFromAsset(context: Context, filename: String): Bitmap? {
   } catch (e: IOException) {
     HMSLogger.e("videoPlugin", e.message + "error reading virtual background image")
   }
-
-//  val o: BitmapFactory.Options = BitmapFactory.Options()
-//  o.inScaled = false
-//  val watermark = BitmapFactory.decodeResource(context.resources, o)
 
   return bitmap
 }
