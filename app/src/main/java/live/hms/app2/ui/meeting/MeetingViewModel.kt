@@ -1,17 +1,19 @@
 package live.hms.app2.ui.meeting
 import android.R
 import android.app.Application
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -20,11 +22,13 @@ import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.connection.degredation.WebrtcStats
+import live.hms.video.connection.stats.*
+import live.hms.video.connection.stats.quality.HMSNetworkObserver
+import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
-import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -35,10 +39,8 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import java.io.IOException
-import java.io.InputStream
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -240,6 +242,53 @@ class MeetingViewModel(
   }
 
   fun startMeeting() {
+
+    hmsSDK.addNetworkObserver(object : HMSNetworkObserver {
+      override fun onNetworkQuality(quality: HMSNetworkQuality, peer: HMSPeer?) {
+        Log.d("NetworkQualityStats", "Quality is: $quality for peer $peer")
+      }
+
+    })
+
+    hmsSDK.addRtcStatsObserver(object : HMSStatsObserver {
+      override fun onLocalAudioStats(
+        audioStats: HMSLocalAudioStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Local VideoStats: $audioStats")
+      }
+
+      override fun onLocalVideoStats(
+        videoStats: HMSLocalVideoStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Local VideoStats: $videoStats")
+      }
+
+      override fun onRTCStats(rtcStats: HMSRTCStatsReport) {
+        Log.d("RtcStatsObserver","Cumulative stats: $rtcStats")
+      }
+
+      override fun onRemoteAudioStats(
+        audioStats: HMSRemoteAudioStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Remote audio stats: $audioStats for peer : ${hmsPeer?.name}, with track : ${hmsTrack?.trackId}")
+      }
+
+      override fun onRemoteVideoStats(
+        videoStats: HMSRemoteVideoStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Remote video stats: $videoStats for peer : ${hmsPeer?.name}, with track : ${hmsTrack?.trackId}")
+      }
+
+    })
+
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
