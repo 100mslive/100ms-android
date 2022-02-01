@@ -1,13 +1,15 @@
-[![](https://jitpack.io/v/100mslive/android-sdk.svg)](https://app.gitbook.com/@100ms/s/100ms-v2/release-notes)
-[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.100ms.live/)
-[![Slack](https://img.shields.io/badge/Community-Join%20on%20Slack-blue)](https://join.slack.com/t/100mslive/shared_invite/zt-llwdnz11-vkb2RzptwacwXHO7UeY0CQ)
-[![Email](https://img.shields.io/badge/Contact-Know%20More-blue)](mailto:founders@100ms.live)
+<a href="https://100ms.live/">
+<img src="https://github.com/100mslive/100ms-ios-sdk/blob/main/100ms.gif" height=256/> 
+<img src="https://github.com/100mslive/100ms-ios-sdk/blob/main/100ms.svg" title="100ms logo" float=center height=256>
+</a>
 
-<p align="center" >
-  <a href="https://100ms.live/">
-  <img src="assets/100ms-logo.png?raw=true" title="100ms logo" float=left>
-  </a>
-</p>
+[![Latest Version](https://jitpack.io/v/100mslive/android-sdk.svg)](https://docs.100ms.live/android/v2/release-notes/Release-Notes)
+[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.100ms.live/android/v2/foundation/Basics)
+[![Discord](https://img.shields.io/discord/843749923060711464?label=Join%20on%20Discord)](https://100ms.live/discord)
+[![Download App](https://img.shields.io/badge/Download%20via-Firebase-green)](https://appdistribution.firebase.dev/i/d8f1648365a33c3e)
+[![Activity](https://img.shields.io/github/commit-activity/m/100mslive/100ms-android.svg)](https://github.com/100mslive/100ms-android/pulls)
+[![Email](https://img.shields.io/badge/Contact-Know%20More-blue)](https://dashboard.100ms.live/register)
+
 
 # 🎉 100ms SDK ＆ Sample App 🚀
 
