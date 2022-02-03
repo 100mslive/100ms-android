@@ -40,6 +40,7 @@ import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
 
@@ -59,6 +60,17 @@ class MeetingViewModel(
     Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username)).toString(),
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
+
+  val showRecordingRtmpInfo : MutableSharedFlow<String> = MutableSharedFlow()
+
+  private val dateFormat = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH)
+  private fun showRtmpRecordingInfo(room : HMSRoom) {
+    val rtmpStart : Long? = room.rtmpHMSRtmpStreamingState?.startedAt
+    val recordingInfo : Long? = room.browserRecordingState?.startedAt
+    val rtmp = "Rtmp Started: ${if (rtmpStart != null) dateFormat.format(Date(rtmpStart)) else "Empty"}"
+    val recording = "Recording Started: ${if (recordingInfo != null) dateFormat.format(Date(recordingInfo)) else "Empty"}"
+    showRecordingRtmpInfo.tryEmit(rtmp + "\n" + recording)
+  }
 
   init {
     roomDetails.apply {
@@ -327,6 +339,7 @@ class MeetingViewModel(
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
           switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
+          showRtmpRecordingInfo(room)
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -392,9 +405,12 @@ class MeetingViewModel(
           when (type) {
             HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
             HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
-            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> _isRecording.postValue(
-                    getRecordingState(hmsRoom)
-            )
+            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> {
+              _isRecording.postValue(
+                getRecordingState(hmsRoom)
+              )
+              showRtmpRecordingInfo(hmsRoom)
+            }
             HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> switchToHlsViewIfRequired()
             else -> {
             }
