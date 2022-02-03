@@ -2,6 +2,8 @@ package live.hms.app2.ui
 
 import android.app.Application
 import android.util.Log
+import com.facebook.soloader.DirectorySoSource
+import com.facebook.soloader.SoLoader
 import live.hms.app2.util.LogUtils
 
 class GlobalApplication : Application() {
@@ -28,5 +30,7 @@ class GlobalApplication : Application() {
     // and
     // app/src/debug/java/live/hms/app2/ui/ConditionalApplicationCode.kt
     ConditionalApplicationCode().run(this)
+    SoLoader.init(this, false)
+    SoLoader.prependSoSource(DirectorySoSource(filesDir, 0))
   }
 }

@@ -11,6 +11,7 @@ import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
+import com.facebook.soloader.SoLoader
 import kotlinx.coroutines.launch
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentPreviewBinding
@@ -29,6 +30,11 @@ class PreviewFragment : Fragment() {
 
   companion object {
     private const val TAG = "PreviewFragment"
+  }
+
+  init {
+    val result = SoLoader.loadLibrary("jingle_peerconnection_so")
+    assert(result)
   }
 
   private var binding by viewLifecycle<FragmentPreviewBinding>()
