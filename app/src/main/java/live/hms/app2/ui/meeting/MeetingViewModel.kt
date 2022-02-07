@@ -1,17 +1,19 @@
 package live.hms.app2.ui.meeting
 import android.R
 import android.app.Application
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -24,7 +26,6 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
-import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -35,10 +36,9 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import java.io.IOException
-import java.io.InputStream
+import live.hms.video.virtualbackground.HMSVirtualBackground
+import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -57,6 +57,19 @@ class MeetingViewModel(
     Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username)).toString(),
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
+
+  private val dateFormat = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH)
+  private fun showRtmpRecordingInfo(room : HMSRoom) {
+    val rtmpStart : Long? = room.rtmpHMSRtmpStreamingState?.startedAt
+    val recordingInfo : Long? = room.browserRecordingState?.startedAt
+    val rtmp = "Rtmp Started: ${if (rtmpStart != null) dateFormat.format(Date(rtmpStart)) else "Empty"}"
+    val recording = "Recording Started: ${if (recordingInfo != null) dateFormat.format(Date(recordingInfo)) else "Empty"}"
+
+    viewModelScope.launch {
+      _events.emit(Event.RtmpRecordEvent(recording))
+      _events.emit(Event.RtmpStartEvent(rtmp))
+    }
+  }
 
   init {
     roomDetails.apply {
@@ -278,6 +291,7 @@ class MeetingViewModel(
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
           switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
+          showRtmpRecordingInfo(room)
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -343,9 +357,12 @@ class MeetingViewModel(
           when (type) {
             HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
             HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
-            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> _isRecording.postValue(
-                    getRecordingState(hmsRoom)
-            )
+            HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> {
+              _isRecording.postValue(
+                getRecordingState(hmsRoom)
+              )
+              showRtmpRecordingInfo(hmsRoom)
+            }
             HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> switchToHlsViewIfRequired()
             else -> {
             }
@@ -923,6 +940,8 @@ class MeetingViewModel(
       data class HlsError(val throwable: HMSException) : Hls()
     }
     class HlsNotStarted(val reason : String) : Event()
+    data class RtmpStartEvent(val message : String) : Event()
+    data class RtmpRecordEvent(val message : String) : Event()
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
