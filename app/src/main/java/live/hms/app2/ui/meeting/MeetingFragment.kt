@@ -21,7 +21,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.app2.R
@@ -583,6 +582,20 @@ class MeetingFragment : Fragment() {
           }
           null -> {}
           is MeetingViewModel.Event.HlsNotStarted -> Toast.makeText(requireContext(), event.reason, Toast.LENGTH_LONG).show()
+          is MeetingViewModel.Event.Hls.HlsError -> Toast.makeText(requireContext(), event.throwable.message, Toast.LENGTH_LONG).show()
+          is MeetingViewModel.Event.RecordEvent ->
+          {
+            Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+            Log.d("RecordingState", event.message)
+          }
+          is MeetingViewModel.Event.RtmpEvent -> {
+            Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+            Log.d("RecordingState", event.message)
+          }
+          is MeetingViewModel.Event.ServerRecordEvent -> {
+            Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+            Log.d("RecordingState", event.message)
+          }
         }
       }
     }

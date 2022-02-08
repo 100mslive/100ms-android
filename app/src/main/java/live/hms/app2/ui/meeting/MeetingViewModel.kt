@@ -37,7 +37,6 @@ import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
 
@@ -58,16 +57,23 @@ class MeetingViewModel(
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
-  private val dateFormat = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH)
-  private fun showRtmpRecordingInfo(room : HMSRoom) {
-    val rtmpStart : Long? = room.rtmpHMSRtmpStreamingState?.startedAt
-    val recordingInfo : Long? = room.browserRecordingState?.startedAt
-    val rtmp = "Rtmp Started: ${if (rtmpStart != null) dateFormat.format(Date(rtmpStart)) else "Empty"}"
-    val recording = "Recording Started: ${if (recordingInfo != null) dateFormat.format(Date(recordingInfo)) else "Empty"}"
+  private val recordingTimesUseCase = RecordingTimesUseCase()
 
+  private fun showServerInfo(room : HMSRoom) {
     viewModelScope.launch {
-      _events.emit(Event.RtmpRecordEvent(recording))
-      _events.emit(Event.RtmpStartEvent(rtmp))
+      _events.emit(recordingTimesUseCase.showServerInfo(room))
+    }
+  }
+
+  private fun showRecordInfo(room : HMSRoom) {
+    viewModelScope.launch {
+      _events.emit(recordingTimesUseCase.showRecordInfo(room))
+    }
+  }
+
+  private fun showRtmpInfo(room : HMSRoom) {
+    viewModelScope.launch {
+      _events.emit(recordingTimesUseCase.showRtmpInfo(room))
     }
   }
 
@@ -291,7 +297,6 @@ class MeetingViewModel(
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
           switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
-          showRtmpRecordingInfo(room)
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -355,15 +360,30 @@ class MeetingViewModel(
           Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
 
           when (type) {
-            HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED,
-            HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED,
+            HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED -> {
+              _isRecording.postValue(
+                getRecordingState(hmsRoom)
+              )
+              showServerInfo(hmsRoom)
+            }
+            HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED -> {
+              _isRecording.postValue(
+                getRecordingState(hmsRoom)
+              )
+              showRtmpInfo(hmsRoom)
+            }
             HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> {
               _isRecording.postValue(
                 getRecordingState(hmsRoom)
               )
-              showRtmpRecordingInfo(hmsRoom)
+              showRecordInfo(hmsRoom)
             }
-            HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> switchToHlsViewIfRequired()
+            HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> {
+              _isRecording.postValue(
+                getRecordingState(hmsRoom)
+              )
+              switchToHlsViewIfRequired()
+            }
             else -> {
             }
           }
@@ -495,7 +515,9 @@ class MeetingViewModel(
 
     val recording = room.browserRecordingState?.running == true ||
             room.serverRecordingState?.running == true
-    val streaming = room.rtmpHMSRtmpStreamingState?.running == true
+    val streaming = room.rtmpHMSRtmpStreamingState?.running == true ||
+            room.hlsStreamingState?.running == true
+
     return if (recording && streaming) {
       RecordingState.STREAMING_AND_RECORDING
     } else if (recording) {
@@ -940,8 +962,9 @@ class MeetingViewModel(
       data class HlsError(val throwable: HMSException) : Hls()
     }
     class HlsNotStarted(val reason : String) : Event()
-    data class RtmpStartEvent(val message : String) : Event()
-    data class RtmpRecordEvent(val message : String) : Event()
+    data class RtmpEvent(val message : String) : Event()
+    data class RecordEvent(val message : String) : Event()
+    data class ServerRecordEvent(val message: String) : Event()
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
