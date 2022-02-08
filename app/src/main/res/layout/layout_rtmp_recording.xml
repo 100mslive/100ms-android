@@ -83,21 +83,21 @@
         android:id="@+id/recording"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/recording_start_stop"
+        tools:text="@string/recording_start_stop"
         />
 
     <TextView
         android:id="@+id/rtmp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/rtmp_start_stop"
+        tools:text="@string/rtmp_start_stop"
         />
 
     <TextView
         android:id="@+id/sfu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/sfu_start"
+        tools:text="@string/sfu_start"
         />
 
     <Button

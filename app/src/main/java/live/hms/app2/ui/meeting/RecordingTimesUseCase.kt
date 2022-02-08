@@ -10,18 +10,18 @@ class RecordingTimesUseCase() {
     fun showServerInfo(room : HMSRoom): String {
         val startStop =
             convertTimes(room.serverRecordingState?.startedAt, null)
-        return "Server Started: ${startStop.first}"
+        return "Server\nStarted: ${startStop.first}"
     }
 
     fun showRecordInfo(room : HMSRoom): String {
         val startStop = convertTimes(room.browserRecordingState?.startedAt, room.browserRecordingState?.stoppedAt)
 
-        return "Recording Started: ${startStop.first}, Stopped: ${startStop.second}"
+        return "Recording\nStarted:${startStop.first}\nStopped:${startStop.second}"
     }
 
     fun showRtmpInfo(room : HMSRoom): String {
         val startStop = convertTimes(room.rtmpHMSRtmpStreamingState?.startedAt, room.rtmpHMSRtmpStreamingState?.stoppedAt)
-        return "Rtmp Started: ${startStop.first}, Stopped: ${startStop.second}"
+        return "Rtmp\nStarted:${startStop.first}\nStopped:${startStop.second}"
     }
 
     private fun convertTimes(startedAt : Long?, stoppedAt: Long?) : Pair<String, String> {
