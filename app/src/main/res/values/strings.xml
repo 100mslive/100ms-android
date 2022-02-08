@@ -157,4 +157,7 @@
     <string name="submit">Submit</string>
     <string name="hls_start">HLS Start</string>
     <string name="hls_stop">HLS Stop</string>
+    <string name="recording_start_stop">Recording Started: %d, Stopped: %d</string>
+    <string name="rtmp_start_stop">RTMP Started: %d, Stopped: %d</string>
+    <string name="sfu_start">SFU started at:%d</string>
 </resources>

@@ -61,19 +61,19 @@ class MeetingViewModel(
 
   private fun showServerInfo(room : HMSRoom) {
     viewModelScope.launch {
-      _events.emit(recordingTimesUseCase.showServerInfo(room))
+      _events.emit(Event.ServerRecordEvent(recordingTimesUseCase.showServerInfo(room)))
     }
   }
 
   private fun showRecordInfo(room : HMSRoom) {
     viewModelScope.launch {
-      _events.emit(recordingTimesUseCase.showRecordInfo(room))
+      _events.emit(Event.RecordEvent(recordingTimesUseCase.showRecordInfo(room)))
     }
   }
 
   private fun showRtmpInfo(room : HMSRoom) {
     viewModelScope.launch {
-      _events.emit(recordingTimesUseCase.showRtmpInfo(room))
+      _events.emit(Event.RtmpEvent(recordingTimesUseCase.showRtmpInfo(room)))
     }
   }
 
