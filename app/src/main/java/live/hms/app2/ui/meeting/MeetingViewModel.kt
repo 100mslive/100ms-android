@@ -737,9 +737,9 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         // Request Successfully sent to server
+        leaveMeeting()
       }
     })
-    leaveMeeting()
   }
 
   fun togglePeerMute(hmsPeer: HMSRemotePeer, type: HMSTrackType) {
