@@ -16,13 +16,18 @@ import live.hms.app2.R
 import live.hms.app2.databinding.FragmentPreviewBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
+import live.hms.app2.ui.meeting.participants.ParticipantsAdapter
+import live.hms.app2.ui.meeting.participants.ParticipantsDialog
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.sdk.HMSPreviewListener
+import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.utils.HMSCoroutineScope
 
 class PreviewFragment : Fragment() {
@@ -47,6 +52,9 @@ class PreviewFragment : Fragment() {
   private lateinit var track: MeetingTrack
 
   private var isViewVisible = false
+
+  private var participantsDialog : ParticipantsDialog? = null
+  private var participantsDialogAdapter : ParticipantsAdapter? = null
 
   override fun onResume() {
     super.onResume()
@@ -85,6 +93,13 @@ class PreviewFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setHasOptionsMenu(true)
+    setupParticipantsDialog()
+  }
+
+
+  private fun setupParticipantsDialog(){
+    participantsDialog = ParticipantsDialog(requireContext())
+    participantsDialogAdapter = participantsDialog?.adapter
   }
 
   override fun onCreateView(
@@ -161,7 +176,7 @@ class PreviewFragment : Fragment() {
     super.onPrepareOptionsMenu(menu)
 
     menu.forEach { item ->
-      if (item.itemId != R.id.action_flip_camera && item.itemId != R.id.action_volume) {
+      if (item.itemId != R.id.action_flip_camera && item.itemId != R.id.action_volume && item.itemId != R.id.action_participants) {
         item.isVisible = false
       }
     }
@@ -184,6 +199,13 @@ class PreviewFragment : Fragment() {
           HMSCoroutineScope.launch {
             (track.video as HMSLocalVideoTrack?)?.switchCamera()
           }
+        }
+      }
+      R.id.action_participants -> {
+        if (participantsDialogAdapter?.getItems()?.isNullOrEmpty()?.not() == true){
+          participantsDialog?.show()
+        }else{
+          Toast.makeText(requireContext(),"No Participants in the meeting !! Be the first one to join", Toast.LENGTH_LONG).show()
         }
       }
       R.id.action_volume -> {
@@ -236,6 +258,16 @@ class PreviewFragment : Fragment() {
         }
       }
 
+      override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
+        requireActivity().runOnUiThread {
+          val peerToUpdate = participantsDialogAdapter?.getItems()?.firstOrNull {
+            it.peerID == peer.peerID
+          }
+          participantsDialogAdapter?.removeItem(peerToUpdate)
+          participantsDialogAdapter?.insertItem(peer)
+        }
+      }
+
       override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
         // We assume  here that localTracks has at-most 2 tracks
         // containing one video & one audio track
@@ -285,6 +317,13 @@ class PreviewFragment : Fragment() {
           }
         } else {
           Log.e(TAG, "Attempted to show preview when activity was null")
+        }
+      }
+
+      override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
+        requireActivity().runOnUiThread {
+          binding.peerCount.text = hmsRoom.peerCount.toString()
+          participantsDialogAdapter?.setItems(hmsRoom.peerList)
         }
       }
     })
