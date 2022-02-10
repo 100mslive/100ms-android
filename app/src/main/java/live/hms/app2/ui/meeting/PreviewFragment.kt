@@ -264,7 +264,9 @@ class PreviewFragment : Fragment() {
             it.peerID == peer.peerID
           }
           participantsDialogAdapter?.removeItem(peerToUpdate)
-          participantsDialogAdapter?.insertItem(peer)
+          if (type != HMSPeerUpdate.PEER_LEFT) {
+            participantsDialogAdapter?.insertItem(peer)
+          }
         }
       }
 
