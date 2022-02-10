@@ -8,13 +8,17 @@ import androidx.recyclerview.widget.RecyclerView
 import live.hms.app2.databinding.ListItemPeerListBinding
 import live.hms.video.sdk.models.HMSPeer
 
+enum class VIEW_TYPE {
+  PREVIEW,MEETING
+}
 class ParticipantsAdapter(
   val isAllowedToChangeRole: Boolean,
   val isAllowedToKickPeer : Boolean,
   val isAllowedToMutePeer : Boolean,
   val isAllowedToAskUnmutePeer : Boolean,
-  private val showSheet : (HMSPeer) -> Unit
-) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
+  private val showSheet : (HMSPeer) -> Unit,
+  val type: VIEW_TYPE = VIEW_TYPE.MEETING,
+  ) : RecyclerView.Adapter<ParticipantsAdapter.PeerViewHolder>() {
 
   companion object {
     private const val TAG = "ParticipantsAdapter"
@@ -35,8 +39,14 @@ class ParticipantsAdapter(
       with(binding) {
         name.text = item.name
         iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
-        iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
-        iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
+        if (VIEW_TYPE.PREVIEW == type){
+          iconAudioOff.visibility = View.GONE
+          iconVideoOff.visibility = View.GONE
+        } else {
+          iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
+          iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
+        }
+
         peerRole.text = item.hmsRole.name
         // Show change role option only if the role of the local peer allows
         //  and if it's not the local peer itself.

@@ -324,7 +324,7 @@ class PreviewFragment : Fragment() {
 
       override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
         requireActivity().runOnUiThread {
-          binding.peerCount.text = hmsRoom.peerCount.toString()
+//          binding.peerCount.text = hmsRoom.peerCount.toString()
           participantsDialogAdapter?.setItems(hmsRoom.peerList)
         }
       }

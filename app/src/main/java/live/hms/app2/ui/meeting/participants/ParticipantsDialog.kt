@@ -10,8 +10,12 @@ import live.hms.app2.databinding.DialogParticipantsBinding
 
 class ParticipantsDialog(context: Context) : Dialog(context) {
 
-    var adapter: ParticipantsAdapter = ParticipantsAdapter(false, false, false, false) {}
+    var adapter: ParticipantsAdapter
     lateinit var dialogParticipantsBinding: DialogParticipantsBinding
+
+    init {
+        adapter = ParticipantsAdapter(false, false, false, false,{},VIEW_TYPE.PREVIEW)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
