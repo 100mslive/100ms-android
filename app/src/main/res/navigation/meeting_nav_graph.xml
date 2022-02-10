@@ -17,6 +17,10 @@
             app:popUpTo="@id/MeetingFragment"
             app:popUpToInclusive="@id/MeetingFragment" />
 
+        <action
+            android:id="@+id/action_PreviewFragment_to_ParticipantsFragment"
+            app:destination="@id/ParticipantsFragment" />
+
     </fragment>
 
     <fragment

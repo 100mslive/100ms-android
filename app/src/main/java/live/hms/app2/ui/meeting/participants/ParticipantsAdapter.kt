@@ -55,6 +55,9 @@ class ParticipantsAdapter(
     notifyDataSetChanged()
   }
 
+  @MainThread
+  fun getItems() = items
+
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PeerViewHolder {
     val binding = ListItemPeerListBinding.inflate(
       LayoutInflater.from(parent.context),
@@ -62,6 +65,16 @@ class ParticipantsAdapter(
       false
     )
     return PeerViewHolder(binding)
+  }
+
+  fun removeItem(item : HMSPeer?){
+    items.remove(item)
+    notifyDataSetChanged()
+  }
+
+  fun insertItem(item : HMSPeer) {
+    items.add(item)
+    notifyItemInserted(items.size - 1)
   }
 
   override fun onBindViewHolder(holder: PeerViewHolder, position: Int) {
