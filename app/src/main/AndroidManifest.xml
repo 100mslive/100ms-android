@@ -27,6 +27,7 @@
         <activity
             android:name="live.hms.app2.ui.home.HomeActivity"
             android:label="@string/app_name"
+            android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
