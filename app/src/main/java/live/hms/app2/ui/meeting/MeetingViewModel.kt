@@ -930,6 +930,11 @@ class MeetingViewModel(
     imageList.add("2.jpeg")
     imageList.add("mountains.jpg")
     imageList.add("tree.jpg")
+    imageList.add("4-3.jpg")
+    imageList.add("16-9.jpg")
+    imageList.add("720p.jpg")
+    imageList.add("landscape.jpg")
+    imageList.add("portrait.jpg")
 
     val randomIndex = Random.nextInt(imageList.size);
     return getBitmapFromAsset(context!!.applicationContext,imageList[randomIndex])!!
