@@ -24,7 +24,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
-import live.hms.video.virtualbackground.HMSVirtualBackground
+//import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -165,7 +165,7 @@ class MeetingViewModel(
     .build()
 
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
-  private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
+//  private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
@@ -902,14 +902,14 @@ class MeetingViewModel(
     val imageBitmap = getRandomVirtualBackgroundBitmap(context)
 
     Log.v(TAG, "Add the bitmap to background")
-    virtualBackgroundPlugin.setBackground(imageBitmap)
+//    virtualBackgroundPlugin.setBackground(imageBitmap)
 
-    hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener)
+//    hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener)
   }
 
   fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
     Log.v(TAG, "Stopping virtual background Plugin")
-    hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
+//    hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
   }
 
   private val _events = MutableSharedFlow<Event?>()
