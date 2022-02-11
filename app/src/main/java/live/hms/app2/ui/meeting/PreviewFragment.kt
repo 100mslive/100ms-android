@@ -24,6 +24,7 @@ import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.sdk.HMSPreviewListener
+import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -325,7 +326,13 @@ class PreviewFragment : Fragment() {
       override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
         requireActivity().runOnUiThread {
 //          binding.peerCount.text = hmsRoom.peerCount.toString()
-          participantsDialogAdapter?.setItems(hmsRoom.peerList)
+          val previewPeerList = arrayListOf<HMSPeer>()
+          hmsRoom.peerList.forEach {
+            if (it !is HMSLocalPeer) {
+              previewPeerList.add(it)
+            }
+          }
+          participantsDialogAdapter?.setItems(previewPeerList.toTypedArray())
         }
       }
     })
