@@ -260,7 +260,8 @@ class MeetingViewModel(
 
   fun startMeeting() {
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
-      error("Cannot start meeting in ${state.value} state")
+      Log.d(TAG, "Not trying to join meeting when it's reconnecting.")
+      return
     }
 
     cleanup()
