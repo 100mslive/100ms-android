@@ -18,6 +18,7 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.RecordingTimesUseCase
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.models.HlsRecordingConfig
 import java.net.URI
 import java.net.URISyntaxException
 
@@ -55,6 +56,12 @@ class RtmpRecordFragment : Fragment() {
             recording.text = recordingTimesUseCase.showRecordInfo(meetingViewModel.hmsSDK.getRoom()!!)
             rtmp.text = recordingTimesUseCase.showRtmpInfo(meetingViewModel.hmsSDK.getRoom()!!)
             sfu.text = recordingTimesUseCase.showServerInfo(meetingViewModel.hmsSDK.getRoom()!!)
+            hlsSingleFilePerLayer.isEnabled = shouldStartHls.isChecked
+            hlsVod.isEnabled = shouldStartHls.isChecked
+            shouldStartHls.setOnCheckedChangeListener { buttonView, isChecked ->
+                hlsSingleFilePerLayer.isEnabled = isChecked
+                hlsVod.isEnabled = isChecked
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -99,6 +106,11 @@ class RtmpRecordFragment : Fragment() {
         val isHls = binding.shouldStartHls.isChecked
         val meetingUrl = binding.meetingUrl.text.toString()
         val isRtmp = settings.rtmpUrlsList.toList().isNotEmpty()
+
+        val isHlsSingleFilePerLayer = binding.hlsSingleFilePerLayer.isChecked
+        val isHlsVod = binding.hlsVod.isChecked
+        val hlsRecordingConfig = HlsRecordingConfig(isHlsSingleFilePerLayer, isHlsVod)
+
         if (isRtmp && !isRecording && !isHls) {
             Toast.makeText(
                 requireContext(),
@@ -122,7 +134,7 @@ class RtmpRecordFragment : Fragment() {
             meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList(), meetingUrl)
             findNavController().popBackStack()
         } else if(isHls) {
-            meetingViewModel.startHls(meetingUrl)
+            meetingViewModel.startHls(meetingUrl, hlsRecordingConfig)
             findNavController().popBackStack()
         }
     }

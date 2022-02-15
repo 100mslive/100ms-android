@@ -75,8 +75,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/hls_start"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:textAlignment="viewStart" />
+
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/hlsSingleFilePerLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Single File Per Layer"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="8dp"
+        android:textAlignment="viewStart" />
+
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/hlsVod"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="HLS Vod"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="4dp"
+        android:textAlignment="viewStart" />
+
+
 
 
     <TextView
