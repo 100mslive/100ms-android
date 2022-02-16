@@ -1014,7 +1014,7 @@ class MeetingViewModel(
 
   fun getStats(): Flow<Map<String, WebrtcStats>> = emptyFlow()//hmsSDK.getStats()
 
-  fun startHls(hlsUrl : String, recordingConfig : HlsRecordingConfig) {
+  fun startHls(hlsUrl : String, recordingConfig : HMSHlsRecordingConfig) {
     val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)),
     recordingConfig)
 
