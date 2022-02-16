@@ -1,5 +1,6 @@
 package live.hms.app2.ui.meeting
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -38,6 +39,7 @@ class PreviewFragment : Fragment() {
   }
 
   private var binding by viewLifecycle<FragmentPreviewBinding>()
+  private val previewViewModel: PreviewViewModel by activityViewModels()
 
   private lateinit var roomDetails: RoomDetails
 
@@ -94,6 +96,14 @@ class PreviewFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setHasOptionsMenu(true)
+  }
+
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+
+    previewViewModel.roomStateLiveData.observe(requireActivity()) {
+      participantsDialogAdapter?.setItems(getRemotePeers(it).toTypedArray())
+    }
     setupParticipantsDialog()
   }
 
@@ -205,7 +215,7 @@ class PreviewFragment : Fragment() {
       R.id.action_participants -> {
         if (participantsDialogAdapter?.getItems()?.isNullOrEmpty()?.not() == true){
           participantsDialog?.show()
-        }else{
+        } else {
           Toast.makeText(requireContext(),"No Participants in the meeting !! Be the first one to join", Toast.LENGTH_LONG).show()
         }
       }
@@ -326,16 +336,20 @@ class PreviewFragment : Fragment() {
       override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
         requireActivity().runOnUiThread {
 //          binding.peerCount.text = hmsRoom.peerCount.toString()
-          val previewPeerList = arrayListOf<HMSPeer>()
-          hmsRoom.peerList.forEach {
-            if (it !is HMSLocalPeer) {
-              previewPeerList.add(it)
-            }
-          }
-          participantsDialogAdapter?.setItems(previewPeerList.toTypedArray())
+          previewViewModel.updateRoomState(hmsRoom)
         }
       }
     })
+  }
+
+  private fun getRemotePeers(hmsRoom: HMSRoom) : ArrayList<HMSPeer>{
+    val previewPeerList = arrayListOf<HMSPeer>()
+    hmsRoom.peerList.forEach {
+      if (it !is HMSLocalPeer) {
+        previewPeerList.add(it)
+      }
+    }
+    return previewPeerList
   }
 
   private fun initOnBackPress() {
