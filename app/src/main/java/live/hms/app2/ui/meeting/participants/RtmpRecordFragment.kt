@@ -18,7 +18,7 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.RecordingTimesUseCase
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.viewLifecycle
-import live.hms.video.sdk.models.HlsRecordingConfig
+import live.hms.video.sdk.models.HMSHlsRecordingConfig
 import java.net.URI
 import java.net.URISyntaxException
 
@@ -109,7 +109,7 @@ class RtmpRecordFragment : Fragment() {
 
         val isHlsSingleFilePerLayer = binding.hlsSingleFilePerLayer.isChecked
         val isHlsVod = binding.hlsVod.isChecked
-        val hlsRecordingConfig = HlsRecordingConfig(isHlsSingleFilePerLayer, isHlsVod)
+        val hlsRecordingConfig = HMSHlsRecordingConfig(isHlsSingleFilePerLayer, isHlsVod)
 
         if (isRtmp && !isRecording && !isHls) {
             Toast.makeText(
