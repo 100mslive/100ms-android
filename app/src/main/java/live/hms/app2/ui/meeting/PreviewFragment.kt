@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import kotlinx.coroutines.launch
 import live.hms.app2.R
@@ -39,7 +40,6 @@ class PreviewFragment : Fragment() {
   }
 
   private var binding by viewLifecycle<FragmentPreviewBinding>()
-  private val previewViewModel: PreviewViewModel by activityViewModels()
 
   private lateinit var roomDetails: RoomDetails
 
@@ -95,15 +95,13 @@ class PreviewFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    requireActivity().invalidateOptionsMenu()
     setHasOptionsMenu(true)
   }
 
   override fun onAttach(context: Context) {
     super.onAttach(context)
 
-    previewViewModel.roomStateLiveData.observe(requireActivity()) {
-      participantsDialogAdapter?.setItems(getRemotePeers(it).toTypedArray())
-    }
     setupParticipantsDialog()
   }
 
@@ -122,9 +120,9 @@ class PreviewFragment : Fragment() {
 
     initOnBackPress()
     initButtons()
-    startPreview()
+    initObservers()
+    meetingViewModel.startPreview()
 
-    requireActivity().invalidateOptionsMenu()
     return binding.root
   }
 
@@ -241,104 +239,90 @@ class PreviewFragment : Fragment() {
     requireActivity().finish()
   }
 
-  private fun startPreview() {
-    meetingViewModel.startPreview(object : HMSPreviewListener {
-      override fun onError(error: HMSException) {
-        requireActivity().runOnUiThread {
-          if (error.isTerminal) {
-            binding.buttonJoinMeeting.isEnabled = false
-            AlertDialog.Builder(requireContext())
-                    .setTitle(error.name)
-                    .setMessage(error.toString())
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.ok) { dialog, _ ->
-                      dialog.dismiss()
-                      goToHomePage()
-                    }
-                    .setNeutralButton(R.string.bug_report) { _, _ ->
-                      requireContext().startActivity(
-                              EmailUtils.getNonFatalLogIntent(requireContext())
-                      )
-                      alertDialog = null
-                    }
-                    .create()
-                    .show()
-          } else {
-            Toast.makeText(context, error.description, Toast.LENGTH_LONG).show()
+  private fun initObservers() {
+
+    meetingViewModel.previewErrorLiveData.observe(requireActivity()) { error ->
+      if (error.isTerminal) {
+        binding.buttonJoinMeeting.isEnabled = false
+        AlertDialog.Builder(requireContext())
+          .setTitle(error.name)
+          .setMessage(error.toString())
+          .setCancelable(false)
+          .setPositiveButton(R.string.ok) { dialog, _ ->
+            dialog.dismiss()
+            goToHomePage()
           }
-        }
+          .setNeutralButton(R.string.bug_report) { _, _ ->
+            requireContext().startActivity(
+              EmailUtils.getNonFatalLogIntent(requireContext())
+            )
+            alertDialog = null
+          }
+          .create()
+          .show()
+      } else {
+        Toast.makeText(context, error.description, Toast.LENGTH_LONG).show()
       }
+    }
 
-      override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
-        requireActivity().runOnUiThread {
-          val peerToUpdate = participantsDialogAdapter?.getItems()?.firstOrNull {
-            it.peerID == peer.peerID
-          }
-          participantsDialogAdapter?.removeItem(peerToUpdate)
-          if (type != HMSPeerUpdate.PEER_LEFT) {
-            participantsDialogAdapter?.insertItem(peer)
-          }
-        }
+    meetingViewModel.previewPeerLiveData.observe(requireActivity()) { (type, peer) ->
+      val peerToUpdate = participantsDialogAdapter?.getItems()?.firstOrNull {
+        it.peerID == peer.peerID
       }
+      participantsDialogAdapter?.removeItem(peerToUpdate)
+      if (type != HMSPeerUpdate.PEER_LEFT) {
+        participantsDialogAdapter?.insertItem(peer)
+      }
+    }
 
-      override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
-        // We assume  here that localTracks has at-most 2 tracks
-        // containing one video & one audio track
-        val activity = activity
-        if (activity != null) {
-          activity.runOnUiThread {
-            binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
-            binding.buttonJoinMeeting.isEnabled = true
+    meetingViewModel.previewUpdateLiveData.observe(
+      requireActivity(),
+      Observer { (room, localTracks) ->
+        binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
+        binding.buttonJoinMeeting.isEnabled = true
 
-            track = MeetingTrack(room.localPeer!!, null, null)
-            localTracks.forEach {
-              when (it) {
-                is HMSLocalAudioTrack -> {
-                  track.audio = it
-                }
-                is HMSLocalVideoTrack -> {
-                  track.video = it
-
-                  if (isViewVisible) {
-                    bindVideo()
-                  }
-                }
-              }
+        track = MeetingTrack(room.localPeer!!, null, null)
+        localTracks.forEach {
+          when (it) {
+            is HMSLocalAudioTrack -> {
+              track.audio = it
             }
+            is HMSLocalVideoTrack -> {
+              track.video = it
 
-            // Disable buttons
-            binding.buttonToggleVideo.apply {
-              isEnabled = (track.video != null)
-
-              track.video?.let {
-                setImageResource(
-                        if (it.isMute) R.drawable.ic_videocam_off_24
-                        else R.drawable.ic_videocam_24
-                )
-              }
-            }
-            binding.buttonToggleAudio.apply {
-              isEnabled = (track.audio != null)
-
-              track.audio?.let {
-                setImageResource(
-                        if (it.isMute) R.drawable.ic_mic_off_24
-                        else R.drawable.ic_mic_24
-                )
+              if (isViewVisible) {
+                bindVideo()
               }
             }
           }
-        } else {
-          Log.e(TAG, "Attempted to show preview when activity was null")
         }
-      }
 
-      override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
-        requireActivity().runOnUiThread {
-//          binding.peerCount.text = hmsRoom.peerCount.toString()
-          previewViewModel.updateRoomState(hmsRoom)
+        // Disable buttons
+        binding.buttonToggleVideo.apply {
+          isEnabled = (track.video != null)
+
+          track.video?.let {
+            setImageResource(
+              if (it.isMute) R.drawable.ic_videocam_off_24
+              else R.drawable.ic_videocam_24
+            )
+          }
         }
-      }
+        binding.buttonToggleAudio.apply {
+          isEnabled = (track.audio != null)
+
+          track.audio?.let {
+            setImageResource(
+              if (it.isMute) R.drawable.ic_mic_off_24
+              else R.drawable.ic_mic_24
+            )
+          }
+        }
+      })
+
+    meetingViewModel.previewRoomStateLiveData.observe(requireActivity(), Observer { (_,room) ->
+      //          binding.peerCount.text = hmsRoom.peerCount.toString()
+      participantsDialogAdapter?.setItems(getRemotePeers(room).toTypedArray())
     })
   }
 
