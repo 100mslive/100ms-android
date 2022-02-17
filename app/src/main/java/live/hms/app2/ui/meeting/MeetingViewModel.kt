@@ -36,8 +36,8 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -94,6 +94,17 @@ class MeetingViewModel(
   private val failures = ArrayList<HMSException>()
 
   val meetingViewMode = MutableLiveData(settings.meetingMode)
+
+  private val roomState : MutableLiveData<Pair<HMSRoomUpdate, HMSRoom>> = MutableLiveData()
+  private val previewPeerData : MutableLiveData<Pair<HMSPeerUpdate, HMSPeer>> = MutableLiveData()
+  private val previewErrorData : MutableLiveData<HMSException> = MutableLiveData()
+  private val previewUpdateData : MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> = MutableLiveData()
+
+  val previewRoomStateLiveData : LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
+  val previewPeerLiveData : LiveData<Pair<HMSPeerUpdate, HMSPeer>> = previewPeerData
+  val previewErrorLiveData : LiveData<HMSException> = previewErrorData
+  val previewUpdateLiveData : LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
+
 
   fun setMeetingViewMode(mode: MeetingViewMode) {
     if (mode != meetingViewMode.value) {
@@ -189,9 +200,26 @@ class MeetingViewModel(
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
 
-  fun startPreview(listener: HMSPreviewListener) {
+  fun startPreview() {
     // call Preview api
-    hmsSDK.preview(config, listener)
+    hmsSDK.preview(config, object : HMSPreviewListener{
+      override fun onError(error: HMSException) {
+        previewErrorData.postValue(error)
+      }
+
+      override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
+        previewPeerData.postValue(Pair(type,peer))
+      }
+
+      override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
+        previewUpdateData.postValue(Pair(room,localTracks))
+      }
+
+      override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
+        roomState.postValue(Pair(type,hmsRoom))
+      }
+
+    })
   }
 
   fun setLocalVideoEnabled(enabled: Boolean) {
