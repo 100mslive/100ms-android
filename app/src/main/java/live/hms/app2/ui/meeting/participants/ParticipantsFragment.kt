@@ -60,6 +60,9 @@ class ParticipantsFragment : Fragment() {
       layoutManager = LinearLayoutManager(requireContext())
       adapter = this@ParticipantsFragment.adapter
     }
+    if (meetingViewModel.peers.isNullOrEmpty().not()){
+      adapter.setItems(meetingViewModel.peers)
+    }
 
     binding.textInputSearch.apply {
       addTextChangedListener { text ->
