@@ -36,6 +36,7 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.random.Random
