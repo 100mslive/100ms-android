@@ -241,7 +241,7 @@ class PreviewFragment : Fragment() {
 
   private fun initObservers() {
 
-    meetingViewModel.previewErrorLiveData.observe(requireActivity()) { error ->
+    meetingViewModel.previewErrorLiveData.observe(viewLifecycleOwner) { error ->
       if (error.isTerminal) {
         binding.buttonJoinMeeting.isEnabled = false
         AlertDialog.Builder(requireContext())
@@ -265,7 +265,7 @@ class PreviewFragment : Fragment() {
       }
     }
 
-    meetingViewModel.previewPeerLiveData.observe(requireActivity()) { (type, peer) ->
+    meetingViewModel.previewPeerLiveData.observe(viewLifecycleOwner) { (type, peer) ->
       val peerToUpdate = participantsDialogAdapter?.getItems()?.firstOrNull {
         it.peerID == peer.peerID
       }
@@ -276,7 +276,7 @@ class PreviewFragment : Fragment() {
     }
 
     meetingViewModel.previewUpdateLiveData.observe(
-      requireActivity(),
+      viewLifecycleOwner,
       Observer { (room, localTracks) ->
         binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
         binding.buttonJoinMeeting.isEnabled = true
@@ -320,7 +320,7 @@ class PreviewFragment : Fragment() {
         }
       })
 
-    meetingViewModel.previewRoomStateLiveData.observe(requireActivity(), Observer { (_,room) ->
+    meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner, Observer { (_,room) ->
       //          binding.peerCount.text = hmsRoom.peerCount.toString()
       participantsDialogAdapter?.setItems(getRemotePeers(room).toTypedArray())
     })
