@@ -678,6 +678,8 @@ class MeetingFragment : Fragment() {
           if (settings.showReconnectingProgressBars) {
             updateProgressBarUI(state.heading, state.message)
             showProgressBar()
+            if (currentFragment is VideoGridBaseFragment)
+              (currentFragment as VideoGridBaseFragment).unbindViews()
           }
         }
 
@@ -699,6 +701,12 @@ class MeetingFragment : Fragment() {
         }
         is MeetingState.Ongoing -> {
           hideProgressBar()
+          isMeetingOngoing = true
+        }
+        is MeetingState.Reconnected -> {
+          hideProgressBar()
+          if (currentFragment is VideoGridBaseFragment)
+            (currentFragment as VideoGridBaseFragment).bindViews()
 
           isMeetingOngoing = true
         }
@@ -791,25 +799,17 @@ class MeetingFragment : Fragment() {
   }
 
   private fun hideProgressBar() {
-    if (binding.progressBar.root.visibility != View.GONE) {
-      binding.fragmentContainer.visibility = View.VISIBLE
-      binding.bottomControls.visibility = View.VISIBLE
+    binding.fragmentContainer.visibility = View.VISIBLE
+    binding.bottomControls.visibility = View.VISIBLE
 
-      binding.progressBar.root.visibility = View.GONE
-      if (currentFragment is VideoGridBaseFragment)
-        (currentFragment as VideoGridBaseFragment).bindViews()
-    }
+    binding.progressBar.root.visibility = View.GONE
   }
 
   private fun showProgressBar() {
-    if ( binding.progressBar.root.visibility != View.VISIBLE) {
-      binding.fragmentContainer.visibility = View.GONE
-      binding.bottomControls.visibility = View.GONE
+    binding.fragmentContainer.visibility = View.GONE
+    binding.bottomControls.visibility = View.GONE
 
-      binding.progressBar.root.visibility = View.VISIBLE
-      if (currentFragment is VideoGridBaseFragment)
-        (currentFragment as VideoGridBaseFragment).unbindViews()
-    }
+    binding.progressBar.root.visibility = View.VISIBLE
   }
 
   private fun initButtons() {
