@@ -31,6 +31,7 @@ import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.app2.ui.meeting.activespeaker.HlsFragment
 import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
+import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
@@ -52,6 +53,7 @@ class MeetingFragment : Fragment() {
   }
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
+  private lateinit var currentFragment: Fragment
 
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
@@ -760,7 +762,7 @@ class MeetingFragment : Fragment() {
   }
 
   private fun updateVideoView(mode: MeetingViewMode) {
-    val fragment = when (mode) {
+    currentFragment = when (mode) {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
@@ -783,7 +785,7 @@ class MeetingFragment : Fragment() {
 
     childFragmentManager
       .beginTransaction()
-      .replace(R.id.fragment_container, fragment)
+      .replace(R.id.fragment_container, currentFragment)
       .addToBackStack(null)
       .commit()
   }
@@ -793,6 +795,8 @@ class MeetingFragment : Fragment() {
     binding.bottomControls.visibility = View.VISIBLE
 
     binding.progressBar.root.visibility = View.GONE
+    if (currentFragment is VideoGridBaseFragment)
+      (currentFragment as VideoGridBaseFragment).bindViews()
   }
 
   private fun showProgressBar() {
@@ -800,6 +804,8 @@ class MeetingFragment : Fragment() {
     binding.bottomControls.visibility = View.GONE
 
     binding.progressBar.root.visibility = View.VISIBLE
+    if (currentFragment is VideoGridBaseFragment)
+      (currentFragment as VideoGridBaseFragment).unbindViews()
   }
 
   private fun initButtons() {

@@ -348,7 +348,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     super.onResume()
     crashlyticsLog(TAG, "Fragment=$tag onResume()")
     isFragmentVisible = true
+    bindViews()
+  }
 
+  fun bindViews() {
     renderedViews.forEach {
       bindSurfaceView(it.binding.videoCard, it.meetingTrack)
       it.statsInterpreter?.initiateStats(
@@ -365,7 +368,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     super.onPause()
     crashlyticsLog(TAG, "Fragment=$tag onPause()")
     isFragmentVisible = false
+    unbindViews()
+  }
 
+  fun unbindViews() {
     renderedViews.forEach {
       unbindSurfaceView(it.binding.videoCard, it.meetingTrack)
 //      it.statsInterpreter?.close()
