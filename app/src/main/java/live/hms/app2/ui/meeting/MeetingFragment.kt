@@ -791,21 +791,25 @@ class MeetingFragment : Fragment() {
   }
 
   private fun hideProgressBar() {
-    binding.fragmentContainer.visibility = View.VISIBLE
-    binding.bottomControls.visibility = View.VISIBLE
+    if (binding.progressBar.root.visibility != View.GONE) {
+      binding.fragmentContainer.visibility = View.VISIBLE
+      binding.bottomControls.visibility = View.VISIBLE
 
-    binding.progressBar.root.visibility = View.GONE
-    if (currentFragment is VideoGridBaseFragment)
-      (currentFragment as VideoGridBaseFragment).bindViews()
+      binding.progressBar.root.visibility = View.GONE
+      if (currentFragment is VideoGridBaseFragment)
+        (currentFragment as VideoGridBaseFragment).bindViews()
+    }
   }
 
   private fun showProgressBar() {
-    binding.fragmentContainer.visibility = View.GONE
-    binding.bottomControls.visibility = View.GONE
+    if ( binding.progressBar.root.visibility != View.VISIBLE) {
+      binding.fragmentContainer.visibility = View.GONE
+      binding.bottomControls.visibility = View.GONE
 
-    binding.progressBar.root.visibility = View.VISIBLE
-    if (currentFragment is VideoGridBaseFragment)
-      (currentFragment as VideoGridBaseFragment).unbindViews()
+      binding.progressBar.root.visibility = View.VISIBLE
+      if (currentFragment is VideoGridBaseFragment)
+        (currentFragment as VideoGridBaseFragment).unbindViews()
+    }
   }
 
   private fun initButtons() {
