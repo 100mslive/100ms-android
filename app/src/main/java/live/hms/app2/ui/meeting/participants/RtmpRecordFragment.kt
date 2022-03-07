@@ -8,12 +8,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import live.hms.app2.databinding.LayoutRtmpRecordingBinding
 import live.hms.app2.ui.meeting.MeetingViewModel
+import live.hms.app2.ui.meeting.RecordingTimesUseCase
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.models.HMSHlsRecordingConfig
 import java.net.URI
 import java.net.URISyntaxException
 
@@ -46,7 +51,30 @@ class RtmpRecordFragment : Fragment() {
         binding.rtmpUrls.adapter = rtmpUrladapter
         binding.startButton.setOnClickListener { startClicked() }
 
-        // Load the role for the bot from preferences.
+        val recordingTimesUseCase = RecordingTimesUseCase()
+        with(binding) {
+            recording.text = recordingTimesUseCase.showRecordInfo(meetingViewModel.hmsSDK.getRoom()!!)
+            rtmp.text = recordingTimesUseCase.showRtmpInfo(meetingViewModel.hmsSDK.getRoom()!!)
+            sfu.text = recordingTimesUseCase.showServerInfo(meetingViewModel.hmsSDK.getRoom()!!)
+            hlsSingleFilePerLayer.isEnabled = shouldStartHls.isChecked
+            hlsVod.isEnabled = shouldStartHls.isChecked
+            shouldStartHls.setOnCheckedChangeListener { buttonView, isChecked ->
+                hlsSingleFilePerLayer.isEnabled = isChecked
+                hlsVod.isEnabled = isChecked
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            meetingViewModel.events.collectLatest {
+                when(it) {
+                    is MeetingViewModel.Event.RecordEvent -> binding.recording.text = it.message
+                    is MeetingViewModel.Event.ServerRecordEvent -> binding.sfu.text = it.message
+                    is MeetingViewModel.Event.RtmpEvent -> binding.rtmp.text = it.message
+                    else -> { /*Ignored*/ }
+                }
+                return@collectLatest
+            }
+        }
     }
 
     private fun addItem() {
@@ -78,6 +106,11 @@ class RtmpRecordFragment : Fragment() {
         val isHls = binding.shouldStartHls.isChecked
         val meetingUrl = binding.meetingUrl.text.toString()
         val isRtmp = settings.rtmpUrlsList.toList().isNotEmpty()
+
+        val isHlsSingleFilePerLayer = binding.hlsSingleFilePerLayer.isChecked
+        val isHlsVod = binding.hlsVod.isChecked
+        val hlsRecordingConfig = HMSHlsRecordingConfig(isHlsSingleFilePerLayer, isHlsVod)
+
         if (isRtmp && !isRecording && !isHls) {
             Toast.makeText(
                 requireContext(),
@@ -101,7 +134,7 @@ class RtmpRecordFragment : Fragment() {
             meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList(), meetingUrl)
             findNavController().popBackStack()
         } else if(isHls) {
-            meetingViewModel.startHls(meetingUrl)
+            meetingViewModel.startHls(meetingUrl, hlsRecordingConfig)
             findNavController().popBackStack()
         }
     }

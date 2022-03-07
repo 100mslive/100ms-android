@@ -21,7 +21,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.app2.R
@@ -32,6 +31,7 @@ import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.app2.ui.meeting.activespeaker.HlsFragment
 import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
 import live.hms.app2.ui.meeting.chat.ChatViewModel
+import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
@@ -53,6 +53,7 @@ class MeetingFragment : Fragment() {
   }
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
+  private lateinit var currentFragment: Fragment
 
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
@@ -583,6 +584,20 @@ class MeetingFragment : Fragment() {
           }
           null -> {}
           is MeetingViewModel.Event.HlsNotStarted -> Toast.makeText(requireContext(), event.reason, Toast.LENGTH_LONG).show()
+          is MeetingViewModel.Event.Hls.HlsError -> Toast.makeText(requireContext(), event.throwable.message, Toast.LENGTH_LONG).show()
+          is MeetingViewModel.Event.RecordEvent ->
+          {
+            Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+            Log.d("RecordingState", event.message)
+          }
+          is MeetingViewModel.Event.RtmpEvent -> {
+            Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+            Log.d("RecordingState", event.message)
+          }
+          is MeetingViewModel.Event.ServerRecordEvent -> {
+            Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+            Log.d("RecordingState", event.message)
+          }
         }
       }
     }
@@ -663,6 +678,8 @@ class MeetingFragment : Fragment() {
           if (settings.showReconnectingProgressBars) {
             updateProgressBarUI(state.heading, state.message)
             showProgressBar()
+            if (currentFragment is VideoGridBaseFragment)
+              (currentFragment as VideoGridBaseFragment).unbindViews()
           }
         }
 
@@ -684,6 +701,12 @@ class MeetingFragment : Fragment() {
         }
         is MeetingState.Ongoing -> {
           hideProgressBar()
+          isMeetingOngoing = true
+        }
+        is MeetingState.Reconnected -> {
+          hideProgressBar()
+          if (currentFragment is VideoGridBaseFragment)
+            (currentFragment as VideoGridBaseFragment).bindViews()
 
           isMeetingOngoing = true
         }
@@ -747,7 +770,7 @@ class MeetingFragment : Fragment() {
   }
 
   private fun updateVideoView(mode: MeetingViewMode) {
-    val fragment = when (mode) {
+    currentFragment = when (mode) {
       MeetingViewMode.GRID -> VideoGridFragment()
       MeetingViewMode.PINNED -> PinnedVideoFragment()
       MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
@@ -770,7 +793,7 @@ class MeetingFragment : Fragment() {
 
     childFragmentManager
       .beginTransaction()
-      .replace(R.id.fragment_container, fragment)
+      .replace(R.id.fragment_container, currentFragment)
       .addToBackStack(null)
       .commit()
   }
@@ -853,4 +876,5 @@ class MeetingFragment : Fragment() {
         }
       })
   }
+
 }
