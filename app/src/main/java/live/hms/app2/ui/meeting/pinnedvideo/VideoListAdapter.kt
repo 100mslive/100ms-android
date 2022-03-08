@@ -16,14 +16,14 @@ import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
 import live.hms.app2.util.visibility
-import live.hms.video.connection.degredation.WebrtcStats
+import live.hms.video.connection.stats.HMSStats
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit,
-  private val itemStats: Flow<Map<String, WebrtcStats>>,
+  private val itemStats: Flow<Map<String, HMSStats>>,
   private val statsActive: Boolean
 ) : RecyclerView.Adapter<VideoListAdapter.VideoItemViewHolder>() {
 
@@ -47,7 +47,7 @@ class VideoListAdapter(
 
   inner class VideoItemViewHolder(
     val binding: ListItemVideoBinding,
-    val itemStats: Flow<Map<String, WebrtcStats>>
+    private val itemStats: Flow<Map<String, HMSStats>>
   ) : RecyclerView.ViewHolder(binding.root) {
 
     private var itemRef: VideoListItem? = null
