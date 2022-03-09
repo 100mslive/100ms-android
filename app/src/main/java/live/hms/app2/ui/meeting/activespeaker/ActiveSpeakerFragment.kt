@@ -32,8 +32,12 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   ): View {
     binding = FragmentActiveSpeakerBinding.inflate(inflater, container, false)
 
-    initViewModels()
     return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    initViewModels()
   }
 
   override fun onResume() {
