@@ -21,6 +21,6 @@
     <color name="status_indicator_4">@color/status_indicator_5</color>
     <color name="status_indicator_3">#FFA500</color>
     <color name="status_indicator_2">#ff7f7f</color>
-    <color name="status_indicator_1">@color/status_indicator_2</color>
-    <color name="status_indicator_0">#ED4C5A</color>
+    <color name="status_indicator_1">#ED4C5A</color>
+    <color name="status_indicator_0">@color/status_indicator_1</color>
 </resources>
