@@ -4,4 +4,5 @@
     <dimen name="video_list_size">120dp</dimen>
     <dimen name="audio_item_size">120dp</dimen>
     <dimen name="bottom_meeting_control_size">64dp</dimen>
+    <dimen name="status_circle_radius">20dp</dimen>
 </resources>

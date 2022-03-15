@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:left="0dp" android:right="90dp">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android"
+            android:shape="oval">
+            <solid
+                android:color="#48b3ff"/>
+            <size
+                android:width="@dimen/status_circle_radius"
+                android:height="@dimen/status_circle_radius" />
+        </shape>
+    </item>
+
+
+    <item android:left="22.5dp" android:right="67.5dp">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android"
+            android:shape="oval">
+            <solid
+                android:color="#48b3ff"/>
+        </shape>
+        <size
+            android:width="@dimen/status_circle_radius"
+            android:height="@dimen/status_circle_radius" />
+    </item>
+
+</layer-list>

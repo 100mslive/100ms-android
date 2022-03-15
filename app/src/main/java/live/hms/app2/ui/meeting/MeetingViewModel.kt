@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -95,6 +94,7 @@ class MeetingViewModel(
   // When we get stats, a flow will be updated with the saved stats.
   private val statsFlow = MutableSharedFlow<Map<String,HMSStats>>()
   private val savedStats : MutableMap<String, HMSStats> = mutableMapOf()
+  val networkQuality = MutableLiveData(0)
 
   private val settings = SettingsStore(getApplication())
 
@@ -298,6 +298,7 @@ class MeetingViewModel(
     hmsSDK.addNetworkObserver(object : HMSNetworkObserver {
       override fun onNetworkQuality(quality: HMSNetworkQuality, peer: HMSPeer?) {
         Log.d("NetworkQualityStats", "Quality is: $quality for peer $peer")
+        networkQuality.postValue(quality.level)
       }
     })
 

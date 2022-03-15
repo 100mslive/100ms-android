@@ -81,6 +81,12 @@
             app:icon="@drawable/ic_call_end_24"
             app:iconTint="@color/red" />
 
+        <ImageView
+            android:id="@+id/networkQuality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/status_indicator"
+            />
     </LinearLayout>
 
 </RelativeLayout>

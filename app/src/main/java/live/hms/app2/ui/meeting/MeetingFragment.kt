@@ -517,6 +517,9 @@ class MeetingFragment : Fragment() {
   }
 
   private fun initViewModel() {
+    meetingViewModel.networkQuality.observe(viewLifecycleOwner) { networkQuality ->
+      binding.networkQuality?.setImageLevel(networkQuality)
+    }
     meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
       chatViewModel.receivedMessage(it)
     }
