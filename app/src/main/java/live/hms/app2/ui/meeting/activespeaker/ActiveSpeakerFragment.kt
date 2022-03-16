@@ -111,7 +111,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
       screenShareStats.initiateStats(
-        this,
+        viewLifecycleOwner,
         meetingViewModel.getStats(),
         screen.video,
         screen.audio,
