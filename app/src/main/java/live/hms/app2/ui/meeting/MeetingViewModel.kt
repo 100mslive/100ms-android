@@ -295,12 +295,6 @@ class MeetingViewModel(
 
   fun startMeeting() {
 
-    hmsSDK.addNetworkObserver(object : HMSNetworkObserver {
-      override fun onNetworkQuality(quality: HMSNetworkQuality, peer: HMSPeer?) {
-        Log.d("NetworkQualityStats", "Quality is: $quality for peer $peer")
-      }
-    })
-
     hmsSDK.addRtcStatsObserver(object : HMSStatsObserver {
       override fun onLocalAudioStats(
         audioStats: HMSLocalAudioStats,
