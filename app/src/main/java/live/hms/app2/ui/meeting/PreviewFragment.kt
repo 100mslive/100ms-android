@@ -170,9 +170,7 @@ class PreviewFragment : Fragment() {
       setOnSingleClickListener(200L) {
         Log.v(TAG, "buttonJoinMeeting.onClick()")
 
-        findNavController().navigate(
-          PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
-        )
+        findNavController().setGraph(R.navigation.meeting_nav_graph)
       }
     }
   }
