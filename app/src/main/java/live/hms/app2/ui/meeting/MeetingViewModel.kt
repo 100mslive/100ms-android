@@ -57,6 +57,7 @@ class MeetingViewModel(
     roomDetails.username,
     roomDetails.authToken,
     Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username)).toString(),
+    captureNetworkQualityInPreview = true,
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
