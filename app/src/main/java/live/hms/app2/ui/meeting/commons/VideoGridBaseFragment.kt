@@ -6,9 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
 import androidx.annotation.CallSuper
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import live.hms.app2.R
 import live.hms.app2.databinding.GridItemVideoBinding
 import live.hms.app2.databinding.VideoCardBinding
 import live.hms.app2.ui.meeting.CustomPeerMetadata
@@ -46,7 +48,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   var isFragmentVisible = false
     private set
 
-  protected data class RenderedViewPair(
+  data class RenderedViewPair(
     val binding: GridItemVideoBinding,
     val meetingTrack: MeetingTrack,
     val statsInterpreter: StatsInterpreter?,
@@ -309,8 +311,41 @@ abstract class VideoGridBaseFragment : Fragment() {
             nameInitials.text = NameUtils.getInitials(isUpdatedPeerRendered.meetingTrack.peer.name)
           }
         }
+        HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+        updateNetworkQuality(peerTypePair.first.downlinkScore,isUpdatedPeerRendered)
+        }
       }
     }
+  }
+
+  fun updateNetworkQuality(downlinkScore: String?, view: RenderedViewPair?){
+    downlinkScore?.toIntOrNull()?.let {
+      view?.binding?.videoCard?.networkQuality?.apply {
+        colorFilter = null
+        visibility = View.VISIBLE
+        when(it){
+          0 -> {
+            setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_0))
+            setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+          }
+          1 -> setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_2))
+          2 -> setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_3))
+          3 -> setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_4))
+          4 , 5 -> {
+            setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_5))
+            setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+          }
+          else -> {
+            this.visibility = View.GONE
+          }
+        }
+      }
+    } ?: run {
+      (view?.binding?.videoCard?.networkQuality?.apply {
+        this.visibility = View.GONE
+      })
+    }
+
   }
 
   protected fun applySpeakerUpdates(speakers: Array<HMSSpeaker>) {

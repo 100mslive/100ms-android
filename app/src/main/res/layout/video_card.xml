@@ -85,6 +85,15 @@
                 android:src="@drawable/ic_degraded"
                 app:tint="@color/white_faded_70" />
 
+            <ImageView
+                android:id="@+id/network_quality"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/ic_baseline_wifi_5"
+                app:tint="@android:color/holo_green_light" />
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
