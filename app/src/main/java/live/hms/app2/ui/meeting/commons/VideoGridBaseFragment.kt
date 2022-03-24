@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import live.hms.app2.R
 import live.hms.app2.databinding.GridItemVideoBinding
 import live.hms.app2.databinding.VideoCardBinding
+import live.hms.app2.helpers.NetworkQualityHelper
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
@@ -312,40 +313,23 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
         }
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
-        updateNetworkQuality(peerTypePair.first.networkQuality?.downlinkQuality,isUpdatedPeerRendered)
-        }
-      }
-    }
-  }
-
-  fun updateNetworkQuality(downlinkScore: Int?, view: RenderedViewPair?){
-    downlinkScore?.let {
-      view?.binding?.videoCard?.networkQuality?.apply {
-        colorFilter = null
-        visibility = View.VISIBLE
-        when(it){
-          0 -> {
-            setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_0))
-            setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
-          }
-          1 -> setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_2))
-          2 -> setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_3))
-          3 -> setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_4))
-          4 , 5 -> {
-            setImageDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.ic_baseline_wifi_5))
-            setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
-          }
-          else -> {
-            this.visibility = View.GONE
+          val downlinkScore = peerTypePair.first.networkQuality?.downlinkQuality
+          isUpdatedPeerRendered.binding.videoCard.networkQuality.apply {
+            NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
+              if (downlinkScore == 0) {
+                this.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+              } else {
+                this.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+              }
+              this.setImageDrawable(drawable)
+              if (drawable == null){
+                this.visibility = View.GONE
+              }
+            }
           }
         }
       }
-    } ?: run {
-      (view?.binding?.videoCard?.networkQuality?.apply {
-        this.visibility = View.GONE
-      })
     }
-
   }
 
   protected fun applySpeakerUpdates(speakers: Array<HMSSpeaker>) {
