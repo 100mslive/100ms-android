@@ -170,9 +170,7 @@ class PreviewFragment : Fragment() {
       setOnSingleClickListener(200L) {
         Log.v(TAG, "buttonJoinMeeting.onClick()")
 
-        findNavController().navigate(
-          PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
-        )
+        findNavController().setGraph(R.navigation.meeting_nav_graph)
       }
     }
   }
@@ -260,12 +258,17 @@ class PreviewFragment : Fragment() {
     }
 
     meetingViewModel.previewPeerLiveData.observe(viewLifecycleOwner) { (type, peer) ->
-      val peerToUpdate = participantsDialogAdapter?.getItems()?.firstOrNull {
-        it.peerID == peer.peerID
-      }
-      participantsDialogAdapter?.removeItem(peerToUpdate)
-      if (type != HMSPeerUpdate.PEER_LEFT) {
-        participantsDialogAdapter?.insertItem(peer)
+      when(type) {
+        HMSPeerUpdate.PEER_JOINED -> {
+          participantsDialogAdapter?.insertItem(peer)
+        }
+        HMSPeerUpdate.PEER_LEFT -> {
+          participantsDialogAdapter?.removeItem(peer)
+        }
+        HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+          Toast.makeText(requireActivity(), "Downlink network quality is ${peer.networkQuality?.downlinkQuality}", Toast.LENGTH_LONG).show()
+        }
+        else -> Unit
       }
     }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/PreviewFragment"
+    android:id="@+id/nav_graph">
+
+    <fragment
+        android:id="@+id/PreviewFragment"
+        android:name="live.hms.app2.ui.meeting.PreviewFragment"
+        android:label="@string/preview_fragment"
+        tools:layout="@layout/fragment_preview" />
+
+</navigation>

@@ -41,6 +41,7 @@ class SettingsStore(context: Context) {
 
     const val LEAK_CANARY = "leak-canary"
     const val SHOW_RECONNECTING_PROGRESS_BARS = "show-reconnecting-progress-bar"
+    const val SHOW_PREVIEW_BEFORE_JOIN = "show-preview-before-join"
     const val SUBSCRIBE_DEGRADATION = "subscribe-degradation-enabling"
     const val RTMP_URL_LIST = "rtmp-url-list"
     const val USE_HARDWARE_AEC = "use-hardware-aec"
@@ -199,6 +200,10 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(SHOW_RECONNECTING_PROGRESS_BARS, true)
     set(value) = putBoolean(SHOW_RECONNECTING_PROGRESS_BARS, value)
 
+  var showPreviewBeforeJoin: Boolean
+    get() = sharedPreferences.getBoolean(SHOW_PREVIEW_BEFORE_JOIN, true)
+    set(value) = putBoolean(SHOW_PREVIEW_BEFORE_JOIN, value)
+
   var meetingMode: MeetingViewMode
     get() {
       val str = sharedPreferences.getString(
@@ -258,6 +263,9 @@ class SettingsStore(context: Context) {
     fun setShowNetworkInfo(value: Boolean) = apply { editor.putBoolean(SHOW_NETWORK_INFO, value) }
     fun setReconnectingShowProgressBars(value: Boolean) =
       apply { editor.putBoolean(SHOW_RECONNECTING_PROGRESS_BARS, value) }
+
+    fun setShowPreviewBeforeJoin(value: Boolean) =
+      apply { editor.putBoolean(SHOW_PREVIEW_BEFORE_JOIN, value) }
 
     fun setAudioPollInterval(value: Long) = apply { editor.putLong(AUDIO_POLL_INTERVAL, value) }
     fun setSilenceAudioLevelThreshold(value: Int) =
