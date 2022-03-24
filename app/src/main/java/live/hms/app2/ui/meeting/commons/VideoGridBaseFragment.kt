@@ -312,14 +312,14 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
         }
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
-        updateNetworkQuality(peerTypePair.first.downlinkScore,isUpdatedPeerRendered)
+        updateNetworkQuality(peerTypePair.first.networkQuality?.downlinkQuality,isUpdatedPeerRendered)
         }
       }
     }
   }
 
-  fun updateNetworkQuality(downlinkScore: String?, view: RenderedViewPair?){
-    downlinkScore?.toIntOrNull()?.let {
+  fun updateNetworkQuality(downlinkScore: Int?, view: RenderedViewPair?){
+    downlinkScore?.let {
       view?.binding?.videoCard?.networkQuality?.apply {
         colorFilter = null
         visibility = View.VISIBLE
