@@ -324,6 +324,8 @@ abstract class VideoGridBaseFragment : Fragment() {
               this.setImageDrawable(drawable)
               if (drawable == null){
                 this.visibility = View.GONE
+              }else{
+                this.visibility = View.VISIBLE
               }
             }
           }

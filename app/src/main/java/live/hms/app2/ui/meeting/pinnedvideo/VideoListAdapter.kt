@@ -189,6 +189,7 @@ class VideoListAdapter(
             }
             is PeerUpdatePayloads.NetworkQualityChanged -> {
               context?.let { context ->
+                holder.binding.networkQuality.visibility = View.VISIBLE
                 NetworkQualityHelper.getNetworkResource(payload.downlinkSpeed, context = context)?.let {
                   if (payload.downlinkSpeed == 0) {
                     holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
@@ -197,7 +198,7 @@ class VideoListAdapter(
                   }
                   holder.binding.networkQuality.setImageDrawable(it)
                 } ?: {
-                  holder.binding.networkQuality.isVisible = false
+                  holder.binding.networkQuality.visibility = View.GONE
                 }
               }
             }
