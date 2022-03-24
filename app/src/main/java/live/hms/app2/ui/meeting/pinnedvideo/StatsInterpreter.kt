@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import live.hms.video.connection.stats.*
 import live.hms.video.media.tracks.HMSAudioTrack
 import live.hms.video.media.tracks.HMSVideoTrack
+import kotlin.math.roundToInt
 
 class StatsInterpreter(val active: Boolean) {
     // For this to happen in n time rather than n^x times for a video, they'll have to
@@ -37,10 +38,10 @@ class StatsInterpreter(val active: Boolean) {
                     .map {
                         it.fold("") { acc, webrtcStats ->
                             acc + when (webrtcStats) {
-                                is HMSRemoteAudioStats -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\n\nBytesReceived:${webrtcStats.bytesReceived}\nBitrate:${webrtcStats.bitrate}\nPR:${webrtcStats.packetsReceived}\nPL:${webrtcStats.packetsLost}\n"
+                                is HMSRemoteAudioStats -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\n\nBytesReceived:${webrtcStats.bytesReceived}\nBitrate:${webrtcStats.bitrate?.roundToInt()}\nPR:${webrtcStats.packetsReceived}\nPL:${webrtcStats.packetsLost}\n"
                                 is HMSRemoteVideoStats -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.frameRate}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}\n"
-                                is HMSLocalAudioStats -> "\nLocalAudio:\n\tIncoming: ${webrtcStats.bitrate}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}"
-                                is HMSLocalVideoStats -> "\nLocalVideo:\n\tIncoming: ${webrtcStats.bitrate}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}"
+                                is HMSLocalAudioStats -> "\nLocalAudio:\n\tIncoming: ${webrtcStats.bitrate?.roundToInt()}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}"
+                                is HMSLocalVideoStats -> "\nLocalVideo:\n\tIncoming: ${webrtcStats.bitrate?.roundToInt()}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}"
                                 else -> acc
                             }
                         }
