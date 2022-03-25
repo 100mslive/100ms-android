@@ -61,7 +61,7 @@ class SettingsFragment : Fragment() {
       "Rear Facing Camera" to REAR_FACING_CAMERA,
     )
 
-    private val MEETING_MODES = MeetingViewMode.values().map { it.toString() }.toTypedArray()
+    private val MEETING_MODES = MeetingViewMode::class.nestedClasses.mapNotNull { it.simpleName }.toTypedArray()
 
     private val LOG_LEVELS_100MS = HMSLogger.LogLevel.values().map { it.toString() }.toTypedArray()
 
@@ -454,7 +454,19 @@ class SettingsFragment : Fragment() {
         EnumSet.of(SettingsMode.HOME),
         settings.enableSubscribeDegradation,
         switchSubscribeDegradationEnabled
-      ) {commitHelper.setSubscribeDegradation(it)}
+      ) { commitHelper.setSubscribeDegradation(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.enableHardwareAEC,
+        switchUseHardwareEchoCancellation
+      ) { commitHelper.setUseHardwareAEC(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.showStats,
+        showStats
+      ) { commitHelper.setShowStats(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
@@ -473,6 +485,13 @@ class SettingsFragment : Fragment() {
         settings.showReconnectingProgressBars,
         switchShowProgressBars
       ) { commitHelper.setReconnectingShowProgressBars(it) }
+
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.showPreviewBeforeJoin,
+        switchShowPreviewBeforeJoin
+      ) { commitHelper.setShowPreviewBeforeJoin(it) }
 
       if (BuildConfig.INTERNAL) {
         initSwitch(
@@ -497,7 +516,6 @@ class SettingsFragment : Fragment() {
       switchPublishAudioOnJoin.isEnabled = false
       switchPublishVideoOnJoin.isEnabled = false
       switchMirrorVideo.isEnabled = false
-      switchShowPreviewBeforeJoin.isEnabled = false
 
       // Disable leak-canary switch for non-debug builds
       switchToggleLeakCanary.isEnabled = BuildConfig.DEBUG

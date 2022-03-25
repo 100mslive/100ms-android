@@ -224,6 +224,23 @@
             android:visibility="visible" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/show_stats"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/show_stats"
+            android:visibility="visible" />
+
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_use_hardware_echo_cancellation"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/use_hardware_AEC"
+            android:visibility="visible" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_publish_video_on_join"
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"

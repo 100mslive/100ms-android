@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.edit
+import live.hms.app2.BuildConfig
 import live.hms.app2.ui.meeting.MeetingViewMode
 import live.hms.video.utils.HMSLogger
 
@@ -40,7 +41,11 @@ class SettingsStore(context: Context) {
 
     const val LEAK_CANARY = "leak-canary"
     const val SHOW_RECONNECTING_PROGRESS_BARS = "show-reconnecting-progress-bar"
+    const val SHOW_PREVIEW_BEFORE_JOIN = "show-preview-before-join"
     const val SUBSCRIBE_DEGRADATION = "subscribe-degradation-enabling"
+    const val RTMP_URL_LIST = "rtmp-url-list"
+    const val USE_HARDWARE_AEC = "use-hardware-aec"
+    const val SHOW_STATS = "show-video-stats"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -60,6 +65,13 @@ class SettingsStore(context: Context) {
 
   fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
     sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
+  }
+
+  private fun putStringSet(key: String, value: Set<String>) {
+    sharedPreferences.edit {
+      putStringSet(key, value)
+      apply()
+    }
   }
 
   private fun putString(key: String, value: String) {
@@ -97,9 +109,18 @@ class SettingsStore(context: Context) {
     }
   }
 
-  var enableSubscribeDegradation : Boolean
-      get() = sharedPreferences.getBoolean(SUBSCRIBE_DEGRADATION, true)
-      set(value) = putBoolean(SUBSCRIBE_DEGRADATION, value)
+  var enableSubscribeDegradation: Boolean
+    get() = sharedPreferences.getBoolean(SUBSCRIBE_DEGRADATION, true)
+    set(value) = putBoolean(SUBSCRIBE_DEGRADATION, value)
+
+  // Set to true to enable Hardware echo cancellation else set to false to enable SW based
+  var enableHardwareAEC: Boolean
+    get() = sharedPreferences.getBoolean(USE_HARDWARE_AEC, true)
+    set(value) = putBoolean(USE_HARDWARE_AEC, value)
+
+  var showStats: Boolean
+    get() = sharedPreferences.getBoolean(SHOW_STATS, true)
+    set(value) = putBoolean(SHOW_STATS, value)
 
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
@@ -179,13 +200,17 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(SHOW_RECONNECTING_PROGRESS_BARS, true)
     set(value) = putBoolean(SHOW_RECONNECTING_PROGRESS_BARS, value)
 
+  var showPreviewBeforeJoin: Boolean
+    get() = sharedPreferences.getBoolean(SHOW_PREVIEW_BEFORE_JOIN, true)
+    set(value) = putBoolean(SHOW_PREVIEW_BEFORE_JOIN, value)
+
   var meetingMode: MeetingViewMode
     get() {
       val str = sharedPreferences.getString(
         MEETING_MODE,
         MeetingViewMode.ACTIVE_SPEAKER.toString()
       )!!
-      return MeetingViewMode.valueOf(str)
+      return MeetingViewMode::class.nestedClasses.find { it.simpleName == str }?.objectInstance as MeetingViewMode? ?: MeetingViewMode.ACTIVE_SPEAKER
     }
     set(value) = putString(MEETING_MODE, value.toString())
 
@@ -209,6 +234,14 @@ class SettingsStore(context: Context) {
     }
     set(value) = putString(LOG_LEVEL_100MS_SDK, value.toString())
 
+  var rtmpUrlsList: Set<String>
+    get() = sharedPreferences.getStringSet(
+      RTMP_URL_LIST,
+      if (BuildConfig.RTMP_INJEST_URL.isEmpty()) emptySet<String>() else setOf(BuildConfig.RTMP_INJEST_URL)
+    )?.toSet() ?: emptySet()
+    set(value) = putStringSet(RTMP_URL_LIST, value)
+
+
   inner class MultiCommitHelper {
 
     private val editor = sharedPreferences.edit()
@@ -231,6 +264,9 @@ class SettingsStore(context: Context) {
     fun setReconnectingShowProgressBars(value: Boolean) =
       apply { editor.putBoolean(SHOW_RECONNECTING_PROGRESS_BARS, value) }
 
+    fun setShowPreviewBeforeJoin(value: Boolean) =
+      apply { editor.putBoolean(SHOW_PREVIEW_BEFORE_JOIN, value) }
+
     fun setAudioPollInterval(value: Long) = apply { editor.putLong(AUDIO_POLL_INTERVAL, value) }
     fun setSilenceAudioLevelThreshold(value: Int) =
       apply { editor.putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value) }
@@ -250,6 +286,9 @@ class SettingsStore(context: Context) {
       apply { editor.putString(LOG_LEVEL_100MS_SDK, value.toString()) }
 
     fun setSubscribeDegradation(value: Boolean) = apply { editor.putBoolean(SUBSCRIBE_DEGRADATION, value) }
+    fun setUseHardwareAEC(value: Boolean) = apply { editor.putBoolean(USE_HARDWARE_AEC, value) }
+    fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
+
 
     fun commit() {
       editor.commit()

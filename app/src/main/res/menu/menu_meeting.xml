@@ -2,10 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_record"
+        android:icon="@drawable/recording"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_volume"
         android:icon="@drawable/ic_volume_up_24"
         android:title="@string/toggle_volume"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_flip_camera"
@@ -20,16 +26,36 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/hls_start"
+        android:title="@string/hls_start"
+        app:showAsAction="ifRoom"
+    />
+
+    <item
+        android:id="@+id/hls_stop"
+        android:title="@string/hls_stop"
+        app:showAsAction="ifRoom"
+    />
+
+    <item
         android:id="@+id/end_room"
         android:title="@string/end_room"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/end_and_lock_room"
         android:title="@string/end_and_lock_room"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/remote_mute_all"
+        android:title="@string/remote_mute_all_desc"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/remote_mute_role"
+        android:title="@string/remote_mute_role_desc"
+        app:showAsAction="ifRoom" />
 
     <group>
         <item
@@ -56,6 +82,37 @@
             android:title="@string/active_speaker_view"
             app:showAsAction="never" />
 
+        <item
+            android:id="@+id/hls_view"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/hls_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_enable_background"
+            android:icon="@drawable/ic_white_svg"
+            android:title="@string/enable_background"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_disable_background"
+            android:icon="@drawable/ic_black_svg"
+            android:title="@string/disable_background"
+            app:showAsAction="never" />
+
+
+        <item
+            android:id="@+id/raise_hand"
+            android:title="@string/raise_hand"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/change_name"
+            android:title="Change Name"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
     </group>
 
     <group>
@@ -66,11 +123,22 @@
             app:showAsAction="never" />
 
         <item
-            android:id="@+id/action_record_meeting"
-            android:icon="@drawable/ic_record_button_24"
-            android:title="@string/record_meeting"
-            android:visible="false"
+            android:id="@+id/action_stop_share_screen"
+            android:icon="@android:drawable/btn_minus"
+            android:title="@string/stop_share_screen"
             app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_record_meeting"
+            android:title="@string/record_meeting"
+            android:checkable="true"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/action_stop_streaming_and_recording"
+            android:title="@string/stop_recording_stream"
+            app:showAsAction="ifRoom" />
+
 
         <item
             android:id="@+id/action_participants"

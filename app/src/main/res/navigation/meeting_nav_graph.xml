@@ -2,8 +2,8 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/PreviewFragment">
+    app:startDestination="@id/MeetingFragment"
+    android:id="@+id/nav_graph">
 
     <fragment
         android:id="@+id/PreviewFragment"
@@ -16,6 +16,10 @@
             app:destination="@id/MeetingFragment"
             app:popUpTo="@id/MeetingFragment"
             app:popUpToInclusive="@id/MeetingFragment" />
+
+        <action
+            android:id="@+id/action_PreviewFragment_to_ParticipantsFragment"
+            app:destination="@id/ParticipantsFragment" />
 
     </fragment>
 
@@ -34,6 +38,15 @@
         <action
             android:id="@+id/action_MeetingFragment_to_ParticipantsFragment"
             app:destination="@id/ParticipantsFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_rtmpRecordFragment"
+            app:destination="@id/rtmpRecordFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_changeNameDialogFragment"
+            app:destination="@id/changeNameDialogFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_hlsViewFragment"
+            app:destination="@id/hlsViewFragment" />
 
     </fragment>
 
@@ -94,5 +107,25 @@
             app:argType="string"
             android:defaultValue='""' />
     </dialog>
+    <fragment
+        android:id="@+id/rtmpRecordFragment"
+        android:name="live.hms.app2.ui.meeting.participants.RtmpRecordFragment"
+        android:label="RtmpRecordFragment"
+        tools:layout="@layout/layout_rtmp_recording" />
+    <fragment
+        android:id="@+id/changeNameDialogFragment"
+        android:name="live.hms.app2.ui.meeting.ChangeNameDialogFragment"
+        android:label="ChangeNameDialogFragment"
+        tools:layout="@layout/change_name_fragment" />
 
+    <fragment
+        android:id="@+id/hlsViewFragment"
+        android:name="live.hms.app2.ui.meeting.activespeaker.HlsFragment"
+        android:label="HlsFragment"
+        tools:layout="@layout/hls_fragment_layout"
+        >
+        <argument
+            android:name="hlsStreamUrl"
+            app:argType="string" />
+    </fragment>
 </navigation>

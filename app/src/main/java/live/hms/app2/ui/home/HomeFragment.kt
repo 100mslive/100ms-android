@@ -14,7 +14,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.BuildConfig
 import live.hms.app2.R
@@ -28,6 +27,7 @@ import live.hms.app2.ui.meeting.MeetingActivity
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.app2.util.NameUtils.isValidUserName
 
 class HomeFragment : Fragment() {
 
@@ -48,7 +48,11 @@ class HomeFragment : Fragment() {
       if (it.toString().isNotEmpty()) {
         val url = it.toString()
         requireActivity().intent.data = null
-        if (saveTokenEndpointUrlIfValid(url) && isValidUserName()) {
+        if (saveTokenEndpointUrlIfValid(url) && isValidUserName(
+            binding.containerName,
+            binding.editTextName
+          )
+        ) {
           joinRoom()
         }
       }
@@ -234,24 +238,23 @@ class HomeFragment : Fragment() {
     }
   }
 
-  private fun isValidUserName(): Boolean {
-    val username = binding.editTextName.text.toString()
-    if (username.isEmpty()) {
-      binding.containerName.error = "Username cannot be empty"
-      return false
-    }
-    return true
-  }
-
   private fun initConnectButton() {
 
     binding.buttonJoinMeeting.setOnClickListener {
       try {
         val input = binding.editTextMeetingUrl.text.toString()
-        if (saveTokenEndpointUrlIfValid(input) && isValidUserName()) {
+        if (saveTokenEndpointUrlIfValid(input) && isValidUserName(
+            binding.containerName,
+            binding.editTextName
+          )
+        ) {
           joinRoom()
           settings.username = binding.editTextName.text.toString()
-        } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName()) {
+        } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName(
+            binding.containerName,
+            binding.editTextName
+          )
+        ) {
           var subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
           if (BuildConfig.INTERNAL) {
             val env = when (settings.environment) {

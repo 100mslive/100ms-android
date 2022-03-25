@@ -9,7 +9,7 @@ fun String.isValidMeetingUrl(): Boolean =
 fun String.getTokenEndpointEnvironment(): String = when {
   this.contains("prod2.100ms.live") -> "prod-in"
   this.contains(".app.100ms.live") -> "prod-in"
-  else -> "qa-in"
+  else -> "qa-in2"
 }
 
 fun String.getInitEndpointEnvironment(): String = when {
@@ -30,4 +30,8 @@ fun String.toUniqueRoomSpecifier(): String {
     val groups = REGEX_MEETING_URL_ROOM_ID.findAll(this).toList()[0].groupValues
     groups[2]
   }
+}
+
+fun getBeamBotJoiningUrl(meetingUrl: String, roomId: String, beamBotUser: String): String {
+  return "https://${meetingUrl.toSubdomain()}/preview/$roomId/$beamBotUser?token=beam_recording"
 }

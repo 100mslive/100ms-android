@@ -5,17 +5,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
+import androidx.annotation.CallSuper
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.app2.databinding.GridItemVideoBinding
 import live.hms.app2.databinding.VideoCardBinding
+import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
+import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.app2.ui.settings.SettingsStore
-import live.hms.app2.util.*
-import live.hms.app2.util.visibility
+import live.hms.app2.util.NameUtils
+import live.hms.app2.util.SurfaceViewRendererUtil
+import live.hms.app2.util.crashlyticsLog
+import live.hms.app2.util.visibilityOpacity
+import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 import kotlin.math.max
 import kotlin.math.min
@@ -41,7 +48,8 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   protected data class RenderedViewPair(
     val binding: GridItemVideoBinding,
-    val meetingTrack: MeetingTrack
+    val meetingTrack: MeetingTrack,
+    val statsInterpreter: StatsInterpreter?,
   )
 
   private val bindedVideoTrackIds = mutableSetOf<String>()
@@ -117,7 +125,8 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     if (item.peer.videoTrack == null
       || item.video == null
-      || item.video?.isMute == true) return
+      || item.video?.isMute == true
+      || bindedVideoTrackIds.contains(item.video?.trackId)) return
 
     binding.surfaceView.let { view ->
       view.setScalingType(scalingType)
@@ -181,7 +190,11 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
 
-  protected fun updateVideos(layout: GridLayout, newVideos: List<MeetingTrack?>) {
+  protected fun updateVideos(
+    layout: GridLayout,
+    newVideos: List<MeetingTrack?>,
+    isVideoGrid: Boolean
+  ) {
     crashlyticsLog(
       TAG,
       "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
@@ -206,6 +219,7 @@ abstract class VideoGridBaseFragment : Fragment() {
             currentRenderedView.binding.videoCard,
             currentRenderedView.meetingTrack
           )
+//          currentRenderedView.statsInterpreter?.close()
           removeViewInLayout(currentRenderedView.binding.root)
         }
       }
@@ -225,21 +239,35 @@ abstract class VideoGridBaseFragment : Fragment() {
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
           }
-
+          renderedViewPair.binding.videoCard.raisedHand.alpha =
+            visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isHandRaised == true)
         } else {
           crashlyticsLog(TAG, "updateVideos: Creating view for video=${newVideo} in fragment=$tag")
           requiresGridLayoutUpdate = true
 
           // Create a new view
           val videoBinding = createVideoView(layout)
+          var statsInterpreter: StatsInterpreter? = null
+          if (!isVideoGrid) {
+            statsInterpreter = StatsInterpreter(settings.showStats)
+            statsInterpreter.initiateStats(
+              this,
+              meetingViewModel.getStats(),
+              newVideo.video,
+              newVideo.audio,
+              newVideo.peer.isLocal
+            ) { videoBinding.videoCard.statsView.text = it }
+          }
 
           // Bind surfaceView when view is visible to user
           if (isFragmentVisible) {
             bindSurfaceView(videoBinding.videoCard, newVideo)
           }
 
+          videoBinding.videoCard.raisedHand.alpha =
+            visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isHandRaised == true)
           layout.addView(videoBinding.root)
-          newRenderedViews.add(RenderedViewPair(videoBinding, newVideo))
+          newRenderedViews.add(RenderedViewPair(videoBinding, newVideo, statsInterpreter))
         }
       }
     }
@@ -263,6 +291,26 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
+  private fun applyMetadataUpdates(peerTypePair: Pair<HMSPeer, HMSPeerUpdate>) {
+    val isUpdatedPeerRendered =
+      renderedViews.find { it.meetingTrack.peer.peerID == peerTypePair.first.peerID }
+    if (isUpdatedPeerRendered != null) {
+      when (peerTypePair.second) {
+        HMSPeerUpdate.METADATA_CHANGED -> {
+          val isHandRaised =
+            CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isHandRaised == true
+          isUpdatedPeerRendered.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
+        }
+        HMSPeerUpdate.NAME_CHANGED -> {
+          with(isUpdatedPeerRendered.binding.videoCard) {
+            name.text = isUpdatedPeerRendered.meetingTrack.peer.name
+            nameInitials.text = NameUtils.getInitials(isUpdatedPeerRendered.meetingTrack.peer.name)
+          }
+        }
+      }
+    }
+  }
+
   protected fun applySpeakerUpdates(speakers: Array<HMSSpeaker>) {
     renderedViews.forEach { renderedView ->
       val track = renderedView.meetingTrack.audio
@@ -273,7 +321,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
           container.strokeWidth = 0
         } else {
-          val level = speakers.find { it.trackId == track.trackId }?.level ?: 0
+          val level = speakers.find { it.hmsTrack?.trackId == track.trackId }?.level ?: 0
 
           videoCard.audioLevel.apply {
             text = "$level"
@@ -299,9 +347,19 @@ abstract class VideoGridBaseFragment : Fragment() {
     super.onResume()
     crashlyticsLog(TAG, "Fragment=$tag onResume()")
     isFragmentVisible = true
+    bindViews()
+  }
 
+  fun bindViews() {
     renderedViews.forEach {
       bindSurfaceView(it.binding.videoCard, it.meetingTrack)
+      it.statsInterpreter?.initiateStats(
+        this,
+        meetingViewModel.getStats(),
+        it.meetingTrack.video,
+        it.meetingTrack.audio,
+        it.meetingTrack.peer.isLocal
+      ) { string -> it.binding.videoCard.statsView.text = string }
     }
   }
 
@@ -309,9 +367,13 @@ abstract class VideoGridBaseFragment : Fragment() {
     super.onPause()
     crashlyticsLog(TAG, "Fragment=$tag onPause()")
     isFragmentVisible = false
+    unbindViews()
+  }
 
+  fun unbindViews() {
     renderedViews.forEach {
       unbindSurfaceView(it.binding.videoCard, it.meetingTrack)
+//      it.statsInterpreter?.close()
     }
   }
 
@@ -321,5 +383,12 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     // Release all references to views
     renderedViews.clear()
+  }
+
+  @CallSuper
+  open fun initViewModels() {
+    meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) {
+      applyMetadataUpdates(it)
+    }
   }
 }

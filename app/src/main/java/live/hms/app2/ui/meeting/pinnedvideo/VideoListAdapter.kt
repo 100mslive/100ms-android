@@ -5,17 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.flow.Flow
 import live.hms.app2.databinding.ListItemVideoBinding
+import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.util.NameUtils
 import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
+import live.hms.app2.util.visibility
+import live.hms.video.connection.stats.HMSStats
+import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 
 class VideoListAdapter(
-  private val onVideoItemClick: (item: MeetingTrack) -> Unit
+  private val onVideoItemClick: (item: MeetingTrack) -> Unit,
+  private val itemStats: Flow<Map<String, HMSStats>>,
+  private val statsActive: Boolean
 ) : RecyclerView.Adapter<VideoListAdapter.VideoItemViewHolder>() {
 
   companion object {
@@ -37,10 +46,12 @@ class VideoListAdapter(
   }
 
   inner class VideoItemViewHolder(
-    val binding: ListItemVideoBinding
+    val binding: ListItemVideoBinding,
+    private val itemStats: Flow<Map<String, HMSStats>>
   ) : RecyclerView.ViewHolder(binding.root) {
 
     private var itemRef: VideoListItem? = null
+    private val statsInterpreter = StatsInterpreter(statsActive)
 
     private var isSurfaceViewBinded = false
 
@@ -59,14 +70,24 @@ class VideoListAdapter(
         isSurfaceViewBinded = false
       }
 
+      val isHandRaised: Boolean =
+        CustomPeerMetadata.fromJson(item.track.peer.metadata)?.isHandRaised == true
+      binding.raisedHand.visibility = visibility(isHandRaised)
+
       binding.root.setOnClickListener { onVideoItemClick(item.track) }
     }
+
 
     fun bindSurfaceView() {
       if (isSurfaceViewBinded) {
         Log.d(TAG, "bindSurfaceView: Surface view already initialized")
         return
       }
+      statsInterpreter.initiateStats(
+        binding.root.findViewTreeLifecycleOwner()!!,
+        itemStats, itemRef?.track?.video,
+        itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
+      ) { binding.stats.text = it }
 
       itemRef?.let { item ->
         SurfaceViewRendererUtil.bind(
@@ -75,7 +96,8 @@ class VideoListAdapter(
           "VideoItemViewHolder::bindSurfaceView"
         ).let { success ->
           if (success) {
-            binding.surfaceView.visibility = if (item.track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+            binding.surfaceView.visibility =
+              if (item.track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
             isSurfaceViewBinded = true
           }
         }
@@ -84,7 +106,7 @@ class VideoListAdapter(
 
     fun unbindSurfaceView() {
       if (!isSurfaceViewBinded) return
-
+//      statsInterpreter.close()
       itemRef?.let { item ->
         SurfaceViewRendererUtil.unbind(
           binding.surfaceView,
@@ -107,7 +129,7 @@ class VideoListAdapter(
    *  to be updated in the VideoGrid
    */
   @MainThread
-  fun setItems(newItems: MutableList<MeetingTrack>) {
+  fun setItems(newItems: List<MeetingTrack>) {
     val newVideoItems = newItems.mapIndexed { index, track -> VideoListItem(index.toLong(), track) }
 
     val callback = VideoListItemDiffUtil(items, newVideoItems)
@@ -125,7 +147,7 @@ class VideoListAdapter(
       parent,
       false
     )
-    return VideoItemViewHolder(binding)
+    return VideoItemViewHolder(binding, itemStats)
   }
 
   override fun onBindViewHolder(holder: VideoItemViewHolder, position: Int) {
@@ -142,17 +164,60 @@ class VideoListAdapter(
   ) {
     if (payloads.isEmpty()) {
       return super.onBindViewHolder(holder, position, payloads)
-    }
+    } else if (payloads.all { it is PeerUpdatePayloads }) {
+      // Only if all the payloads are of type peer udpate it makes sense to individually update.
+      // If they weren't the non-payload type will result in a full redraw anyway so we let
+      // it go to the full redraw in the else clause.
+      payloads.forEach { payload ->
+        if (payload is PeerUpdatePayloads) {
+          when (payload) {
+            is PeerUpdatePayloads.MetadataChanged -> {
+              holder.binding.raisedHand.visibility =
+                visibility(payload.metadata?.isHandRaised == true)
+            }
+            is PeerUpdatePayloads.NameChanged -> {
+              holder.binding.nameInitials.text = NameUtils.getInitials(payload.name)
+              holder.binding.name.text = payload.name
+            }
+          }
+        }
+      }
+    } else {
 
-    crashlyticsLog(
-      TAG,
-      "onBindViewHolder: Manually updating $holder with ${items[position]} " +
-          "[payloads=$payloads]"
-    )
-    holder.unbindSurfaceView() // Free the context initialized for the previous item
-    holder.bind(items[position])
-    holder.bindSurfaceView()
+      crashlyticsLog(
+        TAG,
+        "onBindViewHolder: Manually updating $holder with ${items[position]} " +
+                "[payloads=$payloads]"
+      )
+      holder.unbindSurfaceView() // Free the context initialized for the previous item
+      holder.bind(items[position])
+      holder.bindSurfaceView()
+    }
   }
 
   override fun getItemCount() = items.size
+
+  fun itemChanged(changedPeer: Pair<HMSPeer, HMSPeerUpdate>) {
+
+    val updatedItemId = items.find { it.track.peer.peerID == changedPeer.first.peerID }?.id
+
+    val payload = when (changedPeer.second) {
+      HMSPeerUpdate.METADATA_CHANGED -> PeerUpdatePayloads.MetadataChanged(
+        CustomPeerMetadata.fromJson(
+          changedPeer.first.metadata
+        )
+      )
+      HMSPeerUpdate.NAME_CHANGED -> PeerUpdatePayloads.NameChanged(changedPeer.first.name)
+      else -> null
+    }
+
+    updatedItemId?.toInt()
+      ?.let { notifyItemChanged(it, payload) }
+  }
+
+  sealed class PeerUpdatePayloads {
+    data class NameChanged(val name: String) : PeerUpdatePayloads()
+    data class MetadataChanged(val metadata: CustomPeerMetadata?) : PeerUpdatePayloads()
+  }
+
 }
