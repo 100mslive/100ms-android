@@ -35,7 +35,6 @@ class VideoListAdapter(
   companion object {
     private const val TAG = "VideoListAdapter"
   }
-  private var context : Context? = null
 
   override fun getItemId(position: Int) = items[position].id
 
@@ -156,7 +155,6 @@ class VideoListAdapter(
       parent,
       false
     )
-    context = parent.context
     return VideoItemViewHolder(binding, itemStats)
   }
 
@@ -188,7 +186,7 @@ class VideoListAdapter(
               holder.binding.name.text = payload.name
             }
             is PeerUpdatePayloads.NetworkQualityChanged -> {
-              context?.let { context ->
+              holder.binding.root.context?.let { context ->
                 holder.binding.networkQuality.visibility = View.VISIBLE
                 NetworkQualityHelper.getNetworkResource(payload.downlinkSpeed, context = context)?.let {
                   if (payload.downlinkSpeed == 0) {
