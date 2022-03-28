@@ -2,16 +2,15 @@ package live.hms.app2.ui.meeting.pinnedvideo
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
-import live.hms.video.connection.degredation.Audio
-import live.hms.video.connection.degredation.Peer
-import live.hms.video.connection.degredation.Video
-import live.hms.video.connection.degredation.WebrtcStats
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import live.hms.video.connection.stats.*
 import live.hms.video.media.tracks.HMSAudioTrack
 import live.hms.video.media.tracks.HMSVideoTrack
+import kotlin.math.roundToInt
 
 class StatsInterpreter(val active: Boolean) {
     // For this to happen in n time rather than n^x times for a video, they'll have to
@@ -19,7 +18,7 @@ class StatsInterpreter(val active: Boolean) {
 
     fun initiateStats(
         lifecycleOwner: LifecycleOwner,
-        itemStats: Flow<Map<String, WebrtcStats>>,
+        itemStats: Flow<Map<String, HMSStats>>,
         currentVideoTrack: HMSVideoTrack?,
         currentAudioTrack: HMSAudioTrack?,
         isLocal: Boolean,
@@ -30,21 +29,19 @@ class StatsInterpreter(val active: Boolean) {
 
                 itemStats.map { allStats ->
 
-                    val relevantStats = mutableListOf<WebrtcStats?>().apply {
+                    val relevantStats = mutableListOf<HMSStats?>().apply {
                         add(allStats[currentAudioTrack?.trackId])
                         add(allStats[currentVideoTrack?.trackId])
-                        if (isLocal) {
-                            add(allStats[Peer.LOCAL_PEER])
-                        }
                     }
                     return@map (relevantStats.filterNotNull())
                 }
                     .map {
                         it.fold("") { acc, webrtcStats ->
                             acc + when (webrtcStats) {
-                                is Audio -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nConcealment Events:${webrtcStats.concealmentEvents}"
-//                                is Video -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.framesPerSecond}\nFD:${webrtcStats.framesDropped}\nPLI:${webrtcStats.pliCount}\nNACK:${webrtcStats.nackCount}\nWidth:${webrtcStats.frameWidth}\nHeight:${webrtcStats.frameHeight}\nFreezes:${webrtcStats.freezeCount}"
-                                is Peer -> "\nPeer:\n\tIncoming: ${webrtcStats.availableIncomingBitrate}\nOutgoing: ${webrtcStats.availableOutgoingBitrate}\nRTT${webrtcStats.currentRoundTripTime}"
+                                is HMSRemoteAudioStats -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\n\nBytesReceived:${webrtcStats.bytesReceived}\nBitrate:${webrtcStats.bitrate?.roundToInt()}\nPR:${webrtcStats.packetsReceived}\nPL:${webrtcStats.packetsLost}\n"
+                                is HMSRemoteVideoStats -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.frameRate}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}\n"
+                                is HMSLocalAudioStats -> "\nLocalAudio:\n\tIncoming: ${webrtcStats.bitrate?.roundToInt()}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}"
+                                is HMSLocalVideoStats -> "\nLocalVideo:\n\tIncoming: ${webrtcStats.bitrate?.roundToInt()}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}"
                                 else -> acc
                             }
                         }

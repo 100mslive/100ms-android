@@ -6,11 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
 import androidx.annotation.CallSuper
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import live.hms.app2.R
 import live.hms.app2.databinding.GridItemVideoBinding
 import live.hms.app2.databinding.VideoCardBinding
+import live.hms.app2.helpers.NetworkQualityHelper
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
@@ -46,7 +49,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   var isFragmentVisible = false
     private set
 
-  protected data class RenderedViewPair(
+  data class RenderedViewPair(
     val binding: GridItemVideoBinding,
     val meetingTrack: MeetingTrack,
     val statsInterpreter: StatsInterpreter?,
@@ -125,7 +128,8 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     if (item.peer.videoTrack == null
       || item.video == null
-      || item.video?.isMute == true) return
+      || item.video?.isMute == true
+      || bindedVideoTrackIds.contains(item.video?.trackId)) return
 
     binding.surfaceView.let { view ->
       view.setScalingType(scalingType)
@@ -306,6 +310,24 @@ abstract class VideoGridBaseFragment : Fragment() {
           with(isUpdatedPeerRendered.binding.videoCard) {
             name.text = isUpdatedPeerRendered.meetingTrack.peer.name
             nameInitials.text = NameUtils.getInitials(isUpdatedPeerRendered.meetingTrack.peer.name)
+          }
+        }
+        HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+          val downlinkScore = peerTypePair.first.networkQuality?.downlinkQuality
+          isUpdatedPeerRendered.binding.videoCard.networkQuality.apply {
+            NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
+              if (downlinkScore == 0) {
+                this.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+              } else {
+                this.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+              }
+              this.setImageDrawable(drawable)
+              if (drawable == null){
+                this.visibility = View.GONE
+              }else{
+                this.visibility = View.VISIBLE
+              }
+            }
           }
         }
       }

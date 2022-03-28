@@ -21,16 +21,12 @@ import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.participants.ParticipantsAdapter
 import live.hms.app2.ui.meeting.participants.ParticipantsDialog
 import live.hms.app2.util.*
-import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
-import live.hms.video.media.tracks.HMSTrack
-import live.hms.video.sdk.HMSPreviewListener
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.utils.HMSCoroutineScope
 
 class PreviewFragment : Fragment() {
@@ -174,9 +170,7 @@ class PreviewFragment : Fragment() {
       setOnSingleClickListener(200L) {
         Log.v(TAG, "buttonJoinMeeting.onClick()")
 
-        findNavController().navigate(
-          PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
-        )
+        findNavController().setGraph(R.navigation.meeting_nav_graph)
       }
     }
   }
@@ -211,11 +205,9 @@ class PreviewFragment : Fragment() {
         }
       }
       R.id.action_participants -> {
-        if (participantsDialogAdapter?.getItems()?.isNullOrEmpty()?.not() == true){
-          participantsDialog?.show()
-        } else {
-          Toast.makeText(requireContext(),"No Participants in the meeting !! Be the first one to join", Toast.LENGTH_LONG).show()
-        }
+        participantsDialog?.show()
+        participantsDialog?.participantCount =
+          meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
       }
       R.id.action_volume -> {
         meetingViewModel.apply {
@@ -266,12 +258,17 @@ class PreviewFragment : Fragment() {
     }
 
     meetingViewModel.previewPeerLiveData.observe(viewLifecycleOwner) { (type, peer) ->
-      val peerToUpdate = participantsDialogAdapter?.getItems()?.firstOrNull {
-        it.peerID == peer.peerID
-      }
-      participantsDialogAdapter?.removeItem(peerToUpdate)
-      if (type != HMSPeerUpdate.PEER_LEFT) {
-        participantsDialogAdapter?.insertItem(peer)
+      when(type) {
+        HMSPeerUpdate.PEER_JOINED -> {
+          participantsDialogAdapter?.insertItem(peer)
+        }
+        HMSPeerUpdate.PEER_LEFT -> {
+          participantsDialogAdapter?.removeItem(peer)
+        }
+        HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+          Toast.makeText(requireActivity(), "Downlink network quality is ${peer.networkQuality?.downlinkQuality}", Toast.LENGTH_LONG).show()
+        }
+        else -> Unit
       }
     }
 
@@ -320,11 +317,16 @@ class PreviewFragment : Fragment() {
         }
       })
 
-    meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner, Observer { (_,room) ->
-      //          binding.peerCount.text = hmsRoom.peerCount.toString()
-      participantsDialogAdapter?.setItems(getRemotePeers(room).toTypedArray())
-    })
-  }
+        meetingViewModel.previewRoomStateLiveData.observe(
+            viewLifecycleOwner,
+            Observer { (_, room) ->
+                if (participantsDialog?.isShowing == true) {
+                    participantsDialog?.participantCount =
+                        meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
+                }
+                participantsDialogAdapter?.setItems(getRemotePeers(room).toTypedArray())
+            })
+    }
 
   private fun getRemotePeers(hmsRoom: HMSRoom) : ArrayList<HMSPeer>{
     val previewPeerList = arrayListOf<HMSPeer>()

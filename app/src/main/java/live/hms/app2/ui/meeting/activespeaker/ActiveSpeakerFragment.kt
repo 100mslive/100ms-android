@@ -32,8 +32,12 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   ): View {
     binding = FragmentActiveSpeakerBinding.inflate(inflater, container, false)
 
-    initViewModels()
     return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    initViewModels()
   }
 
   override fun onResume() {
@@ -111,7 +115,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
       screenShareStats.initiateStats(
-        this,
+        viewLifecycleOwner,
         meetingViewModel.getStats(),
         screen.video,
         screen.audio,

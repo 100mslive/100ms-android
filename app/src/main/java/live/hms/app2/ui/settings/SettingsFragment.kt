@@ -486,6 +486,13 @@ class SettingsFragment : Fragment() {
         switchShowProgressBars
       ) { commitHelper.setReconnectingShowProgressBars(it) }
 
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.showPreviewBeforeJoin,
+        switchShowPreviewBeforeJoin
+      ) { commitHelper.setShowPreviewBeforeJoin(it) }
+
       if (BuildConfig.INTERNAL) {
         initSwitch(
           EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
@@ -509,7 +516,6 @@ class SettingsFragment : Fragment() {
       switchPublishAudioOnJoin.isEnabled = false
       switchPublishVideoOnJoin.isEnabled = false
       switchMirrorVideo.isEnabled = false
-      switchShowPreviewBeforeJoin.isEnabled = false
 
       // Disable leak-canary switch for non-debug builds
       switchToggleLeakCanary.isEnabled = BuildConfig.DEBUG
