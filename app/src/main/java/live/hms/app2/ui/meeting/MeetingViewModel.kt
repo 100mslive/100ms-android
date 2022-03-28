@@ -444,6 +444,10 @@ class MeetingViewModel(
               }
             }
 
+            HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+              _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+            }
+
             else -> Unit
           }
         }

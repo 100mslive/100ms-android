@@ -1,15 +1,20 @@
 package live.hms.app2.ui.meeting.pinnedvideo
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
+import live.hms.app2.R
 import live.hms.app2.databinding.ListItemVideoBinding
+import live.hms.app2.helpers.NetworkQualityHelper
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.util.NameUtils
@@ -180,6 +185,21 @@ class VideoListAdapter(
               holder.binding.nameInitials.text = NameUtils.getInitials(payload.name)
               holder.binding.name.text = payload.name
             }
+            is PeerUpdatePayloads.NetworkQualityChanged -> {
+              holder.binding.root.context?.let { context ->
+                holder.binding.networkQuality.visibility = View.VISIBLE
+                NetworkQualityHelper.getNetworkResource(payload.downlinkSpeed, context = context)?.let {
+                  if (payload.downlinkSpeed == 0) {
+                    holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+                  } else {
+                    holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN);
+                  }
+                  holder.binding.networkQuality.setImageDrawable(it)
+                } ?: {
+                  holder.binding.networkQuality.visibility = View.GONE
+                }
+              }
+            }
           }
         }
       }
@@ -208,6 +228,9 @@ class VideoListAdapter(
           changedPeer.first.metadata
         )
       )
+      HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+        PeerUpdatePayloads.NetworkQualityChanged(changedPeer.first.networkQuality?.downlinkQuality)
+      }
       HMSPeerUpdate.NAME_CHANGED -> PeerUpdatePayloads.NameChanged(changedPeer.first.name)
       else -> null
     }
@@ -218,6 +241,7 @@ class VideoListAdapter(
 
   sealed class PeerUpdatePayloads {
     data class NameChanged(val name: String) : PeerUpdatePayloads()
+    data class NetworkQualityChanged(val downlinkSpeed: Int?) : PeerUpdatePayloads()
     data class MetadataChanged(val metadata: CustomPeerMetadata?) : PeerUpdatePayloads()
   }
 
