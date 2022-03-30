@@ -364,7 +364,7 @@ class MeetingViewModel(
       )
     )
 
-    HMSCoroutineScope.launch {
+
       Log.v(TAG, "~~ hmsSDK.join called ~~")
       hmsSDK.join(config, object : HMSUpdateListener {
 
@@ -594,7 +594,6 @@ class MeetingViewModel(
           this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
-    }
   }
 
   private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
