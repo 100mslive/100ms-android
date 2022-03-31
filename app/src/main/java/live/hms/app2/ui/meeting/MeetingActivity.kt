@@ -9,6 +9,7 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import live.hms.app2.R
 import live.hms.app2.databinding.ActivityMeetingBinding
@@ -43,10 +44,11 @@ class MeetingActivity : AppCompatActivity() {
 
     val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
     val navController = navHostFragment.navController
-    if (settingsStore?.showPreviewBeforeJoin == true) {
-      navController.setGraph(R.navigation.preview_nav_graph)
+    val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+    if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not()) {
+      navController?.setGraph(R.navigation.preview_nav_graph)
     } else {
-      navController.setGraph(R.navigation.meeting_nav_graph)
+      navController?.setGraph(R.navigation.meeting_nav_graph)
     }
 
     initViewModels()
