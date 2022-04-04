@@ -53,6 +53,7 @@
                     android:id="@+id/network_quality"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
+                    android:visibility="gone"
                     android:layout_gravity="center"
                     android:layout_marginLeft="8dp"
                     android:contentDescription="@string/screen_share" />
