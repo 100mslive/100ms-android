@@ -32,12 +32,13 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             android:theme="@style/Theme.App2.NoActionBar">
-            <intent-filter>
+            <intent-filter android:exported="true">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter android:label="Join Meeting">
+            <intent-filter android:label="Join Meeting"
+                android:exported="true">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -53,6 +54,7 @@
         <activity
             android:name="live.hms.app2.ui.meeting.MeetingActivity"
             android:label="@string/meeting"
+            android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
             android:theme="@style/Theme.App2.NoActionBar" />
