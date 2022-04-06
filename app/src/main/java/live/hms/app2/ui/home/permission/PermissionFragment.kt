@@ -23,7 +23,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private const val TAG = "PermissionFragment"
 
     private const val RC_CALL = 111
-    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.BLUETOOTH_CONNECT,
+    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
     Manifest.permission.FOREGROUND_SERVICE)
       private val PERMISSIONS_MINIMAL =
           arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
