@@ -26,6 +26,7 @@ import live.hms.video.connection.stats.quality.HMSNetworkObserver
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
+import live.hms.video.media.settings.HMSLogSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
@@ -197,9 +198,12 @@ class MeetingViewModel(
     )
     .build()
 
+  private val hmsLogSettings : HMSLogSettings = HMSLogSettings(10000,true)
+
   val hmsSDK = HMSSDK
     .Builder(application)
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
+    .setHMSLogSettings(hmsLogSettings)
     .build()
 
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
@@ -830,7 +834,7 @@ class MeetingViewModel(
           }
         })
       // Update the peer in participants
-      peerLiveDate.postValue(hmsPeer)
+      peerLiveDate.postValue(hmsPeer!!)
     }
   }
 
