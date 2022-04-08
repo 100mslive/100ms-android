@@ -203,7 +203,7 @@ class MeetingViewModel(
   val hmsSDK = HMSSDK
     .Builder(application)
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
-    .setHMSLogSettings(hmsLogSettings)
+    .setLogSettings(hmsLogSettings)
     .build()
 
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
