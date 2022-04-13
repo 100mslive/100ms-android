@@ -18,9 +18,11 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.RecordingTimesUseCase
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.media.settings.HMSRtmpVideoResolution
 import live.hms.video.sdk.models.HMSHlsRecordingConfig
 import java.net.URI
 import java.net.URISyntaxException
+import kotlin.IllegalArgumentException
 
 class RtmpRecordFragment : Fragment() {
 
@@ -100,6 +102,14 @@ class RtmpRecordFragment : Fragment() {
         false
     }
 
+    private fun checkInputWidthHeight(width : Int?, height: Int?) : HMSRtmpVideoResolution {
+        if(width == null || height == null) {
+            throw IllegalArgumentException("Enter a valid width and height")
+        }
+
+        return HMSRtmpVideoResolution(width, height)
+    }
+
     private fun startClicked() {
         // Create a config and start
         val isRecording = binding.shouldRecord.isChecked
@@ -110,6 +120,20 @@ class RtmpRecordFragment : Fragment() {
         val isHlsSingleFilePerLayer = binding.hlsSingleFilePerLayer.isChecked
         val isHlsVod = binding.hlsVod.isChecked
         val hlsRecordingConfig = HMSHlsRecordingConfig(isHlsSingleFilePerLayer, isHlsVod)
+
+        val inputWidthHeight : HMSRtmpVideoResolution = try {
+            checkInputWidthHeight(
+                binding.rtmpWidth.text.toString().toIntOrNull(),
+                binding.rtmpHeight.text.toString().toIntOrNull()
+            )
+        } catch (e : IllegalArgumentException){
+            Toast.makeText(
+                requireContext(),
+                e.message,
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
 
         if (isRtmp && !isRecording && !isHls) {
             Toast.makeText(
@@ -131,7 +155,7 @@ class RtmpRecordFragment : Fragment() {
             ).show()
         }
         else if(isRecording || isRtmp) {
-            meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList(), meetingUrl)
+            meetingViewModel.recordMeeting(isRecording, settings.rtmpUrlsList.toList(), meetingUrl, inputWidthHeight)
             findNavController().popBackStack()
         } else if(isHls) {
             meetingViewModel.startHls(meetingUrl, hlsRecordingConfig)

@@ -27,6 +27,7 @@ import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSLogSettings
+import live.hms.video.media.settings.HMSRtmpVideoResolution
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
@@ -961,20 +962,20 @@ class MeetingViewModel(
     }
   }
 
-  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>, meetingUrl: String) {
+  fun recordMeeting(
+    isRecording: Boolean,
+    rtmpInjectUrls: List<String>,
+    meetingUrl: String,
+    inputWidthHeight: HMSRtmpVideoResolution) {
     // It's streaming if there are rtmp urls present.
-    val isStreaming = rtmpInjectUrls.isNotEmpty()
-
-    val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
-    else if (isStreaming) RecordingState.STREAMING
-    else RecordingState.RECORDING
 
     Log.v(TAG, "Starting recording")
     hmsSDK.startRtmpOrRecording(
       HMSRecordingConfig(
         meetingUrl,
         rtmpInjectUrls,
-        isRecording
+        isRecording,
+        inputWidthHeight
       ), object : HMSActionResultListener {
         override fun onError(error: HMSException) {
           Log.d(TAG, "RTMP recording error: $error")
