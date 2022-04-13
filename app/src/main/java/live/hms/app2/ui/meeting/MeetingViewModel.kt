@@ -429,7 +429,12 @@ class MeetingViewModel(
               if (hmsPeer.isLocal) {
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
-                switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
+                val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
+                if(isHlsPeer) {
+                  switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
+                } else {
+                  exitHlsViewIfRequired(true)
+                }
               }
             }
 
@@ -650,6 +655,12 @@ class MeetingViewModel(
 
   private fun switchToHlsView(streamUrl : String) =
     meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
+
+  private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
+    if(!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS) {
+      meetingViewMode.postValue(MeetingViewMode.ACTIVE_SPEAKER)
+    }
+  }
 
   private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
     var started = false
