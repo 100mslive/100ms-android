@@ -433,7 +433,7 @@ class MeetingViewModel(
                 if(isHlsPeer) {
                   switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
                 } else {
-                  exitHlsViewIfRequired(true)
+                  exitHlsViewIfRequired(false)
                 }
               }
             }
