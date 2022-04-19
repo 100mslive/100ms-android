@@ -20,7 +20,6 @@ class HlsPlayer {
 
     init {
         dataSourceFactory = DefaultHttpDataSource.Factory()
-
     }
 
     fun getPlayer(context : Context, url : String, playWhenready : Boolean = true) : Player {
@@ -48,5 +47,9 @@ class HlsPlayer {
             release()
         }
         player = null
+    }
+
+    fun mute(mute : Boolean) {
+        player?.isDeviceMuted = mute
     }
 }
