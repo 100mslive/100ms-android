@@ -38,6 +38,7 @@ import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
+import live.hms.video.services.LogAlarmManager
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -199,7 +200,7 @@ class MeetingViewModel(
     )
     .build()
 
-  private val hmsLogSettings : HMSLogSettings = HMSLogSettings(10000,true)
+  private val hmsLogSettings : HMSLogSettings = HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE,true)
 
   val hmsSDK = HMSSDK
     .Builder(application)
