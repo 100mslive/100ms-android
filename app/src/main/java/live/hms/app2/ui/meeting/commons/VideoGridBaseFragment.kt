@@ -1,10 +1,12 @@
 package live.hms.app2.ui.meeting.commons
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
+import android.widget.ImageView
 import androidx.annotation.CallSuper
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
@@ -244,6 +246,9 @@ abstract class VideoGridBaseFragment : Fragment() {
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
           }
+          val downlinkScore = newVideo.peer.networkQuality?.downlinkQuality
+          updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
+
           renderedViewPair.binding.videoCard.raisedHand.alpha =
             visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isHandRaised == true)
         } else {
@@ -315,21 +320,25 @@ abstract class VideoGridBaseFragment : Fragment() {
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
           val downlinkScore = peerTypePair.first.networkQuality?.downlinkQuality
           isUpdatedPeerRendered.binding.videoCard.networkQuality.apply {
-            NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
-              if (downlinkScore == 0) {
-                this.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
-              } else {
-                this.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
-              }
-              this.setImageDrawable(drawable)
-              if (drawable == null){
-                this.visibility = View.GONE
-              }else{
-                this.visibility = View.VISIBLE
-              }
-            }
+            updateNetworkQualityView(downlinkScore ?: -1,requireContext(),this)
           }
         }
+      }
+    }
+  }
+
+  fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
+    NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
+      if (downlinkScore == 0) {
+        imageView.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+      } else {
+        imageView.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+      }
+      imageView.setImageDrawable(drawable)
+      if (drawable == null){
+        imageView.visibility = View.GONE
+      }else{
+        imageView.visibility = View.VISIBLE
       }
     }
   }

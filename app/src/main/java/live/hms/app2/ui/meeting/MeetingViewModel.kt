@@ -26,6 +26,8 @@ import live.hms.video.connection.stats.quality.HMSNetworkObserver
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
+import live.hms.video.media.settings.HMSLogSettings
+import live.hms.video.media.settings.HMSRtmpVideoResolution
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
@@ -36,6 +38,7 @@ import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
+import live.hms.video.services.LogAlarmManager
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -197,9 +200,12 @@ class MeetingViewModel(
     )
     .build()
 
+  private val hmsLogSettings : HMSLogSettings = HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE,true)
+
   val hmsSDK = HMSSDK
     .Builder(application)
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
+    .setLogSettings(hmsLogSettings)
     .build()
 
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
@@ -425,7 +431,12 @@ class MeetingViewModel(
               if (hmsPeer.isLocal) {
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
-                switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
+                val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
+                if(isHlsPeer) {
+                  switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
+                } else {
+                  exitHlsViewIfRequired(false)
+                }
               }
             }
 
@@ -647,6 +658,12 @@ class MeetingViewModel(
   private fun switchToHlsView(streamUrl : String) =
     meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
 
+  private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
+    if(!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS) {
+      meetingViewMode.postValue(MeetingViewMode.ACTIVE_SPEAKER)
+    }
+  }
+
   private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
     var started = false
     val isHlsPeer = isHlsPeer(role)
@@ -830,7 +847,7 @@ class MeetingViewModel(
           }
         })
       // Update the peer in participants
-      peerLiveDate.postValue(hmsPeer)
+      peerLiveDate.postValue(hmsPeer!!)
     }
   }
 
@@ -957,20 +974,20 @@ class MeetingViewModel(
     }
   }
 
-  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>, meetingUrl: String) {
+  fun recordMeeting(
+    isRecording: Boolean,
+    rtmpInjectUrls: List<String>,
+    meetingUrl: String,
+    inputWidthHeight: HMSRtmpVideoResolution) {
     // It's streaming if there are rtmp urls present.
-    val isStreaming = rtmpInjectUrls.isNotEmpty()
-
-    val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
-    else if (isStreaming) RecordingState.STREAMING
-    else RecordingState.RECORDING
 
     Log.v(TAG, "Starting recording")
     hmsSDK.startRtmpOrRecording(
       HMSRecordingConfig(
         meetingUrl,
         rtmpInjectUrls,
-        isRecording
+        isRecording,
+        inputWidthHeight
       ), object : HMSActionResultListener {
         override fun onError(error: HMSException) {
           Log.d(TAG, "RTMP recording error: $error")

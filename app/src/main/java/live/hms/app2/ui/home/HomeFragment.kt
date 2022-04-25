@@ -182,10 +182,6 @@ class HomeFragment : Fragment() {
           )
           Log.i(TAG, "Auth Token: ${roomDetails.authToken}")
 
-          LogUtils.staticFileWriterStart(
-            requireContext(),
-            roomDetails.url.toUniqueRoomSpecifier()
-         )
 
           // Start the meeting activity
           startMeetingActivity(roomDetails)

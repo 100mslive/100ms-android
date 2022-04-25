@@ -2,7 +2,7 @@ package live.hms.app2.ui
 
 import android.app.Application
 import android.util.Log
-import live.hms.app2.util.LogUtils
+import live.hms.video.utils.LogUtils
 
 class GlobalApplication : Application() {
 

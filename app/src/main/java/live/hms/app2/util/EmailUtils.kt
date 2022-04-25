@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.content.FileProvider
 import live.hms.app2.BuildConfig
+import live.hms.video.utils.LogUtils
 import java.util.*
 
 object EmailUtils {
