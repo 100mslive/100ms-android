@@ -33,7 +33,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
     val message = ChatMessage(
       "You",
-      Date(),
+      System.currentTimeMillis(),
       messageStr,
       true,
       Recipient.Everyone
