@@ -9,9 +9,12 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import live.hms.app2.R
 import live.hms.app2.databinding.ActivityMeetingBinding
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.ROOM_DETAILS
 
 class MeetingActivity : AppCompatActivity() {
@@ -20,6 +23,8 @@ class MeetingActivity : AppCompatActivity() {
 
   private val binding: ActivityMeetingBinding
     get() = _binding!!
+
+  var settingsStore : SettingsStore? = null
 
   private val meetingViewModel: MeetingViewModel by viewModels {
     MeetingViewModelFactory(
@@ -35,6 +40,16 @@ class MeetingActivity : AppCompatActivity() {
     setContentView(binding.root)
     setSupportActionBar(binding.containerToolbar.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
+    settingsStore = SettingsStore(this)
+
+    val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+    val navController = navHostFragment.navController
+    val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+    if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not()) {
+      navController?.setGraph(R.navigation.preview_nav_graph)
+    } else {
+      navController?.setGraph(R.navigation.meeting_nav_graph)
+    }
 
     initViewModels()
 

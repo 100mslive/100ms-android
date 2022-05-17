@@ -1,119 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="12dp"
-    android:layout_marginRight="12dp"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:context=".ui.home.HomeFragment">
 
-    <TextView
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/rtmp_settings"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:layout_height="match_parent"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:orientation="vertical">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/meetingUrl"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Meeting url" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:gravity="center"
+            android:text="@string/rtmp_settings"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/rtmpUrlContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/newRtmpUrl"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/add_new_rtmp_streaming_url"
-            android:text="" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="16dp">
 
-    <ImageButton
-        android:id="@+id/addRtmpUrlButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_round_add_circle_24" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/rtmpWidth"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Rtmp Width" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:text="Existing RTMP Urls"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rtmpUrls"
-        android:layout_marginBottom="6dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:itemCount="3"
-        tools:listitem="@layout/layout_rtmp_url_item" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/rtmpHeight"
+                android:inputType="number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="RTMP Height" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/shouldRecord"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/record"
-        android:layout_marginTop="32dp"
-        android:textAlignment="viewStart" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/shouldStartHls"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hls_start"
-        android:layout_marginTop="32dp"
-        android:textAlignment="viewStart" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/meetingUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Meeting url" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/rtmpUrlContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/newRtmpUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/add_new_rtmp_streaming_url"
+                android:text="" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/addRtmpUrlButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_round_add_circle_24" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="Existing RTMP Urls"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rtmpUrls"
+            android:layout_marginBottom="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:itemCount="3"
+            tools:listitem="@layout/layout_rtmp_url_item" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/shouldRecord"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/record"
+            android:layout_marginTop="32dp"
+            android:textAlignment="viewStart" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/shouldStartHls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hls_start"
+            android:layout_marginTop="8dp"
+            android:textAlignment="viewStart" />
 
 
-    <TextView
-        android:id="@+id/recording"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="@string/recording_start_stop"
-        />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/hlsSingleFilePerLayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Single File Per Layer"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="8dp"
+            android:textAlignment="viewStart" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="8dp"
-        />
 
-    <TextView
-        android:id="@+id/rtmp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="@string/rtmp_start_stop"
-        />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/hlsVod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HLS Vod"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="4dp"
+            android:textAlignment="viewStart" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="8dp"
-        />
 
-    <TextView
-        android:id="@+id/sfu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="@string/sfu_start"
-        />
 
-    <Button
-        android:layout_marginTop="16dp"
-        android:id="@+id/startButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/start" />
-</LinearLayout>
+
+        <TextView
+            android:id="@+id/recording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/recording_start_stop"
+            />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            />
+
+        <TextView
+            android:id="@+id/rtmp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/rtmp_start_stop"
+            />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            />
+
+        <TextView
+            android:id="@+id/sfu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/sfu_start"
+            />
+
+        <Button
+            android:layout_marginTop="16dp"
+            android:id="@+id/startButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/start" />
+    </LinearLayout>
+</ScrollView>

@@ -21,9 +21,13 @@ import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
-import live.hms.video.connection.degredation.WebrtcStats
+import live.hms.video.connection.stats.*
+import live.hms.video.connection.stats.quality.HMSNetworkObserver
+import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
+import live.hms.video.media.settings.HMSLogSettings
+import live.hms.video.media.settings.HMSRtmpVideoResolution
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
@@ -34,10 +38,12 @@ import live.hms.video.sdk.models.enums.HMSTrackUpdate
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
+import live.hms.video.services.LogAlarmManager
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -54,6 +60,7 @@ class MeetingViewModel(
     roomDetails.username,
     roomDetails.authToken,
     Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username)).toString(),
+    captureNetworkQualityInPreview = true,
     initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
   )
 
@@ -89,11 +96,26 @@ class MeetingViewModel(
 
   private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
+  // When we get stats, a flow will be updated with the saved stats.
+  private val statsFlow = MutableSharedFlow<Map<String,HMSStats>>()
+  private val savedStats : MutableMap<String, HMSStats> = mutableMapOf()
+
   private val settings = SettingsStore(getApplication())
 
   private val failures = ArrayList<HMSException>()
 
   val meetingViewMode = MutableLiveData(settings.meetingMode)
+
+  private val roomState : MutableLiveData<Pair<HMSRoomUpdate, HMSRoom>> = MutableLiveData()
+  private val previewPeerData : MutableLiveData<Pair<HMSPeerUpdate, HMSPeer>> = MutableLiveData()
+  private val previewErrorData : MutableLiveData<HMSException> = MutableLiveData()
+  private val previewUpdateData : MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> = MutableLiveData()
+
+  val previewRoomStateLiveData : LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
+  val previewPeerLiveData : LiveData<Pair<HMSPeerUpdate, HMSPeer>> = previewPeerData
+  val previewErrorLiveData : LiveData<HMSException> = previewErrorData
+  val previewUpdateLiveData : LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
+
 
   fun setMeetingViewMode(mode: MeetingViewMode) {
     if (mode != meetingViewMode.value) {
@@ -178,9 +200,12 @@ class MeetingViewModel(
     )
     .build()
 
+  private val hmsLogSettings : HMSLogSettings = HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE,true)
+
   val hmsSDK = HMSSDK
     .Builder(application)
     .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
+    .setLogSettings(hmsLogSettings)
     .build()
 
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
@@ -189,9 +214,26 @@ class MeetingViewModel(
   val peers: Array<HMSPeer>
     get() = hmsSDK.getPeers()
 
-  fun startPreview(listener: HMSPreviewListener) {
+  fun startPreview() {
     // call Preview api
-    hmsSDK.preview(config, listener)
+    hmsSDK.preview(config, object : HMSPreviewListener{
+      override fun onError(error: HMSException) {
+        previewErrorData.postValue(error)
+      }
+
+      override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
+        previewPeerData.postValue(Pair(type,peer))
+      }
+
+      override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
+        previewUpdateData.postValue(Pair(room,localTracks))
+      }
+
+      override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
+        roomState.postValue(Pair(type,hmsRoom))
+      }
+
+    })
   }
 
   fun setLocalVideoEnabled(enabled: Boolean) {
@@ -259,6 +301,62 @@ class MeetingViewModel(
   }
 
   fun startMeeting() {
+
+    hmsSDK.addRtcStatsObserver(object : HMSStatsObserver {
+      override fun onLocalAudioStats(
+        audioStats: HMSLocalAudioStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Local VideoStats: $audioStats")
+        val id = hmsTrack?.trackId
+        if(id != null)
+          savedStats[id] = audioStats
+      }
+
+      override fun onLocalVideoStats(
+        videoStats: HMSLocalVideoStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Local VideoStats: $videoStats")
+        val id = hmsTrack?.trackId
+        if(id != null)
+          savedStats[id] = videoStats
+
+      }
+
+      override fun onRTCStats(rtcStats: HMSRTCStatsReport) {
+        Log.d("RtcStatsObserver","Cumulative stats: $rtcStats")
+        viewModelScope.launch {
+          statsFlow.emit(savedStats)
+        }
+      }
+
+      override fun onRemoteAudioStats(
+        audioStats: HMSRemoteAudioStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Remote audio stats: $audioStats for peer : ${hmsPeer?.name}, with track : ${hmsTrack?.trackId}")
+        val id = hmsTrack?.trackId
+        if(id != null)
+          savedStats[id] = audioStats
+      }
+
+      override fun onRemoteVideoStats(
+        videoStats: HMSRemoteVideoStats,
+        hmsTrack: HMSTrack?,
+        hmsPeer: HMSPeer?
+      ) {
+        Log.d("RtcStatsObserver","Remote video stats: $videoStats for peer : ${hmsPeer?.name}, with track : ${hmsTrack?.trackId}")
+        val id = hmsTrack?.trackId
+        if(id != null)
+          savedStats[id] = videoStats
+      }
+
+    })
+
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
@@ -272,7 +370,7 @@ class MeetingViewModel(
       )
     )
 
-    HMSCoroutineScope.launch {
+
       Log.v(TAG, "~~ hmsSDK.join called ~~")
       hmsSDK.join(config, object : HMSUpdateListener {
 
@@ -293,6 +391,7 @@ class MeetingViewModel(
           state.postValue(MeetingState.Ongoing())
           hmsRoom = room // Just storing the room id for the beam bot.
           Log.d("onRoomUpdate", "$room")
+          Log.d(TAG, "SessionId is: ${room.sessionId}")
 
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
@@ -333,7 +432,12 @@ class MeetingViewModel(
               if (hmsPeer.isLocal) {
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
-                switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
+                val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
+                if(isHlsPeer) {
+                  switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
+                } else {
+                  exitHlsViewIfRequired(false)
+                }
               }
             }
 
@@ -350,6 +454,10 @@ class MeetingViewModel(
               } else {
                 _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
               }
+            }
+
+            HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+              _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
             }
 
             else -> Unit
@@ -462,7 +570,7 @@ class MeetingViewModel(
         override fun onReconnected() {
           HMSLogger.d(TAG, "~~ onReconnected ~~")
           failures.clear()
-          state.postValue(MeetingState.Ongoing())
+          state.postValue(MeetingState.Reconnected())
         }
 
         override fun onReconnecting(error: HMSException) {
@@ -498,7 +606,6 @@ class MeetingViewModel(
           this@MeetingViewModel.speakers.postValue(speakers)
         }
       })
-    }
   }
 
   private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
@@ -551,6 +658,12 @@ class MeetingViewModel(
 
   private fun switchToHlsView(streamUrl : String) =
     meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
+
+  private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
+    if(!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS) {
+      meetingViewMode.postValue(MeetingViewMode.ACTIVE_SPEAKER)
+    }
+  }
 
   private fun switchToHlsViewIfRequired(role : HMSRole?, streamUrl: String?) {
     var started = false
@@ -735,7 +848,7 @@ class MeetingViewModel(
           }
         })
       // Update the peer in participants
-      peerLiveDate.postValue(hmsPeer)
+      peerLiveDate.postValue(hmsPeer!!)
     }
   }
 
@@ -862,20 +975,20 @@ class MeetingViewModel(
     }
   }
 
-  fun recordMeeting(isRecording: Boolean, rtmpInjectUrls: List<String>, meetingUrl: String) {
+  fun recordMeeting(
+    isRecording: Boolean,
+    rtmpInjectUrls: List<String>,
+    meetingUrl: String,
+    inputWidthHeight: HMSRtmpVideoResolution) {
     // It's streaming if there are rtmp urls present.
-    val isStreaming = rtmpInjectUrls.isNotEmpty()
-
-    val successResult = if (isStreaming && isRecording) RecordingState.STREAMING_AND_RECORDING
-    else if (isStreaming) RecordingState.STREAMING
-    else RecordingState.RECORDING
 
     Log.v(TAG, "Starting recording")
     hmsSDK.startRtmpOrRecording(
       HMSRecordingConfig(
         meetingUrl,
         rtmpInjectUrls,
-        isRecording
+        isRecording,
+        inputWidthHeight
       ), object : HMSActionResultListener {
         override fun onError(error: HMSException) {
           Log.d(TAG, "RTMP recording error: $error")
@@ -1012,11 +1125,11 @@ class MeetingViewModel(
     })
   }
 
-  fun getStats(): Flow<Map<String, WebrtcStats>> = emptyFlow()//hmsSDK.getStats()
+  fun getStats(): Flow<Map<String, HMSStats>> = statsFlow
 
-  fun startHls(hlsUrl : String) {
-
-    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)))
+  fun startHls(hlsUrl : String, recordingConfig : HMSHlsRecordingConfig) {
+    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)),
+    recordingConfig)
 
     hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {
       override fun onError(error: HMSException) {

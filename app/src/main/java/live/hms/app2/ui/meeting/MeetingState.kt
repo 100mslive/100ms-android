@@ -14,6 +14,7 @@ sealed class MeetingState {
   data class LoadingMedia(val heading: String, val message: String) : MeetingState()
   data class PublishingMedia(val heading: String, val message: String) : MeetingState()
   data class Ongoing(val message: String = "") : MeetingState()
+  data class Reconnected(val message: String = "") : MeetingState()
   data class Disconnecting(val heading: String, val message: String) : MeetingState()
   data class Reconnecting(val heading: String, val message: String) : MeetingState()
   data class Disconnected(val goToHome: Boolean = false, val removedFromRoom : HMSRemovedFromRoom? = null) : MeetingState()

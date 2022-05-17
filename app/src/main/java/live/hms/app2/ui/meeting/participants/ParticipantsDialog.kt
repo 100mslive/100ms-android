@@ -11,10 +11,17 @@ import live.hms.app2.databinding.DialogParticipantsBinding
 class ParticipantsDialog(context: Context) : Dialog(context) {
 
     var adapter: ParticipantsAdapter
-    lateinit var dialogParticipantsBinding: DialogParticipantsBinding
+    private lateinit var dialogParticipantsBinding: DialogParticipantsBinding
+    var participantCount: Int = 0
+        set(value) {
+            if (this.isShowing) {
+                dialogParticipantsBinding.participantCount.text = value.toString()
+                field = value
+            }
+        }
 
     init {
-        adapter = ParticipantsAdapter(false, false, false, false,{},VIEW_TYPE.PREVIEW)
+        adapter = ParticipantsAdapter(false, false, false, false, {}, VIEW_TYPE.PREVIEW)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -41,10 +41,20 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="35dp"
             android:layout_marginBottom="12dp"
             android:backgroundTint="@color/black_faded_40"
             android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/network_quality"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_marginHorizontal="8dp"
+                android:src="@drawable/ic_baseline_wifi_5"
+                app:tint="@android:color/holo_green_light" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/name"
@@ -52,7 +62,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="@string/john_doe"
+                android:layout_weight="1"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="@string/john_doe"                android:ellipsize="end"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 

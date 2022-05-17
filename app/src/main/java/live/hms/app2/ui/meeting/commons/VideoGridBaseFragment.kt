@@ -1,16 +1,21 @@
 package live.hms.app2.ui.meeting.commons
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
+import android.widget.ImageView
 import androidx.annotation.CallSuper
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import live.hms.app2.R
 import live.hms.app2.databinding.GridItemVideoBinding
 import live.hms.app2.databinding.VideoCardBinding
+import live.hms.app2.helpers.NetworkQualityHelper
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
@@ -46,7 +51,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   var isFragmentVisible = false
     private set
 
-  protected data class RenderedViewPair(
+  data class RenderedViewPair(
     val binding: GridItemVideoBinding,
     val meetingTrack: MeetingTrack,
     val statsInterpreter: StatsInterpreter?,
@@ -123,9 +128,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
   ) {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
-    if (item.peer.videoTrack == null
-      || item.video == null
-      || item.video?.isMute == true) return
+    val earlyExit = item.video == null
+            || item.video?.isMute == true
+            || bindedVideoTrackIds.contains(item.video?.trackId)
+    if (earlyExit) return
 
     binding.surfaceView.let { view ->
       view.setScalingType(scalingType)
@@ -159,8 +165,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       icDegraded.alpha = visibilityOpacity(item.video?.isDegraded == true)
 
       /** [View.setVisibility] */
-      val surfaceViewVisibility = if (item.peer.videoTrack == null
-        || item.video == null
+      val surfaceViewVisibility = if (item.video == null
         || item.video?.isMute == true
         || item.video?.isDegraded == true) {
         View.INVISIBLE
@@ -240,6 +245,9 @@ abstract class VideoGridBaseFragment : Fragment() {
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
           }
+          val downlinkScore = newVideo.peer.networkQuality?.downlinkQuality
+          updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
+
           renderedViewPair.binding.videoCard.raisedHand.alpha =
             visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isHandRaised == true)
         } else {
@@ -308,6 +316,28 @@ abstract class VideoGridBaseFragment : Fragment() {
             nameInitials.text = NameUtils.getInitials(isUpdatedPeerRendered.meetingTrack.peer.name)
           }
         }
+        HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
+          val downlinkScore = peerTypePair.first.networkQuality?.downlinkQuality
+          isUpdatedPeerRendered.binding.videoCard.networkQuality.apply {
+            updateNetworkQualityView(downlinkScore ?: -1,requireContext(),this)
+          }
+        }
+      }
+    }
+  }
+
+  fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
+    NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
+      if (downlinkScore == 0) {
+        imageView.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+      } else {
+        imageView.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+      }
+      imageView.setImageDrawable(drawable)
+      if (drawable == null){
+        imageView.visibility = View.GONE
+      }else{
+        imageView.visibility = View.VISIBLE
       }
     }
   }
@@ -348,7 +378,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     super.onResume()
     crashlyticsLog(TAG, "Fragment=$tag onResume()")
     isFragmentVisible = true
+    bindViews()
+  }
 
+  fun bindViews() {
     renderedViews.forEach {
       bindSurfaceView(it.binding.videoCard, it.meetingTrack)
       it.statsInterpreter?.initiateStats(
@@ -365,7 +398,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     super.onPause()
     crashlyticsLog(TAG, "Fragment=$tag onPause()")
     isFragmentVisible = false
+    unbindViews()
+  }
 
+  fun unbindViews() {
     renderedViews.forEach {
       unbindSurfaceView(it.binding.videoCard, it.meetingTrack)
 //      it.statsInterpreter?.close()

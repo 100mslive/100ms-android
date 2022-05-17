@@ -99,7 +99,7 @@ dependencies {
     implementation 'io.grpc:grpc-stub:1.36.1'
 
     // debugImplementation because LeakCanary should only run in debug builds.
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.6'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
