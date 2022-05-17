@@ -32,9 +32,6 @@ class ParticipantsFragment : Fragment() {
             requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
         )
     }
-    if (meetingViewModel.peers.isNullOrEmpty().not()){
-      adapter.setItems(meetingViewModel.peers)
-    }
 
     lateinit var adapter: ParticipantsAdapter
 
