@@ -300,9 +300,8 @@ class MeetingViewModel(
     dominantSpeaker.postValue(null)
   }
 
-  fun startMeeting() {
-
-    hmsSDK.addRtcStatsObserver(object : HMSStatsObserver {
+  fun addRTCStatsObserver() {
+      hmsSDK.addRtcStatsObserver(object : HMSStatsObserver {
       override fun onLocalAudioStats(
         audioStats: HMSLocalAudioStats,
         hmsTrack: HMSTrack?,
@@ -356,6 +355,13 @@ class MeetingViewModel(
       }
 
     })
+  }
+
+  fun removeRtcStatsObserver() {
+    hmsSDK.removeRtcStatsObserver()
+  }
+
+  fun startMeeting() {
 
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
