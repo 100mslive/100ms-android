@@ -233,6 +233,20 @@ class MeetingFragment : Fragment() {
     menu.findItem(R.id.raise_hand).isVisible = true
     menu.findItem(R.id.change_name).isVisible = true
 
+    menu.findItem(R.id.add_rtc_stats_observer).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.addRTCStatsObserver()
+        true
+      }
+    }
+
+    menu.findItem(R.id.remove_rtc_stats_observer).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.removeRtcStatsObserver()
+        true
+      }
+    }
+
     menu.findItem(R.id.action_stop_streaming_and_recording).apply {
       isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING ||
