@@ -363,6 +363,10 @@ class MeetingViewModel(
 
   fun startMeeting() {
 
+    if(settings.showStats) {
+      addRTCStatsObserver()
+    }
+
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
       error("Cannot start meeting in ${state.value} state")
     }
