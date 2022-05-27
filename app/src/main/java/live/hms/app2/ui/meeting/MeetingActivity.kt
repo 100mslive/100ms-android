@@ -54,7 +54,7 @@ class MeetingActivity : AppCompatActivity() {
     initViewModels()
 
     if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      binding.containerToolbar.container.visibility = View.GONE
+      binding.containerToolbar.container.visibility = View.VISIBLE
     } else {
       binding.containerToolbar.container.visibility = View.VISIBLE
     }
