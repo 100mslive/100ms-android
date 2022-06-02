@@ -116,7 +116,19 @@ class MeetingFragment : Fragment() {
 
   override fun onDestroy() {
     super.onDestroy()
+    // Stop screen share and audio share
     meetingViewModel.stopScreenshare(object : HMSActionResultListener{
+      override fun onError(error: HMSException) {
+        // onError
+      }
+
+      override fun onSuccess() {
+        // onSuccess
+      }
+
+    })
+
+    meetingViewModel.stopAudioshare(object : HMSActionResultListener{
       override fun onError(error: HMSException) {
         // onError
       }

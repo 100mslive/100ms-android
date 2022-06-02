@@ -17,51 +17,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/ll_file_info"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:animateLayoutChanges="true"
-        android:layout_marginEnd="72dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/close_button">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="0dp"
-
-            android:text="@string/file_playing" />
-
-        <TextView
-            android:id="@+id/tv_file_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:maxWidth="100dp"
-            android:layout_marginHorizontal="16dp"
-            android:ellipsize="marquee"
-            android:visibility="gone"
-            android:focusableInTouchMode="true"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:scrollHorizontally="true"
-            android:singleLine="true"
-            tools:text="music.mp3music.mp3music.mp3music.mp3" />
-
-        <ImageView
-            android:id="@+id/file_picker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_baseline_attach_file_24" />
-
-    </LinearLayout>
-
     <RadioGroup
         android:id="@+id/rg_music_mode_selector"
         android:layout_width="wrap_content"
@@ -70,8 +25,7 @@
         android:checkedButton="@id/btn_talk"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ll_file_info">
+        app:layout_constraintStart_toStartOf="parent">
 
         <RadioButton
             android:id="@+id/btn_talk"
@@ -123,7 +77,7 @@
         android:textAllCaps="false"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="50dp"
-        android:text="Save" />
+        android:text="Change Mode" />
 
     <Button
         android:id="@+id/stop_button"

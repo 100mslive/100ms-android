@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -14,14 +15,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.activityViewModels
 import androidx.loader.content.CursorLoader
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import live.hms.app2.R
 import live.hms.app2.databinding.DialogMusicModeChooserBinding
-import live.hms.app2.util.MediaPlayerManager
-import live.hms.app2.util.contextSafe
-import live.hms.app2.util.getName
-import live.hms.app2.util.viewLifecycle
+import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.MeetingViewModel
+import live.hms.app2.ui.meeting.MeetingViewModelFactory
+import live.hms.app2.util.*
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSActionResultListener
+import live.hms.video.sdk.models.enums.AudioMixingMode
 
 
 class MusicSelectionSheet : BottomSheetDialogFragment() {
@@ -32,27 +39,49 @@ class MusicSelectionSheet : BottomSheetDialogFragment() {
         MediaPlayerManager(lifecycle)
     }
 
+    private val meetingViewModel: MeetingViewModel by activityViewModels {
+        MeetingViewModelFactory(
+            requireActivity().application,
+            requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+        )
+    }
+
     private var resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.data?.let { uri ->
-                    contextSafe { context, activity ->
+                val data: Intent? = result.data
 
-                        binding.tvFileName.apply {
-                            isSelected = true
-                            text = uri.getName(requireContext()).orEmpty()
-                            visibility = View.VISIBLE
+                data?.let {
+                    meetingViewModel.startAudioshare(it,
+                        getAudioMixingMode(),
+                        object : HMSActionResultListener {
+                        override fun onError(error: HMSException) {
+                            // error
+                            Toast.makeText(activity, " stop audio share " +
+                                    ":: $error.description", Toast.LENGTH_LONG).show()
                         }
 
-                        mediaPlayerManager.startPlay(
-                            uri,
-                            context.applicationContext
-                        )
-                    }
-
+                        override fun onSuccess() {
+                            // success
+                            dismiss()
+                            Toast.makeText(activity, " Device Audio shared successfully " , Toast.LENGTH_LONG).show()
+                        }
+                    })
                 }
             }
         }
+
+    private fun getAudioMixingMode(): AudioMixingMode {
+        val selectedView =
+            binding.root.findViewById<RadioButton>(binding.rgMusicModeSelector.checkedRadioButtonId)
+
+        return when (selectedView.id) {
+            R.id.btn_talk -> AudioMixingMode.TALK_ONLY
+            R.id.btn_talk_music -> AudioMixingMode.TALK_AND_MUSIC
+            R.id.btn_music -> AudioMixingMode.MUSIC_ONLY
+            else -> AudioMixingMode.TALK_AND_MUSIC
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,9 +101,8 @@ class MusicSelectionSheet : BottomSheetDialogFragment() {
     private fun initViews() {
 
         binding.saveButton.setOnClickListener {
-            val selectedView =
-                binding.root.findViewById<RadioButton>(binding.rgMusicModeSelector.checkedRadioButtonId)
-            Log.d("selected Mode", "${selectedView.tag}")
+           meetingViewModel.setAudioMixingMode(getAudioMixingMode())
+            dismiss()
         }
 
         binding.closeButton.setOnClickListener {
@@ -82,15 +110,23 @@ class MusicSelectionSheet : BottomSheetDialogFragment() {
         }
 
         binding.startButton.setOnClickListener {
-            mediaPlayerManager.resume()
+            val mediaProjectionManager: MediaProjectionManager = requireContext().getSystemService(
+                Context.MEDIA_PROJECTION_SERVICE
+            ) as MediaProjectionManager
+            resultLauncher.launch(mediaProjectionManager.createScreenCaptureIntent())
         }
 
         binding.stopButton.setOnClickListener {
-            mediaPlayerManager.pause()
-        }
+            meetingViewModel.stopAudioshare(object : HMSActionResultListener{
+                override fun onError(error: HMSException) {
+                    // Error Event
+                }
 
-        binding.filePicker.setOnClickListener {
-            openFilePicker()
+                override fun onSuccess() {
+                    // Success event
+                    dismiss()
+                }
+            })
         }
     }
 

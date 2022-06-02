@@ -32,6 +32,7 @@ import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
+import live.hms.video.sdk.models.enums.AudioMixingMode
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.enums.HMSTrackUpdate
@@ -1045,6 +1046,30 @@ class MeetingViewModel(
 
   fun stopScreenshare(actionListener: HMSActionResultListener) {
     hmsSDK.stopScreenshare(actionListener)
+  }
+
+  fun startAudioshare(mediaProjectionPermissionResultData: Intent?,
+                      audioMixingMode: AudioMixingMode,
+                      actionListener: HMSActionResultListener) {
+    // Without custom notification
+//    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
+
+    // With custom notification
+    val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
+      .setContentText("Sharing Audio of device to roomId: ${hmsRoom?.roomId}")
+      .setSmallIcon(R.drawable.arrow_up_float)
+      .addAction(R.drawable.ic_menu_close_clear_cancel, "Stop sharing device audio", HMSScreenCaptureService.getStopScreenSharePendingIntent(getApplication()))
+      .build()
+
+    hmsSDK.startAudioshare(actionListener, mediaProjectionPermissionResultData, audioMixingMode, notification)
+  }
+
+  fun setAudioMixingMode(audioMixingMode: AudioMixingMode) {
+    hmsSDK.setAudioMixingMode(audioMixingMode)
+  }
+
+  fun stopAudioshare(actionListener: HMSActionResultListener) {
+    hmsSDK.stopAudioshare(actionListener)
   }
 
   private fun getRandomVirtualBackgroundBitmap(context: Context?) : Bitmap {
