@@ -25,7 +25,7 @@ class RecordingTimesUseCase() {
     }
 
     fun showHlsInfo(room: HMSRoom) : String {
-        return "Streaming: ${room.hlsStreamingState?.running}, Recording: ${room.hlsRecordingState?.running}, Variants: ${room.hlsStreamingState?.variants}, Recording Config: ${room.hlsRecordingState?.hlsRecordingConfig}"
+        return "HLS Streaming: ${room.hlsStreamingState?.running}, Recording: ${room.hlsRecordingState?.running}, Variants: ${room.hlsStreamingState?.variants}, Recording Config: ${room.hlsRecordingState?.hlsRecordingConfig}"
     }
 
     private fun convertTimes(startedAt : Long?, stoppedAt: Long?) : Pair<String, String> {

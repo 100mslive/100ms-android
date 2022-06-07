@@ -612,6 +612,9 @@ class MeetingFragment : Fragment() {
             Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
             Log.d("RecordingState", event.message)
           }
+          is MeetingViewModel.Event.HlsEvent -> {
+            Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+          }
         }
       }
     }
