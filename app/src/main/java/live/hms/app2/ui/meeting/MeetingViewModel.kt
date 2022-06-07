@@ -84,6 +84,12 @@ class MeetingViewModel(
     }
   }
 
+  private fun showHlsInfo(room : HMSRoom) {
+    viewModelScope.launch {
+      _events.emit(Event.HlsEvent(recordingTimesUseCase.showHlsInfo(room)))
+    }
+  }
+
   init {
     roomDetails.apply {
       crashlytics.setCustomKey(MEETING_URL, url)
@@ -501,6 +507,7 @@ class MeetingViewModel(
                 getRecordingState(hmsRoom)
               )
               switchToHlsViewIfRequired()
+              showHlsInfo(hmsRoom)
             }
             else -> {
             }
@@ -1093,6 +1100,7 @@ class MeetingViewModel(
     data class RtmpEvent(val message : String) : Event()
     data class RecordEvent(val message : String) : Event()
     data class ServerRecordEvent(val message: String) : Event()
+    data class HlsEvent(val message : String) : Event()
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
