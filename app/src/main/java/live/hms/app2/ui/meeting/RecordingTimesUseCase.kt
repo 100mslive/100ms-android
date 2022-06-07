@@ -24,6 +24,10 @@ class RecordingTimesUseCase() {
         return "Rtmp\nStarted:${startStop.first}\nStopped:${startStop.second}"
     }
 
+    fun showHlsInfo(room: HMSRoom) : String {
+        return "HLS Streaming: ${room.hlsStreamingState?.running}, Recording: ${room.hlsRecordingState?.running}, Variants: ${room.hlsStreamingState?.variants}, Recording Config: ${room.hlsRecordingState?.hlsRecordingConfig}"
+    }
+
     private fun convertTimes(startedAt : Long?, stoppedAt: Long?) : Pair<String, String> {
         val startedAt = if(startedAt == null)
             "Empty"
