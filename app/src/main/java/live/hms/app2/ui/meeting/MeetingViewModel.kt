@@ -509,6 +509,12 @@ class MeetingViewModel(
               switchToHlsViewIfRequired()
               showHlsInfo(hmsRoom)
             }
+            HMSRoomUpdate.HLS_RECORDING_STATE_UPDATED -> {
+              _isRecording.postValue(
+                getRecordingState(hmsRoom)
+              )
+              showHlsInfo(hmsRoom)
+            }
             else -> {
             }
           }
