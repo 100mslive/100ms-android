@@ -23,10 +23,8 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private const val TAG = "PermissionFragment"
 
     private const val RC_CALL = 111
-    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
-    Manifest.permission.FOREGROUND_SERVICE)
-      private val PERMISSIONS_MINIMAL =
-          arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+    private val PERMISSIONS_API_S = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.BLUETOOTH_CONNECT)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,21 +66,31 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
         PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
       )
     } else {
-      EasyPermissions.requestPermissions(
-        this,
-        resources.getString(R.string.permission_description),
-        RC_CALL,
-        *PERMISSIONS
-      )
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+        EasyPermissions.requestPermissions(
+          this,
+          resources.getString(R.string.permission_description),
+          RC_CALL,
+          *PERMISSIONS_API_S
+        )
+      }else{
+        EasyPermissions.requestPermissions(
+          this,
+          resources.getString(R.string.permission_description),
+          RC_CALL,
+          *PERMISSIONS
+        )
+      }
     }
   }
 
   private fun hasPermissions(): Boolean {
-       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-           if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS_MINIMAL)) {
-               return true
-           }
-       } else if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+          if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS_API_S)){
+            return true
+          }
+       }
+       else if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
             return true
        }
        return false
