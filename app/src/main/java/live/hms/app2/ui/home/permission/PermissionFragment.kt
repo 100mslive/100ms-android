@@ -23,12 +23,8 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     private const val TAG = "PermissionFragment"
 
     private const val RC_CALL = 111
-    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
-    Manifest.permission.FOREGROUND_SERVICE)
-      private val PERMISSIONS_MINIMAL =
-          arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-    private val PERMISSIONS_API_S = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
-      Manifest.permission.FOREGROUND_SERVICE,Manifest.permission.BLUETOOTH_CONNECT)
+    private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+    private val PERMISSIONS_API_S = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.BLUETOOTH_CONNECT)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,12 +85,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
   }
 
   private fun hasPermissions(): Boolean {
-       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-           if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS_MINIMAL)) {
-               return true
-           }
-       }
-       else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
           if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS_API_S)){
             return true
           }
