@@ -199,6 +199,9 @@ class MeetingViewModel(
 
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
+  private val _trackStatus = MutableLiveData<String>()
+  val trackStatus: LiveData<String> = _trackStatus
+
   private val hmsTrackSettings = HMSTrackSettings.Builder()
     .audio(
       HMSAudioTrackSettings.Builder()
@@ -1183,6 +1186,10 @@ class MeetingViewModel(
 
       }
     })
+  }
+
+  fun updateTrackStatus(status: String) {
+    _trackStatus.value = status
   }
 }
 

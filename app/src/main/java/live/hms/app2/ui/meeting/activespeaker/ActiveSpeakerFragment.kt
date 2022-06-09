@@ -49,7 +49,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         it.video,
         it.audio, it.peer.isLocal
       ) { statsString ->
-        binding.screenShare.statsView.text = statsString
+        meetingViewModel?.updateTrackStatus(statsString)
       }
       binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.peer.metadata)?.isHandRaised == true)
       bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
@@ -97,6 +97,10 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
           else -> {}
         }
       }
+    }
+
+    meetingViewModel.trackStatus.observe(viewLifecycleOwner) { statsString ->
+      binding.screenShare.statsView.text = statsString
     }
   }
 
