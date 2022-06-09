@@ -243,6 +243,8 @@ class MeetingViewModel(
 
       override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
         roomState.postValue(Pair(type,hmsRoom))
+        // This will keep the isRecording value updated correctly in preview. It will not be called after join.
+        _isRecording.postValue(getRecordingState(hmsRoom))
       }
 
     })
@@ -418,6 +420,9 @@ class MeetingViewModel(
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
           switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
+          _isRecording.postValue(
+            getRecordingState(room)
+          )
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -650,7 +655,8 @@ class MeetingViewModel(
   private fun getRecordingState(room: HMSRoom): RecordingState {
 
     val recording = room.browserRecordingState?.running == true ||
-            room.serverRecordingState?.running == true
+            room.serverRecordingState?.running == true ||
+            room.hlsRecordingState?.running == true
     val streaming = room.rtmpHMSRtmpStreamingState?.running == true ||
             room.hlsStreamingState?.running == true
 
