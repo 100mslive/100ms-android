@@ -243,6 +243,8 @@ class MeetingViewModel(
 
       override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
         roomState.postValue(Pair(type,hmsRoom))
+        // This will keep the isRecording value updated correctly in preview. It will not be called after join.
+        _isRecording.postValue(getRecordingState(hmsRoom))
       }
 
     })
