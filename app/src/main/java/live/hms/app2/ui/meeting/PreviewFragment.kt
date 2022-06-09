@@ -93,6 +93,9 @@ class PreviewFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     requireActivity().invalidateOptionsMenu()
     setHasOptionsMenu(true)
+    meetingViewModel.isRecording.observe(viewLifecycleOwner) {
+      Log.d("PREVIEW_REC","STATE IS ${it.name}")
+    }
   }
 
   override fun onAttach(context: Context) {
