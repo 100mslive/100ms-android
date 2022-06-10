@@ -81,14 +81,6 @@
             app:icon="@drawable/ic_call_end_24"
             app:iconTint="@color/red" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/toggle_audio_mode"
-            style="@style/MaterialImageButton"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/end_call"
-            app:icon="@android:drawable/presence_audio_away"
-            app:iconTint="@color/red" />
-
     </LinearLayout>
 
 </RelativeLayout>

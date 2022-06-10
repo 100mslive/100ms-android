@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -261,6 +262,19 @@ class MeetingFragment : Fragment() {
       }
     }
 
+    (menu.findItem(R.id.toggle_audio_mode))?.apply {
+      fun updateState() {
+        title = meetingViewModel.getCurrentMediaModeStr()
+        isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
+      }
+      updateState()
+      setOnMenuItemClickListener {
+        meetingViewModel.toggleMediaMode()
+        updateState()
+        true
+      }
+    }
+
     menu.findItem(R.id.action_record_meeting).apply {
       isVisible = true
 
@@ -487,6 +501,7 @@ class MeetingFragment : Fragment() {
         true
       }
     }
+
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -864,7 +879,6 @@ class MeetingFragment : Fragment() {
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
 
-    binding.toggleAudioMode?.setOnSingleClickListener(){ meetingViewModel.toggleMediaMode() }
   }
 
   private fun cleanup() {

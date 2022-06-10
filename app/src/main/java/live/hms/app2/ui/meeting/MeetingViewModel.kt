@@ -1205,9 +1205,22 @@ class MeetingViewModel(
   }
 
   var currentAudioMode = AudioManager.MODE_IN_COMMUNICATION
-  fun toggleMediaMode() {
+
+  fun toggleMediaMode()  {
     currentAudioMode = if (currentAudioMode == AudioManager.MODE_IN_COMMUNICATION) AudioManager.MODE_NORMAL else AudioManager.MODE_IN_COMMUNICATION
     hmsSDK.setAudioMode(currentAudioMode)
+  }
+
+  fun getCurrentMediaModeStr() : String {
+    return when(currentAudioMode) {
+      AudioManager.MODE_IN_COMMUNICATION -> "Audio mode : in-call"
+      AudioManager.MODE_NORMAL -> "Audio mode : media"
+      else -> "Unknown"
+    }
+  }
+
+  fun getCurrentMediaModeCheckedState(): Boolean {
+    return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
   }
 }
 
