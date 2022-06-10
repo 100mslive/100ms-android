@@ -264,7 +264,10 @@ class MeetingFragment : Fragment() {
 
     (menu.findItem(R.id.toggle_audio_mode))?.apply {
       fun updateState() {
-        title = meetingViewModel.getCurrentMediaModeStr()
+        title = getString(if (meetingViewModel.getCurrentMediaModeCheckedState())
+          R.string.audio_mode_media
+        else
+          R.string.audio_mode_in_call)
         isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
       }
       updateState()
@@ -501,7 +504,6 @@ class MeetingFragment : Fragment() {
         true
       }
     }
-
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -878,7 +880,6 @@ class MeetingFragment : Fragment() {
     }
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
-
   }
 
   private fun cleanup() {
