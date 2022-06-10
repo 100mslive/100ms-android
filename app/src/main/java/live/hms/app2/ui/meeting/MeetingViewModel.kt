@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.GlobalApplication
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
@@ -202,11 +203,7 @@ class MeetingViewModel(
 
   private val hmsLogSettings : HMSLogSettings = HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE,true)
 
-  val hmsSDK = HMSSDK
-    .Builder(application)
-    .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
-    .setLogSettings(hmsLogSettings)
-    .build()
+  val hmsSDK = GlobalApplication.hmsSDK
 
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
   private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
