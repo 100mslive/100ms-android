@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -22,8 +21,6 @@ import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.connection.stats.*
-import live.hms.video.connection.stats.quality.HMSNetworkObserver
-import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSLogSettings
@@ -86,7 +83,13 @@ class MeetingViewModel(
 
   private fun showHlsInfo(room : HMSRoom) {
     viewModelScope.launch {
-      _events.emit(Event.HlsEvent(recordingTimesUseCase.showHlsInfo(room)))
+      _events.emit(Event.HlsEvent(recordingTimesUseCase.showHlsInfo(room, false)))
+    }
+  }
+
+  private fun showHlsRecordingInfo(room : HMSRoom) {
+    viewModelScope.launch {
+      _events.emit(Event.HlsRecordingEvent(recordingTimesUseCase.showHlsInfo(room, true)))
     }
   }
 
@@ -199,6 +202,9 @@ class MeetingViewModel(
 
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
+  private val _trackStatus = MutableLiveData<String>()
+  val trackStatus: LiveData<String> = _trackStatus
+
   private val hmsTrackSettings = HMSTrackSettings.Builder()
     .audio(
       HMSAudioTrackSettings.Builder()
@@ -237,6 +243,8 @@ class MeetingViewModel(
 
       override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
         roomState.postValue(Pair(type,hmsRoom))
+        // This will keep the isRecording value updated correctly in preview. It will not be called after join.
+        _isRecording.postValue(getRecordingState(hmsRoom))
       }
 
     })
@@ -412,6 +420,9 @@ class MeetingViewModel(
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
           switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
+          _isRecording.postValue(
+            getRecordingState(room)
+          )
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -513,7 +524,7 @@ class MeetingViewModel(
               _isRecording.postValue(
                 getRecordingState(hmsRoom)
               )
-              showHlsInfo(hmsRoom)
+              showHlsRecordingInfo(hmsRoom)
             }
             else -> {
             }
@@ -644,7 +655,8 @@ class MeetingViewModel(
   private fun getRecordingState(room: HMSRoom): RecordingState {
 
     val recording = room.browserRecordingState?.running == true ||
-            room.serverRecordingState?.running == true
+            room.serverRecordingState?.running == true ||
+            room.hlsRecordingState?.running == true
     val streaming = room.rtmpHMSRtmpStreamingState?.running == true ||
             room.hlsStreamingState?.running == true
 
@@ -1103,10 +1115,12 @@ class MeetingViewModel(
       data class HlsError(val throwable: HMSException) : Hls()
     }
     class HlsNotStarted(val reason : String) : Event()
+    abstract class MessageEvent(open val message : String) : Event()
     data class RtmpEvent(val message : String) : Event()
     data class RecordEvent(val message : String) : Event()
     data class ServerRecordEvent(val message: String) : Event()
-    data class HlsEvent(val message : String) : Event()
+    data class HlsEvent(override val message : String) : MessageEvent(message)
+    data class HlsRecordingEvent(override val message : String) : MessageEvent(message)
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -1183,6 +1197,10 @@ class MeetingViewModel(
 
       }
     })
+  }
+
+  fun updateTrackStatus(status: String) {
+    _trackStatus.value = status
   }
 
   var intialMediaVolumeMic = false
