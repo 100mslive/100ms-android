@@ -1184,5 +1184,11 @@ class MeetingViewModel(
       }
     })
   }
+
+  var intialMediaVolumeMic = false
+  fun enableDisableMediaVolume() {
+    intialMediaVolumeMic = intialMediaVolumeMic.not()
+    hmsSDK.setEnableMediaVolume(intialMediaVolumeMic)
+  }
 }
 
