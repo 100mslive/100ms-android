@@ -178,16 +178,6 @@ class PreviewFragment : Fragment() {
     }
   }
 
-  override fun onPrepareOptionsMenu(menu: Menu) {
-    super.onPrepareOptionsMenu(menu)
-
-    menu.forEach { item ->
-      if (item.itemId != R.id.action_flip_camera && item.itemId != R.id.action_volume && item.itemId != R.id.action_participants) {
-        item.isVisible = false
-      }
-    }
-  }
-
   private fun updateActionVolumeMenuIcon(item: MenuItem) {
     item.apply {
       if (meetingViewModel.isPeerAudioEnabled()) {
