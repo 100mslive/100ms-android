@@ -1204,9 +1204,9 @@ class MeetingViewModel(
   }
 
   var intialMediaVolumeMic = false
-  fun enableDisableMediaVolume() {
+  fun toggleMediaMode() {
     intialMediaVolumeMic = intialMediaVolumeMic.not()
-    hmsSDK.setEnableMediaVolume(intialMediaVolumeMic)
+    hmsSDK.toggleMediaMode(intialMediaVolumeMic)
   }
 }
 

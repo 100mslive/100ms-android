@@ -864,7 +864,7 @@ class MeetingFragment : Fragment() {
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
 
-    binding.toggleAudioMode?.setOnSingleClickListener(){ meetingViewModel.enableDisableMediaVolume() }
+    binding.toggleAudioMode?.setOnSingleClickListener(){ meetingViewModel.toggleMediaMode() }
   }
 
   private fun cleanup() {
