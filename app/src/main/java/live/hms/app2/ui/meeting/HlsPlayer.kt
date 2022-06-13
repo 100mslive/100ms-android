@@ -42,7 +42,7 @@ class HlsPlayer {
     fun releasePlayer() {
         player?.run {
             playbackPosition = this.currentPosition
-            currentWindow = this.currentMediaItemIndex
+//            currentWindow = this.currentMediaItemIndex
             playWhenReady = this.playWhenReady
             release()
         }
