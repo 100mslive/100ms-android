@@ -113,13 +113,6 @@
             android:visible="false"
             app:showAsAction="ifRoom" />
 
-        <item
-            android:id="@+id/toggle_audio_mode"
-            android:title=""
-            android:visible="true"
-            android:checkable="true"
-            app:actionViewClass="androidx.appcompat.widget.SwitchCompat" />
-
     </group>
 
     <group>
@@ -176,6 +169,14 @@
             android:title="Remove Stats Observer"
             app:showAsAction="ifRoom"
             />
+
+
+        <item
+            android:id="@+id/toggle_audio_mode"
+            android:title=""
+            android:visible="true"
+            android:checkable="true"
+            app:actionViewClass="androidx.appcompat.widget.SwitchCompat" />
 
     </group>
 </menu>
