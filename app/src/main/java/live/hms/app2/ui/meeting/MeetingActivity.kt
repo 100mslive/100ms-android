@@ -103,7 +103,7 @@ class MeetingActivity : AppCompatActivity() {
         RecordingState.RECORDING -> {
           // red
           isVisible = true
-          this.icon.setTint(Color.parseColor("#e04848"))
+          this.icon.setTint(getColor(R.color.recording))
         }
         RecordingState.NOT_RECORDING_OR_STREAMING -> {
           isVisible = false
@@ -113,19 +113,19 @@ class MeetingActivity : AppCompatActivity() {
           // White
           isVisible = true
           // change the colour to transitioning
-          this.icon.setTint(Color.parseColor("#FFFFFF"))
+          this.icon.setTint(getColor(R.color.recording_transition))
         }
         RecordingState.STREAMING -> {
           // Blue
           isVisible = true
-          this.icon.setTint(Color.parseColor("#2832c2"))
+          this.icon.setTint(getColor(R.color.streaming))
         }
         RecordingState.STREAMING_AND_RECORDING -> {
           // Orange
           isVisible = true
-          this.icon.setTint(Color.parseColor("#FFC107"))
+          this.icon.setTint(getColor(R.color.streaming_recording))
         }
-        null -> TODO()
+        else ->{}
       }
 
       setOnMenuItemClickListener {
