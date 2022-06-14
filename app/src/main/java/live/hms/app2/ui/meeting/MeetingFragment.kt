@@ -41,6 +41,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.HMSActionResultListener
+import live.hms.video.sdk.models.AudioOutputType
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 
 val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
@@ -50,6 +51,7 @@ class MeetingFragment : Fragment() {
 
   companion object {
     private const val TAG = "MeetingFragment"
+    const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
   }
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
@@ -217,12 +219,24 @@ class MeetingFragment : Fragment() {
     return false
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: AudioOutputType? = AudioOutputType.NONE) {
     item.apply {
-      if (meetingViewModel.isPeerAudioEnabled()) {
-        setIcon(R.drawable.ic_volume_up_24)
-      } else {
-        setIcon(R.drawable.ic_volume_off_24)
+      when (audioOutputType) {
+        AudioOutputType.EARPIECE -> {
+          setIcon(R.drawable.ic_baseline_hearing_24)
+        }
+        AudioOutputType.SPEAKER -> {
+          setIcon(R.drawable.ic_volume_up_24)
+        }
+        AudioOutputType.BLUETOOTH -> {
+          setIcon(R.drawable.ic_baseline_bluetooth_24)
+        }
+        AudioOutputType.WIRED -> {
+          setIcon(R.drawable.ic_baseline_headset_24)
+        }
+        else -> {
+          setIcon(R.drawable.ic_volume_off_24)
+        }
       }
     }
   }
@@ -390,11 +404,13 @@ class MeetingFragment : Fragment() {
     }
 
     menu.findItem(R.id.action_volume).apply {
-      updateActionVolumeMenuIcon(this)
+      updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
       setOnMenuItemClickListener {
         if (isMeetingOngoing) {
-          meetingViewModel.toggleAudio()
-          updateActionVolumeMenuIcon(this)
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) {
+            updateActionVolumeMenuIcon(this, it)
+          }
+          audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,AudioSwitchBottomSheetTAG)
         }
 
         true

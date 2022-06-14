@@ -23,6 +23,7 @@ import live.hms.app2.ui.meeting.participants.ParticipantsDialog
 import live.hms.app2.util.*
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
+import live.hms.video.sdk.models.AudioOutputType
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
@@ -178,12 +179,24 @@ class PreviewFragment : Fragment() {
     }
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: AudioOutputType? = AudioOutputType.NONE) {
     item.apply {
-      if (meetingViewModel.isPeerAudioEnabled()) {
-        setIcon(R.drawable.ic_volume_up_24)
-      } else {
-        setIcon(R.drawable.ic_volume_off_24)
+      when (audioOutputType) {
+        AudioOutputType.EARPIECE -> {
+          setIcon(R.drawable.ic_baseline_hearing_24)
+        }
+        AudioOutputType.SPEAKER -> {
+          setIcon(R.drawable.ic_volume_up_24)
+        }
+        AudioOutputType.BLUETOOTH -> {
+          setIcon(R.drawable.ic_baseline_bluetooth_24)
+        }
+        AudioOutputType.WIRED -> {
+          setIcon(R.drawable.ic_baseline_headset_24)
+        }
+        else -> {
+          setIcon(R.drawable.ic_volume_off_24)
+        }
       }
     }
   }
@@ -204,8 +217,12 @@ class PreviewFragment : Fragment() {
       }
       R.id.action_volume -> {
         meetingViewModel.apply {
-          toggleAudio()
-          updateActionVolumeMenuIcon(item)
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) {
+            updateActionVolumeMenuIcon(item, it)
+          }
+          audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,
+            MeetingFragment.AudioSwitchBottomSheetTAG
+          )
         }
       }
     }
