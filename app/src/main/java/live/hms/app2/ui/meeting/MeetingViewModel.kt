@@ -224,7 +224,7 @@ class MeetingViewModel(
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
   private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
-  val peers: Array<HMSPeer>
+  val peers: List<HMSPeer>
     get() = hmsSDK.getPeers()
 
   fun startPreview() {
