@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -258,6 +259,22 @@ class MeetingFragment : Fragment() {
         title = getString(R.string.lower_hand)
       } else {
         title = getString(R.string.raise_hand)
+      }
+    }
+
+    (menu.findItem(R.id.toggle_audio_mode))?.apply {
+      fun updateState() {
+        title = getString(if (meetingViewModel.getCurrentMediaModeCheckedState())
+          R.string.audio_mode_media
+        else
+          R.string.audio_mode_in_call)
+        isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
+      }
+      updateState()
+      setOnMenuItemClickListener {
+        meetingViewModel.toggleMediaMode()
+        updateState()
+        true
       }
     }
 

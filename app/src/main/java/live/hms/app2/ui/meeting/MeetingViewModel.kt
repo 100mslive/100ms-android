@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
@@ -1201,6 +1202,17 @@ class MeetingViewModel(
 
   fun updateTrackStatus(status: String) {
     _trackStatus.value = status
+  }
+
+  var currentAudioMode = AudioManager.MODE_IN_COMMUNICATION
+
+  fun toggleMediaMode()  {
+    currentAudioMode = if (currentAudioMode == AudioManager.MODE_IN_COMMUNICATION) AudioManager.MODE_NORMAL else AudioManager.MODE_IN_COMMUNICATION
+    hmsSDK.setAudioMode(currentAudioMode)
+  }
+
+  fun getCurrentMediaModeCheckedState(): Boolean {
+    return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
   }
 }
 
