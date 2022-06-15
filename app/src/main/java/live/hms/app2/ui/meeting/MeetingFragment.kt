@@ -278,48 +278,6 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    menu.findItem(R.id.action_record_meeting).apply {
-      isVisible = true
-
-      // If we're in a transitioning state, we prevent further clicks.
-      // Checked or not checked depends on if it's currently recording or not. Checked if recording.
-      when (meetingViewModel.isRecording.value) {
-        RecordingState.STREAMING -> {
-          this.isChecked = true
-          this.isEnabled = true
-          this.title = "Streaming"
-        }
-        RecordingState.STREAMING_AND_RECORDING -> {
-          this.isChecked = true
-          this.isEnabled = true
-          this.title = "Rec+Stream"
-        }
-        RecordingState.RECORDING -> {
-          this.isChecked = true
-          this.isEnabled = true
-          this.title = "Recording"
-        }
-        RecordingState.NOT_RECORDING_OR_STREAMING -> {
-          this.isChecked = false
-          this.isEnabled = true
-          this.title = "Rec+Stream"
-        }
-        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
-          this.isChecked = true
-          this.isEnabled = false
-          this.title = "Recording"
-        }
-        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS -> {
-          this.isChecked = false
-          this.isEnabled = false
-          this.title = "Recording"
-        }
-        else -> {
-          this.title = "Recording"
-        } // Nothing
-      }
-    }
-
     menu.findItem(R.id.end_room).apply {
       isVisible = meetingViewModel.isAllowedToEndMeeting()
 
@@ -446,42 +404,6 @@ class MeetingFragment : Fragment() {
     menu.findItem(R.id.action_flip_camera).apply {
       val ok = meetingViewModel.meetingViewMode.value != MeetingViewMode.AUDIO_ONLY
       isVisible = ok
-    }
-
-    menu.findItem(R.id.action_record).apply {
-      when (meetingViewModel.isRecording.value) {
-        RecordingState.RECORDING -> {
-          // red
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#e04848"))
-        }
-        RecordingState.NOT_RECORDING_OR_STREAMING -> {
-          isVisible = false
-        }
-        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS,
-        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
-          // White
-          isVisible = true
-          // change the colour to transitioning
-          this.icon.setTint(Color.parseColor("#FFFFFF"))
-        }
-        RecordingState.STREAMING -> {
-          // Blue
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#2832c2"))
-        }
-        RecordingState.STREAMING_AND_RECORDING -> {
-          // Orange
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#FFC107"))
-        }
-        null -> TODO()
-      }
-
-      setOnMenuItemClickListener {
-        meetingViewModel.stopRecording()
-        true
-      }
     }
 
     menu.findItem(R.id.action_volume).apply {
