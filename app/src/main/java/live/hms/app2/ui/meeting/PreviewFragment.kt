@@ -21,9 +21,9 @@ import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.participants.ParticipantsAdapter
 import live.hms.app2.ui.meeting.participants.ParticipantsDialog
 import live.hms.app2.util.*
+import live.hms.video.audio.HMSAudioManager
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
-import live.hms.video.sdk.models.AudioOutputType
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
@@ -179,19 +179,19 @@ class PreviewFragment : Fragment() {
     }
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: AudioOutputType? = AudioOutputType.NONE) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: HMSAudioManager.AudioDevice? = HMSAudioManager.AudioDevice.NONE) {
     item.apply {
       when (audioOutputType) {
-        AudioOutputType.EARPIECE -> {
+        HMSAudioManager.AudioDevice.EARPIECE -> {
           setIcon(R.drawable.ic_baseline_hearing_24)
         }
-        AudioOutputType.SPEAKER -> {
+        HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
           setIcon(R.drawable.ic_volume_up_24)
         }
-        AudioOutputType.BLUETOOTH -> {
+        HMSAudioManager.AudioDevice.BLUETOOTH -> {
           setIcon(R.drawable.ic_baseline_bluetooth_24)
         }
-        AudioOutputType.WIRED -> {
+        HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
           setIcon(R.drawable.ic_baseline_headset_24)
         }
         else -> {

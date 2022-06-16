@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.util.Log
@@ -37,11 +36,11 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.audio.HMSAudioManager.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.HMSActionResultListener
-import live.hms.video.sdk.models.AudioOutputType
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 
 val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
@@ -59,6 +58,7 @@ class MeetingFragment : Fragment() {
 
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
+  private var volumeMenuIcon : MenuItem? = null
 
   private val CAPTURE_PERMISSION_REQUEST_CODE = 1
 
@@ -219,19 +219,19 @@ class MeetingFragment : Fragment() {
     return false
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: AudioOutputType? = AudioOutputType.NONE) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioDevice: AudioDevice? = AudioDevice.NONE) {
     item.apply {
-      when (audioOutputType) {
-        AudioOutputType.EARPIECE -> {
+      when (audioDevice) {
+        AudioDevice.EARPIECE -> {
           setIcon(R.drawable.ic_baseline_hearing_24)
         }
-        AudioOutputType.SPEAKER -> {
+        AudioDevice.SPEAKER_PHONE -> {
           setIcon(R.drawable.ic_volume_up_24)
         }
-        AudioOutputType.BLUETOOTH -> {
+        AudioDevice.BLUETOOTH -> {
           setIcon(R.drawable.ic_baseline_bluetooth_24)
         }
-        AudioOutputType.WIRED -> {
+        AudioDevice.WIRED_HEADSET -> {
           setIcon(R.drawable.ic_baseline_headset_24)
         }
         else -> {
@@ -404,12 +404,11 @@ class MeetingFragment : Fragment() {
     }
 
     menu.findItem(R.id.action_volume).apply {
+      volumeMenuIcon = this
       updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
       setOnMenuItemClickListener {
         if (isMeetingOngoing) {
-          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) {
-            updateActionVolumeMenuIcon(this, it)
-          }
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel)
           audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,AudioSwitchBottomSheetTAG)
         }
 
@@ -427,6 +426,7 @@ class MeetingFragment : Fragment() {
     }
   }
 
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     initViewModel()
@@ -437,6 +437,12 @@ class MeetingFragment : Fragment() {
     meetingViewModel.isRecording.observe(
       viewLifecycleOwner,
       Observer { activity?.invalidateOptionsMenu() })
+
+    meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
+      volumeMenuIcon?.let {
+        updateActionVolumeMenuIcon(it,device)
+      }
+    }
   }
 
   override fun onCreateView(
