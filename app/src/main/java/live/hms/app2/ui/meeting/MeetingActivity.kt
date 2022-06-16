@@ -92,12 +92,6 @@ class MeetingActivity : AppCompatActivity() {
   override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
     super.onPrepareOptionsMenu(menu)
 
-    menu?.forEach { item ->
-      if (item.itemId != R.id.action_flip_camera && item.itemId != R.id.action_volume && item.itemId != R.id.action_participants) {
-        item.isVisible = false
-      }
-    }
-
     menu?.findItem(R.id.action_record)?.apply {
       when (meetingViewModel.isRecording.value) {
         RecordingState.RECORDING -> {
@@ -133,6 +127,6 @@ class MeetingActivity : AppCompatActivity() {
         true
       }
     }
-    return false
+    return true
   }
 }
