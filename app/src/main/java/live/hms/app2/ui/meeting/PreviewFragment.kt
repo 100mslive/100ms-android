@@ -217,8 +217,9 @@ class PreviewFragment : Fragment() {
       }
       R.id.action_volume -> {
         meetingViewModel.apply {
-          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) {
-            updateActionVolumeMenuIcon(item, it)
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice ->
+            updateActionVolumeMenuIcon(item, audioDevice)
+            meetingViewModel.setPeerAudioEnabled(audioDevice != HMSAudioManager.AudioDevice.MUTE)
           }
           audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,
             MeetingFragment.AudioSwitchBottomSheetTAG

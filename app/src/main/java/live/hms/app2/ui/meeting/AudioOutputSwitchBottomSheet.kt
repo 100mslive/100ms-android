@@ -42,7 +42,10 @@ class AudioOutputSwitchBottomSheet(
                     ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
                 AudioDevice.EARPIECE -> binding.earpieceBtn.background =
                     ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
-                else -> binding.muteBtn.background =
+                AudioDevice.MUTE ->
+                    binding.muteBtn.background =
+                        ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
+                else -> binding.speakerBtn.background =
                     ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
             }
         }
@@ -69,7 +72,7 @@ class AudioOutputSwitchBottomSheet(
         }
 
         binding.muteBtn.setOnClickListener {
-            setAudioType(AudioDevice.NONE)
+            setAudioType(AudioDevice.MUTE)
         }
     }
 
