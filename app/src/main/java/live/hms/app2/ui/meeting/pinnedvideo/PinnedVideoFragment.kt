@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -146,9 +147,14 @@ class PinnedVideoFragment : Fragment() {
     val view = SurfaceViewRenderer(context)
 
     view.apply {
+      binding.pinVideo.surfaceViewHolder.forEach {
+        if (it is SurfaceViewRenderer){
+          it.release()
+        }
+      }
       binding.pinVideo.surfaceViewHolder.removeAllViews()
       binding.pinVideo.surfaceViewHolder.addView(this)
-      view.visibility = View.GONE
+      visibility = View.GONE
         SurfaceViewRendererUtil.bind(view, track).let { success ->
           if (success) visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
         }
