@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +21,7 @@ import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
+import org.webrtc.SurfaceViewRenderer
 
 class PinnedVideoFragment : Fragment() {
 
@@ -141,19 +143,22 @@ class PinnedVideoFragment : Fragment() {
     }
 
     crashlyticsLog(TAG, "Changing pin-view video to $track (previous=$pinnedTrack)")
-    binding.pinVideo.surfaceView.apply {
-      if (isViewVisible) {
-        // Unbind and Bind only when the view is only released() / init() respectively
-        pinnedTrack?.let {
-          SurfaceViewRendererUtil.unbind(this, it)
-          visibility = View.GONE
-        }
 
-        SurfaceViewRendererUtil.bind(this, track).let { success ->
+    val view = SurfaceViewRenderer(context)
+
+    view.apply {
+      binding.pinVideo.surfaceViewHolder.forEach {
+        if (it is SurfaceViewRenderer){
+          it.release()
+        }
+      }
+      binding.pinVideo.surfaceViewHolder.removeAllViews()
+      binding.pinVideo.surfaceViewHolder.addView(this)
+      visibility = View.GONE
+        SurfaceViewRendererUtil.bind(view, track).let { success ->
           if (success) visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
         }
       }
-    }
 
     pinnedTrack = track
     updatePinnedVideoText()

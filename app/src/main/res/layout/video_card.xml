@@ -16,12 +16,21 @@
         android:textColor="@android:color/white"
         android:textSize="40sp" />
 
-    <org.webrtc.SurfaceViewRenderer
-        android:id="@+id/surface_view"
+    <LinearLayout
+        android:id="@+id/surface_view_holder"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="invisible" />
+        android:layout_height="wrap_content">
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="invisible" />
+
+
+    </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/container_name"
