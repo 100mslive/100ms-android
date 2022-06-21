@@ -745,9 +745,18 @@ class MeetingViewModel(
 
   fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
     state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
-    hmsSDK.leave()
-    cleanup()
-    state.postValue(MeetingState.Disconnected(true, details))
+    hmsSDK.leave(object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        cleanup()
+        state.postValue(MeetingState.Disconnected(true, details))
+      }
+
+      override fun onSuccess() {
+        cleanup()
+        state.postValue(MeetingState.Disconnected(true, details))
+      }
+
+    })
   }
 
   private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
