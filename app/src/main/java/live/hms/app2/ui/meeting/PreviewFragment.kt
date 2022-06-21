@@ -179,7 +179,7 @@ class PreviewFragment : Fragment() {
     }
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: HMSAudioManager.AudioDevice? = HMSAudioManager.AudioDevice.NONE) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: HMSAudioManager.AudioDevice? = null) {
     item.apply {
       when (audioOutputType) {
         HMSAudioManager.AudioDevice.EARPIECE -> {
@@ -217,9 +217,8 @@ class PreviewFragment : Fragment() {
       }
       R.id.action_volume -> {
         meetingViewModel.apply {
-          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice ->
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice , isMuted ->
             updateActionVolumeMenuIcon(item, audioDevice)
-            meetingViewModel.setPeerAudioEnabled(audioDevice != HMSAudioManager.AudioDevice.MUTE)
           }
           audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,
             MeetingFragment.AudioSwitchBottomSheetTAG

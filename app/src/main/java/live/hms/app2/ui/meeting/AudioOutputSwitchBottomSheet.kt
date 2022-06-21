@@ -15,7 +15,7 @@ import live.hms.video.audio.HMSAudioManager.AudioDevice
 class AudioOutputSwitchBottomSheet(
     private val meetingViewModel: MeetingViewModel,
     private var isPreview: Boolean = false,
-    private val onOptionItemClicked: ((AudioDevice) -> Unit)? = null
+    private val onOptionItemClicked: ((AudioDevice?, Boolean) -> Unit)? = null
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetAudioSwitchBinding>()
@@ -34,21 +34,24 @@ class AudioOutputSwitchBottomSheet(
 
         val devicesList = meetingViewModel.hmsSDK.getAudioDevicesList()
 
-        meetingViewModel.hmsSDK.getAudioOutputRouteType().let {
-            when (it) {
-                AudioDevice.BLUETOOTH -> binding.bluetoothBtn.background =
-                    ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
-                AudioDevice.SPEAKER_PHONE -> binding.speakerBtn.background =
-                    ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
-                AudioDevice.EARPIECE -> binding.earpieceBtn.background =
-                    ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
-                AudioDevice.MUTE ->
-                    binding.muteBtn.background =
+        if (meetingViewModel.isPeerAudioEnabled().not()) {
+            binding.muteBtn.background =
+                ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
+        } else {
+            meetingViewModel.hmsSDK.getAudioOutputRouteType().let {
+                when (it) {
+                    AudioDevice.BLUETOOTH -> binding.bluetoothBtn.background =
                         ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
-                else -> binding.speakerBtn.background =
-                    ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
+                    AudioDevice.SPEAKER_PHONE -> binding.speakerBtn.background =
+                        ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
+                    AudioDevice.EARPIECE -> binding.earpieceBtn.background =
+                        ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
+                    else -> binding.speakerBtn.background =
+                        ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
+                }
             }
         }
+
         if (devicesList.contains(AudioDevice.BLUETOOTH)) {
             binding.bluetoothBtn.visibility = View.VISIBLE
         } else if (devicesList.contains(AudioDevice.WIRED_HEADSET)) {
@@ -72,7 +75,9 @@ class AudioOutputSwitchBottomSheet(
         }
 
         binding.muteBtn.setOnClickListener {
-            setAudioType(AudioDevice.MUTE)
+            meetingViewModel.setPeerAudioEnabled(false)
+            onOptionItemClicked?.invoke(null, true)
+            dismiss()
         }
     }
 
@@ -82,7 +87,7 @@ class AudioOutputSwitchBottomSheet(
         } else {
             meetingViewModel.hmsSDK.switchAudioOutput(audioDevice)
         }
-        onOptionItemClicked?.invoke(audioDevice)
+        onOptionItemClicked?.invoke(audioDevice, true)
         dismiss()
     }
 }

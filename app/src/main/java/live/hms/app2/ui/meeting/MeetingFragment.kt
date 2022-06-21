@@ -219,7 +219,7 @@ class MeetingFragment : Fragment() {
     return false
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem,audioDevice: AudioDevice? = AudioDevice.NONE) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioDevice: AudioDevice?) {
     item.apply {
       when (audioDevice) {
         AudioDevice.EARPIECE -> {
@@ -405,10 +405,16 @@ class MeetingFragment : Fragment() {
 
     menu.findItem(R.id.action_volume).apply {
       volumeMenuIcon = this
-      updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      if (meetingViewModel.isPeerAudioEnabled()){
+        updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      }else{
+        updateActionVolumeMenuIcon(this,null)
+      }
       setOnMenuItemClickListener {
         if (isMeetingOngoing) {
-          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel)
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel,false) { audioDevice, isMuted ->
+            updateActionVolumeMenuIcon(it, audioDevice)
+          }
           audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,AudioSwitchBottomSheetTAG)
         }
 
@@ -440,7 +446,9 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
       volumeMenuIcon?.let {
-        updateActionVolumeMenuIcon(it,device)
+        if (meetingViewModel.isPeerAudioEnabled()){
+          updateActionVolumeMenuIcon(it,device)
+        }
       }
     }
   }
