@@ -382,7 +382,6 @@ class MeetingViewModel(
       addRTCStatsObserver()
     }
 
-    state.value = MeetingState.NonFatalFailure(HMSException(200,"","","",""))
     if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure || state.value is MeetingState.NonFatalFailure)) {
       error("Cannot start meeting in ${state.value} state")
     }
