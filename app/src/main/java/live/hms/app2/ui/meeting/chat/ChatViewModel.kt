@@ -118,7 +118,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   }
 
   fun peersUpdate() {
-    val list = convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles())
+    val list = convertPeersToChatMembers(hmssdk.getRemotePeers().toList(), hmssdk.getRoles())
     val currentIndex = when(val num = list.indexOf(currentSelectedRecipient)) {
       -1 -> 0
       else -> num
