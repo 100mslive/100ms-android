@@ -93,6 +93,9 @@ class PreviewFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     requireActivity().invalidateOptionsMenu()
     setHasOptionsMenu(true)
+    meetingViewModel.isRecording.observe(viewLifecycleOwner) {
+      Log.d("PREVIEW_REC","STATE IS ${it.name}")
+    }
   }
 
   override fun onAttach(context: Context) {
@@ -171,16 +174,6 @@ class PreviewFragment : Fragment() {
         Log.v(TAG, "buttonJoinMeeting.onClick()")
 
         findNavController().setGraph(R.navigation.meeting_nav_graph)
-      }
-    }
-  }
-
-  override fun onPrepareOptionsMenu(menu: Menu) {
-    super.onPrepareOptionsMenu(menu)
-
-    menu.forEach { item ->
-      if (item.itemId != R.id.action_flip_camera && item.itemId != R.id.action_volume && item.itemId != R.id.action_participants) {
-        item.isVisible = false
       }
     }
   }
@@ -324,7 +317,7 @@ class PreviewFragment : Fragment() {
                     participantsDialog?.participantCount =
                         meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
                 }
-                participantsDialogAdapter?.setItems(getRemotePeers(room).toTypedArray())
+                participantsDialogAdapter?.setItems(getRemotePeers(room))
             })
     }
 

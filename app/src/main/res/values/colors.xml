@@ -17,4 +17,8 @@
     <color name="white">#ffffff</color>
     <color name="white_faded_30">#4dffffff</color>
     <color name="white_faded_70">#b3ffffff</color>
+    <color name="recording">#e04848</color>
+    <color name="recording_transition">#FFFFFF</color>
+    <color name="streaming">#2832c2</color>
+    <color name="streaming_recording">#FFC107</color>
 </resources>

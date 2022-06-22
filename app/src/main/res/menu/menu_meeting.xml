@@ -158,5 +158,25 @@
             android:title="@string/bug_report"
             app:showAsAction="never" />
 
+        <item
+            android:id="@+id/add_rtc_stats_observer"
+            android:title="Add Stats Observer"
+            app:showAsAction="ifRoom"
+            />
+
+        <item
+            android:id="@+id/remove_rtc_stats_observer"
+            android:title="Remove Stats Observer"
+            app:showAsAction="ifRoom"
+            />
+
+
+        <item
+            android:id="@+id/toggle_audio_mode"
+            android:title=""
+            android:visible="true"
+            android:checkable="true"
+            app:actionViewClass="androidx.appcompat.widget.SwitchCompat" />
+
     </group>
 </menu>

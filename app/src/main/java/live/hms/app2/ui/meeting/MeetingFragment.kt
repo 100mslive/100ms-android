@@ -233,6 +233,20 @@ class MeetingFragment : Fragment() {
     menu.findItem(R.id.raise_hand).isVisible = true
     menu.findItem(R.id.change_name).isVisible = true
 
+    menu.findItem(R.id.add_rtc_stats_observer).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.addRTCStatsObserver()
+        true
+      }
+    }
+
+    menu.findItem(R.id.remove_rtc_stats_observer).apply {
+      setOnMenuItemClickListener {
+        meetingViewModel.removeRtcStatsObserver()
+        true
+      }
+    }
+
     menu.findItem(R.id.action_stop_streaming_and_recording).apply {
       isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING ||
@@ -286,6 +300,22 @@ class MeetingFragment : Fragment() {
         else -> {
           this.title = "Recording"
         } // Nothing
+      }
+    }
+
+    (menu.findItem(R.id.toggle_audio_mode))?.apply {
+      fun updateState() {
+        title = getString(if (meetingViewModel.getCurrentMediaModeCheckedState())
+          R.string.audio_mode_media
+        else
+          R.string.audio_mode_in_call)
+        isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
+      }
+      updateState()
+      setOnMenuItemClickListener {
+        meetingViewModel.toggleMediaMode()
+        updateState()
+        true
       }
     }
 
@@ -417,41 +447,6 @@ class MeetingFragment : Fragment() {
       isVisible = ok
     }
 
-    menu.findItem(R.id.action_record).apply {
-      when (meetingViewModel.isRecording.value) {
-        RecordingState.RECORDING -> {
-          // red
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#e04848"))
-        }
-        RecordingState.NOT_RECORDING_OR_STREAMING -> {
-          isVisible = false
-        }
-        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS,
-        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
-          // White
-          isVisible = true
-          // change the colour to transitioning
-          this.icon.setTint(Color.parseColor("#FFFFFF"))
-        }
-        RecordingState.STREAMING -> {
-          // Blue
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#2832c2"))
-        }
-        RecordingState.STREAMING_AND_RECORDING -> {
-          // Orange
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#FFC107"))
-        }
-        null -> TODO()
-      }
-
-      setOnMenuItemClickListener {
-        meetingViewModel.stopRecording()
-        true
-      }
-    }
 
     menu.findItem(R.id.action_volume).apply {
       updateActionVolumeMenuIcon(this)
@@ -597,6 +592,9 @@ class MeetingFragment : Fragment() {
           is MeetingViewModel.Event.ServerRecordEvent -> {
             Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
             Log.d("RecordingState", event.message)
+          }
+          is MeetingViewModel.Event.HlsEvent, is MeetingViewModel.Event.HlsRecordingEvent -> {
+            Toast.makeText(requireContext(), (event as MeetingViewModel.Event.MessageEvent).message, Toast.LENGTH_LONG).show()
           }
         }
       }

@@ -2,6 +2,7 @@ package live.hms.app2.ui.meeting
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
@@ -9,6 +10,7 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.view.forEach
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import live.hms.app2.R
@@ -82,5 +84,49 @@ class MeetingActivity : AppCompatActivity() {
     meetingViewModel.title.observe(this) {
       binding.containerToolbar.toolbar.setTitle(it)
     }
+    meetingViewModel.isRecording.observe(this) {
+      invalidateOptionsMenu()
+    }
+  }
+
+  override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+    super.onPrepareOptionsMenu(menu)
+
+    menu?.findItem(R.id.action_record)?.apply {
+      when (meetingViewModel.isRecording.value) {
+        RecordingState.RECORDING -> {
+          // red
+          isVisible = true
+          this.icon.setTint(getColor(R.color.recording))
+        }
+        RecordingState.NOT_RECORDING_OR_STREAMING -> {
+          isVisible = false
+        }
+        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS,
+        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
+          // White
+          isVisible = true
+          // change the colour to transitioning
+          this.icon.setTint(getColor(R.color.recording_transition))
+        }
+        RecordingState.STREAMING -> {
+          // Blue
+          isVisible = true
+          this.icon.setTint(getColor(R.color.streaming))
+        }
+        RecordingState.STREAMING_AND_RECORDING -> {
+          // Orange
+          isVisible = true
+          this.icon.setTint(getColor(R.color.streaming_recording))
+        }
+        else ->{}
+      }
+
+      setOnMenuItemClickListener {
+        meetingViewModel.stopRecording()
+        true
+      }
+    }
+    return true
   }
 }

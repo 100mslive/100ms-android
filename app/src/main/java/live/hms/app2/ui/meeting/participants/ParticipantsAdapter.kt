@@ -59,7 +59,7 @@ class ParticipantsAdapter(
   private val items = ArrayList<HMSPeer>()
 
   @MainThread
-  fun setItems(newItems: Array<HMSPeer>) {
+  fun setItems(newItems: List<HMSPeer>) {
     items.clear()
     items.addAll(newItems)
     notifyDataSetChanged()
