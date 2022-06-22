@@ -225,7 +225,7 @@ class MeetingViewModel(
   private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
   val peers: List<HMSPeer>
-    get() = hmsSDK.getPeers().toList()
+    get() = hmsSDK.getPeers()
 
   fun startPreview() {
     // call Preview api
@@ -1208,7 +1208,7 @@ class MeetingViewModel(
 
   fun toggleMediaMode()  {
     currentAudioMode = if (currentAudioMode == AudioManager.MODE_IN_COMMUNICATION) AudioManager.MODE_NORMAL else AudioManager.MODE_IN_COMMUNICATION
-//    hmsSDK.setAudioMode(currentAudioMode)
+    hmsSDK.setAudioMode(currentAudioMode)
   }
 
   fun getCurrentMediaModeCheckedState(): Boolean {
