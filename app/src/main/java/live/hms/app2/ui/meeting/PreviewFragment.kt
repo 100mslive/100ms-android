@@ -8,7 +8,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -52,6 +51,7 @@ class PreviewFragment : Fragment() {
   private lateinit var track: MeetingTrack
 
   private var isViewVisible = false
+  private var audioOutputIcon : MenuItem? = null
 
   private var participantsDialog : ParticipantsDialog? = null
   private var participantsDialogAdapter : ParticipantsAdapter? = null
@@ -96,6 +96,14 @@ class PreviewFragment : Fragment() {
     setHasOptionsMenu(true)
     meetingViewModel.isRecording.observe(viewLifecycleOwner) {
       Log.d("PREVIEW_REC","STATE IS ${it.name}")
+    }
+
+    meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
+      audioOutputIcon?.let {
+        if (meetingViewModel.isPeerAudioEnabled()){
+          updateActionVolumeMenuIcon(it,device)
+        }
+      }
     }
   }
 
@@ -217,6 +225,7 @@ class PreviewFragment : Fragment() {
       }
       R.id.action_volume -> {
         meetingViewModel.apply {
+          audioOutputIcon = item
           val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice , isMuted ->
             updateActionVolumeMenuIcon(item, audioDevice)
           }
