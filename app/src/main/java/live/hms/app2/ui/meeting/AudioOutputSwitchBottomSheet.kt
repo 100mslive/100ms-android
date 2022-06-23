@@ -46,6 +46,8 @@ class AudioOutputSwitchBottomSheet(
                         ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
                     AudioDevice.EARPIECE -> binding.earpieceBtn.background =
                         ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
+                    AudioDevice.WIRED_HEADSET -> binding.wiredBtn.background =
+                        ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
                     else -> binding.speakerBtn.background =
                         ContextCompat.getDrawable(requireContext(), R.color.color_gray_highlight)
                 }
@@ -87,7 +89,7 @@ class AudioOutputSwitchBottomSheet(
         } else {
             meetingViewModel.hmsSDK.switchAudioOutput(audioDevice)
         }
-        onOptionItemClicked?.invoke(audioDevice, true)
+        onOptionItemClicked?.invoke(meetingViewModel.hmsSDK.getAudioOutputRouteType(), true)
         dismiss()
     }
 }

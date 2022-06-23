@@ -209,6 +209,13 @@ class PreviewFragment : Fragment() {
     }
   }
 
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    menu.findItem(R.id.action_volume)?.let {
+      updateActionVolumeMenuIcon(it,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+    }
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.action_flip_camera -> {
