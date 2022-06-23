@@ -343,7 +343,7 @@ class PreviewFragment : Fragment() {
                     participantsDialog?.participantCount =
                         meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
                 }
-                participantsDialogAdapter?.setItems(getRemotePeers(room).toTypedArray())
+                participantsDialogAdapter?.setItems(getRemotePeers(room))
             })
     }
 

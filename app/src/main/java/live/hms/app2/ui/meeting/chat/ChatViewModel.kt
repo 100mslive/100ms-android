@@ -126,7 +126,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     _chatMembers.postValue(SelectedRecipient(list, currentIndex))
   }
 
-  private fun convertPeersToChatMembers(listOfParticipants : Array<HMSRemotePeer>, roles : List<HMSRole>) : List<Recipient> {
+  private fun convertPeersToChatMembers(listOfParticipants : List<HMSRemotePeer>, roles : List<HMSRole>) : List<Recipient> {
     return listOf(Recipient.Everyone)
       .plus(roles.map { Recipient.Role(it) })
       // Remove local peers (yourself) from the list of people you can message.

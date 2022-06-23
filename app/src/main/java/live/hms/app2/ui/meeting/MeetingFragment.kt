@@ -275,6 +275,64 @@ class MeetingFragment : Fragment() {
       }
     }
 
+    menu.findItem(R.id.action_record_meeting).apply {
+      isVisible = true
+
+      // If we're in a transitioning state, we prevent further clicks.
+      // Checked or not checked depends on if it's currently recording or not. Checked if recording.
+      when (meetingViewModel.isRecording.value) {
+        RecordingState.STREAMING -> {
+          this.isChecked = true
+          this.isEnabled = true
+          this.title = "Streaming"
+        }
+        RecordingState.STREAMING_AND_RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = true
+          this.title = "Rec+Stream"
+        }
+        RecordingState.RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = true
+          this.title = "Recording"
+        }
+        RecordingState.NOT_RECORDING_OR_STREAMING -> {
+          this.isChecked = false
+          this.isEnabled = true
+          this.title = "Rec+Stream"
+        }
+        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
+          this.isChecked = true
+          this.isEnabled = false
+          this.title = "Recording"
+        }
+        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS -> {
+          this.isChecked = false
+          this.isEnabled = false
+          this.title = "Recording"
+        }
+        else -> {
+          this.title = "Recording"
+        } // Nothing
+      }
+    }
+
+    (menu.findItem(R.id.toggle_audio_mode))?.apply {
+      fun updateState() {
+        title = getString(if (meetingViewModel.getCurrentMediaModeCheckedState())
+          R.string.audio_mode_media
+        else
+          R.string.audio_mode_in_call)
+        isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
+      }
+      updateState()
+      setOnMenuItemClickListener {
+        meetingViewModel.toggleMediaMode()
+        updateState()
+        true
+      }
+    }
+
     menu.findItem(R.id.end_room).apply {
       isVisible = meetingViewModel.isAllowedToEndMeeting()
 
@@ -402,6 +460,7 @@ class MeetingFragment : Fragment() {
       val ok = meetingViewModel.meetingViewMode.value != MeetingViewMode.AUDIO_ONLY
       isVisible = ok
     }
+
 
     menu.findItem(R.id.action_volume).apply {
       volumeMenuIcon = this

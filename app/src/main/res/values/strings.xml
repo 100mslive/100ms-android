@@ -160,4 +160,7 @@
     <string name="recording_start_stop">Recording Started: %d, Stopped: %d</string>
     <string name="rtmp_start_stop">RTMP Started: %d, Stopped: %d</string>
     <string name="sfu_start">SFU started at:%d</string>
+    <string name="audio_mode_in_call">Audio mode : in-call</string>
+    <string name="audio_mode_media">Audio mode : media</string>
+    <string name="unknown">unknown</string>
 </resources>
