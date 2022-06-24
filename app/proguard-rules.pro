@@ -29,6 +29,8 @@
 -keepnames class live.hms.app2.ui.settings.SettingsMode
 -keep class * extends androidx.fragment.app.Fragment{}
 
+-keep class androidx.appcompat.view.WindowCallbackWrapper { *; }
+
 # Previously required proguard rules for sdk, now included in the library.
-#-keep class org.webrtc.** { *; }
-#-keep class live.hms.video.** { *; }
+-keep class live.hms.** { *; }
+-keep class org.webrtc.** { *; }
