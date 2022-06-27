@@ -8,7 +8,6 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -21,6 +20,7 @@ import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.participants.ParticipantsAdapter
 import live.hms.app2.ui.meeting.participants.ParticipantsDialog
 import live.hms.app2.util.*
+import live.hms.video.audio.HMSAudioManager
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.models.HMSLocalPeer
@@ -51,6 +51,7 @@ class PreviewFragment : Fragment() {
   private lateinit var track: MeetingTrack
 
   private var isViewVisible = false
+  private var audioOutputIcon : MenuItem? = null
 
   private var participantsDialog : ParticipantsDialog? = null
   private var participantsDialogAdapter : ParticipantsAdapter? = null
@@ -93,6 +94,17 @@ class PreviewFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     requireActivity().invalidateOptionsMenu()
     setHasOptionsMenu(true)
+    meetingViewModel.isRecording.observe(viewLifecycleOwner) {
+      Log.d("PREVIEW_REC","STATE IS ${it.name}")
+    }
+
+    meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
+      audioOutputIcon?.let {
+        if (meetingViewModel.isPeerAudioEnabled()){
+          updateActionVolumeMenuIcon(it,device)
+        }
+      }
+    }
   }
 
   override fun onAttach(context: Context) {
@@ -175,23 +187,32 @@ class PreviewFragment : Fragment() {
     }
   }
 
-  override fun onPrepareOptionsMenu(menu: Menu) {
-    super.onPrepareOptionsMenu(menu)
-
-    menu.forEach { item ->
-      if (item.itemId != R.id.action_flip_camera && item.itemId != R.id.action_volume && item.itemId != R.id.action_participants) {
-        item.isVisible = false
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioOutputType: HMSAudioManager.AudioDevice? = null) {
+    item.apply {
+      when (audioOutputType) {
+        HMSAudioManager.AudioDevice.EARPIECE -> {
+          setIcon(R.drawable.ic_baseline_hearing_24)
+        }
+        HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
+          setIcon(R.drawable.ic_volume_up_24)
+        }
+        HMSAudioManager.AudioDevice.BLUETOOTH -> {
+          setIcon(R.drawable.ic_baseline_bluetooth_24)
+        }
+        HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
+          setIcon(R.drawable.ic_baseline_headset_24)
+        }
+        else -> {
+          setIcon(R.drawable.ic_volume_off_24)
+        }
       }
     }
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem) {
-    item.apply {
-      if (meetingViewModel.isPeerAudioEnabled()) {
-        setIcon(R.drawable.ic_volume_up_24)
-      } else {
-        setIcon(R.drawable.ic_volume_off_24)
-      }
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    super.onCreateOptionsMenu(menu, inflater)
+    menu.findItem(R.id.action_volume)?.let {
+      updateActionVolumeMenuIcon(it,meetingViewModel.hmsSDK.getAudioOutputRouteType())
     }
   }
 
@@ -211,8 +232,13 @@ class PreviewFragment : Fragment() {
       }
       R.id.action_volume -> {
         meetingViewModel.apply {
-          toggleAudio()
-          updateActionVolumeMenuIcon(item)
+          audioOutputIcon = item
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice , isMuted ->
+            updateActionVolumeMenuIcon(item, audioDevice)
+          }
+          audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,
+            MeetingFragment.AudioSwitchBottomSheetTAG
+          )
         }
       }
     }
@@ -324,7 +350,7 @@ class PreviewFragment : Fragment() {
                     participantsDialog?.participantCount =
                         meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
                 }
-                participantsDialogAdapter?.setItems(getRemotePeers(room).toTypedArray())
+                participantsDialogAdapter?.setItems(getRemotePeers(room))
             })
     }
 

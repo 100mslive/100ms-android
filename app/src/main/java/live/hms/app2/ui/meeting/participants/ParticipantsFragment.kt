@@ -71,7 +71,6 @@ class ParticipantsFragment : Fragment() {
                 val items = meetingViewModel
                     .peers
                     .filter { text.isNullOrEmpty() || it.name.contains(text.toString(), true) }
-                    .toTypedArray()
                 adapter.setItems(items)
             }
         }

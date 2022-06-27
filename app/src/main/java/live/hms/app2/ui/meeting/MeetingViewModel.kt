@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
@@ -13,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -22,8 +22,6 @@ import live.hms.app2.ui.meeting.chat.Recipient
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.connection.stats.*
-import live.hms.video.connection.stats.quality.HMSNetworkObserver
-import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSLogSettings
@@ -82,6 +80,18 @@ class MeetingViewModel(
   private fun showRtmpInfo(room : HMSRoom) {
     viewModelScope.launch {
       _events.emit(Event.RtmpEvent(recordingTimesUseCase.showRtmpInfo(room)))
+    }
+  }
+
+  private fun showHlsInfo(room : HMSRoom) {
+    viewModelScope.launch {
+      _events.emit(Event.HlsEvent(recordingTimesUseCase.showHlsInfo(room, false)))
+    }
+  }
+
+  private fun showHlsRecordingInfo(room : HMSRoom) {
+    viewModelScope.launch {
+      _events.emit(Event.HlsRecordingEvent(recordingTimesUseCase.showHlsInfo(room, true)))
     }
   }
 
@@ -194,6 +204,9 @@ class MeetingViewModel(
 
   val broadcastsReceived = MutableLiveData<ChatMessage>()
 
+  private val _trackStatus = MutableLiveData<String>()
+  val trackStatus: LiveData<String> = _trackStatus
+
   private val hmsTrackSettings = HMSTrackSettings.Builder()
     .audio(
       HMSAudioTrackSettings.Builder()
@@ -212,7 +225,7 @@ class MeetingViewModel(
   val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
   private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
-  val peers: Array<HMSPeer>
+  val peers: List<HMSPeer>
     get() = hmsSDK.getPeers()
 
   fun startPreview() {
@@ -232,6 +245,8 @@ class MeetingViewModel(
 
       override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
         roomState.postValue(Pair(type,hmsRoom))
+        // This will keep the isRecording value updated correctly in preview. It will not be called after join.
+        _isRecording.postValue(getRecordingState(hmsRoom))
       }
 
     })
@@ -368,7 +383,7 @@ class MeetingViewModel(
       addRTCStatsObserver()
     }
 
-    if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure)) {
+    if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure || state.value is MeetingState.NonFatalFailure)) {
       error("Cannot start meeting in ${state.value} state")
     }
 
@@ -407,6 +422,9 @@ class MeetingViewModel(
           // get the hls URL from the Room, if it exists
           val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
           switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
+          _isRecording.postValue(
+            getRecordingState(room)
+          )
         }
 
         override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -502,6 +520,13 @@ class MeetingViewModel(
                 getRecordingState(hmsRoom)
               )
               switchToHlsViewIfRequired()
+              showHlsInfo(hmsRoom)
+            }
+            HMSRoomUpdate.HLS_RECORDING_STATE_UPDATED -> {
+              _isRecording.postValue(
+                getRecordingState(hmsRoom)
+              )
+              showHlsRecordingInfo(hmsRoom)
             }
             else -> {
             }
@@ -632,7 +657,8 @@ class MeetingViewModel(
   private fun getRecordingState(room: HMSRoom): RecordingState {
 
     val recording = room.browserRecordingState?.running == true ||
-            room.serverRecordingState?.running == true
+            room.serverRecordingState?.running == true ||
+            room.hlsRecordingState?.running == true
     val streaming = room.rtmpHMSRtmpStreamingState?.running == true ||
             room.hlsStreamingState?.running == true
 
@@ -1115,9 +1141,12 @@ class MeetingViewModel(
       data class HlsError(val throwable: HMSException) : Hls()
     }
     class HlsNotStarted(val reason : String) : Event()
+    abstract class MessageEvent(open val message : String) : Event()
     data class RtmpEvent(val message : String) : Event()
     data class RecordEvent(val message : String) : Event()
     data class ServerRecordEvent(val message: String) : Event()
+    data class HlsEvent(override val message : String) : MessageEvent(message)
+    data class HlsRecordingEvent(override val message : String) : MessageEvent(message)
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -1194,6 +1223,21 @@ class MeetingViewModel(
 
       }
     })
+  }
+
+  fun updateTrackStatus(status: String) {
+    _trackStatus.value = status
+  }
+
+  var currentAudioMode = AudioManager.MODE_IN_COMMUNICATION
+
+  fun toggleMediaMode()  {
+    currentAudioMode = if (currentAudioMode == AudioManager.MODE_IN_COMMUNICATION) AudioManager.MODE_NORMAL else AudioManager.MODE_IN_COMMUNICATION
+    hmsSDK.setAudioMode(currentAudioMode)
+  }
+
+  fun getCurrentMediaModeCheckedState(): Boolean {
+    return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
   }
 }
 

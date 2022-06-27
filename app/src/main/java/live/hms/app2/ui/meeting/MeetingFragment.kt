@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.util.Log
@@ -37,6 +36,7 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.audio.HMSAudioManager.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -50,6 +50,7 @@ class MeetingFragment : Fragment() {
 
   companion object {
     private const val TAG = "MeetingFragment"
+    const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
   }
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
@@ -57,6 +58,7 @@ class MeetingFragment : Fragment() {
 
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
+  private var volumeMenuIcon : MenuItem? = null
 
   private val CAPTURE_PERMISSION_REQUEST_CODE = 1
 
@@ -229,12 +231,24 @@ class MeetingFragment : Fragment() {
     return false
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioDevice: AudioDevice?) {
     item.apply {
-      if (meetingViewModel.isPeerAudioEnabled()) {
-        setIcon(R.drawable.ic_volume_up_24)
-      } else {
-        setIcon(R.drawable.ic_volume_off_24)
+      when (audioDevice) {
+        AudioDevice.EARPIECE -> {
+          setIcon(R.drawable.ic_baseline_hearing_24)
+        }
+        AudioDevice.SPEAKER_PHONE -> {
+          setIcon(R.drawable.ic_volume_up_24)
+        }
+        AudioDevice.BLUETOOTH -> {
+          setIcon(R.drawable.ic_baseline_bluetooth_24)
+        }
+        AudioDevice.WIRED_HEADSET -> {
+          setIcon(R.drawable.ic_baseline_headset_24)
+        }
+        else -> {
+          setIcon(R.drawable.ic_volume_off_24)
+        }
       }
     }
   }
@@ -312,6 +326,22 @@ class MeetingFragment : Fragment() {
         else -> {
           this.title = "Recording"
         } // Nothing
+      }
+    }
+
+    (menu.findItem(R.id.toggle_audio_mode))?.apply {
+      fun updateState() {
+        title = getString(if (meetingViewModel.getCurrentMediaModeCheckedState())
+          R.string.audio_mode_media
+        else
+          R.string.audio_mode_in_call)
+        isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
+      }
+      updateState()
+      setOnMenuItemClickListener {
+        meetingViewModel.toggleMediaMode()
+        updateState()
+        true
       }
     }
 
@@ -443,48 +473,20 @@ class MeetingFragment : Fragment() {
       isVisible = ok
     }
 
-    menu.findItem(R.id.action_record).apply {
-      when (meetingViewModel.isRecording.value) {
-        RecordingState.RECORDING -> {
-          // red
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#e04848"))
-        }
-        RecordingState.NOT_RECORDING_OR_STREAMING -> {
-          isVisible = false
-        }
-        RecordingState.NOT_RECORDING_TRANSITION_IN_PROGRESS,
-        RecordingState.RECORDING_TRANSITIONING_TO_NOT_RECORDING -> {
-          // White
-          isVisible = true
-          // change the colour to transitioning
-          this.icon.setTint(Color.parseColor("#FFFFFF"))
-        }
-        RecordingState.STREAMING -> {
-          // Blue
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#2832c2"))
-        }
-        RecordingState.STREAMING_AND_RECORDING -> {
-          // Orange
-          isVisible = true
-          this.icon.setTint(Color.parseColor("#FFC107"))
-        }
-        null -> TODO()
-      }
-
-      setOnMenuItemClickListener {
-        meetingViewModel.stopRecording()
-        true
-      }
-    }
 
     menu.findItem(R.id.action_volume).apply {
-      updateActionVolumeMenuIcon(this)
+      volumeMenuIcon = this
+      if (meetingViewModel.isPeerAudioEnabled()){
+        updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      }else{
+        updateActionVolumeMenuIcon(this,null)
+      }
       setOnMenuItemClickListener {
         if (isMeetingOngoing) {
-          meetingViewModel.toggleAudio()
-          updateActionVolumeMenuIcon(this)
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel,false) { audioDevice, isMuted ->
+            updateActionVolumeMenuIcon(it, audioDevice)
+          }
+          audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,AudioSwitchBottomSheetTAG)
         }
 
         true
@@ -501,6 +503,7 @@ class MeetingFragment : Fragment() {
     }
   }
 
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     initViewModel()
@@ -511,6 +514,14 @@ class MeetingFragment : Fragment() {
     meetingViewModel.isRecording.observe(
       viewLifecycleOwner,
       Observer { activity?.invalidateOptionsMenu() })
+
+    meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
+      volumeMenuIcon?.let {
+        if (meetingViewModel.isPeerAudioEnabled()){
+          updateActionVolumeMenuIcon(it,device)
+        }
+      }
+    }
   }
 
   override fun onCreateView(
@@ -623,6 +634,9 @@ class MeetingFragment : Fragment() {
           is MeetingViewModel.Event.ServerRecordEvent -> {
             Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
             Log.d("RecordingState", event.message)
+          }
+          is MeetingViewModel.Event.HlsEvent, is MeetingViewModel.Event.HlsRecordingEvent -> {
+            Toast.makeText(requireContext(), (event as MeetingViewModel.Event.MessageEvent).message, Toast.LENGTH_LONG).show()
           }
         }
       }
