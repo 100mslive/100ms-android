@@ -212,6 +212,7 @@ class PreviewFragment : Fragment() {
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     menu.findItem(R.id.action_volume)?.let {
+      audioOutputIcon = it
       updateActionVolumeMenuIcon(it,meetingViewModel.hmsSDK.getAudioOutputRouteType())
     }
   }
@@ -232,7 +233,6 @@ class PreviewFragment : Fragment() {
       }
       R.id.action_volume -> {
         meetingViewModel.apply {
-          audioOutputIcon = item
           val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice , isMuted ->
             updateActionVolumeMenuIcon(item, audioDevice)
           }
