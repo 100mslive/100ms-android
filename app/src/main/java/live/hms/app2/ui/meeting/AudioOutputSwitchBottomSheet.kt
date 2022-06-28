@@ -84,11 +84,7 @@ class AudioOutputSwitchBottomSheet(
     }
 
     private fun setAudioType(audioDevice: AudioDevice) {
-        if (isPreview) {
-            meetingViewModel.hmsSDK.setDefaultAudioType(audioDevice)
-        } else {
-            meetingViewModel.hmsSDK.switchAudioOutput(audioDevice)
-        }
+        meetingViewModel.hmsSDK.switchAudioOutput(audioDevice)
         onOptionItemClicked?.invoke(meetingViewModel.hmsSDK.getAudioOutputRouteType(), true)
         dismiss()
     }
