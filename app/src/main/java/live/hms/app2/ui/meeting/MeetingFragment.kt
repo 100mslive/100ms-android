@@ -118,7 +118,19 @@ class MeetingFragment : Fragment() {
 
   override fun onDestroy() {
     super.onDestroy()
+    // Stop screen share and audio share
     meetingViewModel.stopScreenshare(object : HMSActionResultListener{
+      override fun onError(error: HMSException) {
+        // onError
+      }
+
+      override fun onSuccess() {
+        // onSuccess
+      }
+
+    })
+
+    meetingViewModel.stopAudioshare(object : HMSActionResultListener{
       override fun onError(error: HMSException) {
         // onError
       }
@@ -863,6 +875,17 @@ class MeetingFragment : Fragment() {
       }
     }
 
+    binding.buttonMusicPlay?.apply {
+//      visibility = if (settings.musicPlayEnabled) View.VISIBLE else View.GONE
+      // visibility = View.GONE
+//      isEnabled = settings.musicPlayEnabled
+
+      setOnSingleClickListener(200L) {
+        Log.v(TAG, "buttonMusicPlay.onClick()")
+        openMusicDialog()
+      }
+    }
+
     binding.buttonOpenChat.setOnSingleClickListener(1000L) {
       Log.d(TAG, "initButtons: Chat Button clicked")
       findNavController().navigate(
@@ -874,6 +897,10 @@ class MeetingFragment : Fragment() {
     }
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
+  }
+
+  private fun openMusicDialog(){
+    findNavController().navigate(R.id.musicChooserSheet)
   }
 
   private fun cleanup() {
