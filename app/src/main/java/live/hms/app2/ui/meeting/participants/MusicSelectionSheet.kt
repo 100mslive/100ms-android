@@ -35,10 +35,6 @@ class MusicSelectionSheet : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<DialogMusicModeChooserBinding>()
 
-    private val mediaPlayerManager by lazy {
-        MediaPlayerManager(lifecycle)
-    }
-
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
             requireActivity().application,
