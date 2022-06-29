@@ -84,6 +84,7 @@ class AudioOutputSwitchBottomSheet(
     }
 
     private fun setAudioType(audioDevice: AudioDevice) {
+        meetingViewModel.setPeerAudioEnabled(true)
         meetingViewModel.hmsSDK.switchAudioOutput(audioDevice)
         onOptionItemClicked?.invoke(meetingViewModel.hmsSDK.getAudioOutputRouteType(), true)
         dismiss()
