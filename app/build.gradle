@@ -14,8 +14,8 @@ android {
         applicationId "live.hms.app2"
         minSdkVersion 24
         targetSdkVersion 31
-        versionCode project.findProperty('100MS_SDK_VERSION_CODE') as int
-        versionName project.findProperty('100MS_SDK_VERSION_NAME')
+        versionCode project.findProperty('100MS_APP_VERSION_CODE') as int
+        versionName project.findProperty('100MS_APP_VERSION_NAME')
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
