@@ -1,18 +1,23 @@
 package live.hms.app2.ui.meeting
 
 import android.app.Activity
+import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.Rational
 import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -118,28 +123,8 @@ class MeetingFragment : Fragment() {
 
   override fun onDestroy() {
     super.onDestroy()
-    // Stop screen share and audio share
-    meetingViewModel.stopScreenshare(object : HMSActionResultListener{
-      override fun onError(error: HMSException) {
-        // onError
-      }
+    meetingViewModel.leaveMeeting()
 
-      override fun onSuccess() {
-        // onSuccess
-      }
-
-    })
-
-    meetingViewModel.stopAudioshare(object : HMSActionResultListener{
-      override fun onError(error: HMSException) {
-        // onError
-      }
-
-      override fun onSuccess() {
-        // onSuccess
-      }
-
-    })
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -224,6 +209,10 @@ class MeetingFragment : Fragment() {
         meetingViewModel.toggleRaiseHand()
       }
 
+      R.id.pip_mode -> {
+        launchPipMode()
+      }
+
       R.id.change_name -> meetingViewModel.requestNameChange()
 
       R.id.hls_stop -> meetingViewModel.stopHls()
@@ -258,6 +247,7 @@ class MeetingFragment : Fragment() {
 
     menu.findItem(R.id.raise_hand).isVisible = true
     menu.findItem(R.id.change_name).isVisible = true
+    menu.findItem(R.id.pip_mode).isVisible = true
 
     menu.findItem(R.id.add_rtc_stats_observer).apply {
       setOnMenuItemClickListener {
@@ -541,6 +531,12 @@ class MeetingFragment : Fragment() {
   }
 
   private fun goToHomePage(details: HMSRemovedFromRoom? = null) {
+
+    //only way to programmatically dismiss pip mode
+    if (activity?.isInPictureInPictureMode == true){
+       activity?.moveTaskToBack(false)
+    }
+
     Intent(requireContext(), HomeActivity::class.java).apply {
       crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
       if(details != null) {
@@ -897,6 +893,23 @@ class MeetingFragment : Fragment() {
     }
 
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
+  }
+
+  //entry point to start PIP mode
+  private fun launchPipMode() {
+    activity?.enterPictureInPictureMode()
+  }
+
+  override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+    super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+    //hiding views for pip/non-pip layout !
+    if (isInPictureInPictureMode) {
+       binding.bottomControls.visibility = View.GONE
+      (activity as? AppCompatActivity)?.supportActionBar?.hide()
+    } else {
+       binding.bottomControls.visibility = View.VISIBLE
+      (activity as? AppCompatActivity)?.supportActionBar?.show()
+    }
   }
 
   private fun openMusicDialog(){
