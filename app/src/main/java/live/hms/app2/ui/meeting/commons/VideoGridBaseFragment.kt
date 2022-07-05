@@ -140,7 +140,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       }
 
       //Here the layout is modified for pip/non-pip mode
-      if (isPipMode)
+      if (activity?.isInPictureInPictureMode == true)
         pipLayout()
       else
         normalLayout()
