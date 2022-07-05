@@ -863,7 +863,7 @@ class MeetingFragment : Fragment() {
           )
         )
       } else {
-        pipActionsMap.remove("mute")
+        pipActionsMap.remove(muteTogglePipEvent)
       }
     }
     updatePipActions()
