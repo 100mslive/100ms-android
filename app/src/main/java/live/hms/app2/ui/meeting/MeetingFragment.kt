@@ -1,16 +1,15 @@
 package live.hms.app2.ui.meeting
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.app.PictureInPictureParams
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.content.res.Configuration
+import android.app.RemoteAction
+import android.content.*
+import android.graphics.drawable.Icon
 import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.Rational
 import android.view.*
 import android.widget.AdapterView
 import android.widget.Toast
@@ -55,6 +54,9 @@ class MeetingFragment : Fragment() {
 
   companion object {
     private const val TAG = "MeetingFragment"
+    private const val PIP_ACTION_EVENT = "PIP_ACTION_EVENT"
+    private const val muteTogglePipEvent = "muteToggle"
+    private const val disconnectCallPipEvent = "disconnectCall"
     const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
   }
 
@@ -123,6 +125,7 @@ class MeetingFragment : Fragment() {
 
   override fun onDestroy() {
     super.onDestroy()
+    unregisterPipActionListener()
     meetingViewModel.leaveMeeting()
 
   }
@@ -766,7 +769,8 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
       binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
-
+      //to show or hide mic icon [eg in HLS mode mic is not required]
+      updatePipMicState(allowed, true)
     }
 
     meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
@@ -783,6 +787,8 @@ class MeetingFragment : Fragment() {
     }
 
     meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
+      //enable/disable mic on/off state
+      updatePipMicState(isMicOn = enabled)
       binding.buttonToggleAudio.apply {
         setIconResource(
           if (enabled) R.drawable.ic_mic_24
@@ -794,6 +800,73 @@ class MeetingFragment : Fragment() {
     meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
       chatViewModel.peersUpdate()
     }
+  }
+
+  private val pipReceiver by lazy { object : BroadcastReceiver() {
+    override fun onReceive(
+      context: Context,
+      intent: Intent,
+    ) {
+      if (intent.hasExtra(muteTogglePipEvent))
+        meetingViewModel.toggleLocalAudio()
+      else if (intent.hasExtra(disconnectCallPipEvent))
+        meetingViewModel.leaveMeeting()
+    }
+  }}
+
+
+  private fun registerPipActionListener() {
+    val filter = IntentFilter()
+    filter.addAction(PIP_ACTION_EVENT)
+    activity?.registerReceiver(pipReceiver, filter)
+  }
+
+  private fun unregisterPipActionListener() {
+    activity?.unregisterReceiver(pipReceiver)
+  }
+
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    registerPipActionListener()
+  }
+
+  private fun updatePipEndCall() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      pipActionsMap[disconnectCallPipEvent] = RemoteAction(
+        Icon.createWithResource(activity, R.drawable.ic_call_end_24),
+        "End call",
+        "",
+        PendingIntent.getBroadcast(
+          activity,
+          345,
+          Intent(PIP_ACTION_EVENT).putExtra(disconnectCallPipEvent, 345),
+          PendingIntent.FLAG_IMMUTABLE
+        )
+      )
+      updatePipActions()
+    }
+  }
+
+  private fun updatePipMicState(isMicShown: Boolean = true, isMicOn: Boolean) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      if (isMicShown) {
+        pipActionsMap[muteTogglePipEvent] = RemoteAction(
+          Icon.createWithResource(activity, if (isMicOn) R.drawable.ic_mic_24
+          else R.drawable.ic_mic_off_24),
+          "Toggle Audio",
+          "",
+           PendingIntent.getBroadcast(
+            activity,
+            344,
+            Intent(PIP_ACTION_EVENT).putExtra(muteTogglePipEvent, 344),
+            PendingIntent.FLAG_IMMUTABLE
+          )
+        )
+      } else {
+        pipActionsMap.remove("mute")
+      }
+    }
+    updatePipActions()
   }
 
 
@@ -891,13 +964,24 @@ class MeetingFragment : Fragment() {
         )
       )
     }
-
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
+    updatePipEndCall()
   }
 
   //entry point to start PIP mode
   private fun launchPipMode() {
+
     activity?.enterPictureInPictureMode()
+  }
+
+  val pipActionsMap = mutableMapOf<String,RemoteAction>()
+
+  private fun updatePipActions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      activity?.setPictureInPictureParams(PictureInPictureParams.Builder()
+        .setActions(pipActionsMap.map { it.value }.toList())
+        .build())
+    }
   }
 
   override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
