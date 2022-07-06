@@ -52,7 +52,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   var isFragmentVisible = false
     private set
 
-  private var wasLastModePip = true
+  private var wasLastModePip = false
   private lateinit var gridLayout : GridLayout
 
   data class RenderedViewPair(
