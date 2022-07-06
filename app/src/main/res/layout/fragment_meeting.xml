@@ -17,7 +17,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_meeting_control_size"
+        android:layout_height="match_parent"
         android:layout_above="@id/bottom_controls"
         android:layout_alignParentTop="true" />
 

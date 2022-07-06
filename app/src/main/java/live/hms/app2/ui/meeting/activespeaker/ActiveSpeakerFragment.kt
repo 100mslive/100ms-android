@@ -24,6 +24,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   private var binding by viewLifecycle<FragmentActiveSpeakerBinding>()
 
   private var screenShareTrack: MeetingTrack? = null
+  private var wasLastModePip = false
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -40,7 +41,17 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     initViewModels()
   }
 
+  private fun unBindScreenShareTrack() {
+    screenShareTrack?.let {
+      unbindSurfaceView(binding.screenShare, it)
+    }
+  }
+
   override fun onResume() {
+    if (wasLastModePip) {
+      unBindScreenShareTrack()
+      wasLastModePip = false
+    }
 
     screenShareTrack?.let {
       screenShareStats.initiateStats(
@@ -59,8 +70,10 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onPause() {
 
-    screenShareTrack?.let {
-      unbindSurfaceView(binding.screenShare, it)
+    if (activity?.isInPictureInPictureMode == true) {
+      wasLastModePip = true
+    } else {
+     unBindScreenShareTrack()
     }
 //    screenShareStats.close()
     super.onPause()
