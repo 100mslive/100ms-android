@@ -1,7 +1,6 @@
 package live.hms.app2.ui.meeting
 
 import android.app.Activity
-import android.app.PendingIntent
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
 import android.content.*
@@ -34,6 +33,9 @@ import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.app2.ui.meeting.activespeaker.HlsFragment
 import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
 import live.hms.app2.ui.meeting.broadcastreceiver.PipBroadcastReceiver
+import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils
+import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
+import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
@@ -55,9 +57,6 @@ class MeetingFragment : Fragment() {
 
   companion object {
     private const val TAG = "MeetingFragment"
-    private const val PIP_ACTION_EVENT = "PIP_ACTION_EVENT"
-    const val muteTogglePipEvent = "muteToggle"
-    const val disconnectCallPipEvent = "disconnectCall"
     const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
   }
 
@@ -810,13 +809,11 @@ class MeetingFragment : Fragment() {
 
 
   private fun registerPipActionListener() {
-    val filter = IntentFilter()
-    filter.addAction(PIP_ACTION_EVENT)
-    activity?.registerReceiver(pipReceiver, filter)
+    activity?.let { pipReceiver.register(it) }
   }
 
   private fun unregisterPipActionListener() {
-    activity?.unregisterReceiver(pipReceiver)
+   activity?.let { pipReceiver.unregister(it) }
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -825,36 +822,26 @@ class MeetingFragment : Fragment() {
   }
 
   private fun updatePipEndCall() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && activity!= null) {
       pipActionsMap[disconnectCallPipEvent] = RemoteAction(
         Icon.createWithResource(activity, R.drawable.ic_call_end_24),
         "End call",
         "",
-        PendingIntent.getBroadcast(
-          activity,
-          345,
-          Intent(PIP_ACTION_EVENT).putExtra(disconnectCallPipEvent, 345),
-          PendingIntent.FLAG_IMMUTABLE
-        )
+        PipUtils.getToggleMuteBroadcast(requireActivity())
       )
       updatePipActions()
     }
   }
 
   private fun updatePipMicState(isMicShown: Boolean = true, isMicOn: Boolean) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && activity!=null) {
       if (isMicShown) {
         pipActionsMap[muteTogglePipEvent] = RemoteAction(
           Icon.createWithResource(activity, if (isMicOn) R.drawable.ic_mic_24
           else R.drawable.ic_mic_off_24),
           "Toggle Audio",
           "",
-           PendingIntent.getBroadcast(
-            activity,
-            344,
-            Intent(PIP_ACTION_EVENT).putExtra(muteTogglePipEvent, 344),
-            PendingIntent.FLAG_IMMUTABLE
-          )
+          PipUtils.getEndCallBroadcast(requireActivity())
         )
       } else {
         pipActionsMap.remove(muteTogglePipEvent)
