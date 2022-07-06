@@ -33,6 +33,7 @@ import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.app2.ui.meeting.activespeaker.HlsFragment
 import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
+import live.hms.app2.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
@@ -55,8 +56,8 @@ class MeetingFragment : Fragment() {
   companion object {
     private const val TAG = "MeetingFragment"
     private const val PIP_ACTION_EVENT = "PIP_ACTION_EVENT"
-    private const val muteTogglePipEvent = "muteToggle"
-    private const val disconnectCallPipEvent = "disconnectCall"
+    const val muteTogglePipEvent = "muteToggle"
+    const val disconnectCallPipEvent = "disconnectCall"
     const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
   }
 
@@ -802,17 +803,10 @@ class MeetingFragment : Fragment() {
     }
   }
 
-  private val pipReceiver by lazy { object : BroadcastReceiver() {
-    override fun onReceive(
-      context: Context,
-      intent: Intent,
-    ) {
-      if (intent.hasExtra(muteTogglePipEvent))
-        meetingViewModel.toggleLocalAudio()
-      else if (intent.hasExtra(disconnectCallPipEvent))
-        meetingViewModel.leaveMeeting()
-    }
-  }}
+  private val pipReceiver by lazy { PipBroadcastReceiver(
+    toogleLocalAudio =  meetingViewModel::toggleLocalAudio,
+    disconnectCall = meetingViewModel::leaveMeeting
+  ) }
 
 
   private fun registerPipActionListener() {
