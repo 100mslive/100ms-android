@@ -10,7 +10,7 @@ internal object PipUtils {
     const val disconnectCallPipEvent = "disconnectCall"
     const val muteTogglePipEvent = "muteToggle"
 
-    fun getToggleMuteBroadcast(activity: Activity): PendingIntent = PendingIntent.getBroadcast(
+    fun  getEndCallBroadcast(activity: Activity): PendingIntent = PendingIntent.getBroadcast(
         activity,
         345,
         Intent(PIP_ACTION_EVENT).putExtra(disconnectCallPipEvent, 345),
@@ -18,7 +18,7 @@ internal object PipUtils {
     )
 
 
-    fun getEndCallBroadcast(activity: Activity) = PendingIntent.getBroadcast(
+    fun getToggleMuteBroadcast(activity: Activity) = PendingIntent.getBroadcast(
         activity,
         344,
         Intent(PIP_ACTION_EVENT).putExtra(muteTogglePipEvent, 344),

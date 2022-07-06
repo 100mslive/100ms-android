@@ -827,7 +827,7 @@ class MeetingFragment : Fragment() {
         Icon.createWithResource(activity, R.drawable.ic_call_end_24),
         "End call",
         "",
-        PipUtils.getToggleMuteBroadcast(requireActivity())
+        PipUtils.getEndCallBroadcast(requireActivity())
       )
       updatePipActions()
     }
@@ -841,7 +841,7 @@ class MeetingFragment : Fragment() {
           else R.drawable.ic_mic_off_24),
           "Toggle Audio",
           "",
-          PipUtils.getEndCallBroadcast(requireActivity())
+          PipUtils.getToggleMuteBroadcast(requireActivity())
         )
       } else {
         pipActionsMap.remove(muteTogglePipEvent)
