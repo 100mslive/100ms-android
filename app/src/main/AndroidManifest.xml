@@ -57,6 +57,8 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:supportsPictureInPicture="true"
             android:theme="@style/Theme.App2.NoActionBar" />
 
         <provider

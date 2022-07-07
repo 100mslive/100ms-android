@@ -53,14 +53,11 @@ class MusicSelectionSheet : BottomSheetDialogFragment() {
                         object : HMSActionResultListener {
                         override fun onError(error: HMSException) {
                             // error
-                            Toast.makeText(activity, " stop audio share " +
-                                    ":: $error.description", Toast.LENGTH_LONG).show()
                         }
 
                         override fun onSuccess() {
                             // success
                             dismiss()
-                            Toast.makeText(activity, " Device Audio shared successfully " , Toast.LENGTH_LONG).show()
                         }
                     })
                 }
