@@ -1,11 +1,12 @@
 package live.hms.app2.ui.meeting
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.graphics.Color
+import android.app.PictureInPictureParams
+import android.app.RemoteAction
+import android.content.*
+import android.graphics.drawable.Icon
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,6 +32,10 @@ import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.app2.ui.meeting.activespeaker.HlsFragment
 import live.hms.app2.ui.meeting.audiomode.AudioModeFragment
+import live.hms.app2.ui.meeting.broadcastreceiver.PipBroadcastReceiver
+import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils
+import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
+import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
@@ -37,6 +43,7 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.audio.HMSAudioManager.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -50,6 +57,7 @@ class MeetingFragment : Fragment() {
 
   companion object {
     private const val TAG = "MeetingFragment"
+    const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
   }
 
   private var binding by viewLifecycle<FragmentMeetingBinding>()
@@ -57,6 +65,7 @@ class MeetingFragment : Fragment() {
 
   private lateinit var settings: SettingsStore
   private lateinit var roomDetails: RoomDetails
+  private var volumeMenuIcon : MenuItem? = null
 
   private val CAPTURE_PERMISSION_REQUEST_CODE = 1
 
@@ -116,16 +125,9 @@ class MeetingFragment : Fragment() {
 
   override fun onDestroy() {
     super.onDestroy()
-    meetingViewModel.stopScreenshare(object : HMSActionResultListener{
-      override fun onError(error: HMSException) {
-        // onError
-      }
+    unregisterPipActionListener()
+    meetingViewModel.leaveMeeting()
 
-      override fun onSuccess() {
-        // onSuccess
-      }
-
-    })
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -210,6 +212,10 @@ class MeetingFragment : Fragment() {
         meetingViewModel.toggleRaiseHand()
       }
 
+      R.id.pip_mode -> {
+        launchPipMode()
+      }
+
       R.id.change_name -> meetingViewModel.requestNameChange()
 
       R.id.hls_stop -> meetingViewModel.stopHls()
@@ -217,12 +223,24 @@ class MeetingFragment : Fragment() {
     return false
   }
 
-  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+  private fun updateActionVolumeMenuIcon(item: MenuItem,audioDevice: AudioDevice?) {
     item.apply {
-      if (meetingViewModel.isPeerAudioEnabled()) {
-        setIcon(R.drawable.ic_volume_up_24)
-      } else {
-        setIcon(R.drawable.ic_volume_off_24)
+      when (audioDevice) {
+        AudioDevice.EARPIECE -> {
+          setIcon(R.drawable.ic_baseline_hearing_24)
+        }
+        AudioDevice.SPEAKER_PHONE -> {
+          setIcon(R.drawable.ic_volume_up_24)
+        }
+        AudioDevice.BLUETOOTH -> {
+          setIcon(R.drawable.ic_baseline_bluetooth_24)
+        }
+        AudioDevice.WIRED_HEADSET -> {
+          setIcon(R.drawable.ic_baseline_headset_24)
+        }
+        else -> {
+          setIcon(R.drawable.ic_volume_off_24)
+        }
       }
     }
   }
@@ -232,6 +250,7 @@ class MeetingFragment : Fragment() {
 
     menu.findItem(R.id.raise_hand).isVisible = true
     menu.findItem(R.id.change_name).isVisible = true
+    menu.findItem(R.id.pip_mode).isVisible = true
 
     menu.findItem(R.id.add_rtc_stats_observer).apply {
       setOnMenuItemClickListener {
@@ -449,11 +468,18 @@ class MeetingFragment : Fragment() {
 
 
     menu.findItem(R.id.action_volume).apply {
-      updateActionVolumeMenuIcon(this)
+      volumeMenuIcon = this
+      if (meetingViewModel.isPeerAudioEnabled()){
+        updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      }else{
+        updateActionVolumeMenuIcon(this,null)
+      }
       setOnMenuItemClickListener {
         if (isMeetingOngoing) {
-          meetingViewModel.toggleAudio()
-          updateActionVolumeMenuIcon(this)
+          val audioSwitchBottomSheet = AudioOutputSwitchBottomSheet(meetingViewModel,false) { audioDevice, isMuted ->
+            updateActionVolumeMenuIcon(it, audioDevice)
+          }
+          audioSwitchBottomSheet.show(requireActivity().supportFragmentManager,AudioSwitchBottomSheetTAG)
         }
 
         true
@@ -470,6 +496,7 @@ class MeetingFragment : Fragment() {
     }
   }
 
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     initViewModel()
@@ -480,6 +507,14 @@ class MeetingFragment : Fragment() {
     meetingViewModel.isRecording.observe(
       viewLifecycleOwner,
       Observer { activity?.invalidateOptionsMenu() })
+
+    meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
+      volumeMenuIcon?.let {
+        if (meetingViewModel.isPeerAudioEnabled()){
+          updateActionVolumeMenuIcon(it,device)
+        }
+      }
+    }
   }
 
   override fun onCreateView(
@@ -499,6 +534,12 @@ class MeetingFragment : Fragment() {
   }
 
   private fun goToHomePage(details: HMSRemovedFromRoom? = null) {
+
+    //only way to programmatically dismiss pip mode
+    if (activity?.isInPictureInPictureMode == true){
+       activity?.moveTaskToBack(false)
+    }
+
     Intent(requireContext(), HomeActivity::class.java).apply {
       crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
       if(details != null) {
@@ -728,7 +769,8 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
       binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
-
+      //to show or hide mic icon [eg in HLS mode mic is not required]
+      updatePipMicState(allowed, true)
     }
 
     meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
@@ -745,6 +787,8 @@ class MeetingFragment : Fragment() {
     }
 
     meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
+      //enable/disable mic on/off state
+      updatePipMicState(isMicOn = enabled)
       binding.buttonToggleAudio.apply {
         setIconResource(
           if (enabled) R.drawable.ic_mic_24
@@ -756,6 +800,54 @@ class MeetingFragment : Fragment() {
     meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
       chatViewModel.peersUpdate()
     }
+  }
+
+  private val pipReceiver by lazy { PipBroadcastReceiver(
+    toogleLocalAudio =  meetingViewModel::toggleLocalAudio,
+    disconnectCall = meetingViewModel::leaveMeeting
+  ) }
+
+
+  private fun registerPipActionListener() {
+    activity?.let { pipReceiver.register(it) }
+  }
+
+  private fun unregisterPipActionListener() {
+   activity?.let { pipReceiver.unregister(it) }
+  }
+
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    registerPipActionListener()
+  }
+
+  private fun updatePipEndCall() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && activity!= null) {
+      pipActionsMap[disconnectCallPipEvent] = RemoteAction(
+        Icon.createWithResource(activity, R.drawable.ic_call_end_24),
+        "End call",
+        "",
+        PipUtils.getEndCallBroadcast(requireActivity())
+      )
+      updatePipActions()
+    }
+  }
+
+  private fun updatePipMicState(isMicShown: Boolean = true, isMicOn: Boolean) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && activity!=null) {
+      if (isMicShown) {
+        pipActionsMap[muteTogglePipEvent] = RemoteAction(
+          Icon.createWithResource(activity, if (isMicOn) R.drawable.ic_mic_24
+          else R.drawable.ic_mic_off_24),
+          "Toggle Audio",
+          "",
+          PipUtils.getToggleMuteBroadcast(requireActivity())
+        )
+      } else {
+        pipActionsMap.remove(muteTogglePipEvent)
+      }
+    }
+    updatePipActions()
   }
 
 
@@ -833,6 +925,17 @@ class MeetingFragment : Fragment() {
       }
     }
 
+    binding.buttonMusicPlay?.apply {
+//      visibility = if (settings.musicPlayEnabled) View.VISIBLE else View.GONE
+      // visibility = View.GONE
+//      isEnabled = settings.musicPlayEnabled
+
+      setOnSingleClickListener(200L) {
+        Log.v(TAG, "buttonMusicPlay.onClick()")
+        openMusicDialog()
+      }
+    }
+
     binding.buttonOpenChat.setOnSingleClickListener(1000L) {
       Log.d(TAG, "initButtons: Chat Button clicked")
       findNavController().navigate(
@@ -842,8 +945,40 @@ class MeetingFragment : Fragment() {
         )
       )
     }
-
     binding.buttonEndCall.setOnSingleClickListener(350L) { meetingViewModel.leaveMeeting() }
+    updatePipEndCall()
+  }
+
+  //entry point to start PIP mode
+  private fun launchPipMode() {
+
+    activity?.enterPictureInPictureMode()
+  }
+
+  val pipActionsMap = mutableMapOf<String,RemoteAction>()
+
+  private fun updatePipActions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      activity?.setPictureInPictureParams(PictureInPictureParams.Builder()
+        .setActions(pipActionsMap.map { it.value }.toList())
+        .build())
+    }
+  }
+
+  override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+    super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+    //hiding views for pip/non-pip layout !
+    if (isInPictureInPictureMode) {
+       binding.bottomControls.visibility = View.GONE
+      (activity as? AppCompatActivity)?.supportActionBar?.hide()
+    } else {
+       binding.bottomControls.visibility = View.VISIBLE
+      (activity as? AppCompatActivity)?.supportActionBar?.show()
+    }
+  }
+
+  private fun openMusicDialog(){
+    findNavController().navigate(R.id.musicChooserSheet)
   }
 
   private fun cleanup() {

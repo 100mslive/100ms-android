@@ -152,6 +152,7 @@
     <string name="disable_background">Disable Background</string>
     <string name="show_stats">Show stats</string>
     <string name="raise_hand">✋ Raise Hand</string>
+    <string name="pip_mode">PIP mode</string>
     <string name="lower_hand">Lower Hand</string>
     <string name="name_change_dialog">Type in the new name</string>
     <string name="submit">Submit</string>
@@ -163,4 +164,5 @@
     <string name="audio_mode_in_call">Audio mode : in-call</string>
     <string name="audio_mode_media">Audio mode : media</string>
     <string name="unknown">unknown</string>
+    <string name="file_playing">File Playing</string>
 </resources>

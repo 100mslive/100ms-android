@@ -17,7 +17,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bottom_meeting_control_size"
+        android:layout_height="match_parent"
         android:layout_above="@id/bottom_controls"
         android:layout_alignParentTop="true" />
 
@@ -44,6 +44,12 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/toggle_audio"
             app:icon="@drawable/ic_mic_24" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_music_play"
+            style="@style/MaterialImageButton"
+            android:layout_height="match_parent"
+            app:icon="@drawable/ic_baseline_music_note_24" />
 
         <RelativeLayout
             android:layout_width="wrap_content"

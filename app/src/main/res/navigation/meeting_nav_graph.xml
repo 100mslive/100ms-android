@@ -48,6 +48,10 @@
             android:id="@+id/action_MeetingFragment_to_hlsViewFragment"
             app:destination="@id/hlsViewFragment" />
 
+        <action
+            android:id="@+id/action_MeetingFragment_to_MusicModeChooser"
+            app:destination="@id/musicChooserSheet" />
+
     </fragment>
 
     <dialog
@@ -128,4 +132,8 @@
             android:name="hlsStreamUrl"
             app:argType="string" />
     </fragment>
+    <dialog
+        android:id="@+id/musicChooserSheet"
+        android:name="live.hms.app2.ui.meeting.participants.MusicSelectionSheet"
+        android:label="MusicChooserSheet" />
 </navigation>

@@ -29,6 +29,7 @@ import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
@@ -51,6 +52,9 @@ abstract class VideoGridBaseFragment : Fragment() {
   var isFragmentVisible = false
     private set
 
+  private var wasLastModePip = false
+  private lateinit var gridLayout : GridLayout
+
   data class RenderedViewPair(
     val binding: GridItemVideoBinding,
     val meetingTrack: MeetingTrack,
@@ -60,58 +64,91 @@ abstract class VideoGridBaseFragment : Fragment() {
   private val bindedVideoTrackIds = mutableSetOf<String>()
   protected val renderedViews = ArrayList<RenderedViewPair>()
 
-  protected val rows: Int
-    get() = min(max(1, renderedViews.size), settings.videoGridRows)
-
-  protected val columns: Int
-    get() {
+  //Normal layout
+  private fun getNormalLayoutRowCount() = min(max(1, renderedViews.size), settings.videoGridRows)
+  private fun getNormalLayoutColumnCount(): Int
+    {
       val maxColumns = settings.videoGridColumns
-      val result = max(1, (renderedViews.size + rows - 1) / rows)
+      val result = max(1, (renderedViews.size + getNormalLayoutRowCount() - 1) / getNormalLayoutRowCount())
       if (result > maxColumns) {
         val videos = renderedViews.map { it.meetingTrack }
         throw IllegalStateException(
           "At most ${settings.videoGridRows * maxColumns} videos are allowed. Provided $videos"
         )
       }
-
       return result
     }
+
+  private fun getPipLayoutRowCount() = max(1, ceil(renderedViews.size/2.0).toInt())
+  private fun getPipLayoutColumnCount(): Int = min(renderedViews.size, 2)
+
 
   protected val maxItems: Int
     get() = settings.videoGridRows * settings.videoGridColumns
 
-  private fun updateGridLayoutDimensions(layout: GridLayout) {
-    crashlyticsLog(TAG, "updateGridLayoutDimensions: ${rows}x${columns}")
+  private fun updateGridLayoutDimensions(layout: GridLayout, isPipMode: Boolean) {
 
     var childIdx: Pair<Int, Int>? = null
     var colIdx = 0
     var rowIdx = 0
 
     layout.apply {
-      crashlyticsLog(TAG, "Updating GridLayout.spec for ${children.count()} children")
-      for (child in children) {
-        childIdx = Pair(rowIdx, colIdx)
 
-        val params = child.layoutParams as GridLayout.LayoutParams
-        params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
-        params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
+      fun normalLayout() {
+        for (child in children) {
+          childIdx = Pair(rowIdx, colIdx)
 
-        if (colIdx + 1 == columns) {
-          rowIdx += 1
-          colIdx = 0
-        } else {
-          colIdx += 1
+          val params = child.layoutParams as GridLayout.LayoutParams
+          params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
+          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
+
+          if (colIdx + 1 == getNormalLayoutColumnCount()) {
+            rowIdx += 1
+            colIdx = 0
+          } else {
+            colIdx += 1
+          }
         }
+        // Forces maxIndex to be recalculated when rowCount/columnCount is set
+        requestLayout()
+
+        rowCount = getNormalLayoutRowCount()
+        columnCount = getNormalLayoutColumnCount()
       }
 
-      crashlyticsLog(TAG, "Changed GridLayout's children spec with bottom-right at $childIdx")
+      fun pipLayout() {
 
-      // Forces maxIndex to be recalculated when rowCount/columnCount is set
-      requestLayout()
+        for (child in children) {
+          childIdx = Pair(rowIdx, colIdx)
+          val params = child.layoutParams as GridLayout.LayoutParams
+          params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
+          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
 
-      rowCount = rows
-      columnCount = columns
-    }
+          //
+          if ((colIdx + 1) % 2 == 0) {
+            rowIdx += 1
+            colIdx = 0
+          } else {
+            colIdx += 1
+          }
+        }
+
+        requestLayout()
+
+        rowCount = getNormalLayoutRowCount()
+        columnCount = getPipLayoutColumnCount()
+      }
+
+      //Here the layout is modified for pip/non-pip mode
+      if (activity?.isInPictureInPictureMode == true)
+        pipLayout()
+      else
+        normalLayout()
+
+      }
+
+
+
   }
 
   private fun createVideoView(parent: ViewGroup): GridItemVideoBinding {
@@ -205,7 +242,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       TAG,
       "updateVideos(${newVideos.size}) -- presently ${renderedViews.size} items in grid"
     )
-
+    gridLayout = layout
     var requiresGridLayoutUpdate = false
     val newRenderedViews = ArrayList<RenderedViewPair>()
 
@@ -296,7 +333,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
 
     if (requiresGridLayoutUpdate) {
-      updateGridLayoutDimensions(layout)
+      updateGridLayoutDimensions(layout, isPipMode = false)
     }
   }
 
@@ -376,6 +413,13 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   override fun onResume() {
     super.onResume()
+    if (wasLastModePip) {
+      //force pip mode layout refresh
+      if (::gridLayout.isInitialized)
+        updateGridLayoutDimensions(gridLayout, isPipMode = false)
+      unbindViews()
+      wasLastModePip = false
+    }
     crashlyticsLog(TAG, "Fragment=$tag onResume()")
     isFragmentVisible = true
     bindViews()
@@ -397,8 +441,16 @@ abstract class VideoGridBaseFragment : Fragment() {
   override fun onPause() {
     super.onPause()
     crashlyticsLog(TAG, "Fragment=$tag onPause()")
-    isFragmentVisible = false
-    unbindViews()
+    if (activity?.isInPictureInPictureMode == true) {
+      wasLastModePip = true
+      //force pip mode layout refresh
+      if (::gridLayout.isInitialized)
+        updateGridLayoutDimensions(gridLayout, isPipMode = true)
+    } else {
+      isFragmentVisible = false
+      unbindViews()
+    }
+
   }
 
   fun unbindViews() {
@@ -411,7 +463,9 @@ abstract class VideoGridBaseFragment : Fragment() {
   override fun onDestroy() {
     super.onDestroy()
     crashlyticsLog(TAG, "Fragment=$tag onDestroy()")
-
+    if (wasLastModePip) {
+       unbindViews()
+    }
     // Release all references to views
     renderedViews.clear()
   }
