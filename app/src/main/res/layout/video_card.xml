@@ -16,7 +16,7 @@
         android:textColor="@android:color/white"
         android:textSize="40sp" />
 
-    <LinearLayout
+    <live.hms.app2.helpers.ZoomLayout
         android:id="@+id/surface_view_holder"
         android:layout_width="match_parent"
         android:layout_centerInParent="true"
@@ -30,7 +30,7 @@
             android:visibility="invisible" />
 
 
-    </LinearLayout>
+    </live.hms.app2.helpers.ZoomLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/container_name"

@@ -49,8 +49,9 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onResume() {
     if (wasLastModePip) {
-      unBindScreenShareTrack()
+      super.onResume()
       wasLastModePip = false
+      return
     }
 
     screenShareTrack?.let {
