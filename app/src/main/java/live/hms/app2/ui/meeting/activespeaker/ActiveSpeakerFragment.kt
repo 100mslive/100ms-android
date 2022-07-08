@@ -49,6 +49,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onResume() {
     if (wasLastModePip) {
+      //if it's coming back from pip --> full screen i.e [pause --> resume] we wont' by the screenshare track agian since we never removed it in the first place
       super.onResume()
       wasLastModePip = false
       screenShareOverLocalVideoInGrid()
