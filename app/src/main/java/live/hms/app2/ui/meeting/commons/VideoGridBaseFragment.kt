@@ -416,13 +416,18 @@ abstract class VideoGridBaseFragment : Fragment() {
    * When onlyIndexToShow has a value it'll show the most active speaker only in pip mode
    */
   private fun hideOrShowGridsForPip(onlyIndexToShow : Int? = null) {
-    if (activity?.isInPictureInPictureMode == true && onlyIndexToShow != null) {
+    var showAtleastOne = false
+    if (activity?.isInPictureInPictureMode == true && onlyIndexToShow != null && renderedViews.size > 0) {
       renderedViews.forEachIndexed { index, renderedViewPair ->
         if (onlyIndexToShow == index && renderedViewPair.binding.root.isVisible.not()) {
           renderedViewPair.binding.root.visibility = View.VISIBLE
+          showAtleastOne = true
         } else if (onlyIndexToShow != index && renderedViewPair.binding.root.isVisible) {
           renderedViewPair.binding.root.visibility = View.GONE
         }
+      }
+      if (showAtleastOne.not()) {
+        renderedViews[0].binding.root.visibility = View.VISIBLE
       }
     } else {
       renderedViews.forEachIndexed { index, renderedViewPair ->
