@@ -49,8 +49,11 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onResume() {
     if (wasLastModePip) {
-      unBindScreenShareTrack()
+      //if it's coming back from pip --> full screen i.e [pause --> resume] we wont' bind the screenshare track again since we never removed it in the first place
+      super.onResume()
       wasLastModePip = false
+      screenShareOverLocalVideoInGrid()
+      return
     }
 
     screenShareTrack?.let {
@@ -71,12 +74,23 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   override fun onPause() {
 
     if (activity?.isInPictureInPictureMode == true) {
+      //when it's pip mode don't unbind views
       wasLastModePip = true
+      screenShareOverLocalVideoInGrid()
     } else {
      unBindScreenShareTrack()
     }
 //    screenShareStats.close()
     super.onPause()
+  }
+
+  private fun screenShareOverLocalVideoInGrid() {
+    //hide video grid when screen share is shown!
+    binding.container.visibility = if (screenShareTrack != null && activity?.isInPictureInPictureMode == true) {
+        View.GONE
+    } else {
+        View.VISIBLE
+    }
   }
 
   override fun initViewModels() {
@@ -126,6 +140,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         screenShareTrack?.let { unbindSurfaceView(binding.screenShare, it) }
 //        screenShareStats.close()
         screenShareTrack = null
+        screenShareOverLocalVideoInGrid()
       }
     }
 
@@ -141,6 +156,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         binding.screenShare.statsView.text = it
       }
       screenShareTrack = screen
+      screenShareOverLocalVideoInGrid()
       if (isFragmentVisible) {
         bindSurfaceView(
           binding.screenShare,

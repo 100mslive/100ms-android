@@ -10,6 +10,7 @@ import android.widget.ImageView
 import androidx.annotation.CallSuper
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.app2.R
@@ -53,6 +54,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     private set
 
   private var wasLastModePip = false
+  private var wasLastSpeakingViewIndex = 0
   private lateinit var gridLayout : GridLayout
 
   data class RenderedViewPair(
@@ -139,15 +141,11 @@ abstract class VideoGridBaseFragment : Fragment() {
         columnCount = getPipLayoutColumnCount()
       }
 
-      //Here the layout is modified for pip/non-pip mode
-      if (activity?.isInPictureInPictureMode == true)
-        pipLayout()
-      else
         normalLayout()
 
       }
 
-
+    hideOrShowGridsForPip(wasLastSpeakingViewIndex)
 
   }
 
@@ -380,7 +378,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
   protected fun applySpeakerUpdates(speakers: Array<HMSSpeaker>) {
-    renderedViews.forEach { renderedView ->
+    renderedViews.forEachIndexed { index, renderedView ->
       val track = renderedView.meetingTrack.audio
       renderedView.binding.apply {
         if (track == null || track.isMute) {
@@ -394,7 +392,10 @@ abstract class VideoGridBaseFragment : Fragment() {
           videoCard.audioLevel.apply {
             text = "$level"
           }
-
+          if (level >= settings.silenceAudioLevelThreshold) {
+            hideOrShowGridsForPip(index)
+            wasLastSpeakingViewIndex = index
+          }
           when {
             level >= 70 -> {
               container.strokeWidth = 6
@@ -411,14 +412,40 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
+  /**
+   * When onlyIndexToShow has a value it'll show the most active speaker only in pip mode
+   */
+  private fun hideOrShowGridsForPip(onlyIndexToShow : Int? = null) {
+    var showAtleastOne = false
+    if (activity?.isInPictureInPictureMode == true && onlyIndexToShow != null && renderedViews.size > 0) {
+      renderedViews.forEachIndexed { index, renderedViewPair ->
+        if (onlyIndexToShow == index && renderedViewPair.binding.root.isVisible.not()) {
+          renderedViewPair.binding.root.visibility = View.VISIBLE
+          showAtleastOne = true
+        } else if (onlyIndexToShow != index && renderedViewPair.binding.root.isVisible) {
+          renderedViewPair.binding.root.visibility = View.GONE
+        }
+      }
+      if (showAtleastOne.not()) {
+        renderedViews[0].binding.root.visibility = View.VISIBLE
+      }
+    } else {
+      renderedViews.forEachIndexed { index, renderedViewPair ->
+        if (renderedViewPair.binding.root.isVisible.not())
+          renderedViewPair.binding.root.visibility = View.VISIBLE
+      }
+    }
+  }
+
   override fun onResume() {
     super.onResume()
     if (wasLastModePip) {
       //force pip mode layout refresh
+      hideOrShowGridsForPip(null)
       if (::gridLayout.isInitialized)
         updateGridLayoutDimensions(gridLayout, isPipMode = false)
-      unbindViews()
       wasLastModePip = false
+      return
     }
     crashlyticsLog(TAG, "Fragment=$tag onResume()")
     isFragmentVisible = true
@@ -444,8 +471,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (activity?.isInPictureInPictureMode == true) {
       wasLastModePip = true
       //force pip mode layout refresh
-      if (::gridLayout.isInitialized)
-        updateGridLayoutDimensions(gridLayout, isPipMode = true)
+      hideOrShowGridsForPip(wasLastSpeakingViewIndex)
     } else {
       isFragmentVisible = false
       unbindViews()
