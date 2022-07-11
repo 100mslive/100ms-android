@@ -43,6 +43,7 @@ import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.audio.HMSAudioManager
 import live.hms.video.audio.HMSAudioManager.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
@@ -508,13 +509,19 @@ class MeetingFragment : Fragment() {
       viewLifecycleOwner,
       Observer { activity?.invalidateOptionsMenu() })
 
-    meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
-      volumeMenuIcon?.let {
-        if (meetingViewModel.isPeerAudioEnabled()){
-          updateActionVolumeMenuIcon(it,device)
-        }
+    meetingViewModel.hmsSDK.setAudioDeviceChangeListener (object : HMSAudioManager.AudioManagerDeviceChangeListener{
+      override fun onAudioDeviceChanged(device: AudioDevice?, audioDevicesList: MutableSet<AudioDevice>?) {
+          volumeMenuIcon?.let {
+            if (meetingViewModel.isPeerAudioEnabled()){
+              updateActionVolumeMenuIcon(it,device)
+            }
+          }
       }
-    }
+
+      override fun onError(error: HMSException?) {
+        Toast.makeText(requireContext(),"Error : ${error?.description}",Toast.LENGTH_LONG).show()
+      }
+    })
   }
 
   override fun onCreateView(
