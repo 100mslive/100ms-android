@@ -470,9 +470,9 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
-        settings.fixedResolution,
-        switchFixedResolution
-      ) { commitHelper.setFixedResolution(it) }
+        settings.disableAutoResize,
+        disableAutoResize
+      ) { commitHelper.setDisableAutoResize(it) }
 
 
       initSwitch(

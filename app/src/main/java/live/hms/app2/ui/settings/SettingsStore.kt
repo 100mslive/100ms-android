@@ -46,7 +46,7 @@ class SettingsStore(context: Context) {
     const val RTMP_URL_LIST = "rtmp-url-list"
     const val USE_HARDWARE_AEC = "use-hardware-aec"
     const val SHOW_STATS = "show-video-stats"
-    const val FIXED_RESOLUTION = "fixed-resolution"
+    const val DISABLE_AUTO_RESIZE = "disable-auto-resize"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -123,9 +123,9 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(SHOW_STATS, true)
     set(value) = putBoolean(SHOW_STATS, value)
 
-  var fixedResolution: Boolean
-    get() = sharedPreferences.getBoolean(FIXED_RESOLUTION, false)
-    set(value) = putBoolean(FIXED_RESOLUTION, value)
+  var disableAutoResize: Boolean
+    get() = sharedPreferences.getBoolean(DISABLE_AUTO_RESIZE, false)
+    set(value) = putBoolean(DISABLE_AUTO_RESIZE, value)
 
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
@@ -293,7 +293,7 @@ class SettingsStore(context: Context) {
     fun setSubscribeDegradation(value: Boolean) = apply { editor.putBoolean(SUBSCRIBE_DEGRADATION, value) }
     fun setUseHardwareAEC(value: Boolean) = apply { editor.putBoolean(USE_HARDWARE_AEC, value) }
     fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
-    fun setFixedResolution(value: Boolean) = apply { editor.putBoolean(FIXED_RESOLUTION, value) }
+    fun setDisableAutoResize(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_RESIZE, value) }
 
 
     fun commit() {

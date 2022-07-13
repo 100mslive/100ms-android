@@ -209,7 +209,7 @@ class MeetingViewModel(
       HMSAudioTrackSettings.Builder()
         .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build()
     )
-    .video(HMSVideoTrackSettings.Builder().fixedResolution(settings.fixedResolution).build())
+    .video(HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize).build())
     .build()
 
   private val hmsLogSettings : HMSLogSettings = HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE,true)
