@@ -232,11 +232,11 @@
             android:visibility="visible" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_fixed_resolution"
+            android:id="@+id/disable_auto_resize"
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/switch_fixed_resolution"
+            android:text="@string/disable_auto_resize"
             android:visibility="visible" />
 
 
