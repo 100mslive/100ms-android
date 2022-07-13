@@ -151,6 +151,7 @@
     <string name="enable_background">Enable Background</string>
     <string name="disable_background">Disable Background</string>
     <string name="show_stats">Show stats</string>
+    <string name="switch_fixed_resolution">Fixed resolution</string>
     <string name="raise_hand">✋ Raise Hand</string>
     <string name="pip_mode">PIP mode</string>
     <string name="lower_hand">Lower Hand</string>

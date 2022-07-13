@@ -470,6 +470,13 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
+        settings.fixedResolution,
+        switchFixedResolution
+      ) { commitHelper.setFixedResolution(it) }
+
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
         settings.publishVideo,
         switchPublishVideoOnJoin
       ) { commitHelper.setPublishVideo(it) }

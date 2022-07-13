@@ -231,6 +231,15 @@
             android:text="@string/show_stats"
             android:visibility="visible" />
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_fixed_resolution"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/switch_fixed_resolution"
+            android:visibility="visible" />
+
+
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_use_hardware_echo_cancellation"
