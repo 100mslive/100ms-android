@@ -66,6 +66,12 @@ class AudioOutputSwitchBottomSheet(
             binding.earpieceBtn.visibility = View.VISIBLE
         }
 
+        if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() != true){
+            binding.wiredBtn.visibility = View.GONE
+            binding.bluetoothBtn.visibility = View.GONE
+            binding.earpieceBtn.visibility = View.GONE
+        }
+
         binding.speakerBtn.setOnClickListener {
             setAudioType(AudioDevice.SPEAKER_PHONE)
         }
