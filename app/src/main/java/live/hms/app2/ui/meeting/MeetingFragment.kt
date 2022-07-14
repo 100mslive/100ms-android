@@ -246,6 +246,16 @@ class MeetingFragment : Fragment() {
     }
   }
 
+  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+    item.apply {
+      if (meetingViewModel.isPeerAudioEnabled()) {
+        setIcon(R.drawable.ic_volume_up_24)
+      } else {
+        setIcon(R.drawable.ic_volume_off_24)
+      }
+    }
+  }
+
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
 
@@ -470,10 +480,15 @@ class MeetingFragment : Fragment() {
 
     menu.findItem(R.id.action_volume).apply {
       volumeMenuIcon = this
-      if (meetingViewModel.isPeerAudioEnabled()){
-        updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
-      }else{
-        updateActionVolumeMenuIcon(this,null)
+
+      if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true){
+          if (meetingViewModel.isPeerAudioEnabled()){
+            updateActionVolumeMenuIcon(this,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+          }else{
+            updateActionVolumeMenuIcon(this,null)
+          }
+      } else {
+        updateActionVolumeMenuIcon(this)
       }
       setOnMenuItemClickListener {
         if (isMeetingOngoing) {
@@ -512,8 +527,12 @@ class MeetingFragment : Fragment() {
     meetingViewModel.hmsSDK.setAudioDeviceChangeListener (object : HMSAudioManager.AudioManagerDeviceChangeListener{
       override fun onAudioDeviceChanged(device: AudioDevice?, audioDevicesList: MutableSet<AudioDevice>?) {
           volumeMenuIcon?.let {
-            if (meetingViewModel.isPeerAudioEnabled()){
-              updateActionVolumeMenuIcon(it,device)
+            if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true){
+              if (meetingViewModel.isPeerAudioEnabled()){
+                updateActionVolumeMenuIcon(it,device)
+              }
+            }else {
+              updateActionVolumeMenuIcon(it)
             }
           }
       }
