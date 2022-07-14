@@ -23,10 +23,7 @@ import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
-import live.hms.video.media.settings.HMSAudioTrackSettings
-import live.hms.video.media.settings.HMSLogSettings
-import live.hms.video.media.settings.HMSRtmpVideoResolution
-import live.hms.video.media.settings.HMSTrackSettings
+import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
@@ -212,6 +209,7 @@ class MeetingViewModel(
       HMSAudioTrackSettings.Builder()
         .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build()
     )
+    .video(HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize).build())
     .build()
 
   private val hmsLogSettings : HMSLogSettings = HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE,true)
