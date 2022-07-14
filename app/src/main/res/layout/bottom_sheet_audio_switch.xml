@@ -10,6 +10,7 @@
 
     <LinearLayout
         android:id="@+id/earpiece_btn"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="20dp">

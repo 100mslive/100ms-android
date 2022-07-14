@@ -56,8 +56,14 @@ class AudioOutputSwitchBottomSheet(
 
         if (devicesList.contains(AudioDevice.BLUETOOTH)) {
             binding.bluetoothBtn.visibility = View.VISIBLE
-        } else if (devicesList.contains(AudioDevice.WIRED_HEADSET)) {
+        }
+
+        if (devicesList.contains(AudioDevice.WIRED_HEADSET)) {
             binding.wiredBtn.visibility = View.VISIBLE
+        }
+
+        if (devicesList.contains(AudioDevice.EARPIECE)){
+            binding.earpieceBtn.visibility = View.VISIBLE
         }
 
         if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() != true){
