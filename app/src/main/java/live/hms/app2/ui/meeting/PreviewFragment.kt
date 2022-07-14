@@ -220,11 +220,25 @@ class PreviewFragment : Fragment() {
     }
   }
 
+  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+    item.apply {
+      if (meetingViewModel.isPeerAudioEnabled()) {
+        setIcon(R.drawable.ic_volume_up_24)
+      } else {
+        setIcon(R.drawable.ic_volume_off_24)
+      }
+    }
+  }
+
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     menu.findItem(R.id.action_volume)?.let {
       audioOutputIcon = it
-      updateActionVolumeMenuIcon(it,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true){
+        updateActionVolumeMenuIcon(it,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      }else {
+        updateActionVolumeMenuIcon(it)
+      }
     }
   }
 
