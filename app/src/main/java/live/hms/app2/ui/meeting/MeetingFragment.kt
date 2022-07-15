@@ -602,6 +602,11 @@ class MeetingFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       meetingViewModel.events.collect { event ->
         when (event) {
+          is MeetingViewModel.Event.CameraSwitchEvent -> {
+            withContext(Dispatchers.Main) {
+              Toast.makeText(context, "Camera Switch ${event.message}", Toast.LENGTH_LONG).show()
+            }
+          }
           is MeetingViewModel.Event.RTMPError -> {
             withContext(Dispatchers.Main) {
               Toast.makeText(context, "RTMP error ${event.exception}", Toast.LENGTH_LONG).show()
