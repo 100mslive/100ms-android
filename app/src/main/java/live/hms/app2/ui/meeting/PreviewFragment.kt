@@ -21,6 +21,7 @@ import live.hms.app2.ui.meeting.participants.ParticipantsAdapter
 import live.hms.app2.ui.meeting.participants.ParticipantsDialog
 import live.hms.app2.util.*
 import live.hms.video.audio.HMSAudioManager
+import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.models.HMSLocalPeer
@@ -28,6 +29,7 @@ import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.utils.HMSCoroutineScope
+import live.hms.video.utils.HMSLogger
 
 class PreviewFragment : Fragment() {
 
@@ -98,13 +100,22 @@ class PreviewFragment : Fragment() {
       Log.d("PREVIEW_REC","STATE IS ${it.name}")
     }
 
-    meetingViewModel.hmsSDK.setAudioDeviceChangeListener { device, listOfDevices ->
-      audioOutputIcon?.let {
-        if (meetingViewModel.isPeerAudioEnabled()){
-          updateActionVolumeMenuIcon(it,device)
+    meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object : HMSAudioManager.AudioManagerDeviceChangeListener{
+      override fun onAudioDeviceChanged(
+        device: HMSAudioManager.AudioDevice?,
+        listOfDevices: MutableSet<HMSAudioManager.AudioDevice>?
+      ) {
+          audioOutputIcon?.let {
+            if (meetingViewModel.isPeerAudioEnabled()){
+              updateActionVolumeMenuIcon(it,device)
+            }
         }
       }
-    }
+
+      override fun onError(error: HMSException?) {
+        HMSLogger.d(TAG,"error : ${error?.description}")
+      }
+    })
   }
 
   override fun onAttach(context: Context) {
@@ -209,11 +220,25 @@ class PreviewFragment : Fragment() {
     }
   }
 
+  private fun updateActionVolumeMenuIcon(item: MenuItem) {
+    item.apply {
+      if (meetingViewModel.isPeerAudioEnabled()) {
+        setIcon(R.drawable.ic_volume_up_24)
+      } else {
+        setIcon(R.drawable.ic_volume_off_24)
+      }
+    }
+  }
+
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
     menu.findItem(R.id.action_volume)?.let {
       audioOutputIcon = it
-      updateActionVolumeMenuIcon(it,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true){
+        updateActionVolumeMenuIcon(it,meetingViewModel.hmsSDK.getAudioOutputRouteType())
+      }else {
+        updateActionVolumeMenuIcon(it)
+      }
     }
   }
 
