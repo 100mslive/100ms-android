@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/preview_card"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,26 +14,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-<!--        <ImageView-->
-<!--            android:id="@+id/participants_view"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_alignParentEnd="true"-->
-<!--            android:layout_marginEnd="0dp"-->
-<!--            android:gravity="center"-->
-<!--            android:padding="20dp"-->
-<!--            android:src="@drawable/ic_people_24" />-->
+        <!--        <ImageView-->
+        <!--            android:id="@+id/participants_view"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_alignParentEnd="true"-->
+        <!--            android:layout_marginEnd="0dp"-->
+        <!--            android:gravity="center"-->
+        <!--            android:padding="20dp"-->
+        <!--            android:src="@drawable/ic_people_24" />-->
 
-<!--        <TextView-->
-<!--            android:id="@+id/peer_count"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_below="@id/participants_view"-->
-<!--            android:layout_marginTop="-20dp"-->
-<!--            android:layout_marginEnd="-20dp"-->
-<!--            android:layout_toStartOf="@id/participants_view"-->
-<!--            android:src="@drawable/ic_people_24"-->
-<!--            tools:text="20" />-->
+        <!--        <TextView-->
+        <!--            android:id="@+id/peer_count"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_below="@id/participants_view"-->
+        <!--            android:layout_marginTop="-20dp"-->
+        <!--            android:layout_marginEnd="-20dp"-->
+        <!--            android:layout_toStartOf="@id/participants_view"-->
+        <!--            android:src="@drawable/ic_people_24"-->
+        <!--            tools:text="20" />-->
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:backgroundTint="@color/blue_2"
+            android:src="@drawable/settings_icon"
+            app:fabSize="mini" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name_initials"
