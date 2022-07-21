@@ -249,6 +249,7 @@ class MeetingViewModel(
         _isRecording.postValue(getRecordingState(hmsRoom))
         if(type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
           _peerCount.postValue(hmsRoom.peerCount)
+          Log.d("PeerCountUpdated", "New peer count is : ${hmsRoom.peerCount}")
         }
       }
 
