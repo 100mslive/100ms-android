@@ -739,12 +739,22 @@ class MeetingViewModel(
 
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
-    try {
-      HMSCoroutineScope.launch(Dispatchers.Main) {
-        hmsSDK.getLocalPeer()?.videoTrack?.switchCamera()
-      }
-    } catch (ex: HMSException) {
-      Log.e(TAG, "flipCamera: ${ex.description}", ex)
+
+    viewModelScope.launch {
+      hmsSDK.getLocalPeer()?.videoTrack?.switchCamera(object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          viewModelScope.launch {
+            _events.emit(Event.CameraSwitchEvent("Error: $error"))
+          }
+        }
+
+        override fun onSuccess() {
+          viewModelScope.launch {
+            _events.emit(Event.CameraSwitchEvent("Success: Facing is now: ${hmsSDK.getLocalPeer()?.videoTrack?.settings?.cameraFacing}"))
+          }
+        }
+
+      })
     }
   }
 
@@ -1151,6 +1161,7 @@ class MeetingViewModel(
     data class ServerRecordEvent(val message: String) : Event()
     data class HlsEvent(override val message : String) : MessageEvent(message)
     data class HlsRecordingEvent(override val message : String) : MessageEvent(message)
+    data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
