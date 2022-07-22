@@ -124,6 +124,8 @@ class MeetingViewModel(
   val previewErrorLiveData : LiveData<HMSException> = previewErrorData
   val previewUpdateLiveData : LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
 
+  private val _peerCount = MutableLiveData<Int>()
+  val peerCount : LiveData<Int> = _peerCount
 
   fun setMeetingViewMode(mode: MeetingViewMode) {
     if (mode != meetingViewMode.value) {
@@ -245,6 +247,10 @@ class MeetingViewModel(
         roomState.postValue(Pair(type,hmsRoom))
         // This will keep the isRecording value updated correctly in preview. It will not be called after join.
         _isRecording.postValue(getRecordingState(hmsRoom))
+        if(type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
+          _peerCount.postValue(hmsRoom.peerCount)
+          Log.d("PeerCountUpdated", "New peer count is : ${hmsRoom.peerCount}")
+        }
       }
 
     })
