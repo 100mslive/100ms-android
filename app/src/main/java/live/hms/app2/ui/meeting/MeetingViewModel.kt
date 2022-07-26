@@ -883,12 +883,12 @@ class MeetingViewModel(
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.unmute == true
   }
 
-  fun isAllowedToRtmpStream() : Boolean = hmsSDK.getLocalPeer()?.hmsRole?.permission?.streaming == true ||
+  fun isAllowedToRtmpStream() : Boolean =
           hmsSDK.getLocalPeer()?.hmsRole?.permission?.rtmpStreaming == true
 
   fun isAllowedToBrowserRecord() : Boolean = hmsSDK.getLocalPeer()?.hmsRole?.permission?.browserRecording == true
 
-  fun isAllowedToHlsStream() : Boolean = hmsSDK.getLocalPeer()?.hmsRole?.permission?.streaming == true ||
+  fun isAllowedToHlsStream() : Boolean =
     hmsSDK.getLocalPeer()?.hmsRole?.permission?.hlsStreaming == true
 
   fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
