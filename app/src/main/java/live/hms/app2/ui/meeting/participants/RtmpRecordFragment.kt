@@ -135,10 +135,10 @@ class RtmpRecordFragment : Fragment() {
             return
         }
 
-        if (meetingUrl.isNullOrBlank()) {
+        if (meetingUrl.isNullOrBlank() && (isRecording || isRtmp) ) {
             Toast.makeText(
                 requireContext(),
-                "A valid meeting url is required. $meetingUrl is invalid or not a role name",
+                "A valid meeting url is required for recording/rtmp. $meetingUrl is invalid or not a role name",
                 Toast.LENGTH_LONG
             ).show()
         } else if((isRecording || isRtmp) && isHls) {

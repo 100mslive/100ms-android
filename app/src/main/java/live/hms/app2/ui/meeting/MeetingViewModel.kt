@@ -1189,7 +1189,7 @@ class MeetingViewModel(
 
   fun getStats(): Flow<Map<String, HMSStats>> = statsFlow
 
-  fun startHls(hlsUrl : String, recordingConfig : HMSHlsRecordingConfig) {
+  fun startHls(hlsUrl : String?, recordingConfig : HMSHlsRecordingConfig) {
     val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)),
     recordingConfig)
 
