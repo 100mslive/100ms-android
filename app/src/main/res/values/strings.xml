@@ -146,8 +146,8 @@
     <string name="record">Record</string>
     <string name="stop_recording_stream">Stop Recording/Stream</string>
     <string name="add_new_rtmp_streaming_url">Add new RTMP streaming url</string>
-    <string name="rtmp_settings">RTMP Settings</string>
-    <string name="use_hardware_AEC">Use Harware AEC</string>
+    <string name="rtmp_settings">Stream Settings</string>
+    <string name="use_hardware_AEC">Use Hardware AEC</string>
     <string name="enable_background">Enable Background</string>
     <string name="disable_background">Disable Background</string>
     <string name="show_stats">Show stats</string>
@@ -166,4 +166,6 @@
     <string name="audio_mode_media">Audio mode : media</string>
     <string name="unknown">unknown</string>
     <string name="file_playing">File Playing</string>
+    <string name="stream_width">Width</string>
+    <string name="stream_height">Height</string>
 </resources>

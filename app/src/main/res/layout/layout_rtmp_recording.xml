@@ -34,7 +34,7 @@
                 android:inputType="number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Rtmp Width" />
+                android:hint="@string/stream_width" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -47,7 +47,7 @@
                 android:inputType="number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="RTMP Height" />
+                android:hint="@string/stream_height" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -83,6 +83,7 @@
             android:src="@drawable/ic_round_add_circle_24" />
 
         <TextView
+            android:id="@+id/existingRtmpUrlsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
