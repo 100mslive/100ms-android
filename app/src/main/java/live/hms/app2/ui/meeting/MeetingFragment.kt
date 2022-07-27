@@ -901,7 +901,7 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.setTitle(mode.titleResId)
 
-    if (mode == MeetingViewMode.AUDIO_ONLY) {
+    if (mode == MeetingViewMode.AUDIO_ONLY ||mode is MeetingViewMode.HLS) {
       binding.buttonToggleVideo.visibility = View.GONE
     } else {
       binding.buttonToggleVideo.visibility = View.VISIBLE
