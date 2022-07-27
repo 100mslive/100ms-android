@@ -58,6 +58,7 @@ class RtmpRecordFragment : Fragment() {
             rtmp.text = recordingTimesUseCase.showRtmpInfo(meetingViewModel.hmsSDK.getRoom()!!)
             sfu.text = recordingTimesUseCase.showServerInfo(meetingViewModel.hmsSDK.getRoom()!!)
             shouldStartHls.isChecked = meetingViewModel.isAllowedToHlsStream()
+            rtmpStreamingSwitch.isChecked = meetingViewModel.isAllowedToRtmpStream()
             hlsSingleFilePerLayer.isEnabled = shouldStartHls.isChecked
             hlsVod.isEnabled = shouldStartHls.isChecked
             shouldStartHls.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -85,6 +86,7 @@ class RtmpRecordFragment : Fragment() {
             addRtmpUrlButton.isEnabled = meetingViewModel.isAllowedToRtmpStream()
             shouldRecord.isEnabled = meetingViewModel.isAllowedToBrowserRecord()
             shouldStartHls.isEnabled = meetingViewModel.isAllowedToHlsStream()
+            rtmpStreamingSwitch.isEnabled = meetingViewModel.isAllowedToRtmpStream()
         }
     }
 
@@ -140,7 +142,7 @@ class RtmpRecordFragment : Fragment() {
         val isRecording = binding.shouldRecord.isChecked
         val isHls = binding.shouldStartHls.isChecked
         val meetingUrl = binding.meetingUrl.text.toString()
-        val isRtmp = settings.rtmpUrlsList.toList().isNotEmpty() && meetingViewModel.isAllowedToRtmpStream()
+        val isRtmp = binding.rtmpStreamingSwitch.isChecked && settings.rtmpUrlsList.toList().isNotEmpty() && meetingViewModel.isAllowedToRtmpStream()
 
         val isHlsSingleFilePerLayer = binding.hlsSingleFilePerLayer.isChecked
         val isHlsVod = binding.hlsVod.isChecked
