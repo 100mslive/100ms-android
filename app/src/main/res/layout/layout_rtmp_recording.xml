@@ -100,11 +100,18 @@
             tools:listitem="@layout/layout_rtmp_url_item" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/rtmpStreamingSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/rtmp_streaming_switch"
+            android:layout_marginTop="32dp"
+            android:textAlignment="viewStart" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/shouldRecord"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/record"
-            android:layout_marginTop="32dp"
             android:textAlignment="viewStart" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
