@@ -160,7 +160,8 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun bindSurfaceView(
     binding: VideoCardBinding,
     item: MeetingTrack,
-    scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
+    scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED,
+    enableZoom : Boolean = false
   ) {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     val earlyExit = item.video == null
@@ -171,7 +172,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     binding.surfaceView.let { view ->
       view.setScalingType(scalingType)
       view.setEnableHardwareScaler(true)
-
+      view.enableZoomAndPan(enableZoom)
       SurfaceViewRendererUtil.bind(view, item).let { success ->
         if (success) {
           binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE

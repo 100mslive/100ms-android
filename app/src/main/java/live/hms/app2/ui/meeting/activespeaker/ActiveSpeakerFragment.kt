@@ -161,7 +161,8 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         bindSurfaceView(
           binding.screenShare,
           screen,
-          RendererCommon.ScalingType.SCALE_ASPECT_FIT
+          RendererCommon.ScalingType.SCALE_ASPECT_FIT,
+          true
         )
       }
       bindVideo(binding.screenShare, screen)
