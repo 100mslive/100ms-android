@@ -66,7 +66,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         meetingViewModel?.updateTrackStatus(statsString)
       }
       binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.peer.metadata)?.isHandRaised == true)
-      bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+      bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT, true)
     }
     super.onResume()
   }
