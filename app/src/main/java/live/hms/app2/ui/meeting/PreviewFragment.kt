@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -30,6 +32,7 @@ import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
+
 
 class PreviewFragment : Fragment() {
 
@@ -232,6 +235,7 @@ class PreviewFragment : Fragment() {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
+
     menu.findItem(R.id.action_volume)?.let {
       audioOutputIcon = it
       if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true){

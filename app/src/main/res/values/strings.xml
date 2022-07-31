@@ -180,4 +180,12 @@
     <string name="go_live_btn">Go Live</string>
     <string name="viewer_desc_str">Cannot share their audio and video. Cannot put up messages on the chat. Role cannot be changed.</string>
     <string name="viewer_str">Viewer</string>
+    <string name="enter_studio_str">Enter Studio</string>
+    <string name="paste_the_link_here_str">Paste the link here</string>
+    <string name="joining_link_header">Joining Link</string>
+    <string name="meeting_link_header_description">Jump right in by pasting a room link or scanning a QR code</string>
+    <string name="meeting_link_header">Experience the power of 100ms</string>
+    <string name="join_with_link_instead_str">Join with Link Instead</string>
+    <string name="scan_qr_code_str">Scan QR Code</string>
+    <string name="back_btn">back_btn</string>
 </resources>

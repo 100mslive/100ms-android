@@ -13,87 +13,81 @@
         tools:context=".ui.home.HomeFragment">
 
         <LinearLayout
+            android:id="@+id/go_live_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:orientation="vertical">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/container_card_name"
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="85dp"
+                android:layout_gravity="center"
+                android:layout_margin="8dp"
+                android:contentDescription="@string/permission_artwork"
+                android:src="@drawable/music_dj" />
+
+            <TextView
+                style="@style/MaterialTextViewHeading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                app:cardCornerRadius="8dp">
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="@string/go_live_in_five_str"
+                android:textSize="34sp"
+                app:fontFamily="@font/inter_bold" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/container_name"
-                    style="@style/TextInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="12dp"
-                    android:layout_weight="1">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_text_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/enter_name"
-                        android:inputType="textNoSuggestions" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/container_card_join"
+            <com.google.android.material.textview.MaterialTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="12dp"
-                app:cardCornerRadius="8dp">
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:text="@string/get_name_str"
+                android:textColor="#E0ECFF"
+                android:textSize="16sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="12dp"
-                    android:animateLayoutChanges="true"
-                    android:orientation="vertical">
+            <EditText
+                android:id="@+id/edit_text_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="40dp"
+                android:autofillHints=""
+                android:background="@drawable/gray_round_btn"
+                android:fontFamily="@font/inter_regular"
+                android:hint="@string/name_hint_str"
+                android:inputType="text"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="12dp"
+                android:textSize="16sp" />
 
-                    <com.google.android.material.textview.MaterialTextView
-                        style="@style/MaterialTextViewHeading"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/join_a_meeting"
-                        android:textSize="16sp" />
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_join_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/primary_blue_round_drawable"
+                android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
+                android:fontFamily="@font/inter_bold"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="12dp"
+                android:text="@string/get_started_str"
+                android:textAllCaps="false" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/container_meeting_url"
-                        style="@style/TextInputLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_text_meeting_url"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/meeting_url_hint"
-                            android:inputType="textMultiLine"
-                            android:singleLine="false" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_join_meeting"
-                        style="@style/MaterialButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/start"
-                        android:textAllCaps="false" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
         </LinearLayout>
 

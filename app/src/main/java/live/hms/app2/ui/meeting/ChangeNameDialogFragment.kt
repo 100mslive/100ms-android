@@ -26,14 +26,12 @@ class ChangeNameDialogFragment : DialogFragment() {
         val dialoglayout: View =
             layoutInflater.inflate(R.layout.change_name_fragment, null)
 
-        val nameChangeContainer =
-            dialoglayout.findViewById<TextInputLayout>(R.id.name_change_container)
         val newName = dialoglayout.findViewById<TextInputEditText>(R.id.newName)
         val submitButton = dialoglayout.findViewById<Button>(R.id.submit_name_change_button)
 
         submitButton
             .setOnClickListener {
-                if (isValidUserName(nameChangeContainer, newName)) {
+                if (isValidUserName(newName)) {
                     val name = newName.text.toString()
                     meetingViewModel.changeName(name)
                     dismiss()
