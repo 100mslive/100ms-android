@@ -1,6 +1,7 @@
 package live.hms.app2.ui.meeting.pinnedvideo
 
 import androidx.recyclerview.widget.DiffUtil
+import live.hms.app2.ui.meeting.audiomode.AudioItemsDiffUtil
 
 class VideoListItemDiffUtil(
   private val oldList: List<VideoListItem>,
@@ -21,9 +22,21 @@ class VideoListItemDiffUtil(
 
   override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
     return oldList[oldItemPosition].track == newList[newItemPosition].track
+            && oldList[oldItemPosition].isTrackMute == newList[newItemPosition].isTrackMute
   }
 
   override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+    if (oldItemPosition >= oldList.size || newItemPosition >= newList.size) {
+      return null
+    }
+
+    val old = oldList[oldItemPosition]
+    val new = newList[newItemPosition]
+
+    if (old.isTrackMute != new.isTrackMute) {
+      return VideoListAdapter.PeerUpdatePayloads.SpeakerMuteUnmute(new.isTrackMute)
+    }
+
     return listOf(PayloadKey.VALUE)
   }
 }

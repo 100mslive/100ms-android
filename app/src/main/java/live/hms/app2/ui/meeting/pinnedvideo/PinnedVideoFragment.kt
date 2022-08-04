@@ -137,6 +137,7 @@ class PinnedVideoFragment : Fragment() {
 
   @MainThread
   private fun changePinViewVideo(track: MeetingTrack) {
+    binding.pinVideo.iconAudioOff.visibility = visibility(track.peer.audioTrack?.isMute == true)
     if (track == pinnedTrack) {
       crashlyticsLog(TAG, "Track=$track is already pinned")
       return
@@ -163,6 +164,8 @@ class PinnedVideoFragment : Fragment() {
     pinnedTrack = track
     updatePinnedVideoText()
     changePinnedRaiseHandState()
+
+   // videoListAdapter.updatePinnedVideo(track)
   }
 
   private fun initViewModels() {
@@ -170,10 +173,18 @@ class PinnedVideoFragment : Fragment() {
       if (tracks.isNotEmpty()) {
         // Pin a screen if possible else pin user's video
         val toPin = tracks.find { it.isScreen } ?: tracks[0]
+
+
         changePinViewVideo(toPin)
+        videoListAdapter.setItems(tracks)
+
+      } else {
+        videoListAdapter.setItems(tracks)
       }
 
-      videoListAdapter.setItems(tracks)
+
+
+
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
 
