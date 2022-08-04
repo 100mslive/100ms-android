@@ -1,13 +1,12 @@
 package live.hms.app2.ui.meeting.pinnedvideo
 
-import android.content.Context
+import android.graphics.PorterDuff
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +23,7 @@ import live.hms.app2.util.visibility
 import live.hms.video.connection.stats.HMSStats
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import okhttp3.internal.toImmutableList
 import org.webrtc.RendererCommon
 
 class VideoListAdapter(
@@ -36,7 +36,9 @@ class VideoListAdapter(
     private const val TAG = "VideoListAdapter"
   }
 
-  override fun getItemId(position: Int) = items[position].id
+  var pinnedTrack : MeetingTrack? = null
+
+  override fun getItemId(position: Int) = currentTrackItem[position].id
 
   override fun onViewAttachedToWindow(holder: VideoItemViewHolder) {
     super.onViewAttachedToWindow(holder)
@@ -57,6 +59,7 @@ class VideoListAdapter(
 
     private var itemRef: VideoListItem? = null
     private val statsInterpreter = StatsInterpreter(statsActive)
+
 
     private var isSurfaceViewBinded = false
 
@@ -91,11 +94,14 @@ class VideoListAdapter(
         Log.d(TAG, "bindSurfaceView: Surface view already initialized")
         return
       }
-      statsInterpreter.initiateStats(
-        binding.root.findViewTreeLifecycleOwner()!!,
-        itemStats, itemRef?.track?.video,
-        itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
-      ) { binding.stats.text = it }
+
+      binding.root.findViewTreeLifecycleOwner()?.let {
+        statsInterpreter.initiateStats(
+          it,
+          itemStats, itemRef?.track?.video,
+          itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
+        ) { binding.stats.text = it }
+      }
 
       itemRef?.let { item ->
         SurfaceViewRendererUtil.bind(
@@ -130,23 +136,28 @@ class VideoListAdapter(
     }
   }
 
-  private val items = ArrayList<VideoListItem>()
+  private val currentTrackItem = ArrayList<VideoListItem>()
 
   /**
    * @param newItems: Complete list of video items which needs
    *  to be updated in the VideoGrid
    */
   @MainThread
-  fun setItems(newItems: List<MeetingTrack>) {
-    val newVideoItems = newItems.mapIndexed { index, track -> VideoListItem(index.toLong(), track) }
+  fun setItems(newItems: List<MeetingTrack>, excludeTrack: MeetingTrack? = null) {
+    val newVideoItems = newItems
+      .filter { (it == excludeTrack).not() }
+      .sortedBy { it.peer.name }
+      .mapIndexed { index, track -> VideoListItem(index.toLong(), track, isTrackMute = track.peer.audioTrack?.isMute?:false) }.toImmutableList()
 
-    val callback = VideoListItemDiffUtil(items, newVideoItems)
+    val callback = VideoListItemDiffUtil(currentTrackItem, newVideoItems)
     val diff = DiffUtil.calculateDiff(callback)
-    items.clear()
-    items.addAll(newVideoItems)
+
     diff.dispatchUpdatesTo(this)
 
-    crashlyticsLog(TAG, "Updated video list: size=${items.size}")
+    currentTrackItem.clear()
+    currentTrackItem.addAll(newVideoItems)
+
+    crashlyticsLog(TAG, "Updated video list: size=${currentTrackItem.size}")
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoItemViewHolder {
@@ -159,8 +170,8 @@ class VideoListAdapter(
   }
 
   override fun onBindViewHolder(holder: VideoItemViewHolder, position: Int) {
-    crashlyticsLog(TAG, "onBindViewHolder: ${items[position]}")
-    holder.bind(items[position])
+    crashlyticsLog(TAG, "onBindViewHolder: ${currentTrackItem[position]}")
+    holder.bind(currentTrackItem[position])
   }
 
   override fun onBindViewHolder(
@@ -190,9 +201,9 @@ class VideoListAdapter(
                 holder.binding.networkQuality.visibility = View.VISIBLE
                 NetworkQualityHelper.getNetworkResource(payload.downlinkSpeed, context = context)?.let {
                   if (payload.downlinkSpeed == 0) {
-                    holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+                    holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
                   } else {
-                    holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN);
+                    holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), PorterDuff.Mode.SRC_IN);
                   }
                   holder.binding.networkQuality.setImageDrawable(it)
                 } ?: {
@@ -200,6 +211,7 @@ class VideoListAdapter(
                 }
               }
             }
+           is PeerUpdatePayloads.SpeakerMuteUnmute -> holder.binding.iconAudioOff.visibility = visibility(payload.isMute)
           }
         }
       }
@@ -207,20 +219,20 @@ class VideoListAdapter(
 
       crashlyticsLog(
         TAG,
-        "onBindViewHolder: Manually updating $holder with ${items[position]} " +
+        "onBindViewHolder: Manually updating $holder with ${currentTrackItem[position]} " +
                 "[payloads=$payloads]"
       )
       holder.unbindSurfaceView() // Free the context initialized for the previous item
-      holder.bind(items[position])
+      holder.bind(currentTrackItem[position])
       holder.bindSurfaceView()
     }
   }
 
-  override fun getItemCount() = items.size
+  override fun getItemCount() = currentTrackItem.size
 
   fun itemChanged(changedPeer: Pair<HMSPeer, HMSPeerUpdate>) {
 
-    val updatedItemId = items.find { it.track.peer.peerID == changedPeer.first.peerID }?.id
+    val updatedItemId = currentTrackItem.find { it.track.peer.peerID == changedPeer.first.peerID }?.id
 
     val payload = when (changedPeer.second) {
       HMSPeerUpdate.METADATA_CHANGED -> PeerUpdatePayloads.MetadataChanged(
@@ -239,10 +251,30 @@ class VideoListAdapter(
       ?.let { notifyItemChanged(it, payload) }
   }
 
+
+  fun updatePinnedVideo(track: MeetingTrack) {
+    //if pinned track is same then don't perform update
+    if (track == pinnedTrack)
+      return
+
+    //last pinned track has to be added back in the horizontal recycler list and new pinned video has to be removed
+    pinnedTrack?.let { lastPinned ->
+
+      val updatedList = currentTrackItem.map { it.track }.filter { it != lastPinned }.toMutableList()
+      updatedList += lastPinned
+      setItems(updatedList, excludeTrack = track)
+    }
+
+    //updating the new pinned track!
+    pinnedTrack = track
+
+  }
+
   sealed class PeerUpdatePayloads {
     data class NameChanged(val name: String) : PeerUpdatePayloads()
     data class NetworkQualityChanged(val downlinkSpeed: Int?) : PeerUpdatePayloads()
     data class MetadataChanged(val metadata: CustomPeerMetadata?) : PeerUpdatePayloads()
+    data class SpeakerMuteUnmute(val isMute: Boolean) : PeerUpdatePayloads()
   }
 
 }
