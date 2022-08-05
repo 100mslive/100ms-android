@@ -137,24 +137,17 @@ class VideoListAdapter(
   }
 
   private val currentTrackItem = ArrayList<VideoListItem>()
-  private val currentTrackSource = mutableListOf<MeetingTrack>()
-
-  fun updateTotalSource(newItems: List<MeetingTrack>) {
-    currentTrackSource.clear()
-    currentTrackSource+= newItems
-  }
 
   /**
    * @param newItems: Complete list of video items which needs
    *  to be updated in the VideoGrid
    */
   @MainThread
-  fun setItems(excludeTrack: MeetingTrack? = null) {
-
-    val newVideoItems = currentTrackSource
+  fun setItems(newItems: List<MeetingTrack>, excludeTrack: MeetingTrack? = null) {
+    val newVideoItems = newItems
       .filter { (it == excludeTrack).not() }
       .sortedBy { it.peer.name }
-      .mapIndexed { index, track -> VideoListItem(index.toLong(), track, isTrackMute = track.peer.audioTrack?.isMute?:false) }
+      .mapIndexed { index, track -> VideoListItem(index.toLong(), track, isTrackMute = track.peer.audioTrack?.isMute?:false) }.toImmutableList()
 
     val callback = VideoListItemDiffUtil(currentTrackItem, newVideoItems)
     val diff = DiffUtil.calculateDiff(callback)
@@ -260,7 +253,21 @@ class VideoListAdapter(
 
 
   fun updatePinnedVideo(track: MeetingTrack) {
-    setItems(excludeTrack = track)
+    //if pinned track is same then don't perform update
+    if (track == pinnedTrack)
+      return
+
+    //last pinned track has to be added back in the horizontal recycler list and new pinned video has to be removed
+    pinnedTrack?.let { lastPinned ->
+
+      val updatedList = currentTrackItem.map { it.track }.filter { it != lastPinned }.toMutableList()
+      updatedList += lastPinned
+      setItems(updatedList, excludeTrack = track)
+    }
+
+    //updating the new pinned track!
+    pinnedTrack = track
+
   }
 
   sealed class PeerUpdatePayloads {
