@@ -186,9 +186,10 @@ class PinnedVideoFragment : Fragment() {
       videoListAdapter.updateTotalSource(tracks)
       videoListAdapter.setItems(pinnedTrack)
 
-      toPin?.let{
+      toPin?.let {
         changePinViewVideo(it)
-        videoListAdapter.setItems(tracks)
+      }
+    
 
 
 
