@@ -124,6 +124,8 @@ class MeetingViewModel(
   val previewErrorLiveData : LiveData<HMSException> = previewErrorData
   val previewUpdateLiveData : LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
 
+  private val _peerCount = MutableLiveData<Int>()
+  val peerCount : LiveData<Int> = _peerCount
 
   fun setMeetingViewMode(mode: MeetingViewMode) {
     if (mode != meetingViewMode.value) {
@@ -245,6 +247,10 @@ class MeetingViewModel(
         roomState.postValue(Pair(type,hmsRoom))
         // This will keep the isRecording value updated correctly in preview. It will not be called after join.
         _isRecording.postValue(getRecordingState(hmsRoom))
+        if(type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
+          _peerCount.postValue(hmsRoom.peerCount)
+          Log.d("PeerCountUpdated", "New peer count is : ${hmsRoom.peerCount}")
+        }
       }
 
     })
@@ -733,12 +739,22 @@ class MeetingViewModel(
 
     // NOTE: During audio-only calls, this switch-camera is ignored
     //  as no camera in use
-    try {
-      HMSCoroutineScope.launch(Dispatchers.Main) {
-        hmsSDK.getLocalPeer()?.videoTrack?.switchCamera()
-      }
-    } catch (ex: HMSException) {
-      Log.e(TAG, "flipCamera: ${ex.description}", ex)
+
+    viewModelScope.launch {
+      hmsSDK.getLocalPeer()?.videoTrack?.switchCamera(object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          viewModelScope.launch {
+            _events.emit(Event.CameraSwitchEvent("Error: $error"))
+          }
+        }
+
+        override fun onSuccess() {
+          viewModelScope.launch {
+            _events.emit(Event.CameraSwitchEvent("Success: Facing is now: ${hmsSDK.getLocalPeer()?.videoTrack?.settings?.cameraFacing}"))
+          }
+        }
+
+      })
     }
   }
 
@@ -866,6 +882,14 @@ class MeetingViewModel(
   fun isAllowedToAskUnmutePeers(): Boolean {
     return hmsSDK.getLocalPeer()?.hmsRole?.permission?.unmute == true
   }
+
+  fun isAllowedToRtmpStream() : Boolean =
+          hmsSDK.getLocalPeer()?.hmsRole?.permission?.rtmpStreaming == true
+
+  fun isAllowedToBrowserRecord() : Boolean = hmsSDK.getLocalPeer()?.hmsRole?.permission?.browserRecording == true
+
+  fun isAllowedToHlsStream() : Boolean =
+    hmsSDK.getLocalPeer()?.hmsRole?.permission?.hlsStreaming == true
 
   fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
     val hmsPeer = hmsSDK.getPeers().find { it.peerID == remotePeerId }
@@ -1145,6 +1169,7 @@ class MeetingViewModel(
     data class ServerRecordEvent(val message: String) : Event()
     data class HlsEvent(override val message : String) : MessageEvent(message)
     data class HlsRecordingEvent(override val message : String) : MessageEvent(message)
+    data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -1189,7 +1214,7 @@ class MeetingViewModel(
 
   fun getStats(): Flow<Map<String, HMSStats>> = statsFlow
 
-  fun startHls(hlsUrl : String, recordingConfig : HMSHlsRecordingConfig) {
+  fun startHls(hlsUrl : String?, recordingConfig : HMSHlsRecordingConfig) {
     val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)),
     recordingConfig)
 
