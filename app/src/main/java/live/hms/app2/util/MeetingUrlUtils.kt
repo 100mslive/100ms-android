@@ -4,7 +4,7 @@ import android.os.Environment
 import live.hms.app2.BuildConfig
 
 fun String.isValidMeetingUrl(): Boolean =
-  this.matches(REGEX_MEETING_URL_ROOM_ID) || this.matches(REGEX_MEETING_URL_CODE)
+  this.matches(REGEX_MEETING_URL_ROOM_ID) || this.matches(REGEX_MEETING_URL_CODE) || this.matches(REGEX_PREVIEW_URL_CODE)
 
 fun String.getTokenEndpointEnvironment(): String = when {
   this.contains("prod2.100ms.live") -> "prod-in"

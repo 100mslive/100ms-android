@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_close_chat"
+        android:id="@+id/action_close"
         android:icon="@drawable/close_icon"
-        android:title="@string/close_chat"
+        android:title="@string/close"
         app:showAsAction="ifRoom" />
 </menu>

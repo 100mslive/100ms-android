@@ -24,6 +24,7 @@ import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.EmailUtils
 import live.hms.app2.util.REGEX_MEETING_URL_CODE
+import live.hms.app2.util.REGEX_PREVIEW_URL_CODE
 import live.hms.app2.util.viewLifecycle
 
 
@@ -111,7 +112,7 @@ class MeetingLinkFragment : Fragment() {
     }
 
     private fun validate(){
-        if (REGEX_MEETING_URL_CODE.matches(binding.edtMeetingUrl.text.toString())) {
+        if (REGEX_MEETING_URL_CODE.matches(binding.edtMeetingUrl.text.toString()) || REGEX_PREVIEW_URL_CODE.matches(binding.edtMeetingUrl.text.toString())) {
             enableJoinButton()
         } else {
             disableJoinButton()

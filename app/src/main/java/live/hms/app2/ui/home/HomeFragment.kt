@@ -135,6 +135,7 @@ class HomeFragment : Fragment() {
     private fun getUsername() = binding.editTextName.text.toString()
 
     private fun joinRoom() {
+        settings.lastUsedMeetingUrl = settings.lastUsedMeetingUrl.replace("/preview/","/meeting/")
         homeViewModel.sendAuthTokenRequest(settings.lastUsedMeetingUrl)
     }
 

@@ -128,7 +128,7 @@ class PreviewFragment : Fragment() {
 
 
     private fun setupParticipantsDialog() {
-        participantsDialog = ParticipantsDialog(requireContext())
+        participantsDialog = ParticipantsDialog()
         participantsDialogAdapter = participantsDialog?.adapter
     }
 
@@ -257,7 +257,7 @@ class PreviewFragment : Fragment() {
                 }
             }
             R.id.action_participants -> {
-                participantsDialog?.show()
+                participantsDialog?.show(requireActivity().supportFragmentManager,"participant_dialog")
                 participantsDialog?.participantCount =
                     meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
             }
@@ -382,7 +382,7 @@ class PreviewFragment : Fragment() {
         meetingViewModel.previewRoomStateLiveData.observe(
             viewLifecycleOwner,
             Observer { (_, room) ->
-                if (participantsDialog?.isShowing == true) {
+                if (participantsDialog?.isVisible == true) {
                     participantsDialog?.participantCount =
                         meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
                 }

@@ -22,7 +22,7 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="20dp"
             app:layout_scrollFlags="scroll|enterAlways|snap"
-            app:menu="@menu/menu_chat"
+            app:menu="@menu/menu_generic"
             app:title="@string/chat">
 
             <Spinner

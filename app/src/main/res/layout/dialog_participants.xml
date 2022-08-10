@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="8dp"
+    android:background="@color/primary_bg"
+    android:animateLayoutChanges="true"
     android:orientation="vertical"
     android:paddingHorizontal="20dp">
 
@@ -41,7 +43,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        tools:itemCount="5"
         android:layout_marginTop="20dp"
         tools:listitem="@layout/list_item_peer_list" />
 

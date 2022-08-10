@@ -107,7 +107,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private fun initToolbar() {
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                R.id.action_close_chat -> {
+                R.id.action_close -> {
                     dismiss()
                 }
             }

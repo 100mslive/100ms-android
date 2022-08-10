@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import live.hms.app2.R
 import live.hms.app2.databinding.FragmentParticipantsBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.MeetingState
@@ -20,7 +22,7 @@ import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
 import live.hms.video.sdk.models.HMSPeer
 
-class ParticipantsFragment : Fragment() {
+class ParticipantsFragment : BottomSheetDialogFragment() {
 
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<FragmentParticipantsBinding>()

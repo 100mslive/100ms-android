@@ -5,6 +5,7 @@
     style="?attr/bottomSheetStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/primary_bg"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -15,38 +16,39 @@
         android:orientation="vertical">
 
         <TextView
-            android:padding="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
             android:gravity="center"
-            android:text="Select action" />
+            android:padding="8dp"
+            android:text="Select action"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/promptChangeRole"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Prompt to change role" />
-
-
-        <Button
-            android:id="@+id/forceChangeRole"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Force change role" />
-
+            android:textColor="@color/white"
+            android:background="@android:color/transparent"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Change role" />
 
         <Button
             android:id="@+id/muteUnmuteVideo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:drawableLeft="@drawable/ic_videocam_24"
+            android:fontFamily="@font/inter_semibold"
             android:text="Ask to unmute" />
 
         <Button
             android:id="@+id/muteUnmuteAudio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
             android:drawableLeft="@drawable/ic_mic_24"
+            android:fontFamily="@font/inter_semibold"
             android:text="Ask to unmute" />
 
 
@@ -54,25 +56,23 @@
             android:id="@+id/removePeer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:background="@android:color/transparent"
             android:text="Remove Peer" />
+
         <Space
             android:layout_width="0dp"
-            android:layout_height="24dp"
-            />
+            android:layout_height="24dp" />
 
         <Button
             android:id="@+id/cancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cancel"
-            />
+            android:textColor="@color/white"
+            android:background="@android:color/transparent"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Cancel" />
 
-        <Spinner
-            android:id="@+id/retroSpinner"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:spinnerMode="dialog"
-            />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </FrameLayout>
