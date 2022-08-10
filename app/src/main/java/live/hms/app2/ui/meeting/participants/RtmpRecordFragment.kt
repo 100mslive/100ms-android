@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -48,16 +49,16 @@ class RtmpRecordFragment : Fragment() {
         // Get a listener on the page for the urls.
 
         binding.addRtmpUrlButton.setOnClickListener { addItem() }
-        rtmpUrladapter.submitList(settings.rtmpUrlsList.toList())
-        binding.rtmpUrls.layoutManager = LinearLayoutManager(context)
-        binding.rtmpUrls.adapter = rtmpUrladapter
         binding.startButton.setOnClickListener { startClicked() }
 
         val recordingTimesUseCase = RecordingTimesUseCase()
+        enableDisable()
         with(binding) {
             recording.text = recordingTimesUseCase.showRecordInfo(meetingViewModel.hmsSDK.getRoom()!!)
             rtmp.text = recordingTimesUseCase.showRtmpInfo(meetingViewModel.hmsSDK.getRoom()!!)
             sfu.text = recordingTimesUseCase.showServerInfo(meetingViewModel.hmsSDK.getRoom()!!)
+            shouldStartHls.isChecked = meetingViewModel.isAllowedToHlsStream()
+            rtmpStreamingSwitch.isChecked = meetingViewModel.isAllowedToRtmpStream()
             hlsSingleFilePerLayer.isEnabled = shouldStartHls.isChecked
             hlsVod.isEnabled = shouldStartHls.isChecked
             shouldStartHls.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -76,6 +77,32 @@ class RtmpRecordFragment : Fragment() {
                 }
                 return@collectLatest
             }
+        }
+    }
+
+    private fun enableDisable() {
+        with(binding) {
+            enableDisableRtmp()
+            addRtmpUrlButton.isEnabled = meetingViewModel.isAllowedToRtmpStream()
+            shouldRecord.isEnabled = meetingViewModel.isAllowedToBrowserRecord()
+            shouldStartHls.isEnabled = meetingViewModel.isAllowedToHlsStream()
+            rtmpStreamingSwitch.isEnabled = meetingViewModel.isAllowedToRtmpStream()
+        }
+    }
+
+    private fun enableDisableRtmp() {
+        // addRtmpUrlButton,rtmpUrlContainer,existingRtmpUrlsText,rtmpUrls
+        val enabled = meetingViewModel.isAllowedToRtmpStream()
+        with(binding) {
+            if(meetingViewModel.isAllowedToRtmpStream()) {
+                rtmpUrladapter.submitList(settings.rtmpUrlsList.toList())
+                rtmpUrls.layoutManager = LinearLayoutManager(context)
+                rtmpUrls.adapter = rtmpUrladapter
+            }
+            addRtmpUrlButton.isVisible = enabled
+            rtmpUrlContainer.isVisible = enabled
+            existingRtmpUrlsText.isVisible = enabled
+            rtmpUrls.isVisible = enabled
         }
     }
 
@@ -115,7 +142,7 @@ class RtmpRecordFragment : Fragment() {
         val isRecording = binding.shouldRecord.isChecked
         val isHls = binding.shouldStartHls.isChecked
         val meetingUrl = binding.meetingUrl.text.toString()
-        val isRtmp = settings.rtmpUrlsList.toList().isNotEmpty()
+        val isRtmp = binding.rtmpStreamingSwitch.isChecked && settings.rtmpUrlsList.toList().isNotEmpty() && meetingViewModel.isAllowedToRtmpStream()
 
         val isHlsSingleFilePerLayer = binding.hlsSingleFilePerLayer.isChecked
         val isHlsVod = binding.hlsVod.isChecked
@@ -135,10 +162,10 @@ class RtmpRecordFragment : Fragment() {
             return
         }
 
-        if (meetingUrl.isNullOrBlank()) {
+        if (meetingUrl.isNullOrBlank() && (isRecording || isRtmp) ) {
             Toast.makeText(
                 requireContext(),
-                "A valid meeting url is required. $meetingUrl is invalid or not a role name",
+                "A valid meeting url is required for recording/rtmp. $meetingUrl is invalid or not a role name",
                 Toast.LENGTH_LONG
             ).show()
         } else if((isRecording || isRtmp) && isHls) {

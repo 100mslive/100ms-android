@@ -259,6 +259,8 @@ class MeetingFragment : Fragment() {
   override fun onPrepareOptionsMenu(menu: Menu) {
     super.onPrepareOptionsMenu(menu)
 
+    menu.findItem(R.id.hls_start).isVisible = meetingViewModel.isAllowedToHlsStream()
+    menu.findItem(R.id.hls_stop).isVisible = meetingViewModel.isAllowedToHlsStream()
     menu.findItem(R.id.raise_hand).isVisible = true
     menu.findItem(R.id.change_name).isVisible = true
     menu.findItem(R.id.pip_mode).isVisible = true
@@ -278,7 +280,7 @@ class MeetingFragment : Fragment() {
     }
 
     menu.findItem(R.id.action_stop_streaming_and_recording).apply {
-      isVisible = meetingViewModel.isRecording.value == RecordingState.RECORDING ||
+      isVisible = meetingViewModel.isAllowedToBrowserRecord() && meetingViewModel.isRecording.value == RecordingState.RECORDING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING ||
               meetingViewModel.isRecording.value == RecordingState.STREAMING_AND_RECORDING
     }
@@ -292,7 +294,7 @@ class MeetingFragment : Fragment() {
     }
 
     menu.findItem(R.id.action_record_meeting).apply {
-      isVisible = true
+      isVisible = meetingViewModel.isAllowedToBrowserRecord()
 
       // If we're in a transitioning state, we prevent further clicks.
       // Checked or not checked depends on if it's currently recording or not. Checked if recording.
@@ -602,6 +604,11 @@ class MeetingFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       meetingViewModel.events.collect { event ->
         when (event) {
+          is MeetingViewModel.Event.CameraSwitchEvent -> {
+            withContext(Dispatchers.Main) {
+              Toast.makeText(context, "Camera Switch ${event.message}", Toast.LENGTH_LONG).show()
+            }
+          }
           is MeetingViewModel.Event.RTMPError -> {
             withContext(Dispatchers.Main) {
               Toast.makeText(context, "RTMP error ${event.exception}", Toast.LENGTH_LONG).show()
@@ -901,7 +908,7 @@ class MeetingFragment : Fragment() {
 
     meetingViewModel.setTitle(mode.titleResId)
 
-    if (mode == MeetingViewMode.AUDIO_ONLY) {
+    if (mode == MeetingViewMode.AUDIO_ONLY ||mode is MeetingViewMode.HLS) {
       binding.buttonToggleVideo.visibility = View.GONE
     } else {
       binding.buttonToggleVideo.visibility = View.VISIBLE
