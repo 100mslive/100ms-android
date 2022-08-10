@@ -17,103 +17,109 @@ import live.hms.app2.util.viewLifecycle
 
 class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
 
-  companion object {
-    private const val TAG = "ChatFragment"
-  }
-
-  private var binding by viewLifecycle<DialogBottomSheetChatBinding>()
-
-  private val chatViewModel: ChatViewModel by activityViewModels()
-
-  private val args: ChatBottomSheetFragmentArgs by navArgs()
-  private lateinit var roomDetails: RoomDetails
-  private lateinit var currentUserCustomerId: String
-
-  private val messages = ArrayList<ChatMessage>()
-
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    initViewModels()
-    initSpinnerUpdates()
-  }
-
-  override fun onCreateView(
-    inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    binding = DialogBottomSheetChatBinding.inflate(inflater, container, false)
-    roomDetails = args.roomDetail
-    currentUserCustomerId = args.currentUserCustomerId
-
-    initToolbar()
-    initRecyclerView()
-    initButtons()
-    // Once we open the chat, assume that all messages will be seen
-    chatViewModel.unreadMessagesCount.postValue(0)
-
-    return binding.root
-  }
-
-  private fun initSpinnerUpdates() {
-    chatViewModel.chatMembers.observe(viewLifecycleOwner) {
-      refreshSpinner(it.recipients, it.index)
+    companion object {
+        private const val TAG = "ChatFragment"
     }
-  }
 
-  private fun refreshSpinner(recipientList :List<Recipient>, selectedIndex : Int) {
-    val participantSpinner = binding.recipientSpinner
-    ArrayAdapter(requireContext(), R.layout.layout_chat_recipient_selector_item, recipientList)
-      .also { recipientsAdapter ->
-        participantSpinner.adapter = recipientsAdapter
-        participantSpinner.setSelection(selectedIndex, false)
-        recipientsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        participantSpinner.post { participantSpinner.onItemSelectedListener = this }
-      }
-  }
+    private var binding by viewLifecycle<DialogBottomSheetChatBinding>()
 
-  private fun initRecyclerView() {
-    binding.recyclerView.apply {
-      layoutManager = LinearLayoutManager(requireContext())
-      adapter = ChatAdapter(messages)
-      scrollToPosition(messages.size - 1)
+    private val chatViewModel: ChatViewModel by activityViewModels()
+
+    private val args: ChatBottomSheetFragmentArgs by navArgs()
+    private lateinit var roomDetails: RoomDetails
+    private lateinit var currentUserCustomerId: String
+
+    private val messages = ArrayList<ChatMessage>()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViewModels()
+        initSpinnerUpdates()
     }
-  }
 
-  private fun initViewModels() {
-    chatViewModel.messages.observe(viewLifecycleOwner) {
-      messages.clear()
-      messages.addAll(it)
-      binding.recyclerView.apply {
-        adapter?.notifyDataSetChanged()
-        scrollToPosition(messages.size - 1)
-      }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = DialogBottomSheetChatBinding.inflate(inflater, container, false)
+        roomDetails = args.roomDetail
+        currentUserCustomerId = args.currentUserCustomerId
+
+        initToolbar()
+        initRecyclerView()
+        initButtons()
+        // Once we open the chat, assume that all messages will be seen
+        chatViewModel.unreadMessagesCount.postValue(0)
+
+        return binding.root
     }
-  }
 
-  private fun initButtons() {
-    binding.containerMessage.setEndIconOnClickListener {
-      val messageStr = binding.editTextMessage.text.toString().trim()
-      if (messageStr.isNotEmpty()) {
-        chatViewModel.sendMessage(messageStr)
-        binding.editTextMessage.setText("")
-      }
+    private fun initSpinnerUpdates() {
+        chatViewModel.chatMembers.observe(viewLifecycleOwner) {
+            refreshSpinner(it.recipients, it.index)
+        }
     }
-  }
 
-  private fun initToolbar() {
-    binding.toolbar.setOnMenuItemClickListener { item ->
-      when(item.itemId) {
-        R.id.action_close_chat -> { dismiss() }
-      }
-      true
+    private fun refreshSpinner(recipientList: List<Recipient>, selectedIndex: Int) {
+        val participantSpinner = binding.recipientSpinner
+        ArrayAdapter(requireContext(), R.layout.layout_chat_recipient_selector_item, recipientList)
+            .also { recipientsAdapter ->
+                participantSpinner.adapter = recipientsAdapter
+                participantSpinner.setSelection(selectedIndex, false)
+                recipientsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                participantSpinner.post { participantSpinner.onItemSelectedListener = this }
+            }
     }
-  }
 
-  override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-    chatViewModel.recipientSelected(parent?.getItemAtPosition(position) as Recipient)
-  }
+    private fun initRecyclerView() {
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = ChatAdapter(messages)
+            scrollToPosition(messages.size - 1)
+        }
+    }
 
-  override fun onNothingSelected(parent: AdapterView<*>?) {
-    // Ignore it.
-  }
+    private fun initViewModels() {
+        chatViewModel.messages.observe(viewLifecycleOwner) {
+            messages.clear()
+            messages.addAll(it)
+            binding.recyclerView.apply {
+                adapter?.notifyDataSetChanged()
+                scrollToPosition(messages.size - 1)
+            }
+        }
+    }
+
+    private fun initButtons() {
+        binding.iconSend.setOnClickListener {
+            val messageStr = binding.editTextMessage.text.toString().trim()
+            if (messageStr.isNotEmpty()) {
+                chatViewModel.sendMessage(messageStr)
+                binding.editTextMessage.setText("")
+            }
+        }
+
+        binding.btnCloseHint.setOnClickListener {
+            binding.hintView.visibility = View.GONE
+        }
+    }
+
+    private fun initToolbar() {
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_close_chat -> {
+                    dismiss()
+                }
+            }
+            true
+        }
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        chatViewModel.recipientSelected(parent?.getItemAtPosition(position) as Recipient)
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        // Ignore it.
+    }
 }

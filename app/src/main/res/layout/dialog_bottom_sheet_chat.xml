@@ -4,71 +4,141 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    android:background="@color/blue_2"
+    android:animateLayoutChanges="false"
+    android:background="@color/primary_bg"
     android:orientation="vertical"
     tools:context=".ui.home.HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/primary_bg"
         app:liftOnScroll="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/blue_3"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:menu="@menu/menu_chat"
-            app:title="@string/chat" >
+            app:title="@string/chat">
 
-        <Spinner
-            android:id="@+id/recipientSpinner"
-            android:layout_width="wrap_content"
-            android:layout_gravity="end"
-            android:layout_height="wrap_content"
-            tools:listitem="@layout/layout_chat_recipient_selector_item"
-            />
+            <Spinner
+                android:id="@+id/recipientSpinner"
+                style="@style/SpinnerTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginStart="30dp"
+                android:paddingVertical="7dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="30dp"
+                tools:listitem="@layout/layout_chat_recipient_selector_item" />
+
         </com.google.android.material.appbar.MaterialToolbar>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:background="@color/btn_disabled" />
 
     </com.google.android.material.appbar.AppBarLayout>
+
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/hint_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        app:cardBackgroundColor="@color/gray_color"
+        app:cardCornerRadius="5dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="18dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/info_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="20dp"
+                android:layout_weight="1"
+                android:text="Messages can only be seen by people in the call and are deleted when the call ends." />
+
+
+            <ImageView
+                android:id="@+id/btn_close_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_close_16" />
+
+        </LinearLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="20dp"
         android:layout_weight="1"
         android:minHeight="300dp"
         tools:listitem="@layout/list_item_chat" />
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginBottom="20dp"
+        app:cardBackgroundColor="@color/gray_color">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/container_message"
-            style="@style/TextInputLayout"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
-            android:hint="@string/message"
-            app:endIconDrawable="@drawable/ic_send_24"
-            app:endIconMode="custom"
-            app:endIconTint="@color/white">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <EditText
                 android:id="@+id/edit_text_message"
-                android:layout_width="match_parent"
+                style="@style/TextInputLayout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="@string/type_a_message" />
+                android:layout_weight="5"
+                android:background="@color/gray_color"
+                android:hint="Send Message to Everyone"
+                android:padding="10dp"
+                app:endIconDrawable="@drawable/send_icon"
+                app:endIconMode="custom"
+                app:endIconTint="@color/white" />
 
-        </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/icon_send"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/send_icon" />
+
+        </LinearLayout>
+
+
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

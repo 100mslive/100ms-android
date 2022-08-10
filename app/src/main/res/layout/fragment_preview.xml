@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/preview_card"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="12dp"
     android:layout_weight="1"
-    app:cardCornerRadius="8dp"
     app:cardBackgroundColor="@color/primary_bg"
+    app:cardCornerRadius="8dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="30dp"
             android:fontFamily="@font/inter_semibold"
             android:text="Configure Video and Audio"
             android:textColor="#F2F5F9FF"
@@ -28,15 +28,15 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="430dp"
-            android:layout_marginHorizontal="60dp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_marginHorizontal="60dp"
             android:layout_marginTop="30dp"
+            android:layout_weight="1"
             android:elevation="10dp"
             android:orientation="vertical"
             app:cardBackgroundColor="#0F1115"
             app:cardCornerRadius="5dp">
-
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/name_initials"
@@ -112,17 +112,18 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button_join_meeting"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_gravity="center"
             android:layout_marginStart="8dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="8dp"
-            android:paddingHorizontal="10dp"
-            android:drawablePadding="5dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/primary_blue_round_drawable"
             android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
+            android:drawablePadding="5dp"
             android:enabled="true"
             android:fontFamily="@font/inter_semibold"
+            android:paddingHorizontal="10dp"
             android:text="@string/enter_studio_str"
             android:textAllCaps="false"
             app:cornerRadius="5dp"
@@ -132,3 +133,4 @@
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>
+
