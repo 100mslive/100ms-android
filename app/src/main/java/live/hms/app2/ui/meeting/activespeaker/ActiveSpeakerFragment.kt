@@ -1,5 +1,6 @@
 package live.hms.app2.ui.meeting.activespeaker
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +10,13 @@ import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
-import live.hms.app2.util.viewLifecycle
-import live.hms.app2.util.visibilityOpacity
+import live.hms.app2.util.*
+import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.utils.HMSLogger
+import org.webrtc.EglRenderer
 import org.webrtc.RendererCommon
+import org.webrtc.SurfaceViewRenderer
 
 class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
@@ -67,9 +70,41 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       }
       binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.peer.metadata)?.isHandRaised == true)
       bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+      binding.screenShare.surfaceView.setOnLongClickListener { view ->
+        openDialog(view as? SurfaceViewRenderer, it.video)
+        return@setOnLongClickListener true
+      }
     }
     super.onResume()
   }
+
+  private fun openDialog(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
+
+    if (videoTrack == null || videoTrack.isMute || videoTrack.isDegraded){
+      //todo error !
+      return
+    }
+
+    surfaceView?.vibrateStrong()
+    captureVideoFrame(surfaceView)
+  }
+
+  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?) {
+    surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
+      override fun onFrame(bitmap: Bitmap?) {
+
+        //this is returning on the render thread
+        contextSafe { context, activity ->
+          val uri = bitmap?.saveCaptureToLocalCache(context)
+          uri?.let { activity.openShareIntent(it) }
+        }
+
+        //can't call on render thread
+        activity?.runOnUiThread { surfaceView?.removeFrameListener(this) }
+      }
+    }, 1.0f)
+  }
+
 
   override fun onPause() {
 
