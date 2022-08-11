@@ -1,6 +1,7 @@
 package live.hms.app2.ui.meeting.commons
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,17 +23,18 @@ import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.app2.ui.settings.SettingsStore
-import live.hms.app2.util.NameUtils
-import live.hms.app2.util.SurfaceViewRendererUtil
-import live.hms.app2.util.crashlyticsLog
-import live.hms.app2.util.visibilityOpacity
+import live.hms.app2.util.*
+import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import org.webrtc.EglRenderer
 import org.webrtc.RendererCommon
+import org.webrtc.SurfaceViewRenderer
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
+
 
 /**
  * The Grid is created by building column by column.
@@ -65,6 +67,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   private val bindedVideoTrackIds = mutableSetOf<String>()
   protected val renderedViews = ArrayList<RenderedViewPair>()
+  private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
 
   //Normal layout
   private fun getNormalLayoutRowCount() = min(max(1, renderedViews.size), settings.videoGridRows)
@@ -176,9 +179,52 @@ abstract class VideoGridBaseFragment : Fragment() {
         if (success) {
           binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
           bindedVideoTrackIds.add(item.video!!.trackId)
+          binding.surfaceView.setOnLongClickListener {
+            (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
+            true
+          }
         }
       }
     }
+  }
+
+  private fun openDialog(
+    surfaceView: SurfaceViewRenderer?,
+    videoTrack: HMSVideoTrack?,
+    peerName: String
+  ) {
+
+    contextSafe { context, activity ->
+      context.showTileListDialog(peerName) { captureVideoFrame(surfaceView, videoTrack) }
+    }
+  }
+
+
+
+  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
+
+    //safe check incase video
+    if (videoTrack.isValid().not()){
+      return
+    }
+
+    contextSafe { context, activity -> mediaPlayerManager.startPlay(R.raw.camera_shut, context )}
+    surfaceView?.vibrateStrong()
+    surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
+      override fun onFrame(bitmap: Bitmap?) {
+
+        //this is returning on the render thread
+        contextSafe { context, activity ->
+          //stores the bitmap in local cache thus avoiding any permission
+          val uri = bitmap?.saveCaptureToLocalCache(context)
+          //the uri is used to open share intent
+          uri?.let { activity.openShareIntent(it) }
+        }
+
+        //can't call on render thread this is important and just capture a single frame
+        activity?.runOnUiThread { surfaceView?.removeFrameListener(this) }
+      }
+    }, 1.0f)
   }
 
   protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
@@ -224,6 +270,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     SurfaceViewRendererUtil.unbind(binding.surfaceView, item, metadata).let {
       if (it) {
+        binding.surfaceView.setOnLongClickListener(null)
         binding.surfaceView.visibility = View.INVISIBLE
         bindedVideoTrackIds.remove(item.video!!.trackId)
       }
