@@ -96,7 +96,6 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     //safe check incase video
     if (videoTrack.isValid().not()){
-      //todo error !
       return
     }
 
