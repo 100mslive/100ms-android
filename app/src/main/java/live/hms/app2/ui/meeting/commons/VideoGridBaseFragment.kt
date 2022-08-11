@@ -190,7 +190,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
   private fun openDialog(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
-      //todo add check to capture Frame only if video track is present!
+
     if (videoTrack == null || videoTrack.isMute || videoTrack.isDegraded){
         //todo error !
       return
@@ -204,11 +204,13 @@ abstract class VideoGridBaseFragment : Fragment() {
     surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
       override fun onFrame(bitmap: Bitmap?) {
 
+        //this is returning on the render thread
         contextSafe { context, activity ->
           val uri = bitmap?.saveCaptureToLocalCache(context)
           uri?.let { activity.openShareIntent(it) }
         }
 
+        //can't call on render thread
         activity?.runOnUiThread { surfaceView?.removeFrameListener(this) }
       }
     }, 1.0f)
