@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import live.hms.app2.R
 import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
@@ -28,6 +29,8 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   private var screenShareTrack: MeetingTrack? = null
   private var wasLastModePip = false
+
+  private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -98,7 +101,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     if (videoTrack.isValid().not()){
       return
     }
-
+    contextSafe { context, activity -> mediaPlayerManager.startPlay(R.raw.camera_shut, context )}
     surfaceView?.vibrateStrong()
     surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
       override fun onFrame(bitmap: Bitmap?) {

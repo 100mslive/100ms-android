@@ -67,6 +67,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   private val bindedVideoTrackIds = mutableSetOf<String>()
   protected val renderedViews = ArrayList<RenderedViewPair>()
+  private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
 
   //Normal layout
   private fun getNormalLayoutRowCount() = min(max(1, renderedViews.size), settings.videoGridRows)
@@ -207,6 +208,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       return
     }
 
+    contextSafe { context, activity -> mediaPlayerManager.startPlay(R.raw.camera_shut, context )}
     surfaceView?.vibrateStrong()
     surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
       override fun onFrame(bitmap: Bitmap?) {

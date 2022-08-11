@@ -2,20 +2,15 @@ package live.hms.app2.util
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.Dialog
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.HapticFeedbackConstants
 import android.view.View
-import android.view.Window
 import android.view.accessibility.AccessibilityManager
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.FileProvider
-import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
 import live.hms.video.media.tracks.HMSVideoTrack
 import java.io.File
