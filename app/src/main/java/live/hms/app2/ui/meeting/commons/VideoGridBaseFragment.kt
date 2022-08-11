@@ -1,9 +1,7 @@
 package live.hms.app2.ui.meeting.commons
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -181,7 +179,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
           bindedVideoTrackIds.add(item.video!!.trackId)
           binding.surfaceView.setOnLongClickListener {
-            (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video) }
+            (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
             true
           }
         }
@@ -189,18 +187,27 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  private fun openDialog(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
+  private fun openDialog(
+    surfaceView: SurfaceViewRenderer?,
+    videoTrack: HMSVideoTrack?,
+    peerName: String
+  ) {
 
-    if (videoTrack == null || videoTrack.isMute || videoTrack.isDegraded){
-        //todo error !
+    contextSafe { context, activity ->
+      context.showTileListDialog(peerName) { captureVideoFrame(surfaceView, videoTrack) }
+    }
+  }
+
+
+
+  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
+
+    //safe check incase video
+    if (videoTrack.isValid().not()){
       return
     }
 
     surfaceView?.vibrateStrong()
-    captureVideoFrame(surfaceView)
-  }
-
-  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?) {
     surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
       override fun onFrame(bitmap: Bitmap?) {
 
@@ -212,7 +219,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           uri?.let { activity.openShareIntent(it) }
         }
 
-        //can't call on render thread this is important
+        //can't call on render thread this is important and just capture a single frame
         activity?.runOnUiThread { surfaceView?.removeFrameListener(this) }
       }
     }, 1.0f)

@@ -71,35 +71,48 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.peer.metadata)?.isHandRaised == true)
       bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
       binding.screenShare.surfaceView.setOnLongClickListener { view ->
-        openDialog(view as? SurfaceViewRenderer, it.video)
+        openDialog(view as? SurfaceViewRenderer, it.video, it.peer.name.orEmpty())
         return@setOnLongClickListener true
       }
     }
     super.onResume()
   }
 
-  private fun openDialog(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
+  private fun openDialog(
+    surfaceView: SurfaceViewRenderer?,
+    videoTrack: HMSVideoTrack?,
+    peerName: String
+  ) {
 
-    if (videoTrack == null || videoTrack.isMute || videoTrack.isDegraded){
+    if (videoTrack.isValid().not())
+      return
+    contextSafe { context, activity ->
+      context.showTileListDialog (peerName){ captureVideoFrame(surfaceView, videoTrack) }
+    }
+
+  }
+
+  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
+
+    //safe check incase video
+    if (videoTrack.isValid().not()){
       //todo error !
       return
     }
 
     surfaceView?.vibrateStrong()
-    captureVideoFrame(surfaceView)
-  }
-
-  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?) {
     surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
       override fun onFrame(bitmap: Bitmap?) {
 
         //this is returning on the render thread
         contextSafe { context, activity ->
+          //stores the bitmap in local cache thus avoiding any permission
           val uri = bitmap?.saveCaptureToLocalCache(context)
+          //the uri is used to open share intent
           uri?.let { activity.openShareIntent(it) }
         }
 
-        //can't call on render thread
+        //can't call on render thread this is important and just capture a single frame
         activity?.runOnUiThread { surfaceView?.removeFrameListener(this) }
       }
     }, 1.0f)

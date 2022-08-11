@@ -1,15 +1,23 @@
 package live.hms.app2.util
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.HapticFeedbackConstants
 import android.view.View
+import android.view.Window
 import android.view.accessibility.AccessibilityManager
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.FileProvider
+import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
+import live.hms.video.media.tracks.HMSVideoTrack
 import java.io.File
 import java.io.FileOutputStream
 
@@ -83,4 +91,27 @@ fun Activity.openShareIntent(uri: Uri) {
       putExtra(Intent.EXTRA_STREAM, uri)
     }
     startActivity(Intent.createChooser(shareIntent, "Choose an app"))
+}
+
+fun HMSVideoTrack?.isValid(): Boolean {
+ return !(this == null || this.isMute || this.isDegraded)
+}
+
+
+fun Context.showTileListDialog(
+  peerName : String,
+  onScreenCapture: (() -> Unit),
+) {
+
+  val builder = AlertDialog.Builder(this)
+  builder.setTitle("Perform Action")
+  val animals = arrayOf("Screen Capture")
+  builder.setItems(animals) { dialog, which ->
+    when (which) {
+      0 -> { onScreenCapture.invoke() }
+    }
+  }
+
+  builder.show()
+
 }
