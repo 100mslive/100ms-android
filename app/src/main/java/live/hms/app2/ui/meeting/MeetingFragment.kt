@@ -145,7 +145,7 @@ class MeetingFragment : Fragment() {
 
       R.id.action_record_meeting, R.id.hls_start -> {
 
-        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment())
+        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment(roomDetails.url))
       }
 
       R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
