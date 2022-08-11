@@ -54,7 +54,7 @@ private fun Context.isTouchExplorationEnabled(): Boolean {
 }
 
 fun Bitmap.saveCaptureToLocalCache(context: Context) : Uri? {
-  val bitmapSaveTask = kotlin.runCatching {
+  kotlin.runCatching {
 
     val cachePath = File(context.cacheDir, "images")
     cachePath.mkdirs() // don't forget to make the directory

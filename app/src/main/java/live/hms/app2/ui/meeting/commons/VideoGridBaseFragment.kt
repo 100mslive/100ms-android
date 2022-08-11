@@ -206,11 +206,13 @@ abstract class VideoGridBaseFragment : Fragment() {
 
         //this is returning on the render thread
         contextSafe { context, activity ->
+          //stores the bitmap in local cache thus avoiding any permission
           val uri = bitmap?.saveCaptureToLocalCache(context)
+          //the uri is used to open share intent
           uri?.let { activity.openShareIntent(it) }
         }
 
-        //can't call on render thread
+        //can't call on render thread this is important
         activity?.runOnUiThread { surfaceView?.removeFrameListener(this) }
       }
     }, 1.0f)
