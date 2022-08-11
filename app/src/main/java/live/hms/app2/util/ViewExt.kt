@@ -100,8 +100,8 @@ fun Context.showTileListDialog(
 
   val builder = AlertDialog.Builder(this)
   builder.setTitle("Perform Action")
-  val animals = arrayOf("Screen Capture")
-  builder.setItems(animals) { dialog, which ->
+  val intentList = arrayOf("Screen Capture")
+  builder.setItems(intentList) { dialog, which ->
     when (which) {
       0 -> { onScreenCapture.invoke() }
     }
