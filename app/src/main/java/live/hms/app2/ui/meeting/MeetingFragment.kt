@@ -145,7 +145,7 @@ class MeetingFragment : Fragment() {
 
       R.id.action_record_meeting, R.id.hls_start -> {
 
-        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment())
+        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment(roomDetails.url))
       }
 
       R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
@@ -294,7 +294,7 @@ class MeetingFragment : Fragment() {
     }
 
     menu.findItem(R.id.action_record_meeting).apply {
-      isVisible = meetingViewModel.isAllowedToBrowserRecord()
+      isVisible = meetingViewModel.isAllowedToBrowserRecord() || meetingViewModel.isAllowedToRtmpStream()
 
       // If we're in a transitioning state, we prevent further clicks.
       // Checked or not checked depends on if it's currently recording or not. Checked if recording.
