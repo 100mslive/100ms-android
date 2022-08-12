@@ -103,21 +103,15 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
     contextSafe { context, activity -> mediaPlayerManager.startPlay(R.raw.camera_shut, context )}
     surfaceView?.vibrateStrong()
-    surfaceView?.addFrameListener(object : EglRenderer.FrameListener{
-      override fun onFrame(bitmap: Bitmap?) {
 
-        //this is returning on the render thread
-        contextSafe { context, activity ->
-          //stores the bitmap in local cache thus avoiding any permission
-          val uri = bitmap?.saveCaptureToLocalCache(context)
-          //the uri is used to open share intent
-          uri?.let { activity.openShareIntent(it) }
-        }
-
-        //can't call on render thread this is important and just capture a single frame
-        activity?.runOnUiThread { surfaceView?.removeFrameListener(this) }
+    surfaceView?.onBitMap(onBitmap = { bitmap ->
+      contextSafe { context, activity ->
+        //stores the bitmap in local cache thus avoiding any permission
+        val uri = bitmap?.saveCaptureToLocalCache(context)
+        //the uri is used to open share intent
+        uri?.let { activity.openShareIntent(it) }
       }
-    }, 1.0f)
+    })
   }
 
 
