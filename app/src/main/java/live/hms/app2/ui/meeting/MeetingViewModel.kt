@@ -1038,7 +1038,7 @@ class MeetingViewModel(
     isRecording: Boolean,
     rtmpInjectUrls: List<String>,
     meetingUrl: String,
-    inputWidthHeight: HMSRtmpVideoResolution) {
+    inputWidthHeight: HMSRtmpVideoResolution?) {
     // It's streaming if there are rtmp urls present.
 
     Log.v(TAG, "Starting recording")
@@ -1215,7 +1215,11 @@ class MeetingViewModel(
   fun getStats(): Flow<Map<String, HMSStats>> = statsFlow
 
   fun startHls(hlsUrl : String?, recordingConfig : HMSHlsRecordingConfig) {
-    val config = HMSHLSConfig(listOf(HMSHLSMeetingURLVariant(hlsUrl)),
+    val meetingVariants = if(hlsUrl.isNullOrBlank()) {
+      null
+    } else listOf(HMSHLSMeetingURLVariant(hlsUrl))
+
+    val config = HMSHLSConfig(meetingVariants,
     recordingConfig)
 
     hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {

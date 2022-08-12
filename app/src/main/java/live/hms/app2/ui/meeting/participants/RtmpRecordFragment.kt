@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -27,6 +28,7 @@ import kotlin.IllegalArgumentException
 
 class RtmpRecordFragment : Fragment() {
 
+    private val navArgs by navArgs<RtmpRecordFragmentArgs>()
     private var binding by viewLifecycle<LayoutRtmpRecordingBinding>()
     private lateinit var settings: SettingsStore
     private val rtmpUrladapter: RtmpRecordAdapter = RtmpRecordAdapter(::removeItem)
@@ -50,7 +52,7 @@ class RtmpRecordFragment : Fragment() {
 
         binding.addRtmpUrlButton.setOnClickListener { addItem() }
         binding.startButton.setOnClickListener { startClicked() }
-
+        binding.meetingUrl.setText("${navArgs.meetingUrl.meetingToHlsUrl()}")
         val recordingTimesUseCase = RecordingTimesUseCase()
         enableDisable()
         with(binding) {
@@ -129,9 +131,9 @@ class RtmpRecordFragment : Fragment() {
         false
     }
 
-    private fun checkInputWidthHeight(width : Int?, height: Int?) : HMSRtmpVideoResolution {
+    private fun checkInputWidthHeight(width : Int?, height: Int?) : HMSRtmpVideoResolution? {
         if(width == null || height == null) {
-            throw IllegalArgumentException("Enter a valid width and height")
+            return null
         }
 
         return HMSRtmpVideoResolution(width, height)
@@ -148,19 +150,11 @@ class RtmpRecordFragment : Fragment() {
         val isHlsVod = binding.hlsVod.isChecked
         val hlsRecordingConfig = HMSHlsRecordingConfig(isHlsSingleFilePerLayer, isHlsVod)
 
-        val inputWidthHeight : HMSRtmpVideoResolution = try {
+        val inputWidthHeight : HMSRtmpVideoResolution? =
             checkInputWidthHeight(
                 binding.rtmpWidth.text.toString().toIntOrNull(),
                 binding.rtmpHeight.text.toString().toIntOrNull()
             )
-        } catch (e : IllegalArgumentException){
-            Toast.makeText(
-                requireContext(),
-                e.message,
-                Toast.LENGTH_LONG
-            ).show()
-            return
-        }
 
         if (meetingUrl.isNullOrBlank() && (isRecording || isRtmp) ) {
             Toast.makeText(
@@ -193,3 +187,7 @@ class RtmpRecordFragment : Fragment() {
         settings.rtmpUrlsList = newList.toSet()
     }
 }
+
+// this is only required for hms beam bots, your beam auth mechanism will likely be different.
+fun String.meetingToHlsUrl() =
+"${this.replace("/meeting/","/preview/")}?skip_preview=true"
