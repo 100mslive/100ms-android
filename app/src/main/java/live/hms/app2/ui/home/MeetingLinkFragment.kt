@@ -22,10 +22,7 @@ import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
-import live.hms.app2.util.EmailUtils
-import live.hms.app2.util.REGEX_MEETING_URL_CODE
-import live.hms.app2.util.REGEX_PREVIEW_URL_CODE
-import live.hms.app2.util.viewLifecycle
+import live.hms.app2.util.*
 
 
 class MeetingLinkFragment : Fragment() {
@@ -58,6 +55,18 @@ class MeetingLinkFragment : Fragment() {
         val data = requireActivity().intent.data
         Log.v(TAG, "onResume: Trying to update $data into EditTextMeetingUrl")
 
+        data?.let {
+            if (it.toString().isNotEmpty()) {
+                val url = it.toString()
+                requireActivity().intent.data = null
+                if (saveTokenEndpointUrlIfValid(url)
+                ) {
+                    binding.edtMeetingUrl.setText(it.toString())
+                }
+            }
+        }
+
+
         val person = requireActivity().intent.getStringExtra(LEAVE_INFORMATION_PERSON)
         val reason = requireActivity().intent.getStringExtra(LEAVE_INFORMATION_REASON)
         if (person != null && reason != null) {
@@ -65,6 +74,16 @@ class MeetingLinkFragment : Fragment() {
             requireActivity().intent.removeExtra(LEAVE_INFORMATION_REASON)
             requireActivity().intent.removeExtra(LEAVE_INFROMATION_WAS_END_ROOM)
         }
+    }
+
+    private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
+        if (url.isValidMeetingUrl()) {
+            settings.lastUsedMeetingUrl = url
+            settings.environment = url.getInitEndpointEnvironment()
+            return true
+        }
+
+        return false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

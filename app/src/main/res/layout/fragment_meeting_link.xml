@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_weight="1"
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
@@ -21,7 +22,8 @@
             android:layout_height="200dp"
             android:layout_gravity="center"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="1"
             android:src="@drawable/illustration" />
 
         <TextView
@@ -30,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="@string/meeting_link_header"
             android:textSize="34sp"
@@ -41,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="15dp"
             android:layout_marginBottom="8dp"
             android:gravity="center"
             android:text="@string/meeting_link_header_description"
@@ -53,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="15dp"
             android:autofillHints=""
             android:fontFamily="@font/inter_regular"
             android:text="@string/joining_link_header"
@@ -83,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="15dp"
             android:background="@drawable/primary_disabled_round_drawable"
             android:drawablePadding="10dp"
             android:enabled="false"
@@ -97,17 +99,17 @@
             android:layout_width="wrap_content"
             android:layout_height="1dp"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginVertical="20dp"
+            android:layout_marginVertical="15dp"
             android:background="@color/color_gray_highlight" />
 
         <LinearLayout
             android:id="@+id/btn_scan_now"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:clickable="true"
             android:layout_marginHorizontal="24dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/primary_blue_round_drawable"
+            android:clickable="true"
             android:orientation="horizontal">
 
             <Space
@@ -149,6 +151,5 @@
             android:layout_weight="1" />
 
     </LinearLayout>
-
 
 </ScrollView>

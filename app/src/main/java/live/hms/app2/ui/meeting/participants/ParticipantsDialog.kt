@@ -17,8 +17,8 @@ class ParticipantsDialog : BottomSheetDialogFragment() {
         set(value) {
             if (this.isVisible) {
                 dialogParticipantsBinding.participantCount.text = value.toString()
-                field = value
             }
+            field = value
         }
 
     init {
@@ -33,6 +33,11 @@ class ParticipantsDialog : BottomSheetDialogFragment() {
         dialogParticipantsBinding = DialogParticipantsBinding.inflate(LayoutInflater.from(context))
         initViews()
         return dialogParticipantsBinding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        dialogParticipantsBinding.participantCount.text = participantCount.toString()
     }
 
     private fun initViews() {

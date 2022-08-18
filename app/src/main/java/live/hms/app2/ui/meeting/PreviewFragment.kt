@@ -257,9 +257,9 @@ class PreviewFragment : Fragment() {
                 }
             }
             R.id.action_participants -> {
-                participantsDialog?.show(requireActivity().supportFragmentManager,"participant_dialog")
                 participantsDialog?.participantCount =
                     meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
+                participantsDialog?.show(requireActivity().supportFragmentManager,"participant_dialog")
             }
             R.id.action_volume -> {
                 meetingViewModel.apply {

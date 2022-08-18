@@ -73,7 +73,7 @@
                 android:layout_marginEnd="18dp"
                 android:background="@drawable/badge_circle_20"
                 android:gravity="center"
-                android:text="@string/_8"
+                android:text="@string/_0"
                 android:textColor="@color/white"
                 android:textSize="12sp" />
 

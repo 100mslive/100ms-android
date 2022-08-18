@@ -75,6 +75,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                 meetingViewModel.changeRole(args.remotePeerId, it, isForceUpdate)
             }
             dialog.dismiss()
+            findNavController().popBackStack(R.id.MeetingFragment,false)
         }
         dialog.show()
     }
