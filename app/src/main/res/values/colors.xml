@@ -22,4 +22,8 @@
     <color name="recording_transition">#FFFFFF</color>
     <color name="streaming">#2832c2</color>
     <color name="streaming_recording">#FFC107</color>
+    <color name="muted_text">#CCE0ECFF</color>
+    <color name="primary_bg">#14171C</color>
+    <color name="btn_disabled">#242A33</color>
+    <color name="gray_color">#1D2229</color>
 </resources>

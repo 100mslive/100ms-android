@@ -1,14 +1,14 @@
 package live.hms.app2.ui.meeting.participants
 
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
+import android.widget.*
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -27,7 +27,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
     private val TAG = BottomSheetRoleChangeFragment::class.java.simpleName
     private val meetingViewModel: MeetingViewModel by activityViewModels()
     private val args : BottomSheetRoleChangeFragmentArgs by navArgs()
-    private var isForce : Boolean? = null
+    private var stringRole : String? = null
 
     private var binding by viewLifecycle<LayoutFragmentBottomSheetChangeRoleBinding>()
     private lateinit var popupSpinner : Spinner
@@ -45,23 +45,39 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        popupSpinner = view.findViewById(R.id.retroSpinner)
-        initPopup()
         initListeners()
     }
 
     private fun initPopup() {
+
+        val dialog = Dialog(requireActivity())
+        dialog.setContentView(R.layout.change_role_dialog)
+        dialog.findViewById<TextView>(R.id.change_role_text).text = "Change the role of ${args.remotePeerName} to"
+        val spinner = dialog.findViewById<Spinner>(R.id.role_spinner)
         ArrayAdapter(
             requireActivity(),
-            android.R.layout.simple_list_item_1,
+            android.R.layout.simple_spinner_dropdown_item,
             spinnerRoles
         ).also { arrayAdapter ->
-            popupSpinner.adapter = arrayAdapter
-            popupSpinner.prompt = "Changing ${args.remotePeerName}'s role to:"
-            popupSpinner.setSelection(spinnerRoles.size - 1, false)
+            spinner.adapter = arrayAdapter
+            spinner.prompt = "Changing ${args.remotePeerName}'s role to:"
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            popupSpinner.post { popupSpinner.onItemSelectedListener = this }
+            spinner.post { spinner.onItemSelectedListener = this }
         }
+        dialog.findViewById<AppCompatButton>(R.id.cancel_btn).setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.findViewById<AppCompatButton>(R.id.change_role_btn).setOnClickListener {
+            val isForceUpdate = dialog.findViewById<CheckBox>(R.id.is_force_update).isChecked.not()
+
+            stringRole?.let {
+                Log.d(TAG, "Selected role: $stringRole")
+                meetingViewModel.changeRole(args.remotePeerId, it, isForceUpdate)
+            }
+            dialog.dismiss()
+            findNavController().popBackStack(R.id.MeetingFragment,false)
+        }
+        dialog.show()
     }
 
     private fun initListeners() {
@@ -71,12 +87,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
         with(binding) {
             cancel.setOnClickListener { findNavController().popBackStack() }
 
-            forceChangeRole.setOnClickListener {
-                isForce = true
-                spinnerDialog()
-            }
             promptChangeRole.setOnClickListener {
-                isForce = false
                 spinnerDialog()
             }
 
@@ -121,8 +132,6 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                     muteUnmuteVideo.visibility = View.GONE
                     muteUnmuteAudio.visibility = View.GONE
                     removePeer.visibility = View.GONE
-                    forceChangeRole.visibility = View.VISIBLE
-                    forceChangeRole.text = "Change Self Role"
                 }
 
             } else {
@@ -150,19 +159,17 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
 
 
     private fun spinnerDialog() {
-        popupSpinner.performClick()
+        initPopup()
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         val stringRole = parent?.adapter?.getItem(position) as String
         Log.d(TAG, "Selected role: $stringRole")
-        meetingViewModel.changeRole(args.remotePeerId, stringRole, isForce!!)
-        findNavController().popBackStack()
+        this.stringRole = stringRole
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        Log.d(TAG, "Nothing selected")
-        findNavController().popBackStack()
+
     }
 
 }

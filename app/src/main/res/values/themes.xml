@@ -3,7 +3,7 @@
     <style name="Theme.App2" parent="Theme.MaterialComponents">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/blue_1</item>
-        <item name="colorPrimaryVariant">@color/blue_0</item>
+        <item name="colorPrimaryVariant">@color/primary_bg</item>
         <item name="colorOnPrimary">@color/white</item>
 
         <!-- Secondary brand color. -->
@@ -103,5 +103,9 @@
 
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">#ffff</item>
+    </style>
+
+    <style name="SpinnerTheme" parent="android:Widget.Spinner">
+        <item name="android:background">@drawable/stroked_round_drawable</item>
     </style>
 </resources>

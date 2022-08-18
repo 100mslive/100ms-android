@@ -14,6 +14,7 @@ class HomeActivity : AppCompatActivity() {
   private var _binding: ActivityHomeBinding? = null
   private val binding: ActivityHomeBinding
     get() = _binding!!
+  var meetingUrl : String = ""
 
   private fun finishIfOngoingActiveTaskPresent() {
     if (!isTaskRoot

@@ -42,7 +42,7 @@
 
         <action
             android:id="@+id/action_PermissionFragment_to_HomeFragment"
-            app:destination="@id/HomeFragment"
+            app:destination="@id/MeetingLinkFragment"
             app:launchSingleTop="true" />
     </fragment>
 
@@ -51,5 +51,18 @@
         android:name="live.hms.app2.ui.meeting.MeetingActivity"
         android:label="Meeting Activity"
         tools:layout="@layout/activity_meeting" />
+
+    <fragment
+        android:id="@+id/MeetingLinkFragment"
+        android:name="live.hms.app2.ui.home.MeetingLinkFragment"
+        android:label="MeetingLinkFragment">
+        <action
+            android:id="@+id/action_MeetingLinkFragment_to_SettingsFragment"
+            app:destination="@id/SettingsFragment" />
+
+        <action
+            android:id="@+id/action_meetingLinkFragment_to_HomeFragment"
+            app:destination="@id/HomeFragment" />
+    </fragment>
 
 </navigation>
