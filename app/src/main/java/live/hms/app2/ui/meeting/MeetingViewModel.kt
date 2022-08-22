@@ -10,7 +10,6 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -124,9 +123,6 @@ class MeetingViewModel(
   val previewErrorLiveData : LiveData<HMSException> = previewErrorData
   val previewUpdateLiveData : LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
 
-  private val _peerCount = MutableLiveData<Int>()
-  val peerCount : LiveData<Int> = _peerCount
-
   fun setMeetingViewMode(mode: MeetingViewMode) {
     if (mode != meetingViewMode.value) {
       meetingViewMode.postValue(mode)
@@ -194,7 +190,7 @@ class MeetingViewModel(
   val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
   // Live data which changes on any change of peer
-  val peerLiveDate = MutableLiveData<HMSPeer>()
+  val peerLiveData = MutableLiveData<HMSPeer>()
   private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
   val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
@@ -248,7 +244,6 @@ class MeetingViewModel(
         // This will keep the isRecording value updated correctly in preview. It will not be called after join.
         _isRecording.postValue(getRecordingState(hmsRoom))
         if(type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
-          _peerCount.postValue(hmsRoom.peerCount)
           Log.d("PeerCountUpdated", "New peer count is : ${hmsRoom.peerCount}")
         }
       }
@@ -438,12 +433,12 @@ class MeetingViewModel(
               synchronized(_tracks) {
                 _tracks.removeIf { it.peer.peerID == hmsPeer.peerID }
                 _liveDataTracks.postValue(_tracks)
-                peerLiveDate.postValue(hmsPeer)
+                peerLiveData.postValue(hmsPeer)
               }
             }
 
             HMSPeerUpdate.PEER_JOINED -> {
-              peerLiveDate.postValue(hmsPeer)
+              peerLiveData.postValue(hmsPeer)
             }
 
             HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
@@ -461,7 +456,7 @@ class MeetingViewModel(
             }
 
             HMSPeerUpdate.ROLE_CHANGED -> {
-              peerLiveDate.postValue(hmsPeer)
+              peerLiveData.postValue(hmsPeer)
               if (hmsPeer.isLocal) {
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
@@ -907,7 +902,7 @@ class MeetingViewModel(
           }
         })
       // Update the peer in participants
-      peerLiveDate.postValue(hmsPeer!!)
+      peerLiveData.postValue(hmsPeer!!)
     }
   }
 

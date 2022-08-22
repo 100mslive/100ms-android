@@ -8,6 +8,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -159,18 +160,19 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             bindVideo()
                         }
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_24)
+                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
+                        binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
                     } else {
                         // Mute this track
                         it.setMute(true)
                         if (isViewVisible) {
                             unbindVideo()
                         }
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_off_24)
+                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
+                        binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
-
-                    setImageResource(
-                        if (it.isMute) R.drawable.ic_videocam_off_24
-                        else R.drawable.ic_videocam_24
-                    )
                 }
 
             }
@@ -183,10 +185,15 @@ class PreviewFragment : Fragment() {
                 (track.audio as HMSLocalAudioTrack?)?.let {
                     it.setMute(!it.isMute)
 
-                    setImageResource(
-                        if (it.isMute) R.drawable.ic_mic_off_24
-                        else R.drawable.ic_mic_24
-                    )
+                    if (it.isMute) {
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_mic_off_24)
+                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
+                        binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                    } else {
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_mic_24)
+                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
+                        binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
+                    }
                 }
             }
         }
@@ -357,24 +364,35 @@ class PreviewFragment : Fragment() {
                 }
 
                 // Disable buttons
-                binding.buttonToggleVideo.apply {
+                track.video?.let {
+                    binding.buttonToggleVideo.apply {
                     isEnabled = (track.video != null)
 
-                    track.video?.let {
-                        setImageResource(
-                            if (it.isMute) R.drawable.ic_videocam_off_24
-                            else R.drawable.ic_videocam_24
-                        )
+                        if (it.isMute) {
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_off_24)
+                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
+                            binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                        } else {
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_24)
+                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
+                            binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
+                        }
                     }
                 }
-                binding.buttonToggleAudio.apply {
-                    isEnabled = (track.audio != null)
 
-                    track.audio?.let {
-                        setImageResource(
-                            if (it.isMute) R.drawable.ic_mic_off_24
-                            else R.drawable.ic_mic_24
-                        )
+                track.audio?.let {
+                    binding.buttonToggleAudio.apply {
+                        isEnabled = (track.audio != null)
+
+                        if (it.isMute) {
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_mic_off_24)
+                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
+                            binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                        } else {
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_mic_24)
+                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
+                            binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
+                        }
                     }
                 }
             })

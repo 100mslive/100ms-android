@@ -830,7 +830,7 @@ class MeetingFragment : Fragment() {
       }
     }
 
-    meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
+    meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
       chatViewModel.peersUpdate()
     }
   }

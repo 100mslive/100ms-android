@@ -4,4 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:text="Host"
     android:id="@+id/selectorItem"
+    android:ellipsize="end"
+    android:singleLine="true"
+    android:maxLines="1"
     android:layout_height="wrap_content"/>

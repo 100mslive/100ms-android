@@ -28,7 +28,7 @@
             <Spinner
                 android:id="@+id/recipientSpinner"
                 style="@style/SpinnerTheme"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginStart="30dp"
@@ -43,8 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/btn_disabled" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -55,8 +55,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:layout_marginBottom="10dp"
         app:cardBackgroundColor="@color/gray_color"
         app:cardCornerRadius="5dp">
 
