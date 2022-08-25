@@ -160,7 +160,7 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             bindVideo()
                         }
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_24)
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_on)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
                     } else {
@@ -169,7 +169,7 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             unbindVideo()
                         }
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_off_24)
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_off)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
                         binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
                     }
@@ -186,11 +186,11 @@ class PreviewFragment : Fragment() {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_mic_off_24)
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_off)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
                         binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
                     } else {
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_mic_24)
+                        background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_on)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
                     }
@@ -369,11 +369,11 @@ class PreviewFragment : Fragment() {
                     isEnabled = (track.video != null)
 
                         if (it.isMute) {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_off_24)
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_off)
                             backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
                             binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
                         } else {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_videocam_24)
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_on)
                             backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
                         }
@@ -385,11 +385,11 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track.audio != null)
 
                         if (it.isMute) {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_mic_off_24)
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_off)
                             backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
                             binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
                         } else {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_mic_24)
+                            background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_on)
                             backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
                         }

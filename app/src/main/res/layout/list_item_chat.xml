@@ -23,7 +23,11 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:text="@string/john_doe"
+        android:maxWidth="250dp"
         android:textSize="14sp"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:fontFamily="@font/inter_bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

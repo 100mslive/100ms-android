@@ -1087,6 +1087,8 @@ class MeetingViewModel(
     hmsSDK.startScreenshare(actionListener, mediaProjectionPermissionResultData, notification)
   }
 
+  fun isScreenShared() = hmsSDK.isScreenShared()
+
   fun stopScreenshare(actionListener: HMSActionResultListener) {
     hmsSDK.stopScreenshare(actionListener)
   }

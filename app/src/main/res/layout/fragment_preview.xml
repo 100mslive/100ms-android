@@ -87,7 +87,7 @@
                     android:layout_gravity="center"
                     android:layout_margin="7dp"
                     android:backgroundTint="@color/black"
-                    android:background="@drawable/ic_mic_off_24"
+                    android:background="@drawable/ic_audio_toggle_off"
                     android:enabled="false"
                     android:contentDescription="@string/toggle_video"
                     />
@@ -109,7 +109,7 @@
                     android:layout_gravity="center"
                     android:layout_margin="7dp"
                     android:backgroundTint="@color/black"
-                    android:background="@drawable/ic_videocam_off_24"
+                    android:background="@drawable/ic_camera_toggle_off"
                     android:enabled="false"
                     android:tint="@color/black"
                     android:contentDescription="@string/toggle_video"
