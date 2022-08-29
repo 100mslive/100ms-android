@@ -115,7 +115,11 @@
         android:id="@+id/rtmpRecordFragment"
         android:name="live.hms.app2.ui.meeting.participants.RtmpRecordFragment"
         android:label="RtmpRecordFragment"
-        tools:layout="@layout/layout_rtmp_recording" />
+        tools:layout="@layout/layout_rtmp_recording" >
+        <argument
+            android:name="meetingUrl"
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/changeNameDialogFragment"
         android:name="live.hms.app2.ui.meeting.ChangeNameDialogFragment"
