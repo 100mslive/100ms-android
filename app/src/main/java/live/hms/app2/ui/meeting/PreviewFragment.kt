@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -20,6 +23,7 @@ import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.participants.ParticipantsAdapter
 import live.hms.app2.ui.meeting.participants.ParticipantsDialog
+import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.error.HMSException
@@ -42,6 +46,7 @@ class PreviewFragment : Fragment() {
     private var binding by viewLifecycle<FragmentPreviewBinding>()
 
     private lateinit var roomDetails: RoomDetails
+    private lateinit var settings: SettingsStore
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -98,6 +103,8 @@ class PreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
+        settings = SettingsStore(requireContext())
+
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {
             Log.d("PREVIEW_REC", "STATE IS ${it.name}")
         }
@@ -110,7 +117,7 @@ class PreviewFragment : Fragment() {
             ) {
                 audioOutputIcon?.let {
                     if (meetingViewModel.isPeerAudioEnabled()) {
-                        updateActionVolumeMenuIcon(it, device)
+                        updateActionVolumeMenuIcon(device)
                     }
                 }
             }
@@ -149,6 +156,39 @@ class PreviewFragment : Fragment() {
     }
 
     private fun initButtons() {
+
+        binding.iconParticipants.apply {
+            setOnSingleClickListener(200L) {
+                Log.v(TAG, "iconParticipants.onClick()")
+
+                participantsDialog?.participantCount =
+                    meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
+                participantsDialog?.show(
+                    requireActivity().supportFragmentManager,
+                    "participant_dialog"
+                )
+            }
+        }
+
+        binding.iconOutputDevice.apply {
+            setOnSingleClickListener(200L) {
+                Log.v(TAG, "iconParticipants.onClick()")
+
+                meetingViewModel.let {
+                    val audioSwitchBottomSheet =
+                        AudioOutputSwitchBottomSheet(it) { audioDevice, isMuted ->
+                            updateActionVolumeMenuIcon(audioDevice)
+                        }
+                    audioSwitchBottomSheet.show(
+                        requireActivity().supportFragmentManager,
+                        MeetingFragment.AudioSwitchBottomSheetTAG
+                    )
+                }
+
+            }
+        }
+
+
         binding.buttonToggleVideo.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleVideo.onClick()")
@@ -160,18 +200,30 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             bindVideo()
                         }
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_on)
+                        background =
+                            ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
-                        binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
+                        binding.buttonToggleVideoBg.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.gray_color
+                            )
+                        )
                     } else {
                         // Mute this track
                         it.setMute(true)
                         if (isViewVisible) {
                             unbindVideo()
                         }
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_off)
+                        background =
+                            ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_off)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
-                        binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.white))
+                        binding.buttonToggleVideoBg.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.white
+                            )
+                        )
                     }
                 }
 
@@ -186,13 +238,25 @@ class PreviewFragment : Fragment() {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_off)
+                        background =
+                            ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_off)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
-                        binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                        binding.buttonToggleAudioBg.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.white
+                            )
+                        )
                     } else {
-                        background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_on)
+                        background =
+                            ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
-                        binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
+                        binding.buttonToggleAudioBg.setCardBackgroundColor(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.gray_color
+                            )
+                        )
                     }
                 }
             }
@@ -208,48 +272,35 @@ class PreviewFragment : Fragment() {
     }
 
     private fun updateActionVolumeMenuIcon(
-        item: MenuItem,
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
-        item.apply {
+        binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
-                    setIcon(R.drawable.ic_baseline_hearing_24)
+                    setImageResource(R.drawable.ic_baseline_hearing_24)
                 }
                 HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                    setIcon(R.drawable.ic_volume_up_24)
+                    setImageResource(R.drawable.ic_icon_speaker)
                 }
                 HMSAudioManager.AudioDevice.BLUETOOTH -> {
-                    setIcon(R.drawable.ic_baseline_bluetooth_24)
+                    setImageResource(R.drawable.ic_baseline_bluetooth_24)
                 }
                 HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
-                    setIcon(R.drawable.ic_baseline_headset_24)
+                    setImageResource(R.drawable.ic_baseline_headset_24)
                 }
                 else -> {
-                    setIcon(R.drawable.ic_volume_off_24)
+                    setImageResource(R.drawable.ic_volume_off_24)
                 }
             }
         }
     }
 
-    private fun updateActionVolumeMenuIcon(item: MenuItem) {
-        item.apply {
+    private fun updateActionVolumeMenuIcon() {
+        binding.iconOutputDevice.apply {
             if (meetingViewModel.isPeerAudioEnabled()) {
-                setIcon(R.drawable.ic_volume_up_24)
+                setImageResource(R.drawable.ic_icon_speaker)
             } else {
-                setIcon(R.drawable.ic_volume_off_24)
-            }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        menu.findItem(R.id.action_volume)?.let {
-            audioOutputIcon = it
-            if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true) {
-                updateActionVolumeMenuIcon(it, meetingViewModel.hmsSDK.getAudioOutputRouteType())
-            } else {
-                updateActionVolumeMenuIcon(it)
+                setImageResource(R.drawable.ic_volume_off_24)
             }
         }
     }
@@ -266,19 +317,10 @@ class PreviewFragment : Fragment() {
             R.id.action_participants -> {
                 participantsDialog?.participantCount =
                     meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
-                participantsDialog?.show(requireActivity().supportFragmentManager,"participant_dialog")
-            }
-            R.id.action_volume -> {
-                meetingViewModel.apply {
-                    val audioSwitchBottomSheet =
-                        AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice, isMuted ->
-                            updateActionVolumeMenuIcon(item, audioDevice)
-                        }
-                    audioSwitchBottomSheet.show(
-                        requireActivity().supportFragmentManager,
-                        MeetingFragment.AudioSwitchBottomSheetTAG
-                    )
-                }
+                participantsDialog?.show(
+                    requireActivity().supportFragmentManager,
+                    "participant_dialog"
+                )
             }
         }
 
@@ -366,18 +408,41 @@ class PreviewFragment : Fragment() {
                 // Disable buttons
                 track.video?.let {
                     binding.buttonToggleVideo.apply {
-                    isEnabled = (track.video != null)
+                        isEnabled = (track.video != null)
 
                         if (it.isMute) {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_off)
-                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
-                            binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                            background =
+                                ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_off)
+                            backgroundTintList =
+                                ContextCompat.getColorStateList(context, R.color.black)
+                            binding.buttonToggleVideoBg.setCardBackgroundColor(
+                                ContextCompat.getColor(
+                                    context,
+                                    R.color.white
+                                )
+                            )
                         } else {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_camera_toggle_on)
-                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
-                            binding.buttonToggleVideoBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
+                            background =
+                                ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
+                            backgroundTintList =
+                                ContextCompat.getColorStateList(context, R.color.white)
+                            binding.buttonToggleVideoBg.setCardBackgroundColor(
+                                ContextCompat.getColor(
+                                    context,
+                                    R.color.gray_color
+                                )
+                            )
                         }
                     }
+                }
+
+                if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true) {
+                    binding.buttonJoinMeeting.text = "Enter Meeting"
+                    binding.buttonJoinMeeting.visibility = View.VISIBLE
+                    updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
+                } else {
+                    updateActionVolumeMenuIcon()
+                    binding.buttonJoinMeeting.visibility = View.VISIBLE
                 }
 
                 track.audio?.let {
@@ -385,13 +450,27 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track.audio != null)
 
                         if (it.isMute) {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_off)
-                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
-                            binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.white))
+                            background =
+                                ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_off)
+                            backgroundTintList =
+                                ContextCompat.getColorStateList(context, R.color.black)
+                            binding.buttonToggleAudioBg.setCardBackgroundColor(
+                                ContextCompat.getColor(
+                                    context,
+                                    R.color.white
+                                )
+                            )
                         } else {
-                            background = ContextCompat.getDrawable(context,R.drawable.ic_audio_toggle_on)
-                            backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
-                            binding.buttonToggleAudioBg.setCardBackgroundColor(ContextCompat.getColor(context, R.color.gray_color))
+                            background =
+                                ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
+                            backgroundTintList =
+                                ContextCompat.getColorStateList(context, R.color.white)
+                            binding.buttonToggleAudioBg.setCardBackgroundColor(
+                                ContextCompat.getColor(
+                                    context,
+                                    R.color.gray_color
+                                )
+                            )
                         }
                     }
                 }
