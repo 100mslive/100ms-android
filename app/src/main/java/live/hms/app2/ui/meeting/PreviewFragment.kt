@@ -436,7 +436,7 @@ class PreviewFragment : Fragment() {
                     }
                 }
 
-                if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true) {
+                if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
                     binding.buttonJoinMeeting.text = "Enter Meeting"
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())

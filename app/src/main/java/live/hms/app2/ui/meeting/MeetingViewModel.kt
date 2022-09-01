@@ -117,11 +117,13 @@ class MeetingViewModel(
   private val previewPeerData : MutableLiveData<Pair<HMSPeerUpdate, HMSPeer>> = MutableLiveData()
   private val previewErrorData : MutableLiveData<HMSException> = MutableLiveData()
   private val previewUpdateData : MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> = MutableLiveData()
+  private val hlsToggleUpdateData : MutableLiveData<Boolean> = MutableLiveData()
 
   val previewRoomStateLiveData : LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
   val previewPeerLiveData : LiveData<Pair<HMSPeerUpdate, HMSPeer>> = previewPeerData
   val previewErrorLiveData : LiveData<HMSException> = previewErrorData
   val previewUpdateLiveData : LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
+  val hlsToggleUpdateLiveData : LiveData<Boolean> = hlsToggleUpdateData
 
   fun setMeetingViewMode(mode: MeetingViewMode) {
     if (mode != meetingViewMode.value) {
@@ -1223,13 +1225,14 @@ class MeetingViewModel(
       override fun onError(error: HMSException) {
         viewModelScope.launch {
             _events.emit(Event.Hls.HlsError(error))
+          hlsToggleUpdateData.postValue(false)
         }
       }
 
       override fun onSuccess() {
         Log.d(TAG,"Hls streaming started successfully")
+        hlsToggleUpdateData.postValue(true)
       }
-
     })
   }
 

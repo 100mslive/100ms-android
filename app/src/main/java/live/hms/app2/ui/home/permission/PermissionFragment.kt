@@ -52,6 +52,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
   private fun initButtons() {
     binding.buttonGrantPermission.setOnClickListener { gotoHomePage() }
+    binding.btnBack.setOnClickListener { requireActivity().onBackPressed() }
   }
 
   @AfterPermissionGranted(RC_CALL)

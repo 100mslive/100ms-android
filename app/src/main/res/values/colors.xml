@@ -27,4 +27,5 @@
     <color name="primary_bg">#14171C</color>
     <color name="btn_disabled">#242A33</color>
     <color name="gray_color">#1D2229</color>
+    <color name="dark_red">#201617</color>
 </resources>

@@ -18,15 +18,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/top_menu" />
 
-
     <LinearLayout
         android:id="@+id/top_menu"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -35,6 +34,39 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/end_call"
             app:srcCompat="@drawable/ic_icon_end_call" />
+
+        <LinearLayout
+            android:id="@+id/recording_signal_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:drawableStart="@drawable/ic_circle_solid"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/red"
+                android:text="@string/live_str"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+
+            <TextView
+                android:id="@+id/tv_recording_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:visibility="gone"
+                android:textSize="12sp"
+                tools:text="1:00" />
+
+        </LinearLayout>
 
         <Space
             android:layout_width="wrap_content"
@@ -101,17 +133,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_controls"
-        android:layout_below="@id/top_menu" />
+        android:layout_below="@id/top_menu"
+        android:layout_marginBottom="10dp" />
 
     <LinearLayout
         android:id="@+id/bottom_controls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="15dp"
         android:animateLayoutChanges="true"
         android:gravity="center"
+        android:minHeight="70dp"
         android:orientation="horizontal">
 
         <Space
@@ -123,7 +155,7 @@
             android:id="@+id/button_toggle_audio"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_audio"
             android:padding="8dp"
@@ -138,7 +170,7 @@
             android:id="@+id/button_toggle_video"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_video"
             android:padding="8dp"
@@ -150,42 +182,60 @@
             android:layout_weight="1" />
 
         <LinearLayout
+            android:id="@+id/ll_go_live_parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_go_live"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:contentDescription="@string/go_live_btn"
-                android:scaleType="center"
-                android:src="@drawable/live_btn"
-                app:fabCustomSize="80dp"
-                app:maxImageSize="32dp" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center">
+
+                <ProgressBar
+                    android:id="@+id/go_live_progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/button_go_live"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:contentDescription="@string/go_live_btn"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_radar"
+                    app:backgroundTint="@color/primary_blue"
+                    app:fabCustomSize="70dp"
+                    app:maxImageSize="42dp" />
+
+            </FrameLayout>
 
             <TextView
+                android:id="@+id/tv_go_live"
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="6dp"
                 android:fontFamily="@font/inter_semibold"
-                android:text="Go Live"
+                android:text="@string/go_live_str"
                 android:textAllCaps="true"
                 android:textColor="@color/white" />
 
         </LinearLayout>
 
         <Space
+            android:id="@+id/spacer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_weight="1" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/button_share_screen"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_video"
             android:padding="8dp"
@@ -200,7 +250,7 @@
             android:id="@+id/button_settings_menu"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/settings"
             android:padding="8dp"

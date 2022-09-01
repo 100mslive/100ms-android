@@ -131,7 +131,7 @@ class MeetingLinkFragment : Fragment() {
     }
 
     private fun validate(){
-        if (REGEX_MEETING_URL_CODE.matches(binding.edtMeetingUrl.text.toString()) || REGEX_PREVIEW_URL_CODE.matches(binding.edtMeetingUrl.text.toString())) {
+        if (REGEX_MEETING_URL_CODE.matches(binding.edtMeetingUrl.text.toString()) || REGEX_PREVIEW_URL_CODE.matches(binding.edtMeetingUrl.text.toString()) || REGEX_STREAMING_MEETING_URL_ROOM_CODE.matches(binding.edtMeetingUrl.text.toString())) {
             enableJoinButton()
         } else {
             disableJoinButton()
