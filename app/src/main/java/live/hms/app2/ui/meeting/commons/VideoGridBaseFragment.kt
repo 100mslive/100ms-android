@@ -332,6 +332,9 @@ abstract class VideoGridBaseFragment : Fragment() {
 
           renderedViewPair.binding.videoCard.raisedHand.alpha =
             visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isHandRaised == true)
+
+          renderedViewPair.binding.videoCard.isBrb.alpha =
+            visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isBRBOn == true)
         } else {
           crashlyticsLog(TAG, "updateVideos: Creating view for video=${newVideo} in fragment=$tag")
           requiresGridLayoutUpdate = true
@@ -341,13 +344,20 @@ abstract class VideoGridBaseFragment : Fragment() {
           var statsInterpreter: StatsInterpreter? = null
           if (!isVideoGrid) {
             statsInterpreter = StatsInterpreter(settings.showStats)
-            statsInterpreter.initiateStats(
-              this,
-              meetingViewModel.getStats(),
-              newVideo.video,
-              newVideo.audio,
-              newVideo.peer.isLocal
-            ) { videoBinding.videoCard.statsView.text = it }
+            meetingViewModel.statsToggleLiveData.observe(this) {
+              if (it) {
+                videoBinding.videoCard.statsView.visibility = View.VISIBLE
+                statsInterpreter.initiateStats(
+                  this,
+                  meetingViewModel.getStats(),
+                  newVideo.video,
+                  newVideo.audio,
+                  newVideo.peer.isLocal
+                ) { videoBinding.videoCard.statsView.text = it }
+              } else {
+                videoBinding.videoCard.statsView.visibility = View.GONE
+              }
+            }
           }
 
           // Bind surfaceView when view is visible to user
@@ -357,6 +367,10 @@ abstract class VideoGridBaseFragment : Fragment() {
 
           videoBinding.videoCard.raisedHand.alpha =
             visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isHandRaised == true)
+
+          videoBinding.videoCard.isBrb.alpha =
+            visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isBRBOn == true)
+
           layout.addView(videoBinding.root)
           newRenderedViews.add(RenderedViewPair(videoBinding, newVideo, statsInterpreter))
         }
@@ -388,9 +402,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (isUpdatedPeerRendered != null) {
       when (peerTypePair.second) {
         HMSPeerUpdate.METADATA_CHANGED -> {
-          val isHandRaised =
-            CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isHandRaised == true
+          val isHandRaised = CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isHandRaised == true
+          val isBRB = CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isBRBOn == true
           isUpdatedPeerRendered.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
+          isUpdatedPeerRendered.binding.videoCard.isBrb.alpha = visibilityOpacity(isBRB)
         }
         HMSPeerUpdate.NAME_CHANGED -> {
           with(isUpdatedPeerRendered.binding.videoCard) {
@@ -500,15 +515,23 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
   fun bindViews() {
-    renderedViews.forEach {
-      bindSurfaceView(it.binding.videoCard, it.meetingTrack)
-      it.statsInterpreter?.initiateStats(
-        this,
-        meetingViewModel.getStats(),
-        it.meetingTrack.video,
-        it.meetingTrack.audio,
-        it.meetingTrack.peer.isLocal
-      ) { string -> it.binding.videoCard.statsView.text = string }
+    renderedViews.forEach { renderedView ->
+      bindSurfaceView(renderedView.binding.videoCard, renderedView.meetingTrack)
+
+      meetingViewModel.statsToggleLiveData.observe(this) {
+        if (it) {
+          renderedView.binding.videoCard.statsView.visibility = View.VISIBLE
+          renderedView.statsInterpreter?.initiateStats(
+            this,
+            meetingViewModel.getStats(),
+            renderedView.meetingTrack.video,
+            renderedView.meetingTrack.audio,
+            renderedView.meetingTrack.peer.isLocal
+          ) { string -> renderedView.binding.videoCard.statsView.text = string }
+        } else {
+          renderedView.binding.videoCard.statsView.visibility = View.GONE
+        }
+      }
     }
   }
 

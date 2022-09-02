@@ -62,8 +62,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
-                android:visibility="gone"
                 android:textSize="12sp"
+                android:visibility="gone"
                 tools:text="1:00" />
 
         </LinearLayout>
@@ -117,14 +117,14 @@
         </RelativeLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/button_camera_switch"
+            android:id="@+id/button_participants"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/flip_camera"
             android:padding="8dp"
-            app:srcCompat="@drawable/ic_camera_flip" />
+            app:srcCompat="@drawable/ic_icon_people" />
 
     </LinearLayout>
 
@@ -228,8 +228,8 @@
             android:id="@+id/spacer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:visibility="gone" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/button_share_screen"
@@ -254,6 +254,7 @@
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/settings"
             android:padding="8dp"
+            android:tint="@color/white"
             app:srcCompat="@drawable/ic_more_vert_24" />
 
         <Space

@@ -48,6 +48,7 @@ import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEven
 import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.app2.ui.meeting.participants.ParticipantsFragmentDirections
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
@@ -118,6 +119,7 @@ class MeetingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        countDownTimer?.start()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
     }
 
@@ -163,6 +165,12 @@ class MeetingFragment : Fragment() {
         meetingViewModel.leaveMeeting()
     }
 
+    override fun onPause() {
+        super.onPause()
+        isCountdownManuallyCancelled = true
+        countDownTimer?.cancel()
+    }
+
     override fun onStart() {
         super.onStart()
         countDownTimer?.start()
@@ -182,11 +190,11 @@ class MeetingFragment : Fragment() {
 
             R.id.action_record_meeting, R.id.hls_start -> {
 
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment(
-                        roomDetails.url
-                    )
-                )
+//                findNavController().navigate(
+//                    MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment(
+//                        roomDetails.url
+//                    )
+//                )
             }
 
             R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
@@ -347,7 +355,13 @@ class MeetingFragment : Fragment() {
     private fun setupRecordingTimeView() {
         countDownTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(l: Long) {
-//                binding.tvRecordingTime?.text = millisecondsToTime(System.currentTimeMillis().minus(meetingViewModel.hmsSDK.getRoom()?.serverRecordingState?.startedAt ?: 0))
+                val startedAt = meetingViewModel.hmsSDK.getRoom()?.hlsStreamingState?.variants?.firstOrNull()?.startedAt
+                startedAt?.let {
+                    if (startedAt > 0) {
+                        binding.tvRecordingTime?.visibility = View.VISIBLE
+                        binding.tvRecordingTime?.text = millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+                    }
+                }
             }
 
             override fun onFinish() {
@@ -1182,6 +1196,15 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        binding.buttonSettingsMenu?.apply {
+
+            setOnSingleClickListener(200L) {
+                Log.v(TAG, "buttonSettingsMenu.onClick()")
+                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel)
+                settingsBottomSheet.show(requireActivity().supportFragmentManager,"settingsBottomSheet")
+            }
+        }
+
         binding.buttonToggleAudio.apply {
             visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
             // visibility = View.GONE
@@ -1215,7 +1238,7 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
-        binding.buttonCameraSwitch?.setOnSingleClickListener(350L) { meetingViewModel.flipCamera() }
+        binding.buttonParticipants?.setOnSingleClickListener(350L) { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()) }
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
         updatePipEndCall()
@@ -1306,13 +1329,6 @@ class MeetingFragment : Fragment() {
                         endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
                         endCallDialog.findViewById<TextView>(R.id.dialog_title).text =
                             "Leave Meeting"
-                        endCallDialog.findViewById<TextView>(R.id.dialog_title)
-                            .setCompoundDrawables(
-                                ContextCompat.getDrawable(
-                                    requireContext(),
-                                    R.drawable.ic_icon_exit
-                                ), null, null, null
-                            )
                         endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
                             "You're about to quit the meeting, are you sure?"
                         endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text =
@@ -1341,12 +1357,14 @@ class MeetingFragment : Fragment() {
             .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
         stopHlsDialog.findViewById<TextView>(R.id.dialog_title)
             .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-        stopHlsDialog.findViewById<TextView>(R.id.dialog_title).setCompoundDrawables(
-            ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_danger_big
-            ), null, null, null
-        )
+
+        stopHlsDialog.findViewById<TextView>(R.id.dialog_title).apply {
+            setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_danger_big, 0, 0, 0
+            )
+            compoundDrawablePadding = 20
+            setPadding(30,paddingTop,0,paddingBottom)
+        }
         stopHlsDialog.findViewById<TextView>(R.id.dialog_description).text =
             "Your stream will end and everyone will go offline immediately in this room. You can’t undo this action."
         stopHlsDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"
@@ -1393,12 +1411,7 @@ class MeetingFragment : Fragment() {
             val endCallDialog = Dialog(requireContext())
             endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
             endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Studio"
-            endCallDialog.findViewById<TextView>(R.id.dialog_title).setCompoundDrawables(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_icon_exit
-                ), null, null, null
-            )
+            endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding = 0
             endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
                 "Others will continue after you leave. You can join the studio again."
             endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t Leave"
@@ -1421,12 +1434,14 @@ class MeetingFragment : Fragment() {
                 .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
             endSessionDialog.findViewById<TextView>(R.id.dialog_title)
                 .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-            endSessionDialog.findViewById<TextView>(R.id.dialog_title).setCompoundDrawables(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_danger_big
-                ), null, null, null
-            )
+
+            endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
+                setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_danger_big, 0, 0, 0
+                )
+                compoundDrawablePadding = 20
+                setPadding(30,paddingTop,0,paddingBottom)
+            }
             endSessionDialog.findViewById<TextView>(R.id.dialog_description).text =
                 "The session will end for everyone and all the activities will stop. You can’t undo this action."
             endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"

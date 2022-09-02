@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException
 
 data class CustomPeerMetadata(
     val isHandRaised: Boolean,
+    val isBRBOn: Boolean,
     val name: String
 ) {
 

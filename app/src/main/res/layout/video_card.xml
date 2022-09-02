@@ -19,8 +19,8 @@
     <LinearLayout
         android:id="@+id/surface_view_holder"
         android:layout_width="match_parent"
-        android:layout_centerInParent="true"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
 
         <org.webrtc.SurfaceViewRenderer
             android:id="@+id/surface_view"
@@ -60,9 +60,9 @@
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_gravity="center"
-                android:visibility="gone"
                 android:layout_marginHorizontal="8dp"
                 android:src="@drawable/ic_baseline_wifi_5"
+                android:visibility="gone"
                 app:tint="@android:color/holo_green_light" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -70,11 +70,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="center"
                 android:layout_weight="1"
+                android:ellipsize="end"
+                android:gravity="center"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="@string/john_doe"                android:ellipsize="end"
+                android:text="@string/john_doe"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -141,10 +142,22 @@
         android:id="@+id/raised_hand"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="20dp"
         android:padding="16dp"
         android:text="✋"
+        android:textSize="36sp" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/is_brb"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="35dp"
+        android:src="@drawable/ic_brb"
         android:textSize="36sp" />
 
 
