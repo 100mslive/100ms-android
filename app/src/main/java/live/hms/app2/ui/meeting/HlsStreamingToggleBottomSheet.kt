@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.databinding.HlsBottomSheetDialogBinding
 import live.hms.app2.ui.meeting.participants.meetingToHlsUrl
+import live.hms.app2.util.setOnSingleClickListener
 import live.hms.app2.util.viewLifecycle
 import live.hms.video.sdk.models.HMSHlsRecordingConfig
 
@@ -36,20 +37,27 @@ class HlsStreamingToggleBottomSheet(
             dismiss()
         }
 
-        binding.btnGoLive.setOnClickListener {
-            val videoOnDemand = binding.switchRecordStream.isChecked
-            meetingViewModel.startHls(
-                meetingUrl.meetingToHlsUrl(),
-                recordingConfig = HMSHlsRecordingConfig(true, videoOnDemand)
-            )
-            meetingViewModel.hlsToggleUpdateLiveData.observe(requireActivity()) {
-                if (it.not()) {
-                    Toast.makeText(requireContext(), "Error Occurred! Try Again", Toast.LENGTH_LONG)
-                        .show()
+        binding.btnGoLive.apply {
+            setOnSingleClickListener(1000) {
+                val videoOnDemand = binding.switchRecordStream.isChecked
+                meetingViewModel.startHls(
+                    meetingUrl.meetingToHlsUrl(),
+                    recordingConfig = HMSHlsRecordingConfig(true, videoOnDemand)
+                )
+                meetingViewModel.hlsToggleUpdateLiveData.observe(requireActivity()) {
+                    if (it.not()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Error Occurred! Try Again",
+                            Toast.LENGTH_LONG
+                        )
+                            .show()
+                    }
+                    dismiss()
+                    hlsStateChangeListener.invoke(it)
                 }
-                dismiss()
-                hlsStateChangeListener.invoke(it)
             }
+
         }
     }
 }

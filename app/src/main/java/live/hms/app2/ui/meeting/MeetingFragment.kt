@@ -103,6 +103,7 @@ class MeetingFragment : Fragment() {
     private val goLiveBottomSheet by lazy {
         HlsStreamingToggleBottomSheet(meetingViewModel, meetingUrl = settings.lastUsedMeetingUrl) {
             if (it) {
+                binding.tvGoLive?.text = "Starting HLS"
                 binding.buttonGoLive?.visibility = View.GONE
             }
         }
@@ -1176,8 +1177,7 @@ class MeetingFragment : Fragment() {
                         "GoLiveBottomSheet"
                     )
                 } else {
-                    meetingViewModel.stopHls()
-                    binding.buttonGoLive?.visibility = View.GONE
+                    inflateStopHlsDialog()
                 }
             }
         }
@@ -1331,6 +1331,35 @@ class MeetingFragment : Fragment() {
                     }
                 }
             })
+    }
+
+    private fun inflateStopHlsDialog(){
+        val stopHlsDialog = Dialog(requireContext())
+        stopHlsDialog.setContentView(R.layout.exit_confirmation_dialog)
+        stopHlsDialog.findViewById<TextView>(R.id.dialog_title).text = "End live stream for all?"
+        stopHlsDialog.findViewById<FrameLayout>(R.id.parent_view)
+            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
+        stopHlsDialog.findViewById<TextView>(R.id.dialog_title)
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        stopHlsDialog.findViewById<TextView>(R.id.dialog_title).setCompoundDrawables(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_danger_big
+            ), null, null, null
+        )
+        stopHlsDialog.findViewById<TextView>(R.id.dialog_description).text =
+            "Your stream will end and everyone will go offline immediately in this room. You can’t undo this action."
+        stopHlsDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"
+        stopHlsDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "End Stream"
+        stopHlsDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
+            .setOnClickListener { stopHlsDialog.dismiss() }
+        stopHlsDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
+            stopHlsDialog.dismiss()
+            meetingViewModel.stopHls()
+            binding.buttonGoLive?.visibility = View.GONE
+            binding.tvGoLive?.text = "Stopping HLS"
+        }
+        stopHlsDialog.show()
     }
 
     fun inflateExitFlow() {
