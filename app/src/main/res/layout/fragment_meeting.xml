@@ -62,11 +62,29 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
+                android:textColor="#E0ECFF"
+                android:drawableTint="#E0ECFF"
+                android:drawablePadding="5dp"
                 android:textSize="12sp"
-                android:visibility="gone"
+                android:drawableStart="@drawable/ic_baseline_access_time_24"
+                android:visibility="visible"
                 tools:text="1:00" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_viewers_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="10dp"
+            android:visibility="visible"
+            android:layout_marginBottom="1.5dp"
+            android:drawableStart="@drawable/ic_eye"
+            android:drawablePadding="5dp"
+            android:drawableTint="#E0ECFF"
+            tools:text="2"
+            android:textColor="#E0ECFF" />
 
         <Space
             android:layout_width="wrap_content"
@@ -83,7 +101,6 @@
             android:contentDescription="@string/raise_hand"
             android:padding="8dp"
             app:srcCompat="@drawable/ic_raise_hand" />
-
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -218,9 +235,13 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="6dp"
                 android:fontFamily="@font/inter_semibold"
+                android:letterSpacing="0.15"
+                android:lineSpacingExtra="4sp"
                 android:text="@string/go_live_str"
                 android:textAllCaps="true"
-                android:textColor="@color/white" />
+                android:textColor="#F2F5F9FF"
+                android:textSize="10sp"
+                android:translationY="-1.95sp" />
 
         </LinearLayout>
 

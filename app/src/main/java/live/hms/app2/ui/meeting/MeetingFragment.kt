@@ -48,7 +48,6 @@ import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEven
 import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
-import live.hms.app2.ui.meeting.participants.ParticipantsFragmentDirections
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
@@ -119,7 +118,8 @@ class MeetingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        countDownTimer?.start()
+        isCountdownManuallyCancelled = false
+        setupRecordingTimeView()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
     }
 
@@ -173,7 +173,8 @@ class MeetingFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        countDownTimer?.start()
+        isCountdownManuallyCancelled = false
+        setupRecordingTimeView()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -332,6 +333,8 @@ class MeetingFragment : Fragment() {
                 ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.red))
             binding.tvGoLive?.text = requireActivity().resources.getText(R.string.end_stream_str)
             binding.recordingSignalView?.visibility = View.VISIBLE
+            binding.tvViewersCount?.visibility = View.VISIBLE
+            binding.tvViewersCount?.text = (meetingViewModel.hmsSDK.getPeers().size - 1).toString()
             setupRecordingTimeView()
         } else {
             binding.buttonGoLive?.setImageDrawable(
@@ -349,17 +352,21 @@ class MeetingFragment : Fragment() {
                 )
             binding.tvGoLive?.text = requireActivity().resources.getText(R.string.go_live_str)
             binding.recordingSignalView?.visibility = View.GONE
+            binding.tvViewersCount?.visibility = View.GONE
         }
     }
 
     private fun setupRecordingTimeView() {
+        countDownTimer?.cancel()
         countDownTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(l: Long) {
-                val startedAt = meetingViewModel.hmsSDK.getRoom()?.hlsStreamingState?.variants?.firstOrNull()?.startedAt
+                val startedAt =
+                    meetingViewModel.hmsSDK.getRoom()?.hlsStreamingState?.variants?.firstOrNull()?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
                         binding.tvRecordingTime?.visibility = View.VISIBLE
-                        binding.tvRecordingTime?.text = millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+                        binding.tvRecordingTime?.text =
+                            millisecondsToTime(System.currentTimeMillis().minus(startedAt))
                     }
                 }
             }
@@ -1201,7 +1208,10 @@ class MeetingFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
                 val settingsBottomSheet = SettingsBottomSheet(meetingViewModel)
-                settingsBottomSheet.show(requireActivity().supportFragmentManager,"settingsBottomSheet")
+                settingsBottomSheet.show(
+                    requireActivity().supportFragmentManager,
+                    "settingsBottomSheet"
+                )
             }
         }
 
@@ -1238,7 +1248,11 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
-        binding.buttonParticipants?.setOnSingleClickListener(350L) { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()) }
+        binding.buttonParticipants?.setOnSingleClickListener(350L) {
+            findNavController().navigate(
+                MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
+            )
+        }
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
         updatePipEndCall()
@@ -1349,7 +1363,7 @@ class MeetingFragment : Fragment() {
             })
     }
 
-    private fun inflateStopHlsDialog(){
+    private fun inflateStopHlsDialog() {
         val stopHlsDialog = Dialog(requireContext())
         stopHlsDialog.setContentView(R.layout.exit_confirmation_dialog)
         stopHlsDialog.findViewById<TextView>(R.id.dialog_title).text = "End live stream for all?"
@@ -1363,7 +1377,7 @@ class MeetingFragment : Fragment() {
                 R.drawable.ic_danger_big, 0, 0, 0
             )
             compoundDrawablePadding = 20
-            setPadding(30,paddingTop,0,paddingBottom)
+            setPadding(30, paddingTop, 0, paddingBottom)
         }
         stopHlsDialog.findViewById<TextView>(R.id.dialog_description).text =
             "Your stream will end and everyone will go offline immediately in this room. You can’t undo this action."
@@ -1440,7 +1454,7 @@ class MeetingFragment : Fragment() {
                     R.drawable.ic_danger_big, 0, 0, 0
                 )
                 compoundDrawablePadding = 20
-                setPadding(30,paddingTop,0,paddingBottom)
+                setPadding(30, paddingTop, 0, paddingBottom)
             }
             endSessionDialog.findViewById<TextView>(R.id.dialog_description).text =
                 "The session will end for everyone and all the activities will stop. You can’t undo this action."
