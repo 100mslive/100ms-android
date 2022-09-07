@@ -2,8 +2,8 @@ package live.hms.app2.util
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ContentResolver
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -12,6 +12,8 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
 import live.hms.app2.helpers.OnSingleClickListener
+import live.hms.video.media.settings.HMSSimulcastLayer
+import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import java.io.File
 import java.io.FileOutputStream
@@ -94,19 +96,56 @@ fun HMSVideoTrack?.isValid(): Boolean {
 
 
 fun Context.showTileListDialog(
-  peerName : String,
+  isLocalTrack : Boolean,
   onScreenCapture: (() -> Unit),
+  onSimulcast: (() -> Unit)
 ) {
 
   val builder = AlertDialog.Builder(this)
   builder.setTitle("Perform Action")
-  val intentList = arrayOf("Screen Capture")
-  builder.setItems(intentList) { dialog, which ->
+  val intentList = mutableListOf("Screen Capture")
+
+  if (isLocalTrack.not())
+    intentList+= "Simulcast"
+  builder.setItems(intentList.toTypedArray()) { dialog, which ->
     when (which) {
       0 -> { onScreenCapture.invoke() }
+      1 -> { onSimulcast.invoke() }
     }
   }
 
   builder.show()
+
+}
+
+fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
+    if (hmsVideoTrack == null)
+        return
+
+    var selectedQualityIndex = 0
+    val currentQuality = hmsVideoTrack.getLayer()
+    val videoQuality = arrayOf<CharSequence>(HMSSimulcastLayer.HIGH.toString(), HMSSimulcastLayer.MEDIUM.toString(), HMSSimulcastLayer.LOW.toString())
+
+    videoQuality.filterIndexed { index, quality ->
+        if (quality == currentQuality.toString()) {
+            selectedQualityIndex = index
+            true
+        }
+        else
+            false
+    }
+
+    AlertDialog.Builder(this).apply {
+             setTitle("Select Video Quality")
+            .setSingleChoiceItems(videoQuality, selectedQualityIndex
+            ) { dialog, which ->
+                when (which) {
+                    0 -> hmsVideoTrack.setLayer(HMSSimulcastLayer.HIGH)
+                    1 -> hmsVideoTrack.setLayer(HMSSimulcastLayer.MEDIUM)
+                    2 -> hmsVideoTrack.setLayer(HMSSimulcastLayer.LOW)
+                }
+            }
+            show()
+    }
 
 }
