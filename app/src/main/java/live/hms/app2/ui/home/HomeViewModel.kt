@@ -75,7 +75,7 @@ class HomeViewModel : ViewModel() {
         val response = repository.fetchAuthToken(request)
         authTokenResponse.postValue(Resource.success(response))
       } catch (e: Exception) {
-        crashlytics.recordException(e)
+        crashlyticsException(e)
         authTokenResponse.postValue(Resource.error(e.message))
       }
     }

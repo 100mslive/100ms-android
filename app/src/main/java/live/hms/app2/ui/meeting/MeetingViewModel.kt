@@ -94,10 +94,10 @@ class MeetingViewModel(
 
   init {
     roomDetails.apply {
-      crashlytics.setCustomKey(MEETING_URL, url)
-      crashlytics.setCustomKey(USERNAME, username)
-      crashlytics.setCustomKey(ENVIRONMENT, env)
-      crashlytics.setCustomKey(AUTH_TOKEN, authToken)
+      crashlyticsCustomKey(MEETING_URL, url)
+      crashlyticsCustomKey(USERNAME, username)
+      crashlyticsCustomKey(ENVIRONMENT, env)
+      crashlyticsCustomKey(AUTH_TOKEN, authToken)
     }
 
   }
