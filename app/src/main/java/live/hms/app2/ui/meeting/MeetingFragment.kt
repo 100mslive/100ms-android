@@ -94,9 +94,6 @@ class MeetingFragment : Fragment() {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
     }
 
-    private val isHlsKitUrl by lazy {
-        settings.lastUsedMeetingUrl.contains("/streaming/")
-    }
     private var alertDialog: AlertDialog? = null
 
     private var isMeetingOngoing = false
@@ -317,7 +314,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun updateGoLiveButton(recordingState: RecordingState) {
-        if (isHlsKitUrl) {
+        if (meetingViewModel.isHlsKitUrl) {
             binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
             binding.spacer?.visibility = View.VISIBLE
@@ -674,6 +671,7 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
         setHasOptionsMenu(true)
+        setupConfiguration()
         meetingViewModel.showAudioMuted.observe(
             viewLifecycleOwner,
             Observer { activity?.invalidateOptionsMenu() })
@@ -1010,6 +1008,7 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
+            setupConfiguration()
         }
 
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
@@ -1127,8 +1126,8 @@ class MeetingFragment : Fragment() {
                 arguments = bundleOf(
                     "hlsStreamUrl" to mode.url
                 )
+                setupConfiguration()
             }
-
         }
 
         meetingViewModel.setTitle(mode.titleResId)
@@ -1150,6 +1149,12 @@ class MeetingFragment : Fragment() {
             .replace(R.id.fragment_container, currentFragment)
             .addToBackStack(null)
             .commit()
+    }
+
+    private fun setupConfiguration() {
+        if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()?.not() == true || meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS){
+            binding.buttonShareScreen?.visibility = View.GONE
+        }
     }
 
     private fun hideProgressBar() {

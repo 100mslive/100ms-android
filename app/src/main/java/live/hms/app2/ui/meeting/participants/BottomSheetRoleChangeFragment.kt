@@ -30,8 +30,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
     private var stringRole : String? = null
 
     private var binding by viewLifecycle<LayoutFragmentBottomSheetChangeRoleBinding>()
-    private lateinit var popupSpinner : Spinner
-    private val spinnerRoles by lazy { args.availableRoles.plus("Cancel") }
+    private val spinnerRoles by lazy { args.availableRoles }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,8 +59,8 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
             spinnerRoles
         ).also { arrayAdapter ->
             spinner.adapter = arrayAdapter
-            spinner.prompt = "Changing ${args.remotePeerName}'s role to:"
-            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            spinner.prompt = "Changing ${args.remotePeerName}'s role to:"
+//            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.post { spinner.onItemSelectedListener = this }
         }
         dialog.findViewById<AppCompatButton>(R.id.cancel_btn).setOnClickListener {

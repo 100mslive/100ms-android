@@ -25,16 +25,18 @@
             app:menu="@menu/menu_generic"
             app:title="@string/chat">
 
-            <Spinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/recipientSpinner"
                 style="@style/SpinnerTheme"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginStart="30dp"
                 android:paddingVertical="7dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="30dp"
+                android:popupBackground="@color/primary_bg"
+                android:spinnerMode="dropdown"
                 tools:listitem="@layout/layout_chat_recipient_selector_item" />
 
         </com.google.android.material.appbar.MaterialToolbar>
@@ -56,8 +58,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="10dp"
-        android:visibility="gone"
         android:layout_marginBottom="10dp"
+        android:visibility="gone"
         app:cardBackgroundColor="@color/gray_color"
         app:cardCornerRadius="5dp">
 

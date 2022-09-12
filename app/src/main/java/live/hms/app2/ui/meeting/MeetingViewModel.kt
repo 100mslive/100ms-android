@@ -736,6 +736,10 @@ class MeetingViewModel(
         }
     }
 
+    val isHlsKitUrl by lazy {
+        settings.lastUsedMeetingUrl.contains("/streaming/")
+    }
+
     fun switchToHlsViewIfRequired() {
         // get the hls URL from the Room, if it exists
         val hlsUrl = hmsSDK.getRoom()?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
