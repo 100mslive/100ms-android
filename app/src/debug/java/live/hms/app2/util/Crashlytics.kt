@@ -1,9 +1,8 @@
 package live.hms.app2.util
 
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+import java.lang.Exception
 
-val crashlytics = FirebaseCrashlytics.getInstance()
 
 /**
  * Send a DEBUG log message to logcat and firebase.
@@ -12,7 +11,13 @@ val crashlytics = FirebaseCrashlytics.getInstance()
  * @param message The message you would like logged.
  */
 fun crashlyticsLog(tag: String, message: String) {
-  // TODO: Disable firebase logs for release builds?
   Log.d(tag, message)
-  crashlytics.log("$tag: $message")
+}
+
+fun crashlyticsException(e : Exception) {
+  Log.d("Exception", "${e.message}")
+}
+
+fun crashlyticsCustomKey(key : String, value : String) {
+  // No-op
 }

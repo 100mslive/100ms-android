@@ -5,6 +5,6 @@ import android.app.Application
 class ConditionalApplicationCode {
 
     fun run(application: Application) {
-        // Nothing yet
+        crashlyticsLog(GlobalApplication.TAG, "LeakCanary is enabled=$enabled")
     }
 }
