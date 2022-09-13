@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import android.widget.ExpandableListAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.databinding.SettingsBottomSheetDialogBinding
@@ -60,6 +61,34 @@ class SettingsBottomSheet(
             dismiss()
         }
 
+        binding.btnDeviceSettings.apply {
+            setOnSingleClickListener {
+                val audioSwitchBottomSheet =
+                    AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice, isMuted ->
+                        dismiss()
+                    }
+                audioSwitchBottomSheet.show(
+                    requireActivity().supportFragmentManager,
+                    MeetingFragment.AudioSwitchBottomSheetTAG
+                )
+            }
+        }
+
+        binding.btnMeetingMode.apply {
+            binding.audioModeSwitch.isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
+            updateMeetingAudioMode()
+            setOnSingleClickListener {
+                binding.audioModeSwitch.callOnClick()
+            }
+        }
+
+        binding.audioModeSwitch.setOnCheckedChangeListener(object: CompoundButton.OnCheckedChangeListener{
+            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                meetingViewModel.toggleMediaMode()
+                updateMeetingAudioMode()
+            }
+        })
+
         binding.btnBrb.apply {
 
             if (meetingViewModel.isBRBOn()) {
@@ -101,6 +130,14 @@ class SettingsBottomSheet(
                 meetingViewModel.statsToggleData.postValue(meetingViewModel.statsToggleLiveData.value?.not())
                 dismiss()
             }
+        }
+    }
+
+    fun updateMeetingAudioMode(){
+        if (meetingViewModel.getCurrentMediaModeCheckedState()) {
+            binding.tvAudioMode.text = "Audio Mode : Media"
+        } else {
+            binding.tvAudioMode.text = "Audio Mode : In Call"
         }
     }
 
