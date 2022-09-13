@@ -55,9 +55,8 @@ class HlsFragment : Fragment() {
         binding.hlsView.player = hlsPlayer.createPlayer(requireContext(),
                 args.hlsStreamUrl,
                 true)
-        val exoplayer = hlsPlayer.getPlayer()
 
-        exoPlayer.addListener(object : Player.Listener{
+        hlsPlayer.getPlayer()?.addListener(object : Player.Listener{
             override fun onPlayerError(error: PlaybackException) {
                 super.onPlayerError(error)
                 HMSLogger.i(TAG, " ~~ Exoplayer error: $error")
