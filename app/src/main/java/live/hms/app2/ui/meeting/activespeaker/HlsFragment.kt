@@ -41,12 +41,21 @@ class HlsFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnSeekLive.setOnClickListener {
+            hlsPlayer.getPlayer()?.seekToDefaultPosition()
+            hlsPlayer.getPlayer()?.play()
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        val exoPlayer = hlsPlayer.getPlayer(requireContext(),
-        args.hlsStreamUrl,
-        true)
-        binding.hlsView.player = exoPlayer
+        binding.hlsView.player = hlsPlayer.createPlayer(requireContext(),
+                args.hlsStreamUrl,
+                true)
+        val exoplayer = hlsPlayer.getPlayer()
 
         exoPlayer.addListener(object : Player.Listener{
             override fun onPlayerError(error: PlaybackException) {
@@ -59,21 +68,6 @@ class HlsFragment : Fragment() {
                 HMSLogger.i(TAG, "Playback state change to $playbackState")
             }
         })
-
-    }
-
-    private fun isBehindLiveWindow(e: ExoPlaybackException): Boolean {
-        if (e.type != ExoPlaybackException.TYPE_SOURCE) {
-            return false
-        }
-        var cause: Throwable? = e.sourceException
-        while (cause != null) {
-            if (cause is BehindLiveWindowException) {
-                return true
-            }
-            cause = cause.cause
-        }
-        return false
     }
 
     override fun onStop() {
