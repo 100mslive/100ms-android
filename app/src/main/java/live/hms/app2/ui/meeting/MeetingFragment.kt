@@ -1154,6 +1154,12 @@ class MeetingFragment : Fragment() {
     private fun setupConfiguration() {
         if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()?.not() == true || meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS){
             binding.buttonShareScreen?.visibility = View.GONE
+            binding.buttonSettingsMenu?.visibility = View.GONE
+            binding.buttonSettingsMenuTop?.visibility = View.VISIBLE
+        }else{
+            binding.buttonShareScreen?.visibility = View.VISIBLE
+            binding.buttonSettingsMenu?.visibility = View.VISIBLE
+            binding.buttonSettingsMenuTop?.visibility = View.GONE
         }
     }
 
@@ -1217,6 +1223,11 @@ class MeetingFragment : Fragment() {
                     requireActivity().supportFragmentManager,
                     "settingsBottomSheet"
                 )
+            }
+        }
+        binding.buttonSettingsMenuTop?.apply {
+            setOnSingleClickListener(200L) {
+                binding.buttonSettingsMenu?.callOnClick()
             }
         }
 
@@ -1342,7 +1353,7 @@ class MeetingFragment : Fragment() {
                     Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
                     val recordingState = meetingViewModel.isRecording.value
 
-                    if (recordingState == RecordingState.NOT_RECORDING_OR_STREAMING) {
+                    if (recordingState == RecordingState.NOT_RECORDING_OR_STREAMING || meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()?.not() == true) {
 
                         val endCallDialog = Dialog(requireContext())
                         endCallDialog.setContentView(R.layout.exit_confirmation_dialog)

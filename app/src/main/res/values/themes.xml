@@ -13,7 +13,7 @@
         <item name="colorOnSecondary">@color/white</item>
 
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" >@color/primary_bg</item>
 
         <!-- Cards, Background etc -->
         <item name="colorSurface">@color/blue_3</item>

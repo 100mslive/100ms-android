@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
@@ -19,6 +20,7 @@ import androidx.navigation.findNavController
 import kotlinx.coroutines.launch
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentPreviewBinding
+import live.hms.app2.helpers.NetworkQualityHelper
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.home.HomeActivity
 import live.hms.app2.ui.meeting.participants.ParticipantsAdapter
@@ -373,11 +375,10 @@ class PreviewFragment : Fragment() {
                     participantsDialogAdapter?.removeItem(peer)
                 }
                 HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
-                    Toast.makeText(
-                        requireActivity(),
-                        "Downlink network quality is ${peer.networkQuality?.downlinkQuality}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    peer.networkQuality?.downlinkQuality?.let {
+                        binding.networkQuality.visibility = View.VISIBLE
+                        updateNetworkQualityView(it,requireContext(),binding.networkQuality)
+                    }
                 }
                 else -> Unit
             }
@@ -485,6 +486,22 @@ class PreviewFragment : Fragment() {
                 }
                 participantsDialogAdapter?.setItems(getRemotePeers(room))
             })
+    }
+
+    fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
+        NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
+            if (downlinkScore == 0) {
+                imageView.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+            } else {
+                imageView.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+            }
+            imageView.setImageDrawable(drawable)
+            if (drawable == null){
+                imageView.visibility = View.GONE
+            }else{
+                imageView.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun getRemotePeers(hmsRoom: HMSRoom): ArrayList<HMSPeer> {

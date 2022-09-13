@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.AppCompatButton
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -23,11 +22,12 @@ import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
 
 
-class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
+class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(),
+    AdapterView.OnItemSelectedListener {
     private val TAG = BottomSheetRoleChangeFragment::class.java.simpleName
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val args : BottomSheetRoleChangeFragmentArgs by navArgs()
-    private var stringRole : String? = null
+    private val args: BottomSheetRoleChangeFragmentArgs by navArgs()
+    private var stringRole: String? = null
 
     private var binding by viewLifecycle<LayoutFragmentBottomSheetChangeRoleBinding>()
     private val spinnerRoles by lazy { args.availableRoles }
@@ -38,7 +38,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
         savedInstanceState: Bundle?
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = LayoutFragmentBottomSheetChangeRoleBinding.inflate(inflater,container,false)
+        binding = LayoutFragmentBottomSheetChangeRoleBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -48,10 +48,12 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
     }
 
     private fun initPopup() {
+        val peer = meetingViewModel.getPeerForId(args.remotePeerId)
 
         val dialog = Dialog(requireActivity())
         dialog.setContentView(R.layout.change_role_dialog)
-        dialog.findViewById<TextView>(R.id.change_role_text).text = "Change the role of ${args.remotePeerName} to"
+        dialog.findViewById<TextView>(R.id.change_role_text).text =
+            "Change the role of ${args.remotePeerName} to"
         val spinner = dialog.findViewById<Spinner>(R.id.role_spinner)
         ArrayAdapter(
             requireActivity(),
@@ -59,22 +61,26 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
             spinnerRoles
         ).also { arrayAdapter ->
             spinner.adapter = arrayAdapter
-//            spinner.prompt = "Changing ${args.remotePeerName}'s role to:"
-//            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.post { spinner.onItemSelectedListener = this }
         }
         dialog.findViewById<AppCompatButton>(R.id.cancel_btn).setOnClickListener {
             dialog.dismiss()
         }
-        dialog.findViewById<AppCompatButton>(R.id.change_role_btn).setOnClickListener {
-            val isForceUpdate = dialog.findViewById<CheckBox>(R.id.is_force_update).isChecked.not()
+        val checkBox = dialog.findViewById<CheckBox>(R.id.is_force_update)
+        if (peer?.isLocal == true) {
+            checkBox.visibility = View.INVISIBLE
+        }
+        dialog.findViewById<AppCompatButton>(R.id.change_role_btn).apply {
+            setOnClickListener {
+                val isForceUpdate = checkBox.isChecked.not()
 
-            stringRole?.let {
-                Log.d(TAG, "Selected role: $stringRole")
-                meetingViewModel.changeRole(args.remotePeerId, it, isForceUpdate)
+                stringRole?.let {
+                    Log.d(TAG, "Selected role: $stringRole")
+                    meetingViewModel.changeRole(args.remotePeerId, it, isForceUpdate)
+                }
+                dialog.dismiss()
+                findNavController().popBackStack(R.id.MeetingFragment, false)
             }
-            dialog.dismiss()
-            findNavController().popBackStack(R.id.MeetingFragment,false)
         }
         dialog.show()
     }
@@ -87,15 +93,21 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
             cancel.setOnClickListener { findNavController().popBackStack() }
 
             promptChangeRole.setOnClickListener {
-                spinnerDialog()
+                initPopup()
             }
 
-            if(peer != null) {
+            if (peer != null) {
                 val audioTrack = peer.audioTrack
-                if(audioTrack != null)
-                {
-                    setTrackMuteButtonVisibility(audioTrack, peer, muteUnmuteAudio, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
-                    muteUnmuteAudio.setOnClickListener { meetingViewModel.togglePeerMute(peer as HMSRemotePeer, HMSTrackType.AUDIO)
+                if (audioTrack != null) {
+                    setTrackMuteButtonVisibility(
+                        audioTrack,
+                        peer,
+                        muteUnmuteAudio,
+                        meetingViewModel.isAllowedToMutePeers(),
+                        meetingViewModel.isAllowedToAskUnmutePeers()
+                    )
+                    muteUnmuteAudio.setOnClickListener {
+                        meetingViewModel.togglePeerMute(peer as HMSRemotePeer, HMSTrackType.AUDIO)
                         findNavController().popBackStack()
                     }
                 } else {
@@ -105,9 +117,14 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                 Log.d(TAG, "Peer video null? ${peer.videoTrack == null}")
 
                 val videoTrack = peer.videoTrack
-                if(videoTrack != null)
-                {
-                    setTrackMuteButtonVisibility(videoTrack, peer, muteUnmuteVideo, meetingViewModel.isAllowedToMutePeers(), meetingViewModel.isAllowedToAskUnmutePeers())
+                if (videoTrack != null) {
+                    setTrackMuteButtonVisibility(
+                        videoTrack,
+                        peer,
+                        muteUnmuteVideo,
+                        meetingViewModel.isAllowedToMutePeers(),
+                        meetingViewModel.isAllowedToAskUnmutePeers()
+                    )
                     muteUnmuteVideo.setOnClickListener {
                         meetingViewModel.togglePeerMute(peer as HMSRemotePeer, HMSTrackType.VIDEO)
                         findNavController().popBackStack()
@@ -116,8 +133,9 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
                     muteUnmuteVideo.visibility = View.GONE
                 }
 
-                if(meetingViewModel.isAllowedToRemovePeers()) {
-                    removePeer.setOnClickListener { meetingViewModel.requestPeerLeave(peer as HMSRemotePeer, "Bye")
+                if (meetingViewModel.isAllowedToRemovePeers()) {
+                    removePeer.setOnClickListener {
+                        meetingViewModel.requestPeerLeave(peer as HMSRemotePeer, "Bye")
                         findNavController().popBackStack()
                     }
                     removePeer.visibility = View.VISIBLE
@@ -127,7 +145,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
 
                 // Self Role UI changes
                 if (peer.isLocal) {
-                    promptChangeRole.visibility = View.GONE
+//                    promptChangeRole.visibility = View.GONE
                     muteUnmuteVideo.visibility = View.GONE
                     muteUnmuteAudio.visibility = View.GONE
                     removePeer.visibility = View.GONE
@@ -142,23 +160,25 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(), AdapterView.O
 
     private fun v(value: Boolean) = if (value) View.VISIBLE else View.GONE
 
-    private fun setTrackMuteButtonVisibility(it: HMSTrack, item: HMSPeer, button : Button, isAllowedToMutePeer : Boolean, isAllowedToAskUnmutePeer : Boolean) {
+    private fun setTrackMuteButtonVisibility(
+        it: HMSTrack,
+        item: HMSPeer,
+        button: Button,
+        isAllowedToMutePeer: Boolean,
+        isAllowedToAskUnmutePeer: Boolean
+    ) {
         val isMute = it.isMute
-        button.visibility = v(!item.isLocal &&
-                (
-                        ( isAllowedToMutePeer && !isMute) ||
-                                (isAllowedToAskUnmutePeer && isMute)
-                        )
+        button.visibility = v(
+            !item.isLocal &&
+                    (
+                            (isAllowedToMutePeer && !isMute) ||
+                                    (isAllowedToAskUnmutePeer && isMute)
+                            )
         )
-        var text = if(isMute) "Unmute" else "Mute"
-        text += " " + if(it.type == HMSTrackType.VIDEO) "Video" else "Audio"
+        var text = if (isMute) "Unmute" else "Mute"
+        text += " " + if (it.type == HMSTrackType.VIDEO) "Video" else "Audio"
 
         button.text = text
-    }
-
-
-    private fun spinnerDialog() {
-        initPopup()
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

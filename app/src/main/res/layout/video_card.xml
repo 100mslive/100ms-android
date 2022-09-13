@@ -156,6 +156,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
+        android:alpha="0"
         android:layout_marginBottom="35dp"
         android:src="@drawable/ic_brb"
         android:textSize="36sp" />

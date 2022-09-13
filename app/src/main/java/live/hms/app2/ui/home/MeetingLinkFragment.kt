@@ -161,6 +161,18 @@ class MeetingLinkFragment : Fragment() {
             )
         }
 
+        binding.edtMeetingUrl.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.isNullOrEmpty()){
+                    binding.tvMeetingUrlInputLayout.hint = requireContext().resources.getString(R.string.paste_the_link_here_str)
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
         binding.btnScanNow.setOnClickListener {
             val intent = Intent(requireActivity(), QrCodeActivity::class.java)
             qrScanResultLauncher.launch(intent)
