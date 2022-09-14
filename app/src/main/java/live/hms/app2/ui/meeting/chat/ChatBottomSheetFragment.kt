@@ -14,6 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.R
 import live.hms.app2.databinding.DialogBottomSheetChatBinding
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
 import live.hms.app2.util.visibility
 
@@ -26,6 +27,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private var binding by viewLifecycle<DialogBottomSheetChatBinding>()
 
     private val chatViewModel: ChatViewModel by activityViewModels()
+    private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     private val args: ChatBottomSheetFragmentArgs by navArgs()
     private lateinit var roomDetails: RoomDetails
@@ -37,6 +39,20 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
         super.onViewCreated(view, savedInstanceState)
         initViewModels()
         initSpinnerUpdates()
+        initPinnedMessageUpdate()
+    }
+
+    private fun initPinnedMessageUpdate() {
+        meetingViewModel.sessionMetadata.observe(viewLifecycleOwner) { pinned ->
+            binding.pinnedMessage.apply {
+                if (pinned == null) {
+                    hintView.visibility = View.GONE
+                } else {
+                    hintMessageTextview.text = pinned
+                    hintView.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     override fun onCreateView(

@@ -599,16 +599,14 @@ class MeetingViewModel(
         override fun onMessageReceived(message: HMSMessage) {
           Log.v(TAG, "onMessageReceived: $message")
           if(message.type == "metadata"){
-            viewModelScope.launch {
-              _events.emit(Event.SessionMetadataEvent("SessionMetadata: ${getSessionMetadata()}"))
-            }
+              getSessionMetadata()
           } else {
             broadcastsReceived.postValue(
               ChatMessage(
                 message.sender.name,
                 message.serverReceiveTime,
                 message.message,
-                false,
+                true,
                 recipient = Recipient.toRecipient(message.recipient)
               )
             )
