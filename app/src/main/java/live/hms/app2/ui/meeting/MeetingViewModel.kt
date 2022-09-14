@@ -1287,6 +1287,21 @@ class MeetingViewModel(
       override fun onSuccess() {
         viewModelScope.launch {
           _events.emit(Event.SessionMetadataEvent("Session metadata set!"))
+          hmsSDK.sendBroadcastMessage(SESSION_METADATA_BROADCAST_MESSAGE,
+            SESSION_METADATA_BROADCAST_TYPE, object : HMSMessageResultListener {
+            override fun onError(error: HMSException) {
+              viewModelScope.launch {
+                _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
+              }
+            }
+
+            override fun onSuccess(hmsMessage: HMSMessage) {
+              viewModelScope.launch {
+                _events.emit(Event.SessionMetadataEvent("Successfully informed of session metadata"))
+              }
+            }
+
+          })
         }
       }
 
@@ -1307,21 +1322,6 @@ class MeetingViewModel(
         viewModelScope.launch {
           _events.emit(Event.SessionMetadataEvent("Session Metadata retrieved was: $sessionMetadata"))
           sessionData.complete(sessionMetadata)
-
-          hmsSDK.sendBroadcastMessage("refresh","metadata", object : HMSMessageResultListener {
-            override fun onError(error: HMSException) {
-              viewModelScope.launch {
-                _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
-              }
-            }
-
-            override fun onSuccess(hmsMessage: HMSMessage) {
-              viewModelScope.launch {
-                _events.emit(Event.SessionMetadataEvent("Successfully informed of session metadata"))
-              }
-            }
-
-          })
         }
       }
 
