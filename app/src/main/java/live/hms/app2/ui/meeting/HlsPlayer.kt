@@ -22,7 +22,9 @@ class HlsPlayer {
         dataSourceFactory = DefaultHttpDataSource.Factory()
     }
 
-    fun getPlayer(context : Context, url : String, playWhenready : Boolean = true) : Player {
+    fun getPlayer() = player
+
+    fun createPlayer(context : Context, url : String, playWhenready : Boolean = true) : Player {
 
         val hlsMediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
             .setAllowChunklessPreparation(true)

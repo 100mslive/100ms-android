@@ -35,9 +35,18 @@ class HlsFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnSeekLive.setOnClickListener {
+            hlsPlayer.getPlayer()?.seekToDefaultPosition()
+            hlsPlayer.getPlayer()?.play()
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        binding.hlsView.player = hlsPlayer.getPlayer(requireContext(),
+        binding.hlsView.player = hlsPlayer.createPlayer(requireContext(),
                 args.hlsStreamUrl,
                 true)
     }
