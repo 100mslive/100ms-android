@@ -429,7 +429,8 @@ class MeetingViewModel(
                 Log.v(TAG, "~~ onJoin called ~~")
                 val joinSuccessAt = System.currentTimeMillis();
           val timeTakenToJoin = joinSuccessAt - joinStartedAt
-          Log.d(TAG, "~~ HMS SDK took $timeTakenToJoin ms to join ~~")failures.clear()
+          Log.d(TAG, "~~ HMS SDK took $timeTakenToJoin ms to join ~~")
+                failures.clear()
                 state.postValue(MeetingState.Ongoing())
                 hmsRoom = room // Just storing the room id for the beam bot.
                 Log.d("onRoomUpdate", "$room")
