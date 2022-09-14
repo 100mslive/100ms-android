@@ -39,18 +39,11 @@
             android:id="@+id/action_MeetingFragment_to_ParticipantsFragment"
             app:destination="@id/ParticipantsFragment" />
         <action
-            android:id="@+id/action_MeetingFragment_to_rtmpRecordFragment"
-            app:destination="@id/rtmpRecordFragment" />
-        <action
             android:id="@+id/action_MeetingFragment_to_changeNameDialogFragment"
             app:destination="@id/changeNameDialogFragment" />
         <action
             android:id="@+id/action_MeetingFragment_to_hlsViewFragment"
             app:destination="@id/hlsViewFragment" />
-
-        <action
-            android:id="@+id/action_MeetingFragment_to_MusicModeChooser"
-            app:destination="@id/musicChooserSheet" />
 
     </fragment>
 

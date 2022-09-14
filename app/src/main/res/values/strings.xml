@@ -192,4 +192,7 @@
     <string name="stream_width">Width</string>
     <string name="stream_height">Height</string>
     <string name="rtmp_streaming_switch">RTMP streaming</string>
+    <string name="go_live_str">Go Live</string>
+    <string name="end_stream_str">End Stream</string>
+    <string name="live_str">Live</string>
 </resources>

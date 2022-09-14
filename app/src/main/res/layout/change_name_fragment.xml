@@ -1,32 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="12dp"
-    android:layout_marginRight="12dp"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/standardBottomSheet"
+style="?attr/bottomSheetStyle"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+app:behavior_hideable="true"
+app:behavior_peekHeight="0dp"
+app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+<androidx.appcompat.widget.LinearLayoutCompat
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/primary_bg"
     android:orientation="vertical"
-    app:layout_constraintWidth_percent="0.8">
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="20dp">
 
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/name_change_container"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
+        android:fontFamily="@font/inter_semibold"
+        android:padding="8dp"
+        android:text="Change Name"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/newName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="New Name" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <Button
-        android:id="@+id/submit_name_change_button"
+    <EditText
+        android:id="@+id/newName"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/submit" />
+        android:hint="New Name"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp"
+        android:background="@drawable/gray_round_drawable"
+        android:layout_height="wrap_content"/>
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content">
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cancel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gray_round_stroked_drawable"
+            android:fontFamily="@font/inter_semibold"
+            android:paddingHorizontal="30dp"
+            android:text="Cancel" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/submit_name_change_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/primary_blue_round_drawable"
+            android:fontFamily="@font/inter_semibold"
+            android:paddingHorizontal="30dp"
+            android:text="Change" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+
+    </LinearLayout>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+</FrameLayout>
