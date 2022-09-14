@@ -10,11 +10,13 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -596,15 +598,21 @@ class MeetingViewModel(
 
         override fun onMessageReceived(message: HMSMessage) {
           Log.v(TAG, "onMessageReceived: $message")
-          broadcastsReceived.postValue(
-                  ChatMessage(
-                          message.sender.name,
-                          message.serverReceiveTime,
-                          message.message,
-                          false,
-                          recipient = Recipient.toRecipient(message.recipient)
-                  )
-          )
+          if(message.type == "metadata"){
+            viewModelScope.launch {
+              _events.emit(Event.SessionMetadataEvent("SessionMetadata: ${getSessionMetadata()}"))
+            }
+          } else {
+            broadcastsReceived.postValue(
+              ChatMessage(
+                message.sender.name,
+                message.serverReceiveTime,
+                message.message,
+                false,
+                recipient = Recipient.toRecipient(message.recipient)
+              )
+            )
+          }
         }
 
         override fun onReconnected() {
@@ -1170,6 +1178,7 @@ class MeetingViewModel(
     data class HlsEvent(override val message : String) : MessageEvent(message)
     data class HlsRecordingEvent(override val message : String) : MessageEvent(message)
     data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
+    data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
   }
 
   private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -1266,5 +1275,69 @@ class MeetingViewModel(
   fun getCurrentMediaModeCheckedState(): Boolean {
     return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
   }
+
+  fun setSessionMetadata(data : String) {
+    hmsSDK.setSessionMetaData(data, object :HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+          _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+        }
+      }
+
+      override fun onSuccess() {
+        viewModelScope.launch {
+          _events.emit(Event.SessionMetadataEvent("Session metadata set!"))
+        }
+      }
+
+    })
+  }
+
+  fun getSessionMetadata() : Unit {
+    val sessionData = CompletableDeferred<String?>()
+    hmsSDK.getSessionMetaData(object :HMSSessionMetadataListener {
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+          _events.emit(Event.SessionMetadataEvent("Session Metadata retrieval error $error"))
+          sessionData.completeExceptionally(error)
+        }
+      }
+
+      override fun onSuccess(sessionMetadata: String?) {
+        viewModelScope.launch {
+          _events.emit(Event.SessionMetadataEvent("Session Metadata retrieved was: $sessionMetadata"))
+          sessionData.complete(sessionMetadata)
+
+          hmsSDK.sendBroadcastMessage("refresh","metadata", object : HMSMessageResultListener {
+            override fun onError(error: HMSException) {
+              viewModelScope.launch {
+                _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
+              }
+            }
+
+            override fun onSuccess(hmsMessage: HMSMessage) {
+              viewModelScope.launch {
+                _events.emit(Event.SessionMetadataEvent("Successfully informed of session metadata"))
+              }
+            }
+
+          })
+        }
+      }
+
+    })
+
+    viewModelScope.launch {
+      val data = try {
+        sessionData.await()
+      } catch (e : Exception) {
+        "Error $e"
+      }
+      _sessionMetadata.postValue(data)
+    }
+  }
+
+  private val _sessionMetadata = MutableLiveData<String?>(null)
+  val sessionMetadata : LiveData<String?> = _sessionMetadata
 }
 

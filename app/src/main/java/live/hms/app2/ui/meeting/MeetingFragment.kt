@@ -133,6 +133,9 @@ class MeetingFragment : Fragment() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
+      R.id.sessionMetadataAlpha -> {
+        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoomMetadataAlphaFragment())
+      }
       R.id.action_share_link -> {
         val sendIntent = Intent().apply {
           action = Intent.ACTION_SEND
@@ -264,6 +267,9 @@ class MeetingFragment : Fragment() {
     menu.findItem(R.id.raise_hand).isVisible = true
     menu.findItem(R.id.change_name).isVisible = true
     menu.findItem(R.id.pip_mode).isVisible = true
+    menu.findItem(R.id.sessionMetadataAlpha).apply {
+      isVisible = true
+    }
 
     menu.findItem(R.id.add_rtc_stats_observer).apply {
       setOnMenuItemClickListener {
@@ -604,6 +610,11 @@ class MeetingFragment : Fragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       meetingViewModel.events.collect { event ->
         when (event) {
+          is MeetingViewModel.Event.SessionMetadataEvent -> {
+            withContext(Dispatchers.Main) {
+              Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+            }
+          }
           is MeetingViewModel.Event.CameraSwitchEvent -> {
             withContext(Dispatchers.Main) {
               Toast.makeText(context, "Camera Switch ${event.message}", Toast.LENGTH_LONG).show()

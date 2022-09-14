@@ -51,6 +51,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_MusicModeChooser"
             app:destination="@id/musicChooserSheet" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_roomMetadataAlphaFragment"
+            app:destination="@id/roomMetadataAlphaFragment" />
 
     </fragment>
 
@@ -140,4 +143,8 @@
         android:id="@+id/musicChooserSheet"
         android:name="live.hms.app2.ui.meeting.participants.MusicSelectionSheet"
         android:label="MusicChooserSheet" />
+    <fragment
+        android:id="@+id/roomMetadataAlphaFragment"
+        android:name="live.hms.app2.ui.meeting.activespeaker.RoomMetadataAlphaFragment"
+        android:label="RoomMetadataAlphaFragment" />
 </navigation>

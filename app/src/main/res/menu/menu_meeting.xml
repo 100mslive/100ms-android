@@ -26,6 +26,12 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/sessionMetadataAlpha"
+        android:title="Session Metadata Alpha"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
         android:id="@+id/hls_start"
         android:title="@string/hls_start"
         app:showAsAction="ifRoom"
