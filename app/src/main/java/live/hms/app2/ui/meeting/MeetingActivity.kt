@@ -57,17 +57,6 @@ class MeetingActivity : AppCompatActivity() {
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
   }
 
-//  @SuppressLint("RestrictedApi")
-//  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//    menuInflater.inflate(R.menu.menu_meeting, menu)
-//
-//    if (menu is MenuBuilder) {
-//      menu.setOptionalIconsVisible(true)
-//    }
-//
-//    return true
-//  }
-
   override fun onDestroy() {
     super.onDestroy()
     _binding = null
