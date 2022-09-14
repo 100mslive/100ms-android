@@ -124,7 +124,9 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
         // Starts hidden by default
         binding.pinnedMessage.apply {
             hintView.visibility = View.GONE
-            btnCloseHint.visibility = View.GONE
+            btnCloseHint.setOnClickListener {
+                meetingViewModel.setSessionMetadata(null)
+            }
             icon.setImageResource(R.drawable.ic_pinned_message)
         }
     }

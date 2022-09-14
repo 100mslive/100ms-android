@@ -1274,7 +1274,7 @@ class MeetingViewModel(
     return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
   }
 
-  fun setSessionMetadata(data : String) {
+  fun setSessionMetadata(data : String?) {
     hmsSDK.setSessionMetaData(data, object :HMSActionResultListener {
       override fun onError(error: HMSException) {
         viewModelScope.launch {
