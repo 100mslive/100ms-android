@@ -8,12 +8,14 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.R
 import live.hms.app2.databinding.DialogBottomSheetChatBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.util.viewLifecycle
+import live.hms.app2.util.visibility
 
 class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
 
@@ -99,8 +101,15 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
             }
         }
 
-        binding.btnCloseHint.setOnClickListener {
-            binding.hintView.visibility = View.GONE
+        binding.hintView.btnCloseHint.setOnClickListener {
+            binding.hintView.hintView.visibility = View.GONE
+        }
+
+        // Starts hidden by default
+        binding.pinnedMessage.apply {
+            hintView.visibility = View.GONE
+            btnCloseHint.visibility = View.GONE
+            icon.setImageResource(R.drawable.ic_pinned_message)
         }
     }
 
