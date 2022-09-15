@@ -8,6 +8,7 @@ import android.widget.CompoundButton
 import android.widget.ExpandableListAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.databinding.SettingsBottomSheetDialogBinding
+import live.hms.app2.ui.meeting.participants.MusicSelectionSheet
 import live.hms.app2.util.setOnSingleClickListener
 import live.hms.app2.util.viewLifecycle
 
@@ -119,6 +120,14 @@ class SettingsBottomSheet(
             }
         }
 
+        binding.btnAudioShare.apply {
+            setOnSingleClickListener(350) {
+                val musicSelectionSheet = MusicSelectionSheet()
+                musicSelectionSheet.show(requireActivity().supportFragmentManager,"musicSelectionSheet")
+                dismiss()
+            }
+        }
+
         binding.btnShowStats.apply {
             if (meetingViewModel.statsToggleLiveData.value == true) {
                 binding.tvStats.text = "Hide Stats"
@@ -141,10 +150,11 @@ class SettingsBottomSheet(
         }
     }
 
-    private fun setupConfig(){
+    private fun setupConfig() {
         if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()?.not() == true) {
             binding.layoutExpandableList.visibility = View.GONE
             binding.btnCameraSwitch.visibility = View.GONE
+            binding.btnAudioShare.visibility = View.GONE
             binding.btnShowStats.visibility = View.GONE
             binding.btnBrb.visibility = View.GONE
         }
