@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/preview_card"
     android:layout_width="match_parent"
@@ -14,83 +14,133 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:elevation="10dp"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:fontFamily="@font/inter_semibold"
-            android:text="Configure Video and Audio"
-            android:textColor="#F2F5F9FF"
-            android:textSize="20sp" />
-
-        <androidx.cardview.widget.CardView
+        <LinearLayout
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="60dp"
-            android:layout_marginTop="30dp"
-            android:layout_weight="1"
-            android:elevation="10dp"
-            android:orientation="vertical"
-            app:cardBackgroundColor="#0F1115"
-            app:cardCornerRadius="5dp">
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="30dp">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/name_initials"
+            <TextView
+                android:id="@+id/name_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
                 android:layout_gravity="center"
-                android:background="@drawable/circle_secondary_80"
+                android:fontFamily="@font/inter_semibold"
                 android:gravity="center"
-                android:text="@string/john_doe_initials"
-                android:textColor="@android:color/white"
-                android:textSize="40sp" />
+                android:text="Configure"
+                android:textColor="#F2F5F9FF"
+                android:textSize="20sp" />
 
-            <org.webrtc.SurfaceViewRenderer
-                android:id="@+id/preview_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
+            <androidx.cardview.widget.CardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="10dp"
+                app:cardBackgroundColor="@color/gray_color"
+                app:cardCornerRadius="5dp">
 
-        </androidx.cardview.widget.CardView>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_output_device"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:padding="4dp"
+                    android:tint="@color/white"
+                    app:srcCompat="@drawable/ic_icon_speaker" />
 
+            </androidx.cardview.widget.CardView>
 
-        <LinearLayout
+            <androidx.cardview.widget.CardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="10dp"
+                app:cardBackgroundColor="@color/gray_color"
+                app:cardCornerRadius="5dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_participants"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:padding="4dp"
+                    android:layout_gravity="center"
+                    android:tint="@color/white"
+                    app:srcCompat="@drawable/ic_icon_people" />
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+        <Space
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_gravity="center"
+            android:layout_gravity="start"
+            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="16dp"
-            android:gravity="center"
+            android:gravity="start"
             android:orientation="horizontal">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_toggle_audio"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:backgroundTint="@color/blue_2"
-                android:contentDescription="@string/audio_status"
-                android:enabled="false"
-                android:src="@drawable/ic_mic_off_24"
-                app:fabSize="mini" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_toggle_video"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:backgroundTint="@color/blue_2"
-                android:contentDescription="@string/toggle_video"
-                android:enabled="false"
-                android:src="@drawable/ic_videocam_off_24"
-                app:fabSize="mini" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/button_toggle_audio_bg"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="10dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="5dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/button_toggle_audio"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="7dp"
+                    android:background="@drawable/ic_audio_toggle_off"
+                    android:backgroundTint="@color/black"
+                    android:contentDescription="@string/toggle_video"
+                    android:enabled="false" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/button_toggle_video_bg"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:elevation="10dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="5dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/button_toggle_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="7dp"
+                    android:background="@drawable/ic_camera_toggle_off"
+                    android:backgroundTint="@color/black"
+                    android:contentDescription="@string/toggle_video"
+                    android:enabled="false"
+                    android:src="@drawable/ic_videocam_off_24"
+                    android:tint="@color/black" />
+
+            </androidx.cardview.widget.CardView>
+
 
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -104,7 +154,34 @@
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
                 android:src="@drawable/settings_icon"
+                android:visibility="invisible"
                 app:fabSize="mini" />
+
+            <Space android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/button_network_quality"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:elevation="10dp"
+                app:cardBackgroundColor="@color/primary_bg"
+                app:cardCornerRadius="5dp">
+
+                <ImageView
+                    android:id="@+id/network_quality"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:layout_marginHorizontal="8dp"
+                    android:src="@drawable/ic_baseline_wifi_5"
+                    app:tint="@android:color/holo_green_light" />
+
+            </androidx.cardview.widget.CardView>
+
 
 
         </LinearLayout>
@@ -126,11 +203,42 @@
             android:paddingHorizontal="10dp"
             android:text="@string/enter_studio_str"
             android:textAllCaps="false"
+            android:visibility="invisible"
             app:cornerRadius="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/preview_card" />
 
     </LinearLayout>
 
-</com.google.android.material.card.MaterialCardView>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="5dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/name_initials"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:background="@drawable/circle_secondary_80"
+            android:gravity="center"
+            android:text="@string/john_doe_initials"
+            android:textColor="@android:color/white"
+            android:textSize="40sp" />
+
+        <org.webrtc.SurfaceViewRenderer
+            android:id="@+id/preview_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+
+    </androidx.cardview.widget.CardView>
+
+
+</FrameLayout>
 

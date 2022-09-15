@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="false"
     android:background="@color/primary_bg"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:context=".ui.home.HomeFragment">
 
@@ -20,12 +21,12 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:menu="@menu/menu_generic"
             app:title="@string/chat">
 
-            <Spinner
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/recipientSpinner"
                 style="@style/SpinnerTheme"
                 android:layout_width="wrap_content"
@@ -35,6 +36,8 @@
                 android:paddingVertical="7dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="30dp"
+                android:popupBackground="@color/primary_bg"
+                android:spinnerMode="dropdown"
                 tools:listitem="@layout/layout_chat_recipient_selector_item" />
 
         </com.google.android.material.appbar.MaterialToolbar>
@@ -43,8 +46,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:background="@color/btn_disabled" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -60,8 +63,7 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="20dp"
         android:layout_weight="1"
-        android:minHeight="300dp"
-        tools:listitem="@layout/list_item_chat" />
+        android:minHeight="300dp" />
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

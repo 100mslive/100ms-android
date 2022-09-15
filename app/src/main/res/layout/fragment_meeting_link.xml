@@ -62,22 +62,32 @@
             android:textColor="@color/white"
             android:textSize="14sp" />
 
-        <EditText
-            android:id="@+id/edt_meeting_url"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tv_meeting_url_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="10dp"
-            android:autofillHints=""
             android:background="@drawable/gray_round_btn"
-            android:fontFamily="@font/inter_regular"
+            android:autofillHints=""
             android:hint="@string/paste_the_link_here_str"
-            android:inputType="textMultiLine"
-            android:maxLines="2"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="12dp"
-            android:textSize="16sp"
-            tools:ignore="TextFields" />
+            android:textColorHint="@drawable/text_input_focus_selector"
+            app:hintTextColor="@color/cardview_light_background"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:endIconMode="clear_text">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_meeting_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gray_round_btn"
+                android:fontFamily="@font/inter_regular"
+                android:maxLines="2"
+                android:paddingHorizontal="10dp"
+                android:textSize="16sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_join_now"

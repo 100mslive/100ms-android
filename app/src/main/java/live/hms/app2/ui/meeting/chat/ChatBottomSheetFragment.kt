@@ -8,7 +8,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.navGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.R
@@ -22,6 +21,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
 
     companion object {
         private const val TAG = "ChatFragment"
+        var isChatHintHidden = false
     }
 
     private var binding by viewLifecycle<DialogBottomSheetChatBinding>()
@@ -39,7 +39,9 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
         super.onViewCreated(view, savedInstanceState)
         initViewModels()
         initSpinnerUpdates()
+        initViews()
         initPinnedMessageUpdate()
+        meetingViewModel.getSessionMetadata()
     }
 
     private fun initPinnedMessageUpdate() {
@@ -53,6 +55,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
                 }
             }
         }
+
     }
 
     override fun onCreateView(
@@ -75,6 +78,12 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private fun initSpinnerUpdates() {
         chatViewModel.chatMembers.observe(viewLifecycleOwner) {
             refreshSpinner(it.recipients, it.index)
+        }
+    }
+
+    private fun initViews(){
+        if (isChatHintHidden.not()) {
+            binding.hintView.hintView.visibility = View.VISIBLE
         }
     }
 
@@ -117,8 +126,10 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
             }
         }
 
+
         binding.hintView.btnCloseHint.setOnClickListener {
             binding.hintView.hintView.visibility = View.GONE
+            isChatHintHidden = true
         }
 
         // Starts hidden by default

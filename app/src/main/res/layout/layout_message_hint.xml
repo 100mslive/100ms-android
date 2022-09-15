@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/hint_view"
-    app:cardBackgroundColor="@color/gray_color"
-    app:cardCornerRadius="5dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="20dp"
-    android:layout_marginTop="20dp"
-    android:layout_marginBottom="20dp">
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:visibility="gone"
+    app:cardBackgroundColor="@color/gray_color"
+    app:cardCornerRadius="5dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="18dp">
 

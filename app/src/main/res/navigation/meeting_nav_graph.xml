@@ -39,9 +39,6 @@
             android:id="@+id/action_MeetingFragment_to_ParticipantsFragment"
             app:destination="@id/ParticipantsFragment" />
         <action
-            android:id="@+id/action_MeetingFragment_to_rtmpRecordFragment"
-            app:destination="@id/rtmpRecordFragment" />
-        <action
             android:id="@+id/action_MeetingFragment_to_changeNameDialogFragment"
             app:destination="@id/changeNameDialogFragment" />
         <action
@@ -54,7 +51,6 @@
         <action
             android:id="@+id/action_MeetingFragment_to_roomMetadataAlphaFragment"
             app:destination="@id/roomMetadataAlphaFragment" />
-
     </fragment>
 
     <dialog
