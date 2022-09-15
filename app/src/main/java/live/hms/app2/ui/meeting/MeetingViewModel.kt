@@ -1284,7 +1284,7 @@ class MeetingViewModel(
 
       override fun onSuccess() {
         viewModelScope.launch {
-          _events.emit(Event.SessionMetadataEvent("Session metadata set!"))
+
           hmsSDK.sendBroadcastMessage(SESSION_METADATA_BROADCAST_MESSAGE,
             SESSION_METADATA_BROADCAST_TYPE, object : HMSMessageResultListener {
             override fun onError(error: HMSException) {
@@ -1294,9 +1294,7 @@ class MeetingViewModel(
             }
 
             override fun onSuccess(hmsMessage: HMSMessage) {
-              viewModelScope.launch {
-                _events.emit(Event.SessionMetadataEvent("Successfully informed of session metadata"))
-              }
+              getSessionMetadata()
             }
 
           })
@@ -1318,7 +1316,6 @@ class MeetingViewModel(
 
       override fun onSuccess(sessionMetadata: String?) {
         viewModelScope.launch {
-          _events.emit(Event.SessionMetadataEvent("Session Metadata retrieved was: $sessionMetadata"))
           sessionData.complete(sessionMetadata)
         }
       }
