@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.google.android.exoplayer2.Player
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.MeetingViewModel
@@ -20,6 +21,7 @@ class HlsFragment : Fragment() {
     private val meetingViewModel: MeetingViewModel by activityViewModels()
     val playerUpdatesHandler = Handler()
     var runnable: Runnable? = null
+    val TAG = "HlsFragment"
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     private val hlsPlayer: HlsPlayer by lazy {
         HlsPlayer()
@@ -46,21 +48,27 @@ class HlsFragment : Fragment() {
             hlsPlayer.getPlayer()?.play()
         }
 
+        hlsPlayer.getPlayer()?.addListener(object : Player.Listener{
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                Log.d("100ms", "playback state  : $playbackState")
+            }
+        })
+
 
         runnable = Runnable {
-
             val distanceFromLive = ((hlsPlayer.getPlayer()?.duration?.minus(
                 hlsPlayer.getPlayer()?.currentPosition ?: 0
             ))?.div(1000) ?: 0)
+
+            Log.d(TAG,"duration : ${hlsPlayer.getPlayer()?.duration.toString()} current position ${hlsPlayer.getPlayer()?.currentPosition}")
+            Log.d(TAG,"buffered position : ${hlsPlayer.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer.getPlayer()?.totalBufferedDuration} ")
+
             if (distanceFromLive >= 10) {
                 binding.btnSeekLive.visibility = View.VISIBLE
             } else {
                 binding.btnSeekLive.visibility = View.GONE
             }
-            playerUpdatesHandler.postDelayed(runnable!!, 1000)
-        }
-        runnable?.let {
-            playerUpdatesHandler.postDelayed(it, 0)
+            playerUpdatesHandler.postDelayed(runnable!!, 2000)
         }
     }
 
@@ -72,7 +80,7 @@ class HlsFragment : Fragment() {
             true
         )
         runnable?.let {
-            playerUpdatesHandler.postDelayed(it,1000)
+            playerUpdatesHandler.postDelayed(it,0)
         }
     }
 
