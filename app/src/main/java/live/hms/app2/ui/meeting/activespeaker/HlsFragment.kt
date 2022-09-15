@@ -9,11 +9,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.utils.HMSLogger
 
 class HlsFragment : Fragment() {
 
@@ -49,8 +51,14 @@ class HlsFragment : Fragment() {
         }
 
         hlsPlayer.getPlayer()?.addListener(object : Player.Listener{
+            override fun onPlayerError(error: PlaybackException) {
+                super.onPlayerError(error)
+                HMSLogger.i(TAG, " ~~ Exoplayer error: $error")
+            }
+
             override fun onPlaybackStateChanged(playbackState: Int) {
-                Log.d("100ms", "playback state  : $playbackState")
+                super.onPlaybackStateChanged(playbackState)
+                HMSLogger.i(TAG, "Playback state change to $playbackState")
             }
         })
 
@@ -60,8 +68,8 @@ class HlsFragment : Fragment() {
                 hlsPlayer.getPlayer()?.currentPosition ?: 0
             ))?.div(1000) ?: 0)
 
-            Log.d(TAG,"duration : ${hlsPlayer.getPlayer()?.duration.toString()} current position ${hlsPlayer.getPlayer()?.currentPosition}")
-            Log.d(TAG,"buffered position : ${hlsPlayer.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer.getPlayer()?.totalBufferedDuration} ")
+            HMSLogger.i(TAG,"duration : ${hlsPlayer.getPlayer()?.duration.toString()} current position ${hlsPlayer.getPlayer()?.currentPosition}")
+            HMSLogger.i(TAG,"buffered position : ${hlsPlayer.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer.getPlayer()?.totalBufferedDuration} ")
 
             if (distanceFromLive >= 10) {
                 binding.btnSeekLive.visibility = View.VISIBLE
