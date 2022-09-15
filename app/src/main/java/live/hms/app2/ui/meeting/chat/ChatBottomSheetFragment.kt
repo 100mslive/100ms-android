@@ -19,6 +19,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
 
     companion object {
         private const val TAG = "ChatFragment"
+        var isChatHintHidden = false
     }
 
     private var binding by viewLifecycle<DialogBottomSheetChatBinding>()
@@ -35,6 +36,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
         super.onViewCreated(view, savedInstanceState)
         initViewModels()
         initSpinnerUpdates()
+        initViews()
     }
 
     override fun onCreateView(
@@ -57,6 +59,12 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private fun initSpinnerUpdates() {
         chatViewModel.chatMembers.observe(viewLifecycleOwner) {
             refreshSpinner(it.recipients, it.index)
+        }
+    }
+
+    private fun initViews(){
+        if (isChatHintHidden.not()) {
+            binding.hintView.visibility = View.VISIBLE
         }
     }
 
@@ -101,6 +109,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
 
         binding.btnCloseHint.setOnClickListener {
             binding.hintView.visibility = View.GONE
+            isChatHintHidden = true
         }
     }
 

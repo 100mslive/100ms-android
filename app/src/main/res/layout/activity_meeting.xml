@@ -7,10 +7,6 @@
     android:orientation="vertical"
     tools:context=".ui.meeting.MeetingActivity">
 
-    <include
-        android:id="@+id/container_toolbar"
-        layout="@layout/toolbar_meeting" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
