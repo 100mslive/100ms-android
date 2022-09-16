@@ -186,6 +186,10 @@ class MeetingFragment : Fragment() {
                 startActivity(shareIntent)
             }
 
+            R.id.sessionMetadataAlpha -> {
+                findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoomMetadataAlphaFragment())
+            }
+
             R.id.action_record_meeting, R.id.hls_start -> {
 
 //                findNavController().navigate(
@@ -778,6 +782,11 @@ class MeetingFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             meetingViewModel.events.collect { event ->
                 when (event) {
+                    is MeetingViewModel.Event.SessionMetadataEvent -> {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                        }
+                    }
                     is MeetingViewModel.Event.CameraSwitchEvent -> {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(

@@ -13,7 +13,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.R
 import live.hms.app2.databinding.DialogBottomSheetChatBinding
 import live.hms.app2.model.RoomDetails
+import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
+import live.hms.app2.util.visibility
 
 class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
 
@@ -25,6 +27,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private var binding by viewLifecycle<DialogBottomSheetChatBinding>()
 
     private val chatViewModel: ChatViewModel by activityViewModels()
+    private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     private val args: ChatBottomSheetFragmentArgs by navArgs()
     private lateinit var roomDetails: RoomDetails
@@ -37,6 +40,22 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
         initViewModels()
         initSpinnerUpdates()
         initViews()
+        initPinnedMessageUpdate()
+        meetingViewModel.getSessionMetadata()
+    }
+
+    private fun initPinnedMessageUpdate() {
+        meetingViewModel.sessionMetadata.observe(viewLifecycleOwner) { pinned ->
+            binding.pinnedMessage.apply {
+                if (pinned == null) {
+                    hintView.visibility = View.GONE
+                } else {
+                    hintMessageTextview.text = pinned
+                    hintView.visibility = View.VISIBLE
+                }
+            }
+        }
+
     }
 
     override fun onCreateView(
@@ -64,7 +83,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
 
     private fun initViews(){
         if (isChatHintHidden.not()) {
-            binding.hintView.visibility = View.VISIBLE
+            binding.hintView.hintView.visibility = View.VISIBLE
         }
     }
 
@@ -82,7 +101,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private fun initRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = ChatAdapter(messages)
+            adapter = ChatAdapter(messages, meetingViewModel::setSessionMetadata)
             scrollToPosition(messages.size - 1)
         }
     }
@@ -107,9 +126,19 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
             }
         }
 
-        binding.btnCloseHint.setOnClickListener {
-            binding.hintView.visibility = View.GONE
+
+        binding.hintView.btnCloseHint.setOnClickListener {
+            binding.hintView.hintView.visibility = View.GONE
             isChatHintHidden = true
+        }
+
+        // Starts hidden by default
+        binding.pinnedMessage.apply {
+            hintView.visibility = View.GONE
+            btnCloseHint.setOnClickListener {
+                meetingViewModel.setSessionMetadata(null)
+            }
+            icon.setImageResource(R.drawable.ic_pinned_message)
         }
     }
 
