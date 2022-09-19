@@ -28,37 +28,34 @@
             android:id="@+id/promptChangeRole"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
             android:background="@android:color/transparent"
             android:fontFamily="@font/inter_semibold"
-            android:text="Change role" />
+            android:text="Change role"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/muteUnmuteVideo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:drawableLeft="@drawable/ic_videocam_24"
             android:fontFamily="@font/inter_semibold"
-            android:text="Ask to unmute" />
+            android:text="Ask to unmute video"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/muteUnmuteAudio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:drawableLeft="@drawable/ic_mic_24"
             android:fontFamily="@font/inter_semibold"
-            android:text="Ask to unmute" />
-
+            android:text="Ask to unmute audio"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/removePeer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
             android:background="@android:color/transparent"
-            android:text="Remove Peer" />
+            android:text="Remove Peer"
+            android:textColor="@color/white" />
 
         <Space
             android:layout_width="0dp"
@@ -68,10 +65,10 @@
             android:id="@+id/cancel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
             android:background="@android:color/transparent"
             android:fontFamily="@font/inter_semibold"
-            android:text="Cancel" />
+            android:text="Cancel"
+            android:textColor="@color/white" />
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

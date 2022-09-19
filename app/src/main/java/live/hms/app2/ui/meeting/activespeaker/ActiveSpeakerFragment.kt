@@ -172,6 +172,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         when(it.second) {
           HMSPeerUpdate.METADATA_CHANGED -> {
             binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.first.metadata)?.isHandRaised == true)
+            binding.screenShare.isBrb.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.first.metadata)?.isBRBOn == true)
           }
 
           HMSPeerUpdate.NAME_CHANGED -> {
