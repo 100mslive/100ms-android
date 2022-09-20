@@ -16,7 +16,7 @@
         android:paddingVertical="20dp">
 
         <ImageView
-            android:id="@+id/back_btn"
+            android:id="@+id/close_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/close_icon"
@@ -32,9 +32,9 @@
             android:text="Settings"
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@id/back_btn"
+            app:layout_constraintBottom_toBottomOf="@id/close_btn"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/back_btn"
+            app:layout_constraintTop_toTopOf="@id/close_btn"
             tools:layout_editor_absoluteX="76dp"
             tools:layout_editor_absoluteY="38dp" />
 
@@ -202,9 +202,8 @@
 
 
             </LinearLayout>
-
             <LinearLayout
-                android:id="@+id/btn_brb"
+                android:id="@+id/btn_pip_mode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -214,15 +213,14 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_brb" />
+                    android:src="@drawable/settings_icon" />
 
                 <TextView
-                    android:id="@+id/tvBrbStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="20dp"
-                    android:text="BRB" />
+                    android:text="PIP Mode" />
 
                 <Space
                     android:layout_width="wrap_content"
@@ -274,11 +272,47 @@
 
 
             <LinearLayout
+                android:id="@+id/btn_brb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingVertical="10dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_brb" />
+
+                <TextView
+                    android:id="@+id/tvBrbStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="20dp"
+                    android:text="BRB" />
+
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/brb_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    />
+
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btn_show_stats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingVertical="20dp">
+                android:paddingVertical="10dp">
 
                 <ImageView
                     android:layout_width="18dp"
@@ -292,19 +326,19 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="20dp"
-                    android:text="Show Stats" />
+                    android:text="Stats For Nerds" />
 
                 <Space
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_baseline_chevron_right_24" />
-
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/show_stats_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    />
 
             </LinearLayout>
 

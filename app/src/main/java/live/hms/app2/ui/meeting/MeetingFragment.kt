@@ -48,6 +48,7 @@ import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEven
 import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.app2.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
@@ -98,12 +99,16 @@ class MeetingFragment : Fragment() {
 
     private var isMeetingOngoing = false
     private val goLiveBottomSheet by lazy {
-        HlsStreamingToggleBottomSheet(meetingViewModel, meetingUrl = settings.lastUsedMeetingUrl) {
+        HlsStreamingToggleBottomSheet(meetingUrl = settings.lastUsedMeetingUrl) {
             if (it) {
                 binding.tvGoLive?.text = "Starting HLS"
                 binding.buttonGoLive?.visibility = View.GONE
             }
         }
+    }
+
+    private val rtmpBottomSheet by lazy {
+        RtmpRecordBottomSheet()
     }
 
     private val onSettingsChangeListener =
@@ -1203,14 +1208,23 @@ class MeetingFragment : Fragment() {
         binding.buttonGoLive?.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonGoLive.onClick()")
-                if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
-                    goLiveBottomSheet.show(
-                        requireActivity().supportFragmentManager,
-                        "GoLiveBottomSheet"
-                    )
-                } else {
-                    inflateStopHlsDialog()
+                val goLiveSelectionBottomSheet = GoLiveSelectionBottomSheet {
+                    if (it == GoLiveOption.HLS) {
+                        if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
+                            goLiveBottomSheet.show(
+                                requireActivity().supportFragmentManager,
+                                "GoLiveBottomSheet"
+                            )
+                        }else {
+                            inflateStopHlsDialog()
+                        }
+                    }else{
+                        rtmpBottomSheet.show(requireActivity().supportFragmentManager,
+                            "RTMPBottomSheet")
+                    }
                 }
+                goLiveSelectionBottomSheet.show(requireActivity().supportFragmentManager,
+                    "GoLiveSelectionBottomSheet")
             }
         }
 

@@ -1,186 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/primary_bg"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     tools:context=".ui.home.HomeFragment">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:orientation="vertical">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp">
+
+            <ImageView
+                android:id="@+id/close_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/back_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_start_streaming_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="START STREAMING"
+                    android:textAllCaps="true"
+                    android:textColor="@color/muted_text"
+                    android:textSize="10sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/close_btn"
+                    app:layout_constraintStart_toEndOf="@+id/close_btn"
+                    app:layout_constraintTop_toTopOf="@+id/close_btn"
+                    app:layout_constraintVertical_bias="0.0" />
+
+                <TextView
+                    android:id="@+id/start_conversation_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:text="Choose a destination"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toStartOf="@+id/tv_start_streaming_title"
+                    app:layout_constraintTop_toBottomOf="@id/tv_start_streaming_title" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="30dp"
+            android:background="#1B1F26"
+            app:layout_constraintTop_toBottomOf="@+id/start_conversation_tv" />
+
+
+        <ImageView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/rtmp_settings"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:layout_marginTop="30dp"
+            android:src="@drawable/settings_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Custom RTMP"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inter_regular"
+            android:text="Add multiple channels on your platform to show your stream."
+            android:textColor="@color/muted_text"
+            android:textSize="14sp" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/inter_regular"
+            android:text="Resolution"
+            android:textColor="@color/muted_text"
+            android:textSize="14sp" />
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:padding="0.5dp"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/rtmpWidth"
-                android:inputType="number"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/stream_width" />
+                android:background="@drawable/gray_round_btn"
+                android:hint="@string/stream_width"
+                android:inputType="number"
+                android:text="1280"
+                android:textColor="@color/muted_text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:padding="0.5dp"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/rtmpHeight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gray_round_btn"
+                android:hint="@string/stream_height"
                 android:inputType="number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/stream_height" />
+                android:text="720"
+                android:textColor="@color/muted_text" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
+            android:id="@+id/stream_url_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/meetingUrl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Meeting url" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/rtmpUrlContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/newRtmpUrl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/add_new_rtmp_streaming_url"
-                android:text="" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <ImageButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/addRtmpUrlButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_round_add_circle_24" />
+            android:layout_marginTop="10dp"
+            android:background="@drawable/stroked_drawable"
+            android:text="Add Stream" />
 
-        <TextView
-            android:id="@+id/existingRtmpUrlsText"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="Existing RTMP Urls"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:layout_marginTop="20dp"
+            android:background="@drawable/primary_round_solid_drawable"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rtmpUrls"
-            android:layout_marginBottom="6dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:itemCount="3"
-            tools:listitem="@layout/layout_rtmp_url_item" />
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_record_button_24"
+                android:tint="@color/white" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/rtmpStreamingSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/rtmp_streaming_switch"
-            android:layout_marginTop="32dp"
-            android:textAlignment="viewStart" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="20dp"
+                android:text="Record the stream"
+                android:textColor="@color/white" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/shouldRecord"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/record"
-            android:textAlignment="viewStart" />
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/shouldStartHls"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hls_start"
-            android:layout_marginTop="8dp"
-            android:textAlignment="viewStart" />
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/shouldRecord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
+        </LinearLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/hlsSingleFilePerLayer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Single File Per Layer"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="8dp"
-            android:textAlignment="viewStart" />
-
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/hlsVod"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="HLS Vod"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="4dp"
-            android:textAlignment="viewStart" />
-
-
-
-
-        <TextView
-            android:id="@+id/recording"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/recording_start_stop"
-            />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="8dp"
-            />
-
-        <TextView
-            android:id="@+id/rtmp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/rtmp_start_stop"
-            />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="8dp"
-            />
-
-        <TextView
-            android:id="@+id/sfu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="@string/sfu_start"
-            />
-
-        <Button
-            android:layout_marginTop="16dp"
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/startButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/start" />
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/primary_blue_round_drawable"
+            android:text="Go Live" />
     </LinearLayout>
 </ScrollView>

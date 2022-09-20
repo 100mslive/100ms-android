@@ -45,8 +45,8 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
-                app:cardBackgroundColor="@color/gray_color"
-                app:cardCornerRadius="5dp">
+                app:cardBackgroundColor="@color/gray_light"
+                app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/icon_output_device"
@@ -64,8 +64,8 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
-                app:cardBackgroundColor="@color/gray_color"
-                app:cardCornerRadius="5dp">
+                app:cardBackgroundColor="@color/gray_light"
+                app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/icon_participants"
@@ -103,7 +103,7 @@
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/button_toggle_audio"
@@ -124,7 +124,7 @@
                 android:layout_height="40dp"
                 android:elevation="10dp"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/button_toggle_video"
