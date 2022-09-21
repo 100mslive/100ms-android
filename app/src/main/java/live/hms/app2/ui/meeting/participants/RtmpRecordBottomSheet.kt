@@ -19,7 +19,7 @@ import java.net.URI
 import java.net.URISyntaxException
 
 
-class RtmpRecordBottomSheet() : BottomSheetDialogFragment() {
+class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<LayoutRtmpRecordingBinding>()
     private lateinit var settings: SettingsStore
@@ -198,6 +198,7 @@ class RtmpRecordBottomSheet() : BottomSheetDialogFragment() {
                 meetingUrl,
                 inputWidthHeight
             )
+            startClickListener.invoke()
             dismiss()
         }
     }

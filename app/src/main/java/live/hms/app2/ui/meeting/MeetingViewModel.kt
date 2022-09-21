@@ -690,6 +690,9 @@ class MeetingViewModel(
         }
     }
 
+    fun isHlsRunning() = hmsRoom?.hlsStreamingState?.running == true
+    fun isRTMPRunning() = hmsRoom?.rtmpHMSRtmpStreamingState?.running == true
+
     fun setStatetoOngoing() {
         state.postValue(MeetingState.Ongoing())
     }
