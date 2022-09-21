@@ -146,16 +146,6 @@
         </RelativeLayout>
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/button_participants"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@drawable/gray_round_stroked_drawable"
-            android:contentDescription="@string/flip_camera"
-            android:padding="8dp"
-            app:srcCompat="@drawable/ic_icon_people" />
-
-        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/button_settings_menu_top"
             android:layout_width="40dp"
             android:layout_height="40dp"

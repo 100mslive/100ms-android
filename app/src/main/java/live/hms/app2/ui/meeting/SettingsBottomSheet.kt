@@ -6,15 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.ExpandableListAdapter
+import androidx.navigation.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.databinding.SettingsBottomSheetDialogBinding
+import live.hms.app2.ui.home.MeetingLinkFragmentDirections
 import live.hms.app2.ui.meeting.participants.MusicSelectionSheet
+import live.hms.app2.ui.meeting.participants.ParticipantsFragment
 import live.hms.app2.util.setOnSingleClickListener
 import live.hms.app2.util.viewLifecycle
 
 
 class SettingsBottomSheet(
     private val meetingViewModel: MeetingViewModel,
+    private val participantsListener : ()->Unit
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<SettingsBottomSheetDialogBinding>()
@@ -75,8 +79,17 @@ class SettingsBottomSheet(
             }
         }
 
+        binding.participantCount.text = meetingViewModel.hmsSDK.getPeers().size.toString()
+        binding.layoutParticipants.apply {
+            setOnSingleClickListener {
+                dismiss()
+                participantsListener.invoke()
+            }
+        }
+
         binding.btnPipMode.apply {
             setOnSingleClickListener {
+                dismiss()
                 requireActivity().enterPictureInPictureMode()
             }
         }

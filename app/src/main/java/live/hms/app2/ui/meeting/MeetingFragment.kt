@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -799,6 +800,7 @@ class MeetingFragment : Fragment() {
                     }
                     is MeetingViewModel.Event.RTMPError -> {
                         withContext(Dispatchers.Main) {
+                            binding.buttonGoLive?.visibility = View.VISIBLE
                             Toast.makeText(
                                 context,
                                 "RTMP error ${event.exception}",
@@ -1250,7 +1252,9 @@ class MeetingFragment : Fragment() {
 
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
-                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel)
+                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel) {
+                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
+                }
                 settingsBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     "settingsBottomSheet"
@@ -1296,11 +1300,6 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
-        binding.buttonParticipants?.setOnSingleClickListener(350L) {
-            findNavController().navigate(
-                MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
-            )
-        }
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
         updatePipEndCall()

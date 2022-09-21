@@ -108,7 +108,19 @@ class PreviewFragment : Fragment() {
         settings = SettingsStore(requireContext())
 
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {
-            Log.d("PREVIEW_REC", "STATE IS ${it.name}")
+            if (it == RecordingState.STREAMING_AND_RECORDING) {
+                binding.recordingText.text =
+                    "The session you are about to join is live and being recorded"
+                binding.recordingView.visibility = View.VISIBLE
+            } else if (meetingViewModel.isHlsRunning()) {
+                binding.recordingText.text = "The session you are about to join is live"
+                binding.recordingView.visibility = View.VISIBLE
+            } else if (meetingViewModel.isRTMPRunning()) {
+                binding.recordingText.text = "The session you are about to join is live"
+                binding.recordingView.visibility = View.VISIBLE
+            } else {
+                binding.recordingView.visibility = View.GONE
+            }
         }
 
         meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
@@ -377,7 +389,7 @@ class PreviewFragment : Fragment() {
                 HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
                     peer.networkQuality?.downlinkQuality?.let {
                         binding.networkQuality.visibility = View.VISIBLE
-                        updateNetworkQualityView(it,requireContext(),binding.networkQuality)
+                        updateNetworkQualityView(it, requireContext(), binding.networkQuality)
                     }
                 }
                 else -> Unit
@@ -488,20 +500,24 @@ class PreviewFragment : Fragment() {
             })
     }
 
-    fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
-        NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
-            if (downlinkScore == 0) {
-                imageView.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
-            } else {
-                imageView.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+    private fun updateNetworkQualityView(downlinkScore: Int, context: Context, imageView: ImageView) {
+        NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext())
+            .let { drawable ->
+                if (downlinkScore == 0) {
+                    imageView.setColorFilter(
+                        ContextCompat.getColor(context, R.color.red),
+                        android.graphics.PorterDuff.Mode.SRC_IN
+                    )
+                } else {
+                    imageView.colorFilter = null
+                }
+                imageView.setImageDrawable(drawable)
+                if (drawable == null) {
+                    imageView.visibility = View.GONE
+                } else {
+                    imageView.visibility = View.VISIBLE
+                }
             }
-            imageView.setImageDrawable(drawable)
-            if (drawable == null){
-                imageView.visibility = View.GONE
-            }else{
-                imageView.visibility = View.VISIBLE
-            }
-        }
     }
 
     private fun getRemotePeers(hmsRoom: HMSRoom): ArrayList<HMSPeer> {

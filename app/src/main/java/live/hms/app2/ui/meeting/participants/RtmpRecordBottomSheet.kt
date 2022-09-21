@@ -23,7 +23,6 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
 
     private var binding by viewLifecycle<LayoutRtmpRecordingBinding>()
     private lateinit var settings: SettingsStore
-    private val rtmpUrladapter: RtmpRecordAdapter = RtmpRecordAdapter(::removeItem)
 
     private val meetingViewModel: MeetingViewModel by activityViewModels()
 
@@ -60,9 +59,6 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
         // addRtmpUrlButton,rtmpUrlContainer,existingRtmpUrlsText,rtmpUrls
         val enabled = meetingViewModel.isAllowedToRtmpStream()
         with(binding) {
-            if (meetingViewModel.isAllowedToRtmpStream()) {
-                rtmpUrladapter.submitList(settings.rtmpUrlsList.toList())
-            }
             addRtmpUrlButton.isVisible = enabled
         }
     }
@@ -191,25 +187,18 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
                 binding.rtmpHeight.text.toString().toIntOrNull()
             )
 
-        if (isRecording || isRtmp) {
+        if (isRecording || isRtmp && (inputWidthHeight?.height ?: 0) > 0 && (inputWidthHeight?.width ?: 0) > 0) {
+            startClickListener.invoke()
             meetingViewModel.recordMeeting(
                 isRecording,
                 settings.rtmpUrlsList.toList(),
                 meetingUrl,
                 inputWidthHeight
             )
-            startClickListener.invoke()
             dismiss()
+        }else{
+            Toast.makeText(requireContext(),"Enter required fields before starting RTMP.",Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun removeItem(url: String) {
-//        Log.d("rtmprecord", "clicked $url")
-//        // Remove this item from the adapter.
-//        val newList = rtmpUrladapter.currentList.minus(url)
-//        rtmpUrladapter.submitList(newList)
-//        // Actually remove it from preferences
-//        settings.rtmpUrlsList = newList.toSet()
     }
 }
 
