@@ -58,7 +58,7 @@ class SettingsBottomSheet(
             false
         }
 
-        binding.backBtn.setOnClickListener {
+        binding.closeBtn.setOnClickListener {
             dismiss()
         }
 
@@ -75,6 +75,12 @@ class SettingsBottomSheet(
             }
         }
 
+        binding.btnPipMode.apply {
+            setOnSingleClickListener {
+                requireActivity().enterPictureInPictureMode()
+            }
+        }
+
         binding.btnMeetingMode.apply {
             binding.audioModeSwitch.isChecked = meetingViewModel.getCurrentMediaModeCheckedState()
             updateMeetingAudioMode()
@@ -83,26 +89,17 @@ class SettingsBottomSheet(
             }
         }
 
-        binding.audioModeSwitch.setOnCheckedChangeListener(object: CompoundButton.OnCheckedChangeListener{
-            override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-                meetingViewModel.toggleMediaMode()
-                updateMeetingAudioMode()
-            }
-        })
-
-        binding.btnBrb.apply {
-
-            if (meetingViewModel.isBRBOn()) {
-                binding.tvBrbStatus.text = "Disable BRB"
-            } else {
-                binding.tvBrbStatus.text = "Enable BRB"
-            }
-
-            setOnSingleClickListener(350) {
-                meetingViewModel.toggleBRB()
-                dismiss()
-            }
+        binding.audioModeSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            meetingViewModel.toggleMediaMode()
+            updateMeetingAudioMode()
         }
+
+        binding.brbSwitch.isChecked = meetingViewModel.isBRBOn()
+
+        binding.brbSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            meetingViewModel.toggleBRB()
+        }
+
 
         binding.btnChangeName.apply {
             setOnSingleClickListener(350) {
@@ -128,21 +125,15 @@ class SettingsBottomSheet(
             }
         }
 
-        binding.btnShowStats.apply {
-            if (meetingViewModel.statsToggleLiveData.value == true) {
-                binding.tvStats.text = "Hide Stats"
-            } else {
-                binding.tvStats.text = "Show Stats"
-            }
-            setOnSingleClickListener(350) {
+        binding.showStatsSwitch.isChecked = meetingViewModel.statsToggleLiveData.value == true
 
-                meetingViewModel.statsToggleData.postValue(meetingViewModel.statsToggleLiveData.value?.not())
-                dismiss()
-            }
+        binding.showStatsSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            meetingViewModel.statsToggleData.postValue(isChecked)
         }
+
     }
 
-    fun updateMeetingAudioMode(){
+    fun updateMeetingAudioMode() {
         if (meetingViewModel.getCurrentMediaModeCheckedState()) {
             binding.tvAudioMode.text = "Audio Mode : Media"
         } else {

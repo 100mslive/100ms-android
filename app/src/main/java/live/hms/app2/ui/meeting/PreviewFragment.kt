@@ -208,7 +208,7 @@ class PreviewFragment : Fragment() {
                         binding.buttonToggleVideoBg.setCardBackgroundColor(
                             ContextCompat.getColor(
                                 context,
-                                R.color.gray_color
+                                R.color.gray_light
                             )
                         )
                     } else {
@@ -256,7 +256,7 @@ class PreviewFragment : Fragment() {
                         binding.buttonToggleAudioBg.setCardBackgroundColor(
                             ContextCompat.getColor(
                                 context,
-                                R.color.gray_color
+                                R.color.gray_light
                             )
                         )
                     }
@@ -430,7 +430,7 @@ class PreviewFragment : Fragment() {
                             binding.buttonToggleVideoBg.setCardBackgroundColor(
                                 ContextCompat.getColor(
                                     context,
-                                    R.color.gray_color
+                                    R.color.gray_light
                                 )
                             )
                         }
@@ -469,7 +469,7 @@ class PreviewFragment : Fragment() {
                             binding.buttonToggleAudioBg.setCardBackgroundColor(
                                 ContextCompat.getColor(
                                     context,
-                                    R.color.gray_color
+                                    R.color.gray_light
                                 )
                             )
                         }
