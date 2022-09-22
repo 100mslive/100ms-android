@@ -295,7 +295,10 @@ class MeetingFragment : Fragment() {
                     setIcon(R.drawable.ic_baseline_hearing_24)
                 }
                 AudioDevice.SPEAKER_PHONE -> {
-                    setIcon(R.drawable.ic_volume_up_24)
+                    setIcon(R.drawable.ic_icon_speaker)
+                }
+                AudioDevice.AUTOMATIC -> {
+                    setIcon(R.drawable.ic_icon_speaker)
                 }
                 AudioDevice.BLUETOOTH -> {
                     setIcon(R.drawable.ic_baseline_bluetooth_24)

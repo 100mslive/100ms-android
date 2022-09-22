@@ -296,6 +296,9 @@ class PreviewFragment : Fragment() {
                 HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
                     setImageResource(R.drawable.ic_icon_speaker)
                 }
+                HMSAudioManager.AudioDevice.AUTOMATIC -> {
+                    setImageResource(R.drawable.ic_icon_speaker)
+                }
                 HMSAudioManager.AudioDevice.BLUETOOTH -> {
                     setImageResource(R.drawable.ic_baseline_bluetooth_24)
                 }

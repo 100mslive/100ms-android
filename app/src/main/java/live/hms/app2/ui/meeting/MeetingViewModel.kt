@@ -211,10 +211,14 @@ class MeetingViewModel(
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
             HMSAudioTrackSettings.Builder()
-                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build()
+                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
+                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .build()
         )
         .video(
-            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize).build()
+            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
+                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .build()
         )
         .build()
 
