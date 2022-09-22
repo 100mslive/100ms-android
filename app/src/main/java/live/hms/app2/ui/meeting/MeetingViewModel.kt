@@ -785,7 +785,9 @@ class MeetingViewModel(
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
-        hmsSDK.leave()
+        if(details !=null) {
+            hmsSDK.leave()
+        }
         cleanup()
         state.postValue(MeetingState.Disconnected(true, details))
     }
