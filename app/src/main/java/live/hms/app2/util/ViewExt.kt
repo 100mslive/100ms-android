@@ -12,7 +12,7 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
 import live.hms.app2.helpers.OnSingleClickListener
-import live.hms.video.media.settings.HMSSimulcastLayer
+import live.hms.video.media.settings.HMSLayer
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import java.io.File
@@ -123,8 +123,8 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
         return
 
     var selectedQualityIndex = 0
-    val currentQuality = hmsVideoTrack.getLayer()
-    val videoQuality = arrayOf<CharSequence>(HMSSimulcastLayer.HIGH.toString(), HMSSimulcastLayer.MEDIUM.toString(), HMSSimulcastLayer.LOW.toString())
+    val currentQuality = hmsVideoTrack.getCurrentLayer()
+    val videoQuality = arrayOf<CharSequence>(HMSLayer.HIGH.toString(), HMSLayer.MEDIUM.toString(), HMSLayer.LOW.toString())
 
     videoQuality.filterIndexed { index, quality ->
         if (quality == currentQuality.toString()) {
@@ -140,9 +140,9 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
             .setSingleChoiceItems(videoQuality, selectedQualityIndex
             ) { dialog, which ->
                 when (which) {
-                    0 -> hmsVideoTrack.setLayer(HMSSimulcastLayer.HIGH)
-                    1 -> hmsVideoTrack.setLayer(HMSSimulcastLayer.MEDIUM)
-                    2 -> hmsVideoTrack.setLayer(HMSSimulcastLayer.LOW)
+                    0 -> hmsVideoTrack.setLayer(HMSLayer.HIGH)
+                    1 -> hmsVideoTrack.setLayer(HMSLayer.MEDIUM)
+                    2 -> hmsVideoTrack.setLayer(HMSLayer.LOW)
                 }
             }
             show()
