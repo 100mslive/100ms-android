@@ -16,7 +16,7 @@ class HlsPlayer {
     private var playWhenReady = true
     private var currentWindow = 0
     private var playbackPosition = 0L
-    private var player : Player? = null
+    private var player : ExoPlayer? = null
 
     init {
         dataSourceFactory = DefaultHttpDataSource.Factory()
@@ -25,26 +25,30 @@ class HlsPlayer {
     fun getPlayer() = player
 
     fun createPlayer(context : Context, url : String, playWhenready : Boolean = true) : Player {
+        val player = ExoPlayer.Builder(context)
+            .build()
 
+        this.player = player
+        return player
+    }
+
+    fun startPlayer(url : String, playWhenready : Boolean = true) {
         val hlsMediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
             .setAllowChunklessPreparation(true)
             .createMediaSource(MediaItem.fromUri(url))
 
-        val player = ExoPlayer.Builder(context).build()
-        with(player) {
+        player?.apply {
             setMediaSource(hlsMediaSource)
             playWhenReady = playWhenready
             seekTo(currentWindow, playbackPosition)
             prepare()
         }
-        this.player = player
-        return player
     }
 
     fun releasePlayer() {
         player?.run {
             playbackPosition = this.currentPosition
-            currentWindow = this.currentMediaItemIndex
+//            currentWindow = this.currentMediaItemIndex
             playWhenReady = this.playWhenReady
             release()
         }
