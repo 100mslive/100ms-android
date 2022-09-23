@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.databinding.HlsBottomSheetDialogBinding
 import live.hms.app2.ui.meeting.participants.meetingToHlsUrl
@@ -14,12 +15,12 @@ import live.hms.video.sdk.models.HMSHlsRecordingConfig
 
 
 class HlsStreamingToggleBottomSheet(
-    private val meetingViewModel: MeetingViewModel,
     private val meetingUrl: String,
     private val hlsStateChangeListener: (Boolean) -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<HlsBottomSheetDialogBinding>()
+    private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,7 +34,7 @@ class HlsStreamingToggleBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.backBtn.setOnClickListener {
+        binding.closeBtn.setOnClickListener {
             dismiss()
         }
 

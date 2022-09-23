@@ -210,7 +210,7 @@ class VideoListAdapter(
                   if (payload.downlinkSpeed == 0) {
                     holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
                   } else {
-                    holder.binding.networkQuality.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), PorterDuff.Mode.SRC_IN);
+                    holder.binding.networkQuality.colorFilter = null
                   }
                   holder.binding.networkQuality.setImageDrawable(it)
                 } ?: {

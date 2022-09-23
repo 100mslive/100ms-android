@@ -428,7 +428,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       if (downlinkScore == 0) {
         imageView.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
       } else {
-        imageView.setColorFilter(ContextCompat.getColor(context, android.R.color.holo_green_light), android.graphics.PorterDuff.Mode.SRC_IN)
+        imageView.colorFilter = null
       }
       imageView.setImageDrawable(drawable)
       if (drawable == null){

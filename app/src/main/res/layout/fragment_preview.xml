@@ -17,23 +17,39 @@
         android:elevation="10dp"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="30dp">
+            android:background="@drawable/bg_gradient_drawable"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="30dp"
+            android:paddingBottom="40dp">
 
             <TextView
                 android:id="@+id/name_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
                 android:layout_gravity="center"
                 android:fontFamily="@font/inter_semibold"
                 android:gravity="center"
-                android:text="Configure"
+                android:text="Get Started"
                 android:textColor="#F2F5F9FF"
                 android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/name_tv"
+                android:layout_alignParentStart="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="center"
+                android:text="Setup your audio and video"
+                android:textColor="@color/muted_text"
+                android:textSize="14sp" />
 
             <Space
                 android:layout_width="wrap_content"
@@ -41,44 +57,56 @@
                 android:layout_weight="1" />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/button_network_quality"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginEnd="10dp"
+                android:layout_alignParentEnd="true"
                 android:elevation="10dp"
-                app:cardBackgroundColor="@color/gray_color"
-                app:cardCornerRadius="5dp">
+                app:cardBackgroundColor="@color/primary_bg"
+                app:cardCornerRadius="12dp">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/icon_output_device"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                <ImageView
+                    android:id="@+id/network_quality"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    android:padding="4dp"
-                    android:tint="@color/white"
-                    app:srcCompat="@drawable/ic_icon_speaker" />
+                    android:layout_marginHorizontal="8dp"
+                    android:src="@drawable/ic_baseline_wifi_5"
+                    android:visibility="gone"
+                    app:tint="@android:color/holo_green_light" />
 
             </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginEnd="10dp"
-                android:elevation="10dp"
-                app:cardBackgroundColor="@color/gray_color"
-                app:cardCornerRadius="5dp">
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/icon_participants"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:padding="4dp"
-                    android:layout_gravity="center"
-                    android:tint="@color/white"
-                    app:srcCompat="@drawable/ic_icon_people" />
+        </RelativeLayout>
 
-            </androidx.cardview.widget.CardView>
+        <LinearLayout
+            android:id="@+id/recording_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:visibility="gone"
+            android:background="@color/primary_bg"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="15dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_record_button_24"
+                android:tint="@color/red" />
+
+            <TextView
+                android:id="@+id/recording_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:text="The session you are about to join is live and being recorded"
+                android:textSize="12sp" />
 
         </LinearLayout>
+
 
         <Space
             android:layout_width="wrap_content"
@@ -103,7 +131,7 @@
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/button_toggle_audio"
@@ -124,7 +152,7 @@
                 android:layout_height="40dp"
                 android:elevation="10dp"
                 app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="5dp">
+                app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/button_toggle_video"
@@ -142,7 +170,6 @@
             </androidx.cardview.widget.CardView>
 
 
-
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/button_settings"
                 android:layout_width="0dp"
@@ -157,56 +184,93 @@
                 android:visibility="invisible"
                 app:fabSize="mini" />
 
-            <Space android:layout_width="wrap_content"
+            <Space
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                />
+                android:layout_weight="2" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/button_network_quality"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
                 android:elevation="10dp"
-                app:cardBackgroundColor="@color/primary_bg"
-                app:cardCornerRadius="5dp">
+                app:cardBackgroundColor="@color/gray_light"
+                app:cardCornerRadius="12dp">
 
-                <ImageView
-                    android:id="@+id/network_quality"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_output_device"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center"
-                    android:visibility="gone"
-                    android:layout_marginHorizontal="8dp"
-                    android:src="@drawable/ic_baseline_wifi_5"
-                    app:tint="@android:color/holo_green_light" />
+                    android:padding="4dp"
+                    android:tint="@color/white"
+                    app:srcCompat="@drawable/ic_icon_speaker" />
 
             </androidx.cardview.widget.CardView>
 
+            <androidx.cardview.widget.CardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="10dp"
+                app:cardBackgroundColor="@color/gray_light"
+                app:cardCornerRadius="12dp">
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_participants"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:padding="4dp"
+                    android:tint="@color/white"
+                    app:srcCompat="@drawable/ic_icon_people" />
+
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button_join_meeting"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/primary_blue_round_drawable"
-            android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
-            android:drawablePadding="5dp"
-            android:enabled="true"
-            android:fontFamily="@font/inter_semibold"
-            android:paddingHorizontal="10dp"
-            android:text="@string/enter_studio_str"
-            android:textAllCaps="false"
-            android:visibility="invisible"
-            app:cornerRadius="5dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/preview_card" />
+            android:background="@drawable/primary_blue_round_drawable">
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_join_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:enabled="true"
+                android:fontFamily="@font/inter_semibold"
+                android:paddingHorizontal="10dp"
+                android:text="@string/enter_studio_str"
+                android:textAllCaps="false"
+                android:visibility="visible"
+                app:cornerRadius="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/preview_card" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_arrow_forward_24" />
+
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

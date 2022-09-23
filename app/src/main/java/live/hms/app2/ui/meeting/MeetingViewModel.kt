@@ -214,10 +214,14 @@ class MeetingViewModel(
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
             HMSAudioTrackSettings.Builder()
-                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build()
+                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
+                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .build()
         )
         .video(
-            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize).build()
+            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
+                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .build()
         )
         .build()
 
@@ -697,6 +701,9 @@ class MeetingViewModel(
             RecordingState.NOT_RECORDING_OR_STREAMING
         }
     }
+
+    fun isHlsRunning() = hmsRoom?.hlsStreamingState?.running == true
+    fun isRTMPRunning() = hmsRoom?.rtmpHMSRtmpStreamingState?.running == true
 
     fun setStatetoOngoing() {
         state.postValue(MeetingState.Ongoing())
