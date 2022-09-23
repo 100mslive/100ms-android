@@ -44,6 +44,7 @@ class MeetingLinkFragment : Fragment() {
                         if (it.isNullOrEmpty().not()) {
                             binding.edtMeetingUrl.setText(it)
                             validate()
+                            binding.btnJoinNow.callOnClick()
                         }
                     }
                 }
@@ -156,9 +157,7 @@ class MeetingLinkFragment : Fragment() {
         binding.edtMeetingUrl.setText(settings.lastUsedMeetingUrl)
         binding.btnJoinNow.setOnClickListener {
             (requireActivity() as HomeActivity).meetingUrl = binding.edtMeetingUrl.text.toString()
-            findNavController().navigate(
-                MeetingLinkFragmentDirections.actionMeetingLinkFragmentToHomeFragment()
-            )
+            findNavController().navigate(MeetingLinkFragmentDirections.actionMeetingLinkFragmentToHomeFragment())
         }
 
         binding.edtMeetingUrl.addTextChangedListener(object : TextWatcher{

@@ -44,12 +44,13 @@
             tools:visibility="visible">
 
             <TextView
+                android:id="@+id/live_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:drawableStart="@drawable/ic_circle_solid"
-                android:drawablePadding="10dp"
+                android:drawablePadding="5dp"
                 android:drawableTint="@color/red"
                 android:text="@string/live_str"
                 android:textColor="@color/white"
@@ -61,34 +62,41 @@
                 android:layout_weight="1" />
 
 
-            <TextView
-                android:id="@+id/tv_recording_time"
+            <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:drawableStart="@drawable/ic_baseline_access_time_24"
-                android:drawablePadding="5dp"
-                android:drawableTint="#E0ECFF"
-                android:textColor="#E0ECFF"
-                android:textSize="12sp"
-                android:visibility="visible"
-                tools:text="1:00" />
+                android:layout_height="wrap_content">
+
+
+                <TextView
+                    android:id="@+id/tv_recording_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:drawableStart="@drawable/ic_baseline_access_time_24"
+                    android:drawablePadding="5dp"
+                    android:drawableTint="#E0ECFF"
+                    android:textColor="#E0ECFF"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    tools:text="1:00" />
+
+                <TextView
+                    android:id="@+id/tv_viewers_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="10dp"
+                    android:drawableStart="@drawable/ic_eye"
+                    android:drawablePadding="5dp"
+                    android:drawableTint="#E0ECFF"
+                    android:textColor="#E0ECFF"
+                    android:textSize="12sp"
+                    android:visibility="visible"
+                    tools:text="2" />
+
+            </LinearLayout>
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_viewers_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="2dp"
-            android:drawableStart="@drawable/ic_eye"
-            android:drawablePadding="5dp"
-            android:drawableTint="#E0ECFF"
-            android:textColor="#E0ECFF"
-            android:textSize="12sp"
-            android:visibility="visible"
-            tools:text="2" />
 
         <Space
             android:layout_width="wrap_content"
@@ -136,16 +144,6 @@
                 android:textSize="12sp" />
 
         </RelativeLayout>
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/button_participants"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@drawable/gray_round_stroked_drawable"
-            android:contentDescription="@string/flip_camera"
-            android:padding="8dp"
-            app:srcCompat="@drawable/ic_icon_people" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/button_settings_menu_top"
@@ -220,6 +218,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingBottom="10dp"
             android:visibility="gone">
 
             <FrameLayout
@@ -244,21 +243,6 @@
                     app:maxImageSize="42dp" />
 
             </FrameLayout>
-
-            <TextView
-                android:id="@+id/tv_go_live"
-                android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="6dp"
-                android:fontFamily="@font/inter_semibold"
-                android:letterSpacing="0.15"
-                android:lineSpacingExtra="4sp"
-                android:text="@string/go_live_str"
-                android:textAllCaps="true"
-                android:textColor="#F2F5F9FF"
-                android:textSize="10sp"
-                android:translationY="-1.95sp" />
 
         </LinearLayout>
 

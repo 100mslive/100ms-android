@@ -37,7 +37,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/ic_volume_up_24"
+            android:drawableEnd="@drawable/ic_icon_speaker"
             android:text="Speaker" />
 
     </LinearLayout>

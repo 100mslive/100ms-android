@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +49,7 @@ import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEven
 import live.hms.app2.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.app2.ui.meeting.chat.ChatViewModel
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.app2.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.app2.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.app2.ui.meeting.videogrid.VideoGridFragment
 import live.hms.app2.ui.settings.SettingsMode
@@ -98,11 +100,16 @@ class MeetingFragment : Fragment() {
 
     private var isMeetingOngoing = false
     private val goLiveBottomSheet by lazy {
-        HlsStreamingToggleBottomSheet(meetingViewModel, meetingUrl = settings.lastUsedMeetingUrl) {
+        HlsStreamingToggleBottomSheet(meetingUrl = settings.lastUsedMeetingUrl) {
             if (it) {
-                binding.tvGoLive?.text = "Starting HLS"
                 binding.buttonGoLive?.visibility = View.GONE
             }
+        }
+    }
+
+    private val rtmpBottomSheet by lazy {
+        RtmpRecordBottomSheet {
+            binding.buttonGoLive?.visibility = View.GONE
         }
     }
 
@@ -292,7 +299,10 @@ class MeetingFragment : Fragment() {
                     setIcon(R.drawable.ic_baseline_hearing_24)
                 }
                 AudioDevice.SPEAKER_PHONE -> {
-                    setIcon(R.drawable.ic_volume_up_24)
+                    setIcon(R.drawable.ic_icon_speaker)
+                }
+                AudioDevice.AUTOMATIC -> {
+                    setIcon(R.drawable.ic_icon_speaker)
                 }
                 AudioDevice.BLUETOOTH -> {
                     setIcon(R.drawable.ic_baseline_bluetooth_24)
@@ -332,8 +342,12 @@ class MeetingFragment : Fragment() {
             )
             binding.buttonGoLive?.backgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.red))
-            binding.tvGoLive?.text = requireActivity().resources.getText(R.string.end_stream_str)
             binding.recordingSignalView?.visibility = View.VISIBLE
+            if (meetingViewModel.isRTMPRunning()) {
+                binding.liveTitle?.text = "Live with RTMP"
+            } else {
+                binding.liveTitle?.text = "Live"
+            }
             binding.tvViewersCount?.visibility = View.VISIBLE
             binding.tvViewersCount?.text = (meetingViewModel.hmsSDK.getPeers().size - 1).toString()
             setupRecordingTimeView()
@@ -351,7 +365,6 @@ class MeetingFragment : Fragment() {
                         R.color.primary_blue
                     )
                 )
-            binding.tvGoLive?.text = requireActivity().resources.getText(R.string.go_live_str)
             binding.recordingSignalView?.visibility = View.GONE
             binding.tvViewersCount?.visibility = View.GONE
         }
@@ -363,6 +376,7 @@ class MeetingFragment : Fragment() {
             override fun onTick(l: Long) {
                 val startedAt =
                     meetingViewModel.hmsSDK.getRoom()?.hlsStreamingState?.variants?.firstOrNull()?.startedAt
+                        ?: meetingViewModel.hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
                         binding.tvRecordingTime?.visibility = View.VISIBLE
@@ -556,7 +570,6 @@ class MeetingFragment : Fragment() {
             if (isVisible) {
                 val text =
                     if (remotePeersAreMute == null) "No peers to mute/unmute" else if (remotePeersAreMute) "Remote Unmute All" else "Remote Mute All"
-//        text += " " + if(it.type == HMSTrackType.VIDEO) "Video" else "Audio"
                 this.title = text
             }
 
@@ -685,6 +698,7 @@ class MeetingFragment : Fragment() {
                 updateGoLiveButton(it)
             })
 
+
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
                 binding.buttonRaiseHand?.background = ContextCompat.getDrawable(
@@ -798,6 +812,7 @@ class MeetingFragment : Fragment() {
                     }
                     is MeetingViewModel.Event.RTMPError -> {
                         withContext(Dispatchers.Main) {
+                            binding.buttonGoLive?.visibility = View.VISIBLE
                             Toast.makeText(
                                 context,
                                 "RTMP error ${event.exception}",
@@ -1161,11 +1176,13 @@ class MeetingFragment : Fragment() {
     }
 
     private fun setupConfiguration() {
-        if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()?.not() == true || meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS){
+        if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()
+                ?.not() == true || meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS
+        ) {
             binding.buttonShareScreen?.visibility = View.GONE
             binding.buttonSettingsMenu?.visibility = View.GONE
             binding.buttonSettingsMenuTop?.visibility = View.VISIBLE
-        }else{
+        } else {
             binding.buttonShareScreen?.visibility = View.VISIBLE
             binding.buttonSettingsMenu?.visibility = View.VISIBLE
             binding.buttonSettingsMenuTop?.visibility = View.GONE
@@ -1212,14 +1229,34 @@ class MeetingFragment : Fragment() {
         binding.buttonGoLive?.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonGoLive.onClick()")
-                if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
-                    goLiveBottomSheet.show(
-                        requireActivity().supportFragmentManager,
-                        "GoLiveBottomSheet"
-                    )
-                } else {
+
+                if (meetingViewModel.isHlsRunning()) {
                     inflateStopHlsDialog()
+                    return@setOnSingleClickListener
+                } else if (meetingViewModel.isRTMPRunning()) {
+                    inflateStopHlsDialog()
+                    return@setOnSingleClickListener
                 }
+
+                val goLiveSelectionBottomSheet = GoLiveSelectionBottomSheet {
+                    if (it == GoLiveOption.HLS) {
+                        if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
+                            goLiveBottomSheet.show(
+                                requireActivity().supportFragmentManager,
+                                "GoLiveBottomSheet"
+                            )
+                        }
+                    } else {
+                        rtmpBottomSheet.show(
+                            requireActivity().supportFragmentManager,
+                            "RTMPBottomSheet"
+                        )
+                    }
+                }
+                goLiveSelectionBottomSheet.show(
+                    requireActivity().supportFragmentManager,
+                    "GoLiveSelectionBottomSheet"
+                )
             }
         }
 
@@ -1227,7 +1264,9 @@ class MeetingFragment : Fragment() {
 
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
-                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel)
+                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel) {
+                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
+                }
                 settingsBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     "settingsBottomSheet"
@@ -1273,11 +1312,6 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
-        binding.buttonParticipants?.setOnSingleClickListener(350L) {
-            findNavController().navigate(
-                MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
-            )
-        }
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
         updatePipEndCall()
@@ -1362,7 +1396,9 @@ class MeetingFragment : Fragment() {
                     Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
                     val recordingState = meetingViewModel.isRecording.value
 
-                    if (recordingState == RecordingState.NOT_RECORDING_OR_STREAMING || meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()?.not() == true) {
+                    if (recordingState == RecordingState.NOT_RECORDING_OR_STREAMING || meetingViewModel.hmsSDK.getLocalPeer()
+                            ?.isWebrtcPeer()?.not() == true
+                    ) {
 
                         val endCallDialog = Dialog(requireContext())
                         endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
@@ -1412,9 +1448,12 @@ class MeetingFragment : Fragment() {
             .setOnClickListener { stopHlsDialog.dismiss() }
         stopHlsDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
             stopHlsDialog.dismiss()
-            meetingViewModel.stopHls()
+            if (meetingViewModel.isHlsRunning()) {
+                meetingViewModel.stopHls()
+            } else if (meetingViewModel.isRTMPRunning()) {
+                meetingViewModel.stopRecording()
+            }
             binding.buttonGoLive?.visibility = View.GONE
-            binding.tvGoLive?.text = "Stopping HLS"
         }
         stopHlsDialog.show()
     }

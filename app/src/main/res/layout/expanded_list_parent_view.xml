@@ -10,7 +10,7 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_gravity="center"
-        android:src="@drawable/settings_icon" />
+        android:src="@drawable/layout_icon" />
 
     <TextView
         android:id="@+id/tv_title"

@@ -15,7 +15,7 @@
         android:paddingVertical="20dp">
 
         <ImageView
-            android:id="@+id/back_btn"
+            android:id="@+id/close_btn"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/back_icon"
@@ -33,9 +33,9 @@
             android:textAllCaps="true"
             android:textColor="@color/muted_text"
             android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="@+id/back_btn"
-            app:layout_constraintStart_toEndOf="@+id/back_btn"
-            app:layout_constraintTop_toTopOf="@+id/back_btn"
+            app:layout_constraintBottom_toBottomOf="@+id/close_btn"
+            app:layout_constraintStart_toEndOf="@+id/close_btn"
+            app:layout_constraintTop_toTopOf="@+id/close_btn"
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
