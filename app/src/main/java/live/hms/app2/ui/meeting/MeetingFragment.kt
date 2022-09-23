@@ -1018,6 +1018,16 @@ class MeetingFragment : Fragment() {
                 }
 
                 is MeetingState.ForceLeave -> {
+                    with(state.details) {
+                        val message = if(roomWasEnded) {
+                            "Room ended by ${peerWhoRemoved?.name}"
+                        } else {
+                            "${peerWhoRemoved?.name} removed you from the room. ${state.details.reason}"
+                        }
+
+                        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    }
+
                     meetingViewModel.leaveMeeting(state.details)
                 }
 
