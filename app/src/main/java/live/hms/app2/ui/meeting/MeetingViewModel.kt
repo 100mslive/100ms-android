@@ -11,10 +11,13 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -212,12 +215,12 @@ class MeetingViewModel(
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
-                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
                 .build()
         )
         .video(
             HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
-                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
                 .build()
         )
         .build()
@@ -613,15 +616,19 @@ class MeetingViewModel(
 
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
-                broadcastsReceived.postValue(
-                    ChatMessage(
-                        message.sender.name,
-                        message.serverReceiveTime,
-                        message.message,
-                        false,
-                        recipient = Recipient.toRecipient(message.recipient)
+                if(message.type == "metadata"){
+                    getSessionMetadata()
+                } else {
+                    broadcastsReceived.postValue(
+                        ChatMessage(
+                            message.sender.name,
+                            message.serverReceiveTime,
+                            message.message,
+                            false,
+                            recipient = Recipient.toRecipient(message.recipient)
+                        )
                     )
-                )
+                }
             }
 
             override fun onReconnected() {
@@ -653,6 +660,7 @@ class MeetingViewModel(
                 }
             }
         })
+
 
         hmsSDK.addAudioObserver(object : HMSAudioListener {
             override fun onAudioLevelUpdate(speakers: Array<HMSSpeaker>) {
@@ -784,7 +792,10 @@ class MeetingViewModel(
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
-        hmsSDK.leave()
+        // Don't call leave when being forced to leave
+        if(details == null) {
+            hmsSDK.leave()
+        }
         cleanup()
         state.postValue(MeetingState.Disconnected(true, details))
     }
@@ -1217,26 +1228,27 @@ class MeetingViewModel(
     private val _events = MutableSharedFlow<Event?>()
     val events: SharedFlow<Event?> = _events
 
-    sealed class Event {
-        class RTMPError(val exception: HMSException) : Event()
-        class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
-        object OpenChangeNameDialog : Event()
-        sealed class Hls : Event() {
-            data class HlsError(val throwable: HMSException) : Hls()
-        }
-
-        class HlsNotStarted(val reason: String) : Event()
-        abstract class MessageEvent(open val message: String) : Event()
-        data class RtmpEvent(val message: String) : Event()
-        data class RecordEvent(val message: String) : Event()
-        data class ServerRecordEvent(val message: String) : Event()
-        data class HlsEvent(override val message: String) : MessageEvent(message)
-        data class HlsRecordingEvent(override val message: String) : MessageEvent(message)
-        data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
+  sealed class Event {
+    class RTMPError(val exception: HMSException) : Event()
+    class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
+    object OpenChangeNameDialog : Event()
+    sealed class Hls : Event() {
+      data class HlsError(val throwable: HMSException) : Hls()
     }
+    class HlsNotStarted(val reason : String) : Event()
+    abstract class MessageEvent(open val message : String) : Event()
+    data class RtmpEvent(val message : String) : Event()
+    data class RecordEvent(val message : String) : Event()
+    data class ServerRecordEvent(val message: String) : Event()
+    data class HlsEvent(override val message : String) : MessageEvent(message)
+    data class HlsRecordingEvent(override val message : String) : MessageEvent(message)
+    data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
+    data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
+  }
 
     private val _isHandRaised = MutableLiveData<Boolean>(false)
     val isHandRaised: LiveData<Boolean> = _isHandRaised
+
 
     fun toggleRaiseHand() {
         val localPeer = hmsSDK.getLocalPeer()!!
@@ -1356,5 +1368,67 @@ class MeetingViewModel(
     fun getCurrentMediaModeCheckedState(): Boolean {
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
+
+  fun setSessionMetadata(data : String?) {
+    hmsSDK.setSessionMetaData(data, object :HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+          _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+        }
+      }
+
+      override fun onSuccess() {
+        viewModelScope.launch {
+
+          hmsSDK.sendBroadcastMessage(SESSION_METADATA_BROADCAST_MESSAGE,
+            SESSION_METADATA_BROADCAST_TYPE, object : HMSMessageResultListener {
+            override fun onError(error: HMSException) {
+              viewModelScope.launch {
+                _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
+              }
+            }
+
+            override fun onSuccess(hmsMessage: HMSMessage) {
+              getSessionMetadata()
+            }
+
+          })
+        }
+      }
+
+    })
+  }
+
+  fun getSessionMetadata() : Unit {
+    val sessionData = CompletableDeferred<String?>()
+    hmsSDK.getSessionMetaData(object :HMSSessionMetadataListener {
+      override fun onError(error: HMSException) {
+        viewModelScope.launch {
+          _events.emit(Event.SessionMetadataEvent("Session Metadata retrieval error $error"))
+          sessionData.completeExceptionally(error)
+        }
+      }
+
+      override fun onSuccess(sessionMetadata: String?) {
+        viewModelScope.launch {
+          sessionData.complete(sessionMetadata)
+        }
+      }
+
+    })
+
+    viewModelScope.launch {
+      val data = try {
+        sessionData.await()
+      } catch (e : Exception) {
+        "Error $e"
+      }
+      _sessionMetadata.postValue(data)
+    }
+  }
+
+  private val _sessionMetadata = MutableLiveData<String?>(null)
+  val sessionMetadata : LiveData<String?> = _sessionMetadata
+
 }
 
