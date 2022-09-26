@@ -215,12 +215,12 @@ class MeetingViewModel(
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
-                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
                 .build()
         )
         .video(
             HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
-                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
                 .build()
         )
         .build()
@@ -792,7 +792,8 @@ class MeetingViewModel(
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
-        if(details !=null) {
+        // Don't call leave when being forced to leave
+        if(details == null) {
             hmsSDK.leave()
         }
         cleanup()
