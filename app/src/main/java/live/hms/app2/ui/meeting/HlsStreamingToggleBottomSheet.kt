@@ -46,19 +46,10 @@ class HlsStreamingToggleBottomSheet(
                     recordingConfig = HMSHlsRecordingConfig(true, videoOnDemand)
                 )
                 meetingViewModel.hlsToggleUpdateLiveData.observe(requireActivity()) {
-                    if (it.not()) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Error Occurred! Try Again",
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
-                    }
                     dismiss()
                     hlsStateChangeListener.invoke(it)
                 }
             }
-
         }
     }
 }

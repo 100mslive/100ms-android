@@ -72,8 +72,7 @@
                     android:layout_gravity="center"
                     android:layout_marginHorizontal="8dp"
                     android:src="@drawable/ic_baseline_wifi_5"
-                    android:visibility="gone"
-                    app:tint="@android:color/holo_green_light" />
+                    android:visibility="gone" />
 
             </androidx.cardview.widget.CardView>
 
@@ -255,7 +254,7 @@
                 android:text="@string/enter_studio_str"
                 android:textAllCaps="false"
                 android:visibility="visible"
-                app:cornerRadius="5dp"
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/preview_card" />
 
@@ -263,6 +262,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:tint="@color/white"
                 android:src="@drawable/ic_baseline_arrow_forward_24" />
 
             <Space

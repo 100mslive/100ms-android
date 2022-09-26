@@ -324,7 +324,9 @@ class MeetingFragment : Fragment() {
     }
 
     private fun updateGoLiveButton(recordingState: RecordingState) {
-        if (meetingViewModel.isHlsKitUrl) {
+        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
+                ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
+        ) {
             binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
             binding.spacer?.visibility = View.VISIBLE
@@ -589,45 +591,6 @@ class MeetingFragment : Fragment() {
             // Launch a scroll thing.
             isVisible =
                 meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute
-            val cancelRoleName = "Cancel"
-            setOnMenuItemClickListener {
-                val availableRoles = meetingViewModel.getAvailableRoles().map { it.name }
-                val rolesToSend = availableRoles.plus(cancelRoleName)
-                binding.roleSpinner.root.initAdapters(
-                    rolesToSend,
-                    if (remotePeersAreMute == null) "Nothing to change" else if (remotePeersAreMute) "Remote Unmute Role" else "Remote Mute Role",
-                    object : AdapterView.OnItemSelectedListener {
-                        override fun onItemSelected(
-                            parent: AdapterView<*>?,
-                            view: View?,
-                            position: Int,
-                            id: Long
-                        ) {
-                            val stringRole = parent?.adapter?.getItem(position) as String
-                            if (remotePeersAreMute == null) {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "No remote peers, or their audio tracks are absent",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            } else {
-                                if (stringRole != cancelRoleName) {
-                                    meetingViewModel.remoteMute(
-                                        !remotePeersAreMute,
-                                        listOf(stringRole)
-                                    )
-                                }
-                            }
-                        }
-
-                        override fun onNothingSelected(parent: AdapterView<*>?) {
-                            // Nothing
-                        }
-
-                    })
-                binding.roleSpinner.root.performClick()
-                true
-            }
         }
 
         menu.findItem(R.id.action_flip_camera).apply {
@@ -1023,6 +986,10 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
+//            if (allowed.not()) {
+//                if (currentFragment is VideoGridBaseFragment)
+//                    (currentFragment as VideoGridBaseFragment).unbindViews()
+//            }
             setupConfiguration()
         }
 
@@ -1178,6 +1145,10 @@ class MeetingFragment : Fragment() {
             binding.buttonSettingsMenu?.visibility = View.VISIBLE
             binding.buttonSettingsMenuTop?.visibility = View.GONE
         }
+
+        if (meetingViewModel.isAllowedToShareScreen().not()) {
+            binding.buttonShareScreen?.visibility = View.GONE
+        }
     }
 
     private fun hideProgressBar() {
@@ -1229,7 +1200,10 @@ class MeetingFragment : Fragment() {
                     return@setOnSingleClickListener
                 }
 
-                val goLiveSelectionBottomSheet = GoLiveSelectionBottomSheet {
+                val goLiveSelectionBottomSheet = GoLiveSelectionBottomSheet(
+                    meetingViewModel.isAllowedToHlsStream(),
+                    meetingViewModel.isAllowedToRtmpStream()
+                ) {
                     if (it == GoLiveOption.HLS) {
                         if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
                             goLiveBottomSheet.show(
@@ -1255,9 +1229,11 @@ class MeetingFragment : Fragment() {
 
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
-                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel) {
+                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel, {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
-                }
+                }, {
+                    roleChangeRemote()
+                })
                 settingsBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     "settingsBottomSheet"
@@ -1387,32 +1363,78 @@ class MeetingFragment : Fragment() {
                     Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
                     val recordingState = meetingViewModel.isRecording.value
 
-                    if (recordingState == RecordingState.NOT_RECORDING_OR_STREAMING || meetingViewModel.hmsSDK.getLocalPeer()
-                            ?.isWebrtcPeer()?.not() == true
-                    ) {
-
-                        val endCallDialog = Dialog(requireContext())
-                        endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
-                        endCallDialog.findViewById<TextView>(R.id.dialog_title).text =
-                            "Leave Meeting"
-                        endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
-                            "You're about to quit the meeting, are you sure?"
-                        endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text =
-                            "Don’t Leave"
-                        endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "Leave"
-                        endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-                            .setOnClickListener { endCallDialog.dismiss() }
-                        endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn)
-                            .setOnClickListener {
-                                endCallDialog.dismiss()
-                                meetingViewModel.leaveMeeting()
-                            }
-                        endCallDialog.show()
-                    } else {
+//                    if (recordingState == RecordingState.NOT_RECORDING_OR_STREAMING && meetingViewModel.isHlsKitUrl
+//                    ) {
+//
+//                        val endCallDialog = Dialog(requireContext())
+//                        endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
+//                        endCallDialog.findViewById<TextView>(R.id.dialog_title).text =
+//                            "Leave Meeting"
+//                        endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
+//                            "You're about to quit the meeting, are you sure?"
+//                        endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text =
+//                            "Don’t Leave"
+//                        endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "Leave"
+//                        endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
+//                            .setOnClickListener { endCallDialog.dismiss() }
+//                        endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn)
+//                            .setOnClickListener {
+//                                endCallDialog.dismiss()
+//                                meetingViewModel.leaveMeeting()
+//                            }
+//                        endCallDialog.show()
+//                    } else {
                         inflateExitFlow()
-                    }
+//                    }
                 }
             })
+    }
+
+    fun roleChangeRemote() {
+
+        val isAllowedToMuteUnmute =
+            meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers()
+        var remotePeersAreMute: Boolean? = null
+        if (isAllowedToMuteUnmute) {
+            remotePeersAreMute = meetingViewModel.areAllRemotePeersMute()
+        }
+
+        val cancelRoleName = "Cancel"
+        val availableRoles = meetingViewModel.getAvailableRoles().map { it.name }
+        val rolesToSend = availableRoles.plus(cancelRoleName)
+        binding.roleSpinner.root.initAdapters(
+            rolesToSend,
+            if (remotePeersAreMute == null) "Nothing to change" else if (remotePeersAreMute) "Remote Unmute Role" else "Remote Mute Role",
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val stringRole = parent?.adapter?.getItem(position) as String
+                    if (remotePeersAreMute == null) {
+                        Toast.makeText(
+                            requireContext(),
+                            "No remote peers, or their audio tracks are absent",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        if (stringRole != cancelRoleName) {
+                            meetingViewModel.remoteMute(
+                                !remotePeersAreMute,
+                                listOf(stringRole)
+                            )
+                        }
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // Nothing
+                }
+
+            })
+        binding.roleSpinner.root.performClick()
     }
 
     private fun inflateStopHlsDialog() {
@@ -1475,53 +1497,86 @@ class MeetingFragment : Fragment() {
 
         dialog.show()
 
-        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.setOnClickListener {
-            dialog.dismiss()
-            val endCallDialog = Dialog(requireContext())
-            endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
-            endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Studio"
-            endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding = 0
-            endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
-                "Others will continue after you leave. You can join the studio again."
-            endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t Leave"
-            endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "Leave"
-            endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-                .setOnClickListener { endCallDialog.dismiss() }
-            endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
-                endCallDialog.dismiss()
-                meetingViewModel.leaveMeeting()
+        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
+
+            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true){
+                text = "Leave Meeting"
+            }else{
+                text = "Leave Studio"
             }
-            endCallDialog.show()
+            setOnClickListener{
+                dialog.dismiss()
+                val endCallDialog = Dialog(requireContext())
+                endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
+                if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
+                    endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Meeting"
+                    endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding =
+                        0
+                    endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
+                        "Others will continue after you leave. You can join the meeting again."
+                } else {
+                    endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Studio"
+                    endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding =
+                        0
+                    endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
+                        "Others will continue after you leave. You can join the studio again."
+                }
+
+                endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t Leave"
+                endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "Leave"
+
+                endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
+                    .setOnClickListener { endCallDialog.dismiss() }
+                endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
+                    endCallDialog.dismiss()
+                    meetingViewModel.leaveMeeting()
+                }
+                endCallDialog.show()
+            }
         }
 
-        dialog.findViewById<TextView>(R.id.btn_end_session)?.setOnClickListener {
-            dialog.dismiss()
-            val endSessionDialog = Dialog(requireContext())
-            endSessionDialog.setContentView(R.layout.exit_confirmation_dialog)
-            endSessionDialog.findViewById<TextView>(R.id.dialog_title).text = "End Session"
-            endSessionDialog.findViewById<FrameLayout>(R.id.parent_view)
-                .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
-            endSessionDialog.findViewById<TextView>(R.id.dialog_title)
-                .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+        dialog.findViewById<TextView>(R.id.btn_end_session)?.apply {
 
-            endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
-                setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_danger_big, 0, 0, 0
-                )
-                compoundDrawablePadding = 20
-                setPadding(30, paddingTop, 0, paddingBottom)
+            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true){
+                text = "End Meeting"
+            }else{
+                text = "End Session"
             }
-            endSessionDialog.findViewById<TextView>(R.id.dialog_description).text =
-                "The session will end for everyone and all the activities will stop. You can’t undo this action."
-            endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"
-            endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "End Session"
-            endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-                .setOnClickListener { endSessionDialog.dismiss() }
-            endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
-                endSessionDialog.dismiss()
-                meetingViewModel.endRoom(false)
+
+            if (meetingViewModel.isAllowedToEndMeeting()) {
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
             }
-            endSessionDialog.show()
+            setOnClickListener {
+                dialog.dismiss()
+                val endSessionDialog = Dialog(requireContext())
+                endSessionDialog.setContentView(R.layout.exit_confirmation_dialog)
+                endSessionDialog.findViewById<TextView>(R.id.dialog_title).text = "End Session"
+                endSessionDialog.findViewById<FrameLayout>(R.id.parent_view)
+                    .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
+                endSessionDialog.findViewById<TextView>(R.id.dialog_title)
+                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+
+                endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
+                    setCompoundDrawablesWithIntrinsicBounds(
+                        R.drawable.ic_danger_big, 0, 0, 0
+                    )
+                    compoundDrawablePadding = 20
+                    setPadding(30, paddingTop, 0, paddingBottom)
+                }
+                endSessionDialog.findViewById<TextView>(R.id.dialog_description).text =
+                    "The session will end for everyone and all the activities will stop. You can’t undo this action."
+                endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"
+                endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "End Session"
+                endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
+                    .setOnClickListener { endSessionDialog.dismiss() }
+                endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
+                    endSessionDialog.dismiss()
+                    meetingViewModel.endRoom(false)
+                }
+                endSessionDialog.show()
+            }
         }
     }
 
