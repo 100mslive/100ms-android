@@ -88,6 +88,7 @@
             app:cardCornerRadius="16dp"
             android:layout_marginTop="16dp"
             android:elevation="10dp"
+            android:visibility="gone"
             app:cardBackgroundColor="#1E232A"
             app:layout_constraintTop_toBottomOf="@id/tv_start_streaming"
             android:layout_height="wrap_content">
@@ -151,6 +152,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:cardCornerRadius="16dp"
+            android:visibility="gone"
             android:elevation="10dp"
             android:layout_marginTop="20dp"
             app:cardBackgroundColor="#1E232A"

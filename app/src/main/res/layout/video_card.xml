@@ -62,8 +62,7 @@
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="8dp"
                 android:src="@drawable/ic_baseline_wifi_5"
-                android:visibility="gone"
-                app:tint="@android:color/holo_green_light" />
+                android:visibility="gone" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/name"

@@ -556,6 +556,14 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
+  fun unbindLocalView() {
+    renderedViews.forEach {
+      if (it.meetingTrack.isLocal){
+        unbindSurfaceView(it.binding.videoCard, it.meetingTrack)
+      }
+    }
+  }
+
   override fun onDestroy() {
     super.onDestroy()
     crashlyticsLog(TAG, "Fragment=$tag onDestroy()")
