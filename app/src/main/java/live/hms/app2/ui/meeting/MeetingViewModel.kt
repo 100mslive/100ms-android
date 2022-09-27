@@ -131,6 +131,13 @@ class MeetingViewModel(
     val previewUpdateLiveData: LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
     val hlsToggleUpdateLiveData: LiveData<Boolean> = hlsToggleUpdateData
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
+    private var isForceLeave = false
+        set(value) {
+            // Once set to true, this cannot be reset to false.
+            if(!field){
+                field = value
+            }
+        }
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {
@@ -791,9 +798,10 @@ class MeetingViewModel(
     }
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
-        state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
+        isForceLeave = details != null
+        state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting", isForceLeave))
         // Don't call leave when being forced to leave
-        if(details == null) {
+        if(!isForceLeave) {
             hmsSDK.leave()
         }
         cleanup()
