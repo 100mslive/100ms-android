@@ -799,7 +799,7 @@ class MeetingViewModel(
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         isForceLeave = details != null
-        state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting", isForceLeave))
+        state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
         // Don't call leave when being forced to leave
         if(!isForceLeave) {
             hmsSDK.leave()
