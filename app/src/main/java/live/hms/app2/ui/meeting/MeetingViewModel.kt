@@ -215,12 +215,12 @@ class MeetingViewModel(
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
-//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .trackState(getAudioTrackState())
                 .build()
         )
         .video(
             HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
-//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .trackState(getVideoTrackState())
                 .build()
         )
         .build()
@@ -279,6 +279,10 @@ class MeetingViewModel(
             crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
         }
     }
+
+    fun getAudioTrackState() = if (settings.isAudioTrackInitStateEnabled.not()) HMSTrackSettings.TrackState.MUTED else HMSTrackSettings.TrackState.UNMUTED
+    fun getVideoTrackState() = if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.TrackState.MUTED else HMSTrackSettings.TrackState.UNMUTED
+
 
     fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
 

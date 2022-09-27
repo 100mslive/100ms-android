@@ -500,6 +500,18 @@ class SettingsFragment : Fragment() {
         switchShowPreviewBeforeJoin
       ) { commitHelper.setShowPreviewBeforeJoin(it) }
 
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.isAudioTrackInitStateEnabled,
+        switchAudioTrackInitState
+      ) { commitHelper.setEnableAudioTrackInitState(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
+        settings.isVideoTrackInitStateEnabled,
+        switchVideoTrackInitState
+      ) { commitHelper.setEnableVideoTrackInitState(it) }
+
       if (BuildConfig.INTERNAL) {
         initSwitch(
           EnumSet.of(SettingsMode.HOME, SettingsMode.MEETING),
