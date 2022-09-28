@@ -328,12 +328,13 @@ class MeetingFragment : Fragment() {
     }
 
     private fun updateGoLiveButton(recordingState: RecordingState) {
-        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
+        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
+                ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
         ) {
             binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
             binding.spacer?.visibility = View.VISIBLE
-        }else{
+        } else {
             binding.buttonGoLive?.visibility = View.GONE
             binding.llGoLiveParent?.visibility = View.GONE
             binding.spacer?.visibility = View.GONE
@@ -380,7 +381,7 @@ class MeetingFragment : Fragment() {
         countDownTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(l: Long) {
                 val startedAt =
-                    meetingViewModel.hmsSDK.getRoom()?.hlsStreamingState?.variants?.firstOrNull()?.startedAt
+                   meetingViewModel.hmsSDK.getRoom()?.hlsStreamingState?.variants?.firstOrNull()?.startedAt
                         ?: meetingViewModel.hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
@@ -985,7 +986,7 @@ class MeetingFragment : Fragment() {
 
                 is MeetingState.ForceLeave -> {
                     val message = with(state.details) {
-                        if(roomWasEnded) {
+                        if (roomWasEnded) {
                             "Room ended by ${peerWhoRemoved?.name}"
                         } else {
                             "${peerWhoRemoved?.name} removed you from the room. ${state.details.reason}"
@@ -1168,12 +1169,13 @@ class MeetingFragment : Fragment() {
             binding.buttonShareScreen?.visibility = View.GONE
         }
 
-        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
+        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
+                ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
         ) {
             binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
             binding.spacer?.visibility = View.VISIBLE
-        }else{
+        } else {
             binding.buttonGoLive?.visibility = View.GONE
             binding.llGoLiveParent?.visibility = View.GONE
             binding.spacer?.visibility = View.GONE
@@ -1365,10 +1367,10 @@ class MeetingFragment : Fragment() {
         //hiding views for pip/non-pip layout !
         if (isInPictureInPictureMode) {
             binding.bottomControls.visibility = View.GONE
-            (activity as? AppCompatActivity)?.supportActionBar?.hide()
+            binding.topMenu?.visibility = View.GONE
         } else {
             binding.bottomControls.visibility = View.VISIBLE
-            (activity as? AppCompatActivity)?.supportActionBar?.show()
+            binding.topMenu?.visibility = View.VISIBLE
         }
     }
 
@@ -1413,7 +1415,7 @@ class MeetingFragment : Fragment() {
 //                            }
 //                        endCallDialog.show()
 //                    } else {
-                        inflateExitFlow()
+                    inflateExitFlow()
 //                    }
                 }
             })
@@ -1528,12 +1530,12 @@ class MeetingFragment : Fragment() {
 
         dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
 
-            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true){
+            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
                 text = "Leave Meeting"
-            }else{
+            } else {
                 text = "Leave Studio"
             }
-            setOnClickListener{
+            setOnClickListener {
                 dialog.dismiss()
                 val endCallDialog = Dialog(requireContext())
                 endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
@@ -1566,9 +1568,9 @@ class MeetingFragment : Fragment() {
 
         dialog.findViewById<TextView>(R.id.btn_end_session)?.apply {
 
-            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true){
+            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
                 text = "End Meeting"
-            }else{
+            } else {
                 text = "End Session"
             }
 
