@@ -15,6 +15,7 @@ enum class GoLiveOption {
 }
 
 class GoLiveSelectionBottomSheet(
+    val isAllowedToHlsStream : Boolean, val isAllowedToRtmpStream: Boolean,
     private val optionClickListener: (goLiveOption: GoLiveOption) -> Unit
 ) : BottomSheetDialogFragment() {
 
@@ -41,14 +42,20 @@ class GoLiveSelectionBottomSheet(
             dismiss()
         }
 
-        binding.cardHlsView.setOnClickListener {
-            optionClickListener.invoke(GoLiveOption.HLS)
-            dismiss()
+        if (isAllowedToHlsStream){
+            binding.cardHlsView.visibility = View.VISIBLE
+            binding.cardHlsView.setOnClickListener {
+                optionClickListener.invoke(GoLiveOption.HLS)
+                dismiss()
+            }
         }
 
-        binding.cardRtmpView.setOnClickListener {
-            optionClickListener.invoke(GoLiveOption.RTMP)
-            dismiss()
+        if (isAllowedToRtmpStream){
+            binding.cardRtmpView.visibility = View.VISIBLE
+            binding.cardRtmpView.setOnClickListener {
+                optionClickListener.invoke(GoLiveOption.RTMP)
+                dismiss()
+            }
         }
     }
 }

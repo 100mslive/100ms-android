@@ -215,19 +215,19 @@ class MeetingViewModel(
 
     val broadcastsReceived = MutableLiveData<ChatMessage>()
 
-    private val _trackStatus = MutableLiveData<String>()
-    val trackStatus: LiveData<String> = _trackStatus
+    private val _trackStatus = MutableLiveData<Pair<String,Boolean>>()
+    val trackStatus: LiveData<Pair<String,Boolean>> = _trackStatus
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
-//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .initialState(getAudioTrackState())
                 .build()
         )
         .video(
             HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
-//                .trackState(HMSTrackSettings.TrackState.UNMUTED)
+                .initialState(getVideoTrackState())
                 .build()
         )
         .build()
@@ -286,6 +286,10 @@ class MeetingViewModel(
             crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
         }
     }
+
+    private fun getAudioTrackState() = if (settings.isAudioTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+    private fun getVideoTrackState() = if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+
 
     fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
 
@@ -937,6 +941,9 @@ class MeetingViewModel(
     fun isAllowedToHlsStream(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.permission?.hlsStreaming == true
 
+    fun isAllowedToShareScreen(): Boolean =
+        hmsSDK.getLocalPeer()?.hmsRole?.publishParams?.allowed?.contains("screen") == true
+
     fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
         val hmsPeer = hmsSDK.getPeers().find { it.peerID == remotePeerId }
         val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
@@ -1359,8 +1366,8 @@ class MeetingViewModel(
         })
     }
 
-    fun updateTrackStatus(status: String) {
-        _trackStatus.value = status
+    fun updateTrackStatus(status: String,isEnabled : Boolean) {
+        _trackStatus.value = Pair(status,isEnabled)
     }
 
     var currentAudioMode = AudioManager.MODE_IN_COMMUNICATION
