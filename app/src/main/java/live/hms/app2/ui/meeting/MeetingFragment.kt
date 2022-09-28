@@ -328,12 +328,15 @@ class MeetingFragment : Fragment() {
     }
 
     private fun updateGoLiveButton(recordingState: RecordingState) {
-        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
-                ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
+        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
         ) {
             binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
             binding.spacer?.visibility = View.VISIBLE
+        }else{
+            binding.buttonGoLive?.visibility = View.GONE
+            binding.llGoLiveParent?.visibility = View.GONE
+            binding.spacer?.visibility = View.GONE
         }
         if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
             binding.buttonGoLive?.setImageDrawable(
@@ -1004,11 +1007,6 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
-//            if (allowed.not()) {
-//                if (currentFragment is VideoGridBaseFragment)
-//                    (currentFragment as VideoGridBaseFragment).unbindViews()
-//            }
-            setupConfiguration()
         }
 
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
@@ -1028,6 +1026,7 @@ class MeetingFragment : Fragment() {
                 }
             }
         }
+
 
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
@@ -1052,6 +1051,7 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             chatViewModel.peersUpdate()
+            setupConfiguration()
         }
     }
 
@@ -1117,6 +1117,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun updateVideoView(mode: MeetingViewMode) {
+        setupConfiguration()
         currentFragment = when (mode) {
             MeetingViewMode.GRID -> VideoGridFragment()
             MeetingViewMode.PINNED -> PinnedVideoFragment()
@@ -1126,7 +1127,6 @@ class MeetingFragment : Fragment() {
                 arguments = bundleOf(
                     "hlsStreamUrl" to mode.url
                 )
-                setupConfiguration()
             }
         }
 
@@ -1166,6 +1166,17 @@ class MeetingFragment : Fragment() {
 
         if (meetingViewModel.isAllowedToShareScreen().not()) {
             binding.buttonShareScreen?.visibility = View.GONE
+        }
+
+        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
+        ) {
+            binding.buttonGoLive?.visibility = View.VISIBLE
+            binding.llGoLiveParent?.visibility = View.VISIBLE
+            binding.spacer?.visibility = View.VISIBLE
+        }else{
+            binding.buttonGoLive?.visibility = View.GONE
+            binding.llGoLiveParent?.visibility = View.GONE
+            binding.spacer?.visibility = View.GONE
         }
     }
 
