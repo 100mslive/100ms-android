@@ -1184,7 +1184,9 @@ class MeetingFragment : Fragment() {
 
     private fun hideProgressBar() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        binding.bottomControls.visibility = View.VISIBLE
+        if (activity?.isInPictureInPictureMode?.not() == true){
+            binding.bottomControls.visibility = View.VISIBLE
+        }
 
         binding.progressBar.root.visibility = View.GONE
     }
