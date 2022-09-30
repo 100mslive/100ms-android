@@ -683,10 +683,13 @@ class MeetingViewModel(
         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.NAME_CHANGED))
     }
 
+    fun isServerRecordingEnabled(room: HMSRoom) : Boolean{
+       return room.serverRecordingState?.running == true
+    }
+
     private fun getRecordingState(room: HMSRoom): RecordingState {
 
         val recording = room.browserRecordingState?.running == true ||
-                room.serverRecordingState?.running == true ||
                 room.hlsRecordingState?.running == true
         val streaming = room.rtmpHMSRtmpStreamingState?.running == true ||
                 room.hlsStreamingState?.running == true
