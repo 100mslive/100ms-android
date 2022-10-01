@@ -8,6 +8,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <FrameLayout
+        android:id="@+id/stats_view_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#80000000"
+        android:padding="10dp"
+        android:layout_marginTop="30dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/stats_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </FrameLayout>
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_seek_live"
         android:layout_width="wrap_content"

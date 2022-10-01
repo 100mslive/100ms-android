@@ -63,6 +63,7 @@ dependencies {
     //100ms.live SDK
     implementation 'com.github.100mslive.android-sdk:lib:2.4.8'
     implementation 'com.github.100mslive.android-sdk:virtualBackground:2.4.8'
+    implementation 'com.github.100mslive:stats-for-nerds:1.0.0'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"

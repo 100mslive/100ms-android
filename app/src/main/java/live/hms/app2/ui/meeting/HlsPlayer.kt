@@ -3,7 +3,6 @@ package live.hms.app2.ui.meeting
 import android.content.Context
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
@@ -16,7 +15,7 @@ class HlsPlayer {
     private var playWhenReady = true
     private var currentWindow = 0
     private var playbackPosition = 0L
-    private var player : Player? = null
+    private var player : ExoPlayer? = null
 
     init {
         dataSourceFactory = DefaultHttpDataSource.Factory()
@@ -24,7 +23,7 @@ class HlsPlayer {
 
     fun getPlayer() = player
 
-    fun createPlayer(context : Context, url : String, playWhenready : Boolean = true) : Player {
+    fun createPlayer(context : Context, url : String, playWhenready : Boolean = true) : ExoPlayer {
 
         val hlsMediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
             .setAllowChunklessPreparation(true)

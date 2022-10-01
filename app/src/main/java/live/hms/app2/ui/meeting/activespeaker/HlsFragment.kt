@@ -2,7 +2,6 @@ package live.hms.app2.ui.meeting.activespeaker
 
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,9 @@ import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
+import live.hms.stats.PlayerEventsManager
+import live.hms.stats.PlayerEventsListener
+import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.utils.HMSLogger
 
 class HlsFragment : Fragment() {
@@ -28,6 +30,7 @@ class HlsFragment : Fragment() {
     private val hlsPlayer: HlsPlayer by lazy {
         HlsPlayer()
     }
+    var playerEventsHandler: PlayerEventsManager? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,7 +53,24 @@ class HlsFragment : Fragment() {
             hlsPlayer.getPlayer()?.play()
         }
 
-        hlsPlayer.getPlayer()?.addListener(object : Player.Listener{
+        meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
+
+            if (it) {
+                binding.statsViewParent.visibility = View.VISIBLE
+                playerEventsHandler?.listen(object : PlayerEventsListener {
+                    override fun onUpdate(playerStatsModel: PlayerStatsModel) {
+                        binding.statsView.text = playerStatsModel.toString()
+                    }
+                })
+            } else {
+                playerEventsHandler?.stop()
+                binding.statsViewParent.visibility = View.GONE
+
+            }
+
+        }
+
+        hlsPlayer.getPlayer()?.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 super.onPlayerError(error)
                 HMSLogger.i(TAG, " ~~ Exoplayer error: $error")
@@ -68,8 +88,14 @@ class HlsFragment : Fragment() {
                 hlsPlayer.getPlayer()?.currentPosition ?: 0
             ))?.div(1000) ?: 0)
 
-            HMSLogger.i(TAG,"duration : ${hlsPlayer.getPlayer()?.duration.toString()} current position ${hlsPlayer.getPlayer()?.currentPosition}")
-            HMSLogger.i(TAG,"buffered position : ${hlsPlayer.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer.getPlayer()?.totalBufferedDuration} ")
+            HMSLogger.i(
+                TAG,
+                "duration : ${hlsPlayer.getPlayer()?.duration.toString()} current position ${hlsPlayer.getPlayer()?.currentPosition}"
+            )
+            HMSLogger.i(
+                TAG,
+                "buffered position : ${hlsPlayer.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer.getPlayer()?.totalBufferedDuration} "
+            )
 
             if (distanceFromLive >= 10) {
                 binding.btnSeekLive.visibility = View.VISIBLE
@@ -87,8 +113,11 @@ class HlsFragment : Fragment() {
             args.hlsStreamUrl,
             true
         )
+        hlsPlayer.getPlayer()?.let {
+            playerEventsHandler = PlayerEventsManager(it)
+        }
         runnable?.let {
-            playerUpdatesHandler.postDelayed(it,0)
+            playerUpdatesHandler.postDelayed(it, 0)
         }
     }
 
