@@ -52,10 +52,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
   private fun initButtons() {
     binding.buttonGrantPermission.setOnClickListener { gotoHomePage() }
-
-    binding.buttonDoItLater.setOnClickListener {
-      // TODO: Integrate no-camera permission flow
-    }
+    binding.btnBack.setOnClickListener { requireActivity().onBackPressed() }
   }
 
   @AfterPermissionGranted(RC_CALL)

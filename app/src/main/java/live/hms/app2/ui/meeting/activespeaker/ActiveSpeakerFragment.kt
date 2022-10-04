@@ -62,19 +62,25 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       return
     }
 
-    screenShareTrack?.let {
-      screenShareStats.initiateStats(
-        this,
-        meetingViewModel.getStats(),
-        it.video,
-        it.audio, it.peer.isLocal
-      ) { statsString ->
-        meetingViewModel?.updateTrackStatus(statsString)
+    screenShareTrack?.let { meetingTrack ->
+      meetingViewModel.statsToggleData.observe(this) {
+        if (it){
+          screenShareStats.initiateStats(
+            this,
+            meetingViewModel.getStats(),
+            meetingTrack.video,
+            meetingTrack.audio, meetingTrack.peer.isLocal
+          ) { statsString ->
+            meetingViewModel.updateTrackStatus(statsString,true)
+          }
+        }else{
+          meetingViewModel.updateTrackStatus("",false)
+        }
       }
-      binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.peer.metadata)?.isHandRaised == true)
-      bindSurfaceView(binding.screenShare, it, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+      binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(meetingTrack.peer.metadata)?.isHandRaised == true)
+      bindSurfaceView(binding.screenShare, meetingTrack, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
       binding.screenShare.surfaceView.setOnLongClickListener { view ->
-        openDialog(view as? SurfaceViewRenderer, it.video, it.peer.name.orEmpty())
+        openDialog(view as? SurfaceViewRenderer, meetingTrack.video, meetingTrack.peer.name.orEmpty())
         return@setOnLongClickListener true
       }
     }
@@ -159,7 +165,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       if( screenShareTrack?.peer?.peerID == it.first.peerID) {
         when(it.second) {
           HMSPeerUpdate.METADATA_CHANGED -> {
-            binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(it.first.metadata)?.isHandRaised == true)
+            HMSLogger.v(TAG,"metadata changed : ${it.second} ")
           }
 
           HMSPeerUpdate.NAME_CHANGED -> {
@@ -170,8 +176,13 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       }
     }
 
-    meetingViewModel.trackStatus.observe(viewLifecycleOwner) { statsString ->
-      binding.screenShare.statsView.text = statsString
+    meetingViewModel.trackStatus.observe(viewLifecycleOwner) { statsPair ->
+      if (statsPair.second){
+        binding.screenShare.statsView.visibility = View.GONE
+      }else{
+        binding.screenShare.statsView.visibility = View.VISIBLE
+        binding.screenShare.statsView.text = statsPair.first
+      }
     }
   }
 
@@ -190,14 +201,21 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
+
       screenShareStats.initiateStats(
-        viewLifecycleOwner,
+        this,
         meetingViewModel.getStats(),
         screen.video,
-        screen.audio,
-        screen.peer.isLocal
-      ) {
-        binding.screenShare.statsView.text = it
+        screen.audio, screen.peer.isLocal
+      ) { statsString ->
+        meetingViewModel.statsToggleData.observe(viewLifecycleOwner) { isEnabled ->
+          if (isEnabled) {
+            binding.screenShare.statsView.visibility = View.VISIBLE
+            binding.screenShare.statsView.text = statsString
+          } else {
+            binding.screenShare.statsView.visibility = View.GONE
+          }
+        }
       }
       screenShareTrack = screen
       screenShareOverLocalVideoInGrid()

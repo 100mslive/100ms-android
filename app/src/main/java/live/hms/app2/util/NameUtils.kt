@@ -1,5 +1,6 @@
 package live.hms.app2.util
 
+import android.widget.EditText
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.util.*
@@ -34,10 +35,9 @@ object NameUtils {
     }
   }
 
-    fun isValidUserName(container: TextInputLayout, editText: TextInputEditText): Boolean {
+    fun isValidUserName(editText: EditText): Boolean {
         val username = editText.text.toString()
         if (username.isEmpty()) {
-            container.error = "Username cannot be empty"
             return false
         }
         return true

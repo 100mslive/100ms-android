@@ -79,7 +79,7 @@ object RetrofitBuilder {
 
   suspend fun fetchAuthToken(request: Request): TokenResponse {
     val deferred = CompletableDeferred<TokenResponse>()
-
+    val fetchAuthTokenStartedAt = System.currentTimeMillis()
     client.newCall(request).enqueue(object : Callback {
       override fun onFailure(call: Call, e: IOException) {
 
@@ -89,6 +89,7 @@ object RetrofitBuilder {
 
       override fun onResponse(call: Call, response: Response) {
         Log.d(TAG, "fetchAuthToken: response=$response")
+        Log.d(TAG, "~~ Took ${System.currentTimeMillis() - fetchAuthTokenStartedAt} ms to fetch token ~~")
         if (response.code != 200) {
           val ex = Exception("Expected response code 200 but received ${response.code} [response=$response]")
           deferred.completeExceptionally(ex)

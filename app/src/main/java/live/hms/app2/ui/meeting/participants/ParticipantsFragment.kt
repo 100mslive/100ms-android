@@ -1,5 +1,6 @@
 package live.hms.app2.ui.meeting.participants
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,10 +8,10 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.databinding.FragmentParticipantsBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.MeetingState
@@ -18,9 +19,10 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
 import live.hms.app2.util.ROOM_DETAILS
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 
-class ParticipantsFragment : Fragment() {
+class ParticipantsFragment : BottomSheetDialogFragment() {
 
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<FragmentParticipantsBinding>()
@@ -86,14 +88,12 @@ class ParticipantsFragment : Fragment() {
         findNavController().navigate(action)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initViewModels() {
-        meetingViewModel.peerLiveDate.observe(viewLifecycleOwner) {
+        meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             val peers = meetingViewModel.peers
             adapter.setItems(peers)
-        }
-
-        meetingViewModel.peerCount.observe(viewLifecycleOwner) { peerCount ->
-            binding.participantCount.text = "$peerCount"
+            binding.participantCount.text = "${peers.count()}"
         }
 
         meetingViewModel.state.observe(viewLifecycleOwner) { state ->
