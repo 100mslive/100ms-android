@@ -36,9 +36,6 @@ class HlsFragment : Fragment() {
     ): View {
         binding = HlsFragmentLayoutBinding.inflate(inflater, container, false)
 
-        meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
-            hlsPlayer.mute(muted)
-        }
         return binding.root
     }
 
@@ -48,6 +45,10 @@ class HlsFragment : Fragment() {
         binding.btnSeekLive.setOnClickListener {
             hlsPlayer.getPlayer()?.seekToDefaultPosition()
             hlsPlayer.getPlayer()?.play()
+        }
+
+        meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
+            hlsPlayer.mute(muted)
         }
 
         hlsPlayer.getPlayer()?.addListener(object : Player.Listener{
