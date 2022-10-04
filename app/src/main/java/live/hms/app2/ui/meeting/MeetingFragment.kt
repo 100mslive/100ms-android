@@ -1280,7 +1280,7 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonToggleAudio.apply {
-            visibility = if (settings.publishAudio && meetingViewModel.isLocalAudioPublishingAllowed.value == true) View.VISIBLE else View.GONE
+            visibility = if (settings.publishAudio) View.VISIBLE else View.GONE
             // visibility = View.GONE
             isEnabled = settings.publishAudio
 
