@@ -14,7 +14,7 @@ import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
-import live.hms.stats.PlayerEventsManager
+import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
 import live.hms.stats.model.PlayerStats
 import live.hms.video.utils.HMSLogger
@@ -30,7 +30,7 @@ class HlsFragment : Fragment() {
     private val hlsPlayer: HlsPlayer by lazy {
         HlsPlayer()
     }
-    var playerEventsManager: PlayerEventsManager? = null
+    var playerEventsManager: PlayerEventsCollector? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -114,7 +114,7 @@ class HlsFragment : Fragment() {
             true
         )
         hlsPlayer.getPlayer()?.let {
-            playerEventsManager = PlayerEventsManager(it)
+            playerEventsManager = PlayerEventsCollector(it)
         }
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)
