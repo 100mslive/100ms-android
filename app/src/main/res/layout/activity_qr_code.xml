@@ -8,7 +8,7 @@
     tools:context=".ui.home.QrCodeActivity">
 
     <ImageView
-        android:id="@+id/back_btn"
+        android:id="@+id/close_btn"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:contentDescription="@string/back_btn"
@@ -27,10 +27,10 @@
         android:textAllCaps="false"
         android:textColor="@color/muted_text"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/back_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/close_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/back_btn" />
+        app:layout_constraintTop_toTopOf="@+id/close_btn" />
 
 
     <com.journeyapps.barcodescanner.DecoratedBarcodeView

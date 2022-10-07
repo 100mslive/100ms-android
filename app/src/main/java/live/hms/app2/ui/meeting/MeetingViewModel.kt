@@ -208,16 +208,20 @@ class MeetingViewModel(
 
     val broadcastsReceived = MutableLiveData<ChatMessage>()
 
-    private val _trackStatus = MutableLiveData<String>()
-    val trackStatus: LiveData<String> = _trackStatus
+    private val _trackStatus = MutableLiveData<Pair<String,Boolean>>()
+    val trackStatus: LiveData<Pair<String,Boolean>> = _trackStatus
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
             HMSAudioTrackSettings.Builder()
-                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC).build()
+                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
+                .initialState(getAudioTrackState())
+                .build()
         )
         .video(
-            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize).build()
+            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
+                .initialState(getVideoTrackState())
+                .build()
         )
         .build()
 
@@ -275,6 +279,10 @@ class MeetingViewModel(
             crashlyticsLog(TAG, "toggleUserVideo: enabled=$enabled")
         }
     }
+
+    private fun getAudioTrackState() = if (settings.isAudioTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+    private fun getVideoTrackState() = if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+
 
     fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
 
@@ -679,10 +687,13 @@ class MeetingViewModel(
         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.NAME_CHANGED))
     }
 
+    fun isServerRecordingEnabled(room: HMSRoom) : Boolean{
+       return room.serverRecordingState?.running == true
+    }
+
     private fun getRecordingState(room: HMSRoom): RecordingState {
 
         val recording = room.browserRecordingState?.running == true ||
-                room.serverRecordingState?.running == true ||
                 room.hlsRecordingState?.running == true
         val streaming = room.rtmpHMSRtmpStreamingState?.running == true ||
                 room.hlsStreamingState?.running == true
@@ -697,6 +708,9 @@ class MeetingViewModel(
             RecordingState.NOT_RECORDING_OR_STREAMING
         }
     }
+
+    fun isHlsRunning() = hmsRoom?.hlsStreamingState?.running == true
+    fun isRTMPRunning() = hmsRoom?.rtmpHMSRtmpStreamingState?.running == true
 
     fun setStatetoOngoing() {
         state.postValue(MeetingState.Ongoing())
@@ -785,7 +799,10 @@ class MeetingViewModel(
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
-        hmsSDK.leave()
+        // Don't call leave when being forced to leave
+        if(details == null) {
+            hmsSDK.leave()
+        }
         cleanup()
         state.postValue(MeetingState.Disconnected(true, details))
     }
@@ -918,6 +935,9 @@ class MeetingViewModel(
 
     fun isAllowedToHlsStream(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.permission?.hlsStreaming == true
+
+    fun isAllowedToShareScreen(): Boolean =
+        hmsSDK.getLocalPeer()?.hmsRole?.publishParams?.allowed?.contains("screen") == true
 
     fun changeRole(remotePeerId: String, toRoleName: String, force: Boolean) {
         val hmsPeer = hmsSDK.getPeers().find { it.peerID == remotePeerId }
@@ -1341,8 +1361,8 @@ class MeetingViewModel(
         })
     }
 
-    fun updateTrackStatus(status: String) {
-        _trackStatus.value = status
+    fun updateTrackStatus(status: String,isEnabled : Boolean) {
+        _trackStatus.value = Pair(status,isEnabled)
     }
 
     var currentAudioMode = AudioManager.MODE_IN_COMMUNICATION

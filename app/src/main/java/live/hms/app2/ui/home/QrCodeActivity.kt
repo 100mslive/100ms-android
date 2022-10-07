@@ -36,7 +36,7 @@ class QrCodeActivity : AppCompatActivity() {
             }
         }
 
-        binding.backBtn.setOnClickListener {
+        binding.closeBtn.setOnClickListener {
             finish()
         }
 

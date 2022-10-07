@@ -42,6 +42,8 @@ class SettingsStore(context: Context) {
     const val LEAK_CANARY = "leak-canary"
     const val SHOW_RECONNECTING_PROGRESS_BARS = "show-reconnecting-progress-bar"
     const val SHOW_PREVIEW_BEFORE_JOIN = "show-preview-before-join"
+    const val AUDIO_TRACK_INIT_STATE = "audio-track-init-state"
+    const val VIDEO_TRACK_INIT_STATE = "video-track-init-state"
     const val SUBSCRIBE_DEGRADATION = "subscribe-degradation-enabling"
     const val RTMP_URL_LIST = "rtmp-url-list"
     const val USE_HARDWARE_AEC = "use-hardware-aec"
@@ -172,6 +174,14 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getLong(AUDIO_POLL_INTERVAL, 1000)
     set(value) = putLong(AUDIO_POLL_INTERVAL, value)
 
+  var isAudioTrackInitStateEnabled: Boolean
+    get() = sharedPreferences.getBoolean(AUDIO_TRACK_INIT_STATE, true)
+    set(value) = putBoolean(AUDIO_TRACK_INIT_STATE, value)
+
+  var isVideoTrackInitStateEnabled: Boolean
+    get() = sharedPreferences.getBoolean(VIDEO_TRACK_INIT_STATE, true)
+    set(value) = putBoolean(VIDEO_TRACK_INIT_STATE, value)
+
   var silenceAudioLevelThreshold: Int
     get() = sharedPreferences.getInt(SILENCE_AUDIO_LEVEL_THRESHOLD, 10)
     set(value) = putInt(SILENCE_AUDIO_LEVEL_THRESHOLD, value)
@@ -271,6 +281,12 @@ class SettingsStore(context: Context) {
 
     fun setShowPreviewBeforeJoin(value: Boolean) =
       apply { editor.putBoolean(SHOW_PREVIEW_BEFORE_JOIN, value) }
+
+    fun setEnableAudioTrackInitState(value: Boolean) =
+      apply { editor.putBoolean(AUDIO_TRACK_INIT_STATE, value) }
+
+    fun setEnableVideoTrackInitState(value: Boolean) =
+      apply { editor.putBoolean(VIDEO_TRACK_INIT_STATE, value) }
 
     fun setAudioPollInterval(value: Long) = apply { editor.putLong(AUDIO_POLL_INTERVAL, value) }
     fun setSilenceAudioLevelThreshold(value: Int) =
