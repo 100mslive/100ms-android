@@ -271,6 +271,9 @@ class SettingsBottomSheet(
             binding.btnShowStats.visibility = View.GONE
             binding.btnBrb.visibility = View.GONE
         }
+        if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true || meetingViewModel.isHlsRunning()){
+            binding.btnShowStats.visibility = View.VISIBLE
+        }
     }
 
     private fun setListViewHeight() {

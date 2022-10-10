@@ -26,6 +26,7 @@ class HlsFragment : Fragment() {
     val playerUpdatesHandler = Handler()
     var runnable: Runnable? = null
     val TAG = "HlsFragment"
+    var isStatsActive : Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     private val hlsPlayer: HlsPlayer by lazy {
         HlsPlayer()
@@ -62,8 +63,10 @@ class HlsFragment : Fragment() {
                         binding.statsView.text = playerStats.toString()
                     }
                 })
+                isStatsActive = true
             } else {
                 playerEventsManager?.removeListener()
+                isStatsActive  = false
                 binding.statsViewParent.visibility = View.GONE
 
             }
@@ -118,6 +121,23 @@ class HlsFragment : Fragment() {
         }
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playerEventsManager?.removeListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isStatsActive) {
+            playerEventsManager?.removeListener()
+            playerEventsManager?.addListener(object : PlayerEventsListener {
+                override fun onEventUpdate(playerStats: PlayerStats) {
+                    binding.statsView.text = playerStats.toString()
+                }
+            })
         }
     }
 
