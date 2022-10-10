@@ -13,6 +13,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
 import live.hms.app2.helpers.OnSingleClickListener
 import live.hms.video.media.settings.HMSLayer
+import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
@@ -127,7 +128,7 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
     val currentQuality = hmsVideoTrack.getCurrentLayer()
 
 
-    val videoQuality = hmsVideoTrack.getLayerDefinition()?.layers.orEmpty().map { it.toString() }.toTypedArray()
+    val videoQuality = hmsVideoTrack.getLayerDefinition()?.map { it.layer.toString() }?.toTypedArray().orEmpty()
 
     videoQuality.filterIndexed { index, quality ->
         if (quality == currentQuality.toString()) {
@@ -143,12 +144,12 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
             .setSingleChoiceItems(videoQuality, selectedQualityIndex
             ) { dialog, which ->
 
-              val layers : List<HMSLayer> = hmsVideoTrack.getLayerDefinition()?.layers.orEmpty()
+              val layerDefinition : List<HMSSimulcastLayerDefinition> = hmsVideoTrack.getLayerDefinition()
               //safe check
-              if (which>= layers.size)
+              if (which>= layerDefinition.size)
                  return@setSingleChoiceItems
 
-              hmsVideoTrack.setLayer(layers[which])
+              hmsVideoTrack.setLayer(layerDefinition[which].layer)
             }
             show()
     }
