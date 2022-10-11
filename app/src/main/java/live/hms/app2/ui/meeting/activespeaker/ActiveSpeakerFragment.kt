@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentActiveSpeakerBinding
 import live.hms.app2.ui.meeting.CustomPeerMetadata
@@ -44,6 +45,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    screenShareStats = StatsInterpreter(settings.showStats)
     initViewModels()
   }
 
@@ -63,24 +65,19 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
 
     screenShareTrack?.let { meetingTrack ->
-      meetingViewModel.statsToggleData.observe(this) {
-        if (it){
-          screenShareStats.initiateStats(
-            this,
-            meetingViewModel.getStats(),
-            meetingTrack.video,
-            meetingTrack.audio, meetingTrack.peer.isLocal
-          ) { statsString ->
-            meetingViewModel.updateTrackStatus(statsString,true)
-          }
-        }else{
-          meetingViewModel.updateTrackStatus("",false)
-        }
-      }
-      binding.screenShare.raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(meetingTrack.peer.metadata)?.isHandRaised == true)
-      bindSurfaceView(binding.screenShare, meetingTrack, RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+      binding.screenShare.raisedHand.alpha =
+        visibilityOpacity(CustomPeerMetadata.fromJson(meetingTrack.peer.metadata)?.isHandRaised == true)
+      bindSurfaceView(
+        binding.screenShare,
+        meetingTrack,
+        RendererCommon.ScalingType.SCALE_ASPECT_FIT
+      )
       binding.screenShare.surfaceView.setOnLongClickListener { view ->
-        openDialog(view as? SurfaceViewRenderer, meetingTrack.video, meetingTrack.peer.name.orEmpty())
+        openDialog(
+          view as? SurfaceViewRenderer,
+          meetingTrack.video,
+          meetingTrack.peer.name.orEmpty()
+        )
         return@setOnLongClickListener true
       }
     }
@@ -192,7 +189,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-  private val screenShareStats by lazy { StatsInterpreter(settings.showStats) }
+  private var screenShareStats : StatsInterpreter? = null
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
 
     // Check if the currently shared screen-share track is removed
@@ -207,22 +204,21 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
-
-      screenShareStats.initiateStats(
-        this,
-        meetingViewModel.getStats(),
-        screen.video,
-        screen.audio, screen.peer.isLocal
-      ) { statsString ->
-        meetingViewModel.statsToggleData.observe(viewLifecycleOwner) { isEnabled ->
-          if (isEnabled) {
-            binding.screenShare.statsView.visibility = View.VISIBLE
+       screenShareStats?.initiateStats(
+          viewLifecycleOwner,
+          meetingViewModel.getStats(),
+          screen.video,
+          screen.audio, screen.peer.isLocal
+        ) { statsString ->
             binding.screenShare.statsView.text = statsString
-          } else {
-            binding.screenShare.statsView.visibility = View.GONE
-          }
         }
-      }
+      meetingViewModel.statsToggleData.observe(viewLifecycleOwner, Observer {
+        if (it){
+          binding.screenShare.statsView.visibility = View.VISIBLE
+        }else{
+          binding.screenShare.statsView.visibility = View.GONE
+        }
+      })
       screenShareTrack = screen
       screenShareOverLocalVideoInGrid()
       if (isFragmentVisible) {
@@ -247,5 +243,8 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-
+  override fun onDestroyView() {
+    screenShareStats = null
+    super.onDestroyView()
+  }
 }
