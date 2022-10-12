@@ -131,7 +131,7 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
     val videoQuality = hmsVideoTrack.getLayerDefinition()?.map { "${it.layer} (${it.resolution.width} X ${it.resolution.height})" }?.toTypedArray().orEmpty()
 
     videoQuality.filterIndexed { index, quality ->
-        if (quality == currentQuality.toString()) {
+        if (quality == "${currentQuality.layer} (${currentQuality.resolution.width} X ${currentQuality.resolution.height})") {
             selectedQualityIndex = index
             true
         }
