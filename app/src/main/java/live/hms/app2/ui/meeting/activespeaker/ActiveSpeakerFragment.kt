@@ -242,9 +242,4 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       binding.screenShareContainer.visibility = View.GONE
     }
   }
-
-  override fun onDestroyView() {
-    screenShareStats = null
-    super.onDestroyView()
-  }
 }

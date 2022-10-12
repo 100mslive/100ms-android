@@ -398,6 +398,15 @@ class MeetingViewModel(
         })
     }
 
+    fun setRtcObserver(isEnabled: Boolean){
+        if (isEnabled) {
+            addRTCStatsObserver()
+        } else {
+            removeRtcStatsObserver()
+        }
+        statsToggleData.postValue(isEnabled)
+    }
+
     fun removeRtcStatsObserver() {
         hmsSDK.removeRtcStatsObserver()
     }
