@@ -474,6 +474,12 @@ class SettingsFragment : Fragment() {
         disableAutoResize
       ) { commitHelper.setDisableAutoResize(it) }
 
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.forceSoftwareDecoder,
+        forceSoftwareDecoder
+      ) { commitHelper.setForceSoftwareDecoder(it) }
+
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
