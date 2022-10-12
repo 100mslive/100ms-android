@@ -7,14 +7,18 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Looper
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
 import live.hms.app2.helpers.OnSingleClickListener
 import live.hms.video.media.tracks.HMSVideoTrack
+import org.webrtc.EglRenderer
+import org.webrtc.SurfaceViewRenderer
 import java.io.File
 import java.io.FileOutputStream
+import java.util.logging.Handler
 
 
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
@@ -109,4 +113,14 @@ fun Context.showTileListDialog(
 
   builder.show()
 
+}
+
+fun SurfaceViewRenderer.onBitMap(onBitmap: (Bitmap?) -> Unit, scale : Float = 1.0f) {
+  kotlin.runCatching {  }
+  this.addFrameListener(object : EglRenderer.FrameListener{
+    override fun onFrame(bitmap: Bitmap?) {
+      onBitmap.invoke(bitmap)
+      android.os.Handler(Looper.getMainLooper()).post { removeFrameListener(this) }
+    }
+  }, scale)
 }
