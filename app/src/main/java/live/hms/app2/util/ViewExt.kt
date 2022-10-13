@@ -3,7 +3,6 @@ package live.hms.app2.util
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -12,7 +11,6 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
 import live.hms.app2.helpers.OnSingleClickListener
-import live.hms.video.media.settings.HMSLayer
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
@@ -125,13 +123,13 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
         return
 
     var selectedQualityIndex = 0
-    val currentQuality = hmsVideoTrack.getCurrentLayer()
+    val currentLayer = hmsVideoTrack.getCurrentLayer()
 
 
     val videoQuality = hmsVideoTrack.getLayerDefinition()?.map { "${it.layer} (${it.resolution.width} X ${it.resolution.height})" }?.toTypedArray().orEmpty()
 
     videoQuality.filterIndexed { index, quality ->
-        if (quality == "${currentQuality.layer} (${currentQuality.resolution.width} X ${currentQuality.resolution.height})") {
+        if (quality.indexOf(currentLayer.toString()) != -1) {
             selectedQualityIndex = index
             true
         }
