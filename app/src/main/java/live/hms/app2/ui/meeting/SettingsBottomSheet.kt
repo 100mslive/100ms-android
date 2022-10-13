@@ -268,7 +268,6 @@ class SettingsBottomSheet(
             binding.layoutExpandableList.visibility = View.GONE
             binding.btnCameraSwitch.visibility = View.GONE
             binding.btnAudioShare.visibility = View.GONE
-            binding.btnShowStats.visibility = View.GONE
             binding.btnBrb.visibility = View.GONE
         }
     }
