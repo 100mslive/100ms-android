@@ -15,6 +15,10 @@
 
 Here you will find everything you need to build experiences with video using 100ms Android SDK. Dive into our SDKs, quick starts, add real-time video, voice, and screen sharing to your web and mobile applications.
 
+Sample App of 100ms can be downloaded from Play store : https://play.google.com/store/apps/details?id=live.hms.app2
+
+Meeting links can be generated using [dashboard](https://dashboard.100ms.live/)
+
 ## ☝️ Pre-requisites
 
 - Android Studio 3.0 or higher

@@ -947,7 +947,7 @@ class MeetingFragment : Fragment() {
 
     private fun hideProgressBar() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        if (activity?.isInPictureInPictureMode?.not() == true){
+        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
 
@@ -1052,17 +1052,6 @@ class MeetingFragment : Fragment() {
                 meetingViewModel.toggleLocalAudio()
             }
         }
-
-//    binding.buttonMusicPlay?.apply {
-////      visibility = if (settings.musicPlayEnabled) View.VISIBLE else View.GONE
-//      // visibility = View.GONE
-////      isEnabled = settings.musicPlayEnabled
-//
-//      setOnSingleClickListener(200L) {
-//        Log.v(TAG, "buttonMusicPlay.onClick()")
-//        openMusicDialog()
-//      }
-//    }
 
         binding.buttonOpenChat.setOnSingleClickListener(1000L) {
             Log.d(TAG, "initButtons: Chat Button clicked")
