@@ -11,6 +11,7 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
+import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 
@@ -166,4 +167,17 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
             show()
     }
 
+}
+
+
+fun SurfaceViewRenderer.setInit() {
+    setTag(R.id.IS_INT,true)
+}
+
+fun SurfaceViewRenderer.setRelease() {
+    setTag(R.id.IS_INT,false)
+}
+
+fun SurfaceViewRenderer.isInit() : Boolean {
+    return (getTag(R.id.IS_INT) as? Boolean) == true
 }

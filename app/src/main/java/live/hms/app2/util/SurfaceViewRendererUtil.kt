@@ -38,7 +38,7 @@ object SurfaceViewRendererUtil {
 
     Log.v(TAG, "bind called :: ${item.peer.name} with trackID ${item?.video?.trackId.orEmpty()}")
 
-    if ((view.getTag(R.id.IS_INT) as? Boolean) == true) {
+    if (view.isInit()) {
       unbind(view, item, metadata)
     }
 
@@ -50,8 +50,8 @@ object SurfaceViewRendererUtil {
       ++initializedContextCount
 
       item.video!!.addSink(this)
+      setInit()
     }
-    view.setTag(R.id.IS_INT,true)
 
     crashlyticsLog(
       TAG,
@@ -80,9 +80,9 @@ object SurfaceViewRendererUtil {
       item.video!!.removeSink(this)
       release()
       --initializedContextCount
+      setRelease()
     }
 
-    view.setTag(R.id.IS_INT,false)
 
     crashlyticsLog(
       TAG,
@@ -91,3 +91,4 @@ object SurfaceViewRendererUtil {
     return true
   }
 }
+
