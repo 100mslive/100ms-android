@@ -348,7 +348,7 @@ abstract class VideoGridBaseFragment : Fragment() {
               if (it) {
                 videoBinding.videoCard.statsView.visibility = View.VISIBLE
                 statsInterpreter.initiateStats(
-                  this,
+                  viewLifecycleOwner,
                   meetingViewModel.getStats(),
                   newVideo.video,
                   newVideo.audio,
@@ -522,7 +522,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         if (it) {
           renderedView.binding.videoCard.statsView.visibility = View.VISIBLE
           renderedView.statsInterpreter?.initiateStats(
-            this,
+            viewLifecycleOwner,
             meetingViewModel.getStats(),
             renderedView.meetingTrack.video,
             renderedView.meetingTrack.audio,
