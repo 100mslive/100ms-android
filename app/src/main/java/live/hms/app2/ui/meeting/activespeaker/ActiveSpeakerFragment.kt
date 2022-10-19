@@ -45,7 +45,6 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    screenShareStats = StatsInterpreter(settings.showStats)
     initViewModels()
   }
 
@@ -189,7 +188,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
-  private var screenShareStats : StatsInterpreter? = null
+  private val screenShareStats by lazy { StatsInterpreter(settings.showStats) }
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
 
     // Check if the currently shared screen-share track is removed
@@ -204,7 +203,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     // Check for screen share
     if (screenShareTrack == null) tracks.find { it.isScreen }?.let { screen ->
-       screenShareStats?.initiateStats(
+       screenShareStats.initiateStats(
           viewLifecycleOwner,
           meetingViewModel.getStats(),
           screen.video,
