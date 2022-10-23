@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="false"
+    android:background="@color/primary_bg"
+    android:fitsSystemWindows="true"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="20dp"
+    tools:context=".ui.home.HomeFragment">
+
+    <TextView
+        android:id="@+id/track_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="360p"
+        android:clickable="false"
+        android:focusable="false"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_weight="1"/>
+
+    <RadioButton
+        android:id="@+id/track_radio_btn"
+        android:layout_width="wrap_content"
+        android:clickable="false"
+        android:focusable="false"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
