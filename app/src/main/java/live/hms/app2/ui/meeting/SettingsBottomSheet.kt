@@ -144,16 +144,6 @@ class SettingsBottomSheet(
             }
         }
 
-//        binding.remoteMuteRole.apply {
-//            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute) {
-//                visibility = View.VISIBLE
-//            }
-//            setOnSingleClickListener(350) {
-//                roleMuteListener.invoke()
-//                dismiss()
-//            }
-//        }
-
         binding.remoteMuteRole.apply {
             if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute) {
                 visibility = View.VISIBLE
@@ -250,7 +240,7 @@ class SettingsBottomSheet(
         binding.showStatsSwitch.isChecked = meetingViewModel.statsToggleLiveData.value == true
 
         binding.showStatsSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
-            meetingViewModel.statsToggleData.postValue(isChecked)
+            meetingViewModel.setRtcObserver(isChecked)
         }
 
     }
