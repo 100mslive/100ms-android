@@ -635,7 +635,7 @@ class MeetingViewModel(
                 } else {
                     broadcastsReceived.postValue(
                         ChatMessage(
-                            message.sender.name,
+                            message.sender?.name.orEmpty(),
                             message.serverReceiveTime,
                             message.message,
                             false,
