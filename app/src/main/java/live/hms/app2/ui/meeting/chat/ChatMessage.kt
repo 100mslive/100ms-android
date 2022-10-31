@@ -11,7 +11,7 @@ data class ChatMessage(
     val recipient: Recipient
 ) {
     constructor(message: HMSMessage, sentByMe: Boolean) : this(
-        message.sender.name,
+        message.sender?.name.orEmpty(),
         message.serverReceiveTime,
         message.message,
         sentByMe,
