@@ -12,6 +12,7 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsPlayer
+import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
 import live.hms.stats.PlayerEventsCollector
@@ -72,6 +73,13 @@ class HlsFragment : Fragment() {
 
             }
 
+        }
+
+        binding.btnTrackSelection.setOnClickListener {
+            hlsPlayer.getPlayer()?.let {
+                val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(it)
+                trackSelectionBottomSheet.show(requireActivity().supportFragmentManager,"trackSelectionBottomSheet")
+            }
         }
 
         hlsPlayer.getPlayer()?.addListener(object : Player.Listener {
