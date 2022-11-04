@@ -480,6 +480,18 @@ class SettingsFragment : Fragment() {
         forceSoftwareDecoder
       ) { commitHelper.setForceSoftwareDecoder(it) }
 
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.stereoOutput,
+        stereoOutput
+      ) { commitHelper.setStereoOutput(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.stereoInput,
+        stereoInput
+      ) { commitHelper.setStereoInput(it) }
+
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

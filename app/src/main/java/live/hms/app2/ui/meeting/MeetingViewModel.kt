@@ -215,6 +215,8 @@ class MeetingViewModel(
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
+                .useStereoOutput(settings.stereoOutput)
+                .useStereoInput(settings.stereoInput)
                 .initialState(getAudioTrackState())
                 .build()
         )
