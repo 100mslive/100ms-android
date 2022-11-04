@@ -2,7 +2,6 @@ package live.hms.app2.util
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -12,7 +11,11 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
+import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
+import live.hms.video.media.settings.HMSSimulcastLayerDefinition
+
+import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
@@ -98,16 +101,21 @@ fun HMSVideoTrack?.isValid(): Boolean {
 
 
 fun Context.showTileListDialog(
-  peerName : String,
+  isLocalTrack : Boolean,
   onScreenCapture: (() -> Unit),
+  onSimulcast: (() -> Unit)
 ) {
 
   val builder = AlertDialog.Builder(this)
   builder.setTitle("Perform Action")
-  val intentList = arrayOf("Screen Capture")
-  builder.setItems(intentList) { dialog, which ->
+  val intentList = mutableListOf("Screen Capture")
+
+  if (isLocalTrack.not())
+    intentList+= "Simulcast"
+  builder.setItems(intentList.toTypedArray()) { dialog, which ->
     when (which) {
       0 -> { onScreenCapture.invoke() }
+      1 -> { onSimulcast.invoke() }
     }
   }
 
@@ -123,4 +131,53 @@ fun SurfaceViewRenderer.onBitMap(onBitmap: (Bitmap?) -> Unit, scale : Float = 1.
       android.os.Handler(Looper.getMainLooper()).post { removeFrameListener(this) }
     }
   }, scale)
+}
+
+fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
+    if (hmsVideoTrack == null)
+        return
+
+    var selectedQualityIndex = 0
+    val currentLayer = hmsVideoTrack.getLayer()
+
+
+    val videoQuality = hmsVideoTrack.getLayerDefinition()?.map { "${it.layer} (${it.resolution.width} X ${it.resolution.height})" }?.toTypedArray().orEmpty()
+
+    videoQuality.filterIndexed { index, quality ->
+        if (quality.indexOf(currentLayer.toString()) != -1) {
+            selectedQualityIndex = index
+            true
+        }
+        else
+            false
+    }
+
+    AlertDialog.Builder(this).apply {
+             setTitle("Select Video Quality")
+            .setSingleChoiceItems(videoQuality, selectedQualityIndex
+            ) { dialog, which ->
+
+              val layerDefinition : List<HMSSimulcastLayerDefinition> = hmsVideoTrack.getLayerDefinition()
+              //safe check
+              if (which>= layerDefinition.size)
+                 return@setSingleChoiceItems
+
+              hmsVideoTrack.setLayer(layerDefinition[which].layer)
+            }
+            show()
+    }
+
+}
+
+
+fun SurfaceViewRenderer.setInit() {
+    setTag(R.id.IS_INT,true)
+}
+
+fun SurfaceViewRenderer.setRelease() {
+    setTag(R.id.IS_INT,false)
+}
+
+fun SurfaceViewRenderer.isInit() : Boolean {
+    return (getTag(R.id.IS_INT) as? Boolean) == true
 }
