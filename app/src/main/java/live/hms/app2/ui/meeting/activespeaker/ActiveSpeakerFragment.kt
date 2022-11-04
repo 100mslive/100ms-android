@@ -98,7 +98,8 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       context.showTileListDialog (
         isLocalTrack = videoTrack is HMSLocalVideoTrack,
         onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
-        onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) }
+        onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
+        onMirror = { context.showMirrorOptions(surfaceView)}
         )
     }
 
