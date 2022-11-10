@@ -50,6 +50,9 @@ class SettingsStore(context: Context) {
     const val SHOW_STATS = "show-video-stats"
     const val DISABLE_AUTO_RESIZE = "disable-auto-resize"
     const val FORCE_SOFTWARE_DECODER = "force-software-decoder"
+    const val ENABLE_ECHO_CANCELLATION = "enable_echo_cancellation"
+    const val ENABLE_NOISE_SUPRESSION = "enable_noise_supression"
+    const val ENABLE_AUTOMATIC_GAIN_CONTROL = "enable_automatic_gain_control"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -133,6 +136,18 @@ class SettingsStore(context: Context) {
   var forceSoftwareDecoder: Boolean
     get() = sharedPreferences.getBoolean(FORCE_SOFTWARE_DECODER, false)
     set(value) = putBoolean(FORCE_SOFTWARE_DECODER, value)
+
+  var enableAEC: Boolean
+    get() = sharedPreferences.getBoolean(ENABLE_ECHO_CANCELLATION, true)
+    set(value) = putBoolean(ENABLE_ECHO_CANCELLATION, value)
+
+  var enableNS: Boolean
+    get() = sharedPreferences.getBoolean(ENABLE_NOISE_SUPRESSION, true)
+    set(value) = putBoolean(ENABLE_NOISE_SUPRESSION, value)
+
+  var enableAGC: Boolean
+    get() = sharedPreferences.getBoolean(ENABLE_AUTOMATIC_GAIN_CONTROL, true)
+    set(value) = putBoolean(ENABLE_AUTOMATIC_GAIN_CONTROL, value)
 
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
@@ -316,6 +331,9 @@ class SettingsStore(context: Context) {
     fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
     fun setDisableAutoResize(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_RESIZE, value) }
     fun setForceSoftwareDecoder(value: Boolean) = apply { editor.putBoolean(FORCE_SOFTWARE_DECODER, value) }
+    fun setEnableAEC(value: Boolean) = apply { editor.putBoolean(ENABLE_ECHO_CANCELLATION, value) }
+    fun setEnableNS(value: Boolean) = apply { editor.putBoolean(ENABLE_NOISE_SUPRESSION, value) }
+    fun setEnableAGC(value: Boolean) = apply { editor.putBoolean(ENABLE_AUTOMATIC_GAIN_CONTROL, value) }
 
 
     fun commit() {

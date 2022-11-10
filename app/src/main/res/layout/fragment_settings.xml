@@ -248,6 +248,31 @@
             android:visibility="visible" />
 
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/enable_echo_cancellation"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/enable_echo_cancellation"
+            android:visibility="visible" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/enable_noise_supression"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/enable_noise_supression"
+            android:visibility="visible" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/enable_automatic_gain_control"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/enable_automatic_gain_control"
+            android:visibility="visible" />
+
+
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_use_hardware_echo_cancellation"
