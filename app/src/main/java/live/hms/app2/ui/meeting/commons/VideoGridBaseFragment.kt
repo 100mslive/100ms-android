@@ -24,6 +24,8 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.media.tracks.HMSLocalVideoTrack
+import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
@@ -195,7 +197,12 @@ abstract class VideoGridBaseFragment : Fragment() {
   ) {
 
     contextSafe { context, activity ->
-      context.showTileListDialog(peerName) { captureVideoFrame(surfaceView, videoTrack) }
+      context.showTileListDialog (
+        isLocalTrack = videoTrack is HMSLocalVideoTrack,
+        onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
+        onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
+        onMirror = { context.showMirrorOptions(surfaceView)}
+      )
     }
   }
 

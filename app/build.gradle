@@ -65,9 +65,9 @@ dependencies {
     // implementation 'com.github.100mslive:android-sdk:2.5.0'
 
     // To add dependencies of specific module
-    implementation 'com.github.100mslive.android-sdk:lib:2.5.0'
-    implementation 'com.github.100mslive.android-sdk:virtualBackground:2.5.0'
-    implementation 'com.github.100mslive.android-sdk:stats:2.5.0'
+    implementation 'com.github.100mslive.android-sdk:lib:2.5.1'
+    implementation 'com.github.100mslive.android-sdk:virtualBackground:2.5.1'
+    implementation 'com.github.100mslive.android-sdk:stats:2.5.1'
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
