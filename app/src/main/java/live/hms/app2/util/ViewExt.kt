@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Looper
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.accessibility.AccessibilityManager
@@ -103,19 +104,21 @@ fun HMSVideoTrack?.isValid(): Boolean {
 fun Context.showTileListDialog(
   isLocalTrack : Boolean,
   onScreenCapture: (() -> Unit),
-  onSimulcast: (() -> Unit)
+  onSimulcast: (() -> Unit),
+  onMirror: (() -> Unit)
 ) {
 
   val builder = AlertDialog.Builder(this)
   builder.setTitle("Perform Action")
-  val intentList = mutableListOf("Screen Capture")
+  val intentList = mutableListOf("Screen Capture", "Mirror")
 
   if (isLocalTrack.not())
     intentList+= "Simulcast"
-  builder.setItems(intentList.toTypedArray()) { dialog, which ->
+  builder.setItems(intentList.toTypedArray()) { _, which ->
     when (which) {
       0 -> { onScreenCapture.invoke() }
-      1 -> { onSimulcast.invoke() }
+        1 -> {onMirror()}
+      2 -> { onSimulcast.invoke() }
     }
   }
 
@@ -167,6 +170,26 @@ fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
             show()
     }
 
+}
+
+fun Context.showMirrorOptions(surfaceViewRenderer: SurfaceViewRenderer?) {
+    if(surfaceViewRenderer == null)
+        return
+    AlertDialog.Builder(this).apply {
+        setTitle("Select mirror")
+            .setSingleChoiceItems(arrayOf("Ignore","Mirror: True","Mirror: False"), 0) { _, which ->
+                if(which == 1) {
+                    Log.d("Mirroring","set mirror true")
+                    surfaceViewRenderer.setMirror(true)
+                } else if (which == 2) {
+                    Log.d("Mirroring","set mirror false")
+                    surfaceViewRenderer.setMirror(false)
+                } else {
+                    Log.d("Mirroring","don't set mirror")
+                }
+            }
+        show()
+    }
 }
 
 
