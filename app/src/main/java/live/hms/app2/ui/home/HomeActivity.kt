@@ -1,12 +1,20 @@
 package live.hms.app2.ui.home
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioTrack
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
+import android.widget.Toast
+import androidx.annotation.RawRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import live.hms.app2.R
 import live.hms.app2.databinding.ActivityHomeBinding
 import java.io.File
@@ -37,6 +45,10 @@ class HomeActivity : AppCompatActivity() {
     finishIfOngoingActiveTaskPresent()
   }
 
+  data class Audio(
+    @SerializedName("audio") val audioSamples: List<Short>,
+  )
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     _binding = ActivityHomeBinding.inflate(layoutInflater)
@@ -45,11 +57,53 @@ class HomeActivity : AppCompatActivity() {
     setSupportActionBar(binding.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
     copyWeightsAssetsToDirectory()
+    playLocalAudio()
+
+
 
     // TODO: Enable turn screen on / FLAG_SHOW_WHEN_LOCKED
   }
 
-  private fun copyWeightsAssetsToDirectory(targetDirectory: String = getExternalFilesDir(null)!!.absolutePath) {
+  private fun playLocalAudio() {
+        val audioSamples =  jsonToClass<Audio>(R.raw.audio_demo)
+    val size = audioSamples.audioSamples.size
+    val SAMPLE_RATE = 16000
+
+    val decoded_audio = audioSamples.audioSamples.toShortArray()
+
+    val player: AudioTrack = AudioTrack.Builder()
+      .setAudioAttributes(
+        AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build()
+      )
+      .setTransferMode(AudioTrack.MODE_STATIC)
+      .setAudioFormat(
+        AudioFormat.Builder()
+          .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+          .setSampleRate(SAMPLE_RATE)
+          .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+          .build()
+      )
+      .setBufferSizeInBytes(decoded_audio.size * 2)
+      .build()
+
+    val shortsWritten: Int = player.write(
+      decoded_audio,
+      0,
+      decoded_audio.size,
+      AudioTrack.WRITE_BLOCKING
+    )
+
+    player.play()
+
+  }
+
+  inline fun <reified T> Context.jsonToClass(@RawRes resourceId: Int): T =
+    Gson().fromJson(resources.openRawResource(resourceId).bufferedReader().use { it.readText() }, T::class.java)
+
+  private fun copyWeightsAssetsToDirectory() {
+
+    val targetDirectory: String = getExternalFilesDir(null)!!.absolutePath
+    Toast.makeText(this, "Models dir : [$targetDirectory]",Toast.LENGTH_LONG).show()
     try {
       val assetManager = assets
       val files = arrayOf(
