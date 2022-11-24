@@ -19,7 +19,10 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.MeetingViewModelFactory
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.video.HMSVideoView
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 
@@ -89,7 +92,7 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private fun initPinnedView() {
-    binding.pinVideo.surfaceView.apply {
+    binding.pinVideo.hmsVideoView.apply {
       setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
       setEnableHardwareScaler(true)
     }
@@ -122,13 +125,20 @@ class PinnedVideoFragment : Fragment() {
     crashlyticsLog(TAG, "handleOnPinVideoVisibilityChange: isViewVisible=${isViewVisible}")
 
     pinnedTrack?.let { track : MeetingTrack ->
-      binding.pinVideo.surfaceView.apply {
+      binding.pinVideo.hmsVideoView.apply {
         if (isViewVisible) {
-          SurfaceViewRendererUtil.bind(this, track).let { success ->
-            if (success) visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-          }
+          addTrack(track.video, object : HMSActionResultListener{
+            override fun onError(error: HMSException) {
+              // Ignore errors
+            }
+
+            override fun onSuccess() {
+              visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+            }
+
+          })
         } else {
-          SurfaceViewRendererUtil.unbind(this, track)
+          removeTrack()
           visibility = View.GONE
         }
       }
@@ -151,20 +161,27 @@ class PinnedVideoFragment : Fragment() {
 
     crashlyticsLog(TAG, "Changing pin-view video to $track (previous=$pinnedTrack)")
 
-    val view = SurfaceViewRenderer(context)
+    val view = HMSVideoView(requireContext())
 
     view.apply {
       binding.pinVideo.surfaceViewHolder.forEach {
-        if (it is SurfaceViewRenderer){
-          pinnedTrack?.let { pin-> SurfaceViewRendererUtil.unbind(it, pin)  }
+        if (it is HMSVideoView){
+          it.removeTrack()
         }
       }
       binding.pinVideo.surfaceViewHolder.removeAllViews()
       binding.pinVideo.surfaceViewHolder.addView(this)
       visibility = View.GONE
-        SurfaceViewRendererUtil.bind(view, track).let { success ->
-          if (success) visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+      view.addTrack(track.video, object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+//          TODO("Not yet implemented")
         }
+
+        override fun onSuccess() {
+          visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+        }
+
+      })
       }
 
     pinnedTrack = track

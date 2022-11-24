@@ -17,14 +17,13 @@ import live.hms.app2.helpers.NetworkQualityHelper
 import live.hms.app2.ui.meeting.CustomPeerMetadata
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.util.NameUtils
-import live.hms.app2.util.SurfaceViewRendererUtil
 import live.hms.app2.util.crashlyticsLog
 import live.hms.app2.util.visibility
 import live.hms.video.connection.stats.HMSStats
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import okhttp3.internal.toImmutableList
-import org.webrtc.RendererCommon
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit,
@@ -68,17 +67,29 @@ class VideoListAdapter(
       binding.name.text = item.track.peer.name
       binding.iconScreenShare.visibility = if (item.track.isScreen) View.VISIBLE else View.GONE
 
-      binding.surfaceView.apply {
-        setEnableHardwareScaler(true)
-        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+      binding.hmsVideoView.apply {
 
         // Meanwhile until the video is not binded, hide the view.
         visibility = View.GONE
 
         // Update the reference such that when view is attached to window
         // surface view is initialized with correct [VideoTrack]
+        binding.hmsVideoView.addTrack(item.track.video)
         itemRef = item
         isSurfaceViewBinded = false
+//        itemRef?.let { item ->
+//          SurfaceViewRendererUtil.bind(
+//            binding.surfaceView,
+//            item.track,
+//            "VideoItemViewHolder::bindSurfaceView"
+//          ).let { success ->
+//            if (success) {
+//              binding.surfaceView.visibility =
+//                if (item.track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+//              isSurfaceViewBinded = true
+//            }
+//          }
+//        }
       }
 
       val isHandRaised: Boolean =
@@ -102,37 +113,33 @@ class VideoListAdapter(
           itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
         ) { binding.stats.text = it }
       }
-
-      itemRef?.let { item ->
-        SurfaceViewRendererUtil.bind(
-          binding.surfaceView,
-          item.track,
-          "VideoItemViewHolder::bindSurfaceView"
-        ).let { success ->
-          if (success) {
-            binding.surfaceView.visibility =
-              if (item.track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-            isSurfaceViewBinded = true
-          }
+      binding.hmsVideoView.addTrack(itemRef?.track?.video, object :HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          // errors
         }
-      }
+
+        override fun onSuccess() {
+          binding.hmsVideoView.visibility = if (itemRef?.track?.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+          isSurfaceViewBinded = true
+        }
+
+      })
     }
 
     fun unbindSurfaceView() {
       if (!isSurfaceViewBinded) return
 //      statsInterpreter.close()
-      itemRef?.let { item ->
-        SurfaceViewRendererUtil.unbind(
-          binding.surfaceView,
-          item.track,
-          "VideoItemViewHolder::unbindSurfaceView"
-        ).let { success ->
-          if (success) {
-            binding.surfaceView.visibility = View.GONE
-            isSurfaceViewBinded = false
-          }
+      binding.hmsVideoView.removeTrack(object :HMSActionResultListener {
+        override fun onError(error: HMSException) {
+
         }
-      }
+
+        override fun onSuccess() {
+          isSurfaceViewBinded = false
+          binding.hmsVideoView.visibility = View.GONE
+        }
+
+      })
     }
   }
 

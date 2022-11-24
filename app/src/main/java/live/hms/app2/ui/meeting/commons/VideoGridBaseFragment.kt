@@ -24,9 +24,11 @@ import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
+import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -173,20 +175,22 @@ abstract class VideoGridBaseFragment : Fragment() {
             || bindedVideoTrackIds.contains(item.video?.trackId)
     if (earlyExit) return
 
-    binding.surfaceView.let { view ->
-      view.setScalingType(scalingType)
-      view.setEnableHardwareScaler(true)
+    binding.hmsVideoView.let { view ->
+      view.addTrack(item.video, object: HMSActionResultListener {
+        override fun onError(error: HMSException) {
+          // Ignore errors
+        }
 
-      SurfaceViewRendererUtil.bind(view, item).let { success ->
-        if (success) {
-          binding.surfaceView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
+        override fun onSuccess() {
+
+          binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
           bindedVideoTrackIds.add(item.video!!.trackId)
-          binding.surfaceView.setOnLongClickListener {
+          binding.hmsVideoView.setOnLongClickListener {
             (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
             true
           }
         }
-      }
+      })
     }
   }
 
@@ -255,8 +259,8 @@ abstract class VideoGridBaseFragment : Fragment() {
         View.VISIBLE
       }
 
-      if (surfaceView.visibility != surfaceViewVisibility) {
-        surfaceView.visibility = surfaceViewVisibility
+      if (hmsVideoView.visibility != surfaceViewVisibility) {
+        hmsVideoView.visibility = surfaceViewVisibility
       }
     }
   }
@@ -269,13 +273,17 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d(TAG,"unbindSurfaceView for :: ${item.peer.name}")
     if (!bindedVideoTrackIds.contains(item.video?.trackId ?: "")) return
 
-    SurfaceViewRendererUtil.unbind(binding.surfaceView, item, metadata).let {
-      if (it) {
-        binding.surfaceView.setOnLongClickListener(null)
-        binding.surfaceView.visibility = View.INVISIBLE
+    binding.hmsVideoView.removeTrack(object : HMSActionResultListener {
+      override fun onError(error: HMSException) {
+        // Ignore errors
+      }
+
+      override fun onSuccess() {
+        binding.hmsVideoView.setOnLongClickListener(null)
+        binding.hmsVideoView.visibility = View.INVISIBLE
         bindedVideoTrackIds.remove(item.video!!.trackId)
       }
-    }
+    })
   }
 
 

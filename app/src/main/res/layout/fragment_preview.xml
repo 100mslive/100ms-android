@@ -294,7 +294,7 @@
             android:textColor="@android:color/white"
             android:textSize="40sp" />
 
-        <org.webrtc.SurfaceViewRenderer
+        <live.hms.video.video.HMSVideoView
             android:id="@+id/preview_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
