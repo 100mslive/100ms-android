@@ -2,6 +2,7 @@ package live.hms.app2.util
 
 import android.util.Log
 import android.view.View
+import live.hms.app2.R
 import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.video.utils.SharedEglContext
 import org.webrtc.EglBase
@@ -35,7 +36,11 @@ object SurfaceViewRendererUtil {
   ): Boolean {
     if (item.video == null) return false
 
-    Log.v(TAG, "bind called :: ${item.peer.name}")
+    Log.v(TAG, "bind called :: ${item.peer.name} with trackID ${item?.video?.trackId.orEmpty()}")
+
+    if (view.isInit()) {
+      unbind(view, item, metadata)
+    }
 
     view.apply {
       View.VISIBLE
@@ -45,6 +50,7 @@ object SurfaceViewRendererUtil {
       ++initializedContextCount
 
       item.video!!.addSink(this)
+      setInit()
     }
 
     crashlyticsLog(
@@ -66,7 +72,7 @@ object SurfaceViewRendererUtil {
   fun unbind(view: SurfaceViewRenderer, item: MeetingTrack, metadata: String = ""): Boolean {
     if (item.video == null) return false
 
-    Log.v(TAG, "unbind called :: ${item.peer.name}")
+    Log.v(TAG, "unbind called :: ${item.peer.name} with trackID ${item?.video?.trackId.orEmpty()}")
     view.apply {
       // NOTE: We don't dispose off the MediaStreamTrack here as it can
       // be re-used by the any other view
@@ -74,7 +80,9 @@ object SurfaceViewRendererUtil {
       item.video!!.removeSink(this)
       release()
       --initializedContextCount
+      setRelease()
     }
+
 
     crashlyticsLog(
       TAG,
@@ -83,3 +91,4 @@ object SurfaceViewRendererUtil {
     return true
   }
 }
+

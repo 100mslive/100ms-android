@@ -13,6 +13,8 @@ import live.hms.app2.ui.meeting.MeetingTrack
 import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.app2.util.*
+import live.hms.video.media.tracks.HMSLocalVideoTrack
+import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.utils.HMSLogger
@@ -93,7 +95,12 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     if (videoTrack.isValid().not())
       return
     contextSafe { context, activity ->
-      context.showTileListDialog (peerName){ captureVideoFrame(surfaceView, videoTrack) }
+      context.showTileListDialog (
+        isLocalTrack = videoTrack is HMSLocalVideoTrack,
+        onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
+        onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
+        onMirror = { context.showMirrorOptions(surfaceView)}
+        )
     }
 
   }
