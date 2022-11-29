@@ -480,6 +480,24 @@ class SettingsFragment : Fragment() {
         forceSoftwareDecoder
       ) { commitHelper.setForceSoftwareDecoder(it) }
 
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.enableAEC,
+        enableEchoCancellation
+      ) { commitHelper.setEnableAEC(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.enableNS,
+        enableNoiseSupression
+      ) { commitHelper.setEnableNS(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.enableAGC,
+        enableAutomaticGainControl
+      ) { commitHelper.setEnableAGC(it) }
+
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
