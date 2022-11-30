@@ -480,6 +480,12 @@ class SettingsFragment : Fragment() {
         forceSoftwareDecoder
       ) { commitHelper.setForceSoftwareDecoder(it) }
 
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.enableLyra,
+        enableLyra
+      ) { commitHelper.setEnableLyra(it) }
+
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

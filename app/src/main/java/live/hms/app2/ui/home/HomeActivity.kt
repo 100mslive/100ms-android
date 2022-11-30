@@ -57,7 +57,7 @@ class HomeActivity : AppCompatActivity() {
     setSupportActionBar(binding.toolbar)
     supportActionBar?.setDisplayShowTitleEnabled(false)
     copyWeightsAssetsToDirectory()
-    playLocalAudio()
+    //playLocalAudio()
 
 
 

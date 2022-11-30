@@ -50,6 +50,7 @@ class SettingsStore(context: Context) {
     const val SHOW_STATS = "show-video-stats"
     const val DISABLE_AUTO_RESIZE = "disable-auto-resize"
     const val FORCE_SOFTWARE_DECODER = "force-software-decoder"
+    const val ENABLE_LYRA = "enable_lyra"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -133,6 +134,10 @@ class SettingsStore(context: Context) {
   var forceSoftwareDecoder: Boolean
     get() = sharedPreferences.getBoolean(FORCE_SOFTWARE_DECODER, false)
     set(value) = putBoolean(FORCE_SOFTWARE_DECODER, value)
+
+  var enableLyra: Boolean
+    get() = sharedPreferences.getBoolean(ENABLE_LYRA, false)
+    set(value) = putBoolean(ENABLE_LYRA, value)
 
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
@@ -316,6 +321,7 @@ class SettingsStore(context: Context) {
     fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
     fun setDisableAutoResize(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_RESIZE, value) }
     fun setForceSoftwareDecoder(value: Boolean) = apply { editor.putBoolean(FORCE_SOFTWARE_DECODER, value) }
+    fun setEnableLyra(value: Boolean) = apply { editor.putBoolean(ENABLE_LYRA, value) }
 
 
     fun commit() {
