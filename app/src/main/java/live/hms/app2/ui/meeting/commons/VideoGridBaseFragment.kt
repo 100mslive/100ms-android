@@ -176,7 +176,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (earlyExit) return
 
     binding.hmsVideoView.let { view ->
-      view.addTrack(item.video)
+      item.video?.let { view.addTrack(it) }
       binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
       bindedVideoTrackIds.add(item.video!!.trackId)
       binding.hmsVideoView.setOnLongClickListener {

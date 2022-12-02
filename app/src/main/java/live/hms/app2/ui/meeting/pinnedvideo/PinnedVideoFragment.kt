@@ -127,7 +127,7 @@ class PinnedVideoFragment : Fragment() {
     pinnedTrack?.let { track : MeetingTrack ->
       binding.pinVideo.hmsVideoView.apply {
         if (isViewVisible) {
-          addTrack(track.video)
+          track.video?.let { addTrack(it) }
           visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
         } else {
           removeTrack()
@@ -164,7 +164,7 @@ class PinnedVideoFragment : Fragment() {
       binding.pinVideo.surfaceViewHolder.removeAllViews()
       binding.pinVideo.surfaceViewHolder.addView(this)
       visibility = View.GONE
-      view.addTrack(track.video)
+      track.video?.let { view.addTrack(it) }
       visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
       }
 

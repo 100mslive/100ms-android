@@ -74,7 +74,7 @@ class VideoListAdapter(
 
         // Update the reference such that when view is attached to window
         // surface view is initialized with correct [VideoTrack]
-        binding.hmsVideoView.addTrack(item.track.video)
+        item.track.video?.let{ binding.hmsVideoView.addTrack(it) }
         itemRef = item
         isSurfaceViewBinded = false
 //        itemRef?.let { item ->
@@ -113,7 +113,7 @@ class VideoListAdapter(
           itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
         ) { binding.stats.text = it }
       }
-      binding.hmsVideoView.addTrack(itemRef?.track?.video)
+      itemRef?.track?.video?.let { binding.hmsVideoView.addTrack(it) }
       binding.hmsVideoView.visibility = if (itemRef?.track?.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
       isSurfaceViewBinded = true
 

@@ -86,7 +86,7 @@ class PreviewFragment : Fragment() {
 
     private fun bindVideo() {
         if (this::track.isInitialized && track.video?.isMute == false) {
-            binding.previewView.addTrack(track.video)
+            track.video?.let { binding.previewView.addTrack(it) }
             binding.previewView.visibility = View.VISIBLE
         } else {
             binding.previewView.visibility = View.GONE
