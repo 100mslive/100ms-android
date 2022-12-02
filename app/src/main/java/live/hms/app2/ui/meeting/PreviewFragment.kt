@@ -86,7 +86,7 @@ class PreviewFragment : Fragment() {
 
     private fun bindVideo() {
         if (this::track.isInitialized && track.video?.isMute == false) {
-            SurfaceViewRendererUtil.bind(binding.previewView, track)
+            track.video?.let { binding.previewView.addTrack(it) }
             binding.previewView.visibility = View.VISIBLE
         } else {
             binding.previewView.visibility = View.GONE
@@ -95,10 +95,7 @@ class PreviewFragment : Fragment() {
 
     private fun unbindVideo() {
         binding.previewView.visibility = View.GONE
-
-        if (this::track.isInitialized) {
-            SurfaceViewRendererUtil.unbind(binding.previewView, track)
-        }
+        binding.previewView.removeTrack()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
