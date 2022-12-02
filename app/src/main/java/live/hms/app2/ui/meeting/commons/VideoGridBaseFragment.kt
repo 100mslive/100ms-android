@@ -176,12 +176,16 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (earlyExit) return
 
     binding.hmsVideoView.let { view ->
-      item.video?.let { view.addTrack(it) }
-      binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
-      bindedVideoTrackIds.add(item.video!!.trackId)
-      binding.hmsVideoView.setOnLongClickListener {
-        (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
-        true
+      item.video?.let { track ->
+        view.setScalingType(scalingType)
+        view.addTrack(track)
+
+        binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
+        bindedVideoTrackIds.add(item.video!!.trackId)
+        binding.hmsVideoView.setOnLongClickListener {
+          (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
+          true
+        }
       }
     }
   }

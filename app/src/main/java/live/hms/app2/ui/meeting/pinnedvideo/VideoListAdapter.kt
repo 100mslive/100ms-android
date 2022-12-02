@@ -24,6 +24,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import org.webrtc.RendererCommon
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit,
@@ -68,7 +69,7 @@ class VideoListAdapter(
       binding.iconScreenShare.visibility = if (item.track.isScreen) View.VISIBLE else View.GONE
 
       binding.hmsVideoView.apply {
-
+        setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         // Meanwhile until the video is not binded, hide the view.
         visibility = View.GONE
 
@@ -113,9 +114,12 @@ class VideoListAdapter(
           itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
         ) { binding.stats.text = it }
       }
-      itemRef?.track?.video?.let { binding.hmsVideoView.addTrack(it) }
-      binding.hmsVideoView.visibility = if (itemRef?.track?.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-      isSurfaceViewBinded = true
+      itemRef?.track?.video?.let {
+        binding.hmsVideoView.addTrack(it)
+        binding.hmsVideoView.visibility = if (itemRef?.track?.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+        isSurfaceViewBinded = true
+      }
+
 
     }
 
