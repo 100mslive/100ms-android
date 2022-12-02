@@ -294,7 +294,8 @@
             android:textColor="@android:color/white"
             android:textSize="40sp" />
 
-        <live.hms.video.video.HMSVideoView
+
+        <live.hms.videoview.HMSVideoView
             android:id="@+id/preview_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

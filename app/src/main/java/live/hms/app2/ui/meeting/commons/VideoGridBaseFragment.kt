@@ -176,21 +176,13 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (earlyExit) return
 
     binding.hmsVideoView.let { view ->
-      view.addTrack(item.video, object: HMSActionResultListener {
-        override fun onError(error: HMSException) {
-          // Ignore errors
-        }
-
-        override fun onSuccess() {
-
-          binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
-          bindedVideoTrackIds.add(item.video!!.trackId)
-          binding.hmsVideoView.setOnLongClickListener {
-            (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
-            true
-          }
-        }
-      })
+      view.addTrack(item.video)
+      binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
+      bindedVideoTrackIds.add(item.video!!.trackId)
+      binding.hmsVideoView.setOnLongClickListener {
+        (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
+        true
+      }
     }
   }
 
@@ -273,17 +265,11 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d(TAG,"unbindSurfaceView for :: ${item.peer.name}")
     if (!bindedVideoTrackIds.contains(item.video?.trackId ?: "")) return
 
-    binding.hmsVideoView.removeTrack(object : HMSActionResultListener {
-      override fun onError(error: HMSException) {
-        // Ignore errors
-      }
+    binding.hmsVideoView.removeTrack()
+    binding.hmsVideoView.setOnLongClickListener(null)
+    binding.hmsVideoView.visibility = View.INVISIBLE
+    bindedVideoTrackIds.remove(item.video!!.trackId)
 
-      override fun onSuccess() {
-        binding.hmsVideoView.setOnLongClickListener(null)
-        binding.hmsVideoView.visibility = View.INVISIBLE
-        bindedVideoTrackIds.remove(item.video!!.trackId)
-      }
-    })
   }
 
 

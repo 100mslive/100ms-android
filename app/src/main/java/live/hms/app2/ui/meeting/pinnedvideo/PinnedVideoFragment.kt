@@ -22,7 +22,7 @@ import live.hms.app2.util.*
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import live.hms.video.video.HMSVideoView
+import live.hms.videoview.HMSVideoView
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 
@@ -127,16 +127,8 @@ class PinnedVideoFragment : Fragment() {
     pinnedTrack?.let { track : MeetingTrack ->
       binding.pinVideo.hmsVideoView.apply {
         if (isViewVisible) {
-          addTrack(track.video, object : HMSActionResultListener{
-            override fun onError(error: HMSException) {
-              // Ignore errors
-            }
-
-            override fun onSuccess() {
-              visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-            }
-
-          })
+          addTrack(track.video)
+          visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
         } else {
           removeTrack()
           visibility = View.GONE
@@ -172,16 +164,8 @@ class PinnedVideoFragment : Fragment() {
       binding.pinVideo.surfaceViewHolder.removeAllViews()
       binding.pinVideo.surfaceViewHolder.addView(this)
       visibility = View.GONE
-      view.addTrack(track.video, object : HMSActionResultListener {
-        override fun onError(error: HMSException) {
-//          TODO("Not yet implemented")
-        }
-
-        override fun onSuccess() {
-          visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-        }
-
-      })
+      view.addTrack(track.video)
+      visibility = if (track.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
       }
 
     pinnedTrack = track

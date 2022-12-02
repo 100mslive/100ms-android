@@ -23,7 +23,7 @@
             android:textColor="@android:color/white"
             android:textSize="24sp" />
 
-        <live.hms.video.video.HMSVideoView
+        <live.hms.videoview.HMSVideoView
             android:id="@+id/hms_video_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

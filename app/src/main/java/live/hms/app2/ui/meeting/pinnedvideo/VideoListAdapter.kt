@@ -113,33 +113,19 @@ class VideoListAdapter(
           itemRef?.track?.audio, itemRef?.track?.peer?.isLocal == true
         ) { binding.stats.text = it }
       }
-      binding.hmsVideoView.addTrack(itemRef?.track?.video, object :HMSActionResultListener {
-        override fun onError(error: HMSException) {
-          // errors
-        }
+      binding.hmsVideoView.addTrack(itemRef?.track?.video)
+      binding.hmsVideoView.visibility = if (itemRef?.track?.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
+      isSurfaceViewBinded = true
 
-        override fun onSuccess() {
-          binding.hmsVideoView.visibility = if (itemRef?.track?.video?.isDegraded == true) View.INVISIBLE else View.VISIBLE
-          isSurfaceViewBinded = true
-        }
-
-      })
     }
 
     fun unbindSurfaceView() {
       if (!isSurfaceViewBinded) return
 //      statsInterpreter.close()
-      binding.hmsVideoView.removeTrack(object :HMSActionResultListener {
-        override fun onError(error: HMSException) {
+      binding.hmsVideoView.removeTrack()
+      isSurfaceViewBinded = false
+      binding.hmsVideoView.visibility = View.GONE
 
-        }
-
-        override fun onSuccess() {
-          isSurfaceViewBinded = false
-          binding.hmsVideoView.visibility = View.GONE
-        }
-
-      })
     }
   }
 
