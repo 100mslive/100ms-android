@@ -69,7 +69,7 @@ dependencies {
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:virtual-background:$hmsVersion"
     implementation "live.100ms:hls-player-stats:$hmsVersion"
-    implementation "live.100ms:videoview:$hmsVersion"
+    implementation "live.100ms:video-view:$hmsVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
