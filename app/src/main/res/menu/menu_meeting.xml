@@ -114,6 +114,13 @@
             app:showAsAction="ifRoom" />
 
         <item
+            android:id="@+id/action_bulk_role_change"
+            android:title="Bulk role Change"
+            android:visible="true"
+            app:showAsAction="ifRoom" />
+
+
+        <item
             android:id="@+id/pip_mode"
             android:title="@string/pip_mode"
             android:visible="false"

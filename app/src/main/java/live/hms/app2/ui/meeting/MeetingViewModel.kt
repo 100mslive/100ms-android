@@ -1444,6 +1444,19 @@ class MeetingViewModel(
     }
   }
 
+  fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
+      hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, false, object : HMSActionResultListener {
+          override fun onError(error: HMSException) {
+              Log.d("bulkRoleChange","There was an error $error")
+          }
+
+          override fun onSuccess() {
+              Log.d("bulkRoleChange","Successful")
+          }
+
+      })
+  }
+
   private val _sessionMetadata = MutableLiveData<String?>(null)
   val sessionMetadata : LiveData<String?> = _sessionMetadata
 

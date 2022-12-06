@@ -18,7 +18,7 @@ import live.hms.app2.util.viewLifecycle
 class SettingsBottomSheet(
     private val meetingViewModel: MeetingViewModel,
     private val participantsListener: () -> Unit,
-    private val roleMuteListener: () -> Unit
+    private val openBulkRoleChange : () -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<SettingsBottomSheetDialogBinding>()
@@ -93,6 +93,12 @@ class SettingsBottomSheet(
             }
         }
 
+        binding.btnBulkRoleChange.apply {
+            setOnSingleClickListener {
+                dismiss()
+                openBulkRoleChange()
+            }
+        }
         binding.btnPipMode.apply {
             setOnSingleClickListener {
                 dismiss()
