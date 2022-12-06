@@ -23,8 +23,8 @@
             android:textColor="@android:color/white"
             android:textSize="24sp" />
 
-        <org.webrtc.SurfaceViewRenderer
-            android:id="@+id/surface_view"
+        <live.hms.videoview.HMSVideoView
+            android:id="@+id/hms_video_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
