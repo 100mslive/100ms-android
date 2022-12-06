@@ -1445,7 +1445,7 @@ class MeetingViewModel(
   }
 
   fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
-      hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, false, object : HMSActionResultListener {
+      hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, true, object : HMSActionResultListener {
           override fun onError(error: HMSException) {
               Log.d("bulkRoleChange","There was an error $error")
           }
