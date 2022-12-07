@@ -954,7 +954,7 @@ class MeetingViewModel(
         val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
         if (hmsPeer != null && toRole != null) {
             if (hmsPeer.hmsRole.name != toRole.name)
-                hmsSDK.changeRole(hmsPeer, toRole, force, object : HMSActionResultListener {
+                hmsSDK.changeRoleOfPeer(hmsPeer, toRole, force, object : HMSActionResultListener {
                     override fun onSuccess() {
                         Log.i(TAG, "Successfully sent change role request for $hmsPeer")
                     }
@@ -1445,7 +1445,7 @@ class MeetingViewModel(
   }
 
   fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
-      hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, true, object : HMSActionResultListener {
+      hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, object : HMSActionResultListener {
           override fun onError(error: HMSException) {
               Log.d("bulkRoleChange","There was an error $error")
           }
