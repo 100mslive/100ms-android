@@ -98,6 +98,7 @@ class SettingsBottomSheet(
                 dismiss()
                 openBulkRoleChange()
             }
+            visibility = if(!meetingViewModel.isAllowedToChangeRole()) View.VISIBLE else View.GONE
         }
         binding.btnPipMode.apply {
             setOnSingleClickListener {
