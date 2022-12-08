@@ -55,6 +55,9 @@ class RoleChangeFragment : Fragment() {
         vm.selectedRolesToChange.observe(viewLifecycleOwner){
             binding.fromRolesTextView.text = it
         }
+        binding.closeBtn.setOnClickListener {
+            findNavController().navigate(RoleChangeFragmentDirections.actionRoleChangeFragmentToMeetingFragment())
+        }
     }
 
     private fun showRoleSelectDialog(rolesList : List<HMSRole>) {
