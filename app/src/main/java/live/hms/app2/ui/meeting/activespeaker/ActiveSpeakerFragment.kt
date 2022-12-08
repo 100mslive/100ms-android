@@ -74,7 +74,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         meetingTrack,
         RendererCommon.ScalingType.SCALE_ASPECT_FIT
       )
-      binding.screenShare.surfaceView.setOnLongClickListener { view ->
+      binding.screenShare.hmsVideoView.setOnLongClickListener { view ->
         openDialog(
           view as? SurfaceViewRenderer,
           meetingTrack.video,
