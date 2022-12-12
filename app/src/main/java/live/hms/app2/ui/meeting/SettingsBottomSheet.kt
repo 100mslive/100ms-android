@@ -268,6 +268,7 @@ class SettingsBottomSheet(
             binding.btnCameraSwitch.visibility = View.GONE
             binding.btnAudioShare.visibility = View.GONE
             binding.btnBrb.visibility = View.GONE
+            binding.btnMetaDataSend.visibility = View.GONE
         }
     }
 

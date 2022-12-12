@@ -35,8 +35,7 @@ class SendMetaDataDialogFragment : DialogFragment() {
                 meetingViewModel.sendHlsMetadata(
                     metaDataModel = live.hms.video.sdk.models.MetaDataModel(
                         payloadText,
-                        durationText,
-                        ""
+                        durationText
                     )
                 )
                 dismiss()

@@ -1,25 +1,20 @@
 package live.hms.app2.util;
 
 import android.content.Context
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.source.hls.HlsManifest
-import com.google.android.exoplayer2.source.hls.playlist.HlsMediaPlaylist
-import live.hms.app2.model.MetaDataModel
-import live.hms.stats.MetaDataManager
+import live.hms.app2.model.LocalMetaDataModel
 import okhttp3.internal.UTC
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
 class HlsMetadataHandler(
     val exoPlayer: ExoPlayer,
-    val listener: (MetaDataModel) -> Unit,
+    val listener: (LocalMetaDataModel) -> Unit,
     val context: Context
 ) {
     private val META_DATA_MATCHER =
@@ -31,7 +26,7 @@ class HlsMetadataHandler(
 
     var handler: Handler? = null
     private var eventRunnable: Runnable? = null
-    var lastFoundTag: MetaDataModel? = null
+    var lastFoundTag: LocalMetaDataModel? = null
 
     fun start() {
         eventRunnable = Runnable {
@@ -69,10 +64,11 @@ class HlsMetadataHandler(
                         val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                         formatter.timeZone = UTC
                         val tagStartTime = formatter.parse(startDate).time
-                        lastFoundTag = MetaDataModel(payload, duration, it)
+                        lastFoundTag = LocalMetaDataModel(payload, duration)
                         lastFoundTag?.startTime = tagStartTime
                         return@lastOrNull tagStartTime <= currentAbsolutePosition
-                    } catch (e: Exception) {}
+                    } catch (e: Exception) {
+                    }
                 }
             }
             false
