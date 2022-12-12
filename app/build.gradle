@@ -64,10 +64,12 @@ dependencies {
     // To use all the modules use the following dependency
     // implementation 'com.github.100mslive:android-sdk:2.5.0'
 
+    def hmsVersion = "2.5.3"
     // To add dependencies of specific module
-    implementation 'com.github.100mslive.android-sdk:lib:2.5.1'
-    implementation 'com.github.100mslive.android-sdk:virtualBackground:2.5.1'
-    implementation 'com.github.100mslive.android-sdk:stats:2.5.1'
+    implementation "live.100ms:android-sdk:$hmsVersion"
+    implementation "live.100ms:virtual-background:$hmsVersion"
+    implementation "live.100ms:hls-player-stats:$hmsVersion"
+    implementation "live.100ms:video-view:$hmsVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
@@ -86,6 +88,7 @@ dependencies {
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // Get Permissions easily
     implementation 'pub.devrel:easypermissions:1.1.3'
