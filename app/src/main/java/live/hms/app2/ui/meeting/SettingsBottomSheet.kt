@@ -85,6 +85,15 @@ class SettingsBottomSheet(
             }
         }
 
+        binding.btnMetaDataSend.apply {
+            setOnSingleClickListener(350) {
+                SendMetaDataDialogFragment().show(
+                    childFragmentManager,
+                    ChangeNameDialogFragment.TAG
+                )
+            }
+        }
+
         binding.participantCount.text = meetingViewModel.hmsSDK.getPeers().size.toString()
         binding.layoutParticipants.apply {
             setOnSingleClickListener {
@@ -245,7 +254,7 @@ class SettingsBottomSheet(
 
     }
 
-    fun updateMeetingAudioMode() {
+    private fun updateMeetingAudioMode() {
         if (meetingViewModel.getCurrentMediaModeCheckedState()) {
             binding.tvAudioMode.text = "Audio Mode : Media"
         } else {

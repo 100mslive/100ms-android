@@ -14,9 +14,11 @@ import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
+import live.hms.app2.util.HlsMetadataHandler
 import live.hms.app2.util.viewLifecycle
 import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
+import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStats
 import live.hms.video.utils.HMSLogger
 
@@ -27,7 +29,7 @@ class HlsFragment : Fragment() {
     val playerUpdatesHandler = Handler()
     var runnable: Runnable? = null
     val TAG = "HlsFragment"
-    var isStatsActive : Boolean = false
+    var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     private val hlsPlayer: HlsPlayer by lazy {
         HlsPlayer()
@@ -68,7 +70,7 @@ class HlsFragment : Fragment() {
                 isStatsActive = true
             } else {
                 playerEventsManager?.removeListener()
-                isStatsActive  = false
+                isStatsActive = false
                 binding.statsViewParent.visibility = View.GONE
 
             }
@@ -78,7 +80,10 @@ class HlsFragment : Fragment() {
         binding.btnTrackSelection.setOnClickListener {
             hlsPlayer.getPlayer()?.let {
                 val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(it)
-                trackSelectionBottomSheet.show(requireActivity().supportFragmentManager,"trackSelectionBottomSheet")
+                trackSelectionBottomSheet.show(
+                    requireActivity().supportFragmentManager,
+                    "trackSelectionBottomSheet"
+                )
             }
         }
 
@@ -118,6 +123,22 @@ class HlsFragment : Fragment() {
         }
     }
 
+    private fun statsToString(playerStats: PlayerStats): String {
+        return "bitrate : ${
+            Utils.humanReadableByteCount(
+                playerStats.videoInfo.averageBitrate.toLong(),
+                true,
+                true
+            )
+        }/s \n" +
+                "bufferedDuration  : ${playerStats.bufferedDuration / 1000} s \n" +
+                "video width : ${playerStats.videoInfo.videoWidth} px \n" +
+                "video height : ${playerStats.videoInfo.videoHeight} px \n" +
+                "frame rate : ${playerStats.videoInfo.frameRate} fps \n" +
+                "dropped frames : ${playerStats.frameInfo.droppedFrameCount} \n" +
+                "distance from live edge : ${playerStats.distanceFromLive.div(1000)} s"
+    }
+
     override fun onStart() {
         super.onStart()
         binding.hlsView.player = hlsPlayer.createPlayer(
@@ -127,6 +148,8 @@ class HlsFragment : Fragment() {
         )
         hlsPlayer.getPlayer()?.let {
             playerEventsManager = PlayerEventsCollector(it)
+            val handler = HlsMetadataHandler(it, {}, requireContext())
+            handler.start()
         }
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)
