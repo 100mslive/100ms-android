@@ -240,6 +240,12 @@ class MeetingFragment : Fragment() {
                 )
             }
 
+            R.id.action_bulk_role_change -> {
+                findNavController().navigate(
+                    MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment()
+                )
+            }
+
             R.id.action_participants -> {
                 findNavController().navigate(
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
@@ -281,9 +287,6 @@ class MeetingFragment : Fragment() {
                 meetingViewModel.toggleRaiseHand()
             }
 
-            R.id.pip_mode -> {
-                launchPipMode()
-            }
 
             R.id.change_name -> meetingViewModel.requestNameChange()
 
@@ -1028,7 +1031,7 @@ class MeetingFragment : Fragment() {
                 val settingsBottomSheet = SettingsBottomSheet(meetingViewModel, {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
                 }, {
-                    roleChangeRemote()
+                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
                 })
                 settingsBottomSheet.show(
                     requireActivity().supportFragmentManager,

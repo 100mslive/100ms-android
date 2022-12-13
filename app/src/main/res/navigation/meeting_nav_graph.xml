@@ -51,6 +51,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_roomMetadataAlphaFragment"
             app:destination="@id/roomMetadataAlphaFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_roleChangeFragment"
+            app:destination="@id/roleChangeFragment" />
     </fragment>
 
     <dialog
@@ -143,4 +146,12 @@
         android:id="@+id/roomMetadataAlphaFragment"
         android:name="live.hms.app2.ui.meeting.activespeaker.RoomMetadataAlphaFragment"
         android:label="RoomMetadataAlphaFragment" />
+    <fragment
+        android:id="@+id/roleChangeFragment"
+        android:name="live.hms.app2.ui.meeting.chat.RoleChangeFragment"
+        android:label="RoleChangeFragment" >
+        <action
+            android:id="@+id/action_roleChangeFragment_to_MeetingFragment"
+            app:destination="@id/MeetingFragment" />
+    </fragment>
 </navigation>
