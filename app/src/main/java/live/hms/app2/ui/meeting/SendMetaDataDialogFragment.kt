@@ -9,6 +9,7 @@ import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import live.hms.app2.R
+import live.hms.video.sdk.models.HMSHLSTimedMetadata
 
 
 class SendMetaDataDialogFragment : DialogFragment() {
@@ -33,7 +34,7 @@ class SendMetaDataDialogFragment : DialogFragment() {
             val durationText = duration.text.toString().toLongOrNull() ?: 0
             if (payload.text.isNotEmpty() && durationText > 0) {
                 meetingViewModel.sendHlsMetadata(
-                    metaDataModel = live.hms.video.sdk.models.MetaDataModel(
+                    metaDataModel = HMSHLSTimedMetadata(
                         payloadText,
                         durationText
                     )

@@ -1293,7 +1293,7 @@ class MeetingViewModel(
 
     }
 
-    fun sendHlsMetadata(metaDataModel: MetaDataModel) {
+    fun sendHlsMetadata(metaDataModel: HMSHLSTimedMetadata) {
 
         hmsSDK.setHlsSessionMetadata(arrayListOf(metaDataModel), object : HMSActionResultListener {
             override fun onError(error: HMSException) {
