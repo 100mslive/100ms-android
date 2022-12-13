@@ -58,9 +58,9 @@ class HlsMetadataHandler(
                 val matcher = pattern.matcher(it)
                 if (matcher.matches()) {
                     try {
-                        val payload = matcher.group(3).orEmpty()
-                        val duration = matcher.group(2).orEmpty().toLongOrNull()?.times(1000) ?: 0
-                        val startDate = matcher.group(1).orEmpty()
+                        val payload = matcher.group(4).orEmpty()
+                        val duration = matcher.group(3).orEmpty().toLongOrNull()?.times(1000) ?: 0
+                        val startDate = matcher.group(2).orEmpty()
                         val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                         formatter.timeZone = UTC
                         val tagStartTime = formatter.parse(startDate).time
