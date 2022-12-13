@@ -72,7 +72,7 @@ class VideoListAdapter(
         setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         // Meanwhile until the video is not binded, hide the view.
         visibility = View.GONE
-
+        setAutoSimulcast(true)
         // Update the reference such that when view is attached to window
         // surface view is initialized with correct [VideoTrack]
         item.track.video?.let{ binding.hmsVideoView.addTrack(it) }

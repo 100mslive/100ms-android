@@ -139,6 +139,8 @@ class MeetingViewModel(
 
     }
 
+    fun isAutoSimulcastEnabled() = settings.disableHardwareScaler
+
     // Title at the top of the meeting
     val title = MutableLiveData<Int>()
     fun setTitle(@StringRes resId: Int) {
