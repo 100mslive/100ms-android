@@ -283,6 +283,10 @@ class MeetingFragment : Fragment() {
                 })
             }
 
+            R.id.pip_mode -> {
+                launchPipMode()
+            }
+
             R.id.raise_hand -> {
                 meetingViewModel.toggleRaiseHand()
             }
