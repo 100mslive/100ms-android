@@ -495,6 +495,7 @@ class MeetingViewModel(
                     }
 
                     HMSPeerUpdate.ROLE_CHANGED -> {
+                        Log.d("RoleChangeUpdate","${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}")
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
