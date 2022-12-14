@@ -95,7 +95,7 @@ class SettingsBottomSheet(
 
         binding.btnBulkRoleChange.apply {
             setOnSingleClickListener {
-                dismiss()
+                dismissAllowingStateLoss()
                 openBulkRoleChange()
             }
             visibility = if(meetingViewModel.isAllowedToChangeRole()) View.VISIBLE else View.GONE
