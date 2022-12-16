@@ -476,6 +476,12 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
+        settings.disableHardwareScaler,
+        disableHardwareScaler
+      ) { commitHelper.setDisableHardwareScaler(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
         settings.forceSoftwareDecoder,
         forceSoftwareDecoder
       ) { commitHelper.setForceSoftwareDecoder(it) }
