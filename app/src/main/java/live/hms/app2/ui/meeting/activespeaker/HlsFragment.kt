@@ -170,8 +170,10 @@ class HlsFragment : Fragment() {
         )
         hlsPlayer.getPlayer()?.let {
             playerEventsManager = PlayerEventsCollector(it)
-            val handler = HlsMetadataHandler(it, {}, requireContext())
-            handler.start()
+            val hlsMetadataHandler = HlsMetadataHandler(exoPlayer = it, { metaDataModel ->
+
+            }, requireContext())
+            hlsMetadataHandler.start()
         }
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)

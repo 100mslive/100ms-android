@@ -77,6 +77,7 @@ class HlsMetadataHandler(
         lastFoundTag?.let { tag ->
             val tagStartTime = tag.startTime
             if (tagStartTime <= currentAbsolutePosition && currentAbsolutePosition - tagStartTime <= tag.duration) {
+                listener.invoke(tag)
                 Toast.makeText(context, tag.payload, Toast.LENGTH_LONG).show()
             }
         }
