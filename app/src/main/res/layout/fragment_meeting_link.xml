@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
@@ -68,14 +67,14 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="10dp"
-            android:background="@drawable/gray_round_btn"
             android:autofillHints=""
+            android:background="@drawable/gray_round_btn"
             android:hint="@string/paste_the_link_here_str"
             android:textColorHint="@drawable/text_input_focus_selector"
-            app:hintTextColor="@color/cardview_light_background"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="0dp"
-            app:endIconMode="clear_text">
+            app:endIconMode="clear_text"
+            app:hintTextColor="@color/cardview_light_background">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_meeting_url"
@@ -159,6 +158,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
+
+        <LinearLayout
+            android:id="@+id/debug_version"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Webrtc version : " />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SDK version : " />
+        </LinearLayout>
 
     </LinearLayout>
 
