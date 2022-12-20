@@ -108,8 +108,8 @@ class MeetingViewModel(
     private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
     // When we get stats, a flow will be updated with the saved stats.
-    private val statsFlow = MutableSharedFlow<Map<String, HMSStats>>()
-    private val savedStats: MutableMap<String, HMSStats> = mutableMapOf()
+    private val statsFlow = MutableSharedFlow<Map<String, Any>>()
+    private val savedStats: MutableMap<String, Any> = mutableMapOf()
 
     private val settings = SettingsStore(getApplication())
 
@@ -352,7 +352,7 @@ class MeetingViewModel(
             }
 
             override fun onLocalVideoStats(
-                videoStats: HMSLocalVideoStats,
+                videoStats: List<HMSLocalVideoStats>,
                 hmsTrack: HMSTrack?,
                 hmsPeer: HMSPeer?
             ) {
@@ -1330,7 +1330,7 @@ class MeetingViewModel(
         })
     }
 
-    fun getStats(): Flow<Map<String, HMSStats>> = statsFlow
+    fun getStats(): Flow<Map<String, Any>> = statsFlow
 
     fun startHls(hlsUrl: String?, recordingConfig: HMSHlsRecordingConfig) {
         val meetingVariants = if (hlsUrl.isNullOrBlank()) {
