@@ -139,6 +139,8 @@ class MeetingViewModel(
 
     }
 
+    fun isAutoSimulcastEnabled() = settings.disableHardwareScaler
+
     // Title at the top of the meeting
     val title = MutableLiveData<Int>()
     fun setTitle(@StringRes resId: Int) {
@@ -495,6 +497,7 @@ class MeetingViewModel(
                     }
 
                     HMSPeerUpdate.ROLE_CHANGED -> {
+                        Log.d("RoleChangeUpdate","${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}")
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
@@ -954,7 +957,7 @@ class MeetingViewModel(
         val toRole = hmsSDK.getRoles().find { it.name == toRoleName }
         if (hmsPeer != null && toRole != null) {
             if (hmsPeer.hmsRole.name != toRole.name)
-                hmsSDK.changeRole(hmsPeer, toRole, force, object : HMSActionResultListener {
+                hmsSDK.changeRoleOfPeer(hmsPeer, toRole, force, object : HMSActionResultListener {
                     override fun onSuccess() {
                         Log.i(TAG, "Successfully sent change role request for $hmsPeer")
                     }
@@ -1442,6 +1445,19 @@ class MeetingViewModel(
       }
       _sessionMetadata.postValue(data)
     }
+  }
+
+  fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
+      hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, object : HMSActionResultListener {
+          override fun onError(error: HMSException) {
+              Log.d("bulkRoleChange","There was an error $error")
+          }
+
+          override fun onSuccess() {
+              Log.d("bulkRoleChange","Successful")
+          }
+
+      })
   }
 
   private val _sessionMetadata = MutableLiveData<String?>(null)
