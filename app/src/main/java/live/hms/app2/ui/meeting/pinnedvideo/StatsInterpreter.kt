@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.video.connection.stats.*
 import live.hms.video.media.tracks.HMSAudioTrack
+import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import kotlin.math.roundToInt
 
@@ -19,7 +20,7 @@ class StatsInterpreter(val active: Boolean) {
 
     fun initiateStats(
         lifecycleOwner: LifecycleOwner,
-        itemStats: Flow<Map<String, HMSStats>>,
+        itemStats: Flow<Map<String, Any>>,
         currentVideoTrack: HMSVideoTrack?,
         currentAudioTrack: HMSAudioTrack?,
         isLocal: Boolean,
@@ -31,8 +32,12 @@ class StatsInterpreter(val active: Boolean) {
                 itemStats.map { allStats ->
 
                     val relevantStats = mutableListOf<HMSStats?>().apply {
-                        add(allStats[currentAudioTrack?.trackId])
-                        add(allStats[currentVideoTrack?.trackId])
+                        add(allStats[currentAudioTrack?.trackId] as? HMSStats)
+                        add(allStats[currentVideoTrack?.trackId] as? HMSStats)
+
+                        (allStats[currentVideoTrack?.trackId] as? List<*>)?.forEach { simulcastVideoTrack->
+                            add(simulcastVideoTrack as? HMSStats)
+                        }
                     }
                     return@map (relevantStats.filterNotNull())
                 }
@@ -42,7 +47,7 @@ class StatsInterpreter(val active: Boolean) {
                                 is HMSRemoteAudioStats -> "\nAudio:\n\tJitter:${webrtcStats.jitter}\n\nBytesReceived:${webrtcStats.bytesReceived}\nBitrate:${webrtcStats.bitrate?.roundToInt()}\nPR:${webrtcStats.packetsReceived}\nPL:${webrtcStats.packetsLost}\n"
                                 is HMSRemoteVideoStats -> "\nVideo:\n\tJitter:${webrtcStats.jitter}\nPL:${webrtcStats.packetsLost}\nFPS:${webrtcStats.frameRate}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}\n"
                                 is HMSLocalAudioStats -> "\nLocalAudio:\n\tIncoming: ${webrtcStats.bitrate?.roundToInt()}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}"
-                                is HMSLocalVideoStats -> "\nLocalVideo:\n\tIncoming: ${webrtcStats.bitrate?.roundToInt()}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}\nQualityLimitation:${webrtcStats.qualityLimitationReason.reason}\nQLBandwith:${webrtcStats.qualityLimitationReason.bandWidth}\nQLCPU:${webrtcStats.qualityLimitationReason.cpu}\nQLNone:${webrtcStats.qualityLimitationReason.none}\nQLOther:${webrtcStats.qualityLimitationReason.other}"
+                                is HMSLocalVideoStats -> "\nLocalVideo:\n\tIncoming: ${webrtcStats.bitrate?.roundToInt()}\nBytesSent: ${webrtcStats.bytesSent}\nRTT${webrtcStats.roundTripTime}\nWidth:${webrtcStats.resolution?.width}\nHeight:${webrtcStats.resolution?.height}\nQualityLimitation:${webrtcStats.qualityLimitationReason.reason}\nQLBandwith:${webrtcStats.qualityLimitationReason.bandWidth}\nQLCPU:${webrtcStats.qualityLimitationReason.cpu}\nQLNone:${webrtcStats.qualityLimitationReason.none}\nQLOther:${webrtcStats.qualityLimitationReason.other}\nQuality:${webrtcStats.hmsLayer}"
                                 else -> acc
                             }
                         }
