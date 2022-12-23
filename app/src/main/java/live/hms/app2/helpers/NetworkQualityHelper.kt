@@ -10,9 +10,7 @@ class NetworkQualityHelper {
     companion object {
         fun getNetworkResource(downlinkSpeed: Int?, context: Context): Drawable? {
             return when (downlinkSpeed) {
-                0,-1 -> {
-                    (ContextCompat.getDrawable(context, R.drawable.ic_baseline_wifi_0))
-                }
+                0 -> (ContextCompat.getDrawable(context, R.drawable.ic_baseline_wifi_0))
                 1 -> (ContextCompat.getDrawable(context, R.drawable.ic_signal_terrible))
                 2 -> (ContextCompat.getDrawable(context, R.drawable.ic_signal_weak))
                 3 -> (ContextCompat.getDrawable(context, R.drawable.ic_signal_medium))

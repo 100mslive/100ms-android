@@ -87,6 +87,11 @@ class MeetingLinkFragment : Fragment() {
         return false
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
@@ -131,8 +136,9 @@ class MeetingLinkFragment : Fragment() {
         }
     }
 
-    private fun validate(){
-        if (binding.edtMeetingUrl.text.toString().isValidMeetingUrl()) {
+    private fun validate() {
+        if (binding.edtMeetingUrl.text.toString().isValidMeetingUrl()
+        ) {
             enableJoinButton()
         } else {
             disableJoinButton()
@@ -160,12 +166,13 @@ class MeetingLinkFragment : Fragment() {
             findNavController().navigate(MeetingLinkFragmentDirections.actionMeetingLinkFragmentToHomeFragment())
         }
 
-        binding.edtMeetingUrl.addTextChangedListener(object : TextWatcher{
+        binding.edtMeetingUrl.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()){
-                    binding.tvMeetingUrlInputLayout.hint = requireContext().resources.getString(R.string.paste_the_link_here_str)
+                if (s.isNullOrEmpty()) {
+                    binding.tvMeetingUrlInputLayout.hint =
+                        requireContext().resources.getString(R.string.paste_the_link_here_str)
                 }
             }
 
