@@ -224,7 +224,7 @@ class MeetingViewModel(
         )
         .video(
             HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
-//                .forceSoftwareDecoder(settings.forceSoftwareDecoder)
+                .forceSoftwareDecoder(settings.forceSoftwareDecoder)
                 .initialState(getVideoTrackState())
                 .build()
         )
