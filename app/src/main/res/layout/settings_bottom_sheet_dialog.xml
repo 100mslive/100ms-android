@@ -223,6 +223,22 @@
                     android:groupIndicator="@null"
                     android:nestedScrollingEnabled="true" />
 
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/btnBulkRoleChange"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="20dp"
+                    >
+                    <TextView
+                        android:id="@+id/bulk_role_change_real"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="20dp"
+                        android:text="Bulk Role Change" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
                 <LinearLayout
                     android:id="@+id/btn_meeting_mode"
                     android:layout_width="match_parent"

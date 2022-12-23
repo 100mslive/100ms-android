@@ -248,6 +248,14 @@
             android:visibility="visible" />
 
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/disable_hardware_scaler"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/disable_hardware_scaler"
+            android:visibility="visible" />
+
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_use_hardware_echo_cancellation"

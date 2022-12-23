@@ -273,7 +273,7 @@ class PreviewFragment : Fragment() {
             }
         }
 
-        binding.buttonJoinMeeting.apply {
+        binding.enterMeetingParentView.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
 
@@ -503,14 +503,6 @@ class PreviewFragment : Fragment() {
     private fun updateNetworkQualityView(downlinkScore: Int, context: Context, imageView: ImageView) {
         NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext())
             .let { drawable ->
-                if (downlinkScore == 0) {
-                    imageView.setColorFilter(
-                        ContextCompat.getColor(context, R.color.red),
-                        android.graphics.PorterDuff.Mode.SRC_IN
-                    )
-                } else {
-                    imageView.colorFilter = null
-                }
                 imageView.setImageDrawable(drawable)
                 if (drawable == null) {
                     imageView.visibility = View.GONE
