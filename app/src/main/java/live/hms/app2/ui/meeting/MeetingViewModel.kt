@@ -251,6 +251,9 @@ class MeetingViewModel(
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
+                if(type == HMSPeerUpdate.PEER_JOINED) {
+                    Log.d("PeerTime","${peer.name} joined at ${peer.joinedAt}")
+                }
                 previewPeerData.postValue(Pair(type, peer))
             }
 
@@ -450,6 +453,7 @@ class MeetingViewModel(
 
             override fun onJoin(room: HMSRoom) {
                 Log.v(TAG, "~~ onJoin called ~~")
+                Log.d("PeerTime","Local: ${peer.name} joined at ${peer.joinedAt}")
                 val joinSuccessAt = System.currentTimeMillis();
           val timeTakenToJoin = joinSuccessAt - joinStartedAt
           Log.d(TAG, "~~ HMS SDK took $timeTakenToJoin ms to join ~~")
