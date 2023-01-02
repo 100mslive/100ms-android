@@ -229,6 +229,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/enter_meeting_parent_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -249,6 +250,8 @@
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:enabled="true"
+                android:focusable="false"
+                android:clickable="false"
                 android:fontFamily="@font/inter_semibold"
                 android:paddingHorizontal="10dp"
                 android:text="@string/enter_studio_str"
@@ -263,6 +266,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:tint="@color/white"
+                android:focusable="false"
+                android:clickable="false"
                 android:src="@drawable/ic_baseline_arrow_forward_24" />
 
             <Space
