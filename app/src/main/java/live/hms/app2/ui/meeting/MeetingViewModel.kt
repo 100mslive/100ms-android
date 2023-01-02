@@ -55,7 +55,13 @@ class MeetingViewModel(
     private val config = HMSConfig(
         roomDetails.username,
         roomDetails.authToken,
-        Gson().toJson(CustomPeerMetadata(isHandRaised = false, name = roomDetails.username,isBRBOn = false))
+        Gson().toJson(
+            CustomPeerMetadata(
+                isHandRaised = false,
+                name = roomDetails.username,
+                isBRBOn = false
+            )
+        )
             .toString(),
         captureNetworkQualityInPreview = true,
         initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
@@ -208,8 +214,8 @@ class MeetingViewModel(
 
     val broadcastsReceived = MutableLiveData<ChatMessage>()
 
-    private val _trackStatus = MutableLiveData<Pair<String,Boolean>>()
-    val trackStatus: LiveData<Pair<String,Boolean>> = _trackStatus
+    private val _trackStatus = MutableLiveData<Pair<String, Boolean>>()
+    val trackStatus: LiveData<Pair<String, Boolean>> = _trackStatus
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
@@ -281,8 +287,11 @@ class MeetingViewModel(
         }
     }
 
-    private fun getAudioTrackState() = if (settings.isAudioTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
-    private fun getVideoTrackState() = if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+    private fun getAudioTrackState() =
+        if (settings.isAudioTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+
+    private fun getVideoTrackState() =
+        if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
 
 
     fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
@@ -399,7 +408,7 @@ class MeetingViewModel(
         })
     }
 
-    fun setRtcObserver(isEnabled: Boolean){
+    fun setRtcObserver(isEnabled: Boolean) {
         if (isEnabled) {
             addRTCStatsObserver()
         } else {
@@ -431,7 +440,7 @@ class MeetingViewModel(
             )
         )
 
-    val joinStartedAt = System.currentTimeMillis()
+        val joinStartedAt = System.currentTimeMillis()
         Log.v(TAG, "~~ hmsSDK.join called ~~")
         hmsSDK.join(config, object : HMSUpdateListener {
 
@@ -449,8 +458,8 @@ class MeetingViewModel(
             override fun onJoin(room: HMSRoom) {
                 Log.v(TAG, "~~ onJoin called ~~")
                 val joinSuccessAt = System.currentTimeMillis();
-          val timeTakenToJoin = joinSuccessAt - joinStartedAt
-          Log.d(TAG, "~~ HMS SDK took $timeTakenToJoin ms to join ~~")
+                val timeTakenToJoin = joinSuccessAt - joinStartedAt
+                Log.d(TAG, "~~ HMS SDK took $timeTakenToJoin ms to join ~~")
                 failures.clear()
                 state.postValue(MeetingState.Ongoing())
                 hmsRoom = room // Just storing the room id for the beam bot.
@@ -631,7 +640,7 @@ class MeetingViewModel(
 
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
-                if(message.type == "metadata"){
+                if (message.type == "metadata") {
                     getSessionMetadata()
                 } else {
                     broadcastsReceived.postValue(
@@ -698,8 +707,8 @@ class MeetingViewModel(
         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.NAME_CHANGED))
     }
 
-    fun isServerRecordingEnabled(room: HMSRoom) : Boolean{
-       return room.serverRecordingState?.running == true
+    fun isServerRecordingEnabled(room: HMSRoom): Boolean {
+        return room.serverRecordingState?.running == true
     }
 
     private fun getRecordingState(room: HMSRoom): RecordingState {
@@ -811,7 +820,7 @@ class MeetingViewModel(
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
         // Don't call leave when being forced to leave
-        if(details == null) {
+        if (details == null) {
             hmsSDK.leave()
         }
         cleanup()
@@ -1246,23 +1255,24 @@ class MeetingViewModel(
     private val _events = MutableSharedFlow<Event?>()
     val events: SharedFlow<Event?> = _events
 
-  sealed class Event {
-    class RTMPError(val exception: HMSException) : Event()
-    class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
-    object OpenChangeNameDialog : Event()
-    sealed class Hls : Event() {
-      data class HlsError(val throwable: HMSException) : Hls()
+    sealed class Event {
+        class RTMPError(val exception: HMSException) : Event()
+        class ChangeTrackMuteRequest(val request: HMSChangeTrackStateRequest) : Event()
+        object OpenChangeNameDialog : Event()
+        sealed class Hls : Event() {
+            data class HlsError(val throwable: HMSException) : Hls()
+        }
+
+        class HlsNotStarted(val reason: String) : Event()
+        abstract class MessageEvent(open val message: String) : Event()
+        data class RtmpEvent(val message: String) : Event()
+        data class RecordEvent(val message: String) : Event()
+        data class ServerRecordEvent(val message: String) : Event()
+        data class HlsEvent(override val message: String) : MessageEvent(message)
+        data class HlsRecordingEvent(override val message: String) : MessageEvent(message)
+        data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
+        data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
     }
-    class HlsNotStarted(val reason : String) : Event()
-    abstract class MessageEvent(open val message : String) : Event()
-    data class RtmpEvent(val message : String) : Event()
-    data class RecordEvent(val message : String) : Event()
-    data class ServerRecordEvent(val message: String) : Event()
-    data class HlsEvent(override val message : String) : MessageEvent(message)
-    data class HlsRecordingEvent(override val message : String) : MessageEvent(message)
-    data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
-    data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
-  }
 
     private val _isHandRaised = MutableLiveData<Boolean>(false)
     val isHandRaised: LiveData<Boolean> = _isHandRaised
@@ -1286,29 +1296,43 @@ class MeetingViewModel(
 
     }
 
-    fun isBRBOn() : Boolean {
+    fun sendHlsMetadata(metaDataModel: HMSHLSTimedMetadata) {
+
+        hmsSDK.setHlsSessionMetadata(arrayListOf(metaDataModel), object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d(TAG, "hls metadata sending failed")
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "hls metadata sent successfully")
+            }
+        })
+
+    }
+
+    fun isBRBOn(): Boolean {
         val localPeer = hmsSDK.getLocalPeer()!!
         val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
         return currentMetadata!!.isBRBOn
     }
 
-  fun toggleBRB() {
-    val localPeer = hmsSDK.getLocalPeer()!!
-    val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
-    val isBRB = currentMetadata!!.isBRBOn
-    val newMetadataJson = currentMetadata.copy(isBRBOn = !isBRB).toJson()
+    fun toggleBRB() {
+        val localPeer = hmsSDK.getLocalPeer()!!
+        val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
+        val isBRB = currentMetadata!!.isBRBOn
+        val newMetadataJson = currentMetadata.copy(isBRBOn = !isBRB).toJson()
 
-    hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
-      override fun onError(error: HMSException) {
-        Log.d(TAG, "There was an error $error")
-      }
+        hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d(TAG, "There was an error $error")
+            }
 
-      override fun onSuccess() {
-        Log.d(TAG, "Metadata update succeeded")
-      }
-    })
+            override fun onSuccess() {
+                Log.d(TAG, "Metadata update succeeded")
+            }
+        })
 
-  }
+    }
 
     fun requestNameChange() {
         viewModelScope.launch {
@@ -1372,14 +1396,15 @@ class MeetingViewModel(
         })
     }
 
-    fun updateTrackStatus(status: String,isEnabled : Boolean) {
-        _trackStatus.value = Pair(status,isEnabled)
+    fun updateTrackStatus(status: String, isEnabled: Boolean) {
+        _trackStatus.value = Pair(status, isEnabled)
     }
 
     var currentAudioMode = AudioManager.MODE_IN_COMMUNICATION
 
     fun toggleMediaMode() {
-        currentAudioMode = if (currentAudioMode == AudioManager.MODE_IN_COMMUNICATION) AudioManager.MODE_NORMAL else AudioManager.MODE_IN_COMMUNICATION
+        currentAudioMode =
+            if (currentAudioMode == AudioManager.MODE_IN_COMMUNICATION) AudioManager.MODE_NORMAL else AudioManager.MODE_IN_COMMUNICATION
         hmsSDK.setAudioMode(currentAudioMode)
     }
 
@@ -1387,65 +1412,65 @@ class MeetingViewModel(
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
 
-  fun setSessionMetadata(data : String?) {
-    hmsSDK.setSessionMetaData(data, object :HMSActionResultListener {
-      override fun onError(error: HMSException) {
-        viewModelScope.launch {
-          _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
-        }
-      }
-
-      override fun onSuccess() {
-        viewModelScope.launch {
-
-          hmsSDK.sendBroadcastMessage(SESSION_METADATA_BROADCAST_MESSAGE,
-            SESSION_METADATA_BROADCAST_TYPE, object : HMSMessageResultListener {
+    fun setSessionMetadata(data: String?) {
+        hmsSDK.setSessionMetaData(data, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
-              viewModelScope.launch {
-                _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
-              }
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+                }
             }
 
-            override fun onSuccess(hmsMessage: HMSMessage) {
-              getSessionMetadata()
+            override fun onSuccess() {
+                viewModelScope.launch {
+
+                    hmsSDK.sendBroadcastMessage(SESSION_METADATA_BROADCAST_MESSAGE,
+                        SESSION_METADATA_BROADCAST_TYPE, object : HMSMessageResultListener {
+                            override fun onError(error: HMSException) {
+                                viewModelScope.launch {
+                                    _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
+                                }
+                            }
+
+                            override fun onSuccess(hmsMessage: HMSMessage) {
+                                getSessionMetadata()
+                            }
+
+                        })
+                }
             }
 
-          })
-        }
-      }
-
-    })
-  }
-
-  fun getSessionMetadata() : Unit {
-    val sessionData = CompletableDeferred<String?>()
-    hmsSDK.getSessionMetaData(object :HMSSessionMetadataListener {
-      override fun onError(error: HMSException) {
-        viewModelScope.launch {
-          _events.emit(Event.SessionMetadataEvent("Session Metadata retrieval error $error"))
-          sessionData.completeExceptionally(error)
-        }
-      }
-
-      override fun onSuccess(sessionMetadata: String?) {
-        viewModelScope.launch {
-          sessionData.complete(sessionMetadata)
-        }
-      }
-
-    })
-
-    viewModelScope.launch {
-      val data = try {
-        sessionData.await()
-      } catch (e : Exception) {
-        "Error $e"
-      }
-      _sessionMetadata.postValue(data)
+        })
     }
-  }
 
-  fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
+    fun getSessionMetadata(): Unit {
+        val sessionData = CompletableDeferred<String?>()
+        hmsSDK.getSessionMetaData(object : HMSSessionMetadataListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Session Metadata retrieval error $error"))
+                    sessionData.completeExceptionally(error)
+                }
+            }
+
+            override fun onSuccess(sessionMetadata: String?) {
+                viewModelScope.launch {
+                    sessionData.complete(sessionMetadata)
+                }
+            }
+
+        })
+
+        viewModelScope.launch {
+            val data = try {
+                sessionData.await()
+            } catch (e: Exception) {
+                "Error $e"
+            }
+            _sessionMetadata.postValue(data)
+        }
+    }
+
+    fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
       hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, object : HMSActionResultListener {
           override fun onError(error: HMSException) {
               Log.d("bulkRoleChange","There was an error $error")
@@ -1456,10 +1481,8 @@ class MeetingViewModel(
           }
 
       })
-  }
-
-  private val _sessionMetadata = MutableLiveData<String?>(null)
-  val sessionMetadata : LiveData<String?> = _sessionMetadata
+  }private val _sessionMetadata = MutableLiveData<String?>(null)
+    val sessionMetadata: LiveData<String?> = _sessionMetadata
 
 }
 
