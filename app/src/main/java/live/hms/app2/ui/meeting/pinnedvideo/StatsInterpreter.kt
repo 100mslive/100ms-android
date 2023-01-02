@@ -95,14 +95,6 @@ class StatsInterpreter(val active: Boolean) {
                                     appendLine()
                                     append("QualityLimitation:${webrtcStats.qualityLimitationReason.reason}")
                                     appendLine()
-                                    append("QLBandwith:${webrtcStats.qualityLimitationReason.bandWidth}")
-                                    appendLine()
-                                    append("QLCPU:${webrtcStats.qualityLimitationReason.cpu}")
-                                    appendLine()
-                                    append("QLNone:${webrtcStats.qualityLimitationReason.none}")
-                                    appendLine()
-                                    append("QLOther:${webrtcStats.qualityLimitationReason.other}")
-                                    appendLine()
                                 }
 
                                 else -> acc
