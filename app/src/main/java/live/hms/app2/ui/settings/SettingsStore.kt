@@ -50,7 +50,7 @@ class SettingsStore(context: Context) {
     const val SHOW_STATS = "show-video-stats"
     const val DISABLE_AUTO_RESIZE = "disable-auto-resize"
     const val FORCE_SOFTWARE_DECODER = "force-software-decoder"
-    const val DISABLE_HARDWARE_SCALER = "disable_hardware_scaler"
+    const val DISABLE_AUTO_SIMULCAST = "disable_auto_simulcast"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -135,9 +135,9 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(FORCE_SOFTWARE_DECODER, false)
     set(value) = putBoolean(FORCE_SOFTWARE_DECODER, value)
 
-  var disableHardwareScaler: Boolean
-    get() = sharedPreferences.getBoolean(DISABLE_HARDWARE_SCALER, false)
-    set(value) = putBoolean(DISABLE_HARDWARE_SCALER, value)
+  var disableAutoSimulcast: Boolean
+    get() = sharedPreferences.getBoolean(DISABLE_AUTO_SIMULCAST, false)
+    set(value) = putBoolean(DISABLE_AUTO_SIMULCAST, value)
 
   var publishVideo: Boolean
     get() = sharedPreferences.getBoolean(PUBLISH_VIDEO, true)
@@ -321,7 +321,7 @@ class SettingsStore(context: Context) {
     fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
     fun setDisableAutoResize(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_RESIZE, value) }
     fun setForceSoftwareDecoder(value: Boolean) = apply { editor.putBoolean(FORCE_SOFTWARE_DECODER, value) }
-    fun setDisableHardwareScaler(value: Boolean) = apply { editor.putBoolean(DISABLE_HARDWARE_SCALER, value) }
+    fun setDisableAutoSimulcast(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_SIMULCAST, value) }
 
 
     fun commit() {

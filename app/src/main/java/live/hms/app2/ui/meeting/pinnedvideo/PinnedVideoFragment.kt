@@ -94,7 +94,7 @@ class PinnedVideoFragment : Fragment() {
   private fun initPinnedView() {
     binding.pinVideo.hmsVideoView.apply {
       setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-      setAutoSimulcast(meetingViewModel.isAutoSimulcastEnabled())
+      disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
     }
 
     updatePinnedVideoText()
@@ -159,7 +159,7 @@ class PinnedVideoFragment : Fragment() {
     val view = HMSVideoView(requireContext())
 
     view.apply {
-      setAutoSimulcast(true)
+      disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
       binding.pinVideo.surfaceViewHolder.forEach {
         if (it is HMSVideoView){
           it.removeTrack()
