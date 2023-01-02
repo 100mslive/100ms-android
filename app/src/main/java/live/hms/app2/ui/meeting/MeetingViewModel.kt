@@ -12,12 +12,10 @@ import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
@@ -139,7 +137,7 @@ class MeetingViewModel(
 
     }
 
-    fun isAutoSimulcastEnabled() = settings.disableHardwareScaler
+    fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
     // Title at the top of the meeting
     val title = MutableLiveData<Int>()

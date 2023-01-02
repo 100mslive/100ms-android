@@ -179,7 +179,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       item.video?.let { track ->
         view.setScalingType(scalingType)
         view.addTrack(track)
-        view.setAutoSimulcast(meetingViewModel.isAutoSimulcastEnabled())
+        view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
         bindedVideoTrackIds.add(item.video!!.trackId)
         binding.hmsVideoView.setOnLongClickListener {

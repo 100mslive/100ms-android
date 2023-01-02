@@ -476,9 +476,9 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
-        settings.disableHardwareScaler,
-        disableHardwareScaler
-      ) { commitHelper.setDisableHardwareScaler(it) }
+        settings.disableAutoSimulcast,
+        disableAutoSimulcast
+      ) { commitHelper.setDisableAutoSimulcast(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
