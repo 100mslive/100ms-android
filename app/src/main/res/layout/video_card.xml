@@ -110,12 +110,18 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <TextView
-        android:id="@+id/statsView"
+    <ScrollView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        tools:text="hi this is stats" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/statsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            tools:text="hi this is stats" />
+    </ScrollView>
+
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/audio_level"
