@@ -158,7 +158,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
-        
+
+        <TextView
+            android:id="@+id/tv_sdk_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/inter_regular"
+            android:textAllCaps="false" />
+
     </LinearLayout>
 
 </ScrollView>

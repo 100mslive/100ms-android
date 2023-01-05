@@ -23,6 +23,7 @@ import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.sdk.HMSSDK
 
 
 class MeetingLinkFragment : Fragment() {
@@ -90,6 +91,7 @@ class MeetingLinkFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.tvSdkVersion.text = "version : ${HMSSDK.VERSION} | webrtc_version : ${HMSSDK.WEBRTC_VERSION}"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
