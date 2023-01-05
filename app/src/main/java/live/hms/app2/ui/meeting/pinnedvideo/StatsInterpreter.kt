@@ -88,8 +88,10 @@ class StatsInterpreter(val active: Boolean) {
                                 is HMSLocalVideoStats -> buildSpannedString {
                                     append("\nLocalVideo")
                                     appendLine()
-                                    bold { append("Quality:${webrtcStats.hmsLayer}") }
-                                    appendLine()
+                                    if (webrtcStats.hmsLayer != null) {
+                                        bold { append("${webrtcStats.hmsLayer}") }
+                                        appendLine()
+                                    }
                                     append("Width:${webrtcStats.resolution?.width}")
                                     appendLine()
                                     append("Height:${webrtcStats.resolution?.height}")
@@ -105,7 +107,7 @@ class StatsInterpreter(val active: Boolean) {
                                 else -> acc
                             }
 
-                             TextUtils.concat(out, acc)
+                            TextUtils.concat(out, acc)
                         }
                     }
                     .collect {
