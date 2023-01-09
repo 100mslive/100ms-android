@@ -463,8 +463,10 @@ class MeetingViewModel(
                 failures.clear()
                 state.postValue(MeetingState.Ongoing())
                 hmsRoom = room // Just storing the room id for the beam bot.
-                Log.d("onRoomUpdate", "$room")
+                Log.d(TAG, "$room")
+                Log.d(TAG, "Room name is ${room.name}")
                 Log.d(TAG, "SessionId is: ${room.sessionId}")
+                Log.d(TAG, "Room started at: ${room.startedAt}")
 
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
