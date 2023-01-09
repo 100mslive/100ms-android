@@ -61,7 +61,7 @@ class HlsMetadataHandler(
                         val payload = matcher.group(4).orEmpty()
                         val duration = matcher.group(3).orEmpty().toLongOrNull()?.times(1000) ?: 0
                         val startDate = matcher.group(2).orEmpty()
-                        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                         formatter.timeZone = UTC
                         val tagStartTime = formatter.parse(startDate).time
                         lastFoundTag = LocalMetaDataModel(payload, duration)
