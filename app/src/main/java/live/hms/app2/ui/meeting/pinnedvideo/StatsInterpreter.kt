@@ -27,6 +27,15 @@ class StatsInterpreter(val active: Boolean) {
     // For this to happen in n time rather than n^x times for a video, they'll have to
     // register with the central flow and receive events during the iteration.
 
+    private var videoTrack: HMSVideoTrack? = null
+    private var audioTrack: HMSAudioTrack? = null
+
+    //special for simulcast case, on publishing side the track id updates hence init is not called
+    //we need a way to update the video track id so that is shows the correct stats
+    fun updateVideoTrack(currentVideoTrack: HMSVideoTrack?) {
+        videoTrack = currentVideoTrack
+    }
+
     fun initiateStats(
         lifecycleOwner: LifecycleOwner,
         itemStats: Flow<Map<String, Any>>,
@@ -35,15 +44,17 @@ class StatsInterpreter(val active: Boolean) {
         isLocal: Boolean,
         setText: (CharSequence) -> Unit
     ) {
+        audioTrack = currentAudioTrack
+        videoTrack = currentVideoTrack
         if (active) {
             lifecycleOwner.lifecycleScope.launch {
 
                 itemStats.map { allStats ->
 
                     val relevantStats = mutableListOf<HMSStats?>().apply {
-                        add(allStats[currentAudioTrack?.trackId] as? HMSStats)
-                        add(allStats[currentVideoTrack?.trackId] as? HMSStats)
-                        (allStats[currentVideoTrack?.trackId] as? List<*>)?.forEach { simulcastVideoTrack ->
+                         add(allStats[audioTrack?.trackId] as? HMSStats)
+                        add(allStats[videoTrack?.trackId] as? HMSStats)
+                        (allStats[videoTrack?.trackId] as? List<*>)?.forEach { simulcastVideoTrack ->
                             add(simulcastVideoTrack as? HMSStats)
                         }
                     }

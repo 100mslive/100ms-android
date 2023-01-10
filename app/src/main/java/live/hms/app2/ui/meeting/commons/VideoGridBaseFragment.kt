@@ -325,6 +325,8 @@ abstract class VideoGridBaseFragment : Fragment() {
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
+            //handling simulcast case since we are updating local reference it thinks it's an update instead of rebinding it
+            renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
           val downlinkScore = newVideo.peer.networkQuality?.downlinkQuality
           updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
