@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingLinkBinding
+import live.hms.app2.ui.meeting.DeviceStatsBottomSheet
 import live.hms.app2.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
@@ -105,6 +106,10 @@ class MeetingLinkFragment : Fragment() {
                 requireContext().startActivity(
                     EmailUtils.getNonFatalLogIntent(requireContext())
                 )
+            }
+            R.id.action_stats -> {
+                val deviceStatsBottomSheet = DeviceStatsBottomSheet()
+                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
             }
         }
         return false
