@@ -40,13 +40,14 @@ class DeviceStatsBottomSheet : BottomSheetDialogFragment() {
                 val codecCapability = codec.getCapabilitiesForType(codec.supportedTypes.first())
 
                 this.codecName.text = codec.name
+                this.tvHardwareAccelarated.text = (HmsUtilities.isSoftwareOnly(codec).not()).toString()
 
                 this.tvMaxVideoResolution.text = "${codecCapability.videoCapabilities.supportedHeights.upper}x${codecCapability.videoCapabilities.supportedWidths.upper}p"
                 this.tvMinVideoResolution.text = "${codecCapability.videoCapabilities.supportedHeights.lower}x${codecCapability.videoCapabilities.supportedWidths.lower}p"
 
 
                 this.tvMaxFrameRate.text = "${codecCapability.videoCapabilities.supportedFrameRates.upper}fps"
-                this.tvMinFrameRate.text = "${codecCapability.videoCapabilities.supportedFrameRates.upper}fps"
+                this.tvMinFrameRate.text = "${codecCapability.videoCapabilities.supportedFrameRates.lower}fps"
 
             }
 

@@ -199,6 +199,6 @@
     <string name="go_live_str">Go Live</string>
     <string name="end_stream_str">End Stream</string>
     <string name="live_str">Live</string>
-    <string name="device_stats_str">Device Stats</string>
+    <string name="device_stats_str">Device Info</string>
     <item name="IS_INT" type="id"/>
 </resources>
