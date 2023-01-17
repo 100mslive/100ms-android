@@ -8,16 +8,21 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Looper
 import android.util.Log
-import android.view.HapticFeedbackConstants
-import android.view.View
+import android.view.*
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
+import androidx.core.view.GestureDetectorCompat
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
+import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
+import live.hms.videoview.HMSVideoView
 import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
 import java.io.File
@@ -203,4 +208,54 @@ fun SurfaceViewRenderer.setRelease() {
 
 fun SurfaceViewRenderer.isInit() : Boolean {
     return (getTag(R.id.IS_INT) as? Boolean) == true
+}
+
+
+fun HMSVideoView.setCameraGestureListener() {
+
+    val cameraControl: CameraControl = getCameraControl() ?: return
+    //todo can be less than 1 handle that later
+    var lastZoom = 1f
+
+    val gestureDetector = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(e: MotionEvent): Boolean = true
+
+        override fun onSingleTapUp(event: MotionEvent): Boolean {
+            cameraControl.setFocus(
+                valX = event.x,
+                valY = event.y,
+                viewWidth = width,
+                viewHeight = height
+            )
+            return true
+        }
+
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            cameraControl.switchCamera()
+            return true
+        }
+    })
+
+    val scaleGestureDetector = ScaleGestureDetector(
+        context,
+        object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                if (cameraControl.isZoomSupported()) {
+                    lastZoom *= detector.scaleFactor
+                    cameraControl.setZoom(lastZoom)
+                    return true
+                }
+                return false
+            }
+        })
+
+    this.setOnTouchListener { _, event ->
+        var didConsume = scaleGestureDetector.onTouchEvent(event)
+        if (!scaleGestureDetector.isInProgress) {
+            didConsume = gestureDetector.onTouchEvent(event)
+        }
+        didConsume
+    }
+
+
 }

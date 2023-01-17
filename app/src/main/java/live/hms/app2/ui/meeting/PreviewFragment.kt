@@ -87,6 +87,7 @@ class PreviewFragment : Fragment() {
     private fun bindVideo() {
         if (this::track.isInitialized && track.video?.isMute == false) {
             track.video?.let { binding.previewView.addTrack(it) }
+            binding.previewView.setCameraGestureListener()
             binding.previewView.visibility = View.VISIBLE
         } else {
             binding.previewView.visibility = View.GONE
@@ -137,6 +138,8 @@ class PreviewFragment : Fragment() {
                 HMSLogger.d(TAG, "error : ${error?.description}")
             }
         })
+
+
     }
 
     override fun onAttach(context: Context) {
@@ -195,7 +198,6 @@ class PreviewFragment : Fragment() {
                         MeetingFragment.AudioSwitchBottomSheetTAG
                     )
                 }
-
             }
         }
 
