@@ -61,6 +61,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(),
             spinnerRoles
         ).also { arrayAdapter ->
             spinner.adapter = arrayAdapter
+            stringRole = arrayAdapter.getItem(0)
             spinner.post { spinner.onItemSelectedListener = this }
         }
         dialog.findViewById<AppCompatButton>(R.id.cancel_btn).setOnClickListener {
