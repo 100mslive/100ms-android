@@ -10,11 +10,9 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
 import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
 import live.hms.video.media.capturers.camera.CameraControl
@@ -27,7 +25,6 @@ import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
 import java.io.File
 import java.io.FileOutputStream
-import java.util.logging.Handler
 
 
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
@@ -211,7 +208,7 @@ fun SurfaceViewRenderer.isInit() : Boolean {
 }
 
 
-fun HMSVideoView.setCameraGestureListener() {
+fun HMSVideoView.setCameraGestureListener(onImageCapture : (Uri)-> Unit) {
 
     val cameraControl: CameraControl = getCameraControl() ?: return
     //todo can be less than 1 handle that later
@@ -231,8 +228,23 @@ fun HMSVideoView.setCameraGestureListener() {
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            cameraControl.switchCamera()
+            val cachePath = File(context.cacheDir, "images")
+            cachePath.mkdirs()
+            val imageSavePath = File(cachePath, "image.jpeg")
+            cameraControl.takePicture(imageSavePath, { it ->
+                onImageCapture.invoke(FileProvider.getUriForFile(context, "live.hms.app2.provider", imageSavePath))
+            })
             return true
+        }
+
+        override fun onFling(
+            e1: MotionEvent?,
+            e2: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            cameraControl.switchCamera()
+            return super.onFling(e1, e2, velocityX, velocityY)
         }
     })
 

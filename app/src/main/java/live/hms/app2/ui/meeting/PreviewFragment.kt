@@ -87,7 +87,9 @@ class PreviewFragment : Fragment() {
     private fun bindVideo() {
         if (this::track.isInitialized && track.video?.isMute == false) {
             track.video?.let { binding.previewView.addTrack(it) }
-            binding.previewView.setCameraGestureListener()
+            binding.previewView.setCameraGestureListener({
+                activity?.openShareIntent(it)
+            })
             binding.previewView.visibility = View.VISIBLE
         } else {
             binding.previewView.visibility = View.GONE
