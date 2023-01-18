@@ -20,6 +20,7 @@ import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
+import live.hms.app2.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.connection.stats.*
@@ -228,6 +229,7 @@ class MeetingViewModel(
             HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
                 .forceSoftwareDecoder(settings.forceSoftwareDecoder)
                 .initialState(getVideoTrackState())
+                .cameraFacing(getVideoCameraFacing())
                 .build()
         )
         .build()
@@ -292,6 +294,8 @@ class MeetingViewModel(
 
     private fun getVideoTrackState() =
         if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+
+    private fun getVideoCameraFacing() = if (settings.camera.contains(REAR_FACING_CAMERA)) HMSVideoTrackSettings.CameraFacing.BACK else HMSVideoTrackSettings.CameraFacing.FRONT
 
 
     fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
