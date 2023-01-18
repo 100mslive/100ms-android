@@ -222,8 +222,8 @@ fun HMSVideoView.setCameraGestureListener() {
 
         override fun onSingleTapUp(event: MotionEvent): Boolean {
             cameraControl.setFocus(
-                valX = event.x,
-                valY = event.y,
+                 event.x,
+                 event.y,
                 viewWidth = width,
                 viewHeight = height
             )
