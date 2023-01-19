@@ -186,7 +186,9 @@ abstract class VideoGridBaseFragment : Fragment() {
           (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
           true
         }
-        binding.hmsVideoView.setCameraGestureListener({})
+        binding.hmsVideoView.setCameraGestureListener({
+          activity?.openShareIntent(it)
+        })
       }
     }
   }

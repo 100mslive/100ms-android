@@ -231,20 +231,16 @@ fun HMSVideoView.setCameraGestureListener(onImageCapture : (Uri)-> Unit) {
             val cachePath = File(context.cacheDir, "images")
             cachePath.mkdirs()
             val imageSavePath = File(cachePath, "image.jpeg")
-            cameraControl.takePicture(imageSavePath, { it ->
-                onImageCapture.invoke(FileProvider.getUriForFile(context, "live.hms.app2.provider", imageSavePath))
-            })
+            cameraControl.switchCamera()
             return true
         }
 
-        override fun onFling(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
-            cameraControl.switchCamera()
-            return super.onFling(e1, e2, velocityX, velocityY)
+        override fun onLongPress(e: MotionEvent?) {
+            cameraControl.takePicture(imageSavePath, { it ->
+                onImageCapture.invoke(FileProvider.getUriForFile(context, "live.hms.app2.provider", imageSavePath))
+            })
+
+            return
         }
     })
 
