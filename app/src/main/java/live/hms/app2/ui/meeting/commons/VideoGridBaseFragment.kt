@@ -189,7 +189,8 @@ abstract class VideoGridBaseFragment : Fragment() {
         }
         binding.hmsVideoView.setCameraGestureListener({
           activity?.openShareIntent(it)
-        })
+        },
+        onLongPress = {(binding.hmsVideoView as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }})
       }
     }
   }

@@ -89,7 +89,7 @@ class PreviewFragment : Fragment() {
             track.video?.let { binding.previewView.addTrack(it) }
             binding.previewView.setCameraGestureListener({
                 activity?.openShareIntent(it)
-            })
+            },{})
             binding.previewView.visibility = View.VISIBLE
         } else {
             binding.previewView.visibility = View.GONE

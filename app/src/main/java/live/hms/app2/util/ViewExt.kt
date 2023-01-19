@@ -219,7 +219,7 @@ fun SurfaceViewRenderer.isInit() : Boolean {
 }
 
 
-fun HMSVideoView.setCameraGestureListener(onImageCapture : (Uri)-> Unit) {
+fun HMSVideoView.setCameraGestureListener(onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
 
     val cameraControl: CameraControl = getCameraControl() ?: return
     //todo can be less than 1 handle that later
@@ -239,20 +239,47 @@ fun HMSVideoView.setCameraGestureListener(onImageCapture : (Uri)-> Unit) {
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            val cachePath = File(context.cacheDir, "images")
-            cachePath.mkdirs()
-            val imageSavePath = File(cachePath, "image.jpeg")
-            cameraControl.switchCamera()
+            cameraControl.setFlash(cameraControl.isFlashEnabled().not())
             return true
         }
 
         override fun onLongPress(e: MotionEvent?) {
-            cameraControl.takePicture(imageSavePath, { it ->
-                onImageCapture.invoke(FileProvider.getUriForFile(context, "live.hms.app2.provider", imageSavePath))
-            })
-
-            return
+            onLongPress.invoke()
         }
+
+        override fun onFling(
+            e1: MotionEvent?,
+            e2: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            if (e1 == null || e2 == null)
+                return false
+
+            val distanceY: Float = e2.y - e1.y
+            val distanceX : Float = e2.x - e1.x;
+
+            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 100 && Math.abs(velocityX) > 100) {
+                if (distanceX > 0.0) {
+                    val cachePath = File(context.cacheDir, "images")
+                    cachePath.mkdirs()
+                    val imageSavePath = File(cachePath, "image.jpeg")
+                    cameraControl.takePicture(imageSavePath) { it ->
+                        onImageCapture.invoke(
+                            FileProvider.getUriForFile(
+                                context,
+                                "live.hms.app2.provider",
+                                imageSavePath
+                            )
+                        )
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+
     })
 
     val scaleGestureDetector = ScaleGestureDetector(
