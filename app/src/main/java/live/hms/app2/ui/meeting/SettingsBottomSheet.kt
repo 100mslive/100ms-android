@@ -1,6 +1,7 @@
 package live.hms.app2.ui.meeting
 
 import android.app.Dialog
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import live.hms.app2.databinding.SettingsBottomSheetDialogBinding
 import live.hms.app2.ui.meeting.participants.MusicSelectionSheet
 import live.hms.app2.util.setOnSingleClickListener
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.HmsVideoFrameListener
 
 
 class SettingsBottomSheet(
