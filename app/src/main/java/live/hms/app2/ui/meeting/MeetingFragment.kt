@@ -213,6 +213,10 @@ class MeetingFragment : Fragment() {
                     EmailUtils.getNonFatalLogIntent(requireContext())
                 )
             }
+            R.id.action_stats -> {
+                val deviceStatsBottomSheet = DeviceStatsBottomSheet()
+                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
+            }
 
             R.id.action_grid_view -> {
                 meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
