@@ -223,10 +223,11 @@ fun SurfaceViewRenderer.isInit() : Boolean {
 fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
 
     val cameraControl: CameraControl = (track as? HMSLocalVideoTrack)?.getCameraControl() ?: return
-    var lastZoom = 1f
+    var lastZoom = cameraControl.getMinZoom()
 
     val gestureDetector = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
 
+        override fun onDown(e: MotionEvent?) = true
         override fun onSingleTapUp(event: MotionEvent): Boolean {
             if (cameraControl.isTapToFocusSupported())
             cameraControl.setTapToFocusAt(
@@ -260,6 +261,28 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
         override fun onLongPress(e: MotionEvent?) {
             onLongPress.invoke()
         }
+
+        override fun onFling(
+            e1: MotionEvent?,
+            e2: MotionEvent?,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            if (e1 == null || e2 == null)
+                return false
+
+            val distanceY: Float = e2.y - e1.y
+            val distanceX : Float = e2.x - e1.x;
+
+            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 100 && Math.abs(velocityY) > 100) {
+                if (distanceX > 0.0) {
+                    track.switchCamera(null)
+                }
+                return true;
+            }
+            return false;
+        }
+
 
 
     })
