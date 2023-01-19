@@ -275,8 +275,12 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
             val distanceX : Float = e2.x - e1.x;
 
             if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 100 && Math.abs(velocityY) > 100) {
-                if (distanceX > 0.0) {
+                    //swipe up
+                if (distanceY > 0.0) {
                     track.switchCamera(null)
+                } else {
+                    //swipe down
+                    cameraControl.setFlash(cameraControl.isFlashEnabled().not())
                 }
                 return true;
             }
