@@ -29,6 +29,7 @@ import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.HMSActionResultListener
+import live.hms.video.sdk.HmsVideoFrameListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -201,11 +202,23 @@ abstract class VideoGridBaseFragment : Fragment() {
         isLocalTrack = videoTrack is HMSLocalVideoTrack,
         onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
         onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
-        onMirror = { context.showMirrorOptions(surfaceView)}
+        onMirror = { context.showMirrorOptions(surfaceView)},
+        onCameraCapture = { captureCameraFrame() }
       )
     }
   }
 
+  private fun captureCameraFrame() {
+    meetingViewModel.hmsSDK.getLocalPeer()?.videoTrack?.addFrameCaptureListener(object :
+      HmsVideoFrameListener {
+      override fun onFrameCaptured(bitmap: Bitmap) {
+        //stores the bitmap in local cache thus avoiding any permission
+        val uri = bitmap.saveCaptureToLocalCache(requireContext())
+        //the uri is used to open share intent
+        uri?.let { requireActivity().openShareIntent(it) }
+      }
+    })
+  }
 
 
   private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {

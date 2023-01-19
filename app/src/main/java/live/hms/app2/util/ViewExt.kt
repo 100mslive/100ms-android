@@ -105,6 +105,7 @@ fun Context.showTileListDialog(
   isLocalTrack : Boolean,
   onScreenCapture: (() -> Unit),
   onSimulcast: (() -> Unit),
+  onCameraCapture: (() -> Unit),
   onMirror: (() -> Unit)
 ) {
 
@@ -112,13 +113,23 @@ fun Context.showTileListDialog(
   builder.setTitle("Perform Action")
   val intentList = mutableListOf("Screen Capture", "Mirror")
 
+    if (isLocalTrack) {
+        intentList += "Camera Capture"
+    }
+
   if (isLocalTrack.not())
     intentList+= "Simulcast"
   builder.setItems(intentList.toTypedArray()) { _, which ->
     when (which) {
       0 -> { onScreenCapture.invoke() }
         1 -> {onMirror()}
-      2 -> { onSimulcast.invoke() }
+      2 -> {
+          if (isLocalTrack){
+              onCameraCapture.invoke()
+          } else {
+              onSimulcast.invoke()
+          }
+      }
     }
   }
 
