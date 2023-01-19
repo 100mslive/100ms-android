@@ -17,6 +17,7 @@ import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
 import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
+import live.hms.video.media.tracks.HMSLocalVideoTrack
 
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
@@ -219,17 +220,16 @@ fun SurfaceViewRenderer.isInit() : Boolean {
 }
 
 
-fun HMSVideoView.setCameraGestureListener(onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
+fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
 
-    val cameraControl: CameraControl = getCameraControl() ?: return
-    //todo can be less than 1 handle that later
+    val cameraControl: CameraControl = (track as? HMSLocalVideoTrack)?.getCameraControl() ?: return
     var lastZoom = 1f
 
     val gestureDetector = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
-        override fun onDown(e: MotionEvent): Boolean = true
 
         override fun onSingleTapUp(event: MotionEvent): Boolean {
-            cameraControl.setFocus(
+            if (cameraControl.isTapToFocusSupported())
+            cameraControl.setTapToFocusAt(
                  event.x,
                  event.y,
                 viewWidth = width,
@@ -239,44 +239,26 @@ fun HMSVideoView.setCameraGestureListener(onImageCapture : (Uri)-> Unit, onLongP
         }
 
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            cameraControl.setFlash(cameraControl.isFlashEnabled().not())
+
+            val cachePath = File(context.cacheDir, "images")
+            cachePath.mkdirs()
+            val imageSavePath = File(cachePath, "image.jpeg")
+
+            cameraControl.captureMaxResolutionImage(imageSavePath) { it ->
+
+                val fileSaveUri = FileProvider.getUriForFile(
+                    context,
+                    "live.hms.app2.provider",
+                    imageSavePath
+                )
+
+                onImageCapture.invoke(fileSaveUri)
+            }
             return true
         }
 
         override fun onLongPress(e: MotionEvent?) {
             onLongPress.invoke()
-        }
-
-        override fun onFling(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
-            if (e1 == null || e2 == null)
-                return false
-
-            val distanceY: Float = e2.y - e1.y
-            val distanceX : Float = e2.x - e1.x;
-
-            if (Math.abs(distanceX) > Math.abs(distanceY) && Math.abs(distanceX) > 100 && Math.abs(velocityX) > 100) {
-                if (distanceX > 0.0) {
-                    val cachePath = File(context.cacheDir, "images")
-                    cachePath.mkdirs()
-                    val imageSavePath = File(cachePath, "image.jpeg")
-                    cameraControl.takePicture(imageSavePath) { it ->
-                        onImageCapture.invoke(
-                            FileProvider.getUriForFile(
-                                context,
-                                "live.hms.app2.provider",
-                                imageSavePath
-                            )
-                        )
-                    }
-                }
-                return true;
-            }
-            return false;
         }
 
 
