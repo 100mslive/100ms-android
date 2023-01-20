@@ -211,24 +211,10 @@ abstract class VideoGridBaseFragment : Fragment() {
         isLocalTrack = videoTrack is HMSLocalVideoTrack,
         onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
         onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
-        onMirror = { context.showMirrorOptions(surfaceView)},
-        onCameraCapture = { captureCameraFrame() }
+        onMirror = { context.showMirrorOptions(surfaceView)}
       )
     }
   }
-
-  private fun captureCameraFrame() {
-    meetingViewModel.hmsSDK.getLocalPeer()?.videoTrack?.addFrameCaptureListener(object :
-      HmsVideoFrameListener {
-      override fun onFrameCaptured(bitmap: Bitmap) {
-        //stores the bitmap in local cache thus avoiding any permission
-        val uri = bitmap.saveCaptureToLocalCache(requireContext())
-        //the uri is used to open share intent
-        uri?.let { requireActivity().openShareIntent(it) }
-      }
-    })
-  }
-
 
   private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
 
