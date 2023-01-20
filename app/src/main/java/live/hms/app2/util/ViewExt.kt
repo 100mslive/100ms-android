@@ -108,18 +108,12 @@ fun Context.showTileListDialog(
   isLocalTrack : Boolean,
   onScreenCapture: (() -> Unit),
   onSimulcast: (() -> Unit),
-  onCameraCapture: (() -> Unit),
   onMirror: (() -> Unit)
 ) {
 
   val builder = AlertDialog.Builder(this)
   builder.setTitle("Perform Action")
   val intentList = mutableListOf("Screen Capture", "Mirror")
-
-    if (isLocalTrack) {
-        intentList += "Camera Capture"
-    }
-
   if (isLocalTrack.not())
     intentList+= "Simulcast"
   builder.setItems(intentList.toTypedArray()) { _, which ->
@@ -127,11 +121,7 @@ fun Context.showTileListDialog(
       0 -> { onScreenCapture.invoke() }
         1 -> {onMirror()}
       2 -> {
-          if (isLocalTrack){
-              onCameraCapture.invoke()
-          } else {
-              onSimulcast.invoke()
-          }
+          onSimulcast.invoke()
       }
     }
   }
@@ -245,7 +235,7 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
             cachePath.mkdirs()
             val imageSavePath = File(cachePath, "image.jpeg")
 
-            cameraControl.captureMaxResolutionImage(imageSavePath) { it ->
+            cameraControl.captureImageAtMaxSupportedResolution(imageSavePath) { it ->
 
                 val fileSaveUri = FileProvider.getUriForFile(
                     context,
