@@ -33,6 +33,7 @@ import live.hms.video.sdk.HmsVideoFrameListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.videoview.HMSVideoView
 import org.webrtc.EglRenderer
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
@@ -176,6 +177,10 @@ abstract class VideoGridBaseFragment : Fragment() {
             || bindedVideoTrackIds.contains(item.video?.trackId)
     if (earlyExit) return
 
+    fun onLongPress() {
+
+    }
+
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
         view.setScalingType(scalingType)
@@ -184,9 +189,13 @@ abstract class VideoGridBaseFragment : Fragment() {
         binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
         bindedVideoTrackIds.add(item.video!!.trackId)
         binding.hmsVideoView.setOnLongClickListener {
-          (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
+          (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
           true
         }
+        binding.hmsVideoView.setCameraGestureListener(item.video, {
+          activity?.openShareIntent(it)
+        },
+        onLongPress = {(binding.hmsVideoView as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }})
       }
     }
   }
