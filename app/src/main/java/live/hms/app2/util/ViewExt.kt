@@ -262,31 +262,6 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
             onLongPress.invoke()
         }
 
-        override fun onFling(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
-            if (e1 == null || e2 == null)
-                return false
-
-            val distanceY: Float = e2.y - e1.y
-            val distanceX : Float = e2.x - e1.x;
-
-            if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 100 && Math.abs(velocityY) > 100) {
-                    //swipe up
-                if (distanceY > 0.0) {
-                    track.switchCamera(null)
-                } else {
-                    //swipe down
-                    cameraControl.setFlash(cameraControl.isFlashEnabled().not())
-                }
-                return true;
-            }
-            return false;
-        }
-
 
 
     })
