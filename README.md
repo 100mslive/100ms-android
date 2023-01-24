@@ -11,7 +11,7 @@
 [![Email](https://img.shields.io/badge/Contact-Know%20More-blue)](https://dashboard.100ms.live/register)
 
 
-# 🎉 100ms SDK ＆ Sample App 🚀
+# 🎉 Sample App using 100ms Android SDK 🚀
 
 Here you will find everything you need to build experiences with video using 100ms Android SDK. Dive into our SDKs, quick starts, add real-time video, voice, and screen sharing to your web and mobile applications.
 
