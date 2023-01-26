@@ -7,13 +7,16 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis.AxisDependency
-import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
@@ -28,6 +31,7 @@ import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStats
+import live.hms.video.error.HMSException
 import live.hms.video.utils.HMSLogger
 import kotlin.math.absoluteValue
 
@@ -74,7 +78,7 @@ class HlsFragment : Fragment() {
         binding.chart.description.isEnabled = false
         binding.chart.setScaleEnabled(false)
         binding.chart.legend.isEnabled = (false)
-        binding.chart.setViewPortOffsets(0f,0f,0f,0f)
+        binding.chart.setViewPortOffsets(0f, 0f, 0f, 0f)
 
         val networkLineData = LineData()
         networkLineData.setValueTextColor(Color.WHITE)
@@ -82,25 +86,29 @@ class HlsFragment : Fragment() {
         binding.networkActivityChart.description.isEnabled = false
         binding.networkActivityChart.setScaleEnabled(false)
         binding.networkActivityChart.legend.isEnabled = (false)
-        binding.networkActivityChart.setViewPortOffsets(0f,0f,0f,0f)
+        binding.networkActivityChart.setViewPortOffsets(0f, 0f, 0f, 0f)
 
+        playerEventsManager?.addListener(object : PlayerEventsListener {
+            @SuppressLint("SetTextI18n")
+            override fun onEventUpdate(playerStats: PlayerStats) {
+                updateStatsView(playerStats)
+            }
 
+            override fun onError(error: HMSException) {
+                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG)
+                    .show()
+            }
+        })
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
 
             if (it) {
                 binding.statsViewParent.visibility = View.VISIBLE
-                playerEventsManager?.addListener(object : PlayerEventsListener {
-                    @SuppressLint("SetTextI18n")
-                    override fun onEventUpdate(playerStats: PlayerStats) {
-                        updateStatsView(playerStats)
-                    }
-                })
+                playerEventsManager?.init()
                 isStatsActive = true
             } else {
                 playerEventsManager?.removeListener()
                 isStatsActive = false
                 binding.statsViewParent.visibility = View.GONE
-
             }
 
         }
@@ -152,8 +160,14 @@ class HlsFragment : Fragment() {
     }
 
     fun statsToString(playerStats: PlayerStats): String {
-        return "bitrate : ${Utils.humanReadableByteCount(playerStats.videoInfo.averageBitrate.toLong(),true,true)}/s \n" +
-                "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue/1000} s \n" +
+        return "bitrate : ${
+            Utils.humanReadableByteCount(
+                playerStats.videoInfo.averageBitrate.toLong(),
+                true,
+                true
+            )
+        }/s \n" +
+                "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue / 1000} s \n" +
                 "video width : ${playerStats.videoInfo.videoWidth} px \n" +
                 "video height : ${playerStats.videoInfo.videoHeight} px \n" +
                 "frame rate : ${playerStats.videoInfo.frameRate} fps \n" +
@@ -169,7 +183,7 @@ class HlsFragment : Fragment() {
             true
         )
         hlsPlayer.getPlayer()?.let {
-            playerEventsManager = PlayerEventsCollector(it)
+            playerEventsManager = PlayerEventsCollector(it, hmssdk = meetingViewModel.hmsSDK)
             val hlsMetadataHandler = HlsMetadataHandler(exoPlayer = it, { metaDataModel ->
 
             }, requireContext())
@@ -178,6 +192,22 @@ class HlsFragment : Fragment() {
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)
         }
+
+        playerEventsManager?.removeListener()
+        if (isStatsActive){
+            playerEventsManager?.init()
+        }
+        playerEventsManager?.addListener(object : PlayerEventsListener {
+            override fun onEventUpdate(playerStats: PlayerStats) {
+                if (isStatsActive) {
+                    updateStatsView(playerStats)
+                }
+            }
+
+            override fun onError(error: HMSException) {
+                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     override fun onPause() {
@@ -187,22 +217,31 @@ class HlsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (isStatsActive) {
-            playerEventsManager?.removeListener()
-            playerEventsManager?.addListener(object : PlayerEventsListener {
-                override fun onEventUpdate(playerStats: PlayerStats) {
-                        updateStatsView(playerStats)
-                }
-            })
-        }
+
     }
 
-    fun updateStatsView(playerStats: PlayerStats){
-        addEntry(playerStats.bandwidth.bandWidthEstimate.toFloat(),binding.chart,"Bandwidth")
-        binding.bandwidthEstimateTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.bandWidthEstimate, si = true, isBits = true)}/s"
+    fun updateStatsView(playerStats: PlayerStats) {
+        addEntry(playerStats.bandwidth.bandWidthEstimate.toFloat(), binding.chart, "Bandwidth")
+        binding.bandwidthEstimateTv.text = "${
+            Utils.humanReadableByteCount(
+                playerStats.bandwidth.bandWidthEstimate,
+                si = true,
+                isBits = true
+            )
+        }/s"
 
-        addEntry(playerStats.bandwidth.totalBytesLoaded.toFloat(),binding.networkActivityChart,"Network Activity")
-        binding.networkActivityTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.totalBytesLoaded, si = true, isBits = true)}"
+        addEntry(
+            playerStats.bandwidth.totalBytesLoaded.toFloat(),
+            binding.networkActivityChart,
+            "Network Activity"
+        )
+        binding.networkActivityTv.text = "${
+            Utils.humanReadableByteCount(
+                playerStats.bandwidth.totalBytesLoaded,
+                si = true,
+                isBits = true
+            )
+        }"
 
         binding.statsView.text = statsToString(playerStats)
     }
@@ -215,7 +254,7 @@ class HlsFragment : Fragment() {
         }
     }
 
-    private fun addEntry(value: Float, lineChart: LineChart,label: String) {
+    private fun addEntry(value: Float, lineChart: LineChart, label: String) {
         val data: LineData = lineChart.data
         var set = data.getDataSetByIndex(0)
         if (set == null) {
@@ -235,7 +274,7 @@ class HlsFragment : Fragment() {
         lineChart.moveViewToX(data.entryCount.toFloat())
     }
 
-    private fun createSet(label : String): LineDataSet {
+    private fun createSet(label: String): LineDataSet {
         val set = LineDataSet(null, label)
         set.axisDependency = AxisDependency.LEFT
         set.color = ContextCompat.getColor(requireContext(), R.color.primary_blue)

@@ -91,7 +91,7 @@ class MeetingLinkFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvSdkVersion.text = "version : ${HMSSDK.VERSION} | webrtc_version : ${HMSSDK.WEBRTC_VERSION}"
+        binding.tvSdkVersion.text = "version : | webrtc_version :"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
