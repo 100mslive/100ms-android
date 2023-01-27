@@ -33,6 +33,7 @@ import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStats
 import live.hms.video.error.HMSException
 import live.hms.video.utils.HMSLogger
+import live.hms.video.utils.toJson
 import kotlin.math.absoluteValue
 
 
@@ -95,7 +96,7 @@ class HlsFragment : Fragment() {
             }
 
             override fun onError(error: HMSException) {
-                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG)
+                Toast.makeText(requireContext(), error.name, Toast.LENGTH_LONG)
                     .show()
             }
         })
@@ -179,7 +180,7 @@ class HlsFragment : Fragment() {
         super.onStart()
         binding.hlsView.player = hlsPlayer.createPlayer(
             requireContext(),
-            args.hlsStreamUrl,
+            "https://cdn-dev.100ms.live/beam/sdk-testing/hls-test-stream-corrupt-masterm3u8/master.m3u8",
             true
         )
         hlsPlayer.getPlayer()?.let {
@@ -192,6 +193,15 @@ class HlsFragment : Fragment() {
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        playerEventsManager?.removeListener()
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         playerEventsManager?.removeListener()
         if (isStatsActive){
@@ -205,19 +215,9 @@ class HlsFragment : Fragment() {
             }
 
             override fun onError(error: HMSException) {
-                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), error.name, Toast.LENGTH_LONG).show()
             }
         })
-    }
-
-    override fun onPause() {
-        super.onPause()
-        playerEventsManager?.removeListener()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
     }
 
     fun updateStatsView(playerStats: PlayerStats) {
