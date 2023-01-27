@@ -96,7 +96,7 @@ class HlsFragment : Fragment() {
             }
 
             override fun onError(error: HMSException) {
-                Toast.makeText(requireContext(), error.name, Toast.LENGTH_LONG)
+                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG)
                     .show()
             }
         })
@@ -180,7 +180,7 @@ class HlsFragment : Fragment() {
         super.onStart()
         binding.hlsView.player = hlsPlayer.createPlayer(
             requireContext(),
-            "https://cdn-dev.100ms.live/beam/sdk-testing/hls-test-stream-corrupt-masterm3u8/master.m3u8",
+            args.hlsStreamUrl,
             true
         )
         hlsPlayer.getPlayer()?.let {
@@ -215,7 +215,7 @@ class HlsFragment : Fragment() {
             }
 
             override fun onError(error: HMSException) {
-                Toast.makeText(requireContext(), error.name, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG).show()
             }
         })
     }
