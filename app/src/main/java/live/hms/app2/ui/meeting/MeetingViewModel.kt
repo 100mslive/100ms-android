@@ -359,7 +359,7 @@ class MeetingViewModel(
             }
 
             override fun onLocalVideoStats(
-                videoStats: List<HMSLocalVideoStats>,
+                videoStats: HMSLocalVideoStats,
                 hmsTrack: HMSTrack?,
                 hmsPeer: HMSPeer?
             ) {
