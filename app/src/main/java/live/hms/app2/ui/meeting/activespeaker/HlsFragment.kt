@@ -89,22 +89,22 @@ class HlsFragment : Fragment() {
         binding.networkActivityChart.legend.isEnabled = (false)
         binding.networkActivityChart.setViewPortOffsets(0f, 0f, 0f, 0f)
 
-        playerEventsManager?.addListener(object : PlayerEventsListener {
-            @SuppressLint("SetTextI18n")
-            override fun onEventUpdate(playerStats: PlayerStats) {
-                updateStatsView(playerStats)
-            }
 
-            override fun onError(error: HMSException) {
-                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG)
-                    .show()
-            }
-        })
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
 
             if (it) {
                 binding.statsViewParent.visibility = View.VISIBLE
-                playerEventsManager?.init()
+                playerEventsManager?.addListener(object : PlayerEventsListener {
+                    @SuppressLint("SetTextI18n")
+                    override fun onEventUpdate(playerStats: PlayerStats) {
+                        updateStatsView(playerStats)
+                    }
+
+                    override fun onError(error: HMSException) {
+                        Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG)
+                            .show()
+                    }
+                })
                 isStatsActive = true
             } else {
                 playerEventsManager?.removeListener()
@@ -193,6 +193,20 @@ class HlsFragment : Fragment() {
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)
         }
+
+        if (isStatsActive){
+            playerEventsManager?.addListener(object : PlayerEventsListener {
+                override fun onEventUpdate(playerStats: PlayerStats) {
+                    if (isStatsActive) {
+                        updateStatsView(playerStats)
+                    }
+                }
+
+                override fun onError(error: HMSException) {
+                    Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG).show()
+                }
+            })
+        }
     }
 
     override fun onPause() {
@@ -202,22 +216,6 @@ class HlsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
-        playerEventsManager?.removeListener()
-        if (isStatsActive){
-            playerEventsManager?.init()
-        }
-        playerEventsManager?.addListener(object : PlayerEventsListener {
-            override fun onEventUpdate(playerStats: PlayerStats) {
-                if (isStatsActive) {
-                    updateStatsView(playerStats)
-                }
-            }
-
-            override fun onError(error: HMSException) {
-                Toast.makeText(requireContext(), error.description, Toast.LENGTH_LONG).show()
-            }
-        })
     }
 
     fun updateStatsView(playerStats: PlayerStats) {
