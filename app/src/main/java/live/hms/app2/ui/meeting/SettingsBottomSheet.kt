@@ -1,6 +1,7 @@
 package live.hms.app2.ui.meeting
 
 import android.app.Dialog
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import live.hms.app2.databinding.SettingsBottomSheetDialogBinding
 import live.hms.app2.ui.meeting.participants.MusicSelectionSheet
 import live.hms.app2.util.setOnSingleClickListener
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.HmsVideoFrameListener
 
 
 class SettingsBottomSheet(
@@ -81,6 +83,15 @@ class SettingsBottomSheet(
                 audioSwitchBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     MeetingFragment.AudioSwitchBottomSheetTAG
+                )
+            }
+        }
+
+        binding.btnMetaDataSend.apply {
+            setOnSingleClickListener(350) {
+                SendMetaDataDialogFragment().show(
+                    childFragmentManager,
+                    ChangeNameDialogFragment.TAG
                 )
             }
         }
@@ -252,7 +263,7 @@ class SettingsBottomSheet(
 
     }
 
-    fun updateMeetingAudioMode() {
+    private fun updateMeetingAudioMode() {
         if (meetingViewModel.getCurrentMediaModeCheckedState()) {
             binding.tvAudioMode.text = "Audio Mode : Media"
         } else {
@@ -266,6 +277,7 @@ class SettingsBottomSheet(
             binding.btnCameraSwitch.visibility = View.GONE
             binding.btnAudioShare.visibility = View.GONE
             binding.btnBrb.visibility = View.GONE
+            binding.btnMetaDataSend.visibility = View.GONE
         }
     }
 

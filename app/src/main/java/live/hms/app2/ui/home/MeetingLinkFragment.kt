@@ -17,12 +17,14 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentMeetingLinkBinding
+import live.hms.app2.ui.meeting.DeviceStatsBottomSheet
 import live.hms.app2.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.video.sdk.HMSSDK
 
 
 class MeetingLinkFragment : Fragment() {
@@ -87,6 +89,12 @@ class MeetingLinkFragment : Fragment() {
         return false
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.tvSdkVersion.text = "version : ${HMSSDK.VERSION} | webrtc_version : ${HMSSDK.WEBRTC_VERSION}"
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
@@ -100,6 +108,10 @@ class MeetingLinkFragment : Fragment() {
                 requireContext().startActivity(
                     EmailUtils.getNonFatalLogIntent(requireContext())
                 )
+            }
+            R.id.action_stats -> {
+                val deviceStatsBottomSheet = DeviceStatsBottomSheet()
+                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
             }
         }
         return false
@@ -131,8 +143,9 @@ class MeetingLinkFragment : Fragment() {
         }
     }
 
-    private fun validate(){
-        if (binding.edtMeetingUrl.text.toString().isValidMeetingUrl()) {
+    private fun validate() {
+        if (binding.edtMeetingUrl.text.toString().isValidMeetingUrl()
+        ) {
             enableJoinButton()
         } else {
             disableJoinButton()
@@ -160,12 +173,13 @@ class MeetingLinkFragment : Fragment() {
             findNavController().navigate(MeetingLinkFragmentDirections.actionMeetingLinkFragmentToHomeFragment())
         }
 
-        binding.edtMeetingUrl.addTextChangedListener(object : TextWatcher{
+        binding.edtMeetingUrl.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()){
-                    binding.tvMeetingUrlInputLayout.hint = requireContext().resources.getString(R.string.paste_the_link_here_str)
+                if (s.isNullOrEmpty()) {
+                    binding.tvMeetingUrlInputLayout.hint =
+                        requireContext().resources.getString(R.string.paste_the_link_here_str)
                 }
             }
 

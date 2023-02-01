@@ -8,21 +8,24 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Looper
 import android.util.Log
-import android.view.HapticFeedbackConstants
-import android.view.View
+import android.view.*
 import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
 import androidx.core.content.FileProvider
+import androidx.core.view.GestureDetectorCompat
 import live.hms.app2.R
 import live.hms.app2.helpers.OnSingleClickListener
+import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
+import live.hms.video.media.tracks.HMSLocalVideoTrack
 
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
+import live.hms.videoview.HMSVideoView
 import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
 import java.io.File
 import java.io.FileOutputStream
-import java.util.logging.Handler
 
 
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
@@ -111,14 +114,15 @@ fun Context.showTileListDialog(
   val builder = AlertDialog.Builder(this)
   builder.setTitle("Perform Action")
   val intentList = mutableListOf("Screen Capture", "Mirror")
-
   if (isLocalTrack.not())
     intentList+= "Simulcast"
   builder.setItems(intentList.toTypedArray()) { _, which ->
     when (which) {
       0 -> { onScreenCapture.invoke() }
         1 -> {onMirror()}
-      2 -> { onSimulcast.invoke() }
+      2 -> {
+          onSimulcast.invoke()
+      }
     }
   }
 
@@ -203,4 +207,75 @@ fun SurfaceViewRenderer.setRelease() {
 
 fun SurfaceViewRenderer.isInit() : Boolean {
     return (getTag(R.id.IS_INT) as? Boolean) == true
+}
+
+
+fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
+
+    val cameraControl: CameraControl = (track as? HMSLocalVideoTrack)?.getCameraControl() ?: return
+    var lastZoom = cameraControl.getMinZoom()
+
+    val gestureDetector = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
+
+        override fun onDown(e: MotionEvent?) = true
+        override fun onSingleTapUp(event: MotionEvent): Boolean {
+            if (cameraControl.isTapToFocusSupported())
+            cameraControl.setTapToFocusAt(
+                 event.x,
+                 event.y,
+                viewWidth = width,
+                viewHeight = height
+            )
+            return true
+        }
+
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+
+            val cachePath = File(context.cacheDir, "images")
+            cachePath.mkdirs()
+            val imageSavePath = File(cachePath, "image.jpeg")
+
+            cameraControl.captureImageAtMaxSupportedResolution(imageSavePath) { it ->
+
+                val fileSaveUri = FileProvider.getUriForFile(
+                    context,
+                    "live.hms.app2.provider",
+                    imageSavePath
+                )
+
+                onImageCapture.invoke(fileSaveUri)
+            }
+            return true
+        }
+
+        override fun onLongPress(e: MotionEvent?) {
+            onLongPress.invoke()
+        }
+
+
+
+    })
+
+    val scaleGestureDetector = ScaleGestureDetector(
+        context,
+        object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                if (cameraControl.isZoomSupported()) {
+                    lastZoom *= detector.scaleFactor
+                    cameraControl.setZoom(lastZoom)
+                    return true
+                }
+                return false
+            }
+        })
+
+    this.setOnTouchListener { _, event ->
+        var didConsume = scaleGestureDetector.onTouchEvent(event)
+        if (!scaleGestureDetector.isInProgress) {
+            didConsume = gestureDetector.onTouchEvent(event)
+        }
+        didConsume
+    }
+
+
 }

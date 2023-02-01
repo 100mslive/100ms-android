@@ -249,11 +249,11 @@
 
 
         <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/disable_hardware_scaler"
+            android:id="@+id/disable_auto_simulcast"
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/disable_hardware_scaler"
+            android:text="@string/disable_auto_simulcast"
             android:visibility="visible" />
 
 
