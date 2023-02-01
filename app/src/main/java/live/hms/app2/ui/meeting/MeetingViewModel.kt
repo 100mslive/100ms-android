@@ -1492,5 +1492,10 @@ class MeetingViewModel(
   private val _sessionMetadata = MutableLiveData<String?>(null)
   val sessionMetadata : LiveData<String?> = _sessionMetadata
 
+    override fun onCleared() {
+        super.onCleared()
+        leaveMeeting()
+    }
+
 }
 
