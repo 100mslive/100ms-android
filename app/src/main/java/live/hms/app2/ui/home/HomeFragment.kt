@@ -22,10 +22,7 @@ import live.hms.app2.R
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
-import live.hms.app2.ui.meeting.LEAVE_INFORMATION_PERSON
-import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
-import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
-import live.hms.app2.ui.meeting.MeetingActivity
+import live.hms.app2.ui.meeting.*
 import live.hms.app2.ui.settings.SettingsMode
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
@@ -81,6 +78,10 @@ class HomeFragment : Fragment() {
                 requireContext().startActivity(
                     EmailUtils.getNonFatalLogIntent(requireContext())
                 )
+            }
+            R.id.action_stats -> {
+                val deviceStatsBottomSheet = DeviceStatsBottomSheet()
+                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
             }
         }
         return false

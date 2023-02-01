@@ -22,6 +22,7 @@ import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
+import live.hms.app2.util.HlsMetadataHandler
 import live.hms.app2.util.viewLifecycle
 import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
@@ -38,7 +39,7 @@ class HlsFragment : Fragment() {
     val playerUpdatesHandler = Handler()
     var runnable: Runnable? = null
     val TAG = "HlsFragment"
-    var isStatsActive : Boolean = false
+    var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     private val hlsPlayer: HlsPlayer by lazy {
         HlsPlayer()
@@ -97,7 +98,7 @@ class HlsFragment : Fragment() {
                 isStatsActive = true
             } else {
                 playerEventsManager?.removeListener()
-                isStatsActive  = false
+                isStatsActive = false
                 binding.statsViewParent.visibility = View.GONE
 
             }
@@ -107,7 +108,10 @@ class HlsFragment : Fragment() {
         binding.btnTrackSelection.setOnClickListener {
             hlsPlayer.getPlayer()?.let {
                 val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(it)
-                trackSelectionBottomSheet.show(requireActivity().supportFragmentManager,"trackSelectionBottomSheet")
+                trackSelectionBottomSheet.show(
+                    requireActivity().supportFragmentManager,
+                    "trackSelectionBottomSheet"
+                )
             }
         }
 
@@ -166,6 +170,10 @@ class HlsFragment : Fragment() {
         )
         hlsPlayer.getPlayer()?.let {
             playerEventsManager = PlayerEventsCollector(it)
+            val hlsMetadataHandler = HlsMetadataHandler(exoPlayer = it, { metaDataModel ->
+
+            }, requireContext())
+            hlsMetadataHandler.start()
         }
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)

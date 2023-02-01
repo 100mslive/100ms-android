@@ -28,7 +28,7 @@ import org.webrtc.RendererCommon
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit,
-  private val itemStats: Flow<Map<String, HMSStats>>,
+  private val itemStats: Flow<Map<String, Any>>,
   private val statsActive: Boolean
 ) : RecyclerView.Adapter<VideoListAdapter.VideoItemViewHolder>() {
 
@@ -54,7 +54,7 @@ class VideoListAdapter(
 
   inner class VideoItemViewHolder(
     val binding: ListItemVideoBinding,
-    private val itemStats: Flow<Map<String, HMSStats>>
+    private val itemStats: Flow<Map<String, Any>>
   ) : RecyclerView.ViewHolder(binding.root) {
 
     private var itemRef: VideoListItem? = null
@@ -72,7 +72,6 @@ class VideoListAdapter(
         setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         // Meanwhile until the video is not binded, hide the view.
         visibility = View.GONE
-        setAutoSimulcast(true)
         // Update the reference such that when view is attached to window
         // surface view is initialized with correct [VideoTrack]
         item.track.video?.let{ binding.hmsVideoView.addTrack(it) }

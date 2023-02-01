@@ -92,12 +92,15 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
-
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
         <TextView
             android:id="@+id/stats"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Hi" />
+        </ScrollView>
         <TextView
             android:id="@+id/raised_hand"
             android:layout_width="wrap_content"

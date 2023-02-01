@@ -29,9 +29,11 @@ import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.HMSActionResultListener
+import live.hms.video.sdk.HmsVideoFrameListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.videoview.HMSVideoView
 import org.webrtc.EglRenderer
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
@@ -175,17 +177,25 @@ abstract class VideoGridBaseFragment : Fragment() {
             || bindedVideoTrackIds.contains(item.video?.trackId)
     if (earlyExit) return
 
+    fun onLongPress() {
+
+    }
+
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
         view.setScalingType(scalingType)
         view.addTrack(track)
-        view.setAutoSimulcast(meetingViewModel.isAutoSimulcastEnabled())
+        view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
         bindedVideoTrackIds.add(item.video!!.trackId)
         binding.hmsVideoView.setOnLongClickListener {
-          (it as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }
+          (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
           true
         }
+        binding.hmsVideoView.setCameraGestureListener(item.video, {
+          activity?.openShareIntent(it)
+        },
+        onLongPress = {(binding.hmsVideoView as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }})
       }
     }
   }
@@ -205,8 +215,6 @@ abstract class VideoGridBaseFragment : Fragment() {
       )
     }
   }
-
-
 
   private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
 
@@ -325,6 +333,8 @@ abstract class VideoGridBaseFragment : Fragment() {
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
+            //handling simulcast case since we are updating local reference it thinks it's an update instead of rebinding it
+            renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
           val downlinkScore = newVideo.peer.networkQuality?.downlinkQuality
           updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)

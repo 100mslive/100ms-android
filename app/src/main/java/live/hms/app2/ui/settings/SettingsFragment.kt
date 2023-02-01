@@ -53,8 +53,8 @@ class SettingsFragment : Fragment() {
       ENV_QA,
     )
 
-    private const val FRONT_FACING_CAMERA = "user"
-    private const val REAR_FACING_CAMERA = "environment"
+    const val FRONT_FACING_CAMERA = "user"
+    const val REAR_FACING_CAMERA = "environment"
 
     private val CAMERAS = mapOf(
       "Front Facing Camera" to FRONT_FACING_CAMERA,
@@ -476,9 +476,9 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
-        settings.disableHardwareScaler,
-        disableHardwareScaler
-      ) { commitHelper.setDisableHardwareScaler(it) }
+        settings.disableAutoSimulcast,
+        disableAutoSimulcast
+      ) { commitHelper.setDisableAutoSimulcast(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

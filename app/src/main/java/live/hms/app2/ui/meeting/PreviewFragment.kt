@@ -86,7 +86,12 @@ class PreviewFragment : Fragment() {
 
     private fun bindVideo() {
         if (this::track.isInitialized && track.video?.isMute == false) {
-            track.video?.let { binding.previewView.addTrack(it) }
+            track.video?.let {
+                binding.previewView.addTrack(it)
+                binding.previewView.setCameraGestureListener(it, {
+                    activity?.openShareIntent(it)
+                },{})
+            }
             binding.previewView.visibility = View.VISIBLE
         } else {
             binding.previewView.visibility = View.GONE
@@ -137,6 +142,8 @@ class PreviewFragment : Fragment() {
                 HMSLogger.d(TAG, "error : ${error?.description}")
             }
         })
+
+
     }
 
     override fun onAttach(context: Context) {
@@ -195,7 +202,6 @@ class PreviewFragment : Fragment() {
                         MeetingFragment.AudioSwitchBottomSheetTAG
                     )
                 }
-
             }
         }
 
@@ -273,7 +279,7 @@ class PreviewFragment : Fragment() {
             }
         }
 
-        binding.buttonJoinMeeting.apply {
+        binding.enterMeetingParentView.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
 
@@ -503,14 +509,6 @@ class PreviewFragment : Fragment() {
     private fun updateNetworkQualityView(downlinkScore: Int, context: Context, imageView: ImageView) {
         NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext())
             .let { drawable ->
-                if (downlinkScore == 0) {
-                    imageView.setColorFilter(
-                        ContextCompat.getColor(context, R.color.red),
-                        android.graphics.PorterDuff.Mode.SRC_IN
-                    )
-                } else {
-                    imageView.colorFilter = null
-                }
                 imageView.setImageDrawable(drawable)
                 if (drawable == null) {
                     imageView.visibility = View.GONE
