@@ -3,12 +3,15 @@ package live.hms.app2.util;
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Base64
 import android.widget.Toast
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.source.hls.HlsManifest
+import com.google.gson.JsonObject
 import live.hms.app2.model.LocalMetaDataModel
 import okhttp3.internal.UTC
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
@@ -58,13 +61,14 @@ class HlsMetadataHandler(
                 val matcher = pattern.matcher(it)
                 if (matcher.matches()) {
                     try {
-                        val payload = matcher.group(4).orEmpty()
+                        val payloadJson = String(Base64.decode(matcher.group(4).orEmpty(),Base64.DEFAULT))
+                        val payloadVal = JSONObject(payloadJson).get("payload").toString()
                         val duration = matcher.group(3).orEmpty().toLongOrNull()?.times(1000) ?: 0
                         val startDate = matcher.group(2).orEmpty()
                         val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
                         formatter.timeZone = UTC
                         val tagStartTime = formatter.parse(startDate).time
-                        lastFoundTag = LocalMetaDataModel(payload, duration)
+                        lastFoundTag = LocalMetaDataModel(payloadVal, duration)
                         lastFoundTag?.startTime = tagStartTime
                         return@lastOrNull tagStartTime <= currentAbsolutePosition
                     } catch (e: Exception) {
