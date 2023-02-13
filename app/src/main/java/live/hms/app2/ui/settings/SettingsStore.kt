@@ -139,7 +139,7 @@ class SettingsStore(context: Context) {
     set(value) = putBoolean(FORCE_SOFTWARE_DECODER, value)
 
   var enableNS: Boolean
-    get() = sharedPreferences.getBoolean(DISABLE_NS, true)
+    get() = sharedPreferences.getBoolean(DISABLE_NS, false)
     set(value) = putBoolean(DISABLE_NS, value)
 
   var enableAGC: Boolean
