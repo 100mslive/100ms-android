@@ -1370,9 +1370,9 @@ class MeetingViewModel(
         hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
-                    if (error.message.contains("invalid input")){
-                        startHls(hlsUrl,recordingConfig,true)
-                    }else{
+                    if (error.message.contains("invalid input")) {
+                        startHls(hlsUrl, recordingConfig, true)
+                    } else {
                         _events.emit(Event.Hls.HlsError(error))
                         hlsToggleUpdateData.postValue(false)
                     }
