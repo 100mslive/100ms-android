@@ -1357,8 +1357,8 @@ class MeetingViewModel(
 
     fun getStats(): Flow<Map<String, Any>> = statsFlow
 
-    fun startHls(hlsUrl: String?, recordingConfig: HMSHlsRecordingConfig) {
-        val meetingVariants = if (hlsUrl.isNullOrBlank()) {
+    fun startHls(hlsUrl: String?, recordingConfig: HMSHlsRecordingConfig,shouldSendMeetingVariant : Boolean? = false) {
+        val meetingVariants = if (hlsUrl.isNullOrBlank() || shouldSendMeetingVariant?.not() == true) {
             null
         } else listOf(HMSHLSMeetingURLVariant(hlsUrl))
 
@@ -1370,8 +1370,12 @@ class MeetingViewModel(
         hmsSDK.startHLSStreaming(config, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
-                    _events.emit(Event.Hls.HlsError(error))
-                    hlsToggleUpdateData.postValue(false)
+                    if (error.message.contains("invalid input")){
+                        startHls(hlsUrl,recordingConfig,true)
+                    }else{
+                        _events.emit(Event.Hls.HlsError(error))
+                        hlsToggleUpdateData.postValue(false)
+                    }
                 }
             }
 
