@@ -222,6 +222,9 @@ class MeetingViewModel(
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
+                .enableEchoCancellation(settings.enableEC)
+                .enableNoiseSupression(settings.enableNS)
+                .enableAutomaticGainControl(settings.enableAGC)
                 .initialState(getAudioTrackState())
                 .build()
         )
@@ -1491,6 +1494,11 @@ class MeetingViewModel(
 
   private val _sessionMetadata = MutableLiveData<String?>(null)
   val sessionMetadata : LiveData<String?> = _sessionMetadata
+
+    override fun onCleared() {
+        super.onCleared()
+        leaveMeeting()
+    }
 
 }
 

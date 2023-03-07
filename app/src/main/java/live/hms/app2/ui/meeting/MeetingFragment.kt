@@ -166,7 +166,6 @@ class MeetingFragment : Fragment() {
         isCountdownManuallyCancelled = true
         countDownTimer?.cancel()
         unregisterPipActionListener()
-        meetingViewModel.leaveMeeting()
     }
 
     override fun onPause() {
