@@ -249,31 +249,6 @@
 
 
         <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/disable_noise_supression"
-            style="@style/MaterialSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/disable_noise_supression"
-            android:visibility="visible" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/disable_noise_cancellation"
-            style="@style/MaterialSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/disable_noise_cancellation"
-            android:visibility="visible" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/disable_agc"
-            style="@style/MaterialSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/disable_agc"
-            android:visibility="visible" />
-
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/disable_auto_simulcast"
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"

@@ -50,9 +50,6 @@ class SettingsStore(context: Context) {
     const val SHOW_STATS = "show-video-stats"
     const val DISABLE_AUTO_RESIZE = "disable-auto-resize"
     const val FORCE_SOFTWARE_DECODER = "force-software-decoder"
-    const val DISABLE_NS = "disable-ns"
-    const val DISABLE_AGC = "disable-agc"
-    const val DISABLE_EC = "disable-ec"
     const val DISABLE_AUTO_SIMULCAST = "disable_auto_simulcast"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
@@ -137,19 +134,6 @@ class SettingsStore(context: Context) {
   var forceSoftwareDecoder: Boolean
     get() = sharedPreferences.getBoolean(FORCE_SOFTWARE_DECODER, false)
     set(value) = putBoolean(FORCE_SOFTWARE_DECODER, value)
-
-  var enableNS: Boolean
-    get() = sharedPreferences.getBoolean(DISABLE_NS, true)
-    set(value) = putBoolean(DISABLE_NS, value)
-
-  var enableAGC: Boolean
-    get() = sharedPreferences.getBoolean(DISABLE_AGC, true)
-    set(value) = putBoolean(DISABLE_AGC, value)
-
-  var enableEC: Boolean
-    get() = sharedPreferences.getBoolean(DISABLE_EC, true)
-    set(value) = putBoolean(DISABLE_EC, value)
-
 
   var disableAutoSimulcast: Boolean
     get() = sharedPreferences.getBoolean(DISABLE_AUTO_SIMULCAST, false)
@@ -343,11 +327,6 @@ class SettingsStore(context: Context) {
     fun commit() {
       editor.commit()
     }
-
-    fun setDisableNS(value: Boolean) =  apply { editor.putBoolean(DISABLE_NS, value) }
-    fun setDisableAGC(value: Boolean) =  apply { editor.putBoolean(DISABLE_AGC, value) }
-    fun setDisableEC(value: Boolean) =  apply { editor.putBoolean(DISABLE_EC, value) }
-
 
   }
 
