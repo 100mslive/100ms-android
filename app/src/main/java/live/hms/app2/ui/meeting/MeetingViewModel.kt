@@ -222,9 +222,9 @@ class MeetingViewModel(
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
-                .enableEchoCancellation(settings.enableEC)
-                .enableNoiseSupression(settings.enableNS)
-                .enableAutomaticGainControl(settings.enableAGC)
+//                .enableEchoCancellation(settings.enableEC)
+//                .enableNoiseSupression(settings.enableNS)
+//                .enableAutomaticGainControl(settings.enableAGC)
                 .initialState(getAudioTrackState())
                 .build()
         )
