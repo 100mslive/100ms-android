@@ -4,10 +4,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import live.hms.app2.BuildConfig
 import live.hms.app2.api.Resource
 import live.hms.app2.api.RetrofitBuilder
 import live.hms.app2.model.TokenResponse
 import live.hms.app2.util.*
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSTokenListener
+import live.hms.video.signal.init.TokenRequest
+import live.hms.video.signal.init.TokenRequestOptions
+import live.hms.video.signal.init.TokenResult
+import live.hms.video.utils.TokenUtils
 import okhttp3.Request
 
 class HomeViewModel : ViewModel() {
@@ -24,19 +31,29 @@ class HomeViewModel : ViewModel() {
         REGEX_MEETING_URL_CODE.matches(url) -> {
           val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
           val code = groups[2]
-          sendAuthTokenRequest(subdomain, code, env)
+          if (code.length == 11)
+            sendAuthTokenRequest(subdomain, code, env)
+          else
+            sendAuthTokenRequestCode(subdomain, code, env)
+
 
         }
         REGEX_STREAMING_MEETING_URL_ROOM_CODE.matches(url) -> {
           val groups = REGEX_STREAMING_MEETING_URL_ROOM_CODE.findAll(url).toList()[0].groupValues
           val code = groups[2]
-          sendAuthTokenRequest(subdomain, code, env)
+          if (code.length == 11)
+            sendAuthTokenRequest(subdomain, code, env)
+          else
+            sendAuthTokenRequestCode(subdomain, code, env)
 
         }
         REGEX_PREVIEW_URL_CODE.matches(url) -> {
           val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
           val code = groups[2]
-          sendAuthTokenRequest(subdomain, code, env)
+          if (code.length == 11)
+            sendAuthTokenRequest(subdomain, code, env)
+          else
+            sendAuthTokenRequestCode(subdomain, code, env)
 
         }
         REGEX_MEETING_URL_ROOM_ID.matches(url) -> {
@@ -57,6 +74,15 @@ class HomeViewModel : ViewModel() {
 
   private fun sendAuthTokenRequest(
     subdomain: String,
+    code: String,
+    environment: String
+  ) {
+    val request = RetrofitBuilder.makeTokenWithCodeRequest(subdomain, code, environment)
+    sendAuthTokenRequest(request)
+  }
+
+  private fun sendAuthTokenRequest(
+    subdomain: String,
     roomId: String,
     role: String,
     environment: String
@@ -65,14 +91,37 @@ class HomeViewModel : ViewModel() {
     sendAuthTokenRequest(request)
   }
 
-  private fun sendAuthTokenRequest(
+  private fun sendAuthTokenRequestCode(
     subdomain: String,
     code: String,
     environment: String
   ) {
-    val request = RetrofitBuilder.makeTokenWithCodeRequest(subdomain, code, environment)
-    sendAuthTokenRequest(request)
+
+    var subdomainUrl = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
+    if (BuildConfig.INTERNAL) {
+
+      val env = when ("") {
+        ENV_PROD -> "prod2"
+        else -> "qa2"
+      }
+      subdomainUrl = "$env.100ms.live"
+    }
+
+
+    TokenUtils.getAuthTokenByRoomCode(TokenRequest(code), TokenRequestOptions(subdomainUrl) , object :HMSTokenListener {
+      override fun onError(error: HMSException) {
+        authTokenResponse.postValue(Resource.error(error.message))
+      }
+
+      override fun onTokenSuccess(tokenResult: TokenResult) {
+        authTokenResponse.postValue(Resource.success(TokenResponse(tokenResult.token.orEmpty())))
+      }
+
+    })
+
   }
+
+
 
   private fun sendAuthTokenRequest(request: Request) {
     viewModelScope.launch {
