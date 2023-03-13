@@ -102,7 +102,7 @@ class HomeViewModel : ViewModel() {
 
       val env = when ("") {
         ENV_PROD -> "prod2"
-        else -> "qa2"
+        else -> "qa-in2"
       }
       subdomainUrl = "$env.100ms.live"
     }
