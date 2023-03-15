@@ -10,12 +10,13 @@ import live.hms.app2.api.RetrofitBuilder
 import live.hms.app2.model.TokenResponse
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
-import live.hms.video.sdk.HMSTokenListener
+import live.hms.video.signal.init.HMSTokenListener
 import live.hms.video.signal.init.TokenRequest
 import live.hms.video.signal.init.TokenRequestOptions
 import live.hms.video.signal.init.TokenResult
 import live.hms.video.utils.TokenUtils
 import okhttp3.Request
+import java.util.*
 
 class HomeViewModel : ViewModel() {
   private val repository = HomeRepository()
@@ -97,20 +98,13 @@ class HomeViewModel : ViewModel() {
     environment: String
   ) {
 
-    var subdomainUrl = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
-    if (BuildConfig.INTERNAL) {
 
-      val env = when ("") {
-        ENV_PROD -> "prod2"
-        else -> "qa-in2"
-      }
-      subdomainUrl = "$env.100ms.live"
-    }
+    val baseURl : String = if (environment.contains("prod").not()) "https://auth-nonprod.100ms.live" else ""
 
-
-    TokenUtils.getAuthTokenByRoomCode(TokenRequest(code), TokenRequestOptions(subdomainUrl) , object :HMSTokenListener {
+    TokenUtils.getAuthTokenByRoomCode(TokenRequest(code, UUID.randomUUID().toString()), TokenRequestOptions(baseURl) , object :
+      HMSTokenListener {
       override fun onError(error: HMSException) {
-        authTokenResponse.postValue(Resource.error(error.message))
+        authTokenResponse.postValue(Resource.error(error.description))
       }
 
       override fun onTokenSuccess(tokenResult: TokenResult) {
