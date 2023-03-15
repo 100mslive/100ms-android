@@ -19,11 +19,11 @@ import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import live.hms.app2.R
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
-import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.HlsMetadataHandler
 import live.hms.app2.util.viewLifecycle
+import live.hms.hls_player.HlsPlayer
 import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
 import live.hms.stats.Utils
@@ -36,14 +36,12 @@ class HlsFragment : Fragment() {
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
+    private var hlsPlayer: HlsPlayer? = null
     val playerUpdatesHandler = Handler()
     var runnable: Runnable? = null
     val TAG = "HlsFragment"
     var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-    private val hlsPlayer: HlsPlayer by lazy {
-        HlsPlayer()
-    }
     var playerEventsManager: PlayerEventsCollector? = null
 
     override fun onCreateView(
@@ -59,13 +57,15 @@ class HlsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        hlsPlayer = HlsPlayer(requireContext())
+
         binding.btnSeekLive.setOnClickListener {
-            hlsPlayer.getPlayer()?.seekToDefaultPosition()
-            hlsPlayer.getPlayer()?.play()
+            hlsPlayer?.seekToLivePosition()
+            hlsPlayer?.play(args.hlsStreamUrl)
         }
 
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
-            hlsPlayer.mute(muted)
+            hlsPlayer?.mute(muted)
         }
 
         val data = LineData()
@@ -106,7 +106,7 @@ class HlsFragment : Fragment() {
         }
 
         binding.btnTrackSelection.setOnClickListener {
-            hlsPlayer.getPlayer()?.let {
+            hlsPlayer?.getVideoPlayerView(false)?.let {
                 val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(it)
                 trackSelectionBottomSheet.show(
                     requireActivity().supportFragmentManager,
@@ -115,7 +115,7 @@ class HlsFragment : Fragment() {
             }
         }
 
-        hlsPlayer.getPlayer()?.addListener(object : Player.Listener {
+        hlsPlayer?.getPlayer()?.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 super.onPlayerError(error)
                 HMSLogger.i(TAG, " ~~ Exoplayer error: $error")
@@ -129,17 +129,17 @@ class HlsFragment : Fragment() {
 
 
         runnable = Runnable {
-            val distanceFromLive = ((hlsPlayer.getPlayer()?.duration?.minus(
-                hlsPlayer.getPlayer()?.currentPosition ?: 0
+            val distanceFromLive = ((hlsPlayer?.getPlayer()?.duration?.minus(
+                hlsPlayer?.getPlayer()?.currentPosition ?: 0
             ))?.div(1000) ?: 0)
 
             HMSLogger.i(
                 TAG,
-                "duration : ${hlsPlayer.getPlayer()?.duration.toString()} current position ${hlsPlayer.getPlayer()?.currentPosition}"
+                "duration : ${hlsPlayer?.getPlayer()?.duration.toString()} current position ${hlsPlayer?.getPlayer()?.currentPosition}"
             )
             HMSLogger.i(
                 TAG,
-                "buffered position : ${hlsPlayer.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer.getPlayer()?.totalBufferedDuration} "
+                "buffered position : ${hlsPlayer?.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer?.getPlayer()?.totalBufferedDuration} "
             )
 
             if (distanceFromLive >= 10) {
@@ -163,18 +163,16 @@ class HlsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        binding.hlsView.player = hlsPlayer.createPlayer(
-            requireContext(),
-            args.hlsStreamUrl,
-            true
-        )
-        hlsPlayer.getPlayer()?.let {
-            playerEventsManager = PlayerEventsCollector(it)
-            val hlsMetadataHandler = HlsMetadataHandler(exoPlayer = it, { metaDataModel ->
-
-            }, requireContext())
-            hlsMetadataHandler.start()
-        }
+//        binding.hlsView.player = hlsPlayer?.getPlayer()
+        hlsPlayer?.play(args.hlsStreamUrl)
+        // Set player analytics
+//        hlsPlayer.getPlayer()?.let {
+//            playerEventsManager = PlayerEventsCollector(it)
+//            val hlsMetadataHandler = HlsMetadataHandler(exoPlayer = it, { metaDataModel ->
+//
+//            }, requireContext())
+//            hlsMetadataHandler.start()
+//        }
         runnable?.let {
             playerUpdatesHandler.postDelayed(it, 0)
         }
@@ -209,7 +207,7 @@ class HlsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        hlsPlayer.releasePlayer()
+        hlsPlayer?.stop()
         runnable?.let {
             playerUpdatesHandler.removeCallbacks(it)
         }
