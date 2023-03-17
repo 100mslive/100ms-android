@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
+import live.hms.hls_player.HmsHlsPlaybackState
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -23,6 +25,7 @@ import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
 import live.hms.hls_player.HlsPlayer
+import live.hms.hls_player.HmsHlsException
 import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
 import live.hms.stats.Utils
@@ -112,6 +115,18 @@ class HlsFragment : Fragment() {
         }
 
         //TODO re-enable
+        binding.hlsView.onPlaybackFailure = object : (HmsHlsException) -> Unit {
+            override fun invoke(error: HmsHlsException) {
+                Log.d("HMSHLSPLAYER","From App, error: $error")
+            }
+
+        }
+
+        binding.hlsView.onPlaybackStateChanged = object : (HmsHlsPlaybackState) -> Unit {
+            override fun invoke(p1: HmsHlsPlaybackState) {
+                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
+            }
+        }
 //        binding.hlsView?.getPlayer()?.addListener(object : Player.Listener {
 //            override fun onPlayerError(error: PlaybackException) {
 //                super.onPlayerError(error)
