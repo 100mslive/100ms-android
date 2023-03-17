@@ -21,7 +21,6 @@ import live.hms.app2.R
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
-import live.hms.app2.util.HlsMetadataHandler
 import live.hms.app2.util.viewLifecycle
 import live.hms.hls_player.HlsPlayer
 import live.hms.stats.PlayerEventsCollector
