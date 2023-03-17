@@ -25,6 +25,7 @@ import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
 import live.hms.hls_player.HlsPlayer
+import live.hms.hls_player.HmsHlsCue
 import live.hms.hls_player.HmsHlsException
 import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
@@ -127,6 +128,14 @@ class HlsFragment : Fragment() {
                 Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
         }
+
+        binding.hlsView.onCue = object : (HmsHlsCue) -> Unit {
+            override fun invoke(p1: HmsHlsCue) {
+                Log.d("HMSHLSPLAYER","From App, metadata: $p1")
+            }
+
+        }
+
 //        binding.hlsView?.getPlayer()?.addListener(object : Player.Listener {
 //            override fun onPlayerError(error: PlaybackException) {
 //                super.onPlayerError(error)
