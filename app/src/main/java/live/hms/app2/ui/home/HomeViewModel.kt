@@ -64,14 +64,6 @@ class HomeViewModel : ViewModel() {
     }
   }
 
-  private fun sendAuthTokenRequest(
-    subdomain: String,
-    code: String,
-    environment: String
-  ) {
-    val request = RetrofitBuilder.makeTokenWithCodeRequest(subdomain, code, environment)
-    sendAuthTokenRequest(request)
-  }
 
   private fun sendAuthTokenRequest(
     subdomain: String,
