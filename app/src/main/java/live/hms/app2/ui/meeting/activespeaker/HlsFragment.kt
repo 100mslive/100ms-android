@@ -19,6 +19,7 @@ import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
+import com.google.android.material.snackbar.Snackbar
 import live.hms.app2.R
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
@@ -55,6 +56,8 @@ class HlsFragment : Fragment() {
 
         return binding.root
     }
+
+    val shown = HashSet<HmsHlsCue>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -129,12 +132,27 @@ class HlsFragment : Fragment() {
             }
         }
 
-        binding.hlsView.onCue = object : (HmsHlsCue) -> Unit {
-            override fun invoke(p1: HmsHlsCue) {
-                Log.d("HMSHLSPLAYER","From App, metadata: $p1")
+
+        binding.hlsView.onCue = object : (HmsHlsCue?) -> Unit {
+            override fun invoke(p1: HmsHlsCue?) {
+                if(p1 != null && !shown.contains(p1)) {
+                    shown.add(p1)
+                    val duration: Int =
+                        ((p1.endDate?.time ?: 0) - System.currentTimeMillis()).toInt()
+                    if (duration > 0) {
+                        Log.d("HMSHLSPLAYER","From App, metadata: $duration s/ $p1")
+                        Snackbar.make(
+                            this@HlsFragment.requireContext(),
+                            binding.networkActivityTv,
+                            p1.payloadval ?: "empty",
+                            duration
+                        ).show()
+                    }
+                }
             }
 
         }
+
 
 //        binding.hlsView?.getPlayer()?.addListener(object : Player.Listener {
 //            override fun onPlayerError(error: PlaybackException) {
