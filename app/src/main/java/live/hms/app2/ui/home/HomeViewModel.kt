@@ -32,9 +32,6 @@ class HomeViewModel : ViewModel() {
         REGEX_MEETING_URL_CODE.matches(url) -> {
           val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
           val code = groups[2]
-          if (code.length == 11)
-            sendAuthTokenRequest(subdomain, code, env)
-          else
             sendAuthTokenRequestCode(subdomain, code, env)
 
 
@@ -42,18 +39,12 @@ class HomeViewModel : ViewModel() {
         REGEX_STREAMING_MEETING_URL_ROOM_CODE.matches(url) -> {
           val groups = REGEX_STREAMING_MEETING_URL_ROOM_CODE.findAll(url).toList()[0].groupValues
           val code = groups[2]
-          if (code.length == 11)
-            sendAuthTokenRequest(subdomain, code, env)
-          else
             sendAuthTokenRequestCode(subdomain, code, env)
 
         }
         REGEX_PREVIEW_URL_CODE.matches(url) -> {
           val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
           val code = groups[2]
-          if (code.length == 11)
-            sendAuthTokenRequest(subdomain, code, env)
-          else
             sendAuthTokenRequestCode(subdomain, code, env)
 
         }
