@@ -827,10 +827,20 @@ class MeetingViewModel(
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
         // Don't call leave when being forced to leave
         if (details == null) {
-            hmsSDK.leave()
+            hmsSDK.leave(object : HMSActionResultListener{
+                override fun onError(error: HMSException) {
+                    Log.e(TAG, " HMS SDK Leave un successfull")
+                }
+
+                override fun onSuccess() {
+                    Log.d(TAG, " HMS SDK Leave Successfully")
+                    cleanup()
+                    state.postValue(MeetingState.Disconnected(true, details))
+                }
+
+            })
         }
-        cleanup()
-        state.postValue(MeetingState.Disconnected(true, details))
+
     }
 
     private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {
