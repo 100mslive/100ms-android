@@ -33,6 +33,7 @@ import live.hms.stats.PlayerEventsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStats
 import live.hms.video.utils.HMSLogger
+import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
 
@@ -65,6 +66,25 @@ class HlsFragment : Fragment() {
         binding.btnSeekLive.setOnClickListener {
             binding.hlsView.seekToLivePosition()
             binding.hlsView.play(args.hlsStreamUrl)
+        }
+
+        binding.back.setOnClickListener {
+            binding.hlsView.seekBackward(5,TimeUnit.SECONDS)
+        }
+
+        binding.forward.setOnClickListener {
+            binding.hlsView.seekForward(5, TimeUnit.SECONDS)
+        }
+
+        binding.play.setOnClickListener {
+            // Also toggle the drawable
+            if( binding.hlsView.player?.isPlaying == true) {
+                binding.play.text = "⏸️"
+                binding.hlsView.pause()
+            } else {
+                    binding.play.text = "▶️"
+                binding.hlsView.play(args.hlsStreamUrl)
+            }
         }
 
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
