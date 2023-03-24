@@ -65,7 +65,6 @@ class HlsFragment : Fragment() {
 
         binding.btnSeekLive.setOnClickListener {
             binding.hlsView.seekToLivePosition()
-            binding.hlsView.play(args.hlsStreamUrl)
         }
 
         binding.back.setOnClickListener {
@@ -82,8 +81,8 @@ class HlsFragment : Fragment() {
                 binding.play.text = "⏸️"
                 binding.hlsView.pause()
             } else {
-                    binding.play.text = "▶️"
-                binding.hlsView.play(args.hlsStreamUrl)
+                binding.play.text = "▶️"
+                binding.hlsView.resume()
             }
         }
 
