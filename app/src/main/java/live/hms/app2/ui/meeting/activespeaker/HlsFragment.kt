@@ -78,10 +78,10 @@ class HlsFragment : Fragment() {
         binding.play.setOnClickListener {
             // Also toggle the drawable
             if( binding.hlsView.player?.isPlaying == true) {
-                binding.play.text = "⏸️"
+                binding.play.text = "▶️"
                 binding.hlsView.pause()
             } else {
-                binding.play.text = "▶️"
+                binding.play.text = "⏸️"
                 binding.hlsView.resume()
             }
         }
