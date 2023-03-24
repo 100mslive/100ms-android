@@ -784,7 +784,7 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
-            (binding.buttonToggleVideo as AppCompatImageView).apply {
+            (binding.buttonToggleVideo as? AppCompatImageView)?.apply {
                 if (enabled) {
                     background = ContextCompat.getDrawable(
                         requireContext(),
@@ -805,7 +805,7 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
             updatePipMicState(isMicOn = enabled)
-            (binding.buttonToggleAudio as AppCompatImageView).apply {
+            (binding.buttonToggleAudio as? AppCompatImageView)?.apply {
 
                 if (enabled) {
                     background = ContextCompat.getDrawable(
