@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,6 +10,7 @@
 
     <LinearLayout
         android:id="@+id/stats_view_parent"
+        android:layout_below="@id/hls_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -17,32 +18,6 @@
         android:orientation="vertical"
         android:padding="10dp"
         android:visibility="visible">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⬅️"
-                />
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/forward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="➡️"
-                />
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="▶️"
-                />
-
-        </LinearLayout>
 
         <TextView
             android:id="@+id/stats_view"
@@ -106,29 +81,51 @@
 
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_seek_live"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|end"
         android:layout_marginHorizontal="16dp"
+        android:paddingHorizontal="8dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/primary_blue_round_drawable"
-        android:fontFamily="@font/inter_semibold"
-        android:paddingHorizontal="20dp"
-        android:text="Go To Live"
-        android:textAllCaps="false" />
+        android:orientation="horizontal"
+        >
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_track_selection"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:fontFamily="@font/inter_semibold"
+            android:src="@drawable/settings_icon"
+            android:text="Settings"
+            android:textAllCaps="false" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⬅️"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/forward"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="➡️"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="▶️"
+            />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_seek_live"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/primary_blue_round_drawable"
+            android:fontFamily="@font/inter_semibold"
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/btn_track_selection"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="top|start"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/inter_semibold"
-        android:src="@drawable/settings_icon"
-        android:text="Settings"
-        android:textAllCaps="false" />
-</FrameLayout>
+            android:text="Live"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+</RelativeLayout>
