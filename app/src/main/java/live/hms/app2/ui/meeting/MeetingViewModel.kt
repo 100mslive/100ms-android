@@ -916,6 +916,15 @@ class MeetingViewModel(
                 }
             }
 
+            when (track.type) {
+                HMSTrackType.AUDIO -> {
+                    meetingTrack?.audio = null
+                }
+                HMSTrackType.VIDEO -> {
+                    meetingTrack?.video = null
+                }
+            }
+
             if (
             // Remove tile from view since both audio and video track are null for the peer
                 (peer.audioTrack == null && peer.videoTrack == null) ||
