@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
-import live.hms.hls_player.HmsHlsPlaybackState
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -17,17 +16,13 @@ import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis.AxisDependency
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
 import com.google.android.material.snackbar.Snackbar
 import live.hms.app2.R
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
-import live.hms.hls_player.HlsPlayer
-import live.hms.hls_player.HmsHlsCue
-import live.hms.hls_player.HmsHlsException
+import live.hms.hls_player.*
 import live.hms.stats.PlayerEventsCollector
 import live.hms.stats.PlayerEventsListener
 import live.hms.stats.Utils
@@ -47,6 +42,7 @@ class HlsFragment : Fragment() {
     var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     var playerEventsManager: PlayerEventsCollector? = null
+    val player by lazy{ HlsPlayer(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,31 +59,33 @@ class HlsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.hlsView.player = player.getNativePlayer()
+
         binding.btnSeekLive.setOnClickListener {
-            binding.hlsView.seekToLivePosition()
+            player.seekToLivePosition()
         }
 
-        binding.back.setOnClickListener {
-            binding.hlsView.seekBackward(5,TimeUnit.SECONDS)
-        }
-
-        binding.forward.setOnClickListener {
-            binding.hlsView.seekForward(5, TimeUnit.SECONDS)
-        }
-
-        binding.play.setOnClickListener {
-            // Also toggle the drawable
-            if( binding.hlsView.player?.isPlaying == true) {
-                binding.play.text = "▶️"
-                binding.hlsView.pause()
-            } else {
-                binding.play.text = "⏸️"
-                binding.hlsView.resume()
-            }
-        }
+//        binding.back.setOnClickListener {
+//            player.seekBackward(5,TimeUnit.SECONDS)
+//        }
+//
+//        binding.forward.setOnClickListener {
+//            player.seekForward(5, TimeUnit.SECONDS)
+//        }
+//
+//        binding.play.setOnClickListener {
+//            // Also toggle the drawable
+//            if( binding.hlsView.player?.isPlaying == true) {
+//                binding.play.text = "▶️"
+//                player.pause()
+//            } else {
+//                binding.play.text = "⏸️"
+//                player.resume()
+//            }
+//        }
 
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
-            binding.hlsView.mute(muted)
+            player.mute(muted)
         }
 
         val data = LineData()
@@ -137,23 +135,17 @@ class HlsFragment : Fragment() {
             }
         }
 
-        //TODO re-enable
-        binding.hlsView.onPlaybackFailure = object : (HmsHlsException) -> Unit {
-            override fun invoke(error: HmsHlsException) {
-                Log.d("HMSHLSPLAYER","From App, error: $error")
+        val q = object : HmsHlsPlayerEvents {
+
+            override fun onPlaybackFailure(error : HmsHlsException) {
+                    Log.d("HMSHLSPLAYER","From App, error: $error")
             }
 
-        }
-
-        binding.hlsView.onPlaybackStateChanged = object : (HmsHlsPlaybackState) -> Unit {
-            override fun invoke(p1: HmsHlsPlaybackState) {
-                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
+            override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
+                    Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
-        }
 
-
-        binding.hlsView.onCue = object : (HmsHlsCue?) -> Unit {
-            override fun invoke(p1: HmsHlsCue?) {
+            override fun onCue(p1 : HmsHlsCue?) {
                 if(p1 != null && !shown.contains(p1)) {
                     shown.add(p1)
                     val duration: Int =
@@ -169,9 +161,7 @@ class HlsFragment : Fragment() {
                     }
                 }
             }
-
         }
-
 
 //        binding.hlsView?.getPlayer()?.addListener(object : Player.Listener {
 //            override fun onPlayerError(error: PlaybackException) {
@@ -222,7 +212,7 @@ class HlsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        binding.hlsView.play(args.hlsStreamUrl)
+        player.play(args.hlsStreamUrl)
         // Set player analytics
 //        hlsPlayer.getPlayer()?.let {
 //            playerEventsManager = PlayerEventsCollector(it)
@@ -265,7 +255,7 @@ class HlsFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        binding.hlsView.stop()
+        player.stop()
         runnable?.let {
             playerUpdatesHandler.removeCallbacks(it)
         }

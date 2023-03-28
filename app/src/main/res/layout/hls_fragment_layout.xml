@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <live.hms.hls_player.HlsPlayer
+    <androidx.media3.ui.PlayerView
         android:id="@+id/hls_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -98,24 +98,6 @@
             android:src="@drawable/settings_icon"
             android:text="Settings"
             android:textAllCaps="false" />
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="⬅️"
-            />
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/forward"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="➡️"
-            />
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="⏸️"
-            />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_seek_live"
