@@ -6,9 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.TextView
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverrides
+import androidx.media3.common.Player
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.R
 import live.hms.app2.databinding.DialogTrackSelectionBinding
