@@ -23,12 +23,9 @@ import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
 import live.hms.app2.util.viewLifecycle
 import live.hms.hls_player.*
-import live.hms.stats.PlayerEventsCollector
-import live.hms.stats.PlayerEventsListener
+import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
-import live.hms.stats.model.PlayerStats
-import live.hms.video.utils.HMSLogger
-import java.util.concurrent.TimeUnit
+import live.hms.stats.model.PlayerStatsModel
 import kotlin.math.absoluteValue
 
 
@@ -41,7 +38,7 @@ class HlsFragment : Fragment() {
     val TAG = "HlsFragment"
     var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-    var playerEventsManager: PlayerEventsCollector? = null
+//    var playerEventsManager: PlayerEventsCollector? = null
     val player by lazy{ HlsPlayer(requireContext()) }
 
     override fun onCreateView(
@@ -106,23 +103,8 @@ class HlsFragment : Fragment() {
 
 
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
-
-            if (it) {
-                binding.statsViewParent.visibility = View.VISIBLE
-                playerEventsManager?.addListener(object : PlayerEventsListener {
-                    @SuppressLint("SetTextI18n")
-                    override fun onEventUpdate(playerStats: PlayerStats) {
-                        updateStatsView(playerStats)
-                    }
-                })
-                isStatsActive = true
-            } else {
-                playerEventsManager?.removeListener()
-                isStatsActive = false
-                binding.statsViewParent.visibility = View.GONE
-
-            }
-
+            isStatsActive = it
+            setPlayerStats(it)
         }
 
         binding.btnTrackSelection.setOnClickListener {
@@ -135,14 +117,14 @@ class HlsFragment : Fragment() {
             }
         }
 
-        val q = object : HmsHlsPlayerEvents {
+        player.setHmsHlsPlayerEvents(object : HmsHlsPlaybackEvents {
 
             override fun onPlaybackFailure(error : HmsHlsException) {
-                    Log.d("HMSHLSPLAYER","From App, error: $error")
+                Log.d("HMSHLSPLAYER","From App, error: $error")
             }
 
             override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
-                    Log.d("HMSHLSPLAYER","From App, playback state: $p1")
+                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
 
             override fun onCue(p1 : HmsHlsCue?) {
@@ -161,7 +143,7 @@ class HlsFragment : Fragment() {
                     }
                 }
             }
-        }
+        })
 
 //        binding.hlsView?.getPlayer()?.addListener(object : Player.Listener {
 //            override fun onPlayerError(error: PlaybackException) {
@@ -200,7 +182,7 @@ class HlsFragment : Fragment() {
 //        }
     }
 
-    fun statsToString(playerStats: PlayerStats): String {
+    fun statsToString(playerStats: PlayerStatsModel): String {
         return "bitrate : ${Utils.humanReadableByteCount(playerStats.videoInfo.averageBitrate.toLong(),true,true)}/s \n" +
                 "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue/1000} s \n" +
                 "video width : ${playerStats.videoInfo.videoWidth} px \n" +
@@ -228,22 +210,32 @@ class HlsFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        playerEventsManager?.removeListener()
+        setPlayerStats(false)
     }
 
     override fun onResume() {
         super.onResume()
         if (isStatsActive) {
-            playerEventsManager?.removeListener()
-            playerEventsManager?.addListener(object : PlayerEventsListener {
-                override fun onEventUpdate(playerStats: PlayerStats) {
-                        updateStatsView(playerStats)
-                }
-            })
+            setPlayerStats(true)
         }
     }
 
-    fun updateStatsView(playerStats: PlayerStats){
+    private fun setPlayerStats(enable : Boolean) {
+        if(enable) {
+            binding.statsViewParent.visibility = View.VISIBLE
+            player.setStatsMonitor(object : PlayerStatsListener {
+                @SuppressLint("SetTextI18n")
+                override fun onEventUpdate(playerStats: PlayerStatsModel) {
+                    updateStatsView(playerStats)
+                }
+            })
+        } else {
+            player.setStatsMonitor(null)
+            binding.statsViewParent.visibility = View.GONE
+        }
+    }
+
+    fun updateStatsView(playerStats: PlayerStatsModel){
         addEntry(playerStats.bandwidth.bandWidthEstimate.toFloat(),binding.chart,"Bandwidth")
         binding.bandwidthEstimateTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.bandWidthEstimate, si = true, isBits = true)}/s"
 
