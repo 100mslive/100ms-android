@@ -9,8 +9,8 @@
         android:layout_height="match_parent" />
 
     <LinearLayout
+        android:layout_below="@id/extra_properties"
         android:id="@+id/stats_view_parent"
-        android:layout_below="@id/hls_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -82,6 +82,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/extra_properties"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|end"
