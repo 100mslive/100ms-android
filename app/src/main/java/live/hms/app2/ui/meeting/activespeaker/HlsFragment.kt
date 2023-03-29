@@ -109,7 +109,7 @@ class HlsFragment : Fragment() {
 
         binding.btnTrackSelection.setOnClickListener {
             binding.hlsView.let {
-                val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(it.getPlayer()!!)
+                val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
                 trackSelectionBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     "trackSelectionBottomSheet"
@@ -117,7 +117,7 @@ class HlsFragment : Fragment() {
             }
         }
 
-        player.setHmsHlsPlayerEvents(object : HmsHlsPlaybackEvents {
+        player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
             override fun onPlaybackFailure(error : HmsHlsException) {
                 Log.d("HMSHLSPLAYER","From App, error: $error")
@@ -145,18 +145,6 @@ class HlsFragment : Fragment() {
             }
         })
 
-//        binding.hlsView?.getPlayer()?.addListener(object : Player.Listener {
-//            override fun onPlayerError(error: PlaybackException) {
-//                super.onPlayerError(error)
-//                HMSLogger.i(TAG, " ~~ Exoplayer error: $error")
-//            }
-//
-//            override fun onPlaybackStateChanged(playbackState: Int) {
-//                super.onPlaybackStateChanged(playbackState)
-//                HMSLogger.i(TAG, "Playback state change to $playbackState")
-//            }
-//        })
-
 
         // TODO enable
 //        runnable = Runnable {
@@ -182,7 +170,7 @@ class HlsFragment : Fragment() {
 //        }
     }
 
-    fun statsToString(playerStats: PlayerStatsModel): String {
+    private fun statsToString(playerStats: PlayerStatsModel): String {
         return "bitrate : ${Utils.humanReadableByteCount(playerStats.videoInfo.averageBitrate.toLong(),true,true)}/s \n" +
                 "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue/1000} s \n" +
                 "video width : ${playerStats.videoInfo.videoWidth} px \n" +
