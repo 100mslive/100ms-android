@@ -99,14 +99,17 @@
             android:src="@drawable/settings_icon"
             android:text="Settings"
             android:textAllCaps="false" />
-
+<Space
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_seek_live"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/primary_blue_round_drawable"
             android:fontFamily="@font/inter_semibold"
-
             android:text="Live"
             android:textAllCaps="false" />
     </LinearLayout>
