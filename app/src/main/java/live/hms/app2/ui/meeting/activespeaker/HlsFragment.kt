@@ -3,7 +3,6 @@ package live.hms.app2.ui.meeting.activespeaker
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -33,12 +32,9 @@ class HlsFragment : Fragment() {
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    val playerUpdatesHandler = Handler()
-    var runnable: Runnable? = null
     val TAG = "HlsFragment"
     var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-//    var playerEventsManager: PlayerEventsCollector? = null
     val player by lazy{ HlsPlayer(requireContext()) }
 
     override fun onCreateView(
@@ -51,8 +47,6 @@ class HlsFragment : Fragment() {
         return binding.root
     }
 
-    val shown = HashSet<HmsHlsCue>()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -61,25 +55,6 @@ class HlsFragment : Fragment() {
         binding.btnSeekLive.setOnClickListener {
             player.seekToLivePosition()
         }
-
-//        binding.back.setOnClickListener {
-//            player.seekBackward(5,TimeUnit.SECONDS)
-//        }
-//
-//        binding.forward.setOnClickListener {
-//            player.seekForward(5, TimeUnit.SECONDS)
-//        }
-//
-//        binding.play.setOnClickListener {
-//            // Also toggle the drawable
-//            if( binding.hlsView.player?.isPlaying == true) {
-//                binding.play.text = "▶️"
-//                player.pause()
-//            } else {
-//                binding.play.text = "⏸️"
-//                player.resume()
-//            }
-//        }
 
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
             player.mute(muted)
@@ -119,6 +94,11 @@ class HlsFragment : Fragment() {
 
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
+            override fun isLive(live : Boolean) {
+                Log.d("LoveS","$live")
+                binding.btnSeekLive.visibility = if(!live) View.VISIBLE else View.GONE
+            }
+
             override fun onPlaybackFailure(error : HmsHlsException) {
                 Log.d("HMSHLSPLAYER","From App, error: $error")
             }
@@ -127,21 +107,23 @@ class HlsFragment : Fragment() {
                 Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
 
-            override fun onCue(p1 : HmsHlsCue?) {
-                if(p1 != null && !shown.contains(p1)) {
-                    shown.add(p1)
-                    val duration: Int =
-                        ((p1.endDate?.time ?: 0) - System.currentTimeMillis()).toInt()
-                    if (duration > 0) {
-                        Log.d("HMSHLSPLAYER","From App, metadata: $duration s/ $p1")
-                        Snackbar.make(
-                            this@HlsFragment.requireContext(),
-                            binding.networkActivityTv,
-                            p1.payloadval ?: "empty",
-                            duration
-                        ).show()
-                    }
+            override fun onCue(hlsCue : HmsHlsCue) {
+                val duration = if(hlsCue.endDate?.time == null){
+                    Snackbar.LENGTH_INDEFINITE
                 }
+                    else {
+                    ((hlsCue.endDate?.time ?: 0) - System.currentTimeMillis()).toInt()
+                }
+                if (duration > 0 || duration == Snackbar.LENGTH_INDEFINITE) {
+                    Log.d("HMSHLSPLAYER","From App, metadata: $duration s/ $hlsCue")
+                    Snackbar.make(
+                        this@HlsFragment.requireContext(),
+                        binding.networkActivityTv,
+                        hlsCue.payloadval ?: "empty",
+                        duration
+                    ).show()
+                }
+
             }
         })
 
@@ -183,17 +165,6 @@ class HlsFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         player.play(args.hlsStreamUrl)
-        // Set player analytics
-//        hlsPlayer.getPlayer()?.let {
-//            playerEventsManager = PlayerEventsCollector(it)
-//            val hlsMetadataHandler = HlsMetadataHandler(exoPlayer = it, { metaDataModel ->
-//
-//            }, requireContext())
-//            hlsMetadataHandler.start()
-//        }
-        runnable?.let {
-            playerUpdatesHandler.postDelayed(it, 0)
-        }
     }
 
     override fun onPause() {
@@ -236,9 +207,6 @@ class HlsFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         player.stop()
-        runnable?.let {
-            playerUpdatesHandler.removeCallbacks(it)
-        }
     }
 
     private fun addEntry(value: Float, lineChart: LineChart,label: String) {

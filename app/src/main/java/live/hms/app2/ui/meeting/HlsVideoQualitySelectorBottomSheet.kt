@@ -60,7 +60,7 @@ class HlsVideoQualitySelectorBottomSheet(
         }
     }
 
-    private fun addTrackView(title: String, index: Int, isSelected : Boolean = false,onSelectedListener: (index: Int) -> Unit) {
+    private fun addTrackView(title: String, index: Int, isSelected : Boolean = false,onSelectedListener: (index : Int) -> Unit) {
         Log.d("TracksView","Trying to add: $title, $index, $isSelected")
         val trackView = LayoutInflater.from(requireContext())
             .inflate(R.layout.track_selection_view, null, false)
