@@ -50,8 +50,6 @@ class HlsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.hlsView.player = player.getNativePlayer()
-
         binding.btnSeekLive.setOnClickListener {
             player.seekToLivePosition()
         }
@@ -92,41 +90,6 @@ class HlsFragment : Fragment() {
             }
         }
 
-        player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
-
-            override fun isLive(live : Boolean) {
-                binding.btnSeekLive.visibility = if(!live) View.VISIBLE else View.GONE
-            }
-
-            override fun onPlaybackFailure(error : HmsHlsException) {
-                Log.d("HMSHLSPLAYER","From App, error: $error")
-            }
-
-            override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
-                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
-            }
-
-            override fun onCue(hlsCue : HmsHlsCue) {
-                val duration = if(hlsCue.endDate?.time == null){
-                    Snackbar.LENGTH_INDEFINITE
-                }
-                    else {
-                    ((hlsCue.endDate?.time ?: 0) - System.currentTimeMillis()).toInt()
-                }
-                if (duration > 0 || duration == Snackbar.LENGTH_INDEFINITE) {
-                    Log.d("HMSHLSPLAYER","From App, metadata: $duration s/ $hlsCue")
-                    Snackbar.make(
-                        this@HlsFragment.requireContext(),
-                        binding.networkActivityTv,
-                        hlsCue.payloadval ?: "empty",
-                        duration
-                    ).show()
-                }
-
-            }
-        })
-
-
         // TODO enable
 //        runnable = Runnable {
 //            val distanceFromLive = ((hlsPlayer?.getPlayer()?.duration?.minus(
@@ -163,7 +126,48 @@ class HlsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        resumePlay()
         player.play(args.hlsStreamUrl)
+    }
+
+    fun resumePlay() {
+
+        binding.hlsView.player = player.getNativePlayer()
+
+        player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
+
+            override fun isLive(live : Boolean) {
+                binding.btnSeekLive.visibility = if(!live) View.VISIBLE else View.GONE
+            }
+
+            override fun onPlaybackFailure(error : HmsHlsException) {
+                Log.d("HMSHLSPLAYER","From App, error: $error")
+            }
+
+            override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
+                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
+            }
+
+            override fun onCue(hlsCue : HmsHlsCue) {
+                val duration = if(hlsCue.endDate?.time == null){
+                    Snackbar.LENGTH_INDEFINITE
+                }
+                else {
+                    ((hlsCue.endDate?.time ?: 0) - System.currentTimeMillis()).toInt()
+                }
+                if (duration > 0 || duration == Snackbar.LENGTH_INDEFINITE) {
+                    Log.d("HMSHLSPLAYER","From App, metadata: $duration s/ $hlsCue")
+                    Snackbar.make(
+                        this@HlsFragment.requireContext(),
+                        binding.networkActivityTv,
+                        hlsCue.payloadval ?: "empty",
+                        duration
+                    ).show()
+                }
+
+            }
+        })
+
     }
 
     override fun onPause() {
