@@ -95,7 +95,6 @@ class HlsFragment : Fragment() {
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
             override fun isLive(live : Boolean) {
-                Log.d("LoveS","$live")
                 binding.btnSeekLive.visibility = if(!live) View.VISIBLE else View.GONE
             }
 
