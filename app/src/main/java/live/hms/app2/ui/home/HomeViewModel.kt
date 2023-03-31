@@ -97,8 +97,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         authTokenResponse.postValue(Resource.error(error.description))
       }
 
-      override fun onTokenSuccess(tokenResult: TokenResult) {
-        authTokenResponse.postValue(Resource.success(TokenResponse(tokenResult.token.orEmpty())))
+      override fun onTokenSuccess(token: String) {
+        authTokenResponse.postValue(Resource.success(TokenResponse(token.orEmpty())))
       }
 
     })
