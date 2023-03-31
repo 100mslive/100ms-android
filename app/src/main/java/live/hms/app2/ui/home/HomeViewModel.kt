@@ -1,5 +1,7 @@
 package live.hms.app2.ui.home
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,18 +12,23 @@ import live.hms.app2.api.RetrofitBuilder
 import live.hms.app2.model.TokenResponse
 import live.hms.app2.util.*
 import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.init.HMSTokenListener
 import live.hms.video.signal.init.TokenRequest
 import live.hms.video.signal.init.TokenRequestOptions
 import live.hms.video.signal.init.TokenResult
-import live.hms.video.utils.TokenUtils
 import okhttp3.Request
 import java.util.*
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private val repository = HomeRepository()
 
   val authTokenResponse = MutableLiveData<Resource<TokenResponse>>()
+
+  val sdkInstance = HMSSDK
+    .Builder(application)
+    .build()
+
 
   fun sendAuthTokenRequest(url: String) {
     try {
@@ -84,7 +91,7 @@ class HomeViewModel : ViewModel() {
 
     val baseURl : String = if (environment.contains("prod").not()) "https://auth-nonprod.100ms.live" else ""
 
-    TokenUtils.getAuthTokenByRoomCode(TokenRequest(code, UUID.randomUUID().toString()), TokenRequestOptions(baseURl) , object :
+    sdkInstance.getAuthTokenByRoomCode(TokenRequest(code, UUID.randomUUID().toString()), TokenRequestOptions(baseURl) , object :
       HMSTokenListener {
       override fun onError(error: HMSException) {
         authTokenResponse.postValue(Resource.error(error.description))
