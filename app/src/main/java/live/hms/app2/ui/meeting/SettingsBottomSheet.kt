@@ -96,6 +96,15 @@ class SettingsBottomSheet(
             }
         }
 
+        binding.btnChangeMetadata.apply {
+            setOnSingleClickListener(350) {
+                SessionMetadataFragment().show(
+                    childFragmentManager,
+                    SessionMetadataFragment.TAG
+                )
+            }
+        }
+
         binding.participantCount.text = meetingViewModel.hmsSDK.getPeers().size.toString()
         binding.layoutParticipants.apply {
             setOnSingleClickListener {
