@@ -37,6 +37,7 @@ import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
+import live.hms.video.signal.jsonrpc.models.sessionstore.HMSKeyChangeListener
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -478,6 +479,7 @@ class MeetingViewModel(
                 _isRecording.postValue(
                     getRecordingState(room)
                 )
+                setMetadataListener()
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -646,19 +648,15 @@ class MeetingViewModel(
 
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
-                if (message.type == "metadata") {
-                    getSessionMetadata()
-                } else {
-                    broadcastsReceived.postValue(
-                        ChatMessage(
-                            message.sender?.name.orEmpty(),
-                            message.serverReceiveTime,
-                            message.message,
-                            false,
-                            recipient = Recipient.toRecipient(message.recipient)
-                        )
+                broadcastsReceived.postValue(
+                    ChatMessage(
+                        message.sender?.name.orEmpty(),
+                        message.serverReceiveTime,
+                        message.message,
+                        false,
+                        recipient = Recipient.toRecipient(message.recipient)
                     )
-                }
+                )
             }
 
             override fun onReconnected() {
@@ -1448,6 +1446,24 @@ class MeetingViewModel(
         })
     }
 
+    fun setMetadataListener() {
+        hmsSDK.setMetadataListener(listOf("default"), object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+
+            }
+
+            override fun onSuccess() {
+
+            }
+
+        })
+        hmsSDK.getSessionStore()?.keyChangeListener = object : HMSKeyChangeListener {
+            override fun onKeyChanged(key: String, value: String?) {
+                _sessionMetadata.postValue("$key: $value")
+            }
+
+        }
+    }
     fun getSessionMetadata(): Unit {
         val sessionData = CompletableDeferred<String?>()
         hmsSDK.getSessionMetaData(object : HMSSessionMetadataListener {
