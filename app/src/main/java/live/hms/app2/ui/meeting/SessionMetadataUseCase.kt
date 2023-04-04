@@ -4,9 +4,10 @@ import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.jsonrpc.models.sessionstore.HMSKeyChangeListener
+import live.hms.video.signal.jsonrpc.models.sessionstore.HmsSessionStore
 
 private const val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessage"
-class SessionMetadataUseCase {
+class SessionMetadataUseCase(val hmsSessionStore: HmsSessionStore) {
     fun updatePinnedMessage(hmsSDK : HMSSDK, data : String?, reportError : (error : HMSException) -> Unit) {
         hmsSDK.setSessionMetaData(
             PINNED_MESSAGE_SESSION_KEY,
@@ -30,7 +31,7 @@ class SessionMetadataUseCase {
             override fun onSuccess() {} })
 
         // When the value changes, update the message
-        hmsSDK.getSessionStore()?.keyChangeListener = object : HMSKeyChangeListener {
+        hmsSessionStore.keyChangeListener = object : HMSKeyChangeListener {
             override fun onKeyChanged(key: String, value: String?) {
                 if(key == PINNED_MESSAGE_SESSION_KEY) {
                     pinnedMessageUpdated(value)

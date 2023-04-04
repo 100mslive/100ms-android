@@ -37,6 +37,7 @@ import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
+import live.hms.video.signal.jsonrpc.models.sessionstore.HmsSessionStore
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -457,6 +458,11 @@ class MeetingViewModel(
                 } else {
                     state.postValue(MeetingState.NonFatalFailure(error))
                 }
+            }
+
+            override fun onSessionStoreAvailable(sessionStore: HmsSessionStore) {
+                super.onSessionStoreAvailable(sessionStore)
+                sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
             }
 
             override fun onJoin(room: HMSRoom) {
@@ -1417,7 +1423,7 @@ class MeetingViewModel(
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
 
-    private val sessionMetadataUseCase = SessionMetadataUseCase()
+    private lateinit var sessionMetadataUseCase : SessionMetadataUseCase
     fun setSessionMetadata(data: String?) {
         sessionMetadataUseCase.updatePinnedMessage(hmsSDK, data) {error ->
             viewModelScope.launch {
