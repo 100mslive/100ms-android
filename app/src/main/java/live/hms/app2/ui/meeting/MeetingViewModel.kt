@@ -53,6 +53,7 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    private val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessage"
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private val config = HMSConfig(
         roomDetails.username,
@@ -1447,7 +1448,7 @@ class MeetingViewModel(
     }
 
     fun setMetadataListener() {
-        hmsSDK.setMetadataListener(listOf("default"), object : HMSActionResultListener {
+        hmsSDK.setMetadataListener(listOf(PINNED_MESSAGE_SESSION_KEY), object : HMSActionResultListener {
             override fun onError(error: HMSException) {
 
             }
