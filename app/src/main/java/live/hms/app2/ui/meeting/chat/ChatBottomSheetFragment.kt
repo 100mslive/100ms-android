@@ -41,7 +41,6 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
         initSpinnerUpdates()
         initViews()
         initPinnedMessageUpdate()
-        meetingViewModel.getSessionMetadata()
     }
 
     private fun initPinnedMessageUpdate() {

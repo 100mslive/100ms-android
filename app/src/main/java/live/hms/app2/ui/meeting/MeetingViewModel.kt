@@ -11,7 +11,6 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -484,8 +483,8 @@ class MeetingViewModel(
                 _isRecording.postValue(
                     getRecordingState(room)
                 )
-                sessionMetadataUseCase.setPinnedMessageUpdateListener(hmsSDK){ pinnedMessage ->
-                    _sessionMetadata.postValue("$pinnedMessage")
+                sessionMetadataUseCase.setPinnedMessageUpdateListener { pinnedMessage ->
+                    _sessionMetadata.postValue(pinnedMessage)
                 }
             }
 
@@ -1425,38 +1424,10 @@ class MeetingViewModel(
 
     private lateinit var sessionMetadataUseCase : SessionMetadataUseCase
     fun setSessionMetadata(data: String?) {
-        sessionMetadataUseCase.updatePinnedMessage(hmsSDK, data) {error ->
+        sessionMetadataUseCase.updatePinnedMessage(data) { error ->
             viewModelScope.launch {
                 _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
             }
-        }
-    }
-
-    fun getSessionMetadata(): Unit {
-        val sessionData = CompletableDeferred<String?>()
-        hmsSDK.getSessionMetaData(object : HMSSessionMetadataListener {
-            override fun onError(error: HMSException) {
-                viewModelScope.launch {
-                    _events.emit(Event.SessionMetadataEvent("Session Metadata retrieval error $error"))
-                    sessionData.completeExceptionally(error)
-                }
-            }
-
-            override fun onSuccess(sessionMetadata: String?) {
-                viewModelScope.launch {
-                    sessionData.complete(sessionMetadata)
-                }
-            }
-
-        })
-
-        viewModelScope.launch {
-            val data = try {
-                sessionData.await()
-            } catch (e: Exception) {
-                "Error $e"
-            }
-            _sessionMetadata.postValue(data)
         }
     }
 
