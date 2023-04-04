@@ -1418,33 +1418,21 @@ class MeetingViewModel(
     }
 
     fun setSessionMetadata(data: String?) {
-        hmsSDK.setSessionMetaData(data, object : HMSActionResultListener {
-            override fun onError(error: HMSException) {
-                viewModelScope.launch {
-                    _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+        hmsSDK.setSessionMetaData(
+            PINNED_MESSAGE_SESSION_KEY,
+            data,
+            object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    viewModelScope.launch {
+                        _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+                    }
                 }
+
+                // The listener will update the message
+                override fun onSuccess() {}
+
             }
-
-            override fun onSuccess() {
-                viewModelScope.launch {
-
-                    hmsSDK.sendBroadcastMessage(SESSION_METADATA_BROADCAST_MESSAGE,
-                        SESSION_METADATA_BROADCAST_TYPE, object : HMSMessageResultListener {
-                            override fun onError(error: HMSException) {
-                                viewModelScope.launch {
-                                    _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
-                                }
-                            }
-
-                            override fun onSuccess(hmsMessage: HMSMessage) {
-                                getSessionMetadata()
-                            }
-
-                        })
-                }
-            }
-
-        })
+        )
     }
 
     fun setMetadataListener() {
@@ -1460,7 +1448,7 @@ class MeetingViewModel(
         })
         hmsSDK.getSessionStore()?.keyChangeListener = object : HMSKeyChangeListener {
             override fun onKeyChanged(key: String, value: String?) {
-                _sessionMetadata.postValue("$key: $value")
+                _sessionMetadata.postValue("$value")
             }
 
         }
