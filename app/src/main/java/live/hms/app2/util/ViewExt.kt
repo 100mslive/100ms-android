@@ -217,7 +217,7 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
 
     val gestureDetector = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
 
-        override fun onDown(e: MotionEvent?) = true
+        override fun onDown(e: MotionEvent) = true
         override fun onSingleTapUp(event: MotionEvent): Boolean {
             if (cameraControl.isTapToFocusSupported())
             cameraControl.setTapToFocusAt(
@@ -248,7 +248,7 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
             return true
         }
 
-        override fun onLongPress(e: MotionEvent?) {
+        override fun onLongPress(e: MotionEvent) {
             onLongPress.invoke()
         }
 
