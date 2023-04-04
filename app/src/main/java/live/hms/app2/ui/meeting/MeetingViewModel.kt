@@ -37,7 +37,6 @@ import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
-import live.hms.video.signal.jsonrpc.models.sessionstore.HMSKeyChangeListener
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -53,7 +52,6 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
-    private val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessage"
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private val config = HMSConfig(
         roomDetails.username,
@@ -480,7 +478,9 @@ class MeetingViewModel(
                 _isRecording.postValue(
                     getRecordingState(room)
                 )
-                setMetadataListener()
+                sessionMetadataUseCase.setPinnedMessageUpdateListener(hmsSDK){ pinnedMessage ->
+                    _sessionMetadata.postValue("$pinnedMessage")
+                }
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -1417,42 +1417,15 @@ class MeetingViewModel(
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
 
+    private val sessionMetadataUseCase = SessionMetadataUseCase()
     fun setSessionMetadata(data: String?) {
-        hmsSDK.setSessionMetaData(
-            PINNED_MESSAGE_SESSION_KEY,
-            data,
-            object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
-                    viewModelScope.launch {
-                        _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
-                    }
-                }
-
-                // The listener will update the message
-                override fun onSuccess() {}
-
+        sessionMetadataUseCase.updatePinnedMessage(hmsSDK, data) {error ->
+            viewModelScope.launch {
+                _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
             }
-        )
-    }
-
-    fun setMetadataListener() {
-        hmsSDK.setMetadataListener(listOf(PINNED_MESSAGE_SESSION_KEY), object : HMSActionResultListener {
-            override fun onError(error: HMSException) {
-
-            }
-
-            override fun onSuccess() {
-
-            }
-
-        })
-        hmsSDK.getSessionStore()?.keyChangeListener = object : HMSKeyChangeListener {
-            override fun onKeyChanged(key: String, value: String?) {
-                _sessionMetadata.postValue("$value")
-            }
-
         }
     }
+
     fun getSessionMetadata(): Unit {
         val sessionData = CompletableDeferred<String?>()
         hmsSDK.getSessionMetaData(object : HMSSessionMetadataListener {
