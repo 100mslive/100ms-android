@@ -2,8 +2,8 @@ package live.hms.app2.ui.meeting
 
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
-import live.hms.video.signal.jsonrpc.models.sessionstore.HMSKeyChangeListener
-import live.hms.video.signal.jsonrpc.models.sessionstore.HmsSessionStore
+import live.hms.video.sessionstore.HmsSessionStore
+import live.hms.video.sessionstore.HMSKeyChangeListener
 
 private const val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessage"
 class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) {
