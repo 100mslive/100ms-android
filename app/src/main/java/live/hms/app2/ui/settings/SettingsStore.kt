@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.core.content.edit
 import live.hms.app2.BuildConfig
 import live.hms.app2.ui.meeting.MeetingViewMode
+import live.hms.video.sdk.models.DegradationPreference
 import live.hms.video.utils.HMSLogger
 
 class SettingsStore(context: Context) {
@@ -36,6 +37,7 @@ class SettingsStore(context: Context) {
     const val VIDEO_GRID_COLUMNS = "video-grid-columns"
 
     const val MEETING_MODE = "meeting-view-mode"
+    const val DEGRADATION_PREFERENCE = "degradation-preference"
     const val LOG_LEVEL_WEBRTC = "log-level-webrtc"
     const val LOG_LEVEL_100MS_SDK = "log-level-100ms"
 
@@ -208,7 +210,6 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getString(ENVIRONMENT, "prod-init")!!
     set(value) = putString(ENVIRONMENT, value)
 
-
   var videoGridRows: Int
     get() = sharedPreferences.getInt(VIDEO_GRID_ROWS, 2)
     set(value) = putInt(VIDEO_GRID_ROWS, value)
@@ -259,6 +260,17 @@ class SettingsStore(context: Context) {
     }
     set(value) = putString(LOG_LEVEL_100MS_SDK, value.toString())
 
+  var degradationPreferences: DegradationPreference
+    get() {
+      val str = sharedPreferences.getString(
+        DEGRADATION_PREFERENCE,
+        DegradationPreference.DEFAULT.toString()
+      )!!
+     return DegradationPreference.valueOf(str)
+    }
+    set(value) = putString(DEGRADATION_PREFERENCE, value.toString())
+
+
   var rtmpUrlsList: Set<String>
     get() = sharedPreferences.getStringSet(
       RTMP_URL_LIST,
@@ -308,6 +320,8 @@ class SettingsStore(context: Context) {
     fun setVideoGridColumns(value: Int) = apply { editor.putInt(VIDEO_GRID_COLUMNS, value) }
     fun setIsLeakCanaryEnabled(value: Boolean) = apply { editor.putBoolean(LEAK_CANARY, value) }
     fun setMeetingMode(value: String) = apply { editor.putString(MEETING_MODE, value) }
+    fun setDegradationPreference(value: String) = apply { editor.putString(
+      DEGRADATION_PREFERENCE, value) }
     fun setLogLevelWebRtc(value: String) = apply { editor.putString(LOG_LEVEL_WEBRTC, value) }
     fun setLogLevelWebRtc(value: HMSLogger.LogLevel) =
       apply { editor.putString(LOG_LEVEL_WEBRTC, value.toString()) }

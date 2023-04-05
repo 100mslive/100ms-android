@@ -19,6 +19,7 @@ import live.hms.app2.ui.meeting.MeetingViewMode
 import live.hms.app2.util.ENV_PROD
 import live.hms.app2.util.ENV_QA
 import live.hms.app2.util.viewLifecycle
+import live.hms.video.sdk.models.DegradationPreference
 import live.hms.video.utils.HMSLogger
 import java.util.*
 
@@ -64,6 +65,8 @@ class SettingsFragment : Fragment() {
     private val MEETING_MODES = MeetingViewMode::class.nestedClasses.mapNotNull { it.simpleName }.toTypedArray()
 
     private val LOG_LEVELS_100MS = HMSLogger.LogLevel.values().map { it.toString() }.toTypedArray()
+
+    private val DEGRADATION_PREFERENCE_MODES = DegradationPreference.values().map { it.toString() }.toTypedArray()
 
   }
 
@@ -308,6 +311,15 @@ class SettingsFragment : Fragment() {
         settings.meetingMode.toString(),
         MEETING_MODES,
       ) { commitHelper.setMeetingMode(it) }
+
+      initAutoCompleteView(
+        EnumSet.of(SettingsMode.HOME),
+        containerDegradationPreference,
+        autoCompleteDegradationPreference,
+        settings.degradationPreferences.toString(),
+        DEGRADATION_PREFERENCE_MODES,
+      ) { commitHelper.setDegradationPreference(it) }
+
 
       initAutoCompleteView(
         EnumSet.of(SettingsMode.HOME),
