@@ -264,7 +264,7 @@ class SettingsStore(context: Context) {
     get() {
       val str = sharedPreferences.getString(
         DEGRADATION_PREFERENCE,
-        DegradationPreference.DISABLED.toString()
+        DegradationPreference.DEFAULT.toString()
       )!!
      return DegradationPreference.valueOf(str)
     }
