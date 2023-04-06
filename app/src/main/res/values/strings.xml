@@ -50,6 +50,7 @@
     <string name="settings_fragment">Settings Fragment</string>
     <string name="default_name">Default Name</string>
     <string name="default_video_source">Default Video Source</string>
+    <string name="degradation_preference_str">Degradation Preference</string>
     <string name="default_microphone_source">Default Microphone Source</string>
     <string name="publish_video_while_joining">Publish video while joining</string>
     <string name="show_video_preview_before_joining">Show video preview before joining</string>
