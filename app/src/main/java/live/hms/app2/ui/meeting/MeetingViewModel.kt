@@ -20,6 +20,7 @@ import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
+import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
@@ -916,6 +917,7 @@ class MeetingViewModel(
                 }
             }
 
+            VideoGridBaseFragment.bindedVideoTrackIds.remove(track.trackId)
             when (track.type) {
                 HMSTrackType.AUDIO -> {
                     meetingTrack?.audio = null
