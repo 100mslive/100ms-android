@@ -21,7 +21,7 @@ class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) {
 
     fun setPinnedMessageUpdateListener(pinnedMessageUpdated: (String?) -> Unit) {
         // Add the listener for the key that pinned message is sent on
-        hmsSessionStore.setKeyChangeListener(listOf(PINNED_MESSAGE_SESSION_KEY),
+        hmsSessionStore.addKeyChangeListener(listOf(PINNED_MESSAGE_SESSION_KEY),
             object : HMSKeyChangeListener {
                 override fun onKeyChanged(key: String, value: String?) {
                     if(key == PINNED_MESSAGE_SESSION_KEY) {
