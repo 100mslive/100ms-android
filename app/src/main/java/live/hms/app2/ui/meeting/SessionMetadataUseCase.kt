@@ -7,19 +7,12 @@ import live.hms.video.sessionstore.HMSKeyChangeListener
 
 private const val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessage"
 class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) {
-    fun updatePinnedMessage(data: String?, reportError: (error: HMSException) -> Unit) {
-        hmsSessionStore.set(data, PINNED_MESSAGE_SESSION_KEY, object : HMSActionResultListener {
-            override fun onError(error: HMSException) {
-                reportError(error)
-            }
 
-            // The listener will update the message
-            override fun onSuccess() {}
-
-        })
+    fun updatePinnedMessage(data: String?, hmsActionResultListener: HMSActionResultListener) {
+        hmsSessionStore.set(data, PINNED_MESSAGE_SESSION_KEY, hmsActionResultListener)
     }
 
-    fun setPinnedMessageUpdateListener(pinnedMessageUpdated: (String?) -> Unit) {
+    fun setPinnedMessageUpdateListener(pinnedMessageUpdated: (String?) -> Unit, hmsActionResultListener: HMSActionResultListener) {
         // Add the listener for the key that pinned message is sent on
         hmsSessionStore.addKeyChangeListener(listOf(PINNED_MESSAGE_SESSION_KEY),
             object : HMSKeyChangeListener {
@@ -28,10 +21,7 @@ class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) {
                         pinnedMessageUpdated(value)
                     }
                 }
-            },
-            object : HMSActionResultListener {
-            override fun onError(error: HMSException) {}
-            override fun onSuccess() {} })
+            },hmsActionResultListener)
 
     }
 }

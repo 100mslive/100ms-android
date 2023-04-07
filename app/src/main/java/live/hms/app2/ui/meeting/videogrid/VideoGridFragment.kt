@@ -96,7 +96,7 @@ class VideoGridFragment : Fragment() {
     }
 
     if (settings.detectDominantSpeaker) {
-      meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) { meetingTrack ->
+      meetingViewModel.pinnedTrackUiUseCase.observe(viewLifecycleOwner) { meetingTrack ->
         if (meetingTrack == null) {
           binding.dominantSpeakerName.setText(R.string.no_one_speaking)
         } else {

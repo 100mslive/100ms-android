@@ -210,8 +210,12 @@ class MeetingViewModel(
     private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
     val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
-    // Dominant speaker
-    val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
+    // Dominant speaker is for active speaker as well as pinned tracks.
+    private val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
+    private val pinnedTrack = MutableLiveData<MeetingTrack?>(null)
+    val pinnedTrackUiUseCase = PinnedTrackUiUseCase(local = dominantSpeaker,
+        global = pinnedTrack)
+
 
     val broadcastsReceived = MutableLiveData<ChatMessage>()
 
@@ -463,6 +467,7 @@ class MeetingViewModel(
             override fun onSessionStoreAvailable(sessionStore: HmsSessionStore) {
                 super.onSessionStoreAvailable(sessionStore)
                 sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
+                pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
             }
 
             override fun onJoin(room: HMSRoom) {
@@ -484,9 +489,24 @@ class MeetingViewModel(
                 _isRecording.postValue(
                     getRecordingState(room)
                 )
-                sessionMetadataUseCase.setPinnedMessageUpdateListener { pinnedMessage ->
-                    _sessionMetadata.postValue(pinnedMessage)
-                }
+                sessionMetadataUseCase.setPinnedMessageUpdateListener(
+                    { message -> _sessionMetadata.postValue(message)},
+                    object : HMSActionResultListener {
+                        override fun onError(error: HMSException) {}
+                        override fun onSuccess() {}
+                    }
+                )
+                pinnedTrackUseCase.setPinnedTrackListener(
+                    {trackId -> if(trackId == null) {
+                        pinnedTrack.postValue(null)
+                    } else {
+                        getMeetingTrack(trackId)?.let { pinnedTrack.postValue(it) }
+                    }},
+                    object : HMSActionResultListener {
+                        override fun onError(error: HMSException) {}
+                        override fun onSuccess() {}
+                    }
+                )
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -506,11 +526,11 @@ class MeetingViewModel(
 
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
                         synchronized(_tracks) {
-                            val track = _tracks.find {
-                                it.peer.peerID == hmsPeer.peerID &&
-                                        it.video?.trackId == hmsPeer.videoTrack?.trackId
+                            val track = getMeetingTrack(hmsPeer.videoTrack?.trackId)
+                            if (track != null) {
+                                Log.d(TAG,"Getting local dominant speaker ${track.peer.name}")
+                                dominantSpeaker.postValue(track)
                             }
-                            if (track != null) dominantSpeaker.postValue(track)
                         }
                     }
 
@@ -706,6 +726,14 @@ class MeetingViewModel(
                 this@MeetingViewModel.speakers.postValue(speakers)
             }
         })
+    }
+
+    private fun getMeetingTrack(trackId : String?): MeetingTrack? {
+        return if(trackId == null)
+            null
+        else _tracks.find {
+                    it.video?.trackId == trackId
+        }
     }
 
     private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
@@ -1424,12 +1452,16 @@ class MeetingViewModel(
     }
 
     private lateinit var sessionMetadataUseCase : SessionMetadataUseCase
+    private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
     fun setSessionMetadata(data: String?) {
-        sessionMetadataUseCase.updatePinnedMessage(data) { error ->
-            viewModelScope.launch {
-                _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+        sessionMetadataUseCase.updatePinnedMessage(data, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+                }
             }
-        }
+            override fun onSuccess() {}
+        })
     }
 
     fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
