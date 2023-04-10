@@ -20,6 +20,7 @@ import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
+import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
@@ -914,6 +915,18 @@ class MeetingViewModel(
                         it.peer.peerID == peer.peerID &&
                                 it.video?.trackId == track.trackId
                     }
+                }
+            }
+
+            // Remove it from the bindedVideoTrackIds, if present
+            VideoGridBaseFragment.bindedVideoTrackIds.remove(track.trackId)
+            // Set the audio or video track of meetingTrack to null, so that UI updates accordingly
+            when (track.type) {
+                HMSTrackType.AUDIO -> {
+                    meetingTrack?.audio = null
+                }
+                HMSTrackType.VIDEO -> {
+                    meetingTrack?.video = null
                 }
             }
 
