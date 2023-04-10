@@ -11,7 +11,6 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -38,6 +37,7 @@ import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
+import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -211,8 +211,12 @@ class MeetingViewModel(
     private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
     val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
-    // Dominant speaker
-    val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
+    // Dominant speaker is for active speaker as well as pinned tracks.
+    private val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
+    private val pinnedTrack = MutableLiveData<MeetingTrack?>(null)
+    val pinnedTrackUiUseCase = PinnedTrackUiUseCase(local = dominantSpeaker,
+        global = pinnedTrack)
+
 
     val broadcastsReceived = MutableLiveData<ChatMessage>()
 
@@ -461,6 +465,12 @@ class MeetingViewModel(
                 }
             }
 
+            override fun onSessionStoreAvailable(sessionStore: HmsSessionStore) {
+                super.onSessionStoreAvailable(sessionStore)
+                sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
+                pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
+            }
+
             override fun onJoin(room: HMSRoom) {
                 Log.v(TAG, "~~ onJoin called ~~")
                 val joinSuccessAt = System.currentTimeMillis();
@@ -479,6 +489,24 @@ class MeetingViewModel(
                 switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
                 _isRecording.postValue(
                     getRecordingState(room)
+                )
+                sessionMetadataUseCase.setPinnedMessageUpdateListener(
+                    { message -> _sessionMetadata.postValue(message)},
+                    object : HMSActionResultListener {
+                        override fun onError(error: HMSException) {}
+                        override fun onSuccess() {}
+                    }
+                )
+                pinnedTrackUseCase.setPinnedTrackListener(
+                    {trackId -> if(trackId == null) {
+                        pinnedTrack.postValue(null)
+                    } else {
+                        getMeetingTrack(trackId)?.let { pinnedTrack.postValue(it) }
+                    }},
+                    object : HMSActionResultListener {
+                        override fun onError(error: HMSException) {}
+                        override fun onSuccess() {}
+                    }
                 )
             }
 
@@ -499,11 +527,11 @@ class MeetingViewModel(
 
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
                         synchronized(_tracks) {
-                            val track = _tracks.find {
-                                it.peer.peerID == hmsPeer.peerID &&
-                                        it.video?.trackId == hmsPeer.videoTrack?.trackId
+                            val track = getMeetingTrack(hmsPeer.videoTrack?.trackId)
+                            if (track != null) {
+                                Log.d(TAG,"Getting local dominant speaker ${track.peer.name}")
+                                dominantSpeaker.postValue(track)
                             }
-                            if (track != null) dominantSpeaker.postValue(track)
                         }
                     }
 
@@ -648,19 +676,15 @@ class MeetingViewModel(
 
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
-                if (message.type == "metadata") {
-                    getSessionMetadata()
-                } else {
-                    broadcastsReceived.postValue(
-                        ChatMessage(
-                            message.sender?.name.orEmpty(),
-                            message.serverReceiveTime,
-                            message.message,
-                            false,
-                            recipient = Recipient.toRecipient(message.recipient)
-                        )
+                broadcastsReceived.postValue(
+                    ChatMessage(
+                        message.sender?.name.orEmpty(),
+                        message.serverReceiveTime,
+                        message.message,
+                        false,
+                        recipient = Recipient.toRecipient(message.recipient)
                     )
-                }
+                )
             }
 
             override fun onReconnected() {
@@ -703,6 +727,14 @@ class MeetingViewModel(
                 this@MeetingViewModel.speakers.postValue(speakers)
             }
         })
+    }
+
+    private fun getMeetingTrack(trackId : String?): MeetingTrack? {
+        return if(trackId == null)
+            null
+        else _tracks.find {
+                    it.video?.trackId == trackId
+        }
     }
 
     private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
@@ -1432,62 +1464,17 @@ class MeetingViewModel(
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
 
+    private lateinit var sessionMetadataUseCase : SessionMetadataUseCase
+    private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
     fun setSessionMetadata(data: String?) {
-        hmsSDK.setSessionMetaData(data, object : HMSActionResultListener {
+        sessionMetadataUseCase.updatePinnedMessage(data, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
                     _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
                 }
             }
-
-            override fun onSuccess() {
-                viewModelScope.launch {
-
-                    hmsSDK.sendBroadcastMessage(SESSION_METADATA_BROADCAST_MESSAGE,
-                        SESSION_METADATA_BROADCAST_TYPE, object : HMSMessageResultListener {
-                            override fun onError(error: HMSException) {
-                                viewModelScope.launch {
-                                    _events.emit(Event.SessionMetadataEvent("Error sending followup message Session Metadata"))
-                                }
-                            }
-
-                            override fun onSuccess(hmsMessage: HMSMessage) {
-                                getSessionMetadata()
-                            }
-
-                        })
-                }
-            }
-
+            override fun onSuccess() {}
         })
-    }
-
-    fun getSessionMetadata(): Unit {
-        val sessionData = CompletableDeferred<String?>()
-        hmsSDK.getSessionMetaData(object : HMSSessionMetadataListener {
-            override fun onError(error: HMSException) {
-                viewModelScope.launch {
-                    _events.emit(Event.SessionMetadataEvent("Session Metadata retrieval error $error"))
-                    sessionData.completeExceptionally(error)
-                }
-            }
-
-            override fun onSuccess(sessionMetadata: String?) {
-                viewModelScope.launch {
-                    sessionData.complete(sessionMetadata)
-                }
-            }
-
-        })
-
-        viewModelScope.launch {
-            val data = try {
-                sessionData.await()
-            } catch (e: Exception) {
-                "Error $e"
-            }
-            _sessionMetadata.postValue(data)
-        }
     }
 
     fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {

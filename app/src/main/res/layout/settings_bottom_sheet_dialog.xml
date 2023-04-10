@@ -239,6 +239,24 @@
                         android:text="Bulk Role Change" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/btnChangeMetadata"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="20dp"
+                    android:visibility="gone"
+                    >
+                    <TextView
+                        android:id="@+id/change_metadata_actual"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="20dp"
+                        android:text="Change Session Metadata" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
                 <LinearLayout
                     android:id="@+id/btn_meeting_mode"
                     android:layout_width="match_parent"
