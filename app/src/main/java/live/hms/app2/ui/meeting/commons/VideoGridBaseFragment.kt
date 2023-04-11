@@ -52,6 +52,7 @@ import kotlin.math.min
 abstract class VideoGridBaseFragment : Fragment() {
   companion object {
     private const val TAG = "VideoGridBase"
+    val bindedVideoTrackIds = mutableSetOf<String>()
   }
 
   protected val settings: SettingsStore by lazy { SettingsStore(requireContext()) }
