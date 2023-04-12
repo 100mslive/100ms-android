@@ -153,10 +153,11 @@ class HlsFragment : Fragment() {
                     Snackbar.LENGTH_INDEFINITE
                 }
                 else {
-                    ((hlsCue.endDate?.time ?: 0) - System.currentTimeMillis()).toInt()
+                    // The hls time will always be relative to playback time not current time.
+                    ((hlsCue.endDate?.time ?: 0) - hlsCue.startDate.time).toInt()
                 }
                 if (duration > 0 || duration == Snackbar.LENGTH_INDEFINITE) {
-                    Log.d("HMSHLSPLAYER","From App, metadata: $duration s/ $hlsCue")
+
                     Snackbar.make(
                         this@HlsFragment.requireContext(),
                         binding.networkActivityTv,
