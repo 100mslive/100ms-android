@@ -8,8 +8,8 @@ import live.hms.video.sessionstore.HmsSessionStore
 private const val PINNED_TRACK_CHANGED_KEY = "spotlight"
 class PinnedTrackUseCase(private val hmsSessionStore: HmsSessionStore) {
 
-    fun updatePinnedTrack(peerId : String?, hmsActionResultListener: HMSActionResultListener) {
-        hmsSessionStore.set(peerId, PINNED_TRACK_CHANGED_KEY, hmsActionResultListener)
+    fun updatePinnedTrack(trackId : String?, hmsActionResultListener: HMSActionResultListener) {
+        hmsSessionStore.set(trackId, PINNED_TRACK_CHANGED_KEY, hmsActionResultListener)
     }
 
     fun setPinnedTrackListener(pinnedTrackChanged : (String?) -> Unit, hmsActionResultListener: HMSActionResultListener) {

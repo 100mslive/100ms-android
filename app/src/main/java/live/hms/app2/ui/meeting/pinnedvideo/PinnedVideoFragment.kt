@@ -46,7 +46,7 @@ class PinnedVideoFragment : Fragment() {
 
   private val videoListAdapter by lazy {
     VideoListAdapter(
-      { changePinViewVideo(it) },
+      { track -> meetingViewModel.localPinnedTrack.postValue(track) },
       meetingViewModel.getStats(),
       settings.showStats
     )

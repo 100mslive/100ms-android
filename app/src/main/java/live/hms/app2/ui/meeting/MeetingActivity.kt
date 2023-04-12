@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
@@ -67,6 +68,9 @@ class MeetingActivity : AppCompatActivity() {
     }
     meetingViewModel.isRecording.observe(this) {
       invalidateOptionsMenu()
+    }
+    meetingViewModel.pinnedTrack.observe(this) {
+      Toast.makeText(this,"Spotlight: ${it?.peer?.name}", Toast.LENGTH_SHORT).show()
     }
   }
 }

@@ -213,8 +213,10 @@ class MeetingViewModel(
 
     // Dominant speaker is for active speaker as well as pinned tracks.
     private val dominantSpeaker = MutableLiveData<MeetingTrack?>(null)
-    private val pinnedTrack = MutableLiveData<MeetingTrack?>(null)
-    val pinnedTrackUiUseCase = PinnedTrackUiUseCase(local = dominantSpeaker,
+    val pinnedTrack = MutableLiveData<MeetingTrack?>(null)
+    val localPinnedTrack = MutableLiveData<MeetingTrack?>(null)
+
+    val pinnedTrackUiUseCase = PinnedTrackUiUseCase(local = localPinnedTrack,
         global = pinnedTrack)
 
 
