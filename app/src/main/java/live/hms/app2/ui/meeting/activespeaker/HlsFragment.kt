@@ -37,6 +37,7 @@ class HlsFragment : Fragment() {
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     val player by lazy{ HlsPlayer(requireContext()) }
     var distanceFromLive : Long = 0
+    var TEN_SECOND : Long = 10000
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -138,7 +139,7 @@ class HlsFragment : Fragment() {
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
             override fun isLive(live : Boolean) {
-                binding.btnSeekLive.visibility = if(!live && distanceFromLive > 10000) View.VISIBLE else View.GONE
+                binding.btnSeekLive.visibility = if(!live && distanceFromLive > TEN_SECOND) View.VISIBLE else View.GONE
             }
 
             override fun onPlaybackFailure(error : HmsHlsException) {
