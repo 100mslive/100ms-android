@@ -25,6 +25,7 @@ import live.hms.hls_player.*
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
+import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
 
 
@@ -35,7 +36,7 @@ class HlsFragment : Fragment() {
     val TAG = "HlsFragment"
     var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-    val player by lazy{ HlsPlayer(requireContext()) }
+    val player by lazy{ HlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -187,6 +188,10 @@ class HlsFragment : Fragment() {
         if(enable) {
             binding.statsViewParent.visibility = View.VISIBLE
             player.setStatsMonitor(object : PlayerStatsListener {
+                override fun onError(error: HMSException) {
+                    Log.d(TAG,"Error $error")
+                }
+
                 @SuppressLint("SetTextI18n")
                 override fun onEventUpdate(playerStats: PlayerStatsModel) {
                     updateStatsView(playerStats)
