@@ -36,6 +36,7 @@ class HlsFragment : Fragment() {
     var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     val player by lazy{ HlsPlayer(requireContext()) }
+    var distanceFromLive : Long = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -137,7 +138,7 @@ class HlsFragment : Fragment() {
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
             override fun isLive(live : Boolean) {
-                binding.btnSeekLive.visibility = if(!live) View.VISIBLE else View.GONE
+                binding.btnSeekLive.visibility = if(!live && distanceFromLive > 10000) View.VISIBLE else View.GONE
             }
 
             override fun onPlaybackFailure(error : HmsHlsException) {
@@ -203,7 +204,7 @@ class HlsFragment : Fragment() {
 
         addEntry(playerStats.bandwidth.totalBytesLoaded.toFloat(),binding.networkActivityChart,"Network Activity")
         binding.networkActivityTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.totalBytesLoaded, si = true, isBits = true)}"
-
+        distanceFromLive = playerStats.distanceFromLive
         binding.statsView.text = statsToString(playerStats)
     }
 
