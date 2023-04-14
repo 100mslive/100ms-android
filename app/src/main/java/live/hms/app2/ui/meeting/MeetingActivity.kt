@@ -70,7 +70,8 @@ class MeetingActivity : AppCompatActivity() {
       invalidateOptionsMenu()
     }
     meetingViewModel.pinnedTrack.observe(this) {
-      Toast.makeText(this,"Spotlight: ${it?.peer?.name}", Toast.LENGTH_SHORT).show()
+      if(it != null)
+        Toast.makeText(this,"Spotlight: ${it.peer.name}", Toast.LENGTH_SHORT).show()
     }
   }
 }

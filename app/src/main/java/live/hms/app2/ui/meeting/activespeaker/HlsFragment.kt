@@ -10,12 +10,16 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis.AxisDependency
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.app2.R
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
@@ -26,6 +30,7 @@ import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
+import live.hms.video.utils.GsonUtils.gson
 import kotlin.math.absoluteValue
 
 /**
@@ -41,6 +46,7 @@ class HlsFragment : Fragment() {
     var isStatsDisplayActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     val player by lazy{ HlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
+    val displayHlsCuesUseCase = DisplayHlsCuesUseCase { text -> binding.hlsCues.text = text }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -152,23 +158,9 @@ class HlsFragment : Fragment() {
             }
 
             override fun onCue(hlsCue : HmsHlsCue) {
-                val duration = if(hlsCue.endDate?.time == null){
-                    Snackbar.LENGTH_INDEFINITE
+                viewLifecycleOwner.lifecycleScope.launch {
+                    displayHlsCuesUseCase.addCue(hlsCue)
                 }
-                else {
-                    // The hls time will always be relative to playback time not current time.
-                    ((hlsCue.endDate?.time ?: 0) - hlsCue.startDate.time).toInt()
-                }
-                if (duration > 0 || duration == Snackbar.LENGTH_INDEFINITE) {
-
-                    Snackbar.make(
-                        this@HlsFragment.requireContext(),
-                        binding.networkActivityTv,
-                        hlsCue.payloadval ?: "empty",
-                        duration
-                    ).show()
-                }
-
             }
         })
 
