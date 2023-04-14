@@ -11,12 +11,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.app2.R
 import live.hms.app2.databinding.DialogTrackSelectionBinding
 import live.hms.app2.util.viewLifecycle
-import live.hms.hls_player.HlsPlayer
+import live.hms.hls_player.HmsHlsPlayer
 import live.hms.hls_player.HmsHlsLayer
 
 
 class HlsVideoQualitySelectorBottomSheet(
-    private val hlsPlayer: HlsPlayer
+    private val hlsPlayer: HmsHlsPlayer
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<DialogTrackSelectionBinding>()
