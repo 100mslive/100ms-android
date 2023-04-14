@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis.AxisDependency
@@ -79,6 +78,7 @@ class HlsFragment : Fragment() {
 
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
             isStatsDisplayActive = it
+            setStatsVisibility(it)
         }
 
         binding.btnTrackSelection.setOnClickListener {
@@ -91,7 +91,7 @@ class HlsFragment : Fragment() {
             }
         }
 
-        setPlayerStats(true)
+        setPlayerStatsListener(true)
 
         // TODO enable
 //        runnable = Runnable {
@@ -172,19 +172,27 @@ class HlsFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        setPlayerStats(false)
+        setPlayerStatsListener(false)
     }
 
     override fun onResume() {
         super.onResume()
         if (isStatsDisplayActive) {
-            setPlayerStats(true)
+            setPlayerStatsListener(true)
         }
     }
 
-    private fun setPlayerStats(enable : Boolean) {
-        if(enable) {
+    fun setStatsVisibility(enable: Boolean) {
+        if(isStatsDisplayActive && enable) {
             binding.statsViewParent.visibility = View.VISIBLE
+        } else {
+            binding.statsViewParent.visibility = View.GONE
+        }
+    }
+    private fun setPlayerStatsListener(enable : Boolean) {
+        Log.d("SetPlayerStats","display: ${isStatsDisplayActive} && enable: ${enable}")
+
+        if(enable) {
             player.setStatsMonitor(object : PlayerStatsListener {
                 override fun onError(error: HMSException) {
                     Log.d(TAG,"Error $error")
@@ -193,13 +201,13 @@ class HlsFragment : Fragment() {
                 @SuppressLint("SetTextI18n")
                 override fun onEventUpdate(playerStats: PlayerStatsModel) {
                     updateLiveButtonVisibility(playerStats)
-                    if(isStatsDisplayActive)
+                    if(isStatsDisplayActive) {
                         updateStatsView(playerStats)
+                    }
                 }
             })
         } else {
             player.setStatsMonitor(null)
-            binding.statsViewParent.visibility = View.GONE
         }
     }
 
@@ -214,7 +222,9 @@ class HlsFragment : Fragment() {
     }
 
     fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
-        val isLive = playerStats.distanceFromLive/1000 > 10
+        // It's live if the distance from the live edge is less than 10 seconds.
+        val isLive = playerStats.distanceFromLive/1000 < 10
+        // Show the button to go to live if it's not live.
         binding.btnSeekLive.visibility =  if(!isLive)
                 View.VISIBLE
             else
