@@ -28,13 +28,17 @@ import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
 
-
+/**
+ * If the stream is this many seconds behind live
+ *  show the live buttons.
+ */
+private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
     val TAG = "HlsFragment"
-    var isStatsActive: Boolean = false
+    var isStatsDisplayActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     val player by lazy{ HlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
 
@@ -77,8 +81,8 @@ class HlsFragment : Fragment() {
 
 
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
-            isStatsActive = it
-            setPlayerStats(it)
+            isStatsDisplayActive = it
+            setStatsVisibility(it)
         }
 
         binding.btnTrackSelection.setOnClickListener {
@@ -90,6 +94,8 @@ class HlsFragment : Fragment() {
                 )
             }
         }
+
+        setPlayerStatsListener(true)
 
         // TODO enable
 //        runnable = Runnable {
@@ -137,10 +143,6 @@ class HlsFragment : Fragment() {
 
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
-            override fun isLive(live : Boolean) {
-                binding.btnSeekLive.visibility = if(!live) View.VISIBLE else View.GONE
-            }
-
             override fun onPlaybackFailure(error : HmsHlsException) {
                 Log.d("HMSHLSPLAYER","From App, error: $error")
             }
@@ -174,19 +176,27 @@ class HlsFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        setPlayerStats(false)
+        setPlayerStatsListener(false)
     }
 
     override fun onResume() {
         super.onResume()
-        if (isStatsActive) {
-            setPlayerStats(true)
+        if (isStatsDisplayActive) {
+            setPlayerStatsListener(true)
         }
     }
 
-    private fun setPlayerStats(enable : Boolean) {
-        if(enable) {
+    fun setStatsVisibility(enable: Boolean) {
+        if(isStatsDisplayActive && enable) {
             binding.statsViewParent.visibility = View.VISIBLE
+        } else {
+            binding.statsViewParent.visibility = View.GONE
+        }
+    }
+    private fun setPlayerStatsListener(enable : Boolean) {
+        Log.d("SetPlayerStats","display: ${isStatsDisplayActive} && enable: ${enable}")
+
+        if(enable) {
             player.setStatsMonitor(object : PlayerStatsListener {
                 override fun onError(error: HMSException) {
                     Log.d(TAG,"Error $error")
@@ -194,12 +204,14 @@ class HlsFragment : Fragment() {
 
                 @SuppressLint("SetTextI18n")
                 override fun onEventUpdate(playerStats: PlayerStatsModel) {
-                    updateStatsView(playerStats)
+                    updateLiveButtonVisibility(playerStats)
+                    if(isStatsDisplayActive) {
+                        updateStatsView(playerStats)
+                    }
                 }
             })
         } else {
             player.setStatsMonitor(null)
-            binding.statsViewParent.visibility = View.GONE
         }
     }
 
@@ -211,6 +223,16 @@ class HlsFragment : Fragment() {
         binding.networkActivityTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.totalBytesLoaded, si = true, isBits = true)}"
 
         binding.statsView.text = statsToString(playerStats)
+    }
+
+    fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
+        // It's live if the distance from the live edge is less than 10 seconds.
+        val isLive = playerStats.distanceFromLive/1000 < SECONDS_FROM_LIVE
+        // Show the button to go to live if it's not live.
+        binding.btnSeekLive.visibility =  if(!isLive)
+                View.VISIBLE
+            else
+                View.GONE
     }
 
     override fun onStop() {
