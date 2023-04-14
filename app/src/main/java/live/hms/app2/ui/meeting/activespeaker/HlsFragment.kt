@@ -28,7 +28,11 @@ import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
 
-
+/**
+ * If the stream is this many seconds behind live
+ *  show the live buttons.
+ */
+private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
 
     private val args: HlsFragmentArgs by navArgs()
@@ -223,7 +227,7 @@ class HlsFragment : Fragment() {
 
     fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
         // It's live if the distance from the live edge is less than 10 seconds.
-        val isLive = playerStats.distanceFromLive/1000 < 10
+        val isLive = playerStats.distanceFromLive/1000 < SECONDS_FROM_LIVE
         // Show the button to go to live if it's not live.
         binding.btnSeekLive.visibility =  if(!isLive)
                 View.VISIBLE
