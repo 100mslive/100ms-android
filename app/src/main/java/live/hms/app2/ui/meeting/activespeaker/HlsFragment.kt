@@ -30,7 +30,6 @@ import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
-import live.hms.video.utils.GsonUtils.gson
 import kotlin.math.absoluteValue
 
 /**
@@ -45,7 +44,7 @@ class HlsFragment : Fragment() {
     val TAG = "HlsFragment"
     var isStatsDisplayActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-    val player by lazy{ HlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
+    val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
     val displayHlsCuesUseCase = DisplayHlsCuesUseCase { text -> binding.hlsCues.text = text }
 
     override fun onCreateView(
@@ -102,29 +101,6 @@ class HlsFragment : Fragment() {
         }
 
         setPlayerStatsListener(true)
-
-        // TODO enable
-//        runnable = Runnable {
-//            val distanceFromLive = ((hlsPlayer?.getPlayer()?.duration?.minus(
-//                hlsPlayer?.getPlayer()?.currentPosition ?: 0
-//            ))?.div(1000) ?: 0)
-//
-//            HMSLogger.i(
-//                TAG,
-//                "duration : ${hlsPlayer?.getPlayer()?.duration.toString()} current position ${hlsPlayer?.getPlayer()?.currentPosition}"
-//            )
-//            HMSLogger.i(
-//                TAG,
-//                "buffered position : ${hlsPlayer?.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer?.getPlayer()?.totalBufferedDuration} "
-//            )
-//
-//            if (distanceFromLive >= 10) {
-//                binding.btnSeekLive.visibility = View.VISIBLE
-//            } else {
-//                binding.btnSeekLive.visibility = View.GONE
-//            }
-//            playerUpdatesHandler.postDelayed(runnable!!, 2000)
-//        }
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {
