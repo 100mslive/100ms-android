@@ -35,12 +35,9 @@ class HlsFragment : Fragment() {
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
     val TAG = "HlsFragment"
-    var isStatsActive: Boolean = false
+    var isStatsDisplayActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     val player by lazy{ HlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
-    val isLiveUseCase by lazy { IsLiveUseCase(player,viewLifecycleOwner.lifecycleScope) {showLive ->
-        binding.btnSeekLive.visibility = if(showLive) View.VISIBLE else View.GONE
-    } }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,8 +78,7 @@ class HlsFragment : Fragment() {
 
 
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
-            isStatsActive = it
-            setPlayerStats(it)
+            isStatsDisplayActive = it
         }
 
         binding.btnTrackSelection.setOnClickListener {
@@ -94,6 +90,8 @@ class HlsFragment : Fragment() {
                 )
             }
         }
+
+        setPlayerStats(true)
 
         // TODO enable
 //        runnable = Runnable {
@@ -133,7 +131,6 @@ class HlsFragment : Fragment() {
         super.onStart()
         resumePlay()
         player.play(args.hlsStreamUrl)
-        isLiveUseCase.monitorForLive(true)
     }
 
     fun resumePlay() {
@@ -141,10 +138,6 @@ class HlsFragment : Fragment() {
         binding.hlsView.player = player.getNativePlayer()
 
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
-
-            override fun isLive(live : Boolean) {
-                binding.btnSeekLive.visibility = if(!live) View.VISIBLE else View.GONE
-            }
 
             override fun onPlaybackFailure(error : HmsHlsException) {
                 Log.d("HMSHLSPLAYER","From App, error: $error")
@@ -184,7 +177,7 @@ class HlsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (isStatsActive) {
+        if (isStatsDisplayActive) {
             setPlayerStats(true)
         }
     }
@@ -199,7 +192,9 @@ class HlsFragment : Fragment() {
 
                 @SuppressLint("SetTextI18n")
                 override fun onEventUpdate(playerStats: PlayerStatsModel) {
-                    updateStatsView(playerStats)
+                    updateLiveButtonVisibility(playerStats)
+                    if(isStatsDisplayActive)
+                        updateStatsView(playerStats)
                 }
             })
         } else {
@@ -218,10 +213,17 @@ class HlsFragment : Fragment() {
         binding.statsView.text = statsToString(playerStats)
     }
 
+    fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
+        val isLive = playerStats.distanceFromLive/1000 > 10
+        binding.btnSeekLive.visibility =  if(!isLive)
+                View.VISIBLE
+            else
+                View.GONE
+    }
+
     override fun onStop() {
         super.onStop()
         player.stop()
-        isLiveUseCase.monitorForLive(false)
     }
 
     private fun addEntry(value: Float, lineChart: LineChart,label: String) {
