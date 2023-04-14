@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis.AxisDependency
@@ -37,6 +38,9 @@ class HlsFragment : Fragment() {
     var isStatsActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     val player by lazy{ HlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
+    val isLiveUseCase by lazy { IsLiveUseCase(player,viewLifecycleOwner.lifecycleScope) {showLive ->
+        binding.btnSeekLive.visibility = if(showLive) View.VISIBLE else View.GONE
+    } }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -129,6 +133,7 @@ class HlsFragment : Fragment() {
         super.onStart()
         resumePlay()
         player.play(args.hlsStreamUrl)
+        isLiveUseCase.monitorForLive(true)
     }
 
     fun resumePlay() {
@@ -216,6 +221,7 @@ class HlsFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         player.stop()
+        isLiveUseCase.monitorForLive(false)
     }
 
     private fun addEntry(value: Float, lineChart: LineChart,label: String) {
