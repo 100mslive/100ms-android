@@ -3,48 +3,49 @@ package live.hms.app2.ui.meeting.activespeaker
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.YAxis.AxisDependency
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.utils.ColorTemplate
-import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
+import com.google.android.material.snackbar.Snackbar
+import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.app2.R
 import live.hms.app2.databinding.HlsFragmentLayoutBinding
-import live.hms.app2.ui.meeting.HlsPlayer
 import live.hms.app2.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.app2.ui.meeting.MeetingViewModel
-import live.hms.app2.util.HlsMetadataHandler
 import live.hms.app2.util.viewLifecycle
-import live.hms.stats.PlayerEventsCollector
-import live.hms.stats.PlayerEventsListener
+import live.hms.hls_player.*
+import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
-import live.hms.stats.model.PlayerStats
-import live.hms.video.utils.HMSLogger
+import live.hms.stats.model.PlayerStatsModel
+import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
 
-
+/**
+ * If the stream is this many seconds behind live
+ *  show the live buttons.
+ */
+private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    val playerUpdatesHandler = Handler()
-    var runnable: Runnable? = null
     val TAG = "HlsFragment"
-    var isStatsActive: Boolean = false
+    var isStatsDisplayActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-    private val hlsPlayer: HlsPlayer by lazy {
-        HlsPlayer()
-    }
-    var playerEventsManager: PlayerEventsCollector? = null
+    val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
+    val displayHlsCuesUseCase = DisplayHlsCuesUseCase { text -> binding.hlsCues.text = text }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,12 +61,11 @@ class HlsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnSeekLive.setOnClickListener {
-            hlsPlayer.getPlayer()?.seekToDefaultPosition()
-            hlsPlayer.getPlayer()?.play()
+            player.seekToLivePosition()
         }
 
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
-            hlsPlayer.mute(muted)
+            player.mute(muted)
         }
 
         val data = LineData()
@@ -86,28 +86,13 @@ class HlsFragment : Fragment() {
 
 
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
-
-            if (it) {
-                binding.statsViewParent.visibility = View.VISIBLE
-                playerEventsManager?.addListener(object : PlayerEventsListener {
-                    @SuppressLint("SetTextI18n")
-                    override fun onEventUpdate(playerStats: PlayerStats) {
-                        updateStatsView(playerStats)
-                    }
-                })
-                isStatsActive = true
-            } else {
-                playerEventsManager?.removeListener()
-                isStatsActive = false
-                binding.statsViewParent.visibility = View.GONE
-
-            }
-
+            isStatsDisplayActive = it
+            setStatsVisibility(it)
         }
 
         binding.btnTrackSelection.setOnClickListener {
-            hlsPlayer.getPlayer()?.let {
-                val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(it)
+            binding.hlsView.let {
+                val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
                 trackSelectionBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     "trackSelectionBottomSheet"
@@ -115,43 +100,10 @@ class HlsFragment : Fragment() {
             }
         }
 
-        hlsPlayer.getPlayer()?.addListener(object : Player.Listener {
-            override fun onPlayerError(error: PlaybackException) {
-                super.onPlayerError(error)
-                HMSLogger.i(TAG, " ~~ Exoplayer error: $error")
-            }
-
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                super.onPlaybackStateChanged(playbackState)
-                HMSLogger.i(TAG, "Playback state change to $playbackState")
-            }
-        })
-
-
-        runnable = Runnable {
-            val distanceFromLive = ((hlsPlayer.getPlayer()?.duration?.minus(
-                hlsPlayer.getPlayer()?.currentPosition ?: 0
-            ))?.div(1000) ?: 0)
-
-            HMSLogger.i(
-                TAG,
-                "duration : ${hlsPlayer.getPlayer()?.duration.toString()} current position ${hlsPlayer.getPlayer()?.currentPosition}"
-            )
-            HMSLogger.i(
-                TAG,
-                "buffered position : ${hlsPlayer.getPlayer()?.bufferedPosition}  total buffered duration : ${hlsPlayer.getPlayer()?.totalBufferedDuration} "
-            )
-
-            if (distanceFromLive >= 10) {
-                binding.btnSeekLive.visibility = View.VISIBLE
-            } else {
-                binding.btnSeekLive.visibility = View.GONE
-            }
-            playerUpdatesHandler.postDelayed(runnable!!, 2000)
-        }
+        setPlayerStatsListener(true)
     }
 
-    fun statsToString(playerStats: PlayerStats): String {
+    private fun statsToString(playerStats: PlayerStatsModel): String {
         return "bitrate : ${Utils.humanReadableByteCount(playerStats.videoInfo.averageBitrate.toLong(),true,true)}/s \n" +
                 "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue/1000} s \n" +
                 "video width : ${playerStats.videoInfo.videoWidth} px \n" +
@@ -163,41 +115,75 @@ class HlsFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        binding.hlsView.player = hlsPlayer.createPlayer(
-            requireContext(),
-            args.hlsStreamUrl,
-            true
-        )
-        hlsPlayer.getPlayer()?.let {
-            playerEventsManager = PlayerEventsCollector(it)
-            val hlsMetadataHandler = HlsMetadataHandler(exoPlayer = it, { metaDataModel ->
+        resumePlay()
+        player.play(args.hlsStreamUrl)
+    }
 
-            }, requireContext())
-            hlsMetadataHandler.start()
-        }
-        runnable?.let {
-            playerUpdatesHandler.postDelayed(it, 0)
-        }
+    fun resumePlay() {
+
+        binding.hlsView.player = player.getNativePlayer()
+
+        player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
+
+            override fun onPlaybackFailure(error : HmsHlsException) {
+                Log.d("HMSHLSPLAYER","From App, error: $error")
+            }
+
+            override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
+                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
+            }
+
+            override fun onCue(hlsCue : HmsHlsCue) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    displayHlsCuesUseCase.addCue(hlsCue)
+                }
+            }
+        })
+
     }
 
     override fun onPause() {
         super.onPause()
-        playerEventsManager?.removeListener()
+        setPlayerStatsListener(false)
     }
 
     override fun onResume() {
         super.onResume()
-        if (isStatsActive) {
-            playerEventsManager?.removeListener()
-            playerEventsManager?.addListener(object : PlayerEventsListener {
-                override fun onEventUpdate(playerStats: PlayerStats) {
-                        updateStatsView(playerStats)
-                }
-            })
+        if (isStatsDisplayActive) {
+            setPlayerStatsListener(true)
         }
     }
 
-    fun updateStatsView(playerStats: PlayerStats){
+    fun setStatsVisibility(enable: Boolean) {
+        if(isStatsDisplayActive && enable) {
+            binding.statsViewParent.visibility = View.VISIBLE
+        } else {
+            binding.statsViewParent.visibility = View.GONE
+        }
+    }
+    private fun setPlayerStatsListener(enable : Boolean) {
+        Log.d("SetPlayerStats","display: ${isStatsDisplayActive} && enable: ${enable}")
+
+        if(enable) {
+            player.setStatsMonitor(object : PlayerStatsListener {
+                override fun onError(error: HMSException) {
+                    Log.d(TAG,"Error $error")
+                }
+
+                @SuppressLint("SetTextI18n")
+                override fun onEventUpdate(playerStats: PlayerStatsModel) {
+                    updateLiveButtonVisibility(playerStats)
+                    if(isStatsDisplayActive) {
+                        updateStatsView(playerStats)
+                    }
+                }
+            })
+        } else {
+            player.setStatsMonitor(null)
+        }
+    }
+
+    fun updateStatsView(playerStats: PlayerStatsModel){
         addEntry(playerStats.bandwidth.bandWidthEstimate.toFloat(),binding.chart,"Bandwidth")
         binding.bandwidthEstimateTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.bandWidthEstimate, si = true, isBits = true)}/s"
 
@@ -207,12 +193,19 @@ class HlsFragment : Fragment() {
         binding.statsView.text = statsToString(playerStats)
     }
 
+    fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
+        // It's live if the distance from the live edge is less than 10 seconds.
+        val isLive = playerStats.distanceFromLive/1000 < SECONDS_FROM_LIVE
+        // Show the button to go to live if it's not live.
+        binding.btnSeekLive.visibility =  if(!isLive)
+                View.VISIBLE
+            else
+                View.GONE
+    }
+
     override fun onStop() {
         super.onStop()
-        hlsPlayer.releasePlayer()
-        runnable?.let {
-            playerUpdatesHandler.removeCallbacks(it)
-        }
+        player.stop()
     }
 
     private fun addEntry(value: Float, lineChart: LineChart,label: String) {

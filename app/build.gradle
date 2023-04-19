@@ -7,7 +7,7 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
@@ -64,12 +64,13 @@ dependencies {
     // To use all the modules use the following dependency
     // implementation 'com.github.100mslive:android-sdk:2.5.0'
 
-    def hmsVersion = "2.5.9"
+    def hmsVersion = "2.6.1"
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:virtual-background:$hmsVersion"
     implementation "live.100ms:hls-player-stats:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
+    implementation "live.100ms:hls-player:$hmsVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
@@ -113,9 +114,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     testImplementation 'org.hamcrest:hamcrest:2.2'
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.16.1'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.16.1'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.16.1'
+    implementation "androidx.media3:media3-ui:1.0.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }

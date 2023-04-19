@@ -46,7 +46,7 @@ class PinnedVideoFragment : Fragment() {
 
   private val videoListAdapter by lazy {
     VideoListAdapter(
-      { changePinViewVideo(it) },
+      { track -> meetingViewModel.localPinnedTrack.postValue(track) },
       meetingViewModel.getStats(),
       settings.showStats
     )
@@ -184,27 +184,27 @@ class PinnedVideoFragment : Fragment() {
 
   private fun initViewModels() {
     meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+      if(meetingViewModel.pinnedTrackUiUseCase.value == null){
+
+
       var toPin : MeetingTrack? = null
       if (tracks.isNotEmpty()) {
         // Pin a screen if possible else pin user's video
          toPin = tracks.find { it.isScreen } ?: tracks[0]
 
       }
+        toPin?.let {
+          changePinViewVideo(it)
+        }
+      }
 
       videoListAdapter.updateTotalSource(tracks)
       videoListAdapter.setItems(pinnedTrack)
 
-      toPin?.let {
-        changePinViewVideo(it)
-      }
-    
-
-
-
       Log.d(TAG, "Updated video-list items: size=${tracks.size}")
     }
 
-    meetingViewModel.dominantSpeaker.observe(viewLifecycleOwner) {
+    meetingViewModel.pinnedTrackUiUseCase.observe(viewLifecycleOwner) {
       it?.let {
         if (pinnedTrack?.isScreen != true) {
           changePinViewVideo(it)
