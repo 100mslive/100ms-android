@@ -952,8 +952,7 @@ class MeetingViewModel(
                 }
             }
 
-            // Remove it from the bindedVideoTrackIds, if present
-            VideoGridBaseFragment.bindedVideoTrackIds.remove(track.trackId)
+
             // Set the audio or video track of meetingTrack to null, so that UI updates accordingly
             when (track.type) {
                 HMSTrackType.AUDIO -> {

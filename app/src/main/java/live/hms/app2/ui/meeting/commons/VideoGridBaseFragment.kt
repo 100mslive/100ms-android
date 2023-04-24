@@ -52,7 +52,6 @@ import kotlin.math.min
 abstract class VideoGridBaseFragment : Fragment() {
   companion object {
     private const val TAG = "VideoGridBase"
-    val bindedVideoTrackIds = mutableSetOf<String>()
   }
 
   protected val settings: SettingsStore by lazy { SettingsStore(requireContext()) }
@@ -174,12 +173,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     val earlyExit = item.video == null
             || item.video?.isMute == true
-            || bindedVideoTrackIds.contains(item.video?.trackId)
     if (earlyExit) return
-
-    fun onLongPress() {
-
-    }
 
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
@@ -187,7 +181,6 @@ abstract class VideoGridBaseFragment : Fragment() {
         view.addTrack(track)
         view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
-        bindedVideoTrackIds.add(item.video!!.trackId)
         binding.hmsVideoView.setOnLongClickListener {
           (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
           true
@@ -275,12 +268,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     metadata: String = ""
   ) {
     Log.d(TAG,"unbindSurfaceView for :: ${item.peer.name}")
-    if (!bindedVideoTrackIds.contains(item.video?.trackId ?: "")) return
 
     binding.hmsVideoView.removeTrack()
     binding.hmsVideoView.setOnLongClickListener(null)
     binding.hmsVideoView.visibility = View.INVISIBLE
-    bindedVideoTrackIds.remove(item.video!!.trackId)
 
   }
 
@@ -329,7 +320,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           crashlyticsLog(TAG, "updateVideos: Keeping view for video=$newVideo  in fragment=$tag")
           newRenderedViews.add(renderedViewPair)
 
-          if (isFragmentVisible && !bindedVideoTrackIds.contains(newVideo.video?.trackId ?: "")) {
+          if (isFragmentVisible) {
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
