@@ -4,9 +4,25 @@ import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.sessionstore.HMSKeyChangeListener
+import java.io.Closeable
 
 private const val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessage"
-class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) {
+class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) : Closeable {
+    private val addedListeners = mutableListOf<HMSKeyChangeListener>()
+    override fun close() {
+        addedListeners.forEach {
+            hmsSessionStore.removeKeyChangeListener(it, object :HMSActionResultListener{
+                override fun onError(error: HMSException) {
+                }
+
+                override fun onSuccess() {
+
+                }
+
+            })
+        }
+        addedListeners.clear()
+    }
 
     fun updatePinnedMessage(data: String?, hmsActionResultListener: HMSActionResultListener) {
         hmsSessionStore.set(data, PINNED_MESSAGE_SESSION_KEY, hmsActionResultListener)
@@ -14,14 +30,16 @@ class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) {
 
     fun setPinnedMessageUpdateListener(pinnedMessageUpdated: (String?) -> Unit, hmsActionResultListener: HMSActionResultListener) {
         // Add the listener for the key that pinned message is sent on
-        hmsSessionStore.addKeyChangeListener(listOf(PINNED_MESSAGE_SESSION_KEY),
-            object : HMSKeyChangeListener {
-                override fun onKeyChanged(key: String, value: String?) {
-                    if(key == PINNED_MESSAGE_SESSION_KEY) {
-                        pinnedMessageUpdated(value)
-                    }
+        val listener = object : HMSKeyChangeListener {
+            override fun onKeyChanged(key: String, value: Any?) {
+                if(key == PINNED_MESSAGE_SESSION_KEY) {
+                    pinnedMessageUpdated(value.toString())
                 }
-            },hmsActionResultListener)
+            }
+        }
+        addedListeners.add(listener)
+        hmsSessionStore.addKeyChangeListener(listOf(PINNED_MESSAGE_SESSION_KEY),
+            listener,hmsActionResultListener)
 
     }
 }
