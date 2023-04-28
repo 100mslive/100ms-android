@@ -33,7 +33,8 @@ class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) : Clo
         val listener = object : HMSKeyChangeListener {
             override fun onKeyChanged(key: String, value: Any?) {
                 if(key == PINNED_MESSAGE_SESSION_KEY) {
-                    pinnedMessageUpdated(value.toString())
+                    // If the value was null, leave it null. Only stringify if it isn't.
+                    pinnedMessageUpdated(value?.toString())
                 }
             }
         }
