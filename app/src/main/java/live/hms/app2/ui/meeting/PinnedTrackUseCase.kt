@@ -17,7 +17,7 @@ class PinnedTrackUseCase(private val hmsSessionStore: HmsSessionStore) : Closeab
     fun setPinnedTrackListener(pinnedTrackChanged : (String?) -> Unit, hmsActionResultListener: HMSActionResultListener) {
         val listener = object : HMSKeyChangeListener {
             override fun onKeyChanged(key: String, value: Any?) {
-                pinnedTrackChanged(value.toString())
+                pinnedTrackChanged(value as String)
             }
 
         }
