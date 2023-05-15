@@ -33,7 +33,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
     val message = ChatMessage(
       "You",
-      System.currentTimeMillis(),
+      null, // Let the server alone set the time
       messageStr,
       true,
       Recipient.Everyone
@@ -60,7 +60,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true))
+        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
       }
 
     })
@@ -75,7 +75,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true))
+        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
       }
 
     })
@@ -90,7 +90,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true))
+        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
       }
 
     })
@@ -114,7 +114,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   fun receivedMessage(message: ChatMessage) {
     Log.v(TAG, "receivedMessage: $message")
     unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
-    addMessage(message)
+    addMessage(message.appendMessageIdForTest())
   }
 
   fun peersUpdate() {
@@ -140,4 +140,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   init {
     peersUpdate() // Load up local peers into the chat members.
   }
+}
+
+fun ChatMessage.appendMessageIdForTest(): ChatMessage {
+  return this.copy(message = "${this.messageId?.takeLast(8)}: ${this.message}" )
 }
