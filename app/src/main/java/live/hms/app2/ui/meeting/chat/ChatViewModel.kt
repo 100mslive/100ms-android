@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import live.hms.app2.BuildConfig
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSMessageResultListener
 import live.hms.video.sdk.HMSSDK
@@ -143,5 +144,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 }
 
 fun ChatMessage.appendMessageIdForTest(): ChatMessage {
-  return this.copy(message = "${this.messageId?.takeLast(8)}: ${this.message}" )
+  return if(BuildConfig.DEBUG)
+    this.copy(message = "${this.messageId?.takeLast(8)}: ${this.message}" )
+  else
+    this
 }
