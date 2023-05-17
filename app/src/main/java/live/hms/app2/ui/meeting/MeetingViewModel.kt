@@ -684,7 +684,8 @@ class MeetingViewModel(
                         message.serverReceiveTime,
                         message.message,
                         false,
-                        recipient = Recipient.toRecipient(message.recipient)
+                        recipient = Recipient.toRecipient(message.recipient),
+                        message.messageId
                     )
                 )
             }
