@@ -186,10 +186,7 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
                 binding.rtmpHeight.text.toString().toIntOrNull()
             )
 
-        val rtmpUrls = if(settings.rtmpUrlsList.isNotEmpty()) {
-            settings.rtmpUrlsList.toList()
-        } else
-            null
+        val rtmpUrls = settings.rtmpUrlsList.toList()
         if (isRecording || isRtmp && (inputWidthHeight?.height ?: 0) > 0 && (inputWidthHeight?.width ?: 0) > 0) {
             startClickListener.invoke()
             meetingViewModel.recordMeeting(
