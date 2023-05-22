@@ -18,7 +18,7 @@ import live.hms.video.media.settings.HMSRtmpVideoResolution
 import java.net.URI
 import java.net.URISyntaxException
 
-
+private const val MIN_RTMP_URLS = 1
 class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<LayoutRtmpRecordingBinding>()
@@ -128,7 +128,7 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
             dialog.show()
 
             dialog.findViewById<TextView>(R.id.btn_end_session)?.setOnClickListener{
-                if (binding.streamUrlList.childCount > 0){
+                if (binding.streamUrlList.childCount > MIN_RTMP_URLS){
                     binding.streamUrlList.removeView(layout)
                 }
                 dialog.dismiss()
