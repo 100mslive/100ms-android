@@ -18,7 +18,7 @@ import live.hms.video.media.settings.HMSRtmpVideoResolution
 import java.net.URI
 import java.net.URISyntaxException
 
-
+private const val MIN_RTMP_URLS = 1
 class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<LayoutRtmpRecordingBinding>()
@@ -128,7 +128,7 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
             dialog.show()
 
             dialog.findViewById<TextView>(R.id.btn_end_session)?.setOnClickListener{
-                if (binding.streamUrlList.childCount > 1){
+                if (binding.streamUrlList.childCount > MIN_RTMP_URLS){
                     binding.streamUrlList.removeView(layout)
                 }
                 dialog.dismiss()
@@ -177,9 +177,8 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
         settings.rtmpUrlsList = newList.toSet()
 
         val isRecording = binding.shouldRecord.isChecked
-        val meetingUrl = settings.lastUsedMeetingUrl.meetingToHlsUrl()
-        val isRtmp =
-            settings.rtmpUrlsList.toList().isNotEmpty() && meetingViewModel.isAllowedToRtmpStream()
+
+        val isRtmp = meetingViewModel.isAllowedToRtmpStream()
 
         val inputWidthHeight: HMSRtmpVideoResolution? =
             checkInputWidthHeight(
@@ -187,12 +186,12 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
                 binding.rtmpHeight.text.toString().toIntOrNull()
             )
 
+        val rtmpUrls = settings.rtmpUrlsList.toList()
         if (isRecording || isRtmp && (inputWidthHeight?.height ?: 0) > 0 && (inputWidthHeight?.width ?: 0) > 0) {
             startClickListener.invoke()
             meetingViewModel.recordMeeting(
                 isRecording,
-                settings.rtmpUrlsList.toList(),
-                meetingUrl,
+                rtmpUrls,
                 inputWidthHeight
             )
             dismiss()
