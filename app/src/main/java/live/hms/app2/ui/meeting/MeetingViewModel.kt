@@ -19,7 +19,6 @@ import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
-import live.hms.app2.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.app2.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
@@ -684,7 +683,8 @@ class MeetingViewModel(
                         message.serverReceiveTime,
                         message.message,
                         false,
-                        recipient = Recipient.toRecipient(message.recipient)
+                        recipient = Recipient.toRecipient(message.recipient),
+                        message.messageId
                     )
                 )
             }
@@ -1166,15 +1166,14 @@ class MeetingViewModel(
     fun recordMeeting(
         isRecording: Boolean,
         rtmpInjectUrls: List<String>,
-        meetingUrl: String,
         inputWidthHeight: HMSRtmpVideoResolution?
     ) {
         // It's streaming if there are rtmp urls present.
 
-        Log.v(TAG, "Starting recording")
+        Log.v(TAG, "Starting recording. url: $rtmpInjectUrls")
         hmsSDK.startRtmpOrRecording(
             HMSRecordingConfig(
-                meetingUrl,
+                null,
                 rtmpInjectUrls,
                 isRecording,
                 inputWidthHeight
