@@ -1,5 +1,6 @@
 package live.hms.app2.ui.meeting
 
+import com.google.gson.JsonElement
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sessionstore.HMSKeyChangeListener
@@ -16,8 +17,8 @@ class PinnedTrackUseCase(private val hmsSessionStore: HmsSessionStore) : Closeab
 
     fun setPinnedTrackListener(pinnedTrackChanged : (String?) -> Unit, hmsActionResultListener: HMSActionResultListener) {
         val listener = object : HMSKeyChangeListener {
-            override fun onKeyChanged(key: String, value: Any?) {
-                pinnedTrackChanged(value as String?)
+            override fun onKeyChanged(key: String, value: JsonElement?) {
+                pinnedTrackChanged(value?.asString)
             }
 
         }
