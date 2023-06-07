@@ -64,7 +64,7 @@ dependencies {
     // To use all the modules use the following dependency
 //     implementation 'com.github.100mslive.android-sdk:lib:2.5.0'
 
-    def hmsVersion = "2.6.2"
+    def hmsVersion = "2.6.7"
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:virtual-background:$hmsVersion"
