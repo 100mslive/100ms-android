@@ -59,10 +59,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:fontFamily="@font/inter_semibold"
                         android:text="Choose a destination"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
+                        style="@style/HmsHeadings"
                         app:layout_constraintStart_toStartOf="@+id/tv_start_streaming_title"
                         app:layout_constraintTop_toBottomOf="@id/tv_start_streaming_title" />
 
