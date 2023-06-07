@@ -36,22 +36,6 @@ class MeetingLinkFragment : Fragment() {
     private var binding by viewLifecycle<FragmentMeetingLinkBinding>()
     private lateinit var settings: SettingsStore
 
-    private var qrScanResultLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-
-                data?.let {
-                    data.getStringExtra(QrCodeActivity.QR_INTENT_RESULT)?.let {
-                        if (it.isNullOrEmpty().not()) {
-                            binding.edtMeetingUrl.setText(it)
-                            validate()
-                            binding.btnJoinNow.callOnClick()
-                        }
-                    }
-                }
-            }
-        }
 
     override fun onResume() {
         super.onResume()
@@ -188,7 +172,7 @@ class MeetingLinkFragment : Fragment() {
 
         binding.btnScanNow.setOnClickListener {
             val intent = Intent(requireActivity(), QrCodeActivity::class.java)
-            qrScanResultLauncher.launch(intent)
+
         }
     }
 

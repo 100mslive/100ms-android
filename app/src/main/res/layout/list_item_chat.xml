@@ -60,7 +60,7 @@
         android:id="@+id/message_options_image_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/zxing_transparent"
+        android:background="@android:color/transparent"
         android:padding="8dp"
         android:src="@drawable/ic_baseline_more_vert_24"
         android:onClick="showPopup"

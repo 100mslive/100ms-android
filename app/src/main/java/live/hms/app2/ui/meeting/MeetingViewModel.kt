@@ -39,7 +39,6 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
 import kotlin.random.Random
 
@@ -251,7 +250,6 @@ class MeetingViewModel(
         .build()
 
     val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
-    private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
     val peers: List<HMSPeer>
         get() = hmsSDK.getPeers()
@@ -1294,14 +1292,11 @@ class MeetingViewModel(
         val imageBitmap = getRandomVirtualBackgroundBitmap(context)
 
         Log.v(TAG, "Add the bitmap to background")
-        virtualBackgroundPlugin.setBackground(imageBitmap)
 
-        hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener)
     }
 
     fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
         Log.v(TAG, "Stopping virtual background Plugin")
-        hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
     }
 
     private val _events = MutableSharedFlow<Event?>()
