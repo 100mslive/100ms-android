@@ -114,7 +114,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val response = repository.fetchAuthToken(request)
         authTokenResponse.postValue(Resource.success(response))
       } catch (e: Exception) {
-        crashlytics.recordException(e)
         authTokenResponse.postValue(Resource.error(e.message))
       }
     }
