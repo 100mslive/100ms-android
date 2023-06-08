@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
+import live.hms.roomkit.meeting.activespeaker.ActiveSpeakerCache
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.utils.HMSLogger

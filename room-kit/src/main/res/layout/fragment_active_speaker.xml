@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:orientation="vertical"
-    tools:context=".ui.meeting.activespeaker.ActiveSpeakerFragment">
+    tools:context=".meeting.activespeaker.ActiveSpeakerFragment">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/screen_share_container"

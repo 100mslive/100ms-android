@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting.activespeaker
+package live.hms.roomkit.meeting.activespeaker
 
 import live.hms.video.utils.HMSLogger
 import java.util.concurrent.ConcurrentLinkedQueue

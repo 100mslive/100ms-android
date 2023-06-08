@@ -1,6 +1,5 @@
-package live.hms.roomkit.ui.meeting.activespeaker
+package live.hms.roomkit.meeting.activespeaker
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,10 +15,8 @@ import live.hms.roomkit.util.*
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
-import live.hms.video.sdk.HmsVideoFrameListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.utils.HMSLogger
-import org.webrtc.EglRenderer
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 

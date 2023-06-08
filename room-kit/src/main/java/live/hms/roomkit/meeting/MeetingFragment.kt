@@ -38,7 +38,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.home.HomeActivity
-import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
+import live.hms.roomkit.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
