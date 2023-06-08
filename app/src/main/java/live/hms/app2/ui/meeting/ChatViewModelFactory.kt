@@ -8,7 +8,7 @@ import live.hms.video.sdk.HMSSDK
 class ChatViewModelFactory(
     private val hmsSdk: HMSSDK
 ) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
             return ChatViewModel(hmsSdk) as T
         }
