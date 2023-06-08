@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/hls_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_below="@id/extra_properties"
+        android:id="@+id/stats_view_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="#80000000"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/stats_view"
+            android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Bandwidth " />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chart"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp" />
+
+            <TextView
+                android:id="@+id/bandwidth_estimate_tv"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Network Activity " />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/network_activity_chart"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp" />
+
+            <TextView
+                android:id="@+id/network_activity_tv"
+                android:layout_width="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/extra_properties"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|end"
+        android:layout_marginHorizontal="16dp"
+        android:paddingHorizontal="8dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        >
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/btn_track_selection"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:fontFamily="@font/inter_semibold"
+            android:src="@drawable/settings_icon"
+            android:text="Settings"
+            android:textAllCaps="false" />
+<Space
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_seek_live"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/primary_blue_round_drawable"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Live"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_alignParentBottom="true"
+        android:id="@+id/hlsCues"
+        android:textSize="12pt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Hls Text"
+        android:textColor="@color/white"
+        />
+
+
+</RelativeLayout>

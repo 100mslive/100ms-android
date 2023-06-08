@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    tools:context=".ui.meeting.activespeaker.ActiveSpeakerFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/screen_share_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="4dp"
+        android:layout_weight="4">
+
+        <include
+            android:id="@+id/screen_share"
+            layout="@layout/video_card" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <GridLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="7"
+        android:animateLayoutChanges="false" />
+
+</LinearLayout>

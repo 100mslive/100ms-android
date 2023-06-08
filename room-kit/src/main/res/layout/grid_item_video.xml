@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:layout_rowWeight="1"
+    android:layout_columnWeight="1"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:strokeColor="@color/primary_blue"
+    app:strokeWidth="0dp">
+
+    <include
+        android:id="@+id/video_card"
+        layout="@layout/video_card" />
+
+</com.google.android.material.card.MaterialCardView>
