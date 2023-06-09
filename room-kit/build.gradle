@@ -28,7 +28,7 @@ android {
         consumerProguardFiles "consumer-rules.pro"
 
         buildConfigField "boolean", "INTERNAL", project.findProperty('INTERNAL') ? INTERNAL : "false"
-        buildConfigField "String", "TOKEN_ENDPOINT", "TOKEN_ENDPOINT"
+        buildConfigField "String", "TOKEN_ENDPOINT", "$TOKEN_ENDPOINT"
         buildConfigField "String", "BUG_REPORT_EMAIL_TO", project.findProperty('BUG_REPORT_EMAIL_TO') ? BUG_REPORT_EMAIL_TO : "\"\""
         buildConfigField "String", "BUG_REPORT_EMAIL_CC", project.findProperty('BUG_REPORT_EMAIL_CC') ? BUG_REPORT_EMAIL_CC : "\"\""
         buildConfigField "String", "RTMP_INJEST_URL", project.findProperty('RTMP_INJEST_URL') ? RTMP_INJEST_URL : "\"\""
@@ -51,6 +51,12 @@ android {
 
     buildFeatures {
         viewBinding = true
+    }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
     }
 }
 
@@ -105,13 +111,11 @@ afterEvaluate {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
                 from components.release
-
                 pom {
                     // Only sign the artefacts if this is a maven central build.
                     // This would only halt jitpack builds and/or make our signing keys public.
                     if(rootProject.properties["ossrhUsername"]) {
-                        withSourcesJar()
-                        withJavadocJar()
+
                         signing {
                             sign publishing.publications
                         }
