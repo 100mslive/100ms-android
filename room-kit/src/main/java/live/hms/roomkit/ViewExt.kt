@@ -80,7 +80,7 @@ fun Bitmap.saveCaptureToLocalCache(context: Context) : Uri? {
 
     val imagePath = File(context.cacheDir, "images")
     val newFile = File(imagePath, "image.png")
-    return FileProvider.getUriForFile(context, "live.hms.app2.provider", newFile)
+    return FileProvider.getUriForFile(context, "live.hms.roomkit.provider", newFile)
 
   }
 
@@ -238,7 +238,7 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
 
                 val fileSaveUri = FileProvider.getUriForFile(
                     context,
-                    "live.hms.app2.provider",
+                    "live.hms.roomkit.provider",
                     imageSavePath
                 )
 

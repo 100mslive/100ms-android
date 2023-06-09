@@ -15,7 +15,6 @@ import live.hms.roomkit.databinding.DialogBottomSheetChatBinding
 import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.roomkit.util.visibility
 
 class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemSelectedListener {
 

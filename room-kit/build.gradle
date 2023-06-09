@@ -1,13 +1,13 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    id 'kotlin-kapt'
     id 'maven-publish'
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
 //    id 'maven-publish'
  //   id 'com.github.dcendents.android-maven'
 //    id 'org.jetbrains.dokka'
-    id 'kotlin-kapt'
     id 'signing'
 }
 def getVersionName = { ->
@@ -138,7 +138,7 @@ afterEvaluate {
                         url = 'SCM is private'
                     }
                 }
-                groupId = getGroup()
+                groupId = "live.100ms"
                 artifactId = 'room-kit'
                 version = getVersionName()
             }

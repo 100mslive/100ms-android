@@ -14,7 +14,7 @@ object EmailUtils {
 
   fun getNonFatalLogIntent(context: Context, throwable: Throwable? = null): Intent {
     val logFile = LogUtils.saveLogsToFile(context, "nonfatal-log")
-    val logUri = FileProvider.getUriForFile(context, "live.hms.app2.provider", logFile)
+    val logUri = FileProvider.getUriForFile(context, "live.hms.roomkit.provider", logFile)
 
     val throwableStr = throwable?.let {
       "\n\n--------------------------------------------\n" +
@@ -38,7 +38,7 @@ object EmailUtils {
 
     val files = arrayListOf(logUri)
     LogUtils.currentSessionFile?.let { file ->
-      val uri = FileProvider.getUriForFile(context, "live.hms.app2.provider", file)
+      val uri = FileProvider.getUriForFile(context, "live.hms.roomkit.provider", file)
       files.add(uri)
     }
 

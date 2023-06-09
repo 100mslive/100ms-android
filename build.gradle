@@ -10,7 +10,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // Jetpack Navigation
-        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.5.0-alpha01'
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3'
 
         // Firebase Google-Services
         classpath 'com.google.gms:google-services:4.3.10'

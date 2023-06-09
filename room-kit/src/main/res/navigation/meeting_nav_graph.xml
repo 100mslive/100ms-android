@@ -64,7 +64,7 @@
 
         <argument
             android:name="roomDetail"
-            app:argType="live.hms.app2.model.RoomDetails"
+            app:argType="live.hms.roomkit.model.RoomDetails"
             app:nullable="false" />
 
         <argument
@@ -93,7 +93,7 @@
 
         <argument
             android:name="mode"
-            app:argType="live.hms.app2.ui.settings.SettingsMode"
+            app:argType="live.hms.roomkit.ui.settings.SettingsMode"
             app:nullable="false" />
 
     </fragment>
