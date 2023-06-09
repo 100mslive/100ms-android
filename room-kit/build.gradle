@@ -1,14 +1,17 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'androidx.navigation.safeargs.kotlin'
+    id 'maven-publish'
     id 'kotlin-parcelize'
+    id 'androidx.navigation.safeargs.kotlin'
 //    id 'maven-publish'
  //   id 'com.github.dcendents.android-maven'
 //    id 'org.jetbrains.dokka'
-
-//    id 'kotlin-kapt'
-//    id 'signing'
+    id 'kotlin-kapt'
+    id 'signing'
+}
+def getVersionName = { ->
+    return "0.0.1"
 }
 
 android {
@@ -18,6 +21,8 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 31
+        versionCode 1
+        versionName getVersionName()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -90,6 +95,53 @@ dependencies {
 
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+
+                pom {
+                    // Only sign the artefacts if this is a maven central build.
+                    // This would only halt jitpack builds and/or make our signing keys public.
+                    if(rootProject.properties["ossrhUsername"]) {
+                        withSourcesJar()
+                        withJavadocJar()
+                        signing {
+                            sign publishing.publications
+                        }
+                    }
+                    name = "100ms.live Android Room Kit"
+                    description = "Room Kit that simplifies setting up videoconferencing in your own app. See more at https://www.100ms.live/docs/android/v2/guides/quickstart"
+                    url = "100ms.live"
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'http://www.opensource.org/licenses/mit-license.php'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = '1'
+                            name = '100ms'
+                            email = 'support@100ms.live'
+                        }
+                    }
+                    scm {
+                        connection = 'SCM is private'
+                        developerConnection = 'SCM is private'
+                        url = 'SCM is private'
+                    }
+                }
+                groupId = getGroup()
+                artifactId = 'room-kit'
+                version = getVersionName()
+            }
+        }
+    }
 }
