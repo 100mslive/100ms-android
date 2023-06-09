@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/PreviewFragment"
-        android:name="live.hms.app2.ui.meeting.PreviewFragment"
+        android:name="live.hms.roomkit.ui.meeting.PreviewFragment"
         android:label="@string/preview_fragment"
         tools:layout="@layout/fragment_preview">
 
@@ -25,7 +25,7 @@
 
     <fragment
         android:id="@+id/MeetingFragment"
-        android:name="live.hms.app2.ui.meeting.MeetingFragment"
+        android:name="live.hms.roomkit.ui.meeting.MeetingFragment"
         android:label="@string/meeting_fragment"
         tools:layout="@layout/fragment_meeting">
 
@@ -58,7 +58,7 @@
 
     <dialog
         android:id="@+id/ChatBottomSheetFragment"
-        android:name="live.hms.app2.ui.meeting.chat.ChatBottomSheetFragment"
+        android:name="live.hms.roomkit.ui.meeting.chat.ChatBottomSheetFragment"
         android:label="@string/chat_fragment"
         tools:layout="@layout/dialog_bottom_sheet_chat">
 
@@ -76,7 +76,7 @@
 
     <fragment
         android:id="@+id/ParticipantsFragment"
-        android:name="live.hms.app2.ui.meeting.participants.ParticipantsFragment"
+        android:name="live.hms.roomkit.ui.meeting.participants.ParticipantsFragment"
         android:label="@string/participants_fragment"
         tools:layout="@layout/fragment_participants">
 
@@ -87,7 +87,7 @@
 
     <fragment
         android:id="@+id/SettingsFragment"
-        android:name="live.hms.app2.ui.settings.SettingsFragment"
+        android:name="live.hms.roomkit.ui.settings.SettingsFragment"
         android:label="@string/settings_fragment"
         tools:layout="@layout/fragment_settings">
 
@@ -100,7 +100,7 @@
 
     <dialog
         android:id="@+id/BottomSheetRoleChange"
-        android:name="live.hms.app2.ui.meeting.participants.BottomSheetRoleChangeFragment"
+        android:name="live.hms.roomkit.ui.meeting.participants.BottomSheetRoleChangeFragment"
         tools:layout="@layout/layout_fragment_bottom_sheet_change_role" >
         <argument
             android:name="remotePeerId"
@@ -115,7 +115,7 @@
     </dialog>
     <fragment
         android:id="@+id/rtmpRecordFragment"
-        android:name="live.hms.app2.ui.meeting.participants.RtmpRecordBottomSheet"
+        android:name="live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet"
         android:label="RtmpRecordFragment"
         tools:layout="@layout/layout_rtmp_recording" >
         <argument
@@ -124,13 +124,13 @@
     </fragment>
     <fragment
         android:id="@+id/changeNameDialogFragment"
-        android:name="live.hms.app2.ui.meeting.ChangeNameDialogFragment"
+        android:name="live.hms.roomkit.ui.meeting.ChangeNameDialogFragment"
         android:label="ChangeNameDialogFragment"
         tools:layout="@layout/change_name_fragment" />
 
     <fragment
         android:id="@+id/hlsViewFragment"
-        android:name="live.hms.app2.ui.meeting.activespeaker.HlsFragment"
+        android:name="live.hms.roomkit.ui.meeting.activespeaker.HlsFragment"
         android:label="HlsFragment"
         tools:layout="@layout/hls_fragment_layout"
         >
@@ -140,15 +140,15 @@
     </fragment>
     <dialog
         android:id="@+id/musicChooserSheet"
-        android:name="live.hms.app2.ui.meeting.participants.MusicSelectionSheet"
+        android:name="live.hms.roomkit.ui.meeting.participants.MusicSelectionSheet"
         android:label="MusicChooserSheet" />
     <fragment
         android:id="@+id/roomMetadataAlphaFragment"
-        android:name="live.hms.app2.ui.meeting.activespeaker.RoomMetadataAlphaFragment"
+        android:name="live.hms.roomkit.ui.meeting.activespeaker.RoomMetadataAlphaFragment"
         android:label="RoomMetadataAlphaFragment" />
     <fragment
         android:id="@+id/roleChangeFragment"
-        android:name="live.hms.app2.ui.meeting.chat.RoleChangeFragment"
+        android:name="live.hms.roomkit.ui.meeting.chat.RoleChangeFragment"
         android:label="RoleChangeFragment" >
         <action
             android:id="@+id/action_roleChangeFragment_to_MeetingFragment"

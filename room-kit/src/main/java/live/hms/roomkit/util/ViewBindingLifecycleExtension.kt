@@ -27,8 +27,6 @@ fun <T : ViewBinding> Fragment.viewLifecycle(): ReadWriteProperty<Fragment, T> =
 
     override fun onDestroy(owner: LifecycleOwner) {
       super.onDestroy(owner)
-      crashlyticsLog(TAG, "Removing reference to $binding during onDestroy($owner)")
-
       binding = null
       owner.lifecycle.removeObserver(this)
     }

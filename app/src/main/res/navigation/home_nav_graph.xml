@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/SettingsFragment"
-        android:name="live.hms.app2.ui.settings.SettingsFragment"
+        android:name="live.hms.roomkit.ui.settings.SettingsFragment"
         android:label="@string/settings_fragment"
         tools:layout="@layout/fragment_settings">
 
@@ -48,7 +48,7 @@
 
     <activity
         android:id="@+id/MeetingActivity"
-        android:name="live.hms.app2.ui.meeting.MeetingActivity"
+        android:name="live.hms.roomkit.ui.meeting.MeetingActivity"
         android:label="Meeting Activity"
         tools:layout="@layout/activity_meeting" />
 

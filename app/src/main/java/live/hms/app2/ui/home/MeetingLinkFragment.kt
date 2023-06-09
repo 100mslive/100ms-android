@@ -22,7 +22,7 @@ import live.hms.app2.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
 import live.hms.app2.ui.settings.SettingsMode
-import live.hms.app2.ui.settings.SettingsStore
+import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.sdk.HMSSDK
 

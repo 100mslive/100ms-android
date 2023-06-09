@@ -9,7 +9,7 @@
     android:orientation="horizontal"
     android:paddingHorizontal="16dp"
     android:paddingVertical="20dp"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.meeting.MeetingActivity">
 
     <TextView
         android:id="@+id/track_label"

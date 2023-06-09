@@ -10,7 +10,7 @@
     android:orientation="vertical"
     android:paddingHorizontal="16dp"
     android:paddingVertical="20dp"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.meeting.MeetingActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -1,11 +1,14 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'maven-publish'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-parcelize'
+//    id 'maven-publish'
  //   id 'com.github.dcendents.android-maven'
 //    id 'org.jetbrains.dokka'
-    id 'kotlin-kapt'
-    id 'signing'
+
+//    id 'kotlin-kapt'
+//    id 'signing'
 }
 
 android {
@@ -13,11 +16,18 @@ android {
     compileSdk 32
 
     defaultConfig {
-        minSdk 21
-        targetSdk 32
+        minSdkVersion 24
+        targetSdkVersion 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        buildConfigField "boolean", "INTERNAL", project.findProperty('INTERNAL') ? INTERNAL : "false"
+        buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
+        buildConfigField "String", "BUG_REPORT_EMAIL_TO", project.findProperty('BUG_REPORT_EMAIL_TO') ? BUG_REPORT_EMAIL_TO : "\"\""
+        buildConfigField "String", "BUG_REPORT_EMAIL_CC", project.findProperty('BUG_REPORT_EMAIL_CC') ? BUG_REPORT_EMAIL_CC : "\"\""
+        buildConfigField "String", "RTMP_INJEST_URL", project.findProperty('RTMP_INJEST_URL') ? RTMP_INJEST_URL : "\"\""
+
     }
 
     buildTypes {
@@ -80,6 +90,6 @@ dependencies {
 
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

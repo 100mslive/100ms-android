@@ -6,7 +6,7 @@
     android:animateLayoutChanges="true"
     android:background="@color/blue_2"
     android:orientation="vertical"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.meeting.MeetingActivity">
 
     <LinearLayout
         android:id="@+id/earpiece_btn"

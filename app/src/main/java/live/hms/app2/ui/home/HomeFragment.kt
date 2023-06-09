@@ -11,7 +11,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -24,7 +23,7 @@ import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.*
 import live.hms.app2.ui.settings.SettingsMode
-import live.hms.app2.ui.settings.SettingsStore
+import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.app2.util.NameUtils.isValidUserName
 
