@@ -10,8 +10,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
-import live.hms.app2.databinding.FragmentPermissionBinding
 import live.hms.app2.util.viewLifecycle
+import live.hms.roomkit.databinding.FragmentPermissionBinding
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 

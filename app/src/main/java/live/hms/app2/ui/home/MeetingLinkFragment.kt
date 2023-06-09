@@ -16,14 +16,14 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
-import live.hms.app2.databinding.FragmentMeetingLinkBinding
-import live.hms.app2.ui.meeting.DeviceStatsBottomSheet
-import live.hms.app2.ui.meeting.LEAVE_INFORMATION_PERSON
-import live.hms.app2.ui.meeting.LEAVE_INFORMATION_REASON
-import live.hms.app2.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
-import live.hms.app2.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.app2.util.*
+import live.hms.roomkit.databinding.FragmentMeetingLinkBinding
+import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
+import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
+import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
+import live.hms.roomkit.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
+import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.video.sdk.HMSSDK
 
 

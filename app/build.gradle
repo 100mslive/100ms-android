@@ -117,4 +117,5 @@ dependencies {
     implementation "androidx.media3:media3-ui:1.0.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation "live.100ms:room-kit:0.0.1"
 }
