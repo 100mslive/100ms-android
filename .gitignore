@@ -13,3 +13,4 @@ app/gradle.properties
 local.properties
 *.aar
 assets/*.mp4
+room-kit/gradle.properties
