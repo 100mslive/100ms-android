@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.BuildConfig
 import live.hms.app2.R
+import live.hms.app2.api.Resource
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.roomkit.ui.settings.SettingsMode
@@ -25,7 +26,10 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.app2.util.NameUtils.isValidUserName
 import live.hms.roomkit.model.RoomDetails
+import live.hms.roomkit.ui.HMSPrebuiltOptions
+import live.hms.roomkit.ui.HMSRoomKit
 import live.hms.roomkit.ui.meeting.*
+import live.hms.roomkit.util.contextSafe
 
 class HomeFragment : Fragment() {
 
@@ -80,7 +84,10 @@ class HomeFragment : Fragment() {
             }
             R.id.action_stats -> {
                 val deviceStatsBottomSheet = DeviceStatsBottomSheet()
-                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
+                deviceStatsBottomSheet.show(
+                    requireActivity().supportFragmentManager,
+                    "deviceStatsBottomSheet"
+                )
             }
         }
         return false
@@ -94,8 +101,7 @@ class HomeFragment : Fragment() {
         settings = SettingsStore(requireContext())
 
         setHasOptionsMenu(true)
-
-        observeLiveData()
+        
         initEditTextViews()
         initConnectButton()
         hideProgressBar()
@@ -135,55 +141,53 @@ class HomeFragment : Fragment() {
     private fun getUsername() = binding.editTextName.text.toString()
 
     private fun joinRoom() {
-        settings.lastUsedMeetingUrl = settings.lastUsedMeetingUrl.replace("/preview/","/meeting/")
-        homeViewModel.sendAuthTokenRequest(settings.lastUsedMeetingUrl)
+        settings.lastUsedMeetingUrl = settings.lastUsedMeetingUrl.replace("/preview/", "/meeting/")
+        getRoomCodeFromURl(settings.lastUsedMeetingUrl)
     }
 
-    private fun observeLiveData() {
-        homeViewModel.authTokenResponse.observe(viewLifecycleOwner) { response ->
-            when (response.status) {
-                Status.LOADING -> {
-                    updateProgressBarUI()
-                    showProgressBar()
+    private fun getRoomCodeFromURl(url: String) {
+        try {
+            val env = url.getTokenEndpointEnvironment()
+            val subdomain = url.toSubdomain()
+
+            when {
+                REGEX_MEETING_URL_CODE.matches(url) -> {
+                    val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
+                    val code = groups[2]
+                    launchPrebuilt(subdomain, code, env)
+
+
                 }
-                Status.SUCCESS -> {
-                    // No need to hide progress bar here, as we directly move to
-                    // the next page
+                REGEX_STREAMING_MEETING_URL_ROOM_CODE.matches(url) -> {
+                    val groups =
+                        REGEX_STREAMING_MEETING_URL_ROOM_CODE.findAll(url).toList()[0].groupValues
+                    val code = groups[2]
+                    launchPrebuilt(subdomain, code, env)
 
-                    val data = response.data!!
-                    val roomDetails = RoomDetails(
-                        env = settings.environment,
-                        url = settings.lastUsedMeetingUrl,
-                        username = getUsername(),
-                        authToken = data.token
-                    )
-                    Log.i(TAG, "Auth Token: ${roomDetails.authToken}")
-
-
-                    // Start the meeting activity
-                    startMeetingActivity(roomDetails)
-                    requireActivity().finish()
                 }
-                Status.ERROR -> {
-                    hideProgressBar()
-                    Log.e(TAG, "observeLiveData: $response")
+                REGEX_PREVIEW_URL_CODE.matches(url) -> {
+                    val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
+                    val code = groups[2]
+                    launchPrebuilt(subdomain, code, env)
 
-                    Toast.makeText(
-                        requireContext(),
-                        response.message,
-                        Toast.LENGTH_LONG
-                    ).show()
+                }
+                else -> {
+                    homeViewModel.authTokenResponse.postValue(Resource.error("Invalid Meeting URL"))
                 }
             }
+        } catch (ex: Exception) {
+            homeViewModel.authTokenResponse.postValue(Resource.error("Invalid Meeting URL [${ex.message}]"))
+        }
+
+    }
+
+    private fun launchPrebuilt(subdomain: String, code: String, env: String) {
+        contextSafe { context, activity ->
+            HMSRoomKit.launchPrebuilt(code,activity, HMSPrebuiltOptions(userName = getUsername(), environment =settings.environment))
         }
     }
 
-    private fun startMeetingActivity(roomDetails: RoomDetails) {
-        Intent(requireContext(), MeetingActivity::class.java).apply {
-            putExtra(ROOM_DETAILS, roomDetails)
-            startActivity(this)
-        }
-    }
+
 
     private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
         if (url.isValidMeetingUrl()) {
