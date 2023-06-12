@@ -50,8 +50,7 @@ class HomeFragment : Fragment() {
             if (it.toString().isNotEmpty()) {
                 val url = it.toString()
                 requireActivity().intent.data = null
-                if (saveTokenEndpointUrlIfValid(url) && isValidUserName(binding.editTextName)
-                ) {
+                if (saveTokenEndpointUrlIfValid(url) && isValidUserName(binding.editTextName)) {
                     joinRoom()
                 }
             }
@@ -85,8 +84,7 @@ class HomeFragment : Fragment() {
             R.id.action_stats -> {
                 val deviceStatsBottomSheet = DeviceStatsBottomSheet()
                 deviceStatsBottomSheet.show(
-                    requireActivity().supportFragmentManager,
-                    "deviceStatsBottomSheet"
+                    requireActivity().supportFragmentManager, "deviceStatsBottomSheet"
                 )
             }
         }
@@ -94,14 +92,13 @@ class HomeFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         settings = SettingsStore(requireContext())
 
         setHasOptionsMenu(true)
-        
+
         initEditTextViews()
         initConnectButton()
         hideProgressBar()
@@ -183,10 +180,19 @@ class HomeFragment : Fragment() {
 
     private fun launchPrebuilt(subdomain: String, code: String, env: String) {
         contextSafe { context, activity ->
-            HMSRoomKit.launchPrebuilt(code,activity, HMSPrebuiltOptions(userName = getUsername(), environment =settings.environment))
+
+            HMSRoomKit.launchPrebuilt(
+                code, activity, HMSPrebuiltOptions(userName = getUsername(),
+                    environment = settings.environment,
+                    endPoints = hashMapOf<String, String>().apply {
+                        if (settings.environment.contains("prod").not()) {
+                            put("token", "https://auth-nonprod.100ms.live")
+                            put("init", "https://qa-init.100ms.live/init")
+                        }
+                    })
+            )
         }
     }
-
 
 
     private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
@@ -228,12 +234,10 @@ class HomeFragment : Fragment() {
         binding.buttonJoinMeeting.setOnClickListener {
             try {
                 val input = (requireActivity() as HomeActivity).meetingUrl
-                if (saveTokenEndpointUrlIfValid(input) && isValidUserName(binding.editTextName)
-                ) {
+                if (saveTokenEndpointUrlIfValid(input) && isValidUserName(binding.editTextName)) {
                     joinRoom()
                     settings.username = binding.editTextName.text.toString()
-                } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName(binding.editTextName)
-                ) {
+                } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName(binding.editTextName)) {
                     var subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
                     if (BuildConfig.INTERNAL) {
                         val env = when (settings.environment) {
@@ -281,9 +285,7 @@ class HomeFragment : Fragment() {
             "Removed from the room"
         }
 
-        val builder = AlertDialog.Builder(requireContext())
-            .setMessage(message)
-            .setTitle(title)
+        val builder = AlertDialog.Builder(requireContext()).setMessage(message).setTitle(title)
             .setCancelable(false)
 
         builder.setPositiveButton(R.string.ok) { dialog, _ ->
