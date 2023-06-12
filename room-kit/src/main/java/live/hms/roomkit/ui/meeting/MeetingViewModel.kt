@@ -65,7 +65,7 @@ class MeetingViewModel(
         )
             .toString(),
         captureNetworkQualityInPreview = true,
-        initEndpoint = "https://${roomDetails.env}.100ms.live/init" // This is optional paramter, No need to use this in production apps
+        initEndpoint = if (roomDetails.endPoints?.containsKey("init") == true) roomDetails.endPoints["init"].orEmpty() else "https://prod-init.100ms.live/init",
     )
 
     private val recordingTimesUseCase = RecordingTimesUseCase()

@@ -18,14 +18,18 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.BuildConfig
 import live.hms.app2.R
+import live.hms.app2.api.Resource
 import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
-import live.hms.app2.model.RoomDetails
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.app2.util.NameUtils.isValidUserName
+import live.hms.roomkit.model.RoomDetails
+import live.hms.roomkit.ui.HMSPrebuiltOptions
+import live.hms.roomkit.ui.HMSRoomKit
 import live.hms.roomkit.ui.meeting.*
+import live.hms.roomkit.util.contextSafe
 
 class HomeFragment : Fragment() {
 
@@ -46,8 +50,7 @@ class HomeFragment : Fragment() {
             if (it.toString().isNotEmpty()) {
                 val url = it.toString()
                 requireActivity().intent.data = null
-                if (saveTokenEndpointUrlIfValid(url) && isValidUserName(binding.editTextName)
-                ) {
+                if (saveTokenEndpointUrlIfValid(url) && isValidUserName(binding.editTextName)) {
                     joinRoom()
                 }
             }
@@ -80,22 +83,22 @@ class HomeFragment : Fragment() {
             }
             R.id.action_stats -> {
                 val deviceStatsBottomSheet = DeviceStatsBottomSheet()
-                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
+                deviceStatsBottomSheet.show(
+                    requireActivity().supportFragmentManager, "deviceStatsBottomSheet"
+                )
             }
         }
         return false
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         settings = SettingsStore(requireContext())
 
         setHasOptionsMenu(true)
 
-        observeLiveData()
         initEditTextViews()
         initConnectButton()
         hideProgressBar()
@@ -135,55 +138,62 @@ class HomeFragment : Fragment() {
     private fun getUsername() = binding.editTextName.text.toString()
 
     private fun joinRoom() {
-        settings.lastUsedMeetingUrl = settings.lastUsedMeetingUrl.replace("/preview/","/meeting/")
-        homeViewModel.sendAuthTokenRequest(settings.lastUsedMeetingUrl)
+        settings.lastUsedMeetingUrl = settings.lastUsedMeetingUrl.replace("/preview/", "/meeting/")
+        getRoomCodeFromURl(settings.lastUsedMeetingUrl)
     }
 
-    private fun observeLiveData() {
-        homeViewModel.authTokenResponse.observe(viewLifecycleOwner) { response ->
-            when (response.status) {
-                Status.LOADING -> {
-                    updateProgressBarUI()
-                    showProgressBar()
+    private fun getRoomCodeFromURl(url: String) {
+        try {
+            val env = url.getTokenEndpointEnvironment()
+            val subdomain = url.toSubdomain()
+
+            when {
+                REGEX_MEETING_URL_CODE.matches(url) -> {
+                    val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
+                    val code = groups[2]
+                    launchPrebuilt(subdomain, code, env)
+
+
                 }
-                Status.SUCCESS -> {
-                    // No need to hide progress bar here, as we directly move to
-                    // the next page
+                REGEX_STREAMING_MEETING_URL_ROOM_CODE.matches(url) -> {
+                    val groups =
+                        REGEX_STREAMING_MEETING_URL_ROOM_CODE.findAll(url).toList()[0].groupValues
+                    val code = groups[2]
+                    launchPrebuilt(subdomain, code, env)
 
-                    val data = response.data!!
-                    val roomDetails = RoomDetails(
-                        env = settings.environment,
-                        url = settings.lastUsedMeetingUrl,
-                        username = getUsername(),
-                        authToken = data.token
-                    )
-                    Log.i(TAG, "Auth Token: ${roomDetails.authToken}")
-
-
-                    // Start the meeting activity
-                    startMeetingActivity(roomDetails)
-                    requireActivity().finish()
                 }
-                Status.ERROR -> {
-                    hideProgressBar()
-                    Log.e(TAG, "observeLiveData: $response")
+                REGEX_PREVIEW_URL_CODE.matches(url) -> {
+                    val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
+                    val code = groups[2]
+                    launchPrebuilt(subdomain, code, env)
 
-                    Toast.makeText(
-                        requireContext(),
-                        response.message,
-                        Toast.LENGTH_LONG
-                    ).show()
+                }
+                else -> {
+                    homeViewModel.authTokenResponse.postValue(Resource.error("Invalid Meeting URL"))
                 }
             }
+        } catch (ex: Exception) {
+            homeViewModel.authTokenResponse.postValue(Resource.error("Invalid Meeting URL [${ex.message}]"))
+        }
+
+    }
+
+    private fun launchPrebuilt(subdomain: String, code: String, env: String) {
+        contextSafe { context, activity ->
+
+            HMSRoomKit.launchPrebuilt(
+                code, activity, HMSPrebuiltOptions(userName = getUsername(),
+                    environment = settings.environment,
+                    endPoints = hashMapOf<String, String>().apply {
+                        if (settings.environment.contains("prod").not()) {
+                            put("token", "https://auth-nonprod.100ms.live")
+                            put("init", "https://qa-init.100ms.live/init")
+                        }
+                    })
+            )
         }
     }
 
-    private fun startMeetingActivity(roomDetails: RoomDetails) {
-        Intent(requireContext(), MeetingActivity::class.java).apply {
-            putExtra(ROOM_DETAILS, roomDetails)
-            startActivity(this)
-        }
-    }
 
     private fun saveTokenEndpointUrlIfValid(url: String): Boolean {
         if (url.isValidMeetingUrl()) {
@@ -224,12 +234,10 @@ class HomeFragment : Fragment() {
         binding.buttonJoinMeeting.setOnClickListener {
             try {
                 val input = (requireActivity() as HomeActivity).meetingUrl
-                if (saveTokenEndpointUrlIfValid(input) && isValidUserName(binding.editTextName)
-                ) {
+                if (saveTokenEndpointUrlIfValid(input) && isValidUserName(binding.editTextName)) {
                     joinRoom()
                     settings.username = binding.editTextName.text.toString()
-                } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName(binding.editTextName)
-                ) {
+                } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName(binding.editTextName)) {
                     var subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
                     if (BuildConfig.INTERNAL) {
                         val env = when (settings.environment) {
@@ -277,9 +285,7 @@ class HomeFragment : Fragment() {
             "Removed from the room"
         }
 
-        val builder = AlertDialog.Builder(requireContext())
-            .setMessage(message)
-            .setTitle(title)
+        val builder = AlertDialog.Builder(requireContext()).setMessage(message).setTitle(title)
             .setCancelable(false)
 
         builder.setPositiveButton(R.string.ok) { dialog, _ ->
