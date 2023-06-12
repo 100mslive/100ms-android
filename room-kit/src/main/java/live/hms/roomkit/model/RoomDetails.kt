@@ -8,5 +8,6 @@ data class RoomDetails(
   val endPoints : HashMap<String, String>?,
   val url: String,
   val username: String,
-  val authToken: String
+  val authToken: String,
+  val debugInfo: Boolean = false
 ) : Parcelable
