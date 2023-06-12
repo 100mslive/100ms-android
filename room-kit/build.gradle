@@ -5,13 +5,10 @@ plugins {
     id 'maven-publish'
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
-//    id 'maven-publish'
- //   id 'com.github.dcendents.android-maven'
-//    id 'org.jetbrains.dokka'
     id 'signing'
 }
 def getVersionName = { ->
-    return "0.0.1"
+    return "$HMS_ROOM_KIT_VERSION"
 }
 
 android {
@@ -56,6 +53,7 @@ android {
     publishing {
         singleVariant('release') {
             withSourcesJar()
+            withJavadocJar()
         }
     }
 }
