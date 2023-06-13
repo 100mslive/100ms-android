@@ -84,7 +84,10 @@ class MeetingViewModel(
         .build()
 
      fun initSdk(roomCode: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
-        if (hasValidToken) return
+        if (hasValidToken) {
+            onHMSActionResultListener.onSuccess()
+            return
+        }
         //if empty is uses the prod token url else uses the debug token url
         val tokenURL: String = hmsPrebuiltOptions?.endPoints?.get("token") ?: ""
         val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
