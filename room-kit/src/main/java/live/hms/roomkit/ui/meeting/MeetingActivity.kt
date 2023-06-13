@@ -41,6 +41,7 @@ class MeetingActivity : AppCompatActivity() {
     val hmsPrebuiltOption : HMSPrebuiltOptions? = intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
     val roomCode : String = intent!!.getStringExtra(ROOM_CODE)!!
 
+    //todo show a loader UI
     meetingViewModel.initSdk(roomCode, hmsPrebuiltOption, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
           runOnUiThread {
