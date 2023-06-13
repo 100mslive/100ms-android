@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -45,7 +44,6 @@ class PreviewFragment : Fragment() {
 
     private var binding by viewLifecycle<FragmentPreviewBinding>()
 
-    private lateinit var roomDetails: RoomDetails
     private lateinit var settings: SettingsStore
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
@@ -78,7 +76,6 @@ class PreviewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
     }
 
     private fun bindVideo() {

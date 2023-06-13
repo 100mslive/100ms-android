@@ -11,10 +11,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPrebuiltBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.util.*
+import live.hms.roomkit.util.ROOM_CODE
+import live.hms.roomkit.util.ROOM_PREBUILT
+import live.hms.roomkit.util.contextSafe
+import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 

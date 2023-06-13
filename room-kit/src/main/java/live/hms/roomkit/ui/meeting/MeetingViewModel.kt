@@ -284,8 +284,6 @@ class MeetingViewModel(
 
 
 
-    val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
-    private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
     val peers: List<HMSPeer>
         get() = hmsSDK.getPeers()
@@ -1317,32 +1315,12 @@ class MeetingViewModel(
         hmsSDK.stopAudioshare(actionListener)
     }
 
-    private fun getRandomVirtualBackgroundBitmap(context: Context?): Bitmap {
-
-        val imageList = ArrayList<String>()
-
-
-        val randomIndex = Random.nextInt(imageList.size);
-        return getBitmapFromAsset(context!!.applicationContext, imageList[randomIndex])!!
-    }
 
 
     fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
-        Log.v(
-            TAG,
-            "Starting virtual background Plugin, First create a bitmap of the background required to be added"
-        )
-        val imageBitmap = getRandomVirtualBackgroundBitmap(context)
-
-        Log.v(TAG, "Add the bitmap to background")
-        virtualBackgroundPlugin.setBackground(imageBitmap)
-
-        hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener)
     }
 
     fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
-        Log.v(TAG, "Stopping virtual background Plugin")
-        hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
     }
 
     private val _events = MutableSharedFlow<Event?>()
