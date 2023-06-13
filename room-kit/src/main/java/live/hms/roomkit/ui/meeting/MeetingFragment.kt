@@ -84,8 +84,7 @@ class MeetingFragment : Fragment() {
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
-            requireActivity().application,
-            requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+            requireActivity().application
         )
     }
 

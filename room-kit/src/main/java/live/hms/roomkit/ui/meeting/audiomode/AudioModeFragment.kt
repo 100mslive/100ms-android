@@ -8,10 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.roomkit.databinding.FragmentAudioBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
-import live.hms.roomkit.util.ROOM_DETAILS
 import live.hms.roomkit.util.viewLifecycle
 
 class AudioModeFragment : Fragment() {
@@ -21,8 +19,7 @@ class AudioModeFragment : Fragment() {
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
-      requireActivity().application,
-      requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+      requireActivity().application
     )
   }
 

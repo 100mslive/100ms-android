@@ -13,13 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
-import live.hms.roomkit.util.ROOM_DETAILS
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 
 class ParticipantsFragment : BottomSheetDialogFragment() {
@@ -30,8 +27,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
-            requireActivity().application,
-            requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+            requireActivity().application
         )
     }
 

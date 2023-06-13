@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -51,8 +50,7 @@ class PreviewFragment : Fragment() {
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
-            requireActivity().application,
-            requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+            requireActivity().application
         )
     }
 
