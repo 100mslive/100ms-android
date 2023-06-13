@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/pin_message"
+        android:icon="@drawable/ic_pinned_message"
+        android:title="Pin Message"
+        app:showAsAction="ifRoom" />
+</menu>

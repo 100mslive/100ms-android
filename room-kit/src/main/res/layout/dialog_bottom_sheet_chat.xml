@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="false"
+    android:background="@color/primary_bg"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context=".ui.meeting.MeetingActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary_bg"
+            app:liftOnScroll="true">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="10dp"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:menu="@menu/menu_generic"
+                app:title="@string/chat">
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/recipientSpinner"
+                    style="@style/SpinnerTheme"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginStart="30dp"
+                    android:paddingVertical="7dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="30dp"
+                    android:popupBackground="@color/primary_bg"
+                    android:spinnerMode="dropdown"
+                    tools:listitem="@layout/layout_chat_recipient_selector_item" />
+
+            </com.google.android.material.appbar.MaterialToolbar>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/btn_disabled" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <include layout="@layout/layout_message_hint"
+            android:id="@+id/hint_view"
+            />
+
+
+                <include layout="@layout/layout_message_hint"
+                    android:id="@+id/pinned_message"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_weight="1"
+            android:minHeight="300dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="@color/gray_color">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edit_text_message"
+                    style="@style/TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:background="@color/gray_color"
+                    android:hint="Send Message to Everyone"
+                    android:padding="10dp"
+                    app:endIconDrawable="@drawable/send_icon"
+                    app:endIconMode="custom"
+                    app:endIconTint="@color/white" />
+
+
+                <ImageView
+                    android:id="@+id/icon_send"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:layout_marginEnd="20dp"
+                    android:src="@drawable/send_icon" />
+
+            </LinearLayout>
+
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -68,9 +68,9 @@ dependencies {
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:virtual-background:$hmsVersion"
-    implementation "live.100ms:hls-player-stats:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
     implementation "live.100ms:hls-player:$hmsVersion"
+    implementation "live.100ms:room-kit:0.0.1"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
@@ -103,10 +103,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-    implementation 'io.grpc:grpc-okhttp:1.36.1'
-    implementation 'io.grpc:grpc-protobuf-lite:1.36.1'
-    implementation 'io.grpc:grpc-stub:1.36.1'
-
     // debugImplementation because LeakCanary should only run in debug builds.
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 
@@ -117,4 +113,5 @@ dependencies {
     implementation "androidx.media3:media3-ui:1.0.0"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
 }

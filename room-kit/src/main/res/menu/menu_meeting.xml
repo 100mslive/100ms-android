@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_record"
+        android:icon="@drawable/recording"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_volume"
+        android:icon="@drawable/ic_volume_up_24"
+        android:title="@string/toggle_volume"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_flip_camera"
+        android:icon="@drawable/ic_flip_camera_ios_24"
+        android:title="@string/flip_camera"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/ic_settings_24"
+        android:title="@string/settings"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/sessionMetadataAlpha"
+        android:title="Session Metadata Alpha"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
+        android:id="@+id/hls_start"
+        android:title="@string/hls_start"
+        app:showAsAction="ifRoom"
+    />
+
+    <item
+        android:id="@+id/hls_stop"
+        android:title="@string/hls_stop"
+        app:showAsAction="ifRoom"
+    />
+
+    <item
+        android:id="@+id/end_room"
+        android:title="@string/end_room"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/end_and_lock_room"
+        android:title="@string/end_and_lock_room"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/remote_mute_all"
+        android:title="@string/remote_mute_all_desc"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/remote_mute_role"
+        android:title="@string/remote_mute_role_desc"
+        app:showAsAction="ifRoom" />
+
+    <group>
+        <item
+            android:id="@+id/action_grid_view"
+            android:icon="@drawable/ic_grid_view_24"
+            android:title="@string/grid_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_pinned_view"
+            android:icon="@drawable/ic_pinned_view_24"
+            android:title="@string/hero_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/audio_only_view"
+            android:icon="@drawable/ic_volume_up_24"
+            android:title="@string/audio_only_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/active_speaker_view"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/active_speaker_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/hls_view"
+            android:icon="@drawable/ic_person_pin_24"
+            android:title="@string/hls_view"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_enable_background"
+            android:icon="@drawable/ic_white_svg"
+            android:title="@string/enable_background"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_disable_background"
+            android:icon="@drawable/ic_black_svg"
+            android:title="@string/disable_background"
+            app:showAsAction="never" />
+
+
+        <item
+            android:id="@+id/raise_hand"
+            android:title="@string/raise_hand"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/action_bulk_role_change"
+            android:title="Bulk role Change"
+            android:visible="true"
+            app:showAsAction="ifRoom" />
+
+
+        <item
+            android:id="@+id/pip_mode"
+            android:title="@string/pip_mode"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/change_name"
+            android:title="Change Name"
+            android:visible="false"
+            app:showAsAction="ifRoom" />
+
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/action_share_screen"
+            android:icon="@drawable/ic_mobile_screen_share_24"
+            android:title="@string/share_screen"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_stop_share_screen"
+            android:icon="@android:drawable/btn_minus"
+            android:title="@string/stop_share_screen"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_record_meeting"
+            android:title="@string/record_meeting"
+            android:checkable="true"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/action_stop_streaming_and_recording"
+            android:title="@string/stop_recording_stream"
+            app:showAsAction="ifRoom" />
+
+
+        <item
+            android:id="@+id/action_participants"
+            android:icon="@drawable/ic_people_24"
+            android:title="@string/show_participants"
+            app:showAsAction="always" />
+
+        <item
+            android:id="@+id/action_share_link"
+            android:icon="@drawable/ic_share_24"
+            android:title="@string/share_link"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/action_email_logs"
+            android:icon="@drawable/ic_bug_report_24"
+            android:title="@string/bug_report"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/add_rtc_stats_observer"
+            android:title="Add Stats Observer"
+            app:showAsAction="ifRoom"
+            />
+
+        <item
+            android:id="@+id/remove_rtc_stats_observer"
+            android:title="Remove Stats Observer"
+            app:showAsAction="ifRoom"
+            />
+
+
+        <item
+            android:id="@+id/toggle_audio_mode"
+            android:title=""
+            android:visible="true"
+            android:checkable="true"
+            app:actionViewClass="androidx.appcompat.widget.SwitchCompat" />
+
+    </group>
+</menu>
