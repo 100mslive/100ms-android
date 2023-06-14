@@ -16,15 +16,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
+import live.hms.app2.util.getInitEndpointEnvironment
+import live.hms.app2.util.isValidMeetingUrl
+import live.hms.app2.util.viewLifecycle
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.app2.util.*
-import live.hms.roomkit.databinding.FragmentMeetingLinkBinding
+import live.hms.roomkit.util.EmailUtils
+import live.hms.app2.databinding.FragmentMeetingLinkBinding
 import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.roomkit.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
 import live.hms.roomkit.ui.settings.SettingsMode
-import live.hms.video.sdk.HMSSDK
 
 
 class MeetingLinkFragment : Fragment() {
@@ -92,7 +94,7 @@ class MeetingLinkFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvSdkVersion.text = "version : ${HMSSDK.VERSION} | webrtc_version : ${HMSSDK.WEBRTC_VERSION}"
+//        binding.tvSdkVersion.text = "version : ${HMSSDK.VERSION} | webrtc_version : ${HMSSDK.WEBRTC_VERSION}"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

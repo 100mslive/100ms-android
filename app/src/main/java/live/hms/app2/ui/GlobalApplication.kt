@@ -2,7 +2,6 @@ package live.hms.app2.ui
 
 import android.app.Application
 import android.util.Log
-import live.hms.video.utils.LogUtils
 
 class GlobalApplication : Application() {
 
@@ -15,7 +14,7 @@ class GlobalApplication : Application() {
 
     Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
       Log.e(TAG, "CRASH", throwable)
-      LogUtils.saveLogsToFile(applicationContext, "crash-log")
+//      LogUtils.saveLogsToFile(applicationContext, "crash-log")
       defaultHandler?.uncaughtException(thread, throwable)
     }
   }

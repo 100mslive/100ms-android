@@ -1,11 +1,5 @@
 package live.hms.app2.util
 
-const val ROOM_DETAILS = "room-details"
-const val MEETING_URL = "meeting-url"
-const val USERNAME = "username"
-const val ENVIRONMENT = "room-endpoint"
-const val AUTH_TOKEN = "auth-token"
-
 const val ENV_PROD = "prod-init"
 const val ENV_QA = "qa-init"
 
