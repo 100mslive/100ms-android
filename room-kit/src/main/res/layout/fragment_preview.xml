@@ -28,18 +28,19 @@
 
             <TextView
                 android:id="@+id/name_tv"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_gravity="center"
                 android:fontFamily="@font/inter_semibold"
                 android:gravity="center"
+                android:textAlignment="center"
                 android:text="Get Started"
                 android:textColor="#F2F5F9FF"
                 android:textSize="20sp" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name_tv"
                 android:layout_alignParentStart="true"
@@ -47,6 +48,7 @@
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/inter_regular"
                 android:gravity="center"
+                android:textAlignment="center"
                 android:text="Setup your audio and video"
                 android:textColor="@color/muted_text"
                 android:textSize="14sp" />
