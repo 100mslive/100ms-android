@@ -36,7 +36,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
@@ -76,7 +75,6 @@ class MeetingFragment : Fragment() {
     private lateinit var currentFragment: Fragment
 
     private lateinit var settings: SettingsStore
-    private lateinit var roomDetails: RoomDetails
     private var volumeMenuIcon: MenuItem? = null
     var countDownTimer: CountDownTimer? = null
     var isCountdownManuallyCancelled: Boolean = false
@@ -84,8 +82,7 @@ class MeetingFragment : Fragment() {
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
-            requireActivity().application,
-            requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+            requireActivity().application
         )
     }
 
@@ -127,7 +124,6 @@ class MeetingFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         settings = SettingsStore(requireContext())
-        roomDetails = requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
     }
 
     override fun onStop() {
@@ -182,7 +178,6 @@ class MeetingFragment : Fragment() {
             R.id.action_share_link -> {
                 val sendIntent = Intent().apply {
                     action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, roomDetails.url)
                     type = "text/plain"
                 }
                 val shareIntent = Intent.createChooser(sendIntent, null)
@@ -1064,7 +1059,6 @@ class MeetingFragment : Fragment() {
             Log.d(TAG, "initButtons: Chat Button clicked")
             findNavController().navigate(
                 MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
-                    roomDetails,
                     "Dummy Customer Id"
                 )
             )

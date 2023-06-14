@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.DialogBottomSheetChatBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 
@@ -29,7 +28,6 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     private val args: ChatBottomSheetFragmentArgs by navArgs()
-    private lateinit var roomDetails: RoomDetails
     private lateinit var currentUserCustomerId: String
 
     private val messages = ArrayList<ChatMessage>()
@@ -61,7 +59,6 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
         savedInstanceState: Bundle?
     ): View {
         binding = DialogBottomSheetChatBinding.inflate(inflater, container, false)
-        roomDetails = args.roomDetail
         currentUserCustomerId = args.currentUserCustomerId
 
         initToolbar()

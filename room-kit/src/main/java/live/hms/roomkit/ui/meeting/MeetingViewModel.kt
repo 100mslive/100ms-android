@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import live.hms.roomkit.model.RoomDetails
+import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
@@ -37,6 +37,9 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
+import live.hms.video.signal.init.HMSTokenListener
+import live.hms.video.signal.init.TokenRequest
+import live.hms.video.signal.init.TokenRequestOptions
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -45,29 +48,91 @@ import kotlin.random.Random
 
 
 class MeetingViewModel(
-    application: Application,
-    private val roomDetails: RoomDetails
+    application: Application
 ) : AndroidViewModel(application) {
     companion object {
         private const val TAG = "MeetingViewModel"
     }
 
+    private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
-    private val config = HMSConfig(
-        roomDetails.username,
-        roomDetails.authToken,
-        Gson().toJson(
-            CustomPeerMetadata(
-                isHandRaised = false,
-                name = roomDetails.username,
-                isBRBOn = false
-            )
-        )
-            .toString(),
-        captureNetworkQualityInPreview = true,
-        initEndpoint = if (roomDetails.endPoints?.containsKey("init") == true) roomDetails.endPoints["init"].orEmpty() else "https://prod-init.100ms.live/init",
-    )
+    private val settings = SettingsStore(getApplication())
+    private val hmsLogSettings: HMSLogSettings =
+        HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
 
+    private val hmsTrackSettings = HMSTrackSettings.Builder()
+        .audio(
+            HMSAudioTrackSettings.Builder()
+                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
+                .initialState(getAudioTrackState())
+                .build()
+        )
+        .video(
+            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
+                .forceSoftwareDecoder(settings.forceSoftwareDecoder)
+                .setDegradationPreference(settings.degradationPreferences)
+                .initialState(getVideoTrackState())
+                .cameraFacing(getVideoCameraFacing())
+                .build()
+        )
+        .build()
+
+    val hmsSDK = HMSSDK
+        .Builder(application)
+        .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
+        .setLogSettings(hmsLogSettings)
+        .build()
+
+     fun initSdk(roomCode: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+        if (hasValidToken) {
+            onHMSActionResultListener.onSuccess()
+            return
+        }
+        //if empty is uses the prod token url else uses the debug token url
+        val tokenURL: String = hmsPrebuiltOptions?.endPoints?.get("token") ?: ""
+        val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
+            hmsPrebuiltOptions.endPoints["init"].orEmpty()
+        else
+            "https://prod-init.100ms.live/init"
+
+        hmsSDK.getAuthTokenByRoomCode(
+            TokenRequest(roomCode, hmsPrebuiltOptions?.userId?:UUID.randomUUID().toString()),
+            TokenRequestOptions(tokenURL),
+            object : HMSTokenListener {
+                override fun onError(error: HMSException) {
+                    hasValidToken = false
+                    onHMSActionResultListener.onError(error)
+                }
+
+                override fun onTokenSuccess(token: String) {
+
+                   hmsConfig = HMSConfig(
+                        userName = hmsPrebuiltOptions?.userName.orEmpty(),
+                        token,
+                        Gson().toJson(
+                            CustomPeerMetadata(
+                                isHandRaised = false,
+                                name = hmsPrebuiltOptions?.userName.orEmpty(),
+                                isBRBOn = false
+                            )
+                        )
+                            .toString(),
+                        captureNetworkQualityInPreview = true,
+                        initEndpoint = initURL,
+                    )
+
+                    hasValidToken = true
+
+                    onHMSActionResultListener.onSuccess()
+
+                }
+
+            })
+
+
+    }
+
+    private var hmsConfig: HMSConfig? = null
     private val recordingTimesUseCase = RecordingTimesUseCase()
 
     private fun showServerInfo(room: HMSRoom) {
@@ -106,7 +171,7 @@ class MeetingViewModel(
     private val statsFlow = MutableSharedFlow<Map<String, Any>>()
     private val savedStats: MutableMap<String, Any> = mutableMapOf()
 
-    private val settings = SettingsStore(getApplication())
+
 
     private val failures = ArrayList<HMSException>()
 
@@ -205,8 +270,10 @@ class MeetingViewModel(
     val pinnedTrack = MutableLiveData<MeetingTrack?>(null)
     val localPinnedTrack = MutableLiveData<MeetingTrack?>(null)
 
-    val pinnedTrackUiUseCase = PinnedTrackUiUseCase(local = localPinnedTrack,
-        global = pinnedTrack)
+    val pinnedTrackUiUseCase = PinnedTrackUiUseCase(
+        local = localPinnedTrack,
+        global = pinnedTrack
+    )
 
 
     val broadcastsReceived = MutableLiveData<ChatMessage>()
@@ -214,41 +281,20 @@ class MeetingViewModel(
     private val _trackStatus = MutableLiveData<Pair<String, Boolean>>()
     val trackStatus: LiveData<Pair<String, Boolean>> = _trackStatus
 
-    private val hmsTrackSettings = HMSTrackSettings.Builder()
-        .audio(
-            HMSAudioTrackSettings.Builder()
-                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
-                .initialState(getAudioTrackState())
-                .build()
-        )
-        .video(
-            HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
-                .forceSoftwareDecoder(settings.forceSoftwareDecoder)
-                .setDegradationPreference(settings.degradationPreferences)
-                .initialState(getVideoTrackState())
-                .cameraFacing(getVideoCameraFacing())
-                .build()
-        )
-        .build()
 
-    private val hmsLogSettings: HMSLogSettings =
-        HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
 
-    val hmsSDK = HMSSDK
-        .Builder(application)
-        .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
-        .setLogSettings(hmsLogSettings)
-        .build()
 
-    val imageBitmap = getRandomVirtualBackgroundBitmap(application.applicationContext)
-    private val virtualBackgroundPlugin = HMSVirtualBackground(hmsSDK, imageBitmap)
 
     val peers: List<HMSPeer>
         get() = hmsSDK.getPeers()
 
     fun startPreview() {
+        if (hmsConfig == null) {
+            HMSLogger.e(TAG, "HMSConfig is null. Cannot start preview.")
+            return
+        }
         // call Preview api
-        hmsSDK.preview(config, object : HMSPreviewListener {
+        hmsSDK.preview(hmsConfig!!, object : HMSPreviewListener {
             override fun onError(error: HMSException) {
                 previewErrorData.postValue(error)
             }
@@ -291,7 +337,8 @@ class MeetingViewModel(
     private fun getVideoTrackState() =
         if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
 
-    private fun getVideoCameraFacing() = if (settings.camera.contains(REAR_FACING_CAMERA)) HMSVideoTrackSettings.CameraFacing.BACK else HMSVideoTrackSettings.CameraFacing.FRONT
+    private fun getVideoCameraFacing() =
+        if (settings.camera.contains(REAR_FACING_CAMERA)) HMSVideoTrackSettings.CameraFacing.BACK else HMSVideoTrackSettings.CameraFacing.FRONT
 
 
     fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
@@ -422,6 +469,11 @@ class MeetingViewModel(
 
     fun startMeeting() {
 
+        if (hmsConfig == null) {
+            HMSLogger.e(TAG, "HMSConfig is null. Cannot start preview.")
+            return
+        }
+
         if (settings.showStats) {
             addRTCStatsObserver()
         }
@@ -441,7 +493,7 @@ class MeetingViewModel(
 
         val joinStartedAt = System.currentTimeMillis()
         Log.v(TAG, "~~ hmsSDK.join called ~~")
-        hmsSDK.join(config, object : HMSUpdateListener {
+        hmsSDK.join(hmsConfig!!, object : HMSUpdateListener {
 
             override fun onError(error: HMSException) {
                 Log.e(TAG, "onError: $error")
@@ -480,18 +532,20 @@ class MeetingViewModel(
                     getRecordingState(room)
                 )
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
-                    { message -> _sessionMetadata.postValue(message)},
+                    { message -> _sessionMetadata.postValue(message) },
                     object : HMSActionResultListener {
                         override fun onError(error: HMSException) {}
                         override fun onSuccess() {}
                     }
                 )
                 pinnedTrackUseCase.setPinnedTrackListener(
-                    {trackId -> if(trackId == null) {
-                        pinnedTrack.postValue(null)
-                    } else {
-                        getMeetingTrack(trackId)?.let { pinnedTrack.postValue(it) }
-                    }},
+                    { trackId ->
+                        if (trackId == null) {
+                            pinnedTrack.postValue(null)
+                        } else {
+                            getMeetingTrack(trackId)?.let { pinnedTrack.postValue(it) }
+                        }
+                    },
                     object : HMSActionResultListener {
                         override fun onError(error: HMSException) {}
                         override fun onSuccess() {}
@@ -518,7 +572,7 @@ class MeetingViewModel(
                         synchronized(_tracks) {
                             val track = getMeetingTrack(hmsPeer.videoTrack?.trackId)
                             if (track != null) {
-                                Log.d(TAG,"Getting local dominant speaker ${track.peer.name}")
+                                Log.d(TAG, "Getting local dominant speaker ${track.peer.name}")
                                 dominantSpeaker.postValue(track)
                             }
                         }
@@ -529,7 +583,10 @@ class MeetingViewModel(
                     }
 
                     HMSPeerUpdate.ROLE_CHANGED -> {
-                        Log.d("RoleChangeUpdate","${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}")
+                        Log.d(
+                            "RoleChangeUpdate",
+                            "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
+                        )
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
@@ -719,11 +776,11 @@ class MeetingViewModel(
         })
     }
 
-    private fun getMeetingTrack(trackId : String?): MeetingTrack? {
-        return if(trackId == null)
+    private fun getMeetingTrack(trackId: String?): MeetingTrack? {
+        return if (trackId == null)
             null
         else _tracks.find {
-                    it.video?.trackId == trackId
+            it.video?.trackId == trackId
         }
     }
 
@@ -848,6 +905,7 @@ class MeetingViewModel(
     }
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
+        hasValidToken = false
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
         // Don't call leave when being forced to leave
         if (details == null) {
@@ -1257,32 +1315,12 @@ class MeetingViewModel(
         hmsSDK.stopAudioshare(actionListener)
     }
 
-    private fun getRandomVirtualBackgroundBitmap(context: Context?): Bitmap {
-
-        val imageList = ArrayList<String>()
-
-
-        val randomIndex = Random.nextInt(imageList.size);
-        return getBitmapFromAsset(context!!.applicationContext, imageList[randomIndex])!!
-    }
 
 
     fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
-        Log.v(
-            TAG,
-            "Starting virtual background Plugin, First create a bitmap of the background required to be added"
-        )
-        val imageBitmap = getRandomVirtualBackgroundBitmap(context)
-
-        Log.v(TAG, "Add the bitmap to background")
-        virtualBackgroundPlugin.setBackground(imageBitmap)
-
-        hmsSDK.addPlugin(virtualBackgroundPlugin, actionListener)
     }
 
     fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
-        Log.v(TAG, "Stopping virtual background Plugin")
-        hmsSDK.removePlugin(virtualBackgroundPlugin, actionListener)
     }
 
     private val _events = MutableSharedFlow<Event?>()
@@ -1445,7 +1483,7 @@ class MeetingViewModel(
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
 
-    private lateinit var sessionMetadataUseCase : SessionMetadataUseCase
+    private lateinit var sessionMetadataUseCase: SessionMetadataUseCase
     private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
     fun setSessionMetadata(data: String?) {
         sessionMetadataUseCase.updatePinnedMessage(data, object : HMSActionResultListener {
@@ -1454,25 +1492,26 @@ class MeetingViewModel(
                     _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
                 }
             }
+
             override fun onSuccess() {}
         })
     }
 
-    fun bulkRoleChange(toRole : HMSRole, rolesToChange : List<HMSRole>) {
-      hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, object : HMSActionResultListener {
-          override fun onError(error: HMSException) {
-              Log.d("bulkRoleChange","There was an error $error")
-          }
+    fun bulkRoleChange(toRole: HMSRole, rolesToChange: List<HMSRole>) {
+        hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d("bulkRoleChange", "There was an error $error")
+            }
 
-          override fun onSuccess() {
-              Log.d("bulkRoleChange","Successful")
-          }
+            override fun onSuccess() {
+                Log.d("bulkRoleChange", "Successful")
+            }
 
-      })
-  }
+        })
+    }
 
-  private val _sessionMetadata = MutableLiveData<String?>(null)
-  val sessionMetadata : LiveData<String?> = _sessionMetadata
+    private val _sessionMetadata = MutableLiveData<String?>(null)
+    val sessionMetadata: LiveData<String?> = _sessionMetadata
 
     override fun onCleared() {
         super.onCleared()

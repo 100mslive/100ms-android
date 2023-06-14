@@ -1,6 +1,8 @@
 package live.hms.roomkit.util
 
 const val ROOM_DETAILS = "room-details"
+const val ROOM_CODE = "room-code"
+const val ROOM_PREBUILT = "room-prebuilt"
 const val MEETING_URL = "meeting-url"
 const val USERNAME = "username"
 const val ENVIRONMENT = "room-endpoint"

@@ -62,10 +62,6 @@
         android:label="@string/chat_fragment"
         tools:layout="@layout/dialog_bottom_sheet_chat">
 
-        <argument
-            android:name="roomDetail"
-            app:argType="live.hms.roomkit.model.RoomDetails"
-            app:nullable="false" />
 
         <argument
             android:name="currentUserCustomerId"

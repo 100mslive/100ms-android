@@ -3,17 +3,15 @@ package live.hms.roomkit.ui.meeting
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import live.hms.roomkit.model.RoomDetails
 
 class MeetingViewModelFactory(
-  private val application: Application,
-  private val roomDetails: RoomDetails
+  private val application: Application
 ) : ViewModelProvider.Factory {
 
   @Suppress("UNCHECKED_CAST")
   override fun <T : ViewModel> create(modelClass: Class<T>): T {
     if (modelClass.isAssignableFrom(MeetingViewModel::class.java)) {
-      return MeetingViewModel(application, roomDetails) as T
+      return MeetingViewModel(application) as T
     }
     throw IllegalArgumentException("Unknown ViewModel class $modelClass")
   }

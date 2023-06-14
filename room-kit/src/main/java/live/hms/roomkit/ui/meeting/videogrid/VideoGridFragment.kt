@@ -12,11 +12,9 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.util.ROOM_DETAILS
 import live.hms.roomkit.util.viewLifecycle
 
 class VideoGridFragment : Fragment() {
@@ -31,8 +29,7 @@ class VideoGridFragment : Fragment() {
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
-      requireActivity().application,
-      requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+      requireActivity().application
     )
   }
 

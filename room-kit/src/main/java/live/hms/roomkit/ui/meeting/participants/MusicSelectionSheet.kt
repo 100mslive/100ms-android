@@ -1,28 +1,20 @@
 package live.hms.roomkit.ui.meeting.participants
 
-import android.R.attr.data
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.media.projection.MediaProjectionManager
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.OpenableColumns
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
-import androidx.loader.content.CursorLoader
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.DialogMusicModeChooserBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.util.*
@@ -37,8 +29,7 @@ class MusicSelectionSheet : BottomSheetDialogFragment() {
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
-            requireActivity().application,
-            requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+            requireActivity().application
         )
     }
 

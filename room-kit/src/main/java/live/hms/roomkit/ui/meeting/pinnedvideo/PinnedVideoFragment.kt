@@ -12,19 +12,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.roomkit.databinding.FragmentPinnedVideoBinding
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.*
-import live.hms.video.error.HMSException
-import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
 import org.webrtc.RendererCommon
-import org.webrtc.SurfaceViewRenderer
 
 class PinnedVideoFragment : Fragment() {
 
@@ -39,8 +35,7 @@ class PinnedVideoFragment : Fragment() {
 
   private val meetingViewModel: MeetingViewModel by activityViewModels {
     MeetingViewModelFactory(
-      requireActivity().application,
-      requireActivity().intent!!.extras!![ROOM_DETAILS] as RoomDetails
+      requireActivity().application
     )
   }
 
