@@ -285,6 +285,15 @@ class SettingsBottomSheet(
             binding.btnAudioShare.visibility = View.GONE
             binding.btnBrb.visibility = View.GONE
             binding.btnMetaDataSend.visibility = View.GONE
+            binding.remoteMuteAll.visibility = View.GONE
+            binding.remoteMuteRole.visibility = View.GONE
+        }
+
+        if (meetingViewModel.isPrebuiltDebugFlagEnabled()) {
+            binding.btnShowStats.visibility = View.GONE
+            binding.btnMetaDataSend.visibility = View.GONE
+            binding.remoteMuteAll.visibility = View.GONE
+            binding.remoteMuteRole.visibility = View.GONE
         }
     }
 
