@@ -19,13 +19,11 @@ import androidx.navigation.fragment.findNavController
 import live.hms.app2.BuildConfig
 import live.hms.app2.R
 import live.hms.app2.api.Resource
-import live.hms.app2.api.Status
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.app2.util.NameUtils.isValidUserName
-import live.hms.roomkit.model.RoomDetails
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.HMSRoomKit
 import live.hms.roomkit.ui.meeting.*
