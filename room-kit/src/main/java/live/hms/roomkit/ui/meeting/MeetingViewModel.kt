@@ -1525,7 +1525,6 @@ class MeetingViewModel(
         return isPrebuiltDebug
     }
 
-    }
 
 }
 
