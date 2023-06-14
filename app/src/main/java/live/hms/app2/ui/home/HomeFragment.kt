@@ -149,7 +149,7 @@ class HomeFragment : Fragment() {
                 REGEX_MEETING_URL_CODE.matches(url) -> {
                     val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
                     val code = groups[2]
-                    launchPrebuilt(subdomain, code, env)
+                    launchPrebuilt(code)
 
 
                 }
@@ -157,13 +157,13 @@ class HomeFragment : Fragment() {
                     val groups =
                         REGEX_STREAMING_MEETING_URL_ROOM_CODE.findAll(url).toList()[0].groupValues
                     val code = groups[2]
-                    launchPrebuilt(subdomain, code, env)
+                    launchPrebuilt(code)
 
                 }
                 REGEX_PREVIEW_URL_CODE.matches(url) -> {
                     val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
                     val code = groups[2]
-                    launchPrebuilt(subdomain, code, env)
+                    launchPrebuilt(code)
 
                 }
                 else -> {
@@ -176,12 +176,11 @@ class HomeFragment : Fragment() {
 
     }
 
-    private fun launchPrebuilt(subdomain: String, code: String, env: String) {
+    private fun launchPrebuilt(code: String) {
         contextSafe { context, activity ->
 
             HMSRoomKit.launchPrebuilt(
-                code, activity, HMSPrebuiltOptions(userName = getUsername(),
-                    environment = settings.environment,
+                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = "random-user-id",
                     endPoints = hashMapOf<String, String>().apply {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")

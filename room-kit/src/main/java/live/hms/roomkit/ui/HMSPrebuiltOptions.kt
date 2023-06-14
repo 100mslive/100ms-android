@@ -10,5 +10,4 @@ data class HMSPrebuiltOptions(
     val userId: String? = null,
     val endPoints: HashMap<String, String>? = null,
     val debugInfo: Boolean = false,
-    val environment: String? = null,
 ) : Parcelable
