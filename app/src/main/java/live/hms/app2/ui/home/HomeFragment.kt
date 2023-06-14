@@ -21,7 +21,7 @@ import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.EmailUtils
 import live.hms.app2.util.*
-import live.hms.app2.util.NameUtils.isValidUserName
+import live.hms.roomkit.util.NameUtils.isValidUserName
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.HMSRoomKit
 import live.hms.roomkit.ui.meeting.*

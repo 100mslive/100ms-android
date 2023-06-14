@@ -2,6 +2,7 @@ package live.hms.app2.util
 
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert
+import live.hms.roomkit.util.NameUtils
 import org.junit.Test
 
 class NameUtilsTest {
