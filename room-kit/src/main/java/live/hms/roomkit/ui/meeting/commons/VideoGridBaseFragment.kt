@@ -428,6 +428,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun applySpeakerUpdates(speakers: Array<HMSSpeaker>) {
     renderedViews.forEachIndexed { index, renderedView ->
       val track = renderedView.meetingTrack.audio
+
       renderedView.binding.apply {
         if (track == null || track.isMute) {
           videoCard.audioLevel.apply {
@@ -456,6 +457,8 @@ abstract class VideoGridBaseFragment : Fragment() {
             }
           }
         }
+
+        videoCard.audioLevel.visibility = if (meetingViewModel.isPrebuiltDebugFlagEnabled()) View.INVISIBLE else View.VISIBLE
       }
     }
   }
