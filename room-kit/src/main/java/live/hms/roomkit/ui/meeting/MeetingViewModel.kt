@@ -59,6 +59,7 @@ class MeetingViewModel(
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
+    private var isPrebuiltDebug = false
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
@@ -94,6 +95,8 @@ class MeetingViewModel(
             hmsPrebuiltOptions.endPoints["init"].orEmpty()
         else
             "https://prod-init.100ms.live/init"
+
+         isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo?:false
 
         hmsSDK.getAuthTokenByRoomCode(
             TokenRequest(roomCode, hmsPrebuiltOptions?.userId?:UUID.randomUUID().toString()),
@@ -1517,6 +1520,11 @@ class MeetingViewModel(
         super.onCleared()
         leaveMeeting()
     }
+
+    fun isPrebuiltDebugFlagEnabled(): Boolean {
+        return isPrebuiltDebug
+    }
+
 
 }
 

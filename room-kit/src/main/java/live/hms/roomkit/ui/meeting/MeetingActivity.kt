@@ -55,11 +55,8 @@ class MeetingActivity : AppCompatActivity() {
           val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
           val navController = navHostFragment.navController
           val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-          if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not()) {
-            navController?.setGraph(R.navigation.preview_nav_graph)
-          } else {
-            navController?.setGraph(R.navigation.meeting_nav_graph)
-          }
+          if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not())
+            navController?.setGraph(R.navigation.meeting_nav_graph, intent.extras)
           initViewModels()
         }
       }

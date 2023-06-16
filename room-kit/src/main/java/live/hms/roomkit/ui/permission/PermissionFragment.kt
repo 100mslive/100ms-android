@@ -1,4 +1,4 @@
-package live.hms.app2.ui.home.permission
+package live.hms.roomkit.ui.permission
 
 import android.Manifest
 import android.os.Build
@@ -9,9 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import live.hms.app2.R
-import live.hms.app2.util.viewLifecycle
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPermissionBinding
+import live.hms.roomkit.util.viewLifecycle
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -42,10 +42,11 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     return binding.root
   }
 
+
   private fun checkAlreadyGrantedPermissions() {
     if (EasyPermissions.hasPermissions(requireContext(), *PERMISSIONS)) {
       findNavController().navigate(
-        PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
+        PermissionFragmentDirections.actionPermissionFragmentToPreviewFragment()
       )
     }
   }
@@ -60,7 +61,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     if (hasPermissions()) {
       Log.v(TAG, "Permission=$PERMISSIONS granted, moving to HomeFragment")
       findNavController().navigate(
-        PermissionFragmentDirections.actionPermissionFragmentToHomeFragment()
+        PermissionFragmentDirections.actionPermissionFragmentToPreviewFragment()
       )
     } else {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
