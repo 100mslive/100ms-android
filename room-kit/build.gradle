@@ -1,0 +1,147 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'maven-publish'
+    id 'kotlin-parcelize'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'signing'
+}
+def getVersionName = { ->
+    return "$HMS_ROOM_KIT_VERSION"
+}
+
+android {
+    namespace 'live.hms.roomkit'
+    compileSdk 32
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 31
+        versionCode 1
+        versionName getVersionName()
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        buildConfigField "boolean", "INTERNAL", project.findProperty('INTERNAL') ? INTERNAL : "false"
+        buildConfigField "String", "BUG_REPORT_EMAIL_TO", project.findProperty('BUG_REPORT_EMAIL_TO') ? BUG_REPORT_EMAIL_TO : "\"\""
+        buildConfigField "String", "BUG_REPORT_EMAIL_CC", project.findProperty('BUG_REPORT_EMAIL_CC') ? BUG_REPORT_EMAIL_CC : "\"\""
+        buildConfigField "String", "RTMP_INJEST_URL", project.findProperty('RTMP_INJEST_URL') ? RTMP_INJEST_URL : "\"\""
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+}
+
+dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+
+    def hmsVersion = "2.6.7"
+    // To add dependencies of specific module
+    implementation "live.100ms:android-sdk:$hmsVersion"
+    implementation "live.100ms:virtual-background:$hmsVersion"
+    implementation "live.100ms:video-view:$hmsVersion"
+    implementation "live.100ms:hls-player:$hmsVersion"
+
+    // Navigation
+    implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
+    implementation "androidx.navigation:navigation-ui-ktx:2.4.0"
+
+    // Life Cycle
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.4.0"
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // Get Permissions easily
+    implementation 'pub.devrel:easypermissions:1.1.3'
+
+
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.release
+                pom {
+                    // Only sign the artefacts if this is a maven central build.
+                    // This would only halt jitpack builds and/or make our signing keys public.
+                    if(rootProject.properties["ossrhUsername"]) {
+
+                        signing {
+                            sign publishing.publications
+                        }
+                    }
+                    name = "100ms.live Android Room Kit"
+                    description = "Room Kit that simplifies setting up videoconferencing in your own app. See more at https://www.100ms.live/docs/android/v2/guides/quickstart"
+                    url = "100ms.live"
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'http://www.opensource.org/licenses/mit-license.php'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = '1'
+                            name = '100ms'
+                            email = 'support@100ms.live'
+                        }
+                    }
+                    scm {
+                        connection = 'SCM is private'
+                        developerConnection = 'SCM is private'
+                        url = 'SCM is private'
+                    }
+                }
+                groupId = "live.100ms"
+                artifactId = 'room-kit'
+                version = getVersionName()
+            }
+        }
+    }
+}
