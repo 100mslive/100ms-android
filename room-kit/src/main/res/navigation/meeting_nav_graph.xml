@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/MeetingFragment"
+    app:startDestination="@id/PermissionFragment"
     android:id="@+id/nav_graph">
 
     <fragment
@@ -14,8 +14,7 @@
         <action
             android:id="@+id/action_PreviewFragment_to_MeetingFragment"
             app:destination="@id/MeetingFragment"
-            app:popUpTo="@id/MeetingFragment"
-            app:popUpToInclusive="@id/MeetingFragment" />
+            />
 
         <action
             android:id="@+id/action_PreviewFragment_to_ParticipantsFragment"
@@ -54,6 +53,31 @@
         <action
             android:id="@+id/action_MeetingFragment_to_roleChangeFragment"
             app:destination="@id/roleChangeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/PermissionFragment"
+        android:name="live.hms.roomkit.ui.permission.PermissionFragment"
+        android:label="@string/permission_fragment"
+        tools:layout="@layout/fragment_permission">
+
+        <argument
+            android:name="showPreview"
+            app:argType="boolean"
+            app:nullable="false" />
+
+        <action
+            android:id="@+id/action_PermissionFragment_to_MeetingFragment"
+            app:destination="@id/MeetingFragment"
+            app:popUpTo="@id/MeetingFragment"
+            app:popUpToInclusive="@id/MeetingFragment"
+            />
+
+        <action
+            android:id="@+id/action_PermissionFragment_to_PreviewFragment"
+            app:destination="@id/PreviewFragment"
+            app:popUpTo="@id/PreviewFragment"
+            app:popUpToInclusive="@id/PreviewFragment" />
     </fragment>
 
     <dialog

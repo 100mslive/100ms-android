@@ -16,12 +16,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
+import live.hms.roomkit.ui.permission.PermissionFragmentDirections
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
@@ -276,8 +278,11 @@ class PreviewFragment : Fragment() {
         binding.enterMeetingParentView.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
+                findNavController().navigate(
+                    PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
+                )
 
-                findNavController().setGraph(R.navigation.meeting_nav_graph)
+//                findNavController().setGraph(R.navigation.meeting_nav_graph)
             }
         }
     }
