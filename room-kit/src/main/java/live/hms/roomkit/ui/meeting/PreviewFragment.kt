@@ -281,8 +281,6 @@ class PreviewFragment : Fragment() {
                 findNavController().navigate(
                     PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
                 )
-
-//                findNavController().setGraph(R.navigation.meeting_nav_graph)
             }
         }
     }
