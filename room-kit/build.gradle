@@ -6,6 +6,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'androidx.navigation.safeargs.kotlin'
     id 'signing'
+    id "org.jetbrains.dokka" version "1.5.0"
 }
 def getVersionName = { ->
     return "$HMS_ROOM_KIT_VERSION"
@@ -52,7 +53,6 @@ android {
     publishing {
         singleVariant('release') {
             withSourcesJar()
-            withJavadocJar()
         }
     }
 }
@@ -101,6 +101,12 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    archiveFileName = "javadoc.jar"
+    from "build/dokka/javadoc"
+    archiveClassifier.set("javadoc")
+}
+
 afterEvaluate {
     publishing {
         publications {
@@ -111,9 +117,8 @@ afterEvaluate {
                     // Only sign the artefacts if this is a maven central build.
                     // This would only halt jitpack builds and/or make our signing keys public.
                     if(rootProject.properties["ossrhUsername"]) {
-
+                        artifact javadocJar
                         signing {
-                            sign artifacts.find{it.getClassifier() == "javadoc"}.getFile()
                             sign publishing.publications
                         }
                     }
