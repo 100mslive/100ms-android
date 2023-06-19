@@ -1,6 +1,8 @@
 package live.hms.app2.ui.home
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -37,6 +40,8 @@ class HomeFragment : Fragment() {
 
     private var binding by viewLifecycle<FragmentHomeBinding>()
     private lateinit var settings: SettingsStore
+
+
 
     override fun onResume() {
         super.onResume()
@@ -208,7 +213,28 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private var qrScanResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+
+                data?.let {
+                    data.getStringExtra(QrCodeActivity.QR_INTENT_RESULT)?.let {
+                        if (it.isNullOrEmpty().not()) {
+                            binding.edtMeetingUrl.setText(it)
+                            validate()
+                        }
+                    }
+                }
+            }
+        }
+
     private fun initConnectButton() {
+
+        binding.btnScanNow.setOnClickListener {
+            val intent = Intent(requireActivity(), QrCodeActivity::class.java)
+            qrScanResultLauncher.launch(intent)
+        }
 
         binding.btnJoinNow.setOnClickListener {
             if (binding.btnJoinNow.isEnabled.not()) {
