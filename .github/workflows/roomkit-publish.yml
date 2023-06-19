@@ -19,6 +19,8 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Which version
+      run: echo "${{github.ref_name}}"
 
     - name: Decrypt the artefact signing key
       run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ANDROID_ROOM_KIT_SONATYPE_PRIVATE_KEY_DECRYPT_PASSWORD }}" --output secrets/private.pgp secrets/private.pgp.gpg
