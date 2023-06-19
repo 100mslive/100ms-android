@@ -113,6 +113,7 @@ afterEvaluate {
                     if(rootProject.properties["ossrhUsername"]) {
 
                         signing {
+                            sign artifacts.find{it.getClassifier() == "javadoc"}.getFile()
                             sign publishing.publications
                         }
                     }
