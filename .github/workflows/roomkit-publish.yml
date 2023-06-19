@@ -27,5 +27,5 @@ jobs:
       run: chmod +x gradlew
 
     - name: Deploy to Maven Central live.100ms (Sonatype)
-      run: ./gradlew clean publishToSonatype closeAndReleaseSonatypeStagingRepository -PhmsRoomKitGroup="live.100ms" -PHMS_ROOM_KIT_VERSION="${{github.ref_name}}" -PossrhUsername="AniketKadam100ms" -PossrhPassword="${{ secrets.ANDROID_SONATYPE_PASSWORD}}" -Psigning.keyId="62C0C2F9" -Psigning.password="${{ secrets.ANDROID_ROOM_KIT_SIGNING_PASSWORD }}" -Psigning.secretKeyRingFile="../secrets/private.pgp" -PTOKEN_ENDPOINT=""
+      run: ./gradlew clean publishToSonatype closeAndReleaseSonatypeStagingRepository -PhmsRoomKitGroup="live.100ms" -PHMS_ROOM_KIT_VERSION="${{github.ref_name}}" -PossrhUsername="AniketKadam100ms" -PossrhPassword="${{ secrets.ANDROID_SONATYPE_PASSWORD}}" -Psigning.keyId="62C0C2F9" -Psigning.password="${{ secrets.ANDROID_ROOM_KIT_SIGNING_PASSWORD }}" -Psigning.secretKeyRingFile="../secrets/private.pgp" -PTOKEN_ENDPOINT="\"​\""
 
