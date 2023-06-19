@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_nav_graph"
-    app:startDestination="@id/MeetingLinkFragment">
+    app:startDestination="@id/HomeFragment">
 
     <fragment
         android:id="@+id/HomeFragment"
@@ -14,10 +14,6 @@
         <action
             android:id="@+id/action_HomeFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
-
-        <action
-            android:id="@+id/action_HomeFragment_to_MeetingActivity"
-            app:destination="@id/MeetingActivity" />
 
     </fragment>
 
@@ -34,23 +30,5 @@
 
     </fragment>
 
-    <activity
-        android:id="@+id/MeetingActivity"
-        android:name="live.hms.roomkit.ui.meeting.MeetingActivity"
-        android:label="Meeting Activity"
-        tools:layout="@layout/activity_meeting" />
-
-    <fragment
-        android:id="@+id/MeetingLinkFragment"
-        android:name="live.hms.app2.ui.home.MeetingLinkFragment"
-        android:label="MeetingLinkFragment">
-        <action
-            android:id="@+id/action_MeetingLinkFragment_to_SettingsFragment"
-            app:destination="@id/SettingsFragment" />
-
-        <action
-            android:id="@+id/action_meetingLinkFragment_to_HomeFragment"
-            app:destination="@id/HomeFragment" />
-    </fragment>
 
 </navigation>
