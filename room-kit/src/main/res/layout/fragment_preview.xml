@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/preview_card"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -34,12 +34,13 @@
                 android:layout_gravity="center"
                 android:fontFamily="@font/inter_semibold"
                 android:gravity="center"
-                android:textAlignment="center"
                 android:text="Get Started"
+                android:textAlignment="center"
                 android:textColor="#F2F5F9FF"
                 android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/description_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/name_tv"
@@ -48,8 +49,8 @@
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/inter_regular"
                 android:gravity="center"
-                android:textAlignment="center"
                 android:text="Setup your audio and video"
+                android:textAlignment="center"
                 android:textColor="@color/muted_text"
                 android:textSize="14sp" />
 
@@ -86,17 +87,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:visibility="gone"
             android:background="@color/primary_bg"
             android:paddingHorizontal="15dp"
-            android:paddingVertical="15dp">
+            android:paddingVertical="15dp"
+            android:visibility="gone">
 
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_record_button_24"
-                android:tint="@color/red" />
+                app:tint="@color/red" />
 
             <TextView
                 android:id="@+id/recording_text"
@@ -171,19 +172,6 @@
             </androidx.cardview.widget.CardView>
 
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/button_settings"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="50dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/blue_2"
-                android:contentDescription="@string/toggle_video"
-                android:enabled="false"
-                android:src="@drawable/settings_icon"
-                android:visibility="invisible"
-                app:fabSize="mini" />
 
             <Space
                 android:layout_width="wrap_content"
@@ -195,6 +183,7 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
+                android:id="@+id/icon_output_device_bg"
                 app:cardBackgroundColor="@color/gray_light"
                 app:cardCornerRadius="12dp">
 
@@ -214,6 +203,7 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
+                android:id="@+id/icon_participants_bg"
                 app:cardBackgroundColor="@color/gray_light"
                 app:cardCornerRadius="12dp">
 
@@ -251,15 +241,15 @@
                 android:layout_height="50dp"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:clickable="false"
                 android:enabled="true"
                 android:focusable="false"
-                android:clickable="false"
                 android:fontFamily="@font/inter_semibold"
                 android:paddingHorizontal="10dp"
                 android:text="@string/enter_studio_str"
                 android:textAllCaps="false"
-                android:visibility="visible"
                 android:textColor="@color/white"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/preview_card" />
 
@@ -267,10 +257,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:tint="@color/white"
-                android:focusable="false"
                 android:clickable="false"
-                android:src="@drawable/ic_baseline_arrow_forward_24" />
+                android:focusable="false"
+                android:src="@drawable/ic_baseline_arrow_forward_24"
+                app:tint="@color/white" />
 
             <Space
                 android:layout_width="wrap_content"
