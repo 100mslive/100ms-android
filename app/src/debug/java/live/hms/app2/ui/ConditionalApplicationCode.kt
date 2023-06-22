@@ -2,7 +2,7 @@ package live.hms.app2.ui
 
 import android.app.Application
 import leakcanary.LeakCanary
-import live.hms.app2.ui.settings.SettingsStore
+import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.app2.util.crashlyticsLog
 
 class ConditionalApplicationCode {
