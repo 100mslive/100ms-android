@@ -7,13 +7,16 @@ data class PollCreationInfo(
     val anon : Boolean = false,
     val hideVote : Boolean = false,
     val isPoll  : Boolean = false,
+    val pollTitle : String = "",
 )
 
 class PollsViewModel : ViewModel() {
 
     private var pollCreationInfo = PollCreationInfo()
 
-
+    fun setTitle(title : String) {
+        pollCreationInfo = pollCreationInfo.copy(pollTitle = title)
+    }
     fun setTimer(timerEnabled : Boolean) {
         pollCreationInfo = pollCreationInfo.copy(timer = timerEnabled)
     }
@@ -27,4 +30,6 @@ class PollsViewModel : ViewModel() {
     fun highlightPollOrQuiz(isPoll : Boolean) {
         pollCreationInfo = pollCreationInfo.copy(isPoll = isPoll)
     }
+
+    fun getPollsCreationInfo() = pollCreationInfo
 }

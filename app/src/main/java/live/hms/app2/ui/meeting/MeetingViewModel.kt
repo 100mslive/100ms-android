@@ -19,13 +19,17 @@ import live.hms.app2.model.RoomDetails
 import live.hms.app2.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.app2.ui.meeting.chat.ChatMessage
 import live.hms.app2.ui.meeting.chat.Recipient
+import live.hms.app2.ui.polls.PollCreationInfo
+import live.hms.app2.ui.polls.QuestionUi
 import live.hms.app2.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.app2.ui.settings.SettingsStore
 import live.hms.app2.util.*
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
+import live.hms.video.interactivity.HmsInteractivityCenter
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
+import live.hms.video.polls.HMSPollBuilder
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.AudioMixingMode
@@ -52,6 +56,7 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    lateinit var localHmsInteractivityCenter : HmsInteractivityCenter
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private val config = HMSConfig(
         roomDetails.username,
@@ -470,6 +475,11 @@ class MeetingViewModel(
                 super.onSessionStoreAvailable(sessionStore)
                 sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
                 pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
+            }
+
+            override fun onInteractivityCenterAvailable(hmsInteractivityCenter: HmsInteractivityCenter) {
+                super.onInteractivityCenterAvailable(hmsInteractivityCenter)
+                localHmsInteractivityCenter = hmsInteractivityCenter
             }
 
             override fun onJoin(room: HMSRoom) {
@@ -1498,5 +1508,38 @@ class MeetingViewModel(
         leaveMeeting()
     }
 
+    fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
+        // To start a poll
+        val hmsPollBuilder = HMSPollBuilder(UUID.randomUUID().toString(),
+            pollCreationInfo.pollTitle,
+            0,
+            pollCreationInfo.anon,
+            pollCreationInfo.hideVote,
+            rolesThaCanViewResponses = listOf("host"),
+            rolesThatCanVote = listOf("host")
+        )
+        currentList.forEach { questionUi ->
+            when(questionUi) {
+                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
+                is QuestionUi.MultiChoiceQuestion -> hmsPollBuilder.addMultiChoiceQuestion(
+                    questionUi.withTitle, questionUi.options, questionUi.correctOptionIndex
+                )
+                QuestionUi.QuestionCreator -> { /*Nothing to do here*/}
+                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
+                is QuestionUi.SingleChoiceQuestion -> hmsPollBuilder.addSingleChoiceQuestion(questionUi.withTitle,
+                questionUi.options, questionUi.correctOptionIndex)
+            }
+        }
+        localHmsInteractivityCenter.quickStartPoll(hmsPollBuilder, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d("Polls","Error $error")
+            }
+
+            override fun onSuccess() {
+                Log.d("Polls","Success")
+            }
+
+        })
+    }
 }
 

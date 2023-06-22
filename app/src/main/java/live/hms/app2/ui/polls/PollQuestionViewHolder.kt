@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import live.hms.app2.R
 import live.hms.app2.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.app2.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.app2.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
@@ -20,11 +19,11 @@ sealed class QuestionUi(open val index : Long, open val viewType : Int, open val
     object QuestionCreator : QuestionUi(0, 0, false)
 
     // Actual questions that might be asked.
-    data class MultiChoiceQuestion(val withTitle: String, val options: List<String>, val correctOptionIndex: Int? = null, override val index : Long,
+    data class MultiChoiceQuestion(val withTitle: String, val options: List<String>, val correctOptionIndex: List<Int>?, override val index : Long,
                                    override val requiredToAnswer: Boolean) : QuestionUi(index, 1, requiredToAnswer)
     data class SingleChoiceQuestion(val withTitle: String,
                                     val options: List<String>,
-                                    val correctOptionIndex: Int? = null,
+                                    val correctOptionIndex: Int?,
                                     override val index : Long,
                                     override val requiredToAnswer: Boolean) : QuestionUi(index, 2, requiredToAnswer)
     data class LongAnswer(val text : String, override val index: Long,
@@ -53,37 +52,6 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
         with(binding as LayoutPollQuestionCreationItemBinding) {
             val requiredToAnswer = !notRequiredToAnswer.isChecked
 
-
-//            val adapter = object : ArrayAdapter<String>(binding.root.context, R.layout.layout_poll_quiz_options_item) {
-//                override fun getView(
-//                    position: Int, convertView: View?,
-//                    parent: ViewGroup
-//                ): View {
-//                    val view = super.getView(position, convertView, parent)
-//                    Log.d(TAG,"Looking into position $position, hasView: ${view == null}")
-//
-//                    if(view.tag == null) {
-//                        (view as EditText).addTextChangedListener {
-//                            // Modify the text for the given position and then
-//                            //  take it into account when you're changing the number
-//                            //  of items in the adapter.
-//                            options[position] = it.toString()
-//                            Log.d(TAG, "Edited $options")
-//                        }
-////                       if(!hasFocus)
-////                       {
-////                           val newText = (v as EditText).text.toString()
-////                           remove(getItem(position))
-////                           add(newText)
-////                       }
-////                    }
-//                        view.tag = position
-//                    }
-//                    return view
-//                }
-//
-//            }
-
             val optionsAdapter = OptionsListAdapter()
             optionsListView.adapter = optionsAdapter
             optionsListView.layoutManager = LinearLayoutManager(binding.root.context)
@@ -94,7 +62,13 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     position: Int,
                     id: Long
                 ) {
+                    // Reset options whenever a question type is selected
                     optionsAdapter.submitList(emptyList())
+                    // If short/long answer hide the options else show them
+                    val multiOptionVisibility = if(position > 1) View.GONE else View.VISIBLE
+                    addAnOptionTextView.visibility = multiOptionVisibility
+                    optionsListView.visibility = multiOptionVisibility
+                    optionsHeading.visibility = multiOptionVisibility
                     // Only the UI might need to be toggled
                     Log.d(TAG,"Toggle UI")
                 }
@@ -127,15 +101,43 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     // single, multi, short, long
                     0,1 -> {
                         val items = (optionsListView.adapter as OptionsListAdapter).currentList.map { it.text }
-                        if(questionTypeSpinner.selectedItemPosition == 0)
-                            QuestionUi.SingleChoiceQuestion(title, items, null,count++, requiredToAnswer)
-                        else
-                            QuestionUi.MultiChoiceQuestion(title, items, null, count++, requiredToAnswer)
+                        if(questionTypeSpinner.selectedItemPosition == 0) {
+                            val selectedIndex = optionsAdapter.currentList.indexOfFirst { it.isChecked }
+                            val selected = if(selectedIndex == -1)
+                                null
+                            else
+                                selectedIndex
+                            QuestionUi.SingleChoiceQuestion(
+                                title,
+                                items,
+                                selected,
+                                count++,
+                                requiredToAnswer
+                            )
+                        }
+                        else {
+                            val selectedIndices = mutableListOf<Int>()
+                            optionsAdapter.currentList.forEachIndexed { index, option ->
+                                if(option.isChecked)
+                                    selectedIndices.add(index)
+                            }
+                            QuestionUi.MultiChoiceQuestion(
+                                title,
+                                items,
+                                selectedIndices,
+                                count++,
+                                requiredToAnswer
+                            )
+                        }
                     }
                     2 -> QuestionUi.ShortAnswer(title, count++, requiredToAnswer)
                     3 -> QuestionUi.LongAnswer(title, count++, requiredToAnswer)
                     else -> null
                 }
+                // Reset the UI
+                optionsAdapter.submitList(emptyList())
+                askAQuestionEditText.setText("")
+                // Save the info
                 saveInfo(newQuestionUi!!)
             }
         }

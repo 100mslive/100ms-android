@@ -46,6 +46,7 @@ class PollsCreationFragment : Fragment(){
     }
 
     private fun startPoll() {
+        pollsViewModel.setTitle(binding.pollTitleEditText.text.toString())
         // Move to the next fragment but the data is only carried forward isn't it?
         //  It's not quite used yet.
         // Perhaps it really should be a common VM for all these fragments.

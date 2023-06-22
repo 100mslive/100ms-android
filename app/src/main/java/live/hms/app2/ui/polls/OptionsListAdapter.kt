@@ -1,5 +1,6 @@
 package live.hms.app2.ui.polls
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -28,11 +29,17 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionViewHolder {
         val binding = LayoutPollQuizOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return OptionViewHolder(binding,::getItem)
+        return OptionViewHolder(binding,::getItem, ::selectOnlyCurrentOption)
     }
 
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
+    private fun selectOnlyCurrentOption(position: Int) {
+        for ( i in 0 until currentList.size) {
+            Log.d("OptionsListAdapter", "Considering ${getItem(i)}, going to be ${i == position}")
+            getItem(i).isChecked = i == position
+        }
+    }
 }

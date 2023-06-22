@@ -4,14 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.LinearLayoutCompat.OrientationMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
-import androidx.recyclerview.widget.RecyclerView.Orientation
 import live.hms.app2.databinding.LayoutPollQuestionCreationBinding
+import live.hms.app2.ui.meeting.MeetingViewModel
+import live.hms.app2.util.setOnSingleClickListener
 import live.hms.app2.util.viewLifecycle
 
 /**
@@ -24,6 +22,7 @@ import live.hms.app2.util.viewLifecycle
 class PollQuestionCreation : Fragment() {
 
     private val pollsViewModel: PollsViewModel by activityViewModels()
+    private val meetingViewModel : MeetingViewModel by activityViewModels()
     private val adapter = PollQuestionCreatorAdapter()
 
     private var binding by viewLifecycle<LayoutPollQuestionCreationBinding>()
@@ -51,5 +50,10 @@ class PollQuestionCreation : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.createdQuestionList.adapter = adapter
         binding.createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
+        binding.launchPollQuiz.setOnSingleClickListener {
+            // Clear the UI
+            // start the data
+            meetingViewModel.startPoll(adapter.currentList, pollsViewModel.getPollsCreationInfo())
+        }
     }
 }
