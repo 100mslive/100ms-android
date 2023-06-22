@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
 
@@ -51,18 +51,24 @@
             app:layout_constraintLeft_toLeftOf="@id/askAquestionLayout"
             app:layout_constraintTop_toBottomOf="@id/askAquestionLayout" />
 
-        <ListView
+        <RadioGroup
+            android:id="@+id/optionsListRadioGroup"
+            android:layout_marginTop="16dp"
+            app:layout_constraintLeft_toLeftOf="@id/optionsHeading"
+            app:layout_constraintTop_toBottomOf="@id/optionsHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/optionsListView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintLeft_toLeftOf="@id/optionsHeading"
-            app:layout_constraintTop_toBottomOf="@id/optionsHeading" />
+             />
+        </RadioGroup>
 
             <TextView
                 android:id="@+id/addAnOptionTextView"
-                app:layout_constraintTop_toBottomOf="@id/optionsListView"
-                app:layout_constraintLeft_toLeftOf="@id/optionsListView"
+                app:layout_constraintTop_toBottomOf="@id/optionsListRadioGroup"
+                app:layout_constraintLeft_toLeftOf="@id/optionsListRadioGroup"
                 android:padding="5dp"
                 android:drawableLeft="@drawable/add_plus"
                 android:layout_width="match_parent"
@@ -71,6 +77,15 @@
                 android:drawablePadding="23dp"
                 android:gravity="center"
                 />
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/notRequiredToAnswer"
+            app:layout_constraintTop_toBottomOf="@id/addAnOptionTextView"
+            app:layout_constraintLeft_toLeftOf="@id/addAnOptionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:switchPadding="16dp"
+            android:text="Not required to answer"
+            />
         <ImageButton
             android:id="@+id/deleteOptionTrashButton"
             android:layout_width="match_parent"
@@ -79,12 +94,13 @@
             app:layout_constraintTop_toTopOf="@id/saveButton"
             app:layout_constraintBottom_toBottomOf="@id/saveButton"
             />
+
         <Button
             android:id="@+id/saveButton"
             android:background="#475366"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/addAnOptionTextView"
-            app:layout_constraintLeft_toLeftOf="@id/addAnOptionTextView"
+            app:layout_constraintTop_toBottomOf="@id/notRequiredToAnswer"
+            app:layout_constraintLeft_toLeftOf="@id/notRequiredToAnswer"
             android:layout_marginTop="24dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
