@@ -22,7 +22,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/heading"
-            style="@style/MaterialTextViewHeading"
+            android:fontFamily="@font/clan_pro_medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -41,14 +41,14 @@
             android:layout_marginBottom="24dp"
             android:gravity="center"
             android:text="@string/progress_bar_description"
-            android:textColor="@color/text_color_faded_70"
             android:textSize="14sp" />
 
         <ProgressBar
+            android:id="@+id/progress_bar"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:indeterminate="true"
-            android:indeterminateTint="@color/white" />
+            />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
