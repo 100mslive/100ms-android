@@ -4,9 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.LinearLayoutCompat.DividerMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
+import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.setOnSingleClickListener
@@ -50,6 +55,11 @@ class PollQuestionCreation : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.createdQuestionList.adapter = adapter
         binding.createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
+        val divider = DividerItemDecoration(requireContext(), VERTICAL).apply {
+            setDrawable(binding.root.context.getDrawable(R.drawable.questions_divider)!!)
+        }
+        binding.createdQuestionList.addItemDecoration(divider)
+
         binding.launchPollQuiz.setOnSingleClickListener {
             // Clear the UI
             // start the data
