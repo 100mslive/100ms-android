@@ -1031,7 +1031,10 @@ class MeetingFragment : Fragment() {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
                 }, {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
-                })
+                },
+                    {
+                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToNavigation())
+                    })
                 settingsBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     "settingsBottomSheet"

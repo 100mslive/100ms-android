@@ -1,15 +1,17 @@
-package live.hms.app2.ui.polls
+package live.hms.roomkit.ui.polls
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewbinding.ViewBinding
-import live.hms.app2.databinding.LayoutPollQuestionCreationItemBinding
-import live.hms.app2.databinding.LayoutPollQuizItemShortAnswerBinding
-import live.hms.app2.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
+import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
+import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
+import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 
-class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(DIFFUTIL_CALLBACK) {
+class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
+    DIFFUTIL_CALLBACK
+) {
 
     init {
         // Adaptor begins with the question creation ui.

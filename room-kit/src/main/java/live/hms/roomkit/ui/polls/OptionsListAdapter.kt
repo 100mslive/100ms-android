@@ -1,12 +1,12 @@
-package live.hms.app2.ui.polls
+package live.hms.roomkit.ui.polls
 
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import live.hms.app2.databinding.LayoutPollQuizOptionsItemBinding
-import live.hms.app2.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
+import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
+import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 import java.util.*
 
 data class Option(var text : String,

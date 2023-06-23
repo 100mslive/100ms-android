@@ -181,7 +181,7 @@
         app:startDestination="@id/pollsCreationFragment">
         <fragment
             android:id="@+id/pollsCreationFragment"
-            android:name="live.hms.app2.ui.polls.PollsCreationFragment"
+            android:name="live.hms.roomkit.ui.polls.PollsCreationFragment"
             android:label="PollsCreationFragment" >
             <action
                 android:id="@+id/action_pollsCreationFragment_to_pollQuestionCreation"
@@ -189,7 +189,7 @@
         </fragment>
         <fragment
             android:id="@+id/pollQuestionCreation"
-            android:name="live.hms.app2.ui.polls.PollQuestionCreation"
+            android:name="live.hms.roomkit.ui.polls.PollQuestionCreation"
             android:label="PollQuestionCreation" />
     </navigation>
 

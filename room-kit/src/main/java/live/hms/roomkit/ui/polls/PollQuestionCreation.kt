@@ -1,4 +1,4 @@
-package live.hms.app2.ui.polls
+package live.hms.roomkit.ui.polls
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import live.hms.app2.databinding.LayoutPollQuestionCreationBinding
-import live.hms.app2.ui.meeting.MeetingViewModel
-import live.hms.app2.util.setOnSingleClickListener
-import live.hms.app2.util.viewLifecycle
+import live.hms.roomkit.databinding.LayoutPollQuestionCreationBinding
+import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.util.setOnSingleClickListener
+import live.hms.roomkit.util.viewLifecycle
 
 /**
  * This class creates all the questions that we're  going to need.

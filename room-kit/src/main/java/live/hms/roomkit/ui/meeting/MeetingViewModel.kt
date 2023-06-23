@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.meeting
 
-import android.R
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -15,10 +14,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.polls.PollCreationInfo
+import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.*
@@ -1274,9 +1276,9 @@ class MeetingViewModel(
         // With custom notification
         val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
             .setContentText("Screenshare running for roomId: ${hmsRoom?.roomId}")
-            .setSmallIcon(R.drawable.arrow_up_float)
+            .setSmallIcon(android.R.drawable.arrow_up_float)
             .addAction(
-                R.drawable.ic_menu_close_clear_cancel,
+                android.R.drawable.ic_menu_close_clear_cancel,
                 "Stop Screenshare",
                 HMSScreenCaptureService.getStopScreenSharePendingIntent(getApplication())
             )
@@ -1302,9 +1304,9 @@ class MeetingViewModel(
         // With custom notification
         val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
             .setContentText("Sharing Audio of device to roomId: ${hmsRoom?.roomId}")
-            .setSmallIcon(R.drawable.arrow_up_float)
+            .setSmallIcon(android.R.drawable.arrow_up_float)
             .addAction(
-                R.drawable.ic_menu_close_clear_cancel,
+                android.R.drawable.ic_menu_close_clear_cancel,
                 "Stop sharing device audio",
                 HMSScreenCaptureService.getStopScreenSharePendingIntent(getApplication())
             )

@@ -1,4 +1,4 @@
-package live.hms.app2.ui.polls
+package live.hms.roomkit.ui.polls
 
 import android.view.View
 import android.widget.ListAdapter
@@ -6,7 +6,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import live.hms.app2.databinding.LayoutPollQuizOptionsItemBinding
+import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
 
 class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
                        getItem: (position : Int) -> Option,

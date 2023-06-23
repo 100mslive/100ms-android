@@ -1,4 +1,4 @@
-package live.hms.app2.ui.polls
+package live.hms.roomkit.ui.polls
 
 import androidx.lifecycle.ViewModel
 

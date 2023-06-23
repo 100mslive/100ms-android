@@ -1,4 +1,4 @@
-package live.hms.app2.ui.polls
+package live.hms.roomkit.ui.polls
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import live.hms.app2.databinding.FragmentParticipantsBinding
-import live.hms.app2.databinding.LayoutPollsCreationBinding
-import live.hms.app2.ui.meeting.MeetingViewModel
-import live.hms.app2.util.setOnSingleClickListener
-import live.hms.app2.util.viewLifecycle
+import live.hms.roomkit.databinding.FragmentParticipantsBinding
+import live.hms.roomkit.databinding.LayoutPollsCreationBinding
+import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.util.setOnSingleClickListener
+import live.hms.roomkit.util.viewLifecycle
 
 /**
  * The first screen that gathers initial poll creation parameters.

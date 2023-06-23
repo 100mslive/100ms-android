@@ -1,4 +1,4 @@
-package live.hms.app2.ui.polls
+package live.hms.roomkit.ui.polls
 
 import android.util.Log
 import android.view.View
@@ -8,10 +8,10 @@ import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import live.hms.app2.databinding.LayoutPollQuestionCreationItemBinding
-import live.hms.app2.databinding.LayoutPollQuizItemShortAnswerBinding
-import live.hms.app2.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
-import live.hms.app2.util.setOnSingleClickListener
+import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
+import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
+import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
+import live.hms.roomkit.util.setOnSingleClickListener
 
 private var count : Long = 0
 sealed class QuestionUi(open val index : Long, open val viewType : Int, open val requiredToAnswer : Boolean){
@@ -39,7 +39,7 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
 
     fun bind(questionUi: QuestionUi) {
         when(questionUi) {
-            is QuestionUi.QuestionCreator-> bind(QuestionUi.QuestionCreator)
+            is QuestionUi.QuestionCreator -> bind(QuestionUi.QuestionCreator)
             is QuestionUi.LongAnswer -> bind(questionUi)
             is QuestionUi.MultiChoiceQuestion -> bind(questionUi)
             is QuestionUi.ShortAnswer -> bind(questionUi)
