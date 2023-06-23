@@ -26,6 +26,8 @@ data class ThemeColours(
     @SerializedName("onsurface_med_emp") val onsurface_med_emp: String = "#C5C6D0",
     @SerializedName("onsurface_low_emp") val onsurface_low_emp: String = "#8F9099",
     @SerializedName("error_default") val error_default: String = "#C74E5B",
-    @SerializedName("error_container") val error_container: String = "#FFB2B6"
+    @SerializedName("error_container") val error_container: String = "#FFB2B6",
+    @SerializedName("background_default") val background_default: String = "#0B0E15",
+    @SerializedName("border_bright") val border_bright: String = "#272A31"
 )
 

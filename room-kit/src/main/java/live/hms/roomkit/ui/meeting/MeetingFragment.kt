@@ -50,6 +50,10 @@ import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
+import live.hms.roomkit.ui.theme.DefaultTheme
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.setIconTintColor
+import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.audio.HMSAudioManager.AudioDevice
@@ -144,10 +148,8 @@ class MeetingFragment : Fragment() {
                     override fun onSuccess() {
                         // success
                         binding.buttonShareScreen?.apply {
-                            background = ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.gray_round_solid_drawable
-                            )
+                            setBackgroundAndColor(DefaultTheme.getColours().secondary_dim, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
+                            setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp, R.color.gray_light)
                         }
                     }
                 })
@@ -269,10 +271,8 @@ class MeetingFragment : Fragment() {
                     override fun onSuccess() {
                         //success
                         binding.buttonShareScreen?.apply {
-                            background = ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.gray_round_stroked_drawable
-                            )
+                            setBackgroundAndColor(DefaultTheme.getColours().border_bright, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
+                            setIconTintColor(DefaultTheme.getColours().onsurface_high_emp, R.color.gray_light)
                         }
                     }
                 })
@@ -418,6 +418,7 @@ class MeetingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.applyTheme()
         initViewModel()
         setHasOptionsMenu(true)
         setupConfiguration()
@@ -433,15 +434,18 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
-                binding.buttonRaiseHand?.background = ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.gray_round_solid_drawable
-                )
+                binding.buttonRaiseHand?.setBackgroundAndColor(
+                    DefaultTheme.getColours().secondary_dim,
+                    R.color.gray_light,
+                    R.drawable.gray_round_solid_drawable)
+                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp,R.color.gray_light )
             } else {
-                binding.buttonRaiseHand?.background = ContextCompat.getDrawable(
-                    requireContext(),
+                binding.buttonRaiseHand?.setBackgroundAndColor(
+                    DefaultTheme.getColours().border_bright,
+                    R.color.gray_light,
                     R.drawable.gray_round_stroked_drawable
                 )
+                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours().onsurface_high_emp,R.color.gray_light )
             }
         }
 
@@ -778,17 +782,13 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
             (binding.buttonToggleVideo as? AppCompatImageView)?.apply {
                 if (enabled) {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_stroked_drawable
-                    )
+                    setBackgroundAndColor(DefaultTheme.getColours().border_bright, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
                     setImageResource(R.drawable.ic_camera_toggle_on)
+                    setIconTintColor(DefaultTheme.getColours().onsurface_high_emp, R.color.gray_light)
                 } else {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_solid_drawable
-                    )
+                    setBackgroundAndColor(DefaultTheme.getColours().secondary_dim, R.color.gray_light, R.drawable.gray_round_solid_drawable)
                     setImageResource(R.drawable.ic_camera_toggle_off)
+                    setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp, R.color.gray_light)
                 }
             }
         }
@@ -800,17 +800,13 @@ class MeetingFragment : Fragment() {
             (binding.buttonToggleAudio as? AppCompatImageView)?.apply {
 
                 if (enabled) {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_stroked_drawable
-                    )
+                    setBackgroundAndColor(DefaultTheme.getColours().border_bright, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
                     setImageResource(R.drawable.ic_audio_toggle_on)
+                    setIconTintColor(DefaultTheme.getColours().onsurface_high_emp, R.color.gray_light)
                 } else {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_solid_drawable
-                    )
+                    setBackgroundAndColor(DefaultTheme.getColours().secondary_dim, R.color.gray_light, R.drawable.gray_round_solid_drawable)
                     setImageResource(R.drawable.ic_audio_toggle_off)
+                    setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp, R.color.gray_light)
                 }
             }
         }

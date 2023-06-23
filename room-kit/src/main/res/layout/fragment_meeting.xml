@@ -23,9 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -53,7 +52,6 @@
                 android:drawablePadding="5dp"
                 android:drawableTint="@color/red"
                 android:text="@string/live_str"
-                android:textColor="@color/white"
                 android:textSize="16sp" />
 
             <Space
@@ -75,7 +73,6 @@
                     android:drawableStart="@drawable/ic_baseline_access_time_24"
                     android:drawablePadding="5dp"
                     android:drawableTint="#E0ECFF"
-                    android:textColor="#E0ECFF"
                     android:textSize="12sp"
                     android:visibility="visible"
                     tools:text="1:00" />
@@ -89,7 +86,6 @@
                     android:drawableStart="@drawable/ic_eye"
                     android:drawablePadding="5dp"
                     android:drawableTint="#E0ECFF"
-                    android:textColor="#E0ECFF"
                     android:textSize="12sp"
                     android:visibility="visible"
                     tools:text="2" />
@@ -140,7 +136,6 @@
                 android:background="@drawable/badge_circle_20"
                 android:gravity="center"
                 android:text="@string/_0"
-                android:textColor="@color/white"
                 android:textSize="12sp" />
 
         </RelativeLayout>
@@ -156,6 +151,7 @@
             android:padding="8dp"
             android:tint="@color/white"
             android:visibility="gone"
+            tools:visibility="visible"
             app:srcCompat="@drawable/ic_more_vert_24" />
 
     </LinearLayout>
