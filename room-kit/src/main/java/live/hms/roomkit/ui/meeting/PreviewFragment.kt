@@ -445,11 +445,9 @@ class PreviewFragment : Fragment() {
                                 ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
                             backgroundTintList =
                                 ContextCompat.getColorStateList(context, R.color.white)
-                            binding.buttonToggleVideoBg.setCardBackgroundColor(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.gray_light
-                                )
+                            binding.buttonToggleVideoBg.setBackgroundAndColor(
+                                DefaultTheme.getColours().secondary_default,
+                                R.color.gray_light,
                             )
                         }
                     }
@@ -484,11 +482,9 @@ class PreviewFragment : Fragment() {
                                 ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
                             backgroundTintList =
                                 ContextCompat.getColorStateList(context, R.color.white)
-                            binding.buttonToggleAudioBg.setCardBackgroundColor(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.gray_light
-                                )
+                            binding.buttonToggleAudioBg.setBackgroundAndColor(
+                                DefaultTheme.getColours().secondary_default,
+                                R.color.gray_light,
                             )
                         }
                     }
