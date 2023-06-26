@@ -127,4 +127,9 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">14sp</item>
     </style>
+    <style name="QuestionNumberText" parent="Widget.MaterialComponents.TextView">
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:textColor">#C3D0E580</item>
+        <item name="android:textSize">10sp</item>
+    </style>
 </resources>

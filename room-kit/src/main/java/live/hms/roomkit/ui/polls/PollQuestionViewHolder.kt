@@ -163,14 +163,14 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
 
     private fun bind(questionUi: QuestionUi.ShortAnswer) {
         with(binding as LayoutPollQuizItemShortAnswerBinding) {
-            questionType.text = "Short Answer"
-            questionText.text = questionUi.text
+            questionNumberHeading.text = "QUESTION ${questionUi.index} : Short Answer"
+            questionHeading.text = questionUi.text
         }
     }
     private fun bind(questionUi: QuestionUi.LongAnswer) {
         with(binding as LayoutPollQuizItemShortAnswerBinding) {
-            questionType.text = "Long Answer"
-            questionText.text = questionUi.text
+            questionNumberHeading.text = "QUESTION ${questionUi.index} : Long Answer"
+            questionHeading.text = questionUi.text
         }
     }
 }

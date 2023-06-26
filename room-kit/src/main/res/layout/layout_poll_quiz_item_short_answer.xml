@@ -2,7 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="24dp"
+    android:padding="16dp"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -11,18 +11,28 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/questionType"
+            android:id="@+id/questionNumberHeading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:text="Question 1 of 1"
+            style="@style/QuestionNumberText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            />
+        <TextView
+            android:id="@+id/questionHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Short Answer"
+            tools:text="What is the question?"
             />
 
-        <TextView
-            android:id="@+id/questionText"
-            android:layout_marginTop="12dp"
+        <ImageButton
+            android:id="@+id/deleteQuestionTrashButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Question Text"
+            android:layout_height="match_parent"
+            android:src="@drawable/delete_trash"
+            app:layout_constraintTop_toTopOf="@id/saveButton"
+            app:layout_constraintBottom_toBottomOf="@id/saveButton"
             />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
