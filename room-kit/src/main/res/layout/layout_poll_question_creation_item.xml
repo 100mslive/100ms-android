@@ -64,7 +64,6 @@
             android:id="@+id/optionsListRadioGroupVG"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constrainedHeight="true"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@id/addAnOptionTextView"
             app:layout_constraintLeft_toLeftOf="@id/optionsHeading"
@@ -79,6 +78,7 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/optionsListView"
+                    android:nestedScrollingEnabled="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:visibility="gone" />
