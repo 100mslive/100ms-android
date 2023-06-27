@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:windowSoftInputMode="adjustNothing"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,12 +15,12 @@
             android:id="@+id/questionTypeTitle"
             android:layout_width="379dp"
             android:layout_height="16dp"
-            android:text="Question Type"
             android:layout_marginBottom="8dp"
+            android:text="Question Type"
             app:layout_constraintBottom_toTopOf="@+id/questionTypeSpinner"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed" />
+            />
 
         <Spinner
             android:id="@+id/questionTypeSpinner"
@@ -53,9 +54,9 @@
             android:id="@+id/optionsHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Options"
             android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/optionsListRadioGroupVG"
+            android:text="Options"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/askAquestionLayout" />
@@ -64,24 +65,24 @@
             android:id="@+id/optionsListRadioGroupVG"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@id/addAnOptionTextView"
-            app:layout_constraintLeft_toLeftOf="@id/optionsHeading"
-            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/optionsHeading">
 
             <RadioGroup
                 android:id="@+id/optionsListRadioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp">
+                >
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/optionsListView"
-                    android:nestedScrollingEnabled="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:visibility="gone" />
+                    android:nestedScrollingEnabled="false" />
+
+
             </RadioGroup>
 
         </FrameLayout>
@@ -90,12 +91,13 @@
             android:id="@+id/addAnOptionTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
             android:drawablePadding="23dp"
             android:gravity="center"
             android:padding="5dp"
-            android:layout_marginBottom="8dp"
             android:text="Add an option"
-            app:layout_constraintBottom_toTopOf="@+id/notRequiredToAnswer"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/optionsListRadioGroupVG" />
@@ -104,6 +106,8 @@
             android:id="@+id/notRequiredToAnswer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
             android:text="Not required to answer"
             app:layout_constraintBottom_toTopOf="@+id/saveButton"
@@ -124,12 +128,12 @@
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#475366"
             android:layout_marginBottom="8dp"
+            android:background="#475366"
             android:text="Save"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/notRequiredToAnswer" />
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
