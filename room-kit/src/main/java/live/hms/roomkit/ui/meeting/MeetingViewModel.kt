@@ -37,9 +37,7 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
-import live.hms.video.signal.init.HMSTokenListener
-import live.hms.video.signal.init.TokenRequest
-import live.hms.video.signal.init.TokenRequestOptions
+import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
@@ -109,6 +107,17 @@ class MeetingViewModel(
 
                 override fun onTokenSuccess(token: String) {
 
+                   hmsSDK.getLayoutConfigByToken(token, LayoutRequestOptions("https://api-nonprod.100ms.live"), object :
+                       HMSLayoutListener {
+                       override fun onError(error: HMSException) {
+                           Log.e(TAG, "onError: ", error)
+                       }
+
+                       override fun onLayoutSuccess(layoutConfig: LayoutResult) {
+                           Log.d(TAG, "onLayoutSuccess: $layoutConfig")
+                       }
+
+                   })
                    hmsConfig = HMSConfig(
                         userName = hmsPrebuiltOptions?.userName.orEmpty(),
                         token,
