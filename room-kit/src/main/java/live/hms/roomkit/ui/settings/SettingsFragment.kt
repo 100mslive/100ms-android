@@ -499,6 +499,12 @@ class SettingsFragment : Fragment() {
         forceSoftwareDecoder
       ) { commitHelper.setForceSoftwareDecoder(it) }
 
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.muteLocalAudioOnPhoneRing,
+        muteLocalAudioOnPhoneRing
+      ) { commitHelper.setMuteLocalAudioOnPhoneRing(it) }
+
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

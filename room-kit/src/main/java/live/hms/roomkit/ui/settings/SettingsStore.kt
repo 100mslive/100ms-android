@@ -54,6 +54,8 @@ class SettingsStore(context: Context) {
     const val FORCE_SOFTWARE_DECODER = "force-software-decoder"
     const val DISABLE_AUTO_SIMULCAST = "disable_auto_simulcast"
 
+    const val MUTE_LOCAL_AUDIO_ON_PHONE_RING = "mute-local-audio-on-phone-ring"
+
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
       VIDEO_BITRATE,
@@ -136,6 +138,10 @@ class SettingsStore(context: Context) {
   var forceSoftwareDecoder: Boolean
     get() = sharedPreferences.getBoolean(FORCE_SOFTWARE_DECODER, false)
     set(value) = putBoolean(FORCE_SOFTWARE_DECODER, value)
+
+  var muteLocalAudioOnPhoneRing: Boolean
+    get() = sharedPreferences.getBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, true)
+    set(value) = putBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, value)
 
   var disableAutoSimulcast: Boolean
     get() = sharedPreferences.getBoolean(DISABLE_AUTO_SIMULCAST, false)
@@ -335,6 +341,7 @@ class SettingsStore(context: Context) {
     fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
     fun setDisableAutoResize(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_RESIZE, value) }
     fun setForceSoftwareDecoder(value: Boolean) = apply { editor.putBoolean(FORCE_SOFTWARE_DECODER, value) }
+    fun setMuteLocalAudioOnPhoneRing(value: Boolean) = apply { editor.putBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, value) }
     fun setDisableAutoSimulcast(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_SIMULCAST, value) }
 
 
