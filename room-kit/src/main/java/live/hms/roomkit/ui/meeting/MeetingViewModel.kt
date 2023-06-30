@@ -3,7 +3,6 @@ package live.hms.roomkit.ui.meeting
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.media.AudioManager
 import android.util.Log
 import androidx.annotation.StringRes
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
@@ -30,6 +28,9 @@ import live.hms.video.interactivity.HmsInteractivityCenter
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.polls.HMSPollBuilder
+import live.hms.video.polls.HMSPollQuestionBuilder
+import live.hms.video.polls.models.HmsPollCategory
+import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.AudioMixingMode
@@ -46,9 +47,7 @@ import live.hms.video.signal.init.TokenRequest
 import live.hms.video.signal.init.TokenRequestOptions
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
-import kotlin.random.Random
 
 
 class MeetingViewModel(
@@ -1538,27 +1537,43 @@ class MeetingViewModel(
 
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll
-        val hmsPollBuilder = HMSPollBuilder(UUID.randomUUID().toString(),
-            pollCreationInfo.pollTitle,
-            0,
-            pollCreationInfo.anon,
-            pollCreationInfo.hideVote,
-            rolesThaCanViewResponses = listOf("host"),
-            rolesThatCanVote = listOf("host")
-        )
+
+
+        val hmsPollBuilder = HMSPollBuilder.Builder()
+            .withTitle(pollCreationInfo.pollTitle)
+            .withCategory(if (pollCreationInfo.isPoll) HmsPollCategory.POLL else HmsPollCategory.QUIZ)
+            .withAnonymous(pollCreationInfo.hideVote)
+            .withRolesThatCanVote(hmsSDK.getRoles().filter { it.name == "host" })
+            .withRolesThatCanViewResponses(hmsSDK.getRoles().filter { it.name == "host" })
+
         currentList.forEach { questionUi ->
+
             when(questionUi) {
                 is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
-                is QuestionUi.MultiChoiceQuestion -> hmsPollBuilder.addMultiChoiceQuestion(
-                    questionUi.withTitle, questionUi.options, questionUi.correctOptionIndex
-                )
+                is QuestionUi.MultiChoiceQuestion -> {
+                    val multiChoice = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.multiChoice)
+                        .withTitle(questionUi.withTitle)
+                    questionUi.options.forEachIndexed { index : Int, option : String ->
+                        multiChoice.addQuizOption(option, questionUi.correctOptionIndex?.contains(index) == true)
+                    }
+                    hmsPollBuilder
+                        .addQuestion(multiChoice.build())
+                }
                 QuestionUi.QuestionCreator -> { /*Nothing to do here*/}
                 is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
-                is QuestionUi.SingleChoiceQuestion -> hmsPollBuilder.addSingleChoiceQuestion(questionUi.withTitle,
-                questionUi.options, questionUi.correctOptionIndex)
+                is QuestionUi.SingleChoiceQuestion -> {
+                    val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.multiChoice)
+                        .withTitle(questionUi.withTitle)
+                    questionUi.options.forEachIndexed { index : Int, option : String ->
+                        singleChoiceQuestionBuilder.addQuizOption(option, questionUi.correctOptionIndex == index)
+                    }
+                    hmsPollBuilder
+                        .addQuestion(singleChoiceQuestionBuilder.build())
+                }
             }
         }
-        localHmsInteractivityCenter.quickStartPoll(hmsPollBuilder, object : HMSActionResultListener {
+
+        localHmsInteractivityCenter.quickStartPoll(hmsPollBuilder.build(), object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 Log.d("Polls","Error $error")
             }
