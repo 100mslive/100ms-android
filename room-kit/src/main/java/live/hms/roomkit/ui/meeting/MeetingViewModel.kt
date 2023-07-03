@@ -4,7 +4,6 @@ import android.R
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.media.AudioManager
 import android.util.Log
 import androidx.annotation.StringRes
@@ -21,7 +20,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.util.*
+import live.hms.roomkit.ui.theme.DefaultTheme
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.*
@@ -40,9 +39,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
-import kotlin.random.Random
 
 
 class MeetingViewModel(
@@ -107,41 +104,54 @@ class MeetingViewModel(
 
                 override fun onTokenSuccess(token: String) {
 
-                   hmsSDK.getLayoutConfigByToken(token, LayoutRequestOptions("https://api-nonprod.100ms.live"), object :
+                   val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
+                   hmsSDK.getLayoutConfigByToken(token, LayoutRequestOptions(layoutEndpointBase), object :
                        HMSLayoutListener {
                        override fun onError(error: HMSException) {
                            Log.e(TAG, "onError: ", error)
+                           onHMSActionResultListener.onError(error)
                        }
 
                        override fun onLayoutSuccess(layoutConfig: LayoutResult) {
-                           Log.d(TAG, "onLayoutSuccess: $layoutConfig")
+                          setHmsConfig(hmsPrebuiltOptions, token, initURL)
+                          setTheme(layoutConfig)
+                          onHMSActionResultListener.onSuccess()
                        }
 
                    })
-                   hmsConfig = HMSConfig(
-                        userName = hmsPrebuiltOptions?.userName.orEmpty(),
-                        token,
-                        Gson().toJson(
-                            CustomPeerMetadata(
-                                isHandRaised = false,
-                                name = hmsPrebuiltOptions?.userName.orEmpty(),
-                                isBRBOn = false
-                            )
-                        )
-                            .toString(),
-                        captureNetworkQualityInPreview = true,
-                        initEndpoint = initURL,
-                    )
-
-                    hasValidToken = true
-
-                    onHMSActionResultListener.onSuccess()
-
                 }
 
             })
 
 
+    }
+
+    private fun setTheme(layoutConfig: LayoutResult) {
+        val pallete = layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette?:return
+        DefaultTheme.setTheme(pallete)
+    }
+
+    private fun setHmsConfig(
+        hmsPrebuiltOptions: HMSPrebuiltOptions?,
+        token: String,
+        initURL: String
+    ) {
+        hmsConfig = HMSConfig(
+            userName = hmsPrebuiltOptions?.userName.orEmpty(),
+            token,
+            Gson().toJson(
+                CustomPeerMetadata(
+                    isHandRaised = false,
+                    name = hmsPrebuiltOptions?.userName.orEmpty(),
+                    isBRBOn = false
+                )
+            )
+                .toString(),
+            captureNetworkQualityInPreview = true,
+            initEndpoint = initURL,
+        )
+
+        hasValidToken = true
     }
 
     private var hmsConfig: HMSConfig? = null

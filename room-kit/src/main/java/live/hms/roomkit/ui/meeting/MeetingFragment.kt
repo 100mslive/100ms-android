@@ -148,8 +148,8 @@ class MeetingFragment : Fragment() {
                     override fun onSuccess() {
                         // success
                         binding.buttonShareScreen?.apply {
-                            setBackgroundAndColor(DefaultTheme.getColours().secondary_dim, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
-                            setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp, R.color.gray_light)
+                            setBackgroundAndColor(DefaultTheme.getColours()?.secondaryDim, DefaultTheme.getDefaults().secondary_default, R.drawable.gray_round_stroked_drawable)
+                            setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh, DefaultTheme.getDefaults().onsecondary_high_emp)
                         }
                     }
                 })
@@ -271,8 +271,10 @@ class MeetingFragment : Fragment() {
                     override fun onSuccess() {
                         //success
                         binding.buttonShareScreen?.apply {
-                            setBackgroundAndColor(DefaultTheme.getColours().border_bright, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
-                            setIconTintColor(DefaultTheme.getColours().onsurface_high_emp, R.color.gray_light)
+                            setBackgroundAndColor(DefaultTheme.getColours()?.borderBright,
+                                DefaultTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
+                            setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh,
+                                DefaultTheme.getDefaults().onsurface_high_emp)
                         }
                     }
                 })
@@ -435,17 +437,18 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
                 binding.buttonRaiseHand?.setBackgroundAndColor(
-                    DefaultTheme.getColours().secondary_dim,
-                    R.color.gray_light,
+                    DefaultTheme.getColours()?.secondaryDim,
+                    DefaultTheme.getDefaults().secondary_default,
                     R.drawable.gray_round_solid_drawable)
-                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp,R.color.gray_light )
+
+                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh,DefaultTheme.getDefaults().onsecondary_high_emp )
             } else {
                 binding.buttonRaiseHand?.setBackgroundAndColor(
-                    DefaultTheme.getColours().border_bright,
-                    R.color.gray_light,
+                    DefaultTheme.getColours()?.borderBright,
+                    DefaultTheme.getDefaults().border_bright,
                     R.drawable.gray_round_stroked_drawable
                 )
-                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours().onsurface_high_emp,R.color.gray_light )
+                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh,DefaultTheme.getDefaults().onsurface_high_emp )
             }
         }
 
@@ -782,13 +785,15 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
             (binding.buttonToggleVideo as? AppCompatImageView)?.apply {
                 if (enabled) {
-                    setBackgroundAndColor(DefaultTheme.getColours().border_bright, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
+                    setBackgroundAndColor(   DefaultTheme.getColours()?.borderBright,
+                        DefaultTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
                     setImageResource(R.drawable.ic_camera_toggle_on)
-                    setIconTintColor(DefaultTheme.getColours().onsurface_high_emp, R.color.gray_light)
+                    setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh,
+                        DefaultTheme.getDefaults().onsurface_high_emp)
                 } else {
-                    setBackgroundAndColor(DefaultTheme.getColours().secondary_dim, R.color.gray_light, R.drawable.gray_round_solid_drawable)
+                    setBackgroundAndColor(DefaultTheme.getColours()?.secondaryDim, DefaultTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
                     setImageResource(R.drawable.ic_camera_toggle_off)
-                    setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp, R.color.gray_light)
+                    setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh, DefaultTheme.getDefaults().onsecondary_high_emp)
                 }
             }
         }
@@ -800,13 +805,15 @@ class MeetingFragment : Fragment() {
             (binding.buttonToggleAudio as? AppCompatImageView)?.apply {
 
                 if (enabled) {
-                    setBackgroundAndColor(DefaultTheme.getColours().border_bright, R.color.gray_light, R.drawable.gray_round_stroked_drawable)
+                    setBackgroundAndColor(DefaultTheme.getColours()?.borderBright,
+                        DefaultTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
                     setImageResource(R.drawable.ic_audio_toggle_on)
-                    setIconTintColor(DefaultTheme.getColours().onsurface_high_emp, R.color.gray_light)
+
+                    setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh, DefaultTheme.getDefaults().onsurface_high_emp)
                 } else {
-                    setBackgroundAndColor(DefaultTheme.getColours().secondary_dim, R.color.gray_light, R.drawable.gray_round_solid_drawable)
+                    setBackgroundAndColor(DefaultTheme.getColours()?.secondaryDim, DefaultTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
                     setImageResource(R.drawable.ic_audio_toggle_off)
-                    setIconTintColor(DefaultTheme.getColours().onsecondary_high_emp, R.color.gray_light)
+                    setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh, DefaultTheme.getDefaults()?.onsecondary_high_emp)
                 }
             }
         }

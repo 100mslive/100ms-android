@@ -12,23 +12,30 @@ import androidx.core.graphics.drawable.DrawableCompat
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.video.signal.init.LayoutResult
 
 //get theme detail from theme utils parse it accordingly
 
 object DefaultTheme {
-    fun getColours() = ThemeColours()
+    var theme: LayoutResult.Data.Theme.Palette? = null
+    fun getColours() = theme
+    internal fun setTheme(theme: LayoutResult.Data.Theme.Palette) {
+        this.theme = theme
+    }
+
+    fun getDefaults() = ThemeColours()
 }
 
 internal fun CardView.setBackgroundAndColor(
-    backgroundColorStr: String,
-    @ColorRes defaultBackgroundColor: Int,
+    backgroundColorStr: String?,
+    defaultBackgroundColor: String,
 ) {
     this.setCardBackgroundColor(getColorOrDefault(backgroundColorStr, defaultBackgroundColor))
 }
 
 internal fun ViewGroup.setBackgroundAndColor(
-    backgroundColorStr: String,
-    @ColorRes defaultBackgroundColor: Int,
+    backgroundColorStr: String?,
+    defaultBackgroundColor: String,
 ) {
     setBackgroundColor(getColorOrDefault(backgroundColorStr, defaultBackgroundColor))
 }
@@ -36,15 +43,15 @@ internal fun ViewGroup.setBackgroundAndColor(
 
 //AppCompatImageView tint
 internal fun androidx.appcompat.widget.AppCompatImageView.setIconTintColor(
-    iconTintColorStr: String,
-    @ColorRes defaultIconTintColor: Int,
+    iconTintColorStr: String?,
+    defaultIconTintColor: String,
 ) {
     this.imageTintList = ColorStateList.valueOf(getColorOrDefault(iconTintColorStr, defaultIconTintColor))
 }
 
 internal fun View.setBackgroundAndColor(
-    backgroundColorStr: String,
-    @ColorRes defaultBackgroundColor: Int,
+    backgroundColorStr: String?,
+    defaultBackgroundColor: String,
     @DrawableRes backGroundDrawableRes: Int
 ) {
     this.backgroundTintList =
@@ -57,11 +64,15 @@ internal fun View.setBackgroundAndColor(
     background = wrapDrawable
 }
 
-fun getColorOrDefault(colorStr: String, @ColorRes defaultColor: Int): Int {
+fun getColorOrDefault(colorStr: String?,defaultColor: String): Int {
     return try {
-        colorStr.toColorInt()
+        colorStr!!.toColorInt()
     } catch (e: Exception) {
-        defaultColor
+        try {
+            defaultColor.toColorInt()
+        } catch (e: Exception) {
+            android.graphics.Color.parseColor("#FFFFFF")
+        }
     }
 }
 
@@ -72,19 +83,19 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 
     progressBar.containerCardProgressBar.setBackgroundAndColor(
-        DefaultTheme.getColours().surface_default,
-        R.color.primary_bg
+        DefaultTheme.getColours()?.surfaceDefault,
+        DefaultTheme.getDefaults().surface_default
     )
 
     progressBar.heading.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onsurface_high_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onSurfaceHigh, DefaultTheme.getDefaults().onsurface_high_emp
         )
     )
 
     progressBar.description.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onsecondary_med_emp, R.color.muted_text
+            DefaultTheme.getColours()?.onSecondaryHigh, DefaultTheme.getDefaults().onsecondary_high_emp
         )
     )
 
@@ -97,113 +108,113 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
     topMenu?.setBackgroundColor(
         getColorOrDefault(
-            DefaultTheme.getColours().background_default, R.color.primary_bg
+            DefaultTheme.getColours()?.backgroundDefault, DefaultTheme.getDefaults().background_default
         )
     )
 
     liveTitle?.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onsurface_high_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onSurfaceHigh, DefaultTheme.getDefaults().onsurface_high_emp
         )
     )
 
     tvRecordingTime?.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onsurface_med_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onSurfaceMedium, DefaultTheme.getDefaults().onsurface_med_emp
         )
     )
 
     tvViewersCount?.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onsurface_med_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onSurfaceMedium, DefaultTheme.getDefaults().onsurface_med_emp
         )
     )
 
 
     //init should be called once
     buttonRaiseHand?.setBackgroundAndColor(
-        DefaultTheme.getColours().border_bright,
-        R.color.gray_light,
+        DefaultTheme.getColours()?.borderBright,
+        DefaultTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
     )
     buttonRaiseHand?.setIconTintColor(
-        DefaultTheme.getColours().onsurface_high_emp,
-        R.color.gray_light
+        DefaultTheme.getColours()?.onSurfaceHigh,
+        DefaultTheme.getDefaults().onsurface_high_emp
     )
 
     (buttonOpenChat as? AppCompatImageView)?.setIconTintColor(
-        DefaultTheme.getColours().onsurface_high_emp,
-        R.color.gray_light
+        DefaultTheme.getColours()?.onSurfaceHigh,
+        DefaultTheme.getDefaults().onsurface_high_emp
     )
 
     buttonOpenChat.setBackgroundAndColor(
-        DefaultTheme.getColours().border_bright,
-        R.color.gray_light,
+        DefaultTheme.getColours()?.borderBright,
+        DefaultTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
     )
 
 
 
     unreadMessageCount.setBackgroundAndColor(
-        DefaultTheme.getColours().surface_default,
-        R.color.primary_bg,
+        DefaultTheme.getColours()?.surfaceDefault,
+        DefaultTheme.getDefaults().surface_default,
         R.drawable.badge_circle_20
     )
 
     unreadMessageCount.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onsurface_high_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onSurfaceHigh,  DefaultTheme.getDefaults().onsurface_high_emp
         )
     )
 
 
     buttonSettingsMenuTop?.setIconTintColor(
-        DefaultTheme.getColours().onsurface_high_emp,
-        R.color.gray_light
+        DefaultTheme.getColours()?.onSurfaceHigh,
+        DefaultTheme.getDefaults().onsurface_high_emp
     )
 
     buttonSettingsMenuTop?.setBackgroundAndColor(
-        DefaultTheme.getColours().border_bright,
-        R.color.gray_light,
+        DefaultTheme.getColours()?.borderBright,
+        DefaultTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
     )
 
     //bottom menu
     bottomControls.setBackgroundAndColor(
-        DefaultTheme.getColours().background_default,
-        R.color.primary_bg
+        DefaultTheme.getColours()?.backgroundDefault,
+        DefaultTheme.getDefaults().background_default,
     )
 
     (buttonToggleVideo as? AppCompatImageView)?.setIconTintColor(
-        DefaultTheme.getColours().onsurface_high_emp,
-        R.color.gray_light
+        DefaultTheme.getColours()?.onSurfaceHigh,
+        DefaultTheme.getDefaults().onsurface_high_emp
     )
 
     buttonToggleVideo.setBackgroundAndColor(
-        DefaultTheme.getColours().border_bright,
-        R.color.gray_light,
+        DefaultTheme.getColours()?.borderBright,
+        DefaultTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
     )
 
     (buttonToggleAudio as? AppCompatImageView)?.setIconTintColor(
-        DefaultTheme.getColours().onsurface_high_emp,
-        R.color.gray_light
+        DefaultTheme.getColours()?.onSurfaceHigh,
+        DefaultTheme.getDefaults().onsurface_high_emp
     )
 
     buttonToggleAudio.setBackgroundAndColor(
-        DefaultTheme.getColours().border_bright,
-        R.color.gray_light,
+        DefaultTheme.getColours()?.borderBright,
+        DefaultTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
     )
 
     buttonSettingsMenu?.setIconTintColor(
-        DefaultTheme.getColours().onsurface_high_emp,
-        R.color.gray_light
+        DefaultTheme.getColours()?.onSurfaceHigh,
+        DefaultTheme.getDefaults().onsurface_high_emp
     )
 
     buttonSettingsMenu?.setBackgroundAndColor(
-        DefaultTheme.getColours().border_bright,
-        R.color.gray_light,
+        DefaultTheme.getColours()?.borderBright,
+        DefaultTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
     )
 
@@ -213,66 +224,66 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 internal fun FragmentPreviewBinding.applyTheme() {
     previewCard.setBackgroundAndColor(
-        DefaultTheme.getColours().surface_default, R.color.primary_bg
+        DefaultTheme.getColours()?.surfaceDefault,
+        DefaultTheme.getDefaults().surface_default
     )
 
     buttonNetworkQuality.setBackgroundAndColor(
-        DefaultTheme.getColours().secondary_default,
-        R.color.primary_bg,
+        DefaultTheme.getColours()?.surfaceDefault,
+        DefaultTheme.getDefaults().surface_default
     )
 
     recordingView.setBackgroundAndColor(
-        DefaultTheme.getColours().secondary_default, R.color.primary_bg
+        DefaultTheme.getColours()?.secondaryDefault,  DefaultTheme.getDefaults().secondary_default
     )
 
 
     nameTv.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onprimary_high_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onPrimaryHigh,  DefaultTheme.getDefaults().onprimary_high_emp
         )
     )
 
     descriptionTv.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onprimary_med_emp, R.color.muted_text
+            DefaultTheme.getColours()?.onPrimaryMedium,  DefaultTheme.getDefaults().onprimary_med_emp
         )
     )
 
     recordingText.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onprimary_high_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onPrimaryMedium, DefaultTheme.getDefaults().onprimary_med_emp
         )
     )
 
     nameInitials.setBackgroundAndColor(
-        DefaultTheme.getColours().secondary_default,
-        R.color.primary_bg,
+        DefaultTheme.getColours()?.secondaryDefault,  DefaultTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_80
     )
 
     nameInitials.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onprimary_high_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onPrimaryHigh,  DefaultTheme.getDefaults().onprimary_high_emp
         )
     )
 
     iconOutputDeviceBg.setBackgroundAndColor(
-        DefaultTheme.getColours().secondary_default, R.color.gray_light
+        DefaultTheme.getColours()?.secondaryDefault,  DefaultTheme.getDefaults().secondary_default
     )
 
     iconParticipantsBg.setBackgroundAndColor(
-        DefaultTheme.getColours().secondary_default, R.color.gray_light
+        DefaultTheme.getColours()?.secondaryDefault,  DefaultTheme.getDefaults().secondary_default
     )
 
     buttonJoinMeeting.setTextColor(
         getColorOrDefault(
-            DefaultTheme.getColours().onprimary_high_emp, R.color.primary_text
+            DefaultTheme.getColours()?.onPrimaryHigh,  DefaultTheme.getDefaults().onprimary_high_emp
         )
     )
 
     enterMeetingParentView.setBackgroundAndColor(
-        DefaultTheme.getColours().primary_default,
-        R.color.primary_blue,
+        DefaultTheme.getColours()?.primaryDefault,
+        DefaultTheme.getDefaults().primary_default,
         R.drawable.primary_blue_round_drawable
     )
 

@@ -222,8 +222,9 @@ class PreviewFragment : Fragment() {
                             ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleVideoBg.setBackgroundAndColor(
-                            DefaultTheme.getColours().secondary_default,
-                            R.color.gray_light,
+                            DefaultTheme.getColours()?.secondaryDefault,
+                            DefaultTheme.getDefaults().secondary_default
+
                         )
                     } else {
                         // Mute this track
@@ -255,8 +256,8 @@ class PreviewFragment : Fragment() {
 
                     if (it.isMute) {
                         setBackgroundAndColor(
-                            DefaultTheme.getColours().secondary_default,
-                            R.color.black,
+                            DefaultTheme.getColours()?.secondaryDefault,
+                            DefaultTheme.getDefaults().secondary_default,
                             R.drawable.ic_audio_toggle_off,
                         )
                         binding.buttonToggleAudioBg.setCardBackgroundColor(
@@ -270,8 +271,8 @@ class PreviewFragment : Fragment() {
                             ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
                         backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleAudioBg.setBackgroundAndColor(
-                            DefaultTheme.getColours().secondary_default,
-                            R.color.gray_light,
+                            DefaultTheme.getColours()?.secondaryDefault,
+                            DefaultTheme.getDefaults().secondary_default
                         )
                     }
                 }
@@ -446,8 +447,8 @@ class PreviewFragment : Fragment() {
                             backgroundTintList =
                                 ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleVideoBg.setBackgroundAndColor(
-                                DefaultTheme.getColours().secondary_default,
-                                R.color.gray_light,
+                                DefaultTheme.getColours()?.secondaryDefault,
+                                DefaultTheme.getDefaults().secondary_default
                             )
                         }
                     }
@@ -483,8 +484,8 @@ class PreviewFragment : Fragment() {
                             backgroundTintList =
                                 ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleAudioBg.setBackgroundAndColor(
-                                DefaultTheme.getColours().secondary_default,
-                                R.color.gray_light,
+                                DefaultTheme.getColours()?.secondaryDefault,
+                                DefaultTheme.getDefaults().secondary_default
                             )
                         }
                     }
