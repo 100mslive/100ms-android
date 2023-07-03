@@ -50,10 +50,10 @@ import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.DefaultTheme
+import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.setIconTintColor
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.roomkit.ui.theme.setIconTintColor
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.audio.HMSAudioManager.AudioDevice
@@ -100,14 +100,14 @@ class MeetingFragment : Fragment() {
     private val goLiveBottomSheet by lazy {
         HlsStreamingToggleBottomSheet(meetingUrl = settings.lastUsedMeetingUrl) {
             if (it) {
-                binding.buttonGoLive?.visibility = View.GONE
+//                binding.buttonGoLive?.visibility = View.GONE
             }
         }
     }
 
     private val rtmpBottomSheet by lazy {
         RtmpRecordBottomSheet {
-            binding.buttonGoLive?.visibility = View.GONE
+//            binding.buttonGoLive?.visibility = View.GONE
         }
     }
 
@@ -335,23 +335,23 @@ class MeetingFragment : Fragment() {
         if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
                 ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
         ) {
-            binding.buttonGoLive?.visibility = View.VISIBLE
+//            binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
             binding.spacer?.visibility = View.VISIBLE
         } else {
-            binding.buttonGoLive?.visibility = View.GONE
+//            binding.buttonGoLive?.visibility = View.GONE
             binding.llGoLiveParent?.visibility = View.GONE
             binding.spacer?.visibility = View.GONE
         }
         if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
-            binding.buttonGoLive?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_stop_circle
-                )
-            )
-            binding.buttonGoLive?.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.red))
+//            binding.buttonGoLive?.setImageDrawable(
+//                ContextCompat.getDrawable(
+//                    requireContext(),
+//                    R.drawable.ic_stop_circle
+//                )
+//            )
+//            binding.buttonGoLive?.setBackgroundAndColor(DefaultTheme.getColours()?.alertErrorDefault,
+//                DefaultTheme.getDefaults().error_default)
             binding.recordingSignalView?.visibility = View.VISIBLE
             if (meetingViewModel.isRTMPRunning()) {
                 binding.liveTitle?.text = "Live with RTMP"
@@ -362,19 +362,19 @@ class MeetingFragment : Fragment() {
             binding.tvViewersCount?.text = (meetingViewModel.hmsSDK.getPeers().size - 1).toString()
             setupRecordingTimeView()
         } else {
-            binding.buttonGoLive?.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.ic_radar
-                )
-            )
-            binding.buttonGoLive?.backgroundTintList =
-                ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.primary_blue
-                    )
-                )
+//            binding.buttonGoLive?.setImageDrawable(
+//                ContextCompat.getDrawable(
+//                    requireContext(),
+//                    R.drawable.ic_radar
+//                )
+//            )
+//            binding.buttonGoLive?.backgroundTintList =
+//                ColorStateList.valueOf(
+//                    ContextCompat.getColor(
+//                        requireContext(),
+//                        R.color.primary_blue
+//                    )
+//                )
             binding.recordingSignalView?.visibility = View.GONE
             binding.tvViewersCount?.visibility = View.GONE
         }
@@ -551,7 +551,7 @@ class MeetingFragment : Fragment() {
                     }
                     is MeetingViewModel.Event.RTMPError -> {
                         withContext(Dispatchers.Main) {
-                            binding.buttonGoLive?.visibility = View.VISIBLE
+//                            binding.buttonGoLive?.visibility = View.VISIBLE
                             Toast.makeText(
                                 context,
                                 "RTMP error ${event.exception}",
@@ -940,11 +940,11 @@ class MeetingFragment : Fragment() {
         if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
                 ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
         ) {
-            binding.buttonGoLive?.visibility = View.VISIBLE
+//            binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
             binding.spacer?.visibility = View.VISIBLE
         } else {
-            binding.buttonGoLive?.visibility = View.GONE
+//            binding.buttonGoLive?.visibility = View.GONE
             binding.llGoLiveParent?.visibility = View.GONE
             binding.spacer?.visibility = View.GONE
         }
@@ -989,42 +989,42 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        binding.buttonGoLive?.apply {
-            setOnSingleClickListener(200L) {
-                Log.v(TAG, "buttonGoLive.onClick()")
-
-                if (meetingViewModel.isHlsRunning()) {
-                    inflateStopHlsDialog()
-                    return@setOnSingleClickListener
-                } else if (meetingViewModel.isRTMPRunning()) {
-                    inflateStopHlsDialog()
-                    return@setOnSingleClickListener
-                }
-
-                val goLiveSelectionBottomSheet = GoLiveSelectionBottomSheet(
-                    meetingViewModel.isAllowedToHlsStream(),
-                    meetingViewModel.isAllowedToRtmpStream()
-                ) {
-                    if (it == GoLiveOption.HLS) {
-                        if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
-                            goLiveBottomSheet.show(
-                                requireActivity().supportFragmentManager,
-                                "GoLiveBottomSheet"
-                            )
-                        }
-                    } else {
-                        rtmpBottomSheet.show(
-                            requireActivity().supportFragmentManager,
-                            "RTMPBottomSheet"
-                        )
-                    }
-                }
-                goLiveSelectionBottomSheet.show(
-                    requireActivity().supportFragmentManager,
-                    "GoLiveSelectionBottomSheet"
-                )
-            }
-        }
+//        binding.buttonGoLive?.apply {
+//            setOnSingleClickListener(200L) {
+//                Log.v(TAG, "buttonGoLive.onClick()")
+//
+//                if (meetingViewModel.isHlsRunning()) {
+//                    inflateStopHlsDialog()
+//                    return@setOnSingleClickListener
+//                } else if (meetingViewModel.isRTMPRunning()) {
+//                    inflateStopHlsDialog()
+//                    return@setOnSingleClickListener
+//                }
+//
+//                val goLiveSelectionBottomSheet = GoLiveSelectionBottomSheet(
+//                    meetingViewModel.isAllowedToHlsStream(),
+//                    meetingViewModel.isAllowedToRtmpStream()
+//                ) {
+//                    if (it == GoLiveOption.HLS) {
+//                        if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
+//                            goLiveBottomSheet.show(
+//                                requireActivity().supportFragmentManager,
+//                                "GoLiveBottomSheet"
+//                            )
+//                        }
+//                    } else {
+//                        rtmpBottomSheet.show(
+//                            requireActivity().supportFragmentManager,
+//                            "RTMPBottomSheet"
+//                        )
+//                    }
+//                }
+//                goLiveSelectionBottomSheet.show(
+//                    requireActivity().supportFragmentManager,
+//                    "GoLiveSelectionBottomSheet"
+//                )
+//            }
+//        }
 
         binding.buttonSettingsMenu?.apply {
 
@@ -1224,39 +1224,6 @@ class MeetingFragment : Fragment() {
         binding.roleSpinner.root.performClick()
     }
 
-    private fun inflateStopHlsDialog() {
-        val stopHlsDialog = Dialog(requireContext())
-        stopHlsDialog.setContentView(R.layout.exit_confirmation_dialog)
-        stopHlsDialog.findViewById<TextView>(R.id.dialog_title).text = "End live stream for all?"
-        stopHlsDialog.findViewById<FrameLayout>(R.id.parent_view)
-            .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
-        stopHlsDialog.findViewById<TextView>(R.id.dialog_title)
-            .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-
-        stopHlsDialog.findViewById<TextView>(R.id.dialog_title).apply {
-            setCompoundDrawablesWithIntrinsicBounds(
-                R.drawable.ic_danger_big, 0, 0, 0
-            )
-            compoundDrawablePadding = 20
-            setPadding(30, paddingTop, 0, paddingBottom)
-        }
-        stopHlsDialog.findViewById<TextView>(R.id.dialog_description).text =
-            "Your stream will end and everyone will go offline immediately in this room. You can’t undo this action."
-        stopHlsDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"
-        stopHlsDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "End Stream"
-        stopHlsDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-            .setOnClickListener { stopHlsDialog.dismiss() }
-        stopHlsDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
-            stopHlsDialog.dismiss()
-            if (meetingViewModel.isHlsRunning()) {
-                meetingViewModel.stopHls()
-            } else if (meetingViewModel.isRTMPRunning()) {
-                meetingViewModel.stopRecording()
-            }
-            binding.buttonGoLive?.visibility = View.GONE
-        }
-        stopHlsDialog.show()
-    }
 
     fun inflateExitFlow() {
 
@@ -1277,15 +1244,15 @@ class MeetingFragment : Fragment() {
         params.gravity = Gravity.TOP or Gravity.LEFT
         dialog.window!!.attributes = params
         dialog.window?.setDimAmount(0f)
-        dialog.window?.setBackgroundDrawableResource(R.color.primary_bg)
 
         dialog.window?.attributes?.flags =
             dialog.window?.attributes?.flags?.and((WindowManager.LayoutParams.FLAG_DIM_BEHIND).inv())
 
         dialog.show()
 
-        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
+        dialog.findViewById<View>(R.id.parent_view)?.setBackgroundAndColor(DefaultTheme.getColours()?.surfaceDim, DefaultTheme.getDefaults().surface_dim)
 
+        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
             if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
                 text = "Leave Meeting"
             } else {
@@ -1340,10 +1307,12 @@ class MeetingFragment : Fragment() {
                 val endSessionDialog = Dialog(requireContext())
                 endSessionDialog.setContentView(R.layout.exit_confirmation_dialog)
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title).text = "End Session"
-                endSessionDialog.findViewById<FrameLayout>(R.id.parent_view)
-                    .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
+                endSessionDialog.findViewById<FrameLayout>(R.id.parent_view).setBackgroundAndColor(
+                    DefaultTheme.getColours()?.alertErrorBright,
+                    DefaultTheme.getDefaults().error_default
+                )
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title)
-                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    .setTextColor(getColorOrDefault(DefaultTheme.getColours()?.alertSuccess, DefaultTheme.getDefaults().error_default))
 
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
                     setCompoundDrawablesWithIntrinsicBounds(

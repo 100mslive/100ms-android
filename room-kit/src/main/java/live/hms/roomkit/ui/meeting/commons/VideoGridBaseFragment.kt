@@ -23,7 +23,9 @@ import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.roomkit.ui.settings.SettingsStore
+import live.hms.roomkit.ui.theme.DefaultTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -413,7 +415,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
     NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
       if (downlinkScore == 0) {
-        imageView.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+        imageView.setColorFilter(getColorOrDefault(DefaultTheme.getColours()?.alertSuccess, DefaultTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
       } else {
         imageView.colorFilter = null
       }

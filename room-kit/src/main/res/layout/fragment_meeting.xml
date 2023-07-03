@@ -217,28 +217,6 @@
             android:paddingBottom="10dp"
             android:visibility="gone">
 
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center">
-
-                <ProgressBar
-                    android:id="@+id/go_live_progress_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/button_go_live"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:contentDescription="@string/go_live_btn"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_radar"
-                    app:backgroundTint="@color/primary_blue"
-                    app:fabCustomSize="70dp"
-                    app:maxImageSize="42dp" />
-
-            </FrameLayout>
 
         </LinearLayout>
 

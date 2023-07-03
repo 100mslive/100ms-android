@@ -231,7 +231,7 @@ class HlsFragment : Fragment() {
     private fun createSet(label : String): LineDataSet {
         val set = LineDataSet(null, label)
         set.axisDependency = AxisDependency.LEFT
-        set.color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
+        //set.color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
         set.setCircleColor(Color.WHITE)
         set.lineWidth = 1f
         set.circleRadius = 1f

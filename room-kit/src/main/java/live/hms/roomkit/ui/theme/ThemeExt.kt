@@ -35,7 +35,7 @@ internal fun CardView.setBackgroundAndColor(
     this.setCardBackgroundColor(getColorOrDefault(backgroundColorStr, defaultBackgroundColor))
 }
 
-internal fun ViewGroup.setBackgroundAndColor(
+internal fun View.setBackgroundAndColor(
     backgroundColorStr: String?,
     defaultBackgroundColor: String,
 ) {

@@ -220,7 +220,7 @@ class PreviewFragment : Fragment() {
                         }
                         background =
                             ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
-                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
+//                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleVideoBg.setBackgroundAndColor(
                             DefaultTheme.getColours()?.secondaryDefault,
                             DefaultTheme.getDefaults().secondary_default
@@ -234,13 +234,13 @@ class PreviewFragment : Fragment() {
                         }
                         background =
                             ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_off)
-                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
-                        binding.buttonToggleVideoBg.setCardBackgroundColor(
-                            ContextCompat.getColor(
-                                requireContext(),
-                                R.color.white
-                            )
-                        )
+//                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
+//                        binding.buttonToggleVideoBg.setCardBackgroundColor(
+//                            ContextCompat.getColor(
+//                                requireContext(),
+//                                R.color.white
+//                            )
+//                        )
                     }
                 }
 
@@ -260,16 +260,16 @@ class PreviewFragment : Fragment() {
                             DefaultTheme.getDefaults().secondary_default,
                             R.drawable.ic_audio_toggle_off,
                         )
-                        binding.buttonToggleAudioBg.setCardBackgroundColor(
-                            ContextCompat.getColor(
-                                context,
-                                R.color.white
-                            )
-                        )
+//                        binding.buttonToggleAudioBg.setCardBackgroundColor(
+//                            ContextCompat.getColor(
+//                                context,
+//                                R.color.white
+//                            )
+//                        )
                     } else {
                         background =
                             ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
-                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
+//                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleAudioBg.setBackgroundAndColor(
                             DefaultTheme.getColours()?.secondaryDefault,
                             DefaultTheme.getDefaults().secondary_default
@@ -433,19 +433,19 @@ class PreviewFragment : Fragment() {
                         if (it.isMute) {
                             background =
                                 ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_off)
-                            backgroundTintList =
-                                ContextCompat.getColorStateList(context, R.color.black)
-                            binding.buttonToggleVideoBg.setCardBackgroundColor(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.white
-                                )
-                            )
+//                            backgroundTintList =
+//                                ContextCompat.getColorStateList(context, R.color.black)
+//                            binding.buttonToggleVideoBg.setCardBackgroundColor(
+//                                ContextCompat.getColor(
+//                                    context,
+//                                    R.color.white
+//                                )
+//                            )
                         } else {
                             background =
                                 ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
-                            backgroundTintList =
-                                ContextCompat.getColorStateList(context, R.color.white)
+//                            backgroundTintList =
+//                                ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleVideoBg.setBackgroundAndColor(
                                 DefaultTheme.getColours()?.secondaryDefault,
                                 DefaultTheme.getDefaults().secondary_default
@@ -470,19 +470,19 @@ class PreviewFragment : Fragment() {
                         if (it.isMute) {
                             background =
                                 ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_off)
-                            backgroundTintList =
-                                ContextCompat.getColorStateList(context, R.color.black)
-                            binding.buttonToggleAudioBg.setCardBackgroundColor(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.white
-                                )
-                            )
+//                            backgroundTintList =
+//                                ContextCompat.getColorStateList(context, R.color.black)
+//                            binding.buttonToggleAudioBg.setCardBackgroundColor(
+//                                ContextCompat.getColor(
+//                                    context,
+//                                    R.color.white
+//                                )
+//                            )
                         } else {
                             background =
                                 ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
-                            backgroundTintList =
-                                ContextCompat.getColorStateList(context, R.color.white)
+//                            backgroundTintList =
+//                                ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleAudioBg.setBackgroundAndColor(
                                 DefaultTheme.getColours()?.secondaryDefault,
                                 DefaultTheme.getDefaults().secondary_default
