@@ -23,6 +23,7 @@ import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.roomkit.ui.settings.SettingsStore
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -174,7 +175,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     val earlyExit = item.video == null
             || item.video?.isMute == true
     if (earlyExit) return
-
+    binding.applyTheme()
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
         view.setScalingType(scalingType)

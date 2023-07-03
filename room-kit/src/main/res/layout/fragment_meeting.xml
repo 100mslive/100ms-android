@@ -162,7 +162,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_controls"
         android:layout_below="@id/top_menu"
-        android:layout_marginBottom="10dp" />
+         />
 
     <LinearLayout
         android:id="@+id/bottom_controls"

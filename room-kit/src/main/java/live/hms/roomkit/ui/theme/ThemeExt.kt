@@ -10,8 +10,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.video.signal.init.LayoutResult
 
 //get theme detail from theme utils parse it accordingly
@@ -81,6 +83,12 @@ private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
 
+    buttonEndCall.setBackgroundAndColor(
+        DefaultTheme.getColours()?.alertErrorDefault,
+        DefaultTheme.getDefaults().error_default,
+        R.drawable.ic_icon_end_call
+    )
+
 
     progressBar.containerCardProgressBar.setBackgroundAndColor(
         DefaultTheme.getColours()?.surfaceDefault,
@@ -108,7 +116,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
     topMenu?.setBackgroundColor(
         getColorOrDefault(
-            DefaultTheme.getColours()?.backgroundDefault, DefaultTheme.getDefaults().background_default
+            DefaultTheme.getColours()?.backgroundDim, DefaultTheme.getDefaults().background_default
         )
     )
 
@@ -181,7 +189,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
     //bottom menu
     bottomControls.setBackgroundAndColor(
-        DefaultTheme.getColours()?.backgroundDefault,
+        DefaultTheme.getColours()?.backgroundDim,
         DefaultTheme.getDefaults().background_default,
     )
 
@@ -221,10 +229,24 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 }
 
+internal fun FragmentActiveSpeakerBinding.applyTheme() {
+    root?.setBackgroundAndColor(
+        DefaultTheme.getColours()?.backgroundDim,
+        DefaultTheme.getDefaults().background_default
+    )
+}
+
+internal fun VideoCardBinding.applyTheme() {
+    nameInitials.setTextColor(
+        getColorOrDefault(
+            DefaultTheme.getColours()?.onSurfaceHigh,  DefaultTheme.getDefaults().onprimary_high_emp
+        )
+    )
+}
 
 internal fun FragmentPreviewBinding.applyTheme() {
     previewCard.setBackgroundAndColor(
-        DefaultTheme.getColours()?.surfaceDefault,
+        DefaultTheme.getColours()?.backgroundDim,
         DefaultTheme.getDefaults().surface_default
     )
 

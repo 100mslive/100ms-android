@@ -11,6 +11,7 @@ import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.*
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
@@ -45,6 +46,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    binding.applyTheme()
     screenShareStats = StatsInterpreter(settings.showStats)
     initViewModels()
   }
