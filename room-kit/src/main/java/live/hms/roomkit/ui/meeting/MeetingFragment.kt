@@ -148,8 +148,8 @@ class MeetingFragment : Fragment() {
                     override fun onSuccess() {
                         // success
                         binding.buttonShareScreen?.apply {
-                            setBackgroundAndColor(DefaultTheme.getColours()?.secondaryDim, DefaultTheme.getDefaults().secondary_default, R.drawable.gray_round_stroked_drawable)
-                            setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh, DefaultTheme.getDefaults().onsecondary_high_emp)
+                            setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.secondaryDim, HMSPrebuiltTheme.getDefaults().secondary_default, R.drawable.gray_round_stroked_drawable)
+                            setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh, HMSPrebuiltTheme.getDefaults().onsecondary_high_emp)
                         }
                     }
                 })
@@ -271,10 +271,10 @@ class MeetingFragment : Fragment() {
                     override fun onSuccess() {
                         //success
                         binding.buttonShareScreen?.apply {
-                            setBackgroundAndColor(DefaultTheme.getColours()?.borderBright,
-                                DefaultTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
-                            setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh,
-                                DefaultTheme.getDefaults().onsurface_high_emp)
+                            setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.borderBright,
+                                HMSPrebuiltTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
+                            setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                                HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
                         }
                     }
                 })
@@ -437,18 +437,18 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
                 binding.buttonRaiseHand?.setBackgroundAndColor(
-                    DefaultTheme.getColours()?.secondaryDim,
-                    DefaultTheme.getDefaults().secondary_default,
+                    HMSPrebuiltTheme.getColours()?.secondaryDim,
+                    HMSPrebuiltTheme.getDefaults().secondary_default,
                     R.drawable.gray_round_solid_drawable)
 
-                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh,DefaultTheme.getDefaults().onsecondary_high_emp )
+                binding.buttonRaiseHand?.setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh,HMSPrebuiltTheme.getDefaults().onsecondary_high_emp )
             } else {
                 binding.buttonRaiseHand?.setBackgroundAndColor(
-                    DefaultTheme.getColours()?.borderBright,
-                    DefaultTheme.getDefaults().border_bright,
+                    HMSPrebuiltTheme.getColours()?.borderBright,
+                    HMSPrebuiltTheme.getDefaults().border_bright,
                     R.drawable.gray_round_stroked_drawable
                 )
-                binding.buttonRaiseHand?.setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh,DefaultTheme.getDefaults().onsurface_high_emp )
+                binding.buttonRaiseHand?.setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,HMSPrebuiltTheme.getDefaults().onsurface_high_emp )
             }
         }
 
@@ -785,15 +785,15 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
             (binding.buttonToggleVideo as? AppCompatImageView)?.apply {
                 if (enabled) {
-                    setBackgroundAndColor(   DefaultTheme.getColours()?.borderBright,
-                        DefaultTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
+                    setBackgroundAndColor(   HMSPrebuiltTheme.getColours()?.borderBright,
+                        HMSPrebuiltTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
                     setImageResource(R.drawable.ic_camera_toggle_on)
-                    setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh,
-                        DefaultTheme.getDefaults().onsurface_high_emp)
+                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                        HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
                 } else {
-                    setBackgroundAndColor(DefaultTheme.getColours()?.secondaryDim, DefaultTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
+                    setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.secondaryDim, HMSPrebuiltTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
                     setImageResource(R.drawable.ic_camera_toggle_off)
-                    setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh, DefaultTheme.getDefaults().onsecondary_high_emp)
+                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh, HMSPrebuiltTheme.getDefaults().onsecondary_high_emp)
                 }
             }
         }
@@ -805,15 +805,15 @@ class MeetingFragment : Fragment() {
             (binding.buttonToggleAudio as? AppCompatImageView)?.apply {
 
                 if (enabled) {
-                    setBackgroundAndColor(DefaultTheme.getColours()?.borderBright,
-                        DefaultTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
+                    setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.borderBright,
+                        HMSPrebuiltTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
                     setImageResource(R.drawable.ic_audio_toggle_on)
 
-                    setIconTintColor(DefaultTheme.getColours()?.onSurfaceHigh, DefaultTheme.getDefaults().onsurface_high_emp)
+                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
                 } else {
-                    setBackgroundAndColor(DefaultTheme.getColours()?.secondaryDim, DefaultTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
+                    setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.secondaryDim, HMSPrebuiltTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
                     setImageResource(R.drawable.ic_audio_toggle_off)
-                    setIconTintColor(DefaultTheme.getColours()?.onSecondaryHigh, DefaultTheme.getDefaults()?.onsecondary_high_emp)
+                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh, HMSPrebuiltTheme.getDefaults()?.onsecondary_high_emp)
                 }
             }
         }
@@ -1250,7 +1250,7 @@ class MeetingFragment : Fragment() {
 
         dialog.show()
 
-        dialog.findViewById<View>(R.id.parent_view)?.setBackgroundAndColor(DefaultTheme.getColours()?.surfaceDim, DefaultTheme.getDefaults().surface_dim)
+        dialog.findViewById<View>(R.id.parent_view)?.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().surface_dim)
 
         dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
             if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
@@ -1308,11 +1308,11 @@ class MeetingFragment : Fragment() {
                 endSessionDialog.setContentView(R.layout.exit_confirmation_dialog)
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title).text = "End Session"
                 endSessionDialog.findViewById<FrameLayout>(R.id.parent_view).setBackgroundAndColor(
-                    DefaultTheme.getColours()?.alertErrorBright,
-                    DefaultTheme.getDefaults().error_default
+                    HMSPrebuiltTheme.getColours()?.alertErrorBright,
+                    HMSPrebuiltTheme.getDefaults().error_default
                 )
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title)
-                    .setTextColor(getColorOrDefault(DefaultTheme.getColours()?.alertSuccess, DefaultTheme.getDefaults().error_default))
+                    .setTextColor(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertSuccess, HMSPrebuiltTheme.getDefaults().error_default))
 
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
                     setCompoundDrawablesWithIntrinsicBounds(

@@ -25,7 +25,7 @@ import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.permission.PermissionFragmentDirections
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.DefaultTheme
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
@@ -222,8 +222,8 @@ class PreviewFragment : Fragment() {
                             ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
 //                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleVideoBg.setBackgroundAndColor(
-                            DefaultTheme.getColours()?.secondaryDefault,
-                            DefaultTheme.getDefaults().secondary_default
+                            HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                            HMSPrebuiltTheme.getDefaults().secondary_default
 
                         )
                     } else {
@@ -256,8 +256,8 @@ class PreviewFragment : Fragment() {
 
                     if (it.isMute) {
                         setBackgroundAndColor(
-                            DefaultTheme.getColours()?.secondaryDefault,
-                            DefaultTheme.getDefaults().secondary_default,
+                            HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                            HMSPrebuiltTheme.getDefaults().secondary_default,
                             R.drawable.ic_audio_toggle_off,
                         )
 //                        binding.buttonToggleAudioBg.setCardBackgroundColor(
@@ -271,8 +271,8 @@ class PreviewFragment : Fragment() {
                             ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
 //                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
                         binding.buttonToggleAudioBg.setBackgroundAndColor(
-                            DefaultTheme.getColours()?.secondaryDefault,
-                            DefaultTheme.getDefaults().secondary_default
+                            HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                            HMSPrebuiltTheme.getDefaults().secondary_default
                         )
                     }
                 }
@@ -447,8 +447,8 @@ class PreviewFragment : Fragment() {
 //                            backgroundTintList =
 //                                ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleVideoBg.setBackgroundAndColor(
-                                DefaultTheme.getColours()?.secondaryDefault,
-                                DefaultTheme.getDefaults().secondary_default
+                                HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                                HMSPrebuiltTheme.getDefaults().secondary_default
                             )
                         }
                     }
@@ -484,8 +484,8 @@ class PreviewFragment : Fragment() {
 //                            backgroundTintList =
 //                                ContextCompat.getColorStateList(context, R.color.white)
                             binding.buttonToggleAudioBg.setBackgroundAndColor(
-                                DefaultTheme.getColours()?.secondaryDefault,
-                                DefaultTheme.getDefaults().secondary_default
+                                HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                                HMSPrebuiltTheme.getDefaults().secondary_default
                             )
                         }
                     }

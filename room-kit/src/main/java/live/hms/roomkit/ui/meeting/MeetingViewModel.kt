@@ -20,7 +20,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.DefaultTheme
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.*
@@ -128,7 +128,7 @@ class MeetingViewModel(
 
     private fun setTheme(layoutConfig: LayoutResult) {
         val pallete = layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette?:return
-        DefaultTheme.setTheme(pallete)
+        HMSPrebuiltTheme.setTheme(pallete)
     }
 
     private fun setHmsConfig(

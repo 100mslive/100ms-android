@@ -16,7 +16,7 @@ import live.hms.roomkit.databinding.ListItemVideoBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
-import live.hms.roomkit.ui.theme.DefaultTheme
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.visibility
@@ -203,7 +203,7 @@ class VideoListAdapter(
                 holder.binding.networkQuality.visibility = View.VISIBLE
                 NetworkQualityHelper.getNetworkResource(payload.downlinkSpeed, context = context)?.let {
                   if (payload.downlinkSpeed == 0) {
-                    holder.binding.networkQuality.setColorFilter(getColorOrDefault(DefaultTheme.getColours()?.alertSuccess, DefaultTheme.getDefaults().error_default), PorterDuff.Mode.SRC_IN);
+                    holder.binding.networkQuality.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertSuccess, HMSPrebuiltTheme.getDefaults().error_default), PorterDuff.Mode.SRC_IN);
                   } else {
                     holder.binding.networkQuality.colorFilter = null
                   }
