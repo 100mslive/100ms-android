@@ -23,7 +23,7 @@ import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.*
@@ -215,29 +215,15 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             bindVideo()
                         }
-                        background =
-                            ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
-//                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
-                        binding.buttonToggleVideoBg.setBackgroundAndColor(
-                            HMSPrebuiltTheme.getColours()?.secondaryDefault,
-                            HMSPrebuiltTheme.getDefaults().secondary_default
-
-                        )
+                        binding.buttonToggleVideo.setIconEnabled(R.drawable.ic_camera_toggle_on)
+//
                     } else {
                         // Mute this track
                         it.setMute(true)
                         if (isViewVisible) {
                             unbindVideo()
                         }
-                        background =
-                            ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_off)
-//                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.black)
-//                        binding.buttonToggleVideoBg.setCardBackgroundColor(
-//                            ContextCompat.getColor(
-//                                requireContext(),
-//                                R.color.white
-//                            )
-//                        )
+                        binding.buttonToggleVideo.setIconDisabled(R.drawable.ic_camera_toggle_off)
                     }
                 }
 
@@ -252,25 +238,9 @@ class PreviewFragment : Fragment() {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
-                        setBackgroundAndColor(
-                            HMSPrebuiltTheme.getColours()?.secondaryDefault,
-                            HMSPrebuiltTheme.getDefaults().secondary_default,
-                            R.drawable.ic_audio_toggle_off,
-                        )
-//                        binding.buttonToggleAudioBg.setCardBackgroundColor(
-//                            ContextCompat.getColor(
-//                                context,
-//                                R.color.white
-//                            )
-//                        )
+                        binding.buttonToggleAudio.setIconDisabled(R.drawable.ic_audio_toggle_off)
                     } else {
-                        background =
-                            ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
-//                        backgroundTintList = ContextCompat.getColorStateList(context, R.color.white)
-                        binding.buttonToggleAudioBg.setBackgroundAndColor(
-                            HMSPrebuiltTheme.getColours()?.secondaryDefault,
-                            HMSPrebuiltTheme.getDefaults().secondary_default
-                        )
+                        binding.buttonToggleAudio.setIconEnabled(R.drawable.ic_audio_toggle_on)
                     }
                 }
             }
@@ -428,25 +398,9 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track.video != null)
 
                         if (it.isMute) {
-                            background =
-                                ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_off)
-//                            backgroundTintList =
-//                                ContextCompat.getColorStateList(context, R.color.black)
-//                            binding.buttonToggleVideoBg.setCardBackgroundColor(
-//                                ContextCompat.getColor(
-//                                    context,
-//                                    R.color.white
-//                                )
-//                            )
+                            setIconDisabled(R.drawable.ic_camera_toggle_off)
                         } else {
-                            background =
-                                ContextCompat.getDrawable(context, R.drawable.ic_camera_toggle_on)
-//                            backgroundTintList =
-//                                ContextCompat.getColorStateList(context, R.color.white)
-                            binding.buttonToggleVideoBg.setBackgroundAndColor(
-                                HMSPrebuiltTheme.getColours()?.secondaryDefault,
-                                HMSPrebuiltTheme.getDefaults().secondary_default
-                            )
+                            setIconEnabled(R.drawable.ic_camera_toggle_on)
                         }
                     }
                 }
@@ -465,25 +419,9 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track.audio != null)
 
                         if (it.isMute) {
-                            background =
-                                ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_off)
-//                            backgroundTintList =
-//                                ContextCompat.getColorStateList(context, R.color.black)
-//                            binding.buttonToggleAudioBg.setCardBackgroundColor(
-//                                ContextCompat.getColor(
-//                                    context,
-//                                    R.color.white
-//                                )
-//                            )
+                            binding.buttonToggleAudio.setIconDisabled(R.drawable.ic_audio_toggle_off)
                         } else {
-                            background =
-                                ContextCompat.getDrawable(context, R.drawable.ic_audio_toggle_on)
-//                            backgroundTintList =
-//                                ContextCompat.getColorStateList(context, R.color.white)
-                            binding.buttonToggleAudioBg.setBackgroundAndColor(
-                                HMSPrebuiltTheme.getColours()?.secondaryDefault,
-                                HMSPrebuiltTheme.getDefaults().secondary_default
-                            )
+                            binding.buttonToggleAudio.setIconEnabled(R.drawable.ic_audio_toggle_on)
                         }
                     }
                 }

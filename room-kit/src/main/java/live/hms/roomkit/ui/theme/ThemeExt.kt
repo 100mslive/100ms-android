@@ -3,10 +3,12 @@ package live.hms.roomkit.ui.theme
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.widget.ImageButton
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.button.MaterialButton
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
@@ -46,7 +48,8 @@ internal fun androidx.appcompat.widget.AppCompatImageView.setIconTintColor(
     iconTintColorStr: String?,
     defaultIconTintColor: String,
 ) {
-    this.imageTintList = ColorStateList.valueOf(getColorOrDefault(iconTintColorStr, defaultIconTintColor))
+    this.imageTintList =
+        ColorStateList.valueOf(getColorOrDefault(iconTintColorStr, defaultIconTintColor))
 }
 
 internal fun View.setBackgroundAndColor(
@@ -64,7 +67,7 @@ internal fun View.setBackgroundAndColor(
     background = wrapDrawable
 }
 
-fun getColorOrDefault(colorStr: String?,defaultColor: String): Int {
+fun getColorOrDefault(colorStr: String?, defaultColor: String): Int {
     return try {
         colorStr!!.toColorInt()
     } catch (e: Exception) {
@@ -74,6 +77,47 @@ fun getColorOrDefault(colorStr: String?,defaultColor: String): Int {
             android.graphics.Color.parseColor("#FFFFFF")
         }
     }
+}
+
+internal fun ImageButton.setIconDisabled(
+    @DrawableRes disabledIconDrawableRes: Int
+) {
+    this.setImageResource(disabledIconDrawableRes)
+    this.imageTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    setBackgroundResource(R.drawable.gray_round_solid_drawable)
+
+    drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.secondaryDim,
+            HMSPrebuiltTheme.getDefaults().secondary_dim
+        )
+    )
+
+}
+
+internal fun ImageButton.setIconEnabled(
+    @DrawableRes disabledIconDrawableRes: Int
+) {
+    this.setImageResource(disabledIconDrawableRes)
+    this.imageTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    setBackgroundResource(R.drawable.gray_round_stroked_drawable)
+    backgroundTintList = null
+    drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
 }
 
 //hex color to int color
@@ -95,13 +139,15 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
     progressBar.heading.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
     progressBar.description.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryHigh, HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
         )
     )
 
@@ -114,25 +160,29 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
     topMenu?.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDim, HMSPrebuiltTheme.getDefaults().background_default
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
         )
     )
 
     liveTitle?.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
     tvRecordingTime?.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
 
     tvViewersCount?.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
 
@@ -169,7 +219,8 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
     unreadMessageCount.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,  HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
@@ -237,15 +288,15 @@ internal fun FragmentActiveSpeakerBinding.applyTheme() {
 internal fun VideoCardBinding.applyTheme() {
     nameInitials.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,  HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
 }
 
 internal fun FragmentPreviewBinding.applyTheme() {
     previewCard.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.backgroundDim,
-        HMSPrebuiltTheme.getDefaults().surface_default
+        HMSPrebuiltTheme.getColours()?.backgroundDim, HMSPrebuiltTheme.getDefaults().surface_default
     )
 
     buttonNetworkQuality.setBackgroundAndColor(
@@ -254,50 +305,50 @@ internal fun FragmentPreviewBinding.applyTheme() {
     )
 
     recordingView.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,  HMSPrebuiltTheme.getDefaults().secondary_default
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default
     )
 
 
     nameTv.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,  HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
 
     descriptionTv.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,  HMSPrebuiltTheme.getDefaults().onprimary_med_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
+            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
         )
     )
 
     recordingText.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryMedium, HMSPrebuiltTheme.getDefaults().onprimary_med_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
+            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
         )
     )
 
     nameInitials.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,  HMSPrebuiltTheme.getDefaults().secondary_default,
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_80
     )
 
     nameInitials.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,  HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
 
-    iconOutputDeviceBg.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,  HMSPrebuiltTheme.getDefaults().secondary_default
-    )
-
-    iconParticipantsBg.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,  HMSPrebuiltTheme.getDefaults().secondary_default
-    )
 
     buttonJoinMeeting.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,  HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
 
