@@ -3,7 +3,7 @@ package live.hms.roomkit.ui.theme
 import com.google.gson.annotations.SerializedName
 
 //todo move to colors.xml
-data class ThemeColours(
+data class DefaultDarkThemeColours(
     @SerializedName("primary_default") val primary_default: String = "#2572ED",
     @SerializedName("primary_bright") val primary_bright: String = "#538DFF",
     @SerializedName("primary_dim") val primary_dim: String = "#002D6D",

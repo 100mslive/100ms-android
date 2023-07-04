@@ -3,8 +3,6 @@ package live.hms.roomkit.ui.theme
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.cardview.widget.CardView
@@ -25,7 +23,7 @@ object HMSPrebuiltTheme {
         this.theme = theme
     }
 
-    fun getDefaults() = ThemeColours()
+    fun getDefaults() = DefaultDarkThemeColours()
 }
 
 internal fun CardView.setBackgroundAndColor(
