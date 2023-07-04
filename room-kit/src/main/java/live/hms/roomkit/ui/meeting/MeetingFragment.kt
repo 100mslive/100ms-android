@@ -22,6 +22,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -146,10 +147,7 @@ class MeetingFragment : Fragment() {
 
                     override fun onSuccess() {
                         // success
-                        binding.buttonShareScreen?.apply {
-                            setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.secondaryDim, HMSPrebuiltTheme.getDefaults().secondary_default, R.drawable.gray_round_stroked_drawable)
-                            setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh, HMSPrebuiltTheme.getDefaults().onsecondary_high_emp)
-                        }
+                        binding.buttonShareScreen?.setIconEnabled(R.drawable.ic_share_screen)
                     }
                 })
             }
@@ -269,12 +267,7 @@ class MeetingFragment : Fragment() {
 
                     override fun onSuccess() {
                         //success
-                        binding.buttonShareScreen?.apply {
-                            setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.borderBright,
-                                HMSPrebuiltTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
-                            setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-                                HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
-                        }
+                        binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
                     }
                 })
             }
@@ -435,19 +428,9 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
-                binding.buttonRaiseHand?.setBackgroundAndColor(
-                    HMSPrebuiltTheme.getColours()?.secondaryDim,
-                    HMSPrebuiltTheme.getDefaults().secondary_default,
-                    R.drawable.gray_round_solid_drawable)
-
-                binding.buttonRaiseHand?.setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh,HMSPrebuiltTheme.getDefaults().onsecondary_high_emp )
+                binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
             } else {
-                binding.buttonRaiseHand?.setBackgroundAndColor(
-                    HMSPrebuiltTheme.getColours()?.borderBright,
-                    HMSPrebuiltTheme.getDefaults().border_bright,
-                    R.drawable.gray_round_stroked_drawable
-                )
-                binding.buttonRaiseHand?.setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,HMSPrebuiltTheme.getDefaults().onsurface_high_emp )
+                binding.buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
             }
         }
 
@@ -782,17 +765,11 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
-            (binding.buttonToggleVideo as? AppCompatImageView)?.apply {
+            (binding.buttonToggleVideo as? AppCompatImageButton)?.apply {
                 if (enabled) {
-                    setBackgroundAndColor(   HMSPrebuiltTheme.getColours()?.borderBright,
-                        HMSPrebuiltTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
-                    setImageResource(R.drawable.ic_camera_toggle_on)
-                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-                        HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+                    setIconEnabled(R.drawable.ic_camera_toggle_on)
                 } else {
-                    setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.secondaryDim, HMSPrebuiltTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
-                    setImageResource(R.drawable.ic_camera_toggle_off)
-                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh, HMSPrebuiltTheme.getDefaults().onsecondary_high_emp)
+                    setIconDisabled(R.drawable.ic_camera_toggle_off)
                 }
             }
         }
@@ -801,18 +778,12 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
             updatePipMicState(isMicOn = enabled)
-            (binding.buttonToggleAudio as? AppCompatImageView)?.apply {
+            (binding.buttonToggleAudio as? AppCompatImageButton)?.apply {
 
                 if (enabled) {
-                    setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.borderBright,
-                        HMSPrebuiltTheme.getDefaults().border_bright, R.drawable.gray_round_stroked_drawable)
-                    setImageResource(R.drawable.ic_audio_toggle_on)
-
-                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+                    setIconEnabled(R.drawable.ic_audio_toggle_on)
                 } else {
-                    setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.secondaryDim, HMSPrebuiltTheme.getDefaults().secondary_dim, R.drawable.gray_round_solid_drawable)
-                    setImageResource(R.drawable.ic_audio_toggle_off)
-                    setIconTintColor(HMSPrebuiltTheme.getColours()?.onSecondaryHigh, HMSPrebuiltTheme.getDefaults()?.onsecondary_high_emp)
+                    setIconDisabled(R.drawable.ic_audio_toggle_off)
                 }
             }
         }
@@ -977,6 +948,7 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
         binding.buttonShareScreen?.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonShareScreen.onClick()")
@@ -1090,13 +1062,7 @@ class MeetingFragment : Fragment() {
             }
 
             override fun onSuccess() {
-                //success
-                binding.buttonShareScreen?.apply {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_stroked_drawable
-                    )
-                }
+                binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
             }
         })
     }

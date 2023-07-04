@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageButton
 import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
@@ -188,26 +189,10 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 
     //init should be called once
-    buttonRaiseHand?.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright,
-        R.drawable.gray_round_stroked_drawable
-    )
-    buttonRaiseHand?.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    )
+    buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
 
-    (buttonOpenChat as? AppCompatImageView)?.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    )
+    (buttonOpenChat as? AppCompatImageButton)?.setIconDisabled(R.drawable.ic_chat_message)
 
-    buttonOpenChat.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright,
-        R.drawable.gray_round_stroked_drawable
-    )
 
 
 
@@ -242,27 +227,12 @@ internal fun FragmentMeetingBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().background_default,
     )
 
-    (buttonToggleVideo as? AppCompatImageView)?.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    )
+    (buttonToggleVideo as? AppCompatImageButton)?.setIconDisabled(R.drawable.ic_camera_toggle_off)
 
-    buttonToggleVideo.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright,
-        R.drawable.gray_round_stroked_drawable
-    )
+    (buttonToggleAudio as? AppCompatImageButton)?.setIconDisabled(R.drawable.ic_audio_toggle_off)
 
-    (buttonToggleAudio as? AppCompatImageView)?.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    )
 
-    buttonToggleAudio.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright,
-        R.drawable.gray_round_stroked_drawable
-    )
+
 
     buttonSettingsMenu?.setIconTintColor(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,

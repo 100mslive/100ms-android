@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_raise_hand"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -113,7 +113,7 @@
             android:layout_height="match_parent"
             android:gravity="center">
 
-            <androidx.appcompat.widget.AppCompatImageView
+            <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_open_chat"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -177,7 +177,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_toggle_audio"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -192,7 +192,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_toggle_video"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -225,7 +225,7 @@
             android:layout_weight="1"
             android:visibility="gone" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_share_screen"
             android:layout_width="40dp"
             android:layout_height="40dp"
