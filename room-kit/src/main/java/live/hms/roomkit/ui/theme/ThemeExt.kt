@@ -258,10 +258,26 @@ internal fun FragmentActiveSpeakerBinding.applyTheme() {
 internal fun VideoCardBinding.applyTheme() {
     nameInitials.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
+
+    nameInitials.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_80
+    )
+
+
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
+
 }
 
 internal fun FragmentPreviewBinding.applyTheme() {
@@ -309,8 +325,8 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
     nameInitials.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
         )
     )
 
