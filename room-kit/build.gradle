@@ -17,7 +17,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        minSdkVersion 24
+        minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
         versionName getVersionName()
@@ -92,7 +92,7 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // Get Permissions easily
-    implementation 'pub.devrel:easypermissions:1.1.3'
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
 
 
