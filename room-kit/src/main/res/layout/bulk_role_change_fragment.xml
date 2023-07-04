@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/primary_bg"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     tools:context=".ui.meeting.chat.RoleChangeFragment">
@@ -43,7 +42,6 @@
                         android:layout_marginTop="5dp"
                         android:fontFamily="@font/inter_semibold"
                         android:text="Bulk Role Change"
-                        android:textColor="@color/white"
                         android:textSize="20sp"
                         app:layout_constraintStart_toStartOf="@+id/tv_start_streaming_title"
                         app:layout_constraintTop_toBottomOf="@id/tv_start_streaming_title" />
@@ -67,7 +65,6 @@
                 android:layout_marginTop="20dp"
                 android:fontFamily="@font/inter_semibold"
                 android:text="To Role"
-                android:textColor="@color/white"
                 android:textSize="20sp" />
 
             <TextView
@@ -76,7 +73,6 @@
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/inter_regular"
                 android:text="The role that you want everyone changed to."
-                android:textColor="@color/muted_text"
                 android:textSize="14sp" />
 
             <androidx.appcompat.widget.AppCompatSpinner
@@ -88,7 +84,6 @@
                 android:paddingVertical="7dp"
                 android:paddingStart="10dp"
                 android:paddingEnd="30dp"
-                android:popupBackground="@color/primary_bg"
                 android:spinnerMode="dropdown"
                 tools:listitem="@layout/layout_chat_recipient_selector_item"
                 />
@@ -100,7 +95,6 @@
                 android:layout_marginTop="30dp"
                 android:fontFamily="@font/inter_regular"
                 android:text="From Roles"
-                android:textColor="@color/muted_text"
                 android:textSize="14sp" />
 
             <TextView

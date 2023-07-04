@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
-    app:cardBackgroundColor="@color/primary_bg"
     app:cardCornerRadius="8dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent">
@@ -51,7 +50,6 @@
                 android:gravity="center"
                 android:text="Setup your audio and video"
                 android:textAlignment="center"
-                android:textColor="@color/muted_text"
                 android:textSize="14sp" />
 
             <Space
@@ -65,7 +63,6 @@
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:elevation="10dp"
-                app:cardBackgroundColor="@color/primary_bg"
                 app:cardCornerRadius="12dp">
 
                 <ImageView
@@ -87,7 +84,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:background="@color/primary_bg"
             android:paddingHorizontal="15dp"
             android:paddingVertical="15dp"
             android:visibility="gone">
@@ -97,7 +93,7 @@
                 android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_record_button_24"
-                app:tint="@color/red" />
+                />
 
             <TextView
                 android:id="@+id/recording_text"
@@ -132,7 +128,6 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
-                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -142,7 +137,6 @@
                     android:layout_gravity="center"
                     android:layout_margin="7dp"
                     android:background="@drawable/ic_audio_toggle_off"
-                    android:backgroundTint="@color/black"
                     android:contentDescription="@string/toggle_video"
                     android:enabled="false" />
 
@@ -153,7 +147,6 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:elevation="10dp"
-                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -163,11 +156,10 @@
                     android:layout_gravity="center"
                     android:layout_margin="7dp"
                     android:background="@drawable/ic_camera_toggle_off"
-                    android:backgroundTint="@color/black"
                     android:contentDescription="@string/toggle_video"
                     android:enabled="false"
                     android:src="@drawable/ic_videocam_off_24"
-                    android:tint="@color/black" />
+                     />
 
             </androidx.cardview.widget.CardView>
 
@@ -184,7 +176,6 @@
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
                 android:id="@+id/icon_output_device_bg"
-                app:cardBackgroundColor="@color/gray_light"
                 app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -193,7 +184,6 @@
                     android:layout_height="30dp"
                     android:layout_gravity="center"
                     android:padding="4dp"
-                    android:tint="@color/white"
                     app:srcCompat="@drawable/ic_icon_speaker" />
 
             </androidx.cardview.widget.CardView>
@@ -204,7 +194,6 @@
                 android:layout_marginEnd="10dp"
                 android:elevation="10dp"
                 android:id="@+id/icon_participants_bg"
-                app:cardBackgroundColor="@color/gray_light"
                 app:cardCornerRadius="12dp">
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -213,7 +202,7 @@
                     android:layout_height="30dp"
                     android:layout_gravity="center"
                     android:padding="4dp"
-                    android:tint="@color/white"
+
                     app:srcCompat="@drawable/ic_icon_people" />
 
             </androidx.cardview.widget.CardView>
@@ -248,7 +237,7 @@
                 android:paddingHorizontal="10dp"
                 android:text="@string/enter_studio_str"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/preview_card" />
@@ -260,7 +249,7 @@
                 android:clickable="false"
                 android:focusable="false"
                 android:src="@drawable/ic_baseline_arrow_forward_24"
-                app:tint="@color/white" />
+          />
 
             <Space
                 android:layout_width="wrap_content"

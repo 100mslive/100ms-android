@@ -13,7 +13,6 @@ app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior
 <androidx.appcompat.widget.LinearLayoutCompat
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/primary_bg"
     android:orientation="vertical"
     android:paddingHorizontal="16dp"
     android:paddingVertical="20dp">
@@ -24,7 +23,6 @@ app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior
         android:fontFamily="@font/inter_semibold"
         android:padding="8dp"
         android:text="Change Name"
-        android:textColor="@color/white"
         android:textSize="20sp" />
 
     <EditText

@@ -39,7 +39,6 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="-8dp"
         android:layout_marginBottom="-8dp"
-        android:backgroundTint="@color/black_faded_40"
         app:cardCornerRadius="5dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp">
@@ -51,7 +50,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="35dp"
             android:layout_marginBottom="12dp"
-            android:backgroundTint="@color/black_faded_40"
+
             android:orientation="horizontal">
 
             <ImageView
@@ -85,7 +84,7 @@
                 android:layout_marginLeft="8dp"
                 android:contentDescription="@string/audio_status"
                 android:src="@drawable/ic_mic_off_24"
-                app:tint="@color/white_faded_70" />
+                 />
 
             <ImageView
                 android:id="@+id/icon_screen_share"
@@ -95,7 +94,7 @@
                 android:layout_marginLeft="4dp"
                 android:contentDescription="@string/screen_share"
                 android:src="@drawable/ic_mobile_screen_share_24"
-                app:tint="@color/white_faded_70" />
+               />
 
             <ImageView
                 android:id="@+id/ic_degraded"
@@ -104,7 +103,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/ic_degraded"
-                app:tint="@color/white_faded_70" />
+                 />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

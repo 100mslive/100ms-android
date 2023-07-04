@@ -22,7 +22,6 @@
             android:gravity="center|start"
             android:paddingVertical="6dp"
             android:text="Leave Studio"
-            android:textColor="@color/white"
             android:textSize="20sp" />
 
         <TextView
