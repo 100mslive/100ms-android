@@ -171,7 +171,6 @@ abstract class VideoGridBaseFragment : Fragment() {
     val earlyExit = item.video == null
             || item.video?.isMute == true
     if (earlyExit) return
-    binding.applyTheme()
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
         view.setScalingType(scalingType)
@@ -229,7 +228,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
-
+    binding.applyTheme()
     binding.apply {
       // Donot update the text view if not needed, this causes redraw of the entire view leading to  flicker
       if (name.text.equals(item.peer.name).not()) {
