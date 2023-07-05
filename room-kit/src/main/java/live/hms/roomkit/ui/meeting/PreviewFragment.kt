@@ -106,22 +106,22 @@ class PreviewFragment : Fragment() {
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
-
-        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
-            if (it == RecordingState.STREAMING_AND_RECORDING) {
-                binding.recordingText.text =
-                    "The session you are about to join is live and being recorded"
-                binding.recordingView.visibility = View.VISIBLE
-            } else if (meetingViewModel.isHlsRunning()) {
-                binding.recordingText.text = "The session you are about to join is live"
-                binding.recordingView.visibility = View.VISIBLE
-            } else if (meetingViewModel.isRTMPRunning()) {
-                binding.recordingText.text = "The session you are about to join is live"
-                binding.recordingView.visibility = View.VISIBLE
-            } else {
-                binding.recordingView.visibility = View.GONE
-            }
-        }
+//
+//        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
+//            if (it == RecordingState.STREAMING_AND_RECORDING) {
+//                binding.recordingText.text =
+//                    "The session you are about to join is live and being recorded"
+//                binding.recordingView.visibility = View.VISIBLE
+//            } else if (meetingViewModel.isHlsRunning()) {
+//                binding.recordingText.text = "The session you are about to join is live"
+//                binding.recordingView.visibility = View.VISIBLE
+//            } else if (meetingViewModel.isRTMPRunning()) {
+//                binding.recordingText.text = "The session you are about to join is live"
+//                binding.recordingView.visibility = View.VISIBLE
+//            } else {
+//                binding.recordingView.visibility = View.GONE
+//            }
+//        }
 
         meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
             HMSAudioManager.AudioManagerDeviceChangeListener {
@@ -246,7 +246,7 @@ class PreviewFragment : Fragment() {
             }
         }
 
-        binding.enterMeetingParentView.apply {
+        binding.buttonJoinMeeting.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
                 findNavController().navigate(
@@ -262,22 +262,22 @@ class PreviewFragment : Fragment() {
         binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
-                    setImageResource(R.drawable.ic_baseline_hearing_24)
+                    setIconEnabled(R.drawable.ic_baseline_hearing_24)
                 }
                 HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                    setImageResource(R.drawable.ic_icon_speaker)
+                    setIconEnabled(R.drawable.ic_icon_speaker)
                 }
                 HMSAudioManager.AudioDevice.AUTOMATIC -> {
-                    setImageResource(R.drawable.ic_icon_speaker)
+                    setIconEnabled(R.drawable.ic_icon_speaker)
                 }
                 HMSAudioManager.AudioDevice.BLUETOOTH -> {
-                    setImageResource(R.drawable.ic_baseline_bluetooth_24)
+                    setIconEnabled(R.drawable.ic_baseline_bluetooth_24)
                 }
                 HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
-                    setImageResource(R.drawable.ic_baseline_headset_24)
+                    setIconEnabled(R.drawable.ic_baseline_headset_24)
                 }
                 else -> {
-                    setImageResource(R.drawable.ic_volume_off_24)
+                    setIconDisabled(R.drawable.ic_volume_off_24)
                 }
             }
         }
@@ -286,9 +286,9 @@ class PreviewFragment : Fragment() {
     private fun updateActionVolumeMenuIcon() {
         binding.iconOutputDevice.apply {
             if (meetingViewModel.isPeerAudioEnabled()) {
-                setImageResource(R.drawable.ic_icon_speaker)
+                setIconEnabled(R.drawable.ic_icon_speaker)
             } else {
-                setImageResource(R.drawable.ic_volume_off_24)
+                setIconDisabled(R.drawable.ic_volume_off_24)
             }
         }
     }

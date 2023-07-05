@@ -290,9 +290,9 @@ internal fun FragmentPreviewBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().surface_default
     )
 
-    recordingView.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
-        HMSPrebuiltTheme.getDefaults().secondary_default
+    videoContainerBackground.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+        HMSPrebuiltTheme.getDefaults().background_default
     )
 
 
@@ -310,12 +310,6 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
-    recordingText.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
-            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
-        )
-    )
 
     nameInitials.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
@@ -338,22 +332,15 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
-    enterMeetingParentView.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.primaryDefault,
-        HMSPrebuiltTheme.getDefaults().primary_default,
-        R.drawable.primary_blue_round_drawable
+    buttonJoinMeeting.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
     )
 
-//    //TODO only init state
-//    buttonToggleVideoBg.setBackgroundAndColor(
-//        DefaultTheme.getColours().secondary_default,
-//        R.color.gray_light,
-//    )
-//    //TODO only init state
-//    buttonToggleAudioBg.setBackgroundAndColor(
-//        DefaultTheme.getColours().secondary_default,
-//        R.color.gray_light,
-//    )
-
+    //only init state
+    buttonToggleVideo.setIconDisabled(R.drawable.ic_camera_toggle_off)
+    buttonToggleAudio.setIconDisabled(R.drawable.ic_audio_toggle_off)
 
 }
