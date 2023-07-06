@@ -81,19 +81,10 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
             addAnOptionTextView.setOnSingleClickListener {
                 val showCheckBox = questionTypeSpinner.selectedItemPosition == 1
                 optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
-                // Clear the adaptor
-//                adapter.clear()
-//                // Add an item to it.
-//                Log.d(TAG,"Adding $options")
-//                options[options.keys.size]=""
-//                Log.d(TAG,"Is now $options")
-//                // Set the options to the adaptor
-//                adapter.addAll(options.values.toList())
             }
             deleteOptionTrashButton.setOnSingleClickListener {
                 // Delete the last option when delete is clicked.
                 optionsAdapter.submitList(optionsAdapter.currentList.dropLast(1))
-//                adapter.remove(options.remove(adapter.count -1))
             }
             saveButton.setOnClickListener {
                 val title = askAQuestionEditText.text.toString()

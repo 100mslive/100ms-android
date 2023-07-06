@@ -25,11 +25,19 @@ import live.hms.roomkit.util.*
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
+import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.polls.HMSPollBuilder
 import live.hms.video.polls.HMSPollQuestionBuilder
+import live.hms.video.polls.HMSPollResponseBuilder
+import live.hms.video.polls.models.HMSPollUpdateType
+import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
+import live.hms.video.polls.models.HmsPollState
+import live.hms.video.polls.models.answer.PollAnswerResponse
+import live.hms.video.polls.models.question.HMSPollQuestion
+import live.hms.video.polls.models.question.HMSPollQuestionOption
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
@@ -64,6 +72,10 @@ class MeetingViewModel(
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug = false
+    private var poll : HmsPoll? = null
+    fun getCurrentPoll() : HmsPoll?=
+        poll
+
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
@@ -522,6 +534,36 @@ class MeetingViewModel(
             override fun onInteractivityCenterAvailable(hmsInteractivityCenter: HmsInteractivityCenter) {
                 super.onInteractivityCenterAvailable(hmsInteractivityCenter)
                 localHmsInteractivityCenter = hmsInteractivityCenter
+                localHmsInteractivityCenter.pollUpdateListener = object : HmsPollUpdateListener {
+                    override fun onPollUpdate(
+                        hmsPoll: HmsPoll,
+                        hmsPollUpdateType: HMSPollUpdateType
+                    ) {
+                        if(hmsPollUpdateType == HMSPollUpdateType.started) {
+                            viewModelScope.launch {
+                                poll = hmsPoll
+                                _events.emit(Event.PollStarted(hmsPoll))
+                            }
+                        }
+                    }
+
+                }
+                // Launch the first poll that exists.
+                localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+                    override fun onSuccess(result: List<HmsPoll>) {
+                        viewModelScope.launch {
+                            result.firstOrNull()?.also { firstPoll ->
+                                poll = firstPoll
+                                _events.emit(Event.PollStarted(firstPoll))
+                            }
+                        }
+                    }
+
+                    override fun onError(error: HMSException) {
+
+                    }
+
+                })
             }
 
             override fun onJoin(room: HMSRoom) {
@@ -1355,6 +1397,7 @@ class MeetingViewModel(
         data class HlsRecordingEvent(override val message: String) : MessageEvent(message)
         data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
         data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
+        data class PollStarted(val hmsPoll: HmsPoll) : Event()
     }
 
     private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -1538,7 +1581,7 @@ class MeetingViewModel(
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll
 
-
+        Log.d("Polls","$currentList")
         val hmsPollBuilder = HMSPollBuilder.Builder()
             .withTitle(pollCreationInfo.pollTitle)
             .withCategory(if (pollCreationInfo.isPoll) HmsPollCategory.POLL else HmsPollCategory.QUIZ)
@@ -1547,6 +1590,7 @@ class MeetingViewModel(
             .withRolesThatCanViewResponses(hmsSDK.getRoles().filter { it.name == "host" })
 
         currentList.forEach { questionUi ->
+            Log.d("Polls","Processing $questionUi")
 
             when(questionUi) {
                 is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
@@ -1583,6 +1627,74 @@ class MeetingViewModel(
             }
 
         })
+    }
+
+    fun saveInfoText(question: HMSPollQuestion, answer : String) : Boolean {
+
+        val valid = if(question.type == HMSPollQuestionType.shortAnswer &&
+            answer.length > (question.answerShortMinLength ?: 0)
+        ) {
+            true
+        }
+        else question.type == HMSPollQuestionType.longAnswer &&
+            (answer.length > (question.answerLongMinLength ?: 0) )
+
+        if(valid) {
+            val response = HMSPollResponseBuilder(poll!!, null)
+                .addResponse(question, answer)
+            localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
+                override fun onSuccess(result: PollAnswerResponse) {
+                    Log.d("PollAnswer","Success $result")
+                }
+
+                override fun onError(error: HMSException) {
+                    Log.d("PollAnswer","Error $error")
+                }
+
+            })
+        }
+        return valid
+    }
+    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?) : Boolean {
+        val valid = option != null
+        val answer = question.options?.get(option!!)
+        if(valid && answer != null) {
+            val response = HMSPollResponseBuilder(poll!!, null)
+                .addResponse(question, answer)
+            localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
+                override fun onSuccess(result: PollAnswerResponse) {
+                    Log.d("PollAnswer","Success $result")
+                }
+
+                override fun onError(error: HMSException) {
+                    Log.d("PollAnswer","Error $error")
+                }
+
+            })
+        }
+        return valid
+    }
+    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?) : Boolean {
+        val valid = options != null
+        val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
+            options?.contains(index) == true
+        }
+        if(valid && answer != null) {
+            val response = HMSPollResponseBuilder(poll!!, null)
+                .addResponse(question, answer)
+            localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
+                override fun onSuccess(result: PollAnswerResponse) {
+                    Log.d("PollAnswer","Success $result")
+                }
+
+                override fun onError(error: HMSException) {
+                    Log.d("PollAnswer","Error $error")
+                }
+
+            })
+        }
+
+        return valid
     }
 }
 

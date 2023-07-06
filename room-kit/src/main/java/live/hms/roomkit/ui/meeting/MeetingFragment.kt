@@ -31,6 +31,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -623,6 +624,13 @@ class MeetingFragment : Fragment() {
                             Toast.LENGTH_LONG
                         ).show()
                     }
+                    is MeetingViewModel.Event.PollStarted -> {
+                        Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Open") { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment())}
+                            .show()
+                    }
+
+                    else -> null
                 }
             }
         }

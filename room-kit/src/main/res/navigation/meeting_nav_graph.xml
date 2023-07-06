@@ -56,6 +56,9 @@
         <action
             android:id="@+id/action_MeetingFragment_to_navigation"
             app:destination="@id/navigation" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_pollDisplayFragment"
+            app:destination="@id/pollDisplayFragment" />
     </fragment>
 
     <fragment
@@ -192,5 +195,9 @@
             android:name="live.hms.roomkit.ui.polls.PollQuestionCreation"
             android:label="PollQuestionCreation" />
     </navigation>
+    <fragment
+        android:id="@+id/pollDisplayFragment"
+        android:name="live.hms.roomkit.ui.polls.display.PollDisplayFragment"
+        android:label="PollDisplayFragment" />
 
 </navigation>

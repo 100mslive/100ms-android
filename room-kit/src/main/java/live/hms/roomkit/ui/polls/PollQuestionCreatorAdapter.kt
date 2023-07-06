@@ -12,7 +12,6 @@ import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
-
     init {
         // Adaptor begins with the question creation ui.
         submitList(listOf(QuestionUi.QuestionCreator))
