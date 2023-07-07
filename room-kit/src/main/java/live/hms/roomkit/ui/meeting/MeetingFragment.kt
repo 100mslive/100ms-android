@@ -626,7 +626,7 @@ class MeetingFragment : Fragment() {
                     }
                     is MeetingViewModel.Event.PollStarted -> {
                         Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE)
-                            .setAction("Open") { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment())}
+                            .setAction("Open") { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(event.hmsPoll.pollId))}
                             .show()
                     }
 

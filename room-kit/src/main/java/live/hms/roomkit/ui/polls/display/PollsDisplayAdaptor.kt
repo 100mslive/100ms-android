@@ -13,6 +13,7 @@ import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 
+
 // Now we decide what the data holder is (let's leave it the original,
 //  and also what the viewholder is, will need to create a new one to handle the,
 //  logic of answering questions.
@@ -27,9 +28,9 @@ data class QuestionContainer(
     var voted : Boolean = false
 )
 class PollsDisplayAdaptor(
-    val saveInfoText : (question: HMSPollQuestion, answer : String) -> Boolean,
-    val saveInfoSingleChoice : (question : HMSPollQuestion, Int?) -> Boolean,
-    val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?) -> Boolean
+    val saveInfoText : (question: HMSPollQuestion, answer : String, hmsPoll : HmsPoll) -> Boolean,
+    val saveInfoSingleChoice : (question : HMSPollQuestion, Int?, hmsPoll : HmsPoll) -> Boolean,
+    val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll) -> Boolean
 ) : ListAdapter<QuestionContainer, PollDisplayQuestionHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
@@ -84,6 +85,6 @@ class PollsDisplayAdaptor(
     private fun setTextAnswer(answer : String, position: Int): Boolean {
         val option = getItem(position)
         option.textAnswers = answer
-        return saveInfoText(option.question, answer)
+        return saveInfoText(option.question, answer, poll)
     }
 }

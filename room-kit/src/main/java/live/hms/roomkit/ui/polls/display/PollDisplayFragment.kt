@@ -6,10 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import live.hms.roomkit.databinding.LayoutPollsCreationBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.meeting.activespeaker.HlsFragmentArgs
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.polls.models.HmsPoll
@@ -19,6 +21,7 @@ import live.hms.video.polls.models.HmsPoll
  *
  */
 class PollDisplayFragment : Fragment() {
+    private val args: PollDisplayFragmentArgs by navArgs()
     private var binding by viewLifecycle<LayoutPollsDisplayBinding>()
     lateinit var pollsDisplayAdaptor: PollsDisplayAdaptor
     private val meetingViewModel: MeetingViewModel by activityViewModels()
@@ -40,7 +43,7 @@ class PollDisplayFragment : Fragment() {
             meetingViewModel::saveInfoSingleChoice,
             meetingViewModel::saveInfoMultiChoice)
 
-        poll = meetingViewModel.getCurrentPoll()!!
+        poll = meetingViewModel.getPollForPollId(args.pollId)
 
         with(binding) {
             backButton.setOnSingleClickListener { parentFragmentManager.popBackStackImmediate() }

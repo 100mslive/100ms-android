@@ -15,8 +15,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val binding: T,
     val poll : HmsPoll,
     val saveInfoText: (text : String, position : Int) -> Boolean,
-    val saveInfoSingleChoice: (question : HMSPollQuestion, Int?) -> Boolean,
-    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?) -> Boolean
+    val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
+    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val adapter = AnswerOptionsAdapter()
@@ -42,9 +42,9 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             adapter.submitList(question.question.options?.map { Option(it.text?:"", question.question.type == HMSPollQuestionType.multiChoice) })
             votebutton.setOnSingleClickListener {
                 val voted : Boolean = if(question.question.type == HMSPollQuestionType.singleChoice){
-                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull())
+                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll)
                 } else if(question.question.type == HMSPollQuestionType.multiChoice) {
-                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions())
+                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll)
                 } else {
                     saveInfoText("What?", bindingAdapterPosition)
                 }

@@ -198,6 +198,10 @@
     <fragment
         android:id="@+id/pollDisplayFragment"
         android:name="live.hms.roomkit.ui.polls.display.PollDisplayFragment"
-        android:label="PollDisplayFragment" />
+        android:label="PollDisplayFragment" >
+        <argument
+            android:name="pollId"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

@@ -72,10 +72,6 @@ class MeetingViewModel(
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug = false
-    private var poll : HmsPoll? = null
-    fun getCurrentPoll() : HmsPoll?=
-        poll
-
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
@@ -541,7 +537,6 @@ class MeetingViewModel(
                     ) {
                         if(hmsPollUpdateType == HMSPollUpdateType.started) {
                             viewModelScope.launch {
-                                poll = hmsPoll
                                 _events.emit(Event.PollStarted(hmsPoll))
                             }
                         }
@@ -553,7 +548,6 @@ class MeetingViewModel(
                     override fun onSuccess(result: List<HmsPoll>) {
                         viewModelScope.launch {
                             result.firstOrNull()?.also { firstPoll ->
-                                poll = firstPoll
                                 _events.emit(Event.PollStarted(firstPoll))
                             }
                         }
@@ -1629,7 +1623,7 @@ class MeetingViewModel(
         })
     }
 
-    fun saveInfoText(question: HMSPollQuestion, answer : String) : Boolean {
+    fun saveInfoText(question: HMSPollQuestion, answer : String, hmsPoll: HmsPoll) : Boolean {
 
         val valid = if(question.type == HMSPollQuestionType.shortAnswer &&
             answer.length > (question.answerShortMinLength ?: 0)
@@ -1640,7 +1634,7 @@ class MeetingViewModel(
             (answer.length > (question.answerLongMinLength ?: 0) )
 
         if(valid) {
-            val response = HMSPollResponseBuilder(poll!!, null)
+            val response = HMSPollResponseBuilder(hmsPoll, null)
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
@@ -1655,11 +1649,11 @@ class MeetingViewModel(
         }
         return valid
     }
-    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?) : Boolean {
+    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll) : Boolean {
         val valid = option != null
         val answer = question.options?.get(option!!)
         if(valid && answer != null) {
-            val response = HMSPollResponseBuilder(poll!!, null)
+            val response = HMSPollResponseBuilder(hmsPoll, null)
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
@@ -1674,13 +1668,13 @@ class MeetingViewModel(
         }
         return valid
     }
-    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?) : Boolean {
+    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll) : Boolean {
         val valid = options != null
         val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
             options?.contains(index) == true
         }
         if(valid && answer != null) {
-            val response = HMSPollResponseBuilder(poll!!, null)
+            val response = HMSPollResponseBuilder(hmsPoll, null)
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
@@ -1696,5 +1690,7 @@ class MeetingViewModel(
 
         return valid
     }
+
+    fun getPollForPollId(pollId: String): HmsPoll = localHmsInteractivityCenter?.polls?.find{ it.pollId == pollId }!!
 }
 
