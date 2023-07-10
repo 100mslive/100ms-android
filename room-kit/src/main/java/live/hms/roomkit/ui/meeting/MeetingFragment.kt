@@ -1049,7 +1049,7 @@ class MeetingFragment : Fragment() {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
                 },
                     {
-                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToNavigation())
+                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
                     })
                 settingsBottomSheet.show(
                     requireActivity().supportFragmentManager,
