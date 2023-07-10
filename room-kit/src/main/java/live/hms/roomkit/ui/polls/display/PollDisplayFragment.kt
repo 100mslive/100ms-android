@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import live.hms.roomkit.databinding.LayoutPollsCreationBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import live.hms.roomkit.databinding.LayoutPollsDisplayBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.meeting.activespeaker.HlsFragmentArgs
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.polls.models.HmsPoll
@@ -39,11 +41,21 @@ class PollDisplayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        pollsDisplayAdaptor = PollsDisplayAdaptor(meetingViewModel::saveInfoText,
+        pollsDisplayAdaptor = PollsDisplayAdaptor(
+            meetingViewModel::getPollForPollId,
+            meetingViewModel::saveInfoText,
             meetingViewModel::saveInfoSingleChoice,
             meetingViewModel::saveInfoMultiChoice)
 
         poll = meetingViewModel.getPollForPollId(args.pollId)
+        lifecycleScope.launch{
+            meetingViewModel.events.onEach {
+                if(it is MeetingViewModel.Event.PollVotesUpdated) {
+                    // Update the polls? How?
+                    pollsDisplayAdaptor.updatePollVotes(it.hmsPoll)
+                }
+            }.collect()
+        }
 
         with(binding) {
             backButton.setOnSingleClickListener { parentFragmentManager.popBackStackImmediate() }

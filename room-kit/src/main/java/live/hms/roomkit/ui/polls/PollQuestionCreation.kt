@@ -53,7 +53,7 @@ class PollQuestionCreation : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.backButton.setOnSingleClickListener { parentFragmentManager.popBackStackImmediate() }
+        binding.backButton.setOnSingleClickListener { parentFragmentManager.popBackStack() }
         binding.createdQuestionList.adapter = adapter
         binding.createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
         val divider = DividerItemDecoration(requireContext(), VERTICAL).apply {

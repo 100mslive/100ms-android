@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
-import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.PollStatsQuestions
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
+import kotlin.reflect.KFunction2
 
 
 // Now we decide what the data holder is (let's leave it the original,
@@ -28,14 +29,18 @@ data class QuestionContainer(
     var voted : Boolean = false
 )
 class PollsDisplayAdaptor(
+    val getPoll : (pollId : String) -> HmsPoll,
     val saveInfoText : (question: HMSPollQuestion, answer : String, hmsPoll : HmsPoll) -> Boolean,
     val saveInfoSingleChoice : (question : HMSPollQuestion, Int?, hmsPoll : HmsPoll) -> Boolean,
     val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll) -> Boolean
 ) : ListAdapter<QuestionContainer, PollDisplayQuestionHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
+    private val TAG = "PollsDisplayAdaptor"
 
-    private lateinit var poll: HmsPoll
+    private var oldPoll: HmsPoll? = null
+    private lateinit var pollId : String
+    val updater : MutableList<PollDisplayQuestionHolder<ViewBinding>> = mutableListOf()
 
     fun displayPoll(hmsPoll: HmsPoll) {
         val questions = hmsPoll.questions?.map { QuestionContainer(it) }
@@ -43,7 +48,8 @@ class PollsDisplayAdaptor(
         if(questions != null) {
             submitList(questions)
         }
-        this.poll = hmsPoll
+        this.pollId = hmsPoll.pollId
+        this.oldPoll = hmsPoll
     }
 
     companion object {
@@ -72,7 +78,11 @@ class PollsDisplayAdaptor(
             HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        return PollDisplayQuestionHolder(view!!, poll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)
+        val questionHolder = PollDisplayQuestionHolder(view!!, { getPoll(this.pollId)}, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)
+        if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
+            updater.add(questionHolder)
+        }
+        return questionHolder
     }
 
     override fun onBindViewHolder(holder: PollDisplayQuestionHolder<ViewBinding>, position: Int) {
@@ -85,6 +95,19 @@ class PollsDisplayAdaptor(
     private fun setTextAnswer(answer : String, position: Int): Boolean {
         val option = getItem(position)
         option.textAnswers = answer
-        return saveInfoText(option.question, answer, poll)
+        return saveInfoText(option.question, answer, getPoll(pollId))
+    }
+
+    fun updatePollVotes(hmsPoll: HmsPoll) {
+        Log.d(TAG,"Received an update ${hmsPoll.result}" )
+        if(hmsPoll.pollId != pollId)
+            return
+
+        updater.forEach { action ->
+            val questions = hmsPoll.result?.questions
+            if(questions != null) {
+                action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll)
+            }
+        }
     }
 }

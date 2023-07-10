@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.percentlayout.widget.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+    <TextView
+        android:layout_alignParentStart="true"
+        android:id="@+id/answer"
+        app:layout_widthPercent="15%"
+        android:layout_height="wrap_content"
+        tools:text="Carrots"
+        />
+
+    <ProgressBar
+        android:layout_weight="1"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_toRightOf="@id/answer"
+        android:layout_toLeftOf="@id/totalVotes"
+        android:id="@+id/questionProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        />
+
+    <TextView
+        android:layout_alignParentEnd="true"
+        android:id="@+id/totalVotes"
+        app:layout_widthPercent="10%"
+        android:layout_height="wrap_content"
+        tools:text="23"
+        />
+
+</androidx.percentlayout.widget.PercentRelativeLayout>

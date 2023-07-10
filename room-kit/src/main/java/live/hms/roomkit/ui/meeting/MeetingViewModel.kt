@@ -540,6 +540,11 @@ class MeetingViewModel(
                                 _events.emit(Event.PollStarted(hmsPoll))
                             }
                         }
+                        else if (hmsPollUpdateType == HMSPollUpdateType.votesupdated) {
+                            viewModelScope.launch {
+                                _events.emit(Event.PollVotesUpdated(hmsPoll))
+                            }
+                        }
                     }
 
                 }
@@ -1392,6 +1397,7 @@ class MeetingViewModel(
         data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
         data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
         data class PollStarted(val hmsPoll: HmsPoll) : Event()
+        data class PollVotesUpdated(val hmsPoll: HmsPoll) : Event()
     }
 
     private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -1692,5 +1698,8 @@ class MeetingViewModel(
     }
 
     fun getPollForPollId(pollId: String): HmsPoll = localHmsInteractivityCenter?.polls?.find{ it.pollId == pollId }!!
+    fun hasPoll() : HmsPoll? = if(this::localHmsInteractivityCenter.isInitialized) {
+        localHmsInteractivityCenter.polls.firstOrNull()
+    } else null
 }
 

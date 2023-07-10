@@ -35,5 +35,13 @@
         android:layout_height="wrap_content"
         android:text="Vote"
         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/votingProgressBars"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
+        />
+
 </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

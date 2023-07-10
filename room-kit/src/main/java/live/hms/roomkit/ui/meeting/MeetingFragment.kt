@@ -117,6 +117,10 @@ class MeetingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        val poll = meetingViewModel.hasPoll()
+        if(poll != null) {
+            showPollStart(poll.pollId)
+        }
         isCountdownManuallyCancelled = false
         setupRecordingTimeView()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
@@ -625,9 +629,7 @@ class MeetingFragment : Fragment() {
                         ).show()
                     }
                     is MeetingViewModel.Event.PollStarted -> {
-                        Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE)
-                            .setAction("Open") { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(event.hmsPoll.pollId))}
-                            .show()
+                        showPollStart(event.hmsPoll.pollId)
                     }
 
                     else -> null
@@ -827,6 +829,12 @@ class MeetingFragment : Fragment() {
             chatViewModel.peersUpdate()
             setupConfiguration()
         }
+    }
+
+    private fun showPollStart(pollId: String) {
+        Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE)
+            .setAction("Open") { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(pollId))}
+            .show()
     }
 
     private val pipReceiver by lazy {

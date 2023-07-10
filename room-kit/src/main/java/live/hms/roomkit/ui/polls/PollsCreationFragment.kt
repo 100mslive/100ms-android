@@ -34,10 +34,11 @@ class PollsCreationFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
-            backButton.setOnSingleClickListener { parentFragmentManager.popBackStackImmediate() }
+            backButton.setOnSingleClickListener { parentFragmentManager.popBackStack() }
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
             pollButton.setOnSingleClickListener { highlightPollOrQuiz(true)
                 pollsViewModel.highlightPollOrQuiz(true)}
+            pollButton.callOnClick()
             quizButton.setOnSingleClickListener { highlightPollOrQuiz(false)
                 pollsViewModel.highlightPollOrQuiz(false)}
             anonymous.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.isAnon(isChecked) }
