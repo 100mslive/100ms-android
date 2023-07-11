@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.flow.collect
@@ -58,7 +59,7 @@ class PollDisplayFragment : Fragment() {
         }
 
         with(binding) {
-            backButton.setOnSingleClickListener { parentFragmentManager.popBackStackImmediate() }
+            backButton.setOnSingleClickListener { findNavController().popBackStack() }
             questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
             questionsRecyclerView.adapter = pollsDisplayAdaptor
             pollsDisplayAdaptor.displayPoll(poll)

@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.LinearLayoutCompat.DividerMode
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationBinding
@@ -27,10 +26,11 @@ import live.hms.roomkit.util.viewLifecycle
 class PollQuestionCreation : Fragment() {
 
     private val pollsViewModel: PollsViewModel by activityViewModels()
-    private val meetingViewModel : MeetingViewModel by activityViewModels()
+    private val meetingViewModel: MeetingViewModel by activityViewModels()
     private val adapter = PollQuestionCreatorAdapter()
 
     private var binding by viewLifecycle<LayoutPollQuestionCreationBinding>()
+
     /**
      * Fundamentally this contains
      * 1. A list of questions
@@ -53,19 +53,24 @@ class PollQuestionCreation : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.backButton.setOnSingleClickListener { parentFragmentManager.popBackStack() }
-        binding.createdQuestionList.adapter = adapter
-        binding.createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
-        val divider = DividerItemDecoration(requireContext(), VERTICAL).apply {
-            setDrawable(binding.root.context.getDrawable(R.drawable.questions_divider)!!)
-        }
-        binding.createdQuestionList.addItemDecoration(divider)
+        with(binding) {
+            backButton.setOnSingleClickListener { findNavController().popBackStack() }
+            createdQuestionList.adapter = adapter
+            createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
+            val divider = DividerItemDecoration(requireContext(), VERTICAL).apply {
+                setDrawable(binding.root.context.getDrawable(R.drawable.questions_divider)!!)
+            }
+            createdQuestionList.addItemDecoration(divider)
 
-        binding.launchPollQuiz.setOnSingleClickListener {
-            // Clear the UI
-            // start the data
-            meetingViewModel.startPoll(adapter.currentList, pollsViewModel.getPollsCreationInfo())
-            binding.backButton.callOnClick()
+            launchPollQuiz.setOnSingleClickListener {
+                // Clear the UI
+                // start the data
+                meetingViewModel.startPoll(
+                    adapter.currentList,
+                    pollsViewModel.getPollsCreationInfo()
+                )
+                backButton.callOnClick()
+            }
         }
     }
 }
