@@ -288,4 +288,15 @@ class HomeFragment : Fragment() {
         builder.create().apply { show() }
 
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        with(binding){
+            if(!BuildConfig.DEBUG) {
+                editTextName.setText("Android")
+                edtMeetingUrl.setText("https://100ms-play-store.app.100ms.live/meeting/gfc-csun-zyg")
+            }
+        }
+    }
+
 }
