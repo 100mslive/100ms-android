@@ -495,9 +495,21 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
+        settings.inPreBuiltDebugMode,
+        isPrebuiltDebugEnabled
+      ) { commitHelper.setPrebuiltDebugMode(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
         settings.forceSoftwareDecoder,
         forceSoftwareDecoder
       ) { commitHelper.setForceSoftwareDecoder(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.muteLocalAudioOnPhoneRing,
+        muteLocalAudioOnPhoneRing
+      ) { commitHelper.setMuteLocalAudioOnPhoneRing(it) }
 
 
       initSwitch(

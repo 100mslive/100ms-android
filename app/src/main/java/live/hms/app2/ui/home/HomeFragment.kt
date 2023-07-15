@@ -1,6 +1,8 @@
 package live.hms.app2.ui.home
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,8 +12,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.BuildConfig
@@ -35,6 +40,8 @@ class HomeFragment : Fragment() {
 
     private var binding by viewLifecycle<FragmentHomeBinding>()
     private lateinit var settings: SettingsStore
+
+
 
     override fun onResume() {
         super.onResume()
@@ -62,7 +69,22 @@ class HomeFragment : Fragment() {
             requireActivity().intent.removeExtra(LEAVE_INFROMATION_WAS_END_ROOM)
             createForceLeaveDialog(person, reason, roomWasEnded)
         }
+        initOnBackPress()
     }
+
+    private fun initOnBackPress() {
+        requireActivity().apply {
+            onBackPressedDispatcher.addCallback(
+                this@HomeFragment.viewLifecycleOwner,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        Log.v(HomeFragment.TAG, "initOnBackPress -> handleOnBackPressed")
+                        finish()
+                    }
+                })
+        }
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -96,39 +118,12 @@ class HomeFragment : Fragment() {
 
         initEditTextViews()
         initConnectButton()
-        hideProgressBar()
 
         return binding.root
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun updateProgressBarUI() {
-        val headingPrefix = "Fetching Token"
-        binding.progressBar.heading.text = "$headingPrefix ${getUsername()}..."
 
-        val descriptionDefaults = if (settings.publishVideo && settings.publishAudio) {
-            "Video and microphone will be turned on by default.\n"
-        } else if (settings.publishVideo && !settings.publishVideo) {
-            "Only audio will be turned on by default\n"
-        } else if (!settings.publishVideo && settings.publishVideo) {
-            "Only video will be turned on by default\n"
-        } else {
-            "Video and microphone will be turned off by default.\n"
-        }
 
-        val descriptionSetting = "You can change the defaults in the app settings."
-        binding.progressBar.description.text = descriptionDefaults + descriptionSetting
-    }
-
-    private fun showProgressBar() {
-        binding.goLiveView.visibility = View.GONE
-        binding.progressBar.root.visibility = View.VISIBLE
-    }
-
-    private fun hideProgressBar() {
-        binding.goLiveView.visibility = View.VISIBLE
-        binding.progressBar.root.visibility = View.GONE
-    }
 
     private fun getUsername() = binding.editTextName.text.toString()
 
@@ -166,7 +161,7 @@ class HomeFragment : Fragment() {
         contextSafe { context, activity ->
 
             HMSRoomKit.launchPrebuilt(
-                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = "random-user-id", debugInfo = true,
+                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = "random-user-id", debugInfo = settings.inPreBuiltDebugMode,
                     endPoints = hashMapOf<String, String>().apply {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")
@@ -189,52 +184,67 @@ class HomeFragment : Fragment() {
     }
 
     private fun initEditTextViews() {
-        // Load the data if saved earlier (easy debugging)
+        binding.editTextName.doOnTextChanged { text, start, before, count ->
+            validate()
+        }
+
+        binding.edtMeetingUrl.doOnTextChanged { text, start, before, count ->
+            if (text.isNullOrEmpty()) {
+                binding.tvMeetingUrlInputLayout.hint =
+                    requireContext().resources.getString(R.string.paste_the_link_here_str)
+            }
+            validate()
+        }
+
         binding.editTextName.setText(settings.username)
+        binding.edtMeetingUrl.setText(settings.lastUsedMeetingUrl)
 
-        binding.editTextName.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (s.isNullOrEmpty()) {
-                    disableButton()
-                } else {
-                    enableButton()
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-        })
 
     }
 
+    private fun validate() {
+
+        if (binding.editTextName.text.isNullOrEmpty().not()
+            && binding.edtMeetingUrl.text.isNullOrEmpty().not()
+            &&  binding.edtMeetingUrl.text.toString().isValidMeetingUrl()) {
+            enableButton()
+        } else {
+            disableButton()
+        }
+    }
+
+    private var qrScanResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data: Intent? = result.data
+
+                data?.let {
+                    data.getStringExtra(QrCodeActivity.QR_INTENT_RESULT)?.let {
+                        if (it.isNullOrEmpty().not()) {
+                            binding.edtMeetingUrl.setText(it)
+                            validate()
+                        }
+                    }
+                }
+            }
+        }
+
     private fun initConnectButton() {
 
-        binding.buttonJoinMeeting.setOnClickListener {
+        binding.btnScanNow.setOnClickListener {
+            val intent = Intent(requireActivity(), QrCodeActivity::class.java)
+            qrScanResultLauncher.launch(intent)
+        }
+
+        binding.btnJoinNow.setOnClickListener {
+            if (binding.btnJoinNow.isEnabled.not()) {
+                return@setOnClickListener
+            }
             try {
-                val input = (requireActivity() as HomeActivity).meetingUrl
+                val input = binding.edtMeetingUrl.text.toString()
                 if (saveTokenEndpointUrlIfValid(input) && isValidUserName(binding.editTextName)) {
                     joinRoom()
                     settings.username = binding.editTextName.text.toString()
-                } else if (REGEX_MEETING_CODE.matches(input) && isValidUserName(binding.editTextName)) {
-                    var subdomain = BuildConfig.TOKEN_ENDPOINT.toSubdomain()
-                    if (BuildConfig.INTERNAL) {
-                        val env = when (settings.environment) {
-                            ENV_PROD -> "prod2"
-                            else -> "qa2"
-                        }
-                        subdomain = "$env.100ms.live"
-                    }
-                    val url = "https://$subdomain/meeting/$input"
-                    saveTokenEndpointUrlIfValid(url)
-                    joinRoom()
-                } else {
-                    Toast.makeText(requireContext(), "Invalid Meeting URL", Toast.LENGTH_LONG)
-                        .show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), e.message, Toast.LENGTH_LONG).show()
@@ -243,14 +253,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun enableButton() {
-        binding.buttonJoinMeeting.isEnabled = true
-        binding.buttonJoinMeeting.background =
+        binding.btnJoinNow.isEnabled = true
+        binding.btnJoinNow.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.primary_blue_round_drawable)
     }
 
     private fun disableButton() {
-        binding.buttonJoinMeeting.isEnabled = false
-        binding.buttonJoinMeeting.background =
+        binding.btnJoinNow.isEnabled = false
+        binding.btnJoinNow.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.primary_disabled_round_drawable)
 
     }
