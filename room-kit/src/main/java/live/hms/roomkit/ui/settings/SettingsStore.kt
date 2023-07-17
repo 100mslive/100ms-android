@@ -54,6 +54,8 @@ class SettingsStore(context: Context) {
     const val FORCE_SOFTWARE_DECODER = "force-software-decoder"
     const val DISABLE_AUTO_SIMULCAST = "disable_auto_simulcast"
 
+    const val IN_PREBUILT_DEBUG_MODE = "in-prebuilt-debug-mode"
+
     const val MUTE_LOCAL_AUDIO_ON_PHONE_RING = "mute-local-audio-on-phone-ring"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
@@ -142,6 +144,10 @@ class SettingsStore(context: Context) {
   var muteLocalAudioOnPhoneRing: Boolean
     get() = sharedPreferences.getBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, true)
     set(value) = putBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, value)
+
+  var inPreBuiltDebugMode : Boolean
+    get() = sharedPreferences.getBoolean(IN_PREBUILT_DEBUG_MODE, false)
+    set(value) = putBoolean(IN_PREBUILT_DEBUG_MODE, value)
 
   var disableAutoSimulcast: Boolean
     get() = sharedPreferences.getBoolean(DISABLE_AUTO_SIMULCAST, false)
@@ -343,6 +349,8 @@ class SettingsStore(context: Context) {
     fun setForceSoftwareDecoder(value: Boolean) = apply { editor.putBoolean(FORCE_SOFTWARE_DECODER, value) }
     fun setMuteLocalAudioOnPhoneRing(value: Boolean) = apply { editor.putBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, value) }
     fun setDisableAutoSimulcast(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_SIMULCAST, value) }
+
+    fun setPrebuiltDebugMode(value: Boolean) = apply { editor.putBoolean(IN_PREBUILT_DEBUG_MODE, value) }
 
 
     fun commit() {
