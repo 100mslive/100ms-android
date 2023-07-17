@@ -45,7 +45,7 @@
             android:layout_marginTop="16dp"
             android:layout_gravity="right"
             android:layout_margin="16dp"
-            android:background="@drawable/polls_blue_button"
+            style="@style/polls_button"
             android:text="Vote" />
 
         <androidx.recyclerview.widget.RecyclerView

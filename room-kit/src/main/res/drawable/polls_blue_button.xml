@@ -1,4 +1,11 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/primary_blue"/>
-    <corners  android:radius="50dp"/>
-</shape>
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--When Button is not enabled -->
+    <item android:state_enabled="false" android:drawable="@color/colorPrimaryDark" />
+    <!--When Button is in pressed state -->
+    <item android:state_pressed="true" android:drawable="@drawable/polls_blue_button_shape" />
+    <!--When Button is in selected state -->
+    <item android:state_selected="true" android:drawable="@drawable/polls_blue_button_shape" />
+    <!--Default Background Color -->
+    <item android:color="@color/primary_blue" />
+</selector>

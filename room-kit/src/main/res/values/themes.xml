@@ -162,4 +162,8 @@
         <item name="android:textColor">#CCE0ECFF</item>
     </style>
 
+    <style name="polls_button">
+        <item name="android:backgroundTint">@color/primary_blue</item>
+        <item name="android:background">@drawable/polls_blue_button</item>
+    </style>
 </resources>
