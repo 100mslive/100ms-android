@@ -2,9 +2,11 @@ package live.hms.roomkit.ui.polls.display
 
 import android.util.Log
 import android.view.View
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
@@ -42,6 +44,11 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             votebutton.visibility = View.GONE
             votingProgressBars.visibility = View.VISIBLE
             votingProgressBars.adapter= votingProgressAdapter
+            val divider = DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
+                setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
+            }
+            votingProgressBars.addItemDecoration(divider)
+
             votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
             // But nothing will update them. They will always be zero.
 

@@ -1,38 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.percentlayout.widget.PercentRelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="16dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
-    <TextView
-        android:layout_alignParentStart="true"
-        android:id="@+id/answer"
-        app:layout_widthPercent="15%"
-        android:layout_height="wrap_content"
-        tools:text="Carrots"
-        />
+    android:layout_height="wrap_content">
 
-    <ProgressBar
-        android:layout_weight="1"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_toRightOf="@id/answer"
-        android:layout_toLeftOf="@id/totalVotes"
-        android:id="@+id/questionProgressBar"
+    <TextView
+        android:id="@+id/answer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        />
+        android:layout_marginLeft="16dp"
+        android:gravity="top"
+        android:lineSpacingExtra="3sp"
+        android:textAppearance="@style/poll_display_answer_item"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Carrots" />
 
     <TextView
-        android:layout_alignParentEnd="true"
         android:id="@+id/totalVotes"
-        app:layout_widthPercent="10%"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="23"
-        />
+        android:layout_marginRight="16dp"
+        android:gravity="top"
+        android:lineSpacingExtra="3sp"
+        android:textAppearance="@style/poll_display_answer_item"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="23" />
 
-</androidx.percentlayout.widget.PercentRelativeLayout>
+    <ProgressBar
+        android:id="@+id/questionProgressBar"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight="1"
+        android:maxHeight="8dp"
+        android:progressBackgroundTint="#2C333F"
+        android:progressTint="#2672ED"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/answer"
+        tools:progress="50" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

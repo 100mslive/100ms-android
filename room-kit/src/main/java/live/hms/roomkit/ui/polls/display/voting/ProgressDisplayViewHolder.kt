@@ -14,7 +14,7 @@ class ProgressDisplayViewHolder(
         with(binding) {
             questionProgressBar.setProgress(item.percentage, true)
             answer.text = item.optionText
-            totalVotes.text = item.numberOfVotes.toString()
+            totalVotes.text = "${item.numberOfVotes} votes"
         }
     }
 

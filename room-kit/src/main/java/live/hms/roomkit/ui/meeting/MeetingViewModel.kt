@@ -1657,9 +1657,11 @@ class MeetingViewModel(
         return valid
     }
     fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll) : Boolean {
-        val valid = option != null
-        val answer = question.options?.get(option!!)
-        if(valid && answer != null) {
+        if(option == null) {
+            return false
+        }
+        val answer = question.options?.get(option)
+        if(answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
@@ -1673,7 +1675,7 @@ class MeetingViewModel(
 
             })
         }
-        return valid
+        return true
     }
     fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll) : Boolean {
         val valid = options != null
