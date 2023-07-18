@@ -9,12 +9,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <CheckBox
+        android:padding="8dp"
         android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
     <EditText
         android:id="@+id/text"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 </androidx.appcompat.widget.LinearLayoutCompat>
