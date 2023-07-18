@@ -204,4 +204,6 @@
     <string name="live_str">Live</string>
     <string name="device_stats_str">Device Info</string>
     <item name="IS_INT" type="id"/>
+    <string name="single_choice_text">Select one of the radio button to mark the correct answer</string>
+    <string name="multi_choice_text">Check the boxes to mark the correct answers</string>
 </resources>

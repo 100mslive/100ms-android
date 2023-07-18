@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
@@ -69,6 +70,13 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     addAnOptionTextView.visibility = multiOptionVisibility
                     optionsListView.visibility = multiOptionVisibility
                     optionsHeading.visibility = multiOptionVisibility
+                    optionsHeading.text = if(position == 0 ) {
+                        binding.root.context.getString(R.string.single_choice_text)
+                    } else if(position == 1 ){
+                        binding.root.context.getString(R.string.multi_choice_text)
+                    } else {
+                        ""
+                    }
                     // Only the UI might need to be toggled
                     Log.d(TAG,"Toggle UI")
                 }
