@@ -116,7 +116,7 @@ class SettingsBottomSheet(
                 dismissAllowingStateLoss()
                 openBulkRoleChange()
             }
-            visibility = if(meetingViewModel.isAllowedToChangeRole()) View.VISIBLE else View.GONE
+            visibility = if(meetingViewModel.isAllowedToChangeRole() && meetingViewModel.isPrebuiltDebugMode()) View.VISIBLE else View.GONE
         }
         binding.btnPipMode.apply {
             setOnSingleClickListener {
@@ -149,7 +149,7 @@ class SettingsBottomSheet(
         }
 
         binding.remoteMuteAll.apply {
-            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute) {
+            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute && meetingViewModel.isPrebuiltDebugMode()) {
                 visibility = View.VISIBLE
             }
 
@@ -170,7 +170,7 @@ class SettingsBottomSheet(
         }
 
         binding.remoteMuteRole.apply {
-            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute) {
+            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute && meetingViewModel.isPrebuiltDebugMode()) {
                 visibility = View.VISIBLE
             }
             setOnSingleClickListener {
@@ -289,7 +289,8 @@ class SettingsBottomSheet(
             binding.remoteMuteRole.visibility = View.GONE
         }
 
-        if (meetingViewModel.isPrebuiltDebugFlagEnabled()) {
+        if (meetingViewModel.isPrebuiltDebugMode().not()) {
+            //
             binding.btnShowStats.visibility = View.GONE
             binding.btnMetaDataSend.visibility = View.GONE
             binding.remoteMuteAll.visibility = View.GONE

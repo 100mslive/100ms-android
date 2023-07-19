@@ -16,14 +16,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
-import live.hms.roomkit.ui.permission.PermissionFragmentDirections
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
@@ -453,7 +451,7 @@ class PreviewFragment : Fragment() {
                 }
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
-                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugFlagEnabled()) "Join" else  "Enter Meeting"
+                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode().not()) "Join" else  "Enter Meeting"
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
                 } else {

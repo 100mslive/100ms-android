@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting.commons
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,17 +23,13 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.*
-import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
-import live.hms.video.sdk.HMSActionResultListener
-import live.hms.video.sdk.HmsVideoFrameListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
-import org.webrtc.EglRenderer
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 import kotlin.math.ceil
@@ -458,7 +453,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
         }
 
-        videoCard.audioLevel.visibility = if (meetingViewModel.isPrebuiltDebugFlagEnabled()) View.INVISIBLE else View.VISIBLE
+        videoCard.audioLevel.visibility = if (meetingViewModel.isPrebuiltDebugMode()) View.INVISIBLE else View.VISIBLE
       }
     }
   }
