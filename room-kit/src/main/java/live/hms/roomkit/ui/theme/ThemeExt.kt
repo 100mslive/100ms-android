@@ -15,14 +15,14 @@ import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.VideoCardBinding
-import live.hms.video.signal.init.LayoutResult
+import live.hms.video.signal.init.HMSRoomLayout
 
 //get theme detail from theme utils parse it accordingly
 
 object HMSPrebuiltTheme {
-    var theme: LayoutResult.Data.Theme.Palette? = null
+    var theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette? = null
     fun getColours() = theme
-    internal fun setTheme(theme: LayoutResult.Data.Theme.Palette) {
+    internal fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
         this.theme = theme
     }
 

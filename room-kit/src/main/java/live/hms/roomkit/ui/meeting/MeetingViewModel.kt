@@ -106,14 +106,14 @@ class MeetingViewModel(
                 override fun onTokenSuccess(token: String) {
 
                    val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
-                   hmsSDK.getLayoutConfigByToken(token, LayoutRequestOptions(layoutEndpointBase), object :
+                   hmsSDK.getRoomLayout(token, LayoutRequestOptions(layoutEndpointBase), object :
                        HMSLayoutListener {
                        override fun onError(error: HMSException) {
                            Log.e(TAG, "onError: ", error)
                            onHMSActionResultListener.onError(error)
                        }
 
-                       override fun onLayoutSuccess(layoutConfig: LayoutResult) {
+                       override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                           setHmsConfig(hmsPrebuiltOptions, token, initURL)
                           setTheme(layoutConfig)
                           onHMSActionResultListener.onSuccess()
@@ -127,7 +127,7 @@ class MeetingViewModel(
 
     }
 
-    private fun setTheme(layoutConfig: LayoutResult) {
+    private fun setTheme(layoutConfig: HMSRoomLayout) {
         val pallete = layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette?:return
         HMSPrebuiltTheme.setTheme(pallete)
     }
