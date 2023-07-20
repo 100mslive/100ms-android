@@ -406,7 +406,7 @@ class PreviewFragment : Fragment() {
                 }
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
-                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugFlagEnabled()) "Join" else  "Enter Meeting"
+                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode().not()) "Join" else  "Enter Meeting"
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
                 } else {

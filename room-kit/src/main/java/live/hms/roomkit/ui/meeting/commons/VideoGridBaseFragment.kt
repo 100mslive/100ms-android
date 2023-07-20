@@ -454,7 +454,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
         }
 
-        videoCard.audioLevel.visibility = if (meetingViewModel.isPrebuiltDebugFlagEnabled()) View.INVISIBLE else View.VISIBLE
+        videoCard.audioLevel.visibility = if (meetingViewModel.isPrebuiltDebugMode()) View.VISIBLE else View.INVISIBLE
       }
     }
   }

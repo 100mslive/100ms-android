@@ -157,7 +157,7 @@ class HomeFragment : Fragment() {
         contextSafe { _, activity ->
 
             HMSRoomKit.launchPrebuilt(
-                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = "random-user-id", debugInfo = true,
+                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = "random-user-id", debugInfo = settings.inPreBuiltDebugMode,
                     endPoints = hashMapOf<String, String>().apply {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")

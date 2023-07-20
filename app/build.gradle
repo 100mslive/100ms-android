@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId "live.hms.app2"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode project.findProperty('100MS_APP_VERSION_CODE') as int
         versionName project.findProperty('100MS_APP_VERSION_NAME')
 
@@ -61,7 +61,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     //100ms.live prebuilt lib
-    implementation "live.100ms:room-kit:0.0.1"
+    implementation "live.100ms:room-kit:0.0.2"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
@@ -80,9 +80,10 @@ dependencies {
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // Get Permissions easily
-
+    implementation 'pub.devrel:easypermissions:1.1.3'
 
     // Firebase Crashlytics
     // Import the BoM for the Firebase platform

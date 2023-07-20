@@ -61,6 +61,7 @@ class MeetingViewModel(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
                 .initialState(getAudioTrackState())
+                .setPhoneCallMuteState(if (settings.muteLocalAudioOnPhoneRing) PhoneCallState.ENABLE_MUTE_ON_PHONE_CALL_RING else PhoneCallState.DISABLE_MUTE_ON_VOIP_PHONE_CALL_RING)
                 .build()
         )
         .video(
@@ -580,7 +581,12 @@ class MeetingViewModel(
                 when (type) {
                     HMSPeerUpdate.PEER_LEFT -> {
                         synchronized(_tracks) {
-                            _tracks.removeIf { it.peer.peerID == hmsPeer.peerID }
+                            for (track in _tracks) {
+                                if (track.peer.peerID == hmsPeer.peerID) {
+                                    _tracks.remove(track)
+                                    break
+                                }
+                            }
                             _liveDataTracks.postValue(_tracks)
                             peerLiveData.postValue(hmsPeer)
                         }
@@ -1540,7 +1546,7 @@ class MeetingViewModel(
         leaveMeeting()
     }
 
-    fun isPrebuiltDebugFlagEnabled(): Boolean {
+    fun isPrebuiltDebugMode(): Boolean {
         return isPrebuiltDebug
     }
 

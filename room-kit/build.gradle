@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode 1
         versionName getVersionName()
 
@@ -65,10 +65,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
-    def hmsVersion = "2.6.7"
+    def hmsVersion = "2.7.0"
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
-    implementation "live.100ms:virtual-background:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
     implementation "live.100ms:hls-player:$hmsVersion"
 

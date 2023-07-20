@@ -263,6 +263,14 @@
             android:text="@string/force_software_decoder"
             android:visibility="visible" />
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/mute_local_audio_on_phone_ring"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mute_local_audio_on_phone_ring"
+            android:visibility="visible" />
+
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/disable_auto_simulcast"
@@ -270,6 +278,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/disable_auto_simulcast"
+            android:visibility="visible" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/is_prebuilt_debug_enabled"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/is_prebuilt_debug_enabled"
             android:visibility="visible" />
 
 
