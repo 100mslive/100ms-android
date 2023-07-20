@@ -65,7 +65,6 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
-    lateinit var localHmsInteractivityCenter : HmsInteractivityCenter
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private val settings = SettingsStore(getApplication())
@@ -96,6 +95,29 @@ class MeetingViewModel(
         .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
         .setLogSettings(hmsLogSettings)
         .build()
+
+    val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
+        .apply {
+            this.pollUpdateListener = object : HmsPollUpdateListener {
+                override fun onPollUpdate(
+                    hmsPoll: HmsPoll,
+                    hmsPollUpdateType: HMSPollUpdateType
+                ) {
+                    if(hmsPollUpdateType == HMSPollUpdateType.started) {
+                        viewModelScope.launch {
+                            _events.emit(Event.PollStarted(hmsPoll))
+                        }
+                    }
+                    else if (hmsPollUpdateType == HMSPollUpdateType.votesupdated) {
+                        viewModelScope.launch {
+                            _events.emit(Event.PollVotesUpdated(hmsPoll))
+                        }
+                    }
+                }
+
+            }
+        }
+
 
      fun initSdk(roomCode: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
         if (hasValidToken) {
@@ -528,44 +550,6 @@ class MeetingViewModel(
                 pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
             }
 
-            override fun onInteractivityCenterAvailable(hmsInteractivityCenter: HmsInteractivityCenter) {
-                super.onInteractivityCenterAvailable(hmsInteractivityCenter)
-                localHmsInteractivityCenter = hmsInteractivityCenter
-                localHmsInteractivityCenter.pollUpdateListener = object : HmsPollUpdateListener {
-                    override fun onPollUpdate(
-                        hmsPoll: HmsPoll,
-                        hmsPollUpdateType: HMSPollUpdateType
-                    ) {
-                        if(hmsPollUpdateType == HMSPollUpdateType.started) {
-                            viewModelScope.launch {
-                                _events.emit(Event.PollStarted(hmsPoll))
-                            }
-                        }
-                        else if (hmsPollUpdateType == HMSPollUpdateType.votesupdated) {
-                            viewModelScope.launch {
-                                _events.emit(Event.PollVotesUpdated(hmsPoll))
-                            }
-                        }
-                    }
-
-                }
-                // Launch the first poll that exists.
-                localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
-                    override fun onSuccess(result: List<HmsPoll>) {
-                        viewModelScope.launch {
-                            result.firstOrNull()?.also { firstPoll ->
-                                _events.emit(Event.PollStarted(firstPoll))
-                            }
-                        }
-                    }
-
-                    override fun onError(error: HMSException) {
-
-                    }
-
-                })
-            }
-
             override fun onJoin(room: HMSRoom) {
                 Log.v(TAG, "~~ onJoin called ~~")
                 val joinSuccessAt = System.currentTimeMillis();
@@ -605,6 +589,7 @@ class MeetingViewModel(
                         override fun onSuccess() {}
                     }
                 )
+                updatePolls()
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -832,6 +817,23 @@ class MeetingViewModel(
                 )
                 this@MeetingViewModel.speakers.postValue(speakers)
             }
+        })
+    }
+
+    private fun updatePolls() {
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                viewModelScope.launch {
+                    result.firstOrNull()?.also { firstPoll ->
+                        _events.emit(Event.PollStarted(firstPoll))
+                    }
+                }
+            }
+
+            override fun onError(error: HMSException) {
+                Log.d(TAG,"Polls error $error")
+            }
+
         })
     }
 
@@ -1705,9 +1707,7 @@ class MeetingViewModel(
         return valid
     }
 
-    fun getPollForPollId(pollId: String): HmsPoll = localHmsInteractivityCenter?.polls?.find{ it.pollId == pollId }!!
-    fun hasPoll() : HmsPoll? = if(this::localHmsInteractivityCenter.isInitialized) {
-        localHmsInteractivityCenter.polls.firstOrNull()
-    } else null
+    fun getPollForPollId(pollId: String): HmsPoll = localHmsInteractivityCenter.polls.find{ it.pollId == pollId }!!
+    fun hasPoll() : HmsPoll? = localHmsInteractivityCenter.polls.firstOrNull()
 }
 
