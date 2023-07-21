@@ -162,6 +162,7 @@ class HomeFragment : Fragment() {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")
                             put("init", "https://qa-init.100ms.live/init")
+                            put("layout", "https://api-nonprod.100ms.live")
                         }
                     })
             )
