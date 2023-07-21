@@ -87,7 +87,7 @@ class PreviewFragment : Fragment() {
                 binding.previewView.addTrack(it)
                 binding.previewView.setCameraGestureListener(it, {
                     activity?.openShareIntent(it)
-                },{})
+                }, {})
             }
             binding.previewView.visibility = View.VISIBLE
         } else {
@@ -157,9 +157,7 @@ class PreviewFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentPreviewBinding.inflate(inflater, container, false)
 
@@ -173,6 +171,11 @@ class PreviewFragment : Fragment() {
 
     private fun initButtons() {
 
+        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
+            binding.hlsSession.visibility = if (it.second.isHLSRoom()) View.VISIBLE else View.GONE
+            binding.iconParticipants.text = it.second.peerList.formatNames()
+        }
+
         binding.iconParticipants.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconParticipants.onClick()")
@@ -180,8 +183,7 @@ class PreviewFragment : Fragment() {
                 participantsDialog?.participantCount =
                     meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
                 participantsDialog?.show(
-                    requireActivity().supportFragmentManager,
-                    "participant_dialog"
+                    requireActivity().supportFragmentManager, "participant_dialog"
                 )
             }
         }
@@ -264,20 +266,25 @@ class PreviewFragment : Fragment() {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
                     setIconEnabled(R.drawable.ic_baseline_hearing_24)
                 }
+
                 HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
                     setIconEnabled(R.drawable.ic_icon_speaker)
                 }
+
                 HMSAudioManager.AudioDevice.AUTOMATIC -> {
                     setIconEnabled(R.drawable.ic_icon_speaker)
                 }
+
                 HMSAudioManager.AudioDevice.BLUETOOTH -> {
                     setIconEnabled(R.drawable.ic_baseline_bluetooth_24)
                 }
+
                 HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
                     setIconEnabled(R.drawable.ic_baseline_headset_24)
                 }
+
                 else -> {
-                    setIconDisabled(R.drawable.ic_volume_off_24)
+                    setIconEnabled(R.drawable.ic_volume_off_24)
                 }
             }
         }
@@ -302,12 +309,12 @@ class PreviewFragment : Fragment() {
                     }
                 }
             }
+
             R.id.action_participants -> {
                 participantsDialog?.participantCount =
                     meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
                 participantsDialog?.show(
-                    requireActivity().supportFragmentManager,
-                    "participant_dialog"
+                    requireActivity().supportFragmentManager, "participant_dialog"
                 )
             }
         }
@@ -315,8 +322,7 @@ class PreviewFragment : Fragment() {
         return false
     }
 
-    private fun goToHomePage() {
-        /*Intent(requireContext(), HomeActivity::class.java).apply {
+    private fun goToHomePage() {/*Intent(requireContext(), HomeActivity::class.java).apply {
             crashlyticsLog(
                 TAG,
                 "MeetingActivity.finish() -> going to HomeActivity :: $this"
@@ -331,22 +337,17 @@ class PreviewFragment : Fragment() {
         meetingViewModel.previewErrorLiveData.observe(viewLifecycleOwner) { error ->
             if (error.isTerminal) {
                 binding.buttonJoinMeeting.isEnabled = false
-                AlertDialog.Builder(requireContext())
-                    .setTitle(error.name)
-                    .setMessage(error.toString())
-                    .setCancelable(false)
+                AlertDialog.Builder(requireContext()).setTitle(error.name)
+                    .setMessage(error.toString()).setCancelable(false)
                     .setPositiveButton(R.string.ok) { dialog, _ ->
                         dialog.dismiss()
                         goToHomePage()
-                    }
-                    .setNeutralButton(R.string.bug_report) { _, _ ->
+                    }.setNeutralButton(R.string.bug_report) { _, _ ->
                         requireContext().startActivity(
                             EmailUtils.getNonFatalLogIntent(requireContext())
                         )
                         alertDialog = null
-                    }
-                    .create()
-                    .show()
+                    }.create().show()
             } else {
                 Toast.makeText(context, error.description, Toast.LENGTH_LONG).show()
             }
@@ -357,15 +358,18 @@ class PreviewFragment : Fragment() {
                 HMSPeerUpdate.PEER_JOINED -> {
                     participantsDialogAdapter?.insertItem(peer)
                 }
+
                 HMSPeerUpdate.PEER_LEFT -> {
                     participantsDialogAdapter?.removeItem(peer)
                 }
+
                 HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
                     peer.networkQuality?.downlinkQuality?.let {
                         binding.networkQuality.visibility = View.VISIBLE
                         updateNetworkQualityView(it, requireContext(), binding.networkQuality)
                     }
                 }
+
                 else -> Unit
             }
         }
@@ -382,6 +386,7 @@ class PreviewFragment : Fragment() {
                         is HMSLocalAudioTrack -> {
                             track.audio = it
                         }
+
                         is HMSLocalVideoTrack -> {
                             track.video = it
 
@@ -406,7 +411,9 @@ class PreviewFragment : Fragment() {
                 }
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
-                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode().not()) "Join" else  "Enter Meeting"
+                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode()
+                            .not()
+                    ) "Join" else "Enter Meeting"
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
                 } else {
@@ -438,7 +445,9 @@ class PreviewFragment : Fragment() {
             })
     }
 
-    private fun updateNetworkQualityView(downlinkScore: Int, context: Context, imageView: ImageView) {
+    private fun updateNetworkQualityView(
+        downlinkScore: Int, context: Context, imageView: ImageView
+    ) {
         NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext())
             .let { drawable ->
                 imageView.setImageDrawable(drawable)
@@ -470,4 +479,23 @@ class PreviewFragment : Fragment() {
                 }
             })
     }
+}
+
+private fun List<HMSPeer>.formatNames(): CharSequence? {
+    var text = ""
+    var count = 0
+    var hasLocalPeer = false
+    this.forEach {
+        if (it.isLocal) {
+            hasLocalPeer = true
+        }
+    }
+    if (hasLocalPeer && this.size <= 1) {
+        return "You are the first to join"
+    } else return "${this.size - 1} other session in this room"
+}
+
+fun HMSRoom.isHLSRoom() :Boolean {
+    return this.hlsStreamingState?.variants?.size?:0 > 0 &&  this.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl.isNullOrEmpty().not()
+
 }

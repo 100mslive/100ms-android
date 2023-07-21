@@ -107,12 +107,35 @@
         android:gravity="center"
         android:maxLines="1"
         android:padding="8dp"
-        android:text="You and few others"
+        android:text="You are the first to join"
         android:textColor="#EFF0FA"
         android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/hls_session"
+        app:layout_constraintTop_toBottomOf="@id/description_tv" />
+
+    <TextView
+        android:id="@+id/hls_session"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/gray_round_solid_drawable"
+        android:backgroundTint="#C74E5B"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:padding="8dp"
+        android:text="* LIVE"
+        android:textColor="#EFF0FA"
+        android:visibility="gone"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toStartOf="@+id/icon_participants"
+        app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/description_tv" />
+
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -190,7 +213,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/switch_camera"
+                android:id="@+id/button_switch_camera"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -231,7 +254,7 @@
                     android:id="@+id/edit_text_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/default_name"
+                    android:hint="Enter Name ..."
                     android:inputType="textPersonName" />
 
             </com.google.android.material.textfield.TextInputLayout>
