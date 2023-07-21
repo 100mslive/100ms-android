@@ -48,7 +48,7 @@
     <string name="record_meeting">Record Meeting</string>
     <string name="show_participants">Show Participants</string>
     <string name="settings_fragment">Settings Fragment</string>
-    <string name="default_name">Default Name</string>
+    <string name="default_name">Enter Name...</string>
     <string name="default_video_source">Default Video Source</string>
     <string name="degradation_preference_str">Degradation Preference</string>
     <string name="default_microphone_source">Default Microphone Source</string>

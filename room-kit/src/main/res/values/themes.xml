@@ -17,13 +17,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="TextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <item name="android:layout_marginTop">6dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
+    <style name="TextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">#191B23</item>
         <item name="boxStrokeWidth">0dp</item>
-        <item name="hintEnabled">false</item>
         <item name="boxStrokeWidthFocused">0dp</item>
-        <item name="endIconMode">clear_text</item>
+        <item name="hintTextColor">#8F9099</item>
+        <item name="android:textColor">#EFF0FA</item>
     </style>
 
     <style name="AutoCompleteTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">

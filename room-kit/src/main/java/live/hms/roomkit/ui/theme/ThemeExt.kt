@@ -291,9 +291,15 @@ internal fun FragmentPreviewBinding.applyTheme() {
     )
 
     videoContainerBackground.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default
+    )
+
+    previewBottomBar.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.backgroundDefault,
         HMSPrebuiltTheme.getDefaults().background_default
     )
+
 
 
     nameTv.setTextColor(
@@ -332,12 +338,12 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
-    buttonJoinMeeting.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.primaryDefault,
-            HMSPrebuiltTheme.getDefaults().primary_default
-        )
-    )
+//    buttonJoinMeeting.setBackgroundColor(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.primaryDefault,
+//            HMSPrebuiltTheme.getDefaults().primary_default
+//        )
+//    )
 
     //only init state
     buttonToggleVideo.setIconDisabled(R.drawable.ic_camera_toggle_off)

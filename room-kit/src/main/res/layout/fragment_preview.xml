@@ -8,73 +8,23 @@
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/name_tv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:fontFamily="@font/inter_semibold"
-        android:gravity="center"
-        android:text="Get Started"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/description_tv"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <TextView
-        android:id="@+id/description_tv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/name_tv"
-        android:layout_alignParentStart="true"
-        android:layout_gravity="center"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="8dp"
-        android:fontFamily="@font/inter_regular"
-        android:gravity="center"
-        android:text="Setup your audio and video"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@id/icon_participants"
-        app:layout_constraintTop_toBottomOf="@id/name_tv" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/icon_participants"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center"
-        android:layout_marginBottom="8dp"
-        android:padding="4dp"
-        app:layout_constraintBottom_toTopOf="@id/video_card_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description_tv"
-        app:srcCompat="@drawable/ic_icon_people" />
-
     <androidx.cardview.widget.CardView
         android:id="@+id/video_card_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:elevation="0dp"
         app:cardBackgroundColor="@android:color/transparent"
-        app:cardCornerRadius="8dp"
+        app:cardCornerRadius="0dp"
         app:layout_constraintBottom_toBottomOf="@id/video_guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/icon_participants">
+        app:layout_constraintTop_toTopOf="parent">
 
         <FrameLayout
-            tools:background="#000000"
             android:id="@+id/video_container_background"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            tools:background="#000000" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name_initials"
@@ -92,10 +42,77 @@
             android:id="@+id/preview_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-          />
+            android:visibility="gone" />
 
     </androidx.cardview.widget.CardView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="158dp"
+        android:elevation="3dp"
+        android:background="@drawable/bg_gradient_drawable"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/name_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:elevation="4dp"
+        android:fontFamily="@font/inter_semibold"
+        android:gravity="center"
+        android:text="Get Started"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/description_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/description_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name_tv"
+        android:layout_alignParentStart="true"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp"
+        android:fontFamily="@font/inter_regular"
+        android:gravity="center"
+        android:text="Setup your audio and video"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/icon_participants"
+        app:layout_constraintTop_toBottomOf="@id/name_tv"
+        tools:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/icon_participants"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/gray_round_solid_drawable"
+        android:elevation="4dp"
+        android:gravity="center"
+        android:maxLines="1"
+        android:padding="8dp"
+        android:text="You and few others"
+        android:textColor="#EFF0FA"
+        android:textSize="13sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/description_tv" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -103,7 +120,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_end="154dp" />
+        app:layout_constraintGuide_end="157dp" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/button_network_quality"
@@ -127,77 +144,131 @@
 
     </androidx.cardview.widget.CardView>
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/button_toggle_audio"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:contentDescription="@string/toggle_video"
-        android:drawablePadding="0dp"
-        app:icon="@drawable/ic_audio_toggle_off"
-        app:iconGravity="start"
-        app:iconSize="24dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/video_guideline" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/button_toggle_video"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/ic_camera_toggle_off"
-        android:contentDescription="@string/toggle_video"
-        android:enabled="false"
-        android:src="@drawable/ic_videocam_off_24"
-        app:iconSize="24dp"
-        app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
-        app:layout_constraintTop_toBottomOf="@id/video_guideline" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/icon_output_device"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        app:iconSize="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/video_guideline"
-        app:srcCompat="@drawable/ic_icon_speaker" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_join_meeting"
-        style="@style/MaterialImageButton"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="32dp"
-        android:background="@android:color/transparent"
-        android:clickable="false"
-        android:enabled="true"
-        android:focusable="false"
-        android:fontFamily="@font/inter_semibold"
-        android:icon="@drawable/ic_baseline_arrow_forward_24"
-        android:paddingHorizontal="10dp"
-        android:text="@string/enter_studio_str"
-        android:textAllCaps="false"
-        android:visibility="visible"
-        app:iconGravity="end"
-        app:iconSize="24dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/preview_bottom_bar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="12dp"
+        app:cardBackgroundColor="#272A31"
+        app:cardCornerRadius="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
-        tools:visibility="visible" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/video_guideline">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/button_toggle_audio"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/toggle_video"
+                android:drawablePadding="0dp"
+                app:icon="@drawable/ic_audio_toggle_off"
+                app:iconGravity="start"
+                app:iconSize="32dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/button_toggle_video"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/ic_camera_toggle_off"
+                android:contentDescription="@string/toggle_video"
+                android:enabled="false"
+                android:src="@drawable/ic_videocam_off_24"
+                app:iconSize="32dp"
+                app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/switch_camera"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/toggle_video"
+                android:enabled="false"
+                android:src="@drawable/ic_switch_camera"
+                app:iconSize="32dp"
+                app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/icon_output_device"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                app:iconSize="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_icon_speaker" />
 
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/btn_txt_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent=".70" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/container_name"
+                style="@style/TextInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btn_txt_guideline"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/default_name"
+                    android:inputType="textPersonName" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <TextView
+                android:id="@+id/button_join_meeting"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/blue_round_solid_drawable"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Go Live"
+                android:textColor="#EFF0FA"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/btn_txt_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".70" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
