@@ -233,7 +233,7 @@
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_video"
             android:padding="8dp"
-            app:srcCompat="@drawable/ic_share_screen" />
+             />
 
         <Space
             android:layout_width="wrap_content"

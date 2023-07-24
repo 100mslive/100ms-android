@@ -894,7 +894,11 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()
                 ?.not() == true || meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS
         ) {
-            binding.buttonShareScreen?.visibility = View.GONE
+            //TODO fix on prebuilt screen share
+            if (meetingViewModel.isPrebuiltDebugMode().not())
+            binding.buttonShareScreen?.visibility = View.VISIBLE
+            else
+                binding.buttonShareScreen?.visibility = View.GONE
             binding.buttonSettingsMenu?.visibility = View.GONE
             binding.buttonSettingsMenuTop?.visibility = View.VISIBLE
         } else {
@@ -948,14 +952,28 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
+        if (meetingViewModel.isPrebuiltDebugMode().not()) {
+            //temp
+            binding.buttonShareScreen?.setIconEnabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
+        }
+
         binding.buttonShareScreen?.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonShareScreen.onClick()")
-                if (meetingViewModel.isScreenShared()) {
-                    stopScreenShare()
+                if (meetingViewModel.isPrebuiltDebugMode().not()) {
+                    findNavController().navigate(
+                        MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
+                            "Dummy Customer Id"
+                        )
+                    )
                 } else {
-                    startScreenShare()
+                    if (meetingViewModel.isScreenShared()) {
+                        stopScreenShare()
+                    } else {
+                        startScreenShare()
+                    }
                 }
             }
         }

@@ -132,6 +132,11 @@ class MeetingViewModel(
         HMSPrebuiltTheme.setTheme(pallete)
     }
 
+    fun updateNameInPreview(nameStr : String) {
+        if (nameStr.isNullOrEmpty().not())
+        hmsConfig  = hmsConfig?.copy(userName = nameStr)
+    }
+
     private fun setHmsConfig(
         hmsPrebuiltOptions: HMSPrebuiltOptions?,
         token: String,

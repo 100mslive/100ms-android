@@ -258,10 +258,12 @@ class PreviewFragment : Fragment() {
         binding.buttonJoinMeeting.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
-                if (this.isEnabled)
-                findNavController().navigate(
-                    PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
-                )
+                if (this.isEnabled) {
+                    meetingViewModel.updateNameInPreview(binding.editTextName.text.toString().trim())
+                    findNavController().navigate(
+                        PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
+                    )
+                }
             }
         }
     }
