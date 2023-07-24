@@ -106,6 +106,7 @@ class PreviewFragment : Fragment() {
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
+        binding.buttonJoinMeeting.buttonDisabled()
 //
 //        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
 //            if (it == RecordingState.STREAMING_AND_RECORDING) {
@@ -257,6 +258,7 @@ class PreviewFragment : Fragment() {
         binding.buttonJoinMeeting.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
+                if (this.isEnabled)
                 findNavController().navigate(
                     PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
                 )
@@ -342,7 +344,7 @@ class PreviewFragment : Fragment() {
 
         meetingViewModel.previewErrorLiveData.observe(viewLifecycleOwner) { error ->
             if (error.isTerminal) {
-                binding.buttonJoinMeeting.isEnabled = false
+                binding.buttonJoinMeeting.buttonDisabled()
                 AlertDialog.Builder(requireContext()).setTitle(error.name)
                     .setMessage(error.toString()).setCancelable(false)
                     .setPositiveButton(R.string.ok) { dialog, _ ->
@@ -384,7 +386,7 @@ class PreviewFragment : Fragment() {
             viewLifecycleOwner,
             Observer { (room, localTracks) ->
                 binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
-                binding.buttonJoinMeeting.isEnabled = true
+                binding.buttonJoinMeeting.buttonEnabled()
 
                 track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {

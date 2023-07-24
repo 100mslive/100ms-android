@@ -5,6 +5,7 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
@@ -104,6 +105,41 @@ internal fun ImageButton.setIconDisabled(
 
     (drawable as? Animatable)?.start()
 
+}
+
+internal fun TextView.buttonEnabled() {
+    this.isEnabled = true
+
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+}
+
+internal fun TextView.buttonDisabled() {
+    this.isEnabled = false
+
+
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDisabled,
+        HMSPrebuiltTheme.getDefaults().primary_disabled,
+        R.drawable.blue_round_solid_drawable
+    )
 }
 
 internal fun ImageButton.setIconEnabled(
