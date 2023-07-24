@@ -1,6 +1,9 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
+import android.graphics.BlendMode
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -27,7 +30,12 @@ object HMSPrebuiltTheme {
     internal fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
         this.theme = theme
 
-        this.theme = theme.copy(borderBright = "#272A31", onSurfaceHigh = "#EFF0FA", secondaryDim = "#EFF0FA", backgroundDefault = "#0B0E15")
+        this.theme = theme.copy(
+            borderBright = "#272A31",
+            onSurfaceHigh = "#EFF0FA",
+            secondaryDim = "#293042",
+            backgroundDefault = "#0B0E15",
+        )
     }
 
     fun getDefaults() = DefaultDarkThemeColours()
@@ -84,17 +92,42 @@ fun getColorOrDefault(colorStr: String?, defaultColor: String): Int {
     }
 }
 
-internal fun ImageButton.setIconDisabled(
+internal fun ImageButton.setIconEnabled(
     @DrawableRes disabledIconDrawableRes: Int
 ) {
+    this.setBackgroundResource(R.drawable.gray_round_stroked_drawable)
     this.setImageResource(disabledIconDrawableRes)
-    this.imageTintList = ColorStateList.valueOf(
+
+
+    background.setColorFilter(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        ), PorterDuff.Mode.DST_OVER
+    )
+
+    drawable.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
-    setBackgroundResource(R.drawable.gray_round_solid_drawable)
+
+    (drawable as? Animatable)?.start()
+}
+
+
+internal fun ImageButton.setIconDisabled(
+    @DrawableRes disabledIconDrawableRes: Int
+) {
+    this.setImageResource(disabledIconDrawableRes)
+    this.setBackgroundResource(R.drawable.gray_round_solid_drawable)
+    background.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.secondaryDim,
+            HMSPrebuiltTheme.getDefaults().secondary_dim
+        )
+    )
 
     drawable.setTint(
         getColorOrDefault(
@@ -142,27 +175,6 @@ internal fun TextView.buttonDisabled() {
     )
 }
 
-internal fun ImageButton.setIconEnabled(
-    @DrawableRes disabledIconDrawableRes: Int
-) {
-    this.setImageResource(disabledIconDrawableRes)
-    this.imageTintList = ColorStateList.valueOf(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-    setBackgroundResource(R.drawable.gray_round_stroked_drawable)
-    backgroundTintList = null
-    drawable.setTint(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-
-    (drawable as? Animatable)?.start()
-}
 
 //hex color to int color
 private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)

@@ -215,6 +215,7 @@
                     android:id="@+id/layout_expandable_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:childDivider="@android:color/transparent"
                     android:divider="@android:color/darker_gray"
                     android:dividerHeight="1dp"
                     android:groupIndicator="@null"
