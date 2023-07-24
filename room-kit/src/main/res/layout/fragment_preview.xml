@@ -185,8 +185,8 @@
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_toggle_audio"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="@string/toggle_video"
@@ -199,8 +199,8 @@
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_toggle_video"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
@@ -214,22 +214,22 @@
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_switch_camera"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
                 android:src="@drawable/ic_switch_camera"
-                app:iconSize="32dp"
+                app:iconSize="24dp"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/icon_output_device"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="24dp"
@@ -240,7 +240,7 @@
 
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/container_name"
+                android:id="@+id/edit_container_name"
                 style="@style/TextInputLayout"
                 android:layout_width="0dp"
                 android:layout_height="48dp"

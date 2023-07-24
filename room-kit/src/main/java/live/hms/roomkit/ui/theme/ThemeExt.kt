@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageButton
@@ -99,6 +100,8 @@ internal fun ImageButton.setIconDisabled(
         )
     )
 
+    (drawable as? Animatable)?.start()
+
 }
 
 internal fun ImageButton.setIconEnabled(
@@ -119,6 +122,8 @@ internal fun ImageButton.setIconEnabled(
             HMSPrebuiltTheme.getDefaults().border_bright
         )
     )
+
+    (drawable as? Animatable)?.start()
 }
 
 //hex color to int color
@@ -281,6 +286,40 @@ internal fun VideoCardBinding.applyTheme() {
 }
 
 internal fun FragmentPreviewBinding.applyTheme() {
+
+    buttonJoinMeeting.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    buttonJoinMeeting.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+
+    editContainerName.boxBackgroundColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default
+    )
+
+    editContainerName.hintTextColor = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    editTextName.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
     previewCard.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.backgroundDim, HMSPrebuiltTheme.getDefaults().surface_default
     )
@@ -347,7 +386,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
     //only init state
     buttonToggleVideo.setIconDisabled(R.drawable.ic_camera_toggle_off)
-    buttonToggleAudio.setIconDisabled(R.drawable.ic_audio_toggle_off)
+    buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
     buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
 
 }

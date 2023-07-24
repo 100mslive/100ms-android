@@ -240,9 +240,9 @@ class PreviewFragment : Fragment() {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
-                        binding.buttonToggleAudio.setIconDisabled(R.drawable.ic_audio_toggle_off)
+                        binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
                     } else {
-                        binding.buttonToggleAudio.setIconEnabled(R.drawable.ic_audio_toggle_on)
+                        binding.buttonToggleAudio.setIconEnabled(R.drawable.avd_mic_off_to_on)
                     }
                 }
             }
