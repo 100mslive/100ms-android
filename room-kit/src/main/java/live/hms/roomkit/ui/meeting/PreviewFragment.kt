@@ -208,6 +208,10 @@ class PreviewFragment : Fragment() {
         }
 
 
+        binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
+            track.video.switchCamera()
+        }
+
         binding.buttonToggleVideo.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleVideo.onClick()")
