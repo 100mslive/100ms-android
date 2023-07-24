@@ -37,7 +37,7 @@ class SettingsBottomSheet(
 
         setupConfig()
         val settingsExpandableListAdapter: ExpandableListAdapter =
-            SettingsExpandableListAdapter(requireContext())
+            SettingsExpandableListAdapter(requireContext(), meetingViewModel.isPrebuiltDebugMode())
         binding.layoutExpandableList.setAdapter(settingsExpandableListAdapter)
         binding.layoutExpandableList.setOnGroupClickListener(ExpandableListView.OnGroupClickListener { parent, v, groupPosition, id ->
             setListViewHeight()
@@ -292,6 +292,7 @@ class SettingsBottomSheet(
         if (meetingViewModel.isPrebuiltDebugMode().not()) {
             //
             binding.btnShowStats.visibility = View.GONE
+            binding.btnMeetingMode.visibility = View.GONE
             binding.btnMetaDataSend.visibility = View.GONE
             binding.remoteMuteAll.visibility = View.GONE
             binding.remoteMuteRole.visibility = View.GONE

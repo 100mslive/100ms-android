@@ -276,6 +276,7 @@ class PreviewFragment : Fragment() {
         binding.enterMeetingParentView.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
+                if (binding.buttonJoinMeeting.isEnabled)
                 findNavController().navigate(
                     PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
                 )
