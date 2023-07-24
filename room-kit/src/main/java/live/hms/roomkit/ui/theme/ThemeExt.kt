@@ -341,6 +341,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
 
 
+
     nameTv.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
@@ -352,6 +353,32 @@ internal fun FragmentPreviewBinding.applyTheme() {
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
             HMSPrebuiltTheme.getDefaults().onprimary_med_emp
+        )
+    )
+
+    iconParticipants.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_solid_drawable
+    )
+
+    hlsSession.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default,
+        R.drawable.gray_round_solid_drawable
+    )
+
+    iconParticipants.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    hlsSession.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 

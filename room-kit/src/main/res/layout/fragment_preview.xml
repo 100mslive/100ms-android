@@ -129,6 +129,7 @@
         android:padding="8dp"
         android:text="* LIVE"
         android:textColor="#EFF0FA"
+        tools:visibility="visible"
         android:visibility="gone"
         android:textSize="13sp"
         app:layout_constraintEnd_toStartOf="@+id/icon_participants"
@@ -191,9 +192,8 @@
                 android:layout_marginTop="16dp"
                 android:contentDescription="@string/toggle_video"
                 android:drawablePadding="0dp"
-                app:icon="@drawable/ic_audio_toggle_off"
+                app:icon="@drawable/avd_mic_on_to_off"
                 app:iconGravity="start"
-                app:iconSize="32dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -204,11 +204,9 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/ic_camera_toggle_off"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
-                android:src="@drawable/ic_videocam_off_24"
-                app:iconSize="32dp"
+                android:src="@drawable/avd_video_on_to_off"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -236,7 +234,7 @@
                 app:iconSize="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_icon_speaker" />
+                 />
 
 
             <com.google.android.material.textfield.TextInputLayout

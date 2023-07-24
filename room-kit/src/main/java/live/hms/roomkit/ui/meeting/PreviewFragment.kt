@@ -219,7 +219,7 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             bindVideo()
                         }
-                        binding.buttonToggleVideo.setIconEnabled(R.drawable.ic_camera_toggle_on)
+                        binding.buttonToggleVideo.setIconEnabled(R.drawable.avd_video_off_to_on)
 //
                     } else {
                         // Mute this track
@@ -227,7 +227,7 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             unbindVideo()
                         }
-                        binding.buttonToggleVideo.setIconDisabled(R.drawable.ic_camera_toggle_off)
+                        binding.buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
                     }
                 }
 
@@ -428,9 +428,9 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track.audio != null)
 
                         if (it.isMute) {
-                            binding.buttonToggleAudio.setIconDisabled(R.drawable.ic_audio_toggle_off)
+                            binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
                         } else {
-                            binding.buttonToggleAudio.setIconEnabled(R.drawable.ic_audio_toggle_on)
+                            binding.buttonToggleAudio.setIconEnabled(R.drawable.avd_mic_off_to_on)
                         }
                     }
                 }
