@@ -37,7 +37,7 @@
     <target android:name="strike_through1">
         <aapt:attr name="android:animation">
             <objectAnimator
-                android:duration="500"
+                android:duration="300"
                 android:interpolator="@android:anim/accelerate_decelerate_interpolator"
                 android:propertyName="trimPathEnd"
                 android:valueFrom="1"

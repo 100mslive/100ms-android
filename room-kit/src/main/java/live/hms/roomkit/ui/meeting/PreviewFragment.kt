@@ -188,6 +188,8 @@ class PreviewFragment : Fragment() {
             }
         }
 
+
+
         binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconParticipants.onClick()")
@@ -403,9 +405,9 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track.video != null)
 
                         if (it.isMute) {
-                            setIconDisabled(R.drawable.ic_camera_toggle_off)
+                            setIconDisabled(R.drawable.avd_video_on_to_off)
                         } else {
-                            setIconEnabled(R.drawable.ic_camera_toggle_on)
+                            setIconEnabled(R.drawable.avd_video_off_to_on)
                         }
                     }
                 }

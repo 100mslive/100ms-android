@@ -385,7 +385,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
 //    )
 
     //only init state
-    buttonToggleVideo.setIconDisabled(R.drawable.ic_camera_toggle_off)
+    buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
     buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
     buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
 
