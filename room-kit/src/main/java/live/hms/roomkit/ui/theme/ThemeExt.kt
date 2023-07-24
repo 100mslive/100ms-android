@@ -25,6 +25,8 @@ object HMSPrebuiltTheme {
     fun getColours() = theme
     internal fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
         this.theme = theme
+
+        this.theme = theme.copy(borderBright = "#272A31", onSurfaceHigh = "#EFF0FA", secondaryDim = "#EFF0FA", backgroundDefault = "#0B0E15")
     }
 
     fun getDefaults() = DefaultDarkThemeColours()
@@ -95,8 +97,8 @@ internal fun ImageButton.setIconDisabled(
 
     drawable.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.secondaryDim,
-            HMSPrebuiltTheme.getDefaults().secondary_dim
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
@@ -118,8 +120,8 @@ internal fun ImageButton.setIconEnabled(
     backgroundTintList = null
     drawable.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.borderBright,
-            HMSPrebuiltTheme.getDefaults().border_bright
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
