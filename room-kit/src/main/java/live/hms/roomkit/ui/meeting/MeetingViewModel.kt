@@ -4,7 +4,6 @@ import android.R
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.media.AudioManager
 import android.util.Log
 import androidx.annotation.StringRes
@@ -43,7 +42,6 @@ import live.hms.video.signal.init.TokenRequestOptions
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import java.util.*
-import kotlin.random.Random
 
 
 class MeetingViewModel(
@@ -1526,7 +1524,7 @@ class MeetingViewModel(
         leaveMeeting()
     }
 
-    fun isPrebuiltDebugFlagEnabled(): Boolean {
+    fun isPrebuiltDebugMode(): Boolean {
         return isPrebuiltDebug
     }
 
