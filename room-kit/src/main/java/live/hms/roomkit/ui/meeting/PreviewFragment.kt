@@ -211,10 +211,12 @@ class PreviewFragment : Fragment() {
                         AudioOutputSwitchBottomSheet(it) { audioDevice, isMuted ->
                             updateActionVolumeMenuIcon(audioDevice)
                         }
-                    audioSwitchBottomSheet.show(
-                        requireActivity().supportFragmentManager,
-                        MeetingFragment.AudioSwitchBottomSheetTAG
-                    )
+                    contextSafe { _, _ ->
+                        audioSwitchBottomSheet.show(
+                            childFragmentManager,
+                            MeetingFragment.AudioSwitchBottomSheetTAG
+                        )
+                    }
                 }
             }
         }
