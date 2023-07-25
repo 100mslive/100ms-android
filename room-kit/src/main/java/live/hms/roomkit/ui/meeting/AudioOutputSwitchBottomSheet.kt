@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.audio.HMSAudioManager.AudioDevice
@@ -31,23 +32,29 @@ class AudioOutputSwitchBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.root.setBackgroundColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.backgroundDefault,
+                HMSPrebuiltTheme.getDefaults().background_default
+            )
+        )
 
         val devicesList = meetingViewModel.hmsSDK.getAudioDevicesList()
 
         if (meetingViewModel.isPeerAudioEnabled().not()) {
-            binding.muteBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+//            binding.muteBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
         } else {
             meetingViewModel.hmsSDK.getAudioOutputRouteType().let {
-                when (it) {
-                    AudioDevice.BLUETOOTH ->
-                        binding.bluetoothBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
-
-                    AudioDevice.SPEAKER_PHONE ->
-                        binding.speakerBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
-                    AudioDevice.EARPIECE -> binding.earpieceBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
-                    AudioDevice.WIRED_HEADSET -> binding.wiredBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
-                    else -> binding.speakerBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
-                }
+//                when (it) {
+//                    AudioDevice.BLUETOOTH ->
+//                        binding.bluetoothBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+//
+//                    AudioDevice.SPEAKER_PHONE ->
+//                        binding.speakerBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+//                    AudioDevice.EARPIECE -> binding.earpieceBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+//                    AudioDevice.WIRED_HEADSET -> binding.wiredBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+//                    else -> binding.speakerBtn.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.onSurfaceHigh, HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+//                }
             }
         }
 

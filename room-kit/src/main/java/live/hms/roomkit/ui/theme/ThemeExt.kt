@@ -16,6 +16,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.button.MaterialButton
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
@@ -31,6 +32,7 @@ object HMSPrebuiltTheme {
         this.theme = theme
 
         this.theme = theme.copy(
+            backgroundDim = "##000000",
             borderBright = "#272A31",
             onSurfaceHigh = "#EFF0FA",
             secondaryDim = "#293042",
@@ -335,6 +337,9 @@ internal fun VideoCardBinding.applyTheme() {
 
 }
 
+internal fun BottomSheetAudioSwitchBinding.applyTheme() {
+}
+
 internal fun FragmentPreviewBinding.applyTheme() {
 
     buttonJoinMeeting.setTextColor(
@@ -354,6 +359,11 @@ internal fun FragmentPreviewBinding.applyTheme() {
     editContainerName.boxBackgroundColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default
+    )
+
+    editContainerName.boxStrokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default
     )
 
     editContainerName.hintTextColor = ColorStateList.valueOf(

@@ -8,10 +8,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -57,13 +59,15 @@ class PreviewFragment : Fragment() {
 
     private var alertDialog: AlertDialog? = null
 
-    private lateinit var track: MeetingTrack
+    private var track: MeetingTrack? = null
 
     private var isViewVisible = false
     private var audioOutputIcon: MenuItem? = null
 
     private var participantsDialog: ParticipantsDialog? = null
     private var participantsDialogAdapter: ParticipantsAdapter? = null
+
+    private var setTextOnce = false
 
     override fun onResume() {
         super.onResume()
@@ -82,8 +86,8 @@ class PreviewFragment : Fragment() {
     }
 
     private fun bindVideo() {
-        if (this::track.isInitialized && track.video?.isMute == false) {
-            track.video?.let {
+        if (track?.video?.isMute == false) {
+            track?.video?.let {
                 binding.previewView.addTrack(it)
                 binding.previewView.setCameraGestureListener(it, {
                     activity?.openShareIntent(it)
@@ -177,6 +181,13 @@ class PreviewFragment : Fragment() {
             binding.iconParticipants.text = it.second.peerList.formatNames()
         }
 
+        binding.closeBtn.setOnSingleClickListener(300L) {
+            contextSafe { context, activity ->
+                meetingViewModel.leaveMeeting()
+                goToHomePage()
+            }
+        }
+
         binding.iconParticipants.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconParticipants.onClick()")
@@ -210,20 +221,33 @@ class PreviewFragment : Fragment() {
 
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
-            track.video.switchCamera()
+            if (it.isEnabled)
+            track?.video.switchCamera()
         }
+
+//        meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+//            binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
+//            binding.buttonSwitchCamera.visibility = if (allowed) View.VISIBLE else View.GONE
+//        }
+//
+//        meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+//            binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
+//        }
+
 
         binding.buttonToggleVideo.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleVideo.onClick()")
 
-                (track.video as HMSLocalVideoTrack?)?.let {
+                (track?.video as HMSLocalVideoTrack?)?.let {
                     if (it.isMute) {
                         // Un-mute this track
                         it.setMute(false)
                         if (isViewVisible) {
                             bindVideo()
                         }
+                        binding.buttonSwitchCamera.alpha = 1f
+                        binding.buttonSwitchCamera.isEnabled = true
                         binding.buttonToggleVideo.setIconEnabled(R.drawable.avd_video_off_to_on)
 //
                     } else {
@@ -232,6 +256,8 @@ class PreviewFragment : Fragment() {
                         if (isViewVisible) {
                             unbindVideo()
                         }
+                        binding.buttonSwitchCamera.alpha = 0.5f
+                        binding.buttonSwitchCamera.isEnabled = false
                         binding.buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
                     }
                 }
@@ -243,7 +269,7 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleAudio.onClick()")
 
-                (track.audio as HMSLocalAudioTrack?)?.let {
+                (track?.audio as HMSLocalAudioTrack?)?.let {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
@@ -271,6 +297,7 @@ class PreviewFragment : Fragment() {
     private fun updateActionVolumeMenuIcon(
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
+        binding.iconOutputDevice.visibility = View.VISIBLE
         binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
@@ -301,6 +328,7 @@ class PreviewFragment : Fragment() {
     }
 
     private fun updateActionVolumeMenuIcon() {
+        binding.iconOutputDevice.visibility = View.VISIBLE
         binding.iconOutputDevice.apply {
             if (meetingViewModel.isPeerAudioEnabled()) {
                 setIconEnabled(R.drawable.ic_icon_speaker)
@@ -313,9 +341,9 @@ class PreviewFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_flip_camera -> {
-                if (this::track.isInitialized) {
+                if (track!= null) {
                     HMSCoroutineScope.launch {
-                        (track.video as HMSLocalVideoTrack?)?.switchCamera()
+                        (track?.video as HMSLocalVideoTrack?)?.switchCamera()
                     }
                 }
             }
@@ -387,18 +415,24 @@ class PreviewFragment : Fragment() {
         meetingViewModel.previewUpdateLiveData.observe(
             viewLifecycleOwner,
             Observer { (room, localTracks) ->
-                binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
+
+                if (setTextOnce.not()) {
+                    binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
+                    binding.editTextName.setText(NameUtils.getInitials(room.localPeer!!.name), TextView.BufferType.EDITABLE)
+                    setTextOnce = true
+                }
+
                 binding.buttonJoinMeeting.buttonEnabled()
 
                 track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {
                     when (it) {
                         is HMSLocalAudioTrack -> {
-                            track.audio = it
+                            track?.audio = it
                         }
 
                         is HMSLocalVideoTrack -> {
-                            track.video = it
+                            track?.video = it
 
                             if (isViewVisible) {
                                 bindVideo()
@@ -407,10 +441,15 @@ class PreviewFragment : Fragment() {
                     }
                 }
 
+                binding.editTextName.doOnTextChanged { text, start, before, count ->
+                    val intitals =  kotlin.runCatching { NameUtils.getInitials(text.toString()) }
+                    binding.nameInitials.text = intitals.getOrNull().orEmpty()
+                }
+
                 // Disable buttons
-                track.video?.let {
+                track?.video?.let {
                     binding.buttonToggleVideo.apply {
-                        isEnabled = (track.video != null)
+                        isEnabled = (track?.video != null)
 
                         if (it.isMute) {
                             setIconDisabled(R.drawable.avd_video_on_to_off)
@@ -423,7 +462,7 @@ class PreviewFragment : Fragment() {
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
                     binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode()
                             .not()
-                    ) "Join" else "Enter Meeting"
+                    ) "Join Now" else "Enter Meeting"
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
                 } else {
@@ -431,9 +470,9 @@ class PreviewFragment : Fragment() {
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                 }
 
-                track.audio?.let {
+                track?.audio?.let {
                     binding.buttonToggleAudio.apply {
-                        isEnabled = (track.audio != null)
+                        isEnabled = (track?.audio != null)
 
                         if (it.isMute) {
                             binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
