@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import android.app.ProgressDialog.show
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -193,25 +194,21 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconParticipants.onClick()")
 
-                meetingViewModel.let {
-                    val audioSwitchBottomSheet =
-                        AudioOutputSwitchBottomSheet(it) { audioDevice, isMuted ->
-                            updateActionVolumeMenuIcon(audioDevice)
-                        }
-                    contextSafe { _, _ ->
-                        audioSwitchBottomSheet.show(
-                            requireActivity().supportFragmentManager,
-                            MeetingFragment.AudioSwitchBottomSheetTAG
-                        )
-                    }
-                }
+
+                AudioOutputSwitchBottomSheet({ audioDevice, isMuted ->
+                    updateActionVolumeMenuIcon(audioDevice)
+                }).show(
+                    childFragmentManager,
+                    MeetingFragment.AudioSwitchBottomSheetTAG
+                )
+
+
             }
         }
 
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
-            if (it.isEnabled)
-                track?.video.switchCamera()
+            if (it.isEnabled) track?.video.switchCamera()
         }
 
 //        meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
@@ -382,15 +379,13 @@ class PreviewFragment : Fragment() {
             }
         }
 
-        meetingViewModel.previewUpdateLiveData.observe(
-            viewLifecycleOwner,
+        meetingViewModel.previewUpdateLiveData.observe(viewLifecycleOwner,
             Observer { (room, localTracks) ->
 
                 if (setTextOnce.not()) {
                     binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
                     binding.editTextName.setText(
-                        NameUtils.getInitials(room.localPeer!!.name),
-                        TextView.BufferType.EDITABLE
+                        NameUtils.getInitials(room.localPeer!!.name), TextView.BufferType.EDITABLE
                     )
                     setTextOnce = true
                 }
@@ -489,8 +484,7 @@ class PreviewFragment : Fragment() {
     }
 
     private fun initOnBackPress() {
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     meetingViewModel.leaveMeeting()

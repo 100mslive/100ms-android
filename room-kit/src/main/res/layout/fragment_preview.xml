@@ -35,7 +35,9 @@
             tools:background="#000000" />
 
         <ImageView
+            android:elevation="10dp"
             android:visibility="invisible"
+            tools:visibility="visible"
             android:id="@+id/no_name_iv"
             android:src="@drawable/no_name"
             android:layout_gravity="center"

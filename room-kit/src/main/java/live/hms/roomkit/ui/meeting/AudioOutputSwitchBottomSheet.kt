@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
@@ -14,12 +15,17 @@ import live.hms.video.audio.HMSAudioManager.AudioDevice
 
 
 class AudioOutputSwitchBottomSheet(
-    private val meetingViewModel: MeetingViewModel,
-    private var isPreview: Boolean = false,
     private val onOptionItemClicked: ((AudioDevice?, Boolean) -> Unit)? = null
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetAudioSwitchBinding>()
+
+    private val meetingViewModel: MeetingViewModel by activityViewModels {
+        MeetingViewModelFactory(
+            requireActivity().application
+        )
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
