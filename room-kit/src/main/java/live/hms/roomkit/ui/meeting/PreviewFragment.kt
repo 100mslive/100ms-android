@@ -176,9 +176,9 @@ class PreviewFragment : Fragment() {
 
     private fun initButtons() {
 
-        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
-            binding.hlsSession.visibility = if (it.second.isHLSRoom()) View.VISIBLE else View.GONE
-            binding.iconParticipants.text = it.second.peerList.formatNames()
+        meetingViewModel.previewUpdateLiveData.observe(viewLifecycleOwner) {
+            binding.liveHlsGroup.visibility = if (it.first.isHLSRoom()) View.VISIBLE else View.GONE
+            binding.iconParticipants.text = it.first.peerList.formatNames()
         }
 
         binding.closeBtn.setOnSingleClickListener(300L) {
@@ -187,19 +187,6 @@ class PreviewFragment : Fragment() {
                 goToHomePage()
             }
         }
-
-        binding.iconParticipants.apply {
-            setOnSingleClickListener(200L) {
-                Log.v(TAG, "iconParticipants.onClick()")
-
-                participantsDialog?.participantCount =
-                    meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
-                participantsDialog?.show(
-                    requireActivity().supportFragmentManager, "participant_dialog"
-                )
-            }
-        }
-
 
 
         binding.iconOutputDevice.apply {
@@ -213,7 +200,7 @@ class PreviewFragment : Fragment() {
                         }
                     contextSafe { _, _ ->
                         audioSwitchBottomSheet.show(
-                            childFragmentManager,
+                            requireActivity().supportFragmentManager,
                             MeetingFragment.AudioSwitchBottomSheetTAG
                         )
                     }
@@ -224,7 +211,7 @@ class PreviewFragment : Fragment() {
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             if (it.isEnabled)
-            track?.video.switchCamera()
+                track?.video.switchCamera()
         }
 
 //        meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
@@ -287,7 +274,9 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
                 if (this.isEnabled) {
-                    meetingViewModel.updateNameInPreview(binding.editTextName.text.toString().trim())
+                    meetingViewModel.updateNameInPreview(
+                        binding.editTextName.text.toString().trim()
+                    )
                     findNavController().navigate(
                         PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
                     )
@@ -340,27 +329,6 @@ class PreviewFragment : Fragment() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_flip_camera -> {
-                if (track!= null) {
-                    HMSCoroutineScope.launch {
-                        (track?.video as HMSLocalVideoTrack?)?.switchCamera()
-                    }
-                }
-            }
-
-            R.id.action_participants -> {
-                participantsDialog?.participantCount =
-                    meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
-                participantsDialog?.show(
-                    requireActivity().supportFragmentManager, "participant_dialog"
-                )
-            }
-        }
-
-        return false
-    }
 
     private fun goToHomePage() {/*Intent(requireContext(), HomeActivity::class.java).apply {
             crashlyticsLog(
@@ -420,7 +388,10 @@ class PreviewFragment : Fragment() {
 
                 if (setTextOnce.not()) {
                     binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
-                    binding.editTextName.setText(NameUtils.getInitials(room.localPeer!!.name), TextView.BufferType.EDITABLE)
+                    binding.editTextName.setText(
+                        NameUtils.getInitials(room.localPeer!!.name),
+                        TextView.BufferType.EDITABLE
+                    )
                     setTextOnce = true
                 }
 
@@ -444,8 +415,14 @@ class PreviewFragment : Fragment() {
                 }
 
                 binding.editTextName.doOnTextChanged { text, start, before, count ->
-                    val intitals =  kotlin.runCatching { NameUtils.getInitials(text.toString()) }
-                    binding.nameInitials.text = intitals.getOrNull().orEmpty()
+                    if (text.isNullOrEmpty().not()) {
+                        val intitals = kotlin.runCatching { NameUtils.getInitials(text.toString()) }
+                        binding.nameInitials.text = intitals.getOrNull().orEmpty()
+                        binding.noNameIv.visibility = View.GONE
+                    } else {
+                        binding.nameInitials.text = ""
+                        binding.noNameIv.visibility = View.VISIBLE
+                    }
                 }
 
                 // Disable buttons
@@ -485,15 +462,6 @@ class PreviewFragment : Fragment() {
                 }
             })
 
-        meetingViewModel.previewRoomStateLiveData.observe(
-            viewLifecycleOwner,
-            Observer { (_, room) ->
-                if (participantsDialog?.isVisible == true) {
-                    participantsDialog?.participantCount =
-                        meetingViewModel.previewRoomStateLiveData.value?.second?.peerCount ?: 0
-                }
-                participantsDialogAdapter?.setItems(getRemotePeers(room))
-            })
     }
 
     private fun updateNetworkQualityView(
@@ -546,7 +514,9 @@ private fun List<HMSPeer>.formatNames(): CharSequence? {
     } else return "${this.size - 1} other session in this room"
 }
 
-fun HMSRoom.isHLSRoom() :Boolean {
-    return this.hlsStreamingState?.variants?.size?:0 > 0 &&  this.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl.isNullOrEmpty().not()
+fun HMSRoom.isHLSRoom(): Boolean {
+    return this.hlsStreamingState?.variants?.size ?: 0 > 0 && this.hlsStreamingState?.variants?.get(
+        0
+    )?.hlsStreamUrl.isNullOrEmpty().not()
 
 }

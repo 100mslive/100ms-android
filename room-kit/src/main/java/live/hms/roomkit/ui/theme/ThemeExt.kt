@@ -32,7 +32,7 @@ object HMSPrebuiltTheme {
         this.theme = theme
 
         this.theme = theme.copy(
-            backgroundDim = "##000000",
+            backgroundDim = "#000000",
             borderBright = "#272A31",
             onSurfaceHigh = "#EFF0FA",
             secondaryDim = "#293042",
@@ -390,8 +390,8 @@ internal fun FragmentPreviewBinding.applyTheme() {
     )
 
     videoContainerBackground.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
-        HMSPrebuiltTheme.getDefaults().surface_default
+        HMSPrebuiltTheme.getColours()?.backgroundDim,
+        HMSPrebuiltTheme.getDefaults().background_default
     )
 
     previewBottomBar.setBackgroundAndColor(

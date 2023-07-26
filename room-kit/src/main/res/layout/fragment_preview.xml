@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/preview_card"
+    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -32,6 +33,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:background="#000000" />
+
+        <ImageView
+            android:visibility="invisible"
+            android:id="@+id/no_name_iv"
+            android:src="@drawable/no_name"
+            android:layout_gravity="center"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name_initials"
@@ -143,11 +152,29 @@
         app:layout_constraintStart_toEndOf="@+id/hls_session"
         app:layout_constraintTop_toBottomOf="@id/description_tv" />
 
+    <ImageView
+        android:id="@+id/hls_dot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="5dp"
+        android:src="@drawable/dot_default_5"
+        app:layout_constraintBottom_toBottomOf="@id/hls_session"
+        app:layout_constraintEnd_toEndOf="@id/hls_session"
+        app:layout_constraintHorizontal_bias="0.09"
+        app:layout_constraintStart_toStartOf="@id/hls_session"
+        app:layout_constraintTop_toTopOf="@id/hls_session" />
+
+    <androidx.constraintlayout.widget.Group
+        android:visibility="gone"
+        android:id="@+id/live_hls_group"
+        app:constraint_referenced_ids="hls_dot,hls_session"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <TextView
         android:id="@+id/hls_session"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_gravity="center"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/gray_round_solid_drawable"
@@ -156,9 +183,7 @@
         android:gravity="center"
         android:maxLines="1"
         android:padding="8dp"
-        android:drawablePadding="16dp"
-        android:drawableStart="@drawable/dot_default_5"
-        android:text="LIVE"
+        android:text="  LIVE"
         android:textColor="#EFF0FA"
         tools:visibility="visible"
         android:visibility="gone"
@@ -188,12 +213,12 @@
         android:id="@+id/button_network_quality"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:elevation="10dp"
         app:cardCornerRadius="8dp"
         app:layout_constraintBottom_toBottomOf="@id/video_card_container"
-        app:layout_constraintEnd_toEndOf="@id/video_card_container">
+        app:layout_constraintStart_toStartOf="@id/video_card_container">
 
         <ImageView
             android:id="@+id/network_quality"

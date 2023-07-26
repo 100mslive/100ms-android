@@ -22,7 +22,7 @@
         android:orientation="vertical"
         tools:context=".ui.meeting.MeetingActivity">
 
-        <LinearLayout
+        <FrameLayout
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,11 +32,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="Speaker Settings"
+                android:layout_gravity="center_vertical"
+                android:text="Audio Output"
                 android:textSize="21sp" />
 
-        </LinearLayout>
+            <ImageView
+                android:id="@+id/close_btn"
+                android:layout_width="40dp"
+
+                android:elevation="3dp"
+                android:layout_height="40dp"
+                android:layout_gravity="right"
+                android:src="@drawable/close_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </FrameLayout>
 
 
         <LinearLayout
