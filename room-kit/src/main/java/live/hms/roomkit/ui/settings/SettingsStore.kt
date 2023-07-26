@@ -244,11 +244,7 @@ class SettingsStore(context: Context) {
 
   var meetingMode: MeetingViewMode
     get() {
-      val str = sharedPreferences.getString(
-        MEETING_MODE,
-        MeetingViewMode.ACTIVE_SPEAKER.toString()
-      )!!
-      return MeetingViewMode::class.nestedClasses.find { it.simpleName == str }?.objectInstance as MeetingViewMode? ?: MeetingViewMode.ACTIVE_SPEAKER
+      return  MeetingViewMode.ACTIVE_SPEAKER
     }
     set(value) = putString(MEETING_MODE, value.toString())
 
