@@ -37,12 +37,6 @@
                 android:layout_gravity="center"
                 android:text="Bandwidth " />
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/chart"
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp" />
-
             <TextView
                 android:id="@+id/bandwidth_estimate_tv"
                 android:layout_width="wrap_content"
@@ -63,11 +57,6 @@
                 android:layout_gravity="center"
                 android:text="Network Activity " />
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/network_activity_chart"
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp" />
 
             <TextView
                 android:id="@+id/network_activity_tv"

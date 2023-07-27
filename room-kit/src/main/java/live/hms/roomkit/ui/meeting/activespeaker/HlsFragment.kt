@@ -12,13 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.YAxis.AxisDependency
-import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.google.android.material.snackbar.Snackbar
-import com.google.gson.annotations.SerializedName
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
@@ -67,22 +60,6 @@ class HlsFragment : Fragment() {
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
             player.mute(muted)
         }
-
-        val data = LineData()
-        data.setValueTextColor(Color.WHITE)
-        binding.chart.data = data
-        binding.chart.description.isEnabled = false
-        binding.chart.setScaleEnabled(false)
-        binding.chart.legend.isEnabled = (false)
-        binding.chart.setViewPortOffsets(0f,0f,0f,0f)
-
-        val networkLineData = LineData()
-        networkLineData.setValueTextColor(Color.WHITE)
-        binding.networkActivityChart.data = networkLineData
-        binding.networkActivityChart.description.isEnabled = false
-        binding.networkActivityChart.setScaleEnabled(false)
-        binding.networkActivityChart.legend.isEnabled = (false)
-        binding.networkActivityChart.setViewPortOffsets(0f,0f,0f,0f)
 
 
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
@@ -184,10 +161,8 @@ class HlsFragment : Fragment() {
     }
 
     fun updateStatsView(playerStats: PlayerStatsModel){
-        addEntry(playerStats.bandwidth.bandWidthEstimate.toFloat(),binding.chart,"Bandwidth")
         binding.bandwidthEstimateTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.bandWidthEstimate, si = true, isBits = true)}/s"
 
-        addEntry(playerStats.bandwidth.totalBytesLoaded.toFloat(),binding.networkActivityChart,"Network Activity")
         binding.networkActivityTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.totalBytesLoaded, si = true, isBits = true)}"
 
         binding.statsView.text = statsToString(playerStats)
@@ -206,41 +181,5 @@ class HlsFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         player.stop()
-    }
-
-    private fun addEntry(value: Float, lineChart: LineChart,label: String) {
-        val data: LineData = lineChart.data
-        var set = data.getDataSetByIndex(0)
-        if (set == null) {
-            set = createSet(label)
-            data.addDataSet(set)
-        }
-        data.addEntry(Entry(set.entryCount.toFloat(), value), 0)
-        data.notifyDataChanged()
-
-        // let the chart know it's data has changed
-        lineChart.notifyDataSetChanged()
-
-        // limit the number of visible entries
-        lineChart.setVisibleXRangeMaximum(15f)
-
-        // move to the latest entry
-        lineChart.moveViewToX(data.entryCount.toFloat())
-    }
-
-    private fun createSet(label : String): LineDataSet {
-        val set = LineDataSet(null, label)
-        set.axisDependency = AxisDependency.LEFT
-        //set.color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
-        set.setCircleColor(Color.WHITE)
-        set.lineWidth = 1f
-        set.circleRadius = 1f
-        set.fillAlpha = 35
-        set.fillColor = ColorTemplate.getHoloBlue()
-        set.highLightColor = Color.rgb(244, 117, 117)
-        set.valueTextColor = Color.WHITE
-        set.valueTextSize = 9f
-        set.setDrawValues(false)
-        return set
     }
 }
