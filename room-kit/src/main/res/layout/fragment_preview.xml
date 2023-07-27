@@ -34,16 +34,6 @@
             android:layout_height="match_parent"
             tools:background="#000000" />
 
-        <ImageView
-            android:elevation="10dp"
-            android:visibility="invisible"
-            tools:visibility="visible"
-            android:id="@+id/no_name_iv"
-            android:src="@drawable/no_name"
-            android:layout_gravity="center"
-            android:layout_width="40dp"
-            android:layout_height="40dp"/>
-
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name_initials"
             android:layout_width="wrap_content"
@@ -55,6 +45,16 @@
             android:text="@string/john_doe_initials"
             android:textColor="@android:color/white"
             android:textSize="40sp" />
+
+        <ImageView
+            android:visibility="invisible"
+            tools:visibility="visible"
+            android:id="@+id/no_name_iv"
+            android:src="@drawable/no_name"
+            android:layout_gravity="center"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
 
         <live.hms.videoview.HMSVideoView
             android:id="@+id/preview_view"

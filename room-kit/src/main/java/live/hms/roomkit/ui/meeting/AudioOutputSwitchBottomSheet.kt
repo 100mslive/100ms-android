@@ -45,6 +45,10 @@ class AudioOutputSwitchBottomSheet(
             )
         )
 
+        binding.closeBtn.setOnClickListener {
+            dismissAllowingStateLoss()
+        }
+
         val devicesList = meetingViewModel.hmsSDK.getAudioDevicesList()
 
         if (meetingViewModel.isPeerAudioEnabled().not()) {

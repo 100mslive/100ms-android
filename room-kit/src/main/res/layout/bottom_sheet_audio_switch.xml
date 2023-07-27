@@ -2,7 +2,6 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/preview_bottom_bar"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="-16dp"
@@ -11,16 +10,13 @@
     app:cardCornerRadius="16dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/video_guideline">
+    app:layout_constraintStart_toStartOf="parent">
 
     <LinearLayout
-        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        android:orientation="vertical"
-        tools:context=".ui.meeting.MeetingActivity">
+        android:orientation="vertical">
 
         <FrameLayout
 
@@ -38,12 +34,11 @@
 
             <ImageView
                 android:id="@+id/close_btn"
-                android:layout_width="40dp"
-
+                android:layout_width="24dp"
                 android:elevation="3dp"
-                android:layout_height="40dp"
+                android:layout_height="24dp"
                 android:layout_gravity="right"
-                android:src="@drawable/close_icon"
+                android:src="@drawable/ic_close_16"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
