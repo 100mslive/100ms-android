@@ -385,7 +385,7 @@ class PreviewFragment : Fragment() {
                 if (setTextOnce.not()) {
                     binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
                     binding.editTextName.setText(
-                        NameUtils.getInitials(room.localPeer!!.name), TextView.BufferType.EDITABLE
+                        room.localPeer?.name.orEmpty(), TextView.BufferType.EDITABLE
                     )
                     setTextOnce = true
                 }

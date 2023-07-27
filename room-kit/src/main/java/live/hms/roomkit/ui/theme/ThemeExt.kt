@@ -177,7 +177,7 @@ internal fun TextView.buttonDisabled() {
 
     this.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getColours()?.primaryDisabled,
             HMSPrebuiltTheme.getDefaults().onprimary_low_emp
         )
     )

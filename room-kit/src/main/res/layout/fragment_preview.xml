@@ -66,7 +66,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="158dp"
+        android:layout_height="216dp"
         android:elevation="3dp"
         android:background="@drawable/bg_gradient_drawable"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -105,7 +105,9 @@
         android:gravity="center"
         android:text="Get Started"
         android:textAlignment="center"
-        android:textSize="20sp"
+        android:textSize="24sp"
+        android:lineHeight="32sp"
+        app:fontFamily="@font/inter_bold"
         app:layout_constraintBottom_toTopOf="@id/description_tv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -127,6 +129,8 @@
         android:fontFamily="@font/inter_regular"
         android:gravity="center"
         android:maxLines="2"
+        app:fontFamily="@font/inter_regular"
+        android:lineHeight="20sp"
         android:text="Setup your audio and video before joining"
         android:textAlignment="center"
         android:textSize="14sp"
@@ -146,7 +150,8 @@
         android:elevation="4dp"
         android:gravity="center"
         android:maxLines="1"
-        android:padding="8dp"
+       android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
         android:text="You are the first to join"
         android:textColor="#EFF0FA"
         android:textSize="13sp"
@@ -254,7 +259,7 @@
                 android:id="@+id/button_toggle_audio"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="24dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="@string/toggle_video"
                 android:drawablePadding="0dp"
@@ -269,7 +274,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="@string/toggle_video"
                 android:background="@drawable/gray_round_solid_drawable"
@@ -283,7 +288,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
@@ -298,7 +303,7 @@
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="24dp"
+                android:layout_marginEnd="16dp"
                 app:iconSize="24dp"
                 tools:visibility="visible"
                 android:visibility="gone"
@@ -311,18 +316,21 @@
                 android:id="@+id/edit_container_name"
                 style="@style/TextInputLayout"
                 android:layout_width="0dp"
+                android:layout_marginTop="-4dp"
                 android:layout_height="48dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginBottom="44dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
                 app:layout_constraintEnd_toStartOf="@id/btn_txt_guideline"
                 app:layout_constraintStart_toStartOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_name"
                     android:layout_width="match_parent"
+                    android:maxLines="1"
+                    android:background="@drawable/focused_text"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Name ..."
+                    android:hint="Enter Name"
                     android:inputType="textPersonName" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -343,7 +351,7 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="44dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/btn_txt_guideline" />
@@ -354,6 +362,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent=".60" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/edit_text_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="72dp"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

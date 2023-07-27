@@ -148,7 +148,6 @@ class MeetingViewModel(
     }
 
     fun updateNameInPreview(nameStr: String) {
-        if (nameStr.isNullOrEmpty().not())
             hmsConfig = hmsConfig?.copy(userName = nameStr)
     }
 
