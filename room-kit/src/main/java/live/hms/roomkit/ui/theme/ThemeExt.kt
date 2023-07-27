@@ -19,6 +19,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
+import live.hms.roomkit.databinding.FragmentPermissionBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.video.signal.init.HMSRoomLayout
@@ -342,6 +343,46 @@ internal fun VideoCardBinding.applyTheme() {
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.backgroundDefault,
             HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
+
+}
+
+internal fun FragmentPermissionBinding.applyTheme() {
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
+        )
+
+    )
+
+    buttonGrantPermission.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
+    buttonGrantPermission.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
 

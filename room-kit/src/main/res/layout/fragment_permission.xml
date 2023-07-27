@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:id="@+id/root"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
@@ -28,6 +29,7 @@
         android:src="@drawable/lock_icon" />
 
     <TextView
+        android:id="@+id/heading"
         style="@style/MaterialTextViewHeading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,6 +41,8 @@
         app:fontFamily="@font/inter_bold" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:paddingHorizontal="8dp"
+        android:id="@+id/subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
