@@ -22,6 +22,7 @@ import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.video.signal.init.HMSRoomLayout
+import live.hms.video.utils.GsonUtils.gson
 
 //get theme detail from theme utils parse it accordingly
 
@@ -41,6 +42,16 @@ object HMSPrebuiltTheme {
     }
 
     fun getDefaults() = DefaultDarkThemeColours()
+
+    //temp
+    fun getDefaultHmsColorPalette(): HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette {
+        val jsonStr =
+            "{\"alert_error_bright\":\"#FFB2B6\",\"alert_error_brighter\":\"#FFEDEC\",\"alert_error_default\":\"#C74E5B\",\"alert_error_dim\":\"#270005\",\"alert_success\":\"#36B37E\",\"alert_warning\":\"#FFAB00\",\"background_default\":\"#0B0E15\",\"background_dim\":\"#000000\",\"border_bright\":\"#272A31\",\"border_default\":\"#1D1F27\",\"on_primary_high\":\"#FFFFFF\",\"on_primary_low\":\"#84AAFF\",\"on_primary_medium\":\"#CCDAFF\",\"on_secondary_high\":\"#FFFFFF\",\"on_secondary_low\":\"#A4ABC0\",\"on_secondary_medium\":\"#D3D9F0\",\"on_surface_high\":\"#EFF0FA\",\"on_surface_low\":\"#8F9099\",\"on_surface_medium\":\"#404759\",\"primary_bright\":\"#538dff\",\"primary_default\":\"#2572ed\",\"primary_dim\":\"#004299\",\"primary_disabled\":\"#444954\",\"secondary_bright\":\"#70778B\",\"secondary_default\":\"#444954\",\"secondary_dim\":\"#293042\",\"secondary_disabled\":\"#404759\",\"surface_bright\":\"#272A31\",\"surface_brighter\":\"#2E3038\",\"surface_default\":\"#191B23\",\"surface_dim\":\"#11131A\"}"
+
+        return gson.fromJson(
+            jsonStr, HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette::class.java
+        )
+    }
 }
 
 internal fun CardView.setBackgroundAndColor(
