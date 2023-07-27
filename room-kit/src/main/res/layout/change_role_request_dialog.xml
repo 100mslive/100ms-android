@@ -12,7 +12,6 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary_bg"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
         android:paddingVertical="20dp">
@@ -23,7 +22,7 @@
             android:fontFamily="@font/inter_semibold"
             android:padding="8dp"
             android:text="Change Role Request"
-            android:textColor="@color/white"
+
             android:textSize="20sp" />
 
         <TextView

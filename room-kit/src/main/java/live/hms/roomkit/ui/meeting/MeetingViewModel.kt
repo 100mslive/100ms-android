@@ -20,7 +20,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.util.*
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.*
@@ -36,11 +36,11 @@ import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
-import live.hms.video.signal.init.HMSTokenListener
-import live.hms.video.signal.init.TokenRequest
-import live.hms.video.signal.init.TokenRequestOptions
+import live.hms.video.signal.init.*
+import live.hms.video.utils.GsonUtils.gson
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
+import live.hms.video.utils.toJsonObject
 import java.util.*
 
 
@@ -82,7 +82,11 @@ class MeetingViewModel(
         .setLogSettings(hmsLogSettings)
         .build()
 
-     fun initSdk(roomCode: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+    fun initSdk(
+        roomCode: String,
+        hmsPrebuiltOptions: HMSPrebuiltOptions?,
+        onHMSActionResultListener: HMSActionResultListener
+    ) {
         if (hasValidToken) {
             onHMSActionResultListener.onSuccess()
             return
@@ -94,10 +98,10 @@ class MeetingViewModel(
         else
             "https://prod-init.100ms.live/init"
 
-         isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo?:false
+        isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo ?: false
 
         hmsSDK.getAuthTokenByRoomCode(
-            TokenRequest(roomCode, hmsPrebuiltOptions?.userId?:UUID.randomUUID().toString()),
+            TokenRequest(roomCode, hmsPrebuiltOptions?.userId ?: UUID.randomUUID().toString()),
             TokenRequestOptions(tokenURL),
             object : HMSTokenListener {
                 override fun onError(error: HMSException) {
@@ -107,30 +111,67 @@ class MeetingViewModel(
 
                 override fun onTokenSuccess(token: String) {
 
-                   hmsConfig = HMSConfig(
-                        userName = hmsPrebuiltOptions?.userName.orEmpty(),
-                        token,
-                        Gson().toJson(
-                            CustomPeerMetadata(
-                                isHandRaised = false,
-                                name = hmsPrebuiltOptions?.userName.orEmpty(),
-                                isBRBOn = false
-                            )
-                        )
-                            .toString(),
-                        captureNetworkQualityInPreview = true,
-                        initEndpoint = initURL,
-                    )
+                    val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
+                    if (layoutEndpointBase.isNullOrEmpty()) {
+                        //todo remove this if it's a prod room then don't call the layout API
+                        setHmsConfig(hmsPrebuiltOptions, token, initURL)
+                        setTheme(HMSPrebuiltTheme.getDefaultHmsColorPalette())
+                        onHMSActionResultListener.onSuccess()
+                    } else {
+                        hmsSDK.getRoomLayout(
+                            token,
+                            LayoutRequestOptions(layoutEndpointBase),
+                            object :
+                                HMSLayoutListener {
+                                override fun onError(error: HMSException) {
+                                    Log.e(TAG, "onError: ", error)
+                                    onHMSActionResultListener.onError(error)
+                                }
 
-                    hasValidToken = true
+                                override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
+                                    setHmsConfig(hmsPrebuiltOptions, token, initURL)
+                                    kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
+                                    onHMSActionResultListener.onSuccess()
+                                }
 
-                    onHMSActionResultListener.onSuccess()
-
+                            })
+                    }
                 }
 
             })
 
 
+    }
+
+    private fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
+        HMSPrebuiltTheme.setTheme(theme)
+    }
+
+    fun updateNameInPreview(nameStr: String) {
+            hmsConfig = hmsConfig?.copy(userName = nameStr)
+    }
+
+    private fun setHmsConfig(
+        hmsPrebuiltOptions: HMSPrebuiltOptions?,
+        token: String,
+        initURL: String
+    ) {
+        hmsConfig = HMSConfig(
+            userName = hmsPrebuiltOptions?.userName.orEmpty(),
+            token,
+            Gson().toJson(
+                CustomPeerMetadata(
+                    isHandRaised = false,
+                    name = hmsPrebuiltOptions?.userName.orEmpty(),
+                    isBRBOn = false
+                )
+            )
+                .toString(),
+            captureNetworkQualityInPreview = true,
+            initEndpoint = initURL,
+        )
+
+        hasValidToken = true
     }
 
     private var hmsConfig: HMSConfig? = null
@@ -171,7 +212,6 @@ class MeetingViewModel(
     // When we get stats, a flow will be updated with the saved stats.
     private val statsFlow = MutableSharedFlow<Map<String, Any>>()
     private val savedStats: MutableMap<String, Any> = mutableMapOf()
-
 
 
     private val failures = ArrayList<HMSException>()
@@ -281,9 +321,6 @@ class MeetingViewModel(
 
     private val _trackStatus = MutableLiveData<Pair<String, Boolean>>()
     val trackStatus: LiveData<Pair<String, Boolean>> = _trackStatus
-
-
-
 
 
     val peers: List<HMSPeer>
@@ -613,6 +650,7 @@ class MeetingViewModel(
                             _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
                         }
                     }
+
                     HMSPeerUpdate.NAME_CHANGED -> {
                         if (hmsPeer.isLocal) {
                             updateNameChange(hmsPeer as HMSLocalPeer)
@@ -639,18 +677,21 @@ class MeetingViewModel(
                         )
                         showServerInfo(hmsRoom)
                     }
+
                     HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
                         )
                         showRtmpInfo(hmsRoom)
                     }
+
                     HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
                         )
                         showRecordInfo(hmsRoom)
                     }
+
                     HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
@@ -658,12 +699,14 @@ class MeetingViewModel(
                         switchToHlsViewIfRequired()
                         showHlsInfo(hmsRoom)
                     }
+
                     HMSRoomUpdate.HLS_RECORDING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
                         )
                         showHlsRecordingInfo(hmsRoom)
                     }
+
                     else -> {
                     }
                 }
@@ -679,6 +722,7 @@ class MeetingViewModel(
                                     isLocalAudioPublishingAllowed.postValue(true)
                                     isLocalAudioEnabled.postValue(!track.isMute)
                                 }
+
                                 HMSTrackType.VIDEO -> {
                                     isLocalVideoPublishingAllowed.postValue(true)
                                     isLocalVideoEnabled.postValue(!track.isMute)
@@ -687,12 +731,14 @@ class MeetingViewModel(
                         }
                         addTrack(track, peer)
                     }
+
                     HMSTrackUpdate.TRACK_REMOVED -> {
                         if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                             when (track.type) {
                                 HMSTrackType.AUDIO -> {
                                     isLocalAudioPublishingAllowed.postValue(false)
                                 }
+
                                 HMSTrackType.VIDEO -> {
                                     isLocalVideoPublishingAllowed.postValue(false)
                                 }
@@ -700,6 +746,7 @@ class MeetingViewModel(
                         }
                         removeTrack(track, peer)
                     }
+
                     HMSTrackUpdate.TRACK_MUTED -> {
                         _liveDataTracks.postValue(_tracks)
                         if (peer.isLocal) {
@@ -710,6 +757,7 @@ class MeetingViewModel(
                             }
                         }
                     }
+
                     HMSTrackUpdate.TRACK_UNMUTED -> {
                         _liveDataTracks.postValue(_tracks)
                         if (peer.isLocal) {
@@ -720,6 +768,7 @@ class MeetingViewModel(
                             }
                         }
                     }
+
                     HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> _liveDataTracks.postValue(_tracks)
                     HMSTrackUpdate.TRACK_DEGRADED -> _liveDataTracks.postValue(_tracks)
                     HMSTrackUpdate.TRACK_RESTORED -> _liveDataTracks.postValue(_tracks)
@@ -996,6 +1045,7 @@ class MeetingViewModel(
                                 it.audio?.trackId == track.trackId
                     }
                 }
+
                 HMSTrackType.VIDEO -> {
                     _tracks.find {
                         it.peer.peerID == peer.peerID &&
@@ -1010,6 +1060,7 @@ class MeetingViewModel(
                 HMSTrackType.AUDIO -> {
                     meetingTrack?.audio = null
                 }
+
                 HMSTrackType.VIDEO -> {
                     meetingTrack?.video = null
                 }
@@ -1188,9 +1239,11 @@ class MeetingViewModel(
                 HMSTrackType.AUDIO -> {
                     it.audioTrack?.isMute
                 }
+
                 HMSTrackType.VIDEO -> {
                     it.videoTrack?.isMute
                 }
+
                 else -> {
                     val audioMute = it.audioTrack?.isMute
                     val videoMute = it.videoTrack?.isMute
@@ -1198,9 +1251,11 @@ class MeetingViewModel(
                         audioMute == null -> {
                             videoMute
                         }
+
                         videoMute == null -> {
                             audioMute
                         }
+
                         else -> {
                             videoMute || audioMute
                         }
@@ -1320,7 +1375,6 @@ class MeetingViewModel(
     fun stopAudioshare(actionListener: HMSActionResultListener) {
         hmsSDK.stopAudioshare(actionListener)
     }
-
 
 
     fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {

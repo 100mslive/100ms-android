@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    app:cardBackgroundColor="@color/primary_bg"
     app:cardCornerRadius="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -39,7 +38,6 @@
             android:fontFamily="@font/inter_semibold"
             android:text="Welcome Joy!"
             android:textAllCaps="true"
-            android:textColor="@color/muted_text"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="@+id/hand_icon"
             app:layout_constraintStart_toEndOf="@+id/hand_icon"
@@ -53,7 +51,6 @@
             android:layout_marginTop="5dp"
             android:fontFamily="@font/inter_semibold"
             android:text="Let’s get you started"
-            android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="@+id/tv_start_streaming_title"
             app:layout_constraintTop_toBottomOf="@id/tv_start_streaming_title" />
@@ -117,7 +114,6 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_semibold"
                         android:text="Live Stream with HLS"
-                        android:textColor="@color/white"
                         android:textSize="20sp" />
 
                     <TextView
@@ -126,7 +122,6 @@
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/inter_regular"
                         android:text="Stream to millions, edit and control what the viewer sees and more!"
-                        android:textColor="@color/muted_text"
                         android:textSize="14sp" />
 
                 </LinearLayout>
@@ -185,7 +180,6 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/inter_semibold"
                         android:text="Stream to Facebook, Twitch, and others"
-                        android:textColor="@color/white"
                         android:textSize="20sp" />
 
                     <TextView
@@ -194,7 +188,6 @@
                         android:layout_marginTop="4dp"
                         android:fontFamily="@font/inter_regular"
                         android:text="Stream to a specific destination directly from your app."
-                        android:textColor="@color/muted_text"
                         android:textSize="14sp" />
 
                 </LinearLayout>

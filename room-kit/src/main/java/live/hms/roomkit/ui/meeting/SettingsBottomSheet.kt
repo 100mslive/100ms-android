@@ -75,7 +75,7 @@ class SettingsBottomSheet(
         binding.btnDeviceSettings.apply {
             setOnSingleClickListener {
                 val audioSwitchBottomSheet =
-                    AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice, isMuted ->
+                    AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
                         dismiss()
                     }
                 audioSwitchBottomSheet.show(

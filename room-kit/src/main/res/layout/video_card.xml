@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/root"
     android:layout_height="match_parent">
 
     <com.google.android.material.textview.MaterialTextView
@@ -10,7 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@drawable/circle_secondary_80"
         android:gravity="center"
         android:text="@string/john_doe_initials"
         android:textColor="@android:color/white"
@@ -40,7 +40,6 @@
         android:layout_alignParentBottom="true"
         android:layout_marginStart="-8dp"
         android:layout_marginBottom="-8dp"
-        android:backgroundTint="@color/black_faded_40"
         app:cardCornerRadius="5dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp">
@@ -52,7 +51,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="12dp"
-            android:backgroundTint="@color/black_faded_40"
+
             android:orientation="horizontal">
 
             <ImageView
@@ -87,7 +86,7 @@
                 android:layout_marginLeft="8dp"
                 android:contentDescription="@string/audio_status"
                 android:src="@drawable/ic_mic_off_24"
-                app:tint="@color/white_faded_70" />
+                 />
 
             <ImageView
                 android:id="@+id/icon_screen_share"
@@ -98,7 +97,7 @@
                 android:layout_marginLeft="4dp"
                 android:contentDescription="@string/screen_share"
                 android:src="@drawable/ic_mobile_screen_share_24"
-                app:tint="@color/white_faded_70" />
+               />
 
             <ImageView
                 android:id="@+id/ic_degraded"
@@ -108,7 +107,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/ic_degraded"
-                app:tint="@color/white_faded_70" />
+                 />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -20,7 +20,7 @@
             android:label="@string/meeting"
             android:launchMode="singleTask"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Theme.App2"
+            android:theme="@style/Theme.App2.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
 

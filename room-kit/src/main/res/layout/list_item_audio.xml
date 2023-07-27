@@ -5,10 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/audio_item_size"
     android:layout_margin="4dp"
-    android:backgroundTint="@color/blue_2"
     android:maxWidth="@dimen/audio_item_size"
     app:cardCornerRadius="4dp"
-    app:strokeColor="@color/primary_blue"
     app:strokeWidth="0dp">
 
     <RelativeLayout
@@ -66,7 +64,7 @@
                     android:layout_marginLeft="8dp"
                     android:contentDescription="@string/audio_status"
                     android:src="@drawable/ic_mic_off_24"
-                    app:tint="@color/white_faded_70" />
+                     />
 
 
             </LinearLayout>

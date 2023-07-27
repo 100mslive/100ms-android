@@ -61,7 +61,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     //100ms.live prebuilt lib
-    implementation "live.100ms:room-kit:0.0.4"
+    implementation "live.100ms:room-kit:0.0.5"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
@@ -80,7 +80,6 @@ dependencies {
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // Get Permissions easily
     implementation 'pub.devrel:easypermissions:1.1.3'

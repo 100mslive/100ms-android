@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.ImageView
 import androidx.annotation.CallSuper
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -22,6 +21,9 @@ import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.roomkit.ui.settings.SettingsStore
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.*
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
@@ -169,7 +171,6 @@ abstract class VideoGridBaseFragment : Fragment() {
     val earlyExit = item.video == null
             || item.video?.isMute == true
     if (earlyExit) return
-
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
         view.setScalingType(scalingType)
@@ -227,7 +228,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
-
+    binding.applyTheme()
     binding.apply {
       // Donot update the text view if not needed, this causes redraw of the entire view leading to  flicker
       if (name.text.equals(item.peer.name).not()) {
@@ -407,7 +408,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
     NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
       if (downlinkScore == 0) {
-        imageView.setColorFilter(ContextCompat.getColor(context, R.color.red), android.graphics.PorterDuff.Mode.SRC_IN);
+        imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertSuccess, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
       } else {
         imageView.colorFilter = null
       }

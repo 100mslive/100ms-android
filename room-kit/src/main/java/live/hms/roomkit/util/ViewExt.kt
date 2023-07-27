@@ -208,6 +208,9 @@ fun SurfaceViewRenderer.isInit() : Boolean {
     return (getTag(R.id.IS_INT) as? Boolean) == true
 }
 
+fun HMSVideoTrack?.switchCamera() {
+    (this as? HMSLocalVideoTrack)?.switchCamera()
+}
 
 fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
 

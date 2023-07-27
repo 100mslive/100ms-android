@@ -34,7 +34,6 @@
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
         android:animateLayoutChanges="true"
-        android:background="@color/blue_3"
         android:orientation="vertical">
 
         <com.google.android.material.button.MaterialButton
@@ -70,7 +69,6 @@
                 android:background="@drawable/badge_circle_20"
                 android:gravity="center"
                 android:text="@string/_0"
-                android:textColor="@color/white"
                 android:textSize="12sp" />
 
         </RelativeLayout>
@@ -79,8 +77,7 @@
             android:id="@+id/button_end_call"
             style="@style/MaterialImageButton"
             android:contentDescription="@string/end_call"
-            app:icon="@drawable/ic_call_end_24"
-            app:iconTint="@color/red" />
+            app:icon="@drawable/ic_call_end_24" />
 
     </LinearLayout>
 
