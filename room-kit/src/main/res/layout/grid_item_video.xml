@@ -8,7 +8,6 @@
     android:layout_columnWeight="1"
     android:layout_margin="4dp"
     app:cardCornerRadius="8dp"
-    app:strokeColor="@color/primary_blue"
     app:strokeWidth="0dp">
 
     <include

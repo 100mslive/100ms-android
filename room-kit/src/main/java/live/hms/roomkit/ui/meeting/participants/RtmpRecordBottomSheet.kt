@@ -120,7 +120,7 @@ class RtmpRecordBottomSheet(val startClickListener: ()->Unit) : BottomSheetDialo
             params.gravity = Gravity.TOP or Gravity.LEFT
             dialog.window!!.attributes = params
             dialog.window?.setDimAmount(0f)
-            dialog.window?.setBackgroundDrawableResource(R.color.primary_bg)
+           // dialog.window?.setBackgroundDrawableResource(R.color.primary_bg)
 
             dialog.window?.attributes?.flags =
                 dialog.window?.attributes?.flags?.and((WindowManager.LayoutParams.FLAG_DIM_BEHIND).inv())

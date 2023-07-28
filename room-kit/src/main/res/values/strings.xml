@@ -48,7 +48,7 @@
     <string name="record_meeting">Record Meeting</string>
     <string name="show_participants">Show Participants</string>
     <string name="settings_fragment">Settings Fragment</string>
-    <string name="default_name">Default Name</string>
+    <string name="default_name">Enter Name...</string>
     <string name="default_video_source">Default Video Source</string>
     <string name="degradation_preference_str">Degradation Preference</string>
     <string name="default_microphone_source">Default Microphone Source</string>
@@ -158,7 +158,7 @@
     <string name="force_software_decoder">Force Software Decoder</string>
     <string name="mute_local_audio_on_phone_ring">Mute local audio on phone ring</string>
     <string name="disable_auto_simulcast">Disable Auto Simulcast</string>
-    <string name="is_prebuilt_debug_enabled">Prebuilt Debug mode</string>
+    <string name="is_prebuilt_debug_enabled">Prebuilt (NonDebug/Debug)</string>
     <string name="raise_hand">✋ Raise Hand</string>
     <string name="pip_mode">PIP mode</string>
     <string name="lower_hand">Lower Hand</string>
@@ -174,8 +174,8 @@
     <string name="unknown">unknown</string>
     <string name="file_playing">File Playing</string>
 
-    <string name="camera_and_mic_permissions"><![CDATA[Camera & Mic permissions]]></string>
-    <string name="permissions_description">Just a few things before you join</string>
+    <string name="camera_and_mic_permissions">Enable permissions</string>
+    <string name="permissions_description">Sharing your camera and microphone permissions helps us give you the optimal experience</string>
     <string name="get_name_str">Let’s get started with your name</string>
     <string name="go_live_in_five_str">Go live in five!</string>
     <string name="get_started_str">Get Started</string>

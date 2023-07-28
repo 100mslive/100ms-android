@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPermissionBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.EasyPermissions
@@ -24,7 +25,7 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
 
     private const val RC_CALL = 111
     private val PERMISSIONS = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
-    private val PERMISSIONS_API_S = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.READ_PHONE_STATE)
+    private val PERMISSIONS_API_S = arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.BLUETOOTH_CONNECT)
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +41,11 @@ class PermissionFragment : Fragment(), EasyPermissions.PermissionCallbacks {
     binding = FragmentPermissionBinding.inflate(inflater, container, false)
     initButtons()
     return binding.root
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    binding.applyTheme()
   }
 
 

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary_bg"
     android:paddingHorizontal="16dp"
     android:paddingVertical="20dp">
 
@@ -31,7 +30,6 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_semibold"
                 android:text="Settings"
-                android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="@id/close_btn"
                 app:layout_constraintStart_toStartOf="parent"
@@ -217,7 +215,7 @@
                     android:id="@+id/layout_expandable_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:childDivider="@color/gray_color"
+                    android:childDivider="@android:color/transparent"
                     android:divider="@android:color/darker_gray"
                     android:dividerHeight="1dp"
                     android:groupIndicator="@null"
@@ -545,7 +543,7 @@
                         android:layout_height="18dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_brb"
-                        android:tint="@color/white" />
+                         />
 
                     <TextView
                         android:id="@+id/tvBrbStatus"

@@ -50,7 +50,6 @@
         android:layout_width="wrap_content"
         android:layout_height="8dp"
         android:layout_margin="4dp"
-        android:backgroundTint="@color/blue_1"
         app:tabBackground="@drawable/dot_selector_4"
         android:layout_gravity="center"
         app:tabGravity="center"

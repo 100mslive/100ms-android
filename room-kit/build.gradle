@@ -66,7 +66,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
 
-    def hmsVersion = "2.7.0"
+    def hmsVersion = "2.7.2"
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
@@ -89,10 +89,10 @@ dependencies {
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // Get Permissions easily
-    implementation 'pub.devrel:easypermissions:1.1.3'
+    implementation 'pub.devrel:easypermissions:3.0.0'
+
 
 
 

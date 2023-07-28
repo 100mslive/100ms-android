@@ -38,7 +38,7 @@ class SettingsBottomSheet(
 
         setupConfig()
         val settingsExpandableListAdapter: ExpandableListAdapter =
-            SettingsExpandableListAdapter(requireContext())
+            SettingsExpandableListAdapter(requireContext(), meetingViewModel.isPrebuiltDebugMode())
         binding.layoutExpandableList.setAdapter(settingsExpandableListAdapter)
         binding.layoutExpandableList.setOnGroupClickListener(ExpandableListView.OnGroupClickListener { parent, v, groupPosition, id ->
             setListViewHeight()
@@ -76,7 +76,7 @@ class SettingsBottomSheet(
         binding.btnDeviceSettings.apply {
             setOnSingleClickListener {
                 val audioSwitchBottomSheet =
-                    AudioOutputSwitchBottomSheet(meetingViewModel) { audioDevice, isMuted ->
+                    AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
                         dismiss()
                     }
                 audioSwitchBottomSheet.show(
@@ -117,7 +117,7 @@ class SettingsBottomSheet(
                 dismissAllowingStateLoss()
                 openBulkRoleChange()
             }
-            visibility = if(meetingViewModel.isAllowedToChangeRole()) View.VISIBLE else View.GONE
+            visibility = if(meetingViewModel.isAllowedToChangeRole() && meetingViewModel.isPrebuiltDebugMode()) View.VISIBLE else View.GONE
         }
         binding.btnPolls.apply {
             setOnSingleClickListener{
@@ -156,7 +156,7 @@ class SettingsBottomSheet(
         }
 
         binding.remoteMuteAll.apply {
-            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute) {
+            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute && meetingViewModel.isPrebuiltDebugMode()) {
                 visibility = View.VISIBLE
             }
 
@@ -177,7 +177,7 @@ class SettingsBottomSheet(
         }
 
         binding.remoteMuteRole.apply {
-            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute) {
+            if (meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers() && isAllowedToMuteUnmute && meetingViewModel.isPrebuiltDebugMode()) {
                 visibility = View.VISIBLE
             }
             setOnSingleClickListener {
@@ -296,8 +296,10 @@ class SettingsBottomSheet(
             binding.remoteMuteRole.visibility = View.GONE
         }
 
-        if (meetingViewModel.isPrebuiltDebugFlagEnabled()) {
+        if (meetingViewModel.isPrebuiltDebugMode().not()) {
+            //
             binding.btnShowStats.visibility = View.GONE
+            binding.btnMeetingMode.visibility = View.GONE
             binding.btnMetaDataSend.visibility = View.GONE
             binding.remoteMuteAll.visibility = View.GONE
             binding.remoteMuteRole.visibility = View.GONE

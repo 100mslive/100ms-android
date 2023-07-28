@@ -9,13 +9,19 @@ import android.widget.TextView
 import live.hms.roomkit.R
 
 
-class SettingsExpandableListAdapter(var context: Context) : BaseExpandableListAdapter() {
+class SettingsExpandableListAdapter(var context: Context, prebuiltDebugMode: Boolean) :
+    BaseExpandableListAdapter() {
 
-    enum class MeetingLayout{
-        ActiveSpeaker,HeroMode,GridView
+    enum class MeetingLayout {
+        ActiveSpeaker, HeroMode, GridView
     }
 
-    val list = arrayListOf<MeetingLayout>(MeetingLayout.ActiveSpeaker,MeetingLayout.HeroMode,MeetingLayout.GridView)
+    val list = arrayListOf(
+        MeetingLayout.ActiveSpeaker,
+        if (prebuiltDebugMode) MeetingLayout.HeroMode else null,
+        MeetingLayout.GridView
+    ).filterNotNull()
+
     override fun getGroupCount(): Int = 1
 
     override fun getChildrenCount(groupPosition: Int): Int = list.size
@@ -41,15 +47,13 @@ class SettingsExpandableListAdapter(var context: Context) : BaseExpandableListAd
     }
 
     override fun getGroupView(
-        groupPosition: Int,
-        isExpanded: Boolean,
-        convertViewParent: View?,
-        parent: ViewGroup?
+        groupPosition: Int, isExpanded: Boolean, convertViewParent: View?, parent: ViewGroup?
     ): View {
-        val title : String = getGroup(groupPosition)
+        val title: String = getGroup(groupPosition)
         var convertView = convertViewParent
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.expanded_list_parent_view,null,false)
+            convertView = LayoutInflater.from(context)
+                .inflate(R.layout.expanded_list_parent_view, null, false)
         }
         val expandedListTextView = convertView?.findViewById<TextView>(R.id.tv_title)
         expandedListTextView?.text = title
@@ -63,10 +67,11 @@ class SettingsExpandableListAdapter(var context: Context) : BaseExpandableListAd
         convertViewParent: View?,
         parent: ViewGroup?
     ): View {
-        val title : String = getChild(groupPosition,childPosition)
+        val title: String = getChild(groupPosition, childPosition)
         var convertView = convertViewParent
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.expanded_list_child_view,null,false)
+            convertView =
+                LayoutInflater.from(context).inflate(R.layout.expanded_list_child_view, null, false)
         }
         val expandedListTextView = convertView?.findViewById<TextView>(R.id.expandedListItem)
         expandedListTextView?.text = title
