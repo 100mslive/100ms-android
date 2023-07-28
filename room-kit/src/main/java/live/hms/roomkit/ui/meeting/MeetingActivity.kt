@@ -38,6 +38,8 @@ class MeetingActivity : AppCompatActivity() {
     supportActionBar?.setDisplayShowTitleEnabled(false)
     settingsStore = SettingsStore(this)
 
+
+
     val hmsPrebuiltOption : HMSPrebuiltOptions? = intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
     val roomCode : String = intent!!.getStringExtra(ROOM_CODE)!!
 
