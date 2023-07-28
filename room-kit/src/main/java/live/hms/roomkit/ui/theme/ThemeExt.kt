@@ -35,10 +35,13 @@ object HMSPrebuiltTheme {
 
         this.theme = theme.copy(
             backgroundDim = "#000000",
+            primaryDefault = "#2572ED",
             borderBright = "#272A31",
             onSurfaceHigh = "#EFF0FA",
             secondaryDim = "#293042",
             backgroundDefault = "#0B0E15",
+            onPrimaryLow = "#84AAFF",
+            primaryDisabled = "#004299"
         )
     }
 
@@ -408,11 +411,6 @@ internal fun FragmentPreviewBinding.applyTheme() {
     )
 
 
-    editContainerName.boxBackgroundColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
-        HMSPrebuiltTheme.getDefaults().surface_default
-    )
-
     editContainerName.boxStrokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default
@@ -424,6 +422,9 @@ internal fun FragmentPreviewBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_low_emp
         )
     )
+
+
+    editTextName.isCursorVisible = true
 
     editTextName.setTextColor(
         getColorOrDefault(
