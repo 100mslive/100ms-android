@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting
 
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -42,7 +43,7 @@ class MeetingActivity : AppCompatActivity() {
 
     val hmsPrebuiltOption : HMSPrebuiltOptions? = intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
     val roomCode : String = intent!!.getStringExtra(ROOM_CODE)!!
-
+    binding.progressBar.visibility = View.VISIBLE
     //todo show a loader UI
     meetingViewModel.initSdk(roomCode, hmsPrebuiltOption, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
@@ -54,6 +55,7 @@ class MeetingActivity : AppCompatActivity() {
 
       override fun onSuccess() {
         runOnUiThread {
+          binding.progressBar.visibility = View.GONE
           val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
           val navController = navHostFragment.navController
           val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
