@@ -336,6 +336,30 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <FrameLayout
+                android:elevation="8dp"
+                android:visibility="invisible"
+                android:id="@+id/join_loader"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/blue_round_solid_drawable"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:layout_marginBottom="44dp"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline" >
+                <ProgressBar
+                    android:id="@+id/join_loader_progress"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </FrameLayout>
+
 
             <TextView
                 android:id="@+id/button_join_meeting"

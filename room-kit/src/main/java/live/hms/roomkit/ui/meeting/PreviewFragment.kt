@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
@@ -70,7 +71,7 @@ class PreviewFragment : Fragment() {
 
     private var setTextOnce = false
     private var isPreviewLoaded = false
-    private var nameEditText : String ? = null
+    private var nameEditText: String? = null
 
     override fun onResume() {
         super.onResume()
@@ -123,22 +124,6 @@ class PreviewFragment : Fragment() {
         settings = SettingsStore(requireContext())
 
         enableDisableJoinNowButton()
-//
-//        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
-//            if (it == RecordingState.STREAMING_AND_RECORDING) {
-//                binding.recordingText.text =
-//                    "The session you are about to join is live and being recorded"
-//                binding.recordingView.visibility = View.VISIBLE
-//            } else if (meetingViewModel.isHlsRunning()) {
-//                binding.recordingText.text = "The session you are about to join is live"
-//                binding.recordingView.visibility = View.VISIBLE
-//            } else if (meetingViewModel.isRTMPRunning()) {
-//                binding.recordingText.text = "The session you are about to join is live"
-//                binding.recordingView.visibility = View.VISIBLE
-//            } else {
-//                binding.recordingView.visibility = View.GONE
-//            }
-//        }
 
         meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
             HMSAudioManager.AudioManagerDeviceChangeListener {
@@ -209,8 +194,7 @@ class PreviewFragment : Fragment() {
                 AudioOutputSwitchBottomSheet({ audioDevice, isMuted ->
                     updateActionVolumeMenuIcon(audioDevice)
                 }).show(
-                    childFragmentManager,
-                    MeetingFragment.AudioSwitchBottomSheetTAG
+                    childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
 
 
@@ -276,12 +260,32 @@ class PreviewFragment : Fragment() {
                     meetingViewModel.updateNameInPreview(
                         binding.editTextName.text.toString().trim()
                     )
-                    findNavController().navigate(
-                        PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
-                    )
+
+                    //start meeting
+                    if (meetingViewModel.state.value is MeetingState.Disconnected) {
+                        meetingViewModel.startMeeting()
+                    }
                 }
             }
         }
+    }
+
+    private fun enableJoinLoader() {
+        binding.joinLoader.visibility = View.VISIBLE
+        binding.editContainerName.isEnabled = false
+        binding.editTextName.isEnabled = false
+    }
+
+    private fun disableJoinLoader() {
+        binding.joinLoader.visibility = View.INVISIBLE
+        binding.editContainerName.isEnabled = true
+        binding.editTextName.isEnabled = true
+    }
+
+    private fun navigateToMeeting() {
+        findNavController().navigate(
+            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
+        )
     }
 
     private fun updateActionVolumeMenuIcon(
@@ -341,6 +345,38 @@ class PreviewFragment : Fragment() {
 
     private fun initObservers() {
 
+        meetingViewModel.state.observe(viewLifecycleOwner) {
+            when (it) {
+                is MeetingState.Connecting, is MeetingState.Reconnecting, is MeetingState.Joining, is MeetingState.PublishingMedia -> {
+                    enableJoinLoader()
+                }
+
+                is MeetingState.Failure -> {
+                    disableJoinLoader()
+                    contextSafe { context, activity ->
+                        Toast.makeText(
+                            activity, "${it.exceptions}", Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                }
+
+                is MeetingState.ForceLeave -> {
+                    meetingViewModel.leaveMeeting()
+                    goToHomePage()
+                }
+
+                is MeetingState.Ongoing, is MeetingState.Reconnected -> {
+                    disableJoinLoader()
+                    navigateToMeeting()
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
         meetingViewModel.previewErrorLiveData.observe(viewLifecycleOwner) { error ->
             if (error.isTerminal) {
                 isPreviewLoaded = false
@@ -390,6 +426,8 @@ class PreviewFragment : Fragment() {
                     binding.editTextName.setText(
                         room.localPeer?.name.orEmpty(), TextView.BufferType.EDITABLE
                     )
+                    nameEditText = room.localPeer?.name.orEmpty()
+                    enableDisableJoinNowButton()
                     setTextOnce = true
                 }
                 isPreviewLoaded = true

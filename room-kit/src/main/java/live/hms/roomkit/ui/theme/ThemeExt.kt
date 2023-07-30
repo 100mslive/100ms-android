@@ -410,6 +410,20 @@ internal fun FragmentPreviewBinding.applyTheme() {
         R.drawable.blue_round_solid_drawable
     )
 
+    joinLoader.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDisabled,
+        HMSPrebuiltTheme.getDefaults().primary_disabled,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    joinLoaderProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
+
 
     editContainerName.boxStrokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
