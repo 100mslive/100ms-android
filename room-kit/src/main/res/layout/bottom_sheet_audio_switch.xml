@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="-16dp"
-    android:elevation="12dp"
-    app:cardBackgroundColor="#272A31"
-    app:cardCornerRadius="16dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent">
@@ -19,25 +15,28 @@
         android:orientation="vertical">
 
         <FrameLayout
-
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:paddingLeft="16dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp">
 
             <TextView
+                android:id="@+id/audio_ot"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
                 android:layout_gravity="center_vertical"
+                android:drawablePadding="8dp"
                 android:text="Audio Output"
                 android:textSize="21sp" />
 
             <ImageView
                 android:id="@+id/close_btn"
                 android:layout_width="24dp"
-                android:elevation="3dp"
                 android:layout_height="24dp"
                 android:layout_gravity="right"
+                android:layout_marginEnd="16dp"
+                android:elevation="3dp"
                 android:src="@drawable/ic_close_16"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -45,111 +44,127 @@
 
         </FrameLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/gray_line_vertical_divider" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/automatic_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_icon_speaker"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Automatic"
+            android:visibility="gone" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/gray_line_vertical_divider" />
+
+        <TextView
             android:id="@+id/earpiece_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:visibility="gone">
+            android:drawableStart="@drawable/phone"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Earpiece"
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_baseline_hearing_24"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="Earpiece" />
-
-        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
             android:background="@drawable/gray_line_vertical_divider" />
 
-        <LinearLayout
+
+        <TextView
             android:id="@+id/speaker_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:drawableStart="@drawable/ic_icon_speaker"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Speaker"
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_icon_speaker"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="Speaker" />
-
-        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
             android:background="@drawable/gray_line_vertical_divider" />
 
-        <LinearLayout
+
+        <TextView
             android:id="@+id/bluetooth_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            tools:visibility="visible"
-            android:visibility="gone">
+            android:drawableStart="@drawable/bt"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_baseline_bluetooth_24"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="Bluetooth" />
+            android:paddingVertical="20dp"
+            android:text="Bluetooth"
+            android:visibility="gone" />
 
-        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5px"
-            android:background="@drawable/gray_line_vertical_divider" />
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/gray_line_vertical_divider"
+            android:visibility="gone" />
 
-        <LinearLayout
+
+        <TextView
             android:id="@+id/wired_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:visibility="gone">
+            android:drawableStart="@drawable/wired"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Wired Headset"
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_baseline_headset_24"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="Wired Headset" />
-
-        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
             android:background="@drawable/gray_line_vertical_divider" />
 
 
-        <LinearLayout
+        <TextView
             android:id="@+id/mute_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:drawableStart="@drawable/ic_baseline_volume_mute_24"
+            android:drawablePadding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Mute"
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_baseline_volume_mute_24"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="Mute" />
-        </LinearLayout>
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</FrameLayout>

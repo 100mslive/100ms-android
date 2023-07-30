@@ -289,7 +289,7 @@ class PreviewFragment : Fragment() {
         binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
-                    setIconEnabled(R.drawable.ic_baseline_hearing_24)
+                    setIconEnabled(R.drawable.phone)
                 }
 
                 HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
@@ -301,11 +301,11 @@ class PreviewFragment : Fragment() {
                 }
 
                 HMSAudioManager.AudioDevice.BLUETOOTH -> {
-                    setIconEnabled(R.drawable.ic_baseline_bluetooth_24)
+                    setIconEnabled(R.drawable.bt)
                 }
 
                 HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
-                    setIconEnabled(R.drawable.ic_baseline_headset_24)
+                    setIconEnabled(R.drawable.wired)
                 }
 
                 else -> {
