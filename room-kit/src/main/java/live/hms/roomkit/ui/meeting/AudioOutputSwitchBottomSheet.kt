@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
+import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
@@ -54,7 +55,6 @@ class AudioOutputSwitchBottomSheet(
 
         var btnArray = arrayOf(
             binding.muteBtn,
-            binding.automaticBtn,
             binding.speakerBtn,
             binding.wiredBtn,
             binding.bluetoothBtn,
@@ -62,15 +62,27 @@ class AudioOutputSwitchBottomSheet(
             binding.audioOt
         )
 
-        btnArray.forEach {
-            it.setTextColor(
+        val borders = arrayOf(
+            binding.border1, binding.border2, binding.border3, binding.border4, binding.border5
+        )
+
+        borders.forEach {
+            it.setBackgroundColor(
                 getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                    HMSPrebuiltTheme.getColours()?.borderDefault,
+                    HMSPrebuiltTheme.getDefaults().border_bright
                 )
             )
         }
 
+
+
+        binding.closeBtn.drawable.setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
 
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
@@ -99,16 +111,29 @@ class AudioOutputSwitchBottomSheet(
                         binding.wiredBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
                     }
 
-                    AudioDevice.AUTOMATIC -> {
-                        binding.automaticBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
-                    }
-
                     else -> {
                         binding.speakerBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
                     }
                 }
             }
         }
+
+        btnArray.forEach {
+            it.setTextColor(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+
+            it.drawableEnd?.setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+        }
+
 
         if (devicesList.contains(AudioDevice.BLUETOOTH)) {
             binding.bluetoothBtn.visibility = View.VISIBLE
@@ -126,21 +151,18 @@ class AudioOutputSwitchBottomSheet(
             binding.speakerBtn.visibility = View.VISIBLE
         }
 
-        if (devicesList.contains(AudioDevice.AUTOMATIC)) {
-            binding.automaticBtn.visibility = View.VISIBLE
-        }
+
 
         if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() != true) {
             binding.wiredBtn.visibility = View.GONE
             binding.bluetoothBtn.visibility = View.GONE
             binding.earpieceBtn.visibility = View.GONE
-            binding.automaticBtn.visibility = View.GONE
+            binding.muteBtn.visibility = View.GONE
+        } else {
+            binding.muteBtn.visibility = View.VISIBLE
         }
 
 
-        binding.automaticBtn.setOnClickListener {
-            setAudioType(AudioDevice.AUTOMATIC)
-        }
 
 
         binding.speakerBtn.setOnClickListener {

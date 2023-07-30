@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="-16dp"
+    android:paddingBottom="32dp"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent">
@@ -27,8 +28,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:drawablePadding="8dp"
+                android:fontFamily="@font/inter_semibold"
                 android:text="Audio Output"
-                android:textSize="21sp" />
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/close_btn"
@@ -44,27 +46,9 @@
 
         </FrameLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.5px"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/gray_line_vertical_divider" />
-
-        <TextView
-            android:id="@+id/automatic_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_icon_speaker"
-            android:drawablePadding="8dp"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="20dp"
-            android:text="Automatic"
-            android:visibility="gone" />
-
 
         <View
+            android:id="@+id/border5"
             android:layout_width="match_parent"
             android:layout_height="0.5px"
             android:layout_marginHorizontal="16dp"
@@ -74,6 +58,7 @@
             android:id="@+id/earpiece_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
             android:drawableStart="@drawable/phone"
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
@@ -84,6 +69,7 @@
 
 
         <View
+            android:id="@+id/border4"
             android:layout_width="match_parent"
             android:layout_height="0.5px"
             android:layout_marginHorizontal="16dp"
@@ -93,6 +79,7 @@
         <TextView
             android:id="@+id/speaker_btn"
             android:layout_width="match_parent"
+            android:fontFamily="@font/inter_semibold"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_icon_speaker"
             android:drawablePadding="8dp"
@@ -104,8 +91,10 @@
 
 
         <View
+            android:id="@+id/border3"
             android:layout_width="match_parent"
             android:layout_height="0.5px"
+            android:fontFamily="@font/inter_semibold"
             android:layout_marginHorizontal="16dp"
             android:background="@drawable/gray_line_vertical_divider" />
 
@@ -118,13 +107,14 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
-
+            android:fontFamily="@font/inter_semibold"
             android:paddingVertical="20dp"
             android:text="Bluetooth"
             android:visibility="gone" />
 
 
         <View
+            android:id="@+id/border2"
             android:layout_width="match_parent"
             android:layout_height="0.5px"
             android:layout_marginHorizontal="16dp"
@@ -137,6 +127,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/wired"
+            android:fontFamily="@font/inter_semibold"
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
@@ -146,6 +137,7 @@
 
 
         <View
+            android:id="@+id/border1"
             android:layout_width="match_parent"
             android:layout_height="0.5px"
             android:layout_marginHorizontal="16dp"
@@ -160,6 +152,7 @@
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
+            android:fontFamily="@font/inter_semibold"
             android:paddingVertical="20dp"
             android:text="Mute"
             android:visibility="gone" />
