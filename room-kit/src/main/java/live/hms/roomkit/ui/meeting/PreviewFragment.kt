@@ -69,6 +69,8 @@ class PreviewFragment : Fragment() {
     private var participantsDialogAdapter: ParticipantsAdapter? = null
 
     private var setTextOnce = false
+    private var isPreviewLoaded = false
+    private var nameEditText : String ? = null
 
     override fun onResume() {
         super.onResume()
@@ -105,13 +107,22 @@ class PreviewFragment : Fragment() {
         binding.previewView.removeTrack()
     }
 
+    private fun enableDisableJoinNowButton() {
+        if (isPreviewLoaded && nameEditText.isNullOrEmpty().not()) {
+            binding.buttonJoinMeeting.buttonEnabled()
+        } else {
+            binding.buttonJoinMeeting.buttonDisabled()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
-        binding.buttonJoinMeeting.buttonDisabled()
+
+        enableDisableJoinNowButton()
 //
 //        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
 //            if (it == RecordingState.STREAMING_AND_RECORDING) {
@@ -210,15 +221,6 @@ class PreviewFragment : Fragment() {
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             if (it.isEnabled) track?.video.switchCamera()
         }
-
-//        meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
-//            binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
-//            binding.buttonSwitchCamera.visibility = if (allowed) View.VISIBLE else View.GONE
-//        }
-//
-//        meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
-//            binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
-//        }
 
 
         binding.buttonToggleVideo.apply {
@@ -341,7 +343,8 @@ class PreviewFragment : Fragment() {
 
         meetingViewModel.previewErrorLiveData.observe(viewLifecycleOwner) { error ->
             if (error.isTerminal) {
-                binding.buttonJoinMeeting.buttonDisabled()
+                isPreviewLoaded = false
+                enableDisableJoinNowButton()
                 AlertDialog.Builder(requireContext()).setTitle(error.name)
                     .setMessage(error.toString()).setCancelable(false)
                     .setPositiveButton(R.string.ok) { dialog, _ ->
@@ -389,8 +392,8 @@ class PreviewFragment : Fragment() {
                     )
                     setTextOnce = true
                 }
-
-                binding.buttonJoinMeeting.buttonEnabled()
+                isPreviewLoaded = true
+                enableDisableJoinNowButton()
 
                 track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {
@@ -418,6 +421,8 @@ class PreviewFragment : Fragment() {
                         binding.nameInitials.text = ""
                         binding.noNameIv.visibility = View.VISIBLE
                     }
+                    nameEditText = text.toString()
+                    enableDisableJoinNowButton()
                 }
 
                 // Disable buttons
@@ -426,8 +431,12 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track?.video != null)
 
                         if (it.isMute) {
+                            binding.buttonSwitchCamera.alpha = 0.5f
+                            binding.buttonSwitchCamera.isEnabled = false
                             setIconDisabled(R.drawable.avd_video_on_to_off)
                         } else {
+                            binding.buttonSwitchCamera.alpha = 1f
+                            binding.buttonSwitchCamera.isEnabled = true
                             setIconEnabled(R.drawable.avd_video_off_to_on)
                         }
                     }

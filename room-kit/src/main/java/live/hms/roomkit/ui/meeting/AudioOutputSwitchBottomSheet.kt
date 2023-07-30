@@ -9,6 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.drawableEnd
+import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
@@ -112,7 +113,7 @@ class AudioOutputSwitchBottomSheet(
                     }
 
                     else -> {
-                        binding.speakerBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
+                        binding.muteBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
                     }
                 }
             }
@@ -127,6 +128,13 @@ class AudioOutputSwitchBottomSheet(
             )
 
             it.drawableEnd?.setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+
+            it.drawableStart?.setTint(
                 getColorOrDefault(
                     HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
                     HMSPrebuiltTheme.getDefaults().onsurface_high_emp
