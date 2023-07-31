@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
@@ -69,6 +70,8 @@ class PreviewFragment : Fragment() {
     private var participantsDialogAdapter: ParticipantsAdapter? = null
 
     private var setTextOnce = false
+    private var isPreviewLoaded = false
+    private var nameEditText: String? = null
 
     override fun onResume() {
         super.onResume()
@@ -105,29 +108,22 @@ class PreviewFragment : Fragment() {
         binding.previewView.removeTrack()
     }
 
+    private fun enableDisableJoinNowButton() {
+        if (isPreviewLoaded && nameEditText.isNullOrEmpty().not()) {
+            binding.buttonJoinMeeting.buttonEnabled()
+        } else {
+            binding.buttonJoinMeeting.buttonDisabled()
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
-        binding.buttonJoinMeeting.buttonDisabled()
-//
-//        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
-//            if (it == RecordingState.STREAMING_AND_RECORDING) {
-//                binding.recordingText.text =
-//                    "The session you are about to join is live and being recorded"
-//                binding.recordingView.visibility = View.VISIBLE
-//            } else if (meetingViewModel.isHlsRunning()) {
-//                binding.recordingText.text = "The session you are about to join is live"
-//                binding.recordingView.visibility = View.VISIBLE
-//            } else if (meetingViewModel.isRTMPRunning()) {
-//                binding.recordingText.text = "The session you are about to join is live"
-//                binding.recordingView.visibility = View.VISIBLE
-//            } else {
-//                binding.recordingView.visibility = View.GONE
-//            }
-//        }
+
+        enableDisableJoinNowButton()
 
         meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
             HMSAudioManager.AudioManagerDeviceChangeListener {
@@ -198,8 +194,7 @@ class PreviewFragment : Fragment() {
                 AudioOutputSwitchBottomSheet({ audioDevice, isMuted ->
                     updateActionVolumeMenuIcon(audioDevice)
                 }).show(
-                    childFragmentManager,
-                    MeetingFragment.AudioSwitchBottomSheetTAG
+                    childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
 
 
@@ -210,15 +205,6 @@ class PreviewFragment : Fragment() {
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             if (it.isEnabled) track?.video.switchCamera()
         }
-
-//        meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
-//            binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
-//            binding.buttonSwitchCamera.visibility = if (allowed) View.VISIBLE else View.GONE
-//        }
-//
-//        meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
-//            binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
-//        }
 
 
         binding.buttonToggleVideo.apply {
@@ -274,12 +260,32 @@ class PreviewFragment : Fragment() {
                     meetingViewModel.updateNameInPreview(
                         binding.editTextName.text.toString().trim()
                     )
-                    findNavController().navigate(
-                        PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
-                    )
+
+                    //start meeting
+                    if (meetingViewModel.state.value is MeetingState.Disconnected) {
+                        meetingViewModel.startMeeting()
+                    }
                 }
             }
         }
+    }
+
+    private fun enableJoinLoader() {
+        binding.joinLoader.visibility = View.VISIBLE
+        binding.editContainerName.isEnabled = false
+        binding.editTextName.isEnabled = false
+    }
+
+    private fun disableJoinLoader() {
+        binding.joinLoader.visibility = View.INVISIBLE
+        binding.editContainerName.isEnabled = true
+        binding.editTextName.isEnabled = true
+    }
+
+    private fun navigateToMeeting() {
+        findNavController().navigate(
+            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
+        )
     }
 
     private fun updateActionVolumeMenuIcon(
@@ -289,7 +295,7 @@ class PreviewFragment : Fragment() {
         binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
-                    setIconEnabled(R.drawable.ic_baseline_hearing_24)
+                    setIconEnabled(R.drawable.phone)
                 }
 
                 HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
@@ -301,11 +307,11 @@ class PreviewFragment : Fragment() {
                 }
 
                 HMSAudioManager.AudioDevice.BLUETOOTH -> {
-                    setIconEnabled(R.drawable.ic_baseline_bluetooth_24)
+                    setIconEnabled(R.drawable.bt)
                 }
 
                 HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
-                    setIconEnabled(R.drawable.ic_baseline_headset_24)
+                    setIconEnabled(R.drawable.wired)
                 }
 
                 else -> {
@@ -339,9 +345,42 @@ class PreviewFragment : Fragment() {
 
     private fun initObservers() {
 
+        meetingViewModel.state.observe(viewLifecycleOwner) {
+            when (it) {
+                is MeetingState.Connecting, is MeetingState.Reconnecting, is MeetingState.Joining, is MeetingState.PublishingMedia -> {
+                    enableJoinLoader()
+                }
+
+                is MeetingState.Failure -> {
+                    disableJoinLoader()
+                    contextSafe { context, activity ->
+                        Toast.makeText(
+                            activity, "${it.exceptions}", Toast.LENGTH_LONG
+                        ).show()
+                    }
+
+                }
+
+                is MeetingState.ForceLeave -> {
+                    meetingViewModel.leaveMeeting()
+                    goToHomePage()
+                }
+
+                is MeetingState.Ongoing, is MeetingState.Reconnected -> {
+                    disableJoinLoader()
+                    navigateToMeeting()
+                }
+
+                else -> {
+
+                }
+            }
+        }
+
         meetingViewModel.previewErrorLiveData.observe(viewLifecycleOwner) { error ->
             if (error.isTerminal) {
-                binding.buttonJoinMeeting.buttonDisabled()
+                isPreviewLoaded = false
+                enableDisableJoinNowButton()
                 AlertDialog.Builder(requireContext()).setTitle(error.name)
                     .setMessage(error.toString()).setCancelable(false)
                     .setPositiveButton(R.string.ok) { dialog, _ ->
@@ -387,10 +426,12 @@ class PreviewFragment : Fragment() {
                     binding.editTextName.setText(
                         room.localPeer?.name.orEmpty(), TextView.BufferType.EDITABLE
                     )
+                    nameEditText = room.localPeer?.name.orEmpty()
+                    enableDisableJoinNowButton()
                     setTextOnce = true
                 }
-
-                binding.buttonJoinMeeting.buttonEnabled()
+                isPreviewLoaded = true
+                enableDisableJoinNowButton()
 
                 track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {
@@ -418,6 +459,8 @@ class PreviewFragment : Fragment() {
                         binding.nameInitials.text = ""
                         binding.noNameIv.visibility = View.VISIBLE
                     }
+                    nameEditText = text.toString()
+                    enableDisableJoinNowButton()
                 }
 
                 // Disable buttons
@@ -426,8 +469,12 @@ class PreviewFragment : Fragment() {
                         isEnabled = (track?.video != null)
 
                         if (it.isMute) {
+                            binding.buttonSwitchCamera.alpha = 0.5f
+                            binding.buttonSwitchCamera.isEnabled = false
                             setIconDisabled(R.drawable.avd_video_on_to_off)
                         } else {
+                            binding.buttonSwitchCamera.alpha = 1f
+                            binding.buttonSwitchCamera.isEnabled = true
                             setIconEnabled(R.drawable.avd_video_off_to_on)
                         }
                     }

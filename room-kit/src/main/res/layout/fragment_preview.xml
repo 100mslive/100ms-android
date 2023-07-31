@@ -23,7 +23,7 @@
         android:elevation="0dp"
         app:cardBackgroundColor="@android:color/transparent"
         app:cardCornerRadius="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/video_guideline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -141,7 +141,7 @@
     <TextView
         android:id="@+id/icon_participants"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
@@ -218,13 +218,13 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/button_network_quality"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="36dp"
+        android:layout_height="28dp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:elevation="10dp"
         app:cardCornerRadius="8dp"
-        app:layout_constraintBottom_toBottomOf="@id/video_card_container"
+        app:layout_constraintBottom_toBottomOf="@id/video_guideline"
         app:layout_constraintStart_toStartOf="@id/video_card_container">
 
         <ImageView
@@ -314,12 +314,12 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/edit_container_name"
-                style="@style/TextInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="0dp"
                 android:layout_marginTop="-4dp"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginBottom="44dp"
+                android:textCursorDrawable="@drawable/cursor_drawable"
                 app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
                 app:layout_constraintEnd_toStartOf="@id/btn_txt_guideline"
                 app:layout_constraintStart_toStartOf="parent">
@@ -328,12 +328,36 @@
                     android:id="@+id/edit_text_name"
                     android:layout_width="match_parent"
                     android:maxLines="1"
-                    android:background="@drawable/focused_text"
+                    android:textCursorDrawable="@drawable/cursor_drawable"
                     android:layout_height="wrap_content"
                     android:hint="Enter Name"
                     android:inputType="textPersonName" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
+            <FrameLayout
+                android:elevation="8dp"
+                android:visibility="invisible"
+                android:id="@+id/join_loader"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/blue_round_solid_drawable"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:layout_marginBottom="44dp"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline" >
+                <ProgressBar
+                    android:id="@+id/join_loader_progress"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </FrameLayout>
 
 
             <TextView

@@ -292,7 +292,7 @@ class MeetingFragment : Fragment() {
         item.apply {
             when (audioDevice) {
                 AudioDevice.EARPIECE -> {
-                    setIcon(R.drawable.ic_baseline_hearing_24)
+                    setIcon(R.drawable.phone)
                 }
                 AudioDevice.SPEAKER_PHONE -> {
                     setIcon(R.drawable.ic_icon_speaker)
@@ -301,10 +301,10 @@ class MeetingFragment : Fragment() {
                     setIcon(R.drawable.ic_icon_speaker)
                 }
                 AudioDevice.BLUETOOTH -> {
-                    setIcon(R.drawable.ic_baseline_bluetooth_24)
+                    setIcon(R.drawable.bt)
                 }
                 AudioDevice.WIRED_HEADSET -> {
-                    setIcon(R.drawable.ic_baseline_headset_24)
+                    setIcon(R.drawable.wired)
                 }
                 else -> {
                     setIcon(R.drawable.ic_volume_off_24)

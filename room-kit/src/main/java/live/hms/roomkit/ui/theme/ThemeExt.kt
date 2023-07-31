@@ -35,10 +35,13 @@ object HMSPrebuiltTheme {
 
         this.theme = theme.copy(
             backgroundDim = "#000000",
+            primaryDefault = "#2572ED",
             borderBright = "#272A31",
             onSurfaceHigh = "#EFF0FA",
             secondaryDim = "#293042",
             backgroundDefault = "#0B0E15",
+            onPrimaryLow = "#84AAFF",
+            primaryDisabled = "#004299"
         )
     }
 
@@ -177,7 +180,7 @@ internal fun TextView.buttonDisabled() {
 
     this.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.primaryDisabled,
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
             HMSPrebuiltTheme.getDefaults().onprimary_low_emp
         )
     )
@@ -407,11 +410,20 @@ internal fun FragmentPreviewBinding.applyTheme() {
         R.drawable.blue_round_solid_drawable
     )
 
-
-    editContainerName.boxBackgroundColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
-        HMSPrebuiltTheme.getDefaults().surface_default
+    joinLoader.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDisabled,
+        HMSPrebuiltTheme.getDefaults().primary_disabled,
+        R.drawable.blue_round_solid_drawable
     )
+
+    joinLoaderProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
+
 
     editContainerName.boxStrokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
@@ -424,6 +436,9 @@ internal fun FragmentPreviewBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_low_emp
         )
     )
+
+
+    editTextName.isCursorVisible = true
 
     editTextName.setTextColor(
         getColorOrDefault(
