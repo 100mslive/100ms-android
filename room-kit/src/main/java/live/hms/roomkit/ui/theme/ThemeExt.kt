@@ -204,6 +204,20 @@ internal fun FragmentMeetingBinding.applyTheme() {
         R.drawable.ic_icon_end_call
     )
 
+    meetingFragmentProgress?.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
+    meetingFragmentProgressBar?.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
 
     progressBar.containerCardProgressBar.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
