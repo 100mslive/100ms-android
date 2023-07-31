@@ -1491,7 +1491,7 @@ class MeetingViewModel(
     fun startHls(hlsUrl: String?, recordingConfig: HMSHlsRecordingConfig) {
         val meetingVariants = if (hlsUrl.isNullOrBlank()) {
             null
-        } else listOf(HMSHLSMeetingURLVariant(hlsUrl))
+        } else null
 
         val config = HMSHLSConfig(
             meetingVariants,

@@ -25,6 +25,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
@@ -262,6 +263,8 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
                 if (this.isEnabled) {
+                    hideKeyboard()
+
                     meetingViewModel.updateNameInPreview(
                         binding.editTextName.text.toString().trim()
                     )
