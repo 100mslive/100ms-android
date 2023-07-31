@@ -106,6 +106,7 @@ class MeetingActivity : AppCompatActivity() {
   private val requestPermissionLauncher = registerForActivityResult(
     ActivityResultContracts.RequestMultiplePermissions()
   ) {
+    // Do not prevent joining if bluetooth connect is denied.
     if(it.filterKeys { key -> key != BLUETOOTH_CONNECT }.values.all { granted -> granted })
       meetingViewModel.permissionGranted()
     else {
