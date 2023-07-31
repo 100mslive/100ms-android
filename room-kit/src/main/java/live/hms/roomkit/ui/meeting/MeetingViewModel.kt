@@ -80,7 +80,8 @@ class MeetingViewModel(
 
     val hmsSDK = HMSSDK
         .Builder(application)
-//        .setFrameworkInfo(FrameworkInfo(isPrebuilt = true))
+        .haltPreviewJoinForPermissionsRequest(true)
+        .setFrameworkInfo(FrameworkInfo(isPrebuilt = true))
         .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
         .setLogSettings(hmsLogSettings)
         .build()
@@ -342,7 +343,7 @@ class MeetingViewModel(
                 previewErrorData.postValue(error)
             }
 
-            override fun requestPermission(permissions : List<String>) {
+            override fun requestPermissions(permissions : List<String>) {
                 viewModelScope.launch {
                     _events.emit(Event.RequestPermission(permissions.toTypedArray()))
                 }
