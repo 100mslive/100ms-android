@@ -284,7 +284,7 @@ class PreviewFragment : Fragment() {
 
     private fun navigateToMeeting() {
         findNavController().navigate(
-            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
+            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(false)
         )
     }
 
