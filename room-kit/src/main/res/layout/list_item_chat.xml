@@ -3,14 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="30dp"
-    android:background="@color/primary_bg">
+    android:layout_marginBottom="30dp">
 
     <View
         android:id="@+id/blue_bar"
         android:layout_width="4dp"
         android:layout_height="0dp"
-        android:background="@color/primary_blue"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

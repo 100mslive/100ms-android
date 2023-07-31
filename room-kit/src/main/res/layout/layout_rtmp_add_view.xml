@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/primary_bg"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toTopOf="parent"
     tools:context=".ui.meeting.MeetingActivity">
@@ -26,7 +25,6 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_semibold"
                 android:text="Stream 1"
-                android:textColor="@color/white"
                 android:textSize="16sp" />
 
             <Space
@@ -69,8 +67,7 @@
             android:hint="RTMP URL"
             android:text="rtmp://bom01.contribute.live-video.net/app/"
             android:paddingHorizontal="10dp"
-            android:paddingVertical="10dp"
-            android:textColor="@color/muted_text" />
+            android:paddingVertical="10dp" />
 
         <TextView
             android:id="@+id/streaming_url_title"
@@ -91,8 +88,7 @@
             android:hint="Streaming url"
             android:text="live_739264700_ANrHsQbCzlLmf6LjtHV7Cc8AKcozWC"
             android:paddingHorizontal="10dp"
-            android:paddingVertical="10dp"
-            android:textColor="@color/muted_text" />
+            android:paddingVertical="10dp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

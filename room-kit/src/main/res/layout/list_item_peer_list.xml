@@ -61,7 +61,7 @@
             android:layout_marginLeft="4dp"
             android:contentDescription="@string/screen_share"
             android:src="@drawable/ic_mobile_screen_share_24"
-            app:tint="@color/white_faded_70" />
+             />
 
         <ImageView
             android:id="@+id/icon_video_off"
@@ -70,8 +70,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
             android:contentDescription="@string/video_status"
-            android:src="@drawable/ic_videocam_off_24"
-            app:tint="@color/white_faded_70" />
+            android:src="@drawable/ic_videocam_off_24" />
 
         <ImageView
             android:id="@+id/icon_audio_off"
@@ -81,7 +80,7 @@
             android:layout_marginLeft="8dp"
             android:contentDescription="@string/audio_status"
             android:src="@drawable/ic_mic_off_24"
-            app:tint="@color/white_faded_70" />
+             />
 
         <ImageButton
             android:id="@+id/peerSettings"

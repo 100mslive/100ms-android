@@ -7,7 +7,6 @@ import android.app.RemoteAction
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
 import android.graphics.drawable.Icon
 import android.media.projection.MediaProjectionManager
 import android.os.Build
@@ -23,6 +22,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -50,6 +50,10 @@ import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
+import live.hms.roomkit.ui.theme.*
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.roomkit.ui.theme.setIconTintColor
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.audio.HMSAudioManager.AudioDevice
@@ -143,12 +147,7 @@ class MeetingFragment : Fragment() {
 
                     override fun onSuccess() {
                         // success
-                        binding.buttonShareScreen?.apply {
-                            background = ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.gray_round_solid_drawable
-                            )
-                        }
+                        binding.buttonShareScreen?.setIconEnabled(R.drawable.ic_share_screen)
                     }
                 })
             }
@@ -268,12 +267,7 @@ class MeetingFragment : Fragment() {
 
                     override fun onSuccess() {
                         //success
-                        binding.buttonShareScreen?.apply {
-                            background = ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.gray_round_stroked_drawable
-                            )
-                        }
+                        binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
                     }
                 })
             }
@@ -298,7 +292,7 @@ class MeetingFragment : Fragment() {
         item.apply {
             when (audioDevice) {
                 AudioDevice.EARPIECE -> {
-                    setIcon(R.drawable.ic_baseline_hearing_24)
+                    setIcon(R.drawable.phone)
                 }
                 AudioDevice.SPEAKER_PHONE -> {
                     setIcon(R.drawable.ic_icon_speaker)
@@ -307,10 +301,10 @@ class MeetingFragment : Fragment() {
                     setIcon(R.drawable.ic_icon_speaker)
                 }
                 AudioDevice.BLUETOOTH -> {
-                    setIcon(R.drawable.ic_baseline_bluetooth_24)
+                    setIcon(R.drawable.bt)
                 }
                 AudioDevice.WIRED_HEADSET -> {
-                    setIcon(R.drawable.ic_baseline_headset_24)
+                    setIcon(R.drawable.wired)
                 }
                 else -> {
                     setIcon(R.drawable.ic_volume_off_24)
@@ -418,6 +412,7 @@ class MeetingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.applyTheme()
         initViewModel()
         setHasOptionsMenu(true)
         setupConfiguration()
@@ -433,15 +428,9 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
-                binding.buttonRaiseHand?.background = ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.gray_round_solid_drawable
-                )
+                binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
             } else {
-                binding.buttonRaiseHand?.background = ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.gray_round_stroked_drawable
-                )
+                binding.buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
             }
         }
 
@@ -776,19 +765,11 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
-            (binding.buttonToggleVideo as? AppCompatImageView)?.apply {
+            (binding.buttonToggleVideo as? AppCompatImageButton)?.apply {
                 if (enabled) {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_stroked_drawable
-                    )
-                    setImageResource(R.drawable.ic_camera_toggle_on)
+                    setIconEnabled(R.drawable.ic_camera_toggle_on)
                 } else {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_solid_drawable
-                    )
-                    setImageResource(R.drawable.ic_camera_toggle_off)
+                    setIconDisabled(R.drawable.ic_camera_toggle_off)
                 }
             }
         }
@@ -797,20 +778,12 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
             updatePipMicState(isMicOn = enabled)
-            (binding.buttonToggleAudio as? AppCompatImageView)?.apply {
+            (binding.buttonToggleAudio as? AppCompatImageButton)?.apply {
 
                 if (enabled) {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_stroked_drawable
-                    )
-                    setImageResource(R.drawable.ic_audio_toggle_on)
+                    setIconEnabled(R.drawable.ic_audio_toggle_on)
                 } else {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_solid_drawable
-                    )
-                    setImageResource(R.drawable.ic_audio_toggle_off)
+                    setIconDisabled(R.drawable.ic_audio_toggle_off)
                 }
             }
         }
@@ -981,9 +954,9 @@ class MeetingFragment : Fragment() {
 
         if (meetingViewModel.isPrebuiltDebugMode().not()) {
             //temp
-            binding.buttonShareScreen?.apply {
-                setImageResource(R.drawable.ic_chat_message)
-            }
+            binding.buttonShareScreen?.setIconEnabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
         }
 
         binding.buttonShareScreen?.apply {
@@ -1107,13 +1080,7 @@ class MeetingFragment : Fragment() {
             }
 
             override fun onSuccess() {
-                //success
-                binding.buttonShareScreen?.apply {
-                    background = ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.gray_round_stroked_drawable
-                    )
-                }
+                binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
             }
         })
     }
@@ -1260,15 +1227,15 @@ class MeetingFragment : Fragment() {
         params.gravity = Gravity.TOP or Gravity.LEFT
         dialog.window!!.attributes = params
         dialog.window?.setDimAmount(0f)
-        dialog.window?.setBackgroundDrawableResource(R.color.primary_bg)
 
         dialog.window?.attributes?.flags =
             dialog.window?.attributes?.flags?.and((WindowManager.LayoutParams.FLAG_DIM_BEHIND).inv())
 
         dialog.show()
 
-        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
+        dialog.findViewById<View>(R.id.parent_view)?.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().surface_dim)
 
+        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
             if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
                 text = "Leave Meeting"
             } else {
@@ -1323,10 +1290,12 @@ class MeetingFragment : Fragment() {
                 val endSessionDialog = Dialog(requireContext())
                 endSessionDialog.setContentView(R.layout.exit_confirmation_dialog)
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title).text = "End Session"
-                endSessionDialog.findViewById<FrameLayout>(R.id.parent_view)
-                    .setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.dark_red))
+                endSessionDialog.findViewById<FrameLayout>(R.id.parent_view).setBackgroundAndColor(
+                    HMSPrebuiltTheme.getColours()?.alertErrorBright,
+                    HMSPrebuiltTheme.getDefaults().error_default
+                )
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title)
-                    .setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                    .setTextColor(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertSuccess, HMSPrebuiltTheme.getDefaults().error_default))
 
                 endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
                     setCompoundDrawablesWithIntrinsicBounds(

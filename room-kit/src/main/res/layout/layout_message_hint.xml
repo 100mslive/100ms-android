@@ -10,7 +10,6 @@
     android:layout_marginTop="10dp"
     android:layout_marginBottom="10dp"
     android:visibility="gone"
-    app:cardBackgroundColor="@color/gray_color"
     app:cardCornerRadius="5dp">
 
     <LinearLayout
