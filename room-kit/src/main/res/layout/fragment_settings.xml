@@ -288,6 +288,14 @@
             android:text="@string/is_prebuilt_debug_enabled"
             android:visibility="visible" />
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/go_live_in_prebuilt_debug_enabled"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/is_prebuilt_debug_enabled"
+            android:visibility="visible" />
+
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_use_hardware_echo_cancellation"

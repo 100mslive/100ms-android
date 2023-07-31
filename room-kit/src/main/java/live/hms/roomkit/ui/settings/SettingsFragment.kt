@@ -501,6 +501,12 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
+        settings.goLiveInPrebuilt,
+        goLiveInPrebuiltDebugEnabled
+      ) { commitHelper.setGOLiveInPrebuilt(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
         settings.forceSoftwareDecoder,
         forceSoftwareDecoder
       ) { commitHelper.setForceSoftwareDecoder(it) }

@@ -76,7 +76,7 @@ class PreviewFragment : Fragment() {
     private var nameEditText: String? = null
 
     //TODO get from the config api
-    private var startLiveStreamIng = false
+    private val startLiveStreamIng by lazy { meetingViewModel.isGoLiveInPreBuiltEnabled() }
 
     override fun onResume() {
         super.onResume()

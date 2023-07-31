@@ -242,6 +242,8 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
+    fun isGoLiveInPreBuiltEnabled() = settings.goLiveInPrebuilt
+
     // Title at the top of the meeting
     val title = MutableLiveData<Int>()
     fun setTitle(@StringRes resId: Int) {
