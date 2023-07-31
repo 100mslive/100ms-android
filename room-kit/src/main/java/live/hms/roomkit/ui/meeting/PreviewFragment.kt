@@ -23,7 +23,9 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.drawableStart
 import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -72,6 +74,9 @@ class PreviewFragment : Fragment() {
     private var setTextOnce = false
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
+
+    //TODO get from the config api
+    private var startLiveStreamIng = false
 
     override fun onResume() {
         super.onResume()
@@ -284,7 +289,7 @@ class PreviewFragment : Fragment() {
 
     private fun navigateToMeeting() {
         findNavController().navigate(
-            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(false)
+            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(startLiveStreamIng)
         )
     }
 
@@ -481,9 +486,16 @@ class PreviewFragment : Fragment() {
                 }
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
-                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode()
-                            .not()
-                    ) "Join Now" else "Enter Meeting"
+                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode()) {
+                        "Enter Meeting"
+                    }
+                    else if (startLiveStreamIng) {
+                        binding.buttonJoinMeeting.setDrawables(start = ContextCompat.getDrawable(context!!, R.drawable.ic_live))
+                        enableDisableJoinNowButton()
+                        "Go LIve"
+                    } else {
+                        "Join Now"
+                    }
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
                 } else {
