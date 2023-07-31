@@ -101,13 +101,6 @@ class MeetingFragment : Fragment() {
     private var alertDialog: AlertDialog? = null
 
     private var isMeetingOngoing = false
-    private val goLiveBottomSheet by lazy {
-        HlsStreamingToggleBottomSheet(meetingUrl = settings.lastUsedMeetingUrl) {
-            if (it) {
-//                binding.buttonGoLive?.visibility = View.GONE
-            }
-        }
-    }
 
     private val rtmpBottomSheet by lazy {
         RtmpRecordBottomSheet {
