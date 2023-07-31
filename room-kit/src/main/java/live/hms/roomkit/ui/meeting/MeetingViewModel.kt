@@ -25,6 +25,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
+import live.hms.video.events.AgentType
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.sdk.*
@@ -81,7 +82,7 @@ class MeetingViewModel(
     val hmsSDK = HMSSDK
         .Builder(application)
         .haltPreviewJoinForPermissionsRequest(true)
-        .setFrameworkInfo(FrameworkInfo(isPrebuilt = true))
+        .setFrameworkInfo(FrameworkInfo(framework = AgentType.ANDROID_NATIVE, isPrebuilt = true))
         .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
         .setLogSettings(hmsLogSettings)
         .build()
