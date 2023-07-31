@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import android.Manifest.permission.BLUETOOTH_CONNECT
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -105,7 +106,7 @@ class MeetingActivity : AppCompatActivity() {
   private val requestPermissionLauncher = registerForActivityResult(
     ActivityResultContracts.RequestMultiplePermissions()
   ) {
-    if(it.values.all { granted -> granted })
+    if(it.filterKeys { key -> key != BLUETOOTH_CONNECT }.values.all { granted -> granted })
       meetingViewModel.permissionGranted()
     else {
       // Leave the meeting
