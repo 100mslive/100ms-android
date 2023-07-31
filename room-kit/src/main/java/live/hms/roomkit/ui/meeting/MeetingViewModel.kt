@@ -19,7 +19,6 @@ import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
-import live.hms.roomkit.ui.permission.PermissionFragment
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
@@ -40,10 +39,8 @@ import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
-import live.hms.video.utils.GsonUtils.gson
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import live.hms.video.utils.toJsonObject
 import java.util.*
 
 
