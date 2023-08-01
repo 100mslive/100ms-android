@@ -341,7 +341,7 @@ class MeetingViewModel(
                 previewErrorData.postValue(error)
             }
 
-            override fun requestPermissions(permissions : List<String>) {
+            override fun onPermissionsRequested(permissions : List<String>) {
                 viewModelScope.launch {
                     _events.emit(Event.RequestPermission(permissions.toTypedArray()))
                 }
