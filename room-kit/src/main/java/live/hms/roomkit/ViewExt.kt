@@ -12,10 +12,12 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
+import androidx.fragment.app.Fragment
 import live.hms.roomkit.R
 import live.hms.roomkit.helpers.OnSingleClickListener
 import live.hms.video.media.capturers.camera.CameraControl
@@ -79,6 +81,19 @@ private val TextView.drawables: Array<Drawable?>
 
  fun TextView.setDrawables(start: Drawable? = drawableStart, top: Drawable? = drawableTop, end: Drawable? = drawableEnd, bottom: Drawable? = drawableBottom) {
         setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom)
+}
+
+fun Fragment.hideKeyboard() {
+    view?.let { activity?.hideKeyboard(it) }
+}
+
+fun Activity.hideKeyboard() {
+    hideKeyboard(currentFocus ?: View(this))
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
 fun Context.drawabless(@DrawableRes id: Int): Drawable {

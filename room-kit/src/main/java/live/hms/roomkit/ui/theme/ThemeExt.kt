@@ -21,6 +21,7 @@ import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.VideoCardBinding
+import live.hms.roomkit.drawableStart
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -171,6 +172,13 @@ internal fun TextView.buttonEnabled() {
         HMSPrebuiltTheme.getDefaults().primary_default,
         R.drawable.blue_round_solid_drawable
     )
+
+    this.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
 }
 
 internal fun TextView.buttonDisabled() {
@@ -189,6 +197,14 @@ internal fun TextView.buttonDisabled() {
         HMSPrebuiltTheme.getDefaults().primary_disabled,
         R.drawable.blue_round_solid_drawable
     )
+
+    this.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
 }
 
 
@@ -201,6 +217,20 @@ internal fun FragmentMeetingBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
         R.drawable.ic_icon_end_call
+    )
+
+    meetingFragmentProgress?.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
+    meetingFragmentProgressBar?.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
     )
 
 

@@ -23,7 +23,10 @@ import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.drawableStart
 import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.roomkit.hideKeyboard
+import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -39,6 +42,7 @@ import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.sdk.models.role.PublishParams
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 
@@ -72,6 +76,9 @@ class PreviewFragment : Fragment() {
     private var setTextOnce = false
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
+
+    //TODO get from the config api
+    private val startLiveStreamIng by lazy { meetingViewModel.isGoLiveInPreBuiltEnabled() }
 
     override fun onResume() {
         super.onResume()
@@ -257,6 +264,8 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
                 if (this.isEnabled) {
+                    hideKeyboard()
+
                     meetingViewModel.updateNameInPreview(
                         binding.editTextName.text.toString().trim()
                     )
@@ -284,7 +293,7 @@ class PreviewFragment : Fragment() {
 
     private fun navigateToMeeting() {
         findNavController().navigate(
-            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment()
+            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(startLiveStreamIng)
         )
     }
 
@@ -418,7 +427,8 @@ class PreviewFragment : Fragment() {
             }
         }
 
-        meetingViewModel.previewUpdateLiveData.observe(viewLifecycleOwner,
+        meetingViewModel.previewUpdateLiveData.observe(
+            viewLifecycleOwner,
             Observer { (room, localTracks) ->
 
                 if (setTextOnce.not()) {
@@ -433,6 +443,7 @@ class PreviewFragment : Fragment() {
                 isPreviewLoaded = true
                 enableDisableJoinNowButton()
 
+                updateUiBasedOnPublishParams(room.localPeer?.hmsRole?.publishParams)
                 track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {
                     when (it) {
@@ -481,9 +492,19 @@ class PreviewFragment : Fragment() {
                 }
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
-                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode()
-                            .not()
-                    ) "Join Now" else "Enter Meeting"
+                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode()) {
+                        "Enter Meeting"
+                    } else if (startLiveStreamIng) {
+                        binding.buttonJoinMeeting.setDrawables(
+                            start = ContextCompat.getDrawable(
+                                context!!, R.drawable.ic_live
+                            )
+                        )
+                        enableDisableJoinNowButton()
+                        "Go LIve"
+                    } else {
+                        "Join Now"
+                    }
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
                 } else {
@@ -504,6 +525,28 @@ class PreviewFragment : Fragment() {
                 }
             })
 
+    }
+
+    private fun updateUiBasedOnPublishParams(publishParams: PublishParams?) {
+        if (publishParams == null) return
+
+
+        if (publishParams.allowed.contains("audio")) {
+            binding.buttonToggleAudio.visibility = View.VISIBLE
+        } else {
+            binding.buttonToggleAudio.visibility = View.GONE
+        }
+
+        if (publishParams.allowed.contains("video")) {
+            binding.buttonToggleVideo.visibility = View.VISIBLE
+            binding.buttonSwitchCamera.visibility = View.VISIBLE
+            binding.videoCardContainer.visibility = View.VISIBLE
+        } else {
+            binding.topMarging.setGuidelinePercent(0.3f)
+            binding.buttonToggleVideo.visibility = View.GONE
+            binding.buttonSwitchCamera.visibility = View.GONE
+            binding.videoCardContainer.visibility = View.GONE
+        }
     }
 
     private fun updateNetworkQualityView(
@@ -531,7 +574,8 @@ class PreviewFragment : Fragment() {
     }
 
     private fun initOnBackPress() {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     meetingViewModel.leaveMeeting()

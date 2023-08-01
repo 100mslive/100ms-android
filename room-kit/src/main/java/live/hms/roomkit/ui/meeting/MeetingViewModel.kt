@@ -244,6 +244,8 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
+    fun isGoLiveInPreBuiltEnabled() = settings.goLiveInPrebuilt
+
     // Title at the top of the meeting
     val title = MutableLiveData<Int>()
     fun setTitle(@StringRes resId: Int) {
@@ -1501,7 +1503,7 @@ class MeetingViewModel(
     fun startHls(hlsUrl: String?, recordingConfig: HMSHlsRecordingConfig) {
         val meetingVariants = if (hlsUrl.isNullOrBlank()) {
             null
-        } else listOf(HMSHLSMeetingURLVariant(hlsUrl))
+        } else null
 
         val config = HMSHLSConfig(
             meetingVariants,

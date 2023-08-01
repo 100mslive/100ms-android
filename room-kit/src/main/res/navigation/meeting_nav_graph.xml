@@ -28,6 +28,11 @@
         android:label="@string/meeting_fragment"
         tools:layout="@layout/fragment_meeting">
 
+        <argument
+            android:name="startHlsStream"
+            app:argType="boolean"
+            app:nullable="false" />
+
         <action
             android:id="@+id/action_MeetingFragment_to_ChatBottomSheetFragment"
             app:destination="@id/ChatBottomSheetFragment" />

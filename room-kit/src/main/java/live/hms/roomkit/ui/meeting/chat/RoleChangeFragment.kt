@@ -47,7 +47,7 @@ class RoleChangeFragment : Fragment() {
         initRoleToChangeToSpinner(vm.rolesList.map{ RolePresenter(it) })
         binding.btnChangeRoles.setOnClickListener {
             vm.changeRoles()
-            findNavController().navigate(RoleChangeFragmentDirections.actionRoleChangeFragmentToMeetingFragment())
+            findNavController().navigate(RoleChangeFragmentDirections.actionRoleChangeFragmentToMeetingFragment(startHlsStream = false))
         }
         binding.fromRolesTextView.setOnClickListener {
             showRoleSelectDialog(vm.rolesList)
@@ -56,7 +56,7 @@ class RoleChangeFragment : Fragment() {
             binding.fromRolesTextView.text = it
         }
         binding.closeBtn.setOnClickListener {
-            findNavController().navigate(RoleChangeFragmentDirections.actionRoleChangeFragmentToMeetingFragment())
+            findNavController().navigate(RoleChangeFragmentDirections.actionRoleChangeFragmentToMeetingFragment(startHlsStream = false))
         }
     }
 

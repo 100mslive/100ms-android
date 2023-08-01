@@ -63,7 +63,7 @@ class SettingsFragment : Fragment() {
       "Rear Facing Camera" to REAR_FACING_CAMERA,
     )
 
-    private val MEETING_MODES = MeetingViewMode::class.nestedClasses.mapNotNull { it.simpleName }.toTypedArray()
+    private val MEETING_MODES = arrayListOf<String>("ACTIVE_SPEAKER").toTypedArray()
 
     private val LOG_LEVELS_100MS = HMSLogger.LogLevel.values().map { it.toString() }.toTypedArray()
 
@@ -498,6 +498,12 @@ class SettingsFragment : Fragment() {
         settings.inPreBuiltDebugMode,
         isPrebuiltDebugEnabled
       ) { commitHelper.setPrebuiltDebugMode(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.goLiveInPrebuilt,
+        goLiveInPrebuiltDebugEnabled
+      ) { commitHelper.setGOLiveInPrebuilt(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
