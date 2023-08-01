@@ -167,14 +167,19 @@ class PreviewFragment : Fragment() {
                 dispatchMode = WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
             )
         )
-//        ViewCompat.setWindowInsetsAnimationCallback(
-//            binding.conversationRecyclerview,
-//            TranslateDeferringInsetsAnimationCallback(
-//                view = binding.conversationRecyclerview,
-//                persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
-//                deferredInsetTypes = WindowInsetsCompat.Type.ime()
-//            )
-//        )
+
+        val movableOnKeybaordOpen = arrayOf(binding.buttonNetworkQuality)
+        movableOnKeybaordOpen.forEach {
+            ViewCompat.setWindowInsetsAnimationCallback(
+                it,
+                TranslateDeferringInsetsAnimationCallback(
+                    view = it,
+                    persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
+                    deferredInsetTypes = WindowInsetsCompat.Type.ime()
+                )
+            )
+
+        }
     }
 
     override fun onAttach(context: Context) {
