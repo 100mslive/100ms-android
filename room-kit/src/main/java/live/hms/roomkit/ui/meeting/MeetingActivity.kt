@@ -6,8 +6,12 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.fragment.NavHostFragment
 import live.hms.roomkit.R
+import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -34,11 +38,22 @@ class MeetingActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     _binding = ActivityMeetingBinding.inflate(layoutInflater)
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+
+
 
     setContentView(binding.root)
     supportActionBar?.setDisplayShowTitleEnabled(false)
     settingsStore = SettingsStore(this)
 
+    val deferringInsetsListener = RootViewDeferringInsetsCallback(
+      persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
+      deferredInsetTypes = WindowInsetsCompat.Type.ime()
+    )
+    // RootViewDeferringInsetsCallback is both an WindowInsetsAnimation.Callback and an
+    // OnApplyWindowInsetsListener, so needs to be set as so.
+    ViewCompat.setWindowInsetsAnimationCallback(binding.root, deferringInsetsListener)
+    ViewCompat.setOnApplyWindowInsetsListener(binding.root, deferringInsetsListener)
 
 
     val hmsPrebuiltOption : HMSPrebuiltOptions? = intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions

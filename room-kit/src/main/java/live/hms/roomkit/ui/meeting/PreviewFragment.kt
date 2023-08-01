@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.meeting
 
-import android.app.ProgressDialog.show
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -14,16 +13,18 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import kotlinx.coroutines.launch
+import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.R
+import live.hms.roomkit.animation.TranslateDeferringInsetsAnimationCallback
 import live.hms.roomkit.databinding.FragmentPreviewBinding
-import live.hms.roomkit.drawableStart
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setDrawables
@@ -32,7 +33,6 @@ import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.error.HMSException
@@ -43,7 +43,6 @@ import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.role.PublishParams
-import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 
 
@@ -130,6 +129,8 @@ class PreviewFragment : Fragment() {
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
 
+        setupKeyboardAnimation()
+
         enableDisableJoinNowButton()
 
         meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
@@ -151,6 +152,29 @@ class PreviewFragment : Fragment() {
         })
 
 
+    }
+
+    private fun setupKeyboardAnimation() {
+
+        ViewCompat.setWindowInsetsAnimationCallback(
+            binding.previewBottomBar,
+            TranslateDeferringInsetsAnimationCallback(
+                view = binding.previewBottomBar,
+                persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
+                deferredInsetTypes = WindowInsetsCompat.Type.ime(),
+                // We explicitly allow dispatch to continue down to binding.messageHolder's
+                // child views, so that step 2.5 below receives the call
+                dispatchMode = WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE
+            )
+        )
+//        ViewCompat.setWindowInsetsAnimationCallback(
+//            binding.conversationRecyclerview,
+//            TranslateDeferringInsetsAnimationCallback(
+//                view = binding.conversationRecyclerview,
+//                persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
+//                deferredInsetTypes = WindowInsetsCompat.Type.ime()
+//            )
+//        )
     }
 
     override fun onAttach(context: Context) {

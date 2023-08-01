@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.samples.insetsanimation
+package live.hms.roomkit.animation
 
 import android.view.View
 import androidx.core.view.OnApplyWindowInsetsListener

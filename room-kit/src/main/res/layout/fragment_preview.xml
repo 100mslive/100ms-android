@@ -1,405 +1,405 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<live.hms.roomkit.animation.InsetsAnimationLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/preview_card"
-    android:animateLayoutChanges="true"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/top_marging"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="32dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/video_card_container"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="0dp"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:cardCornerRadius="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/preview_card"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <FrameLayout
-            android:id="@+id/video_container_background"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:background="#000000" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/name_initials"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/top_marging"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:background="@drawable/circle_secondary_80"
-            android:gravity="center"
-            android:text="@string/john_doe_initials"
-            android:textColor="@android:color/white"
-            android:textSize="40sp" />
+            android:orientation="horizontal"
+            app:layout_constraintGuide_begin="32dp" />
 
-        <ImageView
-            android:visibility="invisible"
-            tools:visibility="visible"
-            android:id="@+id/no_name_iv"
-            android:src="@drawable/no_name"
-            android:layout_gravity="center"
-            android:layout_width="40dp"
-            android:layout_height="40dp"/>
-
-
-        <live.hms.videoview.HMSVideoView
-            android:id="@+id/preview_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-    </androidx.cardview.widget.CardView>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="216dp"
-        android:elevation="3dp"
-        android:background="@drawable/bg_gradient_drawable"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/close_btn"
-        android:layout_width="40dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:elevation="3dp"
-        android:layout_height="40dp"
-        android:src="@drawable/back_icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    
-    <ImageView
-        android:id="@+id/logo_iv"
-        android:elevation="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_marging"
-        android:src="@drawable/genericlogo"
-        android:layout_width="30dp"
-        android:layout_height="30dp"/>
-
-    <TextView
-        android:id="@+id/name_tv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:elevation="4dp"
-        android:fontFamily="@font/inter_semibold"
-        android:gravity="center"
-        android:text="Get Started"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:lineHeight="32sp"
-        app:fontFamily="@font/inter_bold"
-        app:layout_constraintBottom_toTopOf="@id/description_tv"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo_iv"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:textColor="@android:color/white" />
-
-    <TextView
-        android:id="@+id/description_tv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/name_tv"
-        android:layout_alignParentStart="true"
-        android:layout_gravity="center"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="8dp"
-        android:elevation="4dp"
-        android:fontFamily="@font/inter_regular"
-        android:gravity="center"
-        android:maxLines="2"
-        app:fontFamily="@font/inter_regular"
-        android:lineHeight="20sp"
-        android:text="Setup your audio and video before joining"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@id/icon_participants"
-        app:layout_constraintTop_toBottomOf="@id/name_tv"
-        tools:textColor="@android:color/white" />
-
-    <TextView
-        android:id="@+id/icon_participants"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/gray_round_solid_drawable"
-        android:elevation="4dp"
-        android:gravity="center"
-        android:maxLines="1"
-       android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp"
-        android:text="You are the first to join"
-        android:textColor="#EFF0FA"
-        android:textSize="13sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/hls_session"
-        app:layout_constraintTop_toBottomOf="@id/description_tv" />
-
-    <ImageView
-        android:id="@+id/hls_dot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:elevation="5dp"
-        android:src="@drawable/dot_default_5"
-        app:layout_constraintBottom_toBottomOf="@id/hls_session"
-        app:layout_constraintEnd_toEndOf="@id/hls_session"
-        app:layout_constraintHorizontal_bias="0.09"
-        app:layout_constraintStart_toStartOf="@id/hls_session"
-        app:layout_constraintTop_toTopOf="@id/hls_session" />
-
-    <androidx.constraintlayout.widget.Group
-        android:visibility="gone"
-        android:id="@+id/live_hls_group"
-        app:constraint_referenced_ids="hls_dot,hls_session"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <TextView
-        android:id="@+id/hls_session"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/gray_round_solid_drawable"
-        android:backgroundTint="#C74E5B"
-        android:elevation="4dp"
-        android:gravity="center"
-        android:maxLines="1"
-        android:padding="8dp"
-        android:text="  LIVE"
-        android:textColor="#EFF0FA"
-        tools:visibility="visible"
-        android:visibility="gone"
-        android:textSize="13sp"
-        app:layout_constraintEnd_toStartOf="@+id/icon_participants"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/description_tv" />
-
-
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/video_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_end="157dp" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/video_guideline_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_end="150dp" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/button_network_quality"
-        android:layout_width="36dp"
-        android:layout_height="28dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:elevation="10dp"
-        app:cardCornerRadius="8dp"
-        app:layout_constraintBottom_toBottomOf="@id/video_guideline"
-        app:layout_constraintStart_toStartOf="@id/video_card_container">
-
-        <ImageView
-            android:id="@+id/network_quality"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="8dp"
-            android:src="@drawable/ic_baseline_wifi_5"
-            android:visibility="gone" />
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/preview_bottom_bar"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="12dp"
-        app:cardBackgroundColor="#272A31"
-        app:cardCornerRadius="16dp"
-        android:layout_marginBottom="-16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/video_guideline">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/button_toggle_audio"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="@string/toggle_video"
-                android:drawablePadding="0dp"
-                android:background="@drawable/gray_round_solid_drawable"
-                app:icon="@drawable/avd_mic_on_to_off"
-                app:iconGravity="start"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/button_toggle_video"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="@string/toggle_video"
-                android:background="@drawable/gray_round_solid_drawable"
-                android:enabled="false"
-                android:src="@drawable/avd_video_on_to_off"
-                app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/button_switch_camera"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="@string/toggle_video"
-                android:enabled="false"
-                android:src="@drawable/ic_switch_camera"
-                app:iconSize="24dp"
-                app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/icon_output_device"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                app:iconSize="24dp"
-                tools:visibility="visible"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                 />
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edit_container_name"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                android:layout_width="0dp"
-                android:layout_marginTop="-4dp"
-                android:layout_height="52dp"
-                android:layout_marginLeft="16dp"
-                android:textCursorDrawable="@drawable/cursor_drawable"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
-                app:layout_constraintEnd_toStartOf="@id/btn_txt_guideline"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_name"
-                    android:layout_width="match_parent"
-                    android:maxLines="1"
-                    android:textCursorDrawable="@drawable/cursor_drawable"
-                    android:layout_height="wrap_content"
-                    android:hint="Enter Name"
-                    android:inputType="textPersonName" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/video_card_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:elevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <FrameLayout
-                android:elevation="8dp"
+                android:id="@+id/video_container_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:background="#000000" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/name_initials"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:background="@drawable/circle_secondary_80"
+                android:gravity="center"
+                android:text="@string/john_doe_initials"
+                android:textColor="@android:color/white"
+                android:textSize="40sp" />
+
+            <ImageView
+                android:id="@+id/no_name_iv"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:src="@drawable/no_name"
                 android:visibility="invisible"
-                android:id="@+id/join_loader"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/blue_round_solid_drawable"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:layout_marginBottom="44dp"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline" >
-                <ProgressBar
-                    android:id="@+id/join_loader_progress"
+                tools:visibility="visible" />
+
+
+            <live.hms.videoview.HMSVideoView
+                android:id="@+id/preview_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+        </androidx.cardview.widget.CardView>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="216dp"
+            android:background="@drawable/bg_gradient_drawable"
+            android:elevation="3dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/close_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:elevation="3dp"
+            android:src="@drawable/back_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/logo_iv"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:elevation="4dp"
+            android:src="@drawable/genericlogo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/top_marging" />
+
+        <TextView
+            android:id="@+id/name_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:elevation="4dp"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center"
+            android:lineHeight="32sp"
+            android:text="Get Started"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            app:fontFamily="@font/inter_bold"
+            app:layout_constraintBottom_toTopOf="@id/description_tv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/logo_iv"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/description_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/name_tv"
+            android:layout_alignParentStart="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="4dp"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="center"
+            android:lineHeight="20sp"
+            android:maxLines="2"
+            android:text="Setup your audio and video before joining"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:fontFamily="@font/inter_regular"
+            app:layout_constraintBottom_toTopOf="@id/icon_participants"
+            app:layout_constraintTop_toBottomOf="@id/name_tv"
+            tools:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/icon_participants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/gray_round_solid_drawable"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="You are the first to join"
+            android:textColor="#EFF0FA"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/hls_session"
+            app:layout_constraintTop_toBottomOf="@id/description_tv" />
+
+        <ImageView
+            android:id="@+id/hls_dot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            android:src="@drawable/dot_default_5"
+            app:layout_constraintBottom_toBottomOf="@id/hls_session"
+            app:layout_constraintEnd_toEndOf="@id/hls_session"
+            app:layout_constraintHorizontal_bias="0.09"
+            app:layout_constraintStart_toStartOf="@id/hls_session"
+            app:layout_constraintTop_toTopOf="@id/hls_session" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/live_hls_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="hls_dot,hls_session" />
+
+        <TextView
+            android:id="@+id/hls_session"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/gray_round_solid_drawable"
+            android:backgroundTint="#C74E5B"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:padding="8dp"
+            android:text="  LIVE"
+            android:textColor="#EFF0FA"
+            android:textSize="13sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/icon_participants"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/description_tv"
+            tools:visibility="visible" />
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/video_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_end="157dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/video_guideline_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_end="150dp" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/button_network_quality"
+            android:layout_width="36dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="10dp"
+            app:cardCornerRadius="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/video_guideline"
+            app:layout_constraintStart_toStartOf="@id/video_card_container">
+
+            <ImageView
+                android:id="@+id/network_quality"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="8dp"
+                android:src="@drawable/ic_baseline_wifi_5"
+                android:visibility="gone" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/preview_bottom_bar"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="-16dp"
+            android:elevation="12dp"
+            app:cardBackgroundColor="#272A31"
+            app:cardCornerRadius="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/video_guideline">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/button_toggle_audio"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/gray_round_solid_drawable"
+                    android:contentDescription="@string/toggle_video"
+                    android:drawablePadding="0dp"
+                    app:icon="@drawable/avd_mic_on_to_off"
+                    app:iconGravity="start"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/button_toggle_video"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="center"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/gray_round_solid_drawable"
+                    android:contentDescription="@string/toggle_video"
+                    android:enabled="false"
+                    android:src="@drawable/avd_video_on_to_off"
+                    app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/button_switch_camera"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="16dp"
+                    android:contentDescription="@string/toggle_video"
+                    android:enabled="false"
+                    android:src="@drawable/ic_switch_camera"
+                    app:iconSize="24dp"
+                    app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/icon_output_device"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:visibility="gone"
+                    app:iconSize="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/edit_container_name"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="-4dp"
+                    android:textCursorDrawable="@drawable/cursor_drawable"
+                    app:layout_constraintEnd_toStartOf="@id/btn_txt_guideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/edit_text_guideline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edit_text_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Enter Name"
+                        android:inputType="textPersonName"
+                        android:maxLines="1"
+                        android:textCursorDrawable="@drawable/cursor_drawable" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <FrameLayout
+                    android:id="@+id/join_loader"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="44dp"
+                    android:background="@drawable/blue_round_solid_drawable"
+                    android:elevation="8dp"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
+                    app:layout_constraintTop_toTopOf="@+id/edit_text_guideline">
+
+                    <ProgressBar
+                        android:id="@+id/join_loader_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center" />
+                </FrameLayout>
+
+
+                <TextView
+                    android:id="@+id/button_join_meeting"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="44dp"
+                    android:background="@drawable/blue_round_solid_drawable"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:text="Join Now"
+                    android:textColor="#EFF0FA"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
+                    app:layout_constraintTop_toTopOf="@+id/edit_text_guideline" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/btn_txt_guideline"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </FrameLayout>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent=".60" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/edit_text_guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_begin="72dp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
 
 
-            <TextView
-                android:id="@+id/button_join_meeting"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/blue_round_solid_drawable"
-                android:gravity="center"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
-                android:text="Join Now"
-                android:textColor="#EFF0FA"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="44dp"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/btn_txt_guideline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent=".60" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/edit_text_guideline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_begin="72dp"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
-
-
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</live.hms.roomkit.animation.InsetsAnimationLinearLayout>
