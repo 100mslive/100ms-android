@@ -23,6 +23,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.R
+import live.hms.roomkit.animation.ControlFocusInsetsAnimationCallback
 import live.hms.roomkit.animation.TranslateDeferringInsetsAnimationCallback
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
@@ -180,6 +181,11 @@ class PreviewFragment : Fragment() {
             )
 
         }
+
+        ViewCompat.setWindowInsetsAnimationCallback(
+            binding.editTextName,
+            ControlFocusInsetsAnimationCallback(binding.editTextName)
+        )
     }
 
     override fun onAttach(context: Context) {

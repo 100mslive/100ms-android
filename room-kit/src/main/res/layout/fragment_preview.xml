@@ -3,15 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:clipToPadding="false"
         android:id="@+id/preview_card"
+        android:layout_weight="1"
+        android:layout_marginBottom="-10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+
+        >
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/top_marging"
@@ -210,14 +213,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_end="157dp" />
+            app:layout_constraintGuide_end="0dp" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/video_guideline_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_end="150dp" />
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/button_network_quality"
@@ -241,165 +239,164 @@
 
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/preview_bottom_bar"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="-16dp"
-            android:elevation="12dp"
-            app:cardBackgroundColor="#272A31"
-            app:cardCornerRadius="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/video_guideline">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/button_toggle_audio"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/gray_round_solid_drawable"
-                    android:contentDescription="@string/toggle_video"
-                    android:drawablePadding="0dp"
-                    app:icon="@drawable/avd_mic_on_to_off"
-                    app:iconGravity="start"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/button_toggle_video"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/gray_round_solid_drawable"
-                    android:contentDescription="@string/toggle_video"
-                    android:enabled="false"
-                    android:src="@drawable/avd_video_on_to_off"
-                    app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/button_switch_camera"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="24dp"
-                    android:layout_marginTop="16dp"
-                    android:contentDescription="@string/toggle_video"
-                    android:enabled="false"
-                    android:src="@drawable/ic_switch_camera"
-                    app:iconSize="24dp"
-                    app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/icon_output_device"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:visibility="gone"
-                    app:iconSize="24dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
-
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/edit_container_name"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-                    android:layout_width="0dp"
-                    android:layout_height="52dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="-4dp"
-                    android:textCursorDrawable="@drawable/cursor_drawable"
-                    app:layout_constraintEnd_toStartOf="@id/btn_txt_guideline"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/edit_text_guideline">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_text_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Enter Name"
-                        android:inputType="textPersonName"
-                        android:maxLines="1"
-                        android:textCursorDrawable="@drawable/cursor_drawable" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <FrameLayout
-                    android:id="@+id/join_loader"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="44dp"
-                    android:background="@drawable/blue_round_solid_drawable"
-                    android:elevation="8dp"
-                    android:gravity="center"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="8dp"
-                    android:visibility="invisible"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
-                    app:layout_constraintTop_toTopOf="@+id/edit_text_guideline">
-
-                    <ProgressBar
-                        android:id="@+id/join_loader_progress"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center" />
-                </FrameLayout>
-
-
-                <TextView
-                    android:id="@+id/button_join_meeting"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="44dp"
-                    android:background="@drawable/blue_round_solid_drawable"
-                    android:gravity="center"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="8dp"
-                    android:text="Join Now"
-                    android:textColor="#EFF0FA"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
-                    app:layout_constraintTop_toTopOf="@+id/edit_text_guideline" />
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/btn_txt_guideline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent=".60" />
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/edit_text_guideline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_begin="72dp" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.cardview.widget.CardView>
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/preview_bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="157dp"
+        android:layout_marginBottom="-16dp"
+        android:elevation="12dp"
+        app:cardBackgroundColor="#272A31"
+        app:cardCornerRadius="16dp"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/button_toggle_audio"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/gray_round_solid_drawable"
+                android:contentDescription="@string/toggle_video"
+                android:drawablePadding="0dp"
+                app:icon="@drawable/avd_mic_on_to_off"
+                app:iconGravity="start"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/button_toggle_video"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/gray_round_solid_drawable"
+                android:contentDescription="@string/toggle_video"
+                android:enabled="false"
+                android:src="@drawable/avd_video_on_to_off"
+                app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/button_switch_camera"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:contentDescription="@string/toggle_video"
+                android:enabled="false"
+                android:src="@drawable/ic_switch_camera"
+                app:iconSize="24dp"
+                app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/icon_output_device"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone"
+                app:iconSize="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:visibility="visible" />
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/edit_container_name"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="-4dp"
+                android:textCursorDrawable="@drawable/cursor_drawable"
+                app:layout_constraintEnd_toStartOf="@id/btn_txt_guideline"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Name"
+                    android:inputType="textPersonName"
+                    android:maxLines="1"
+                    android:textCursorDrawable="@drawable/cursor_drawable" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <FrameLayout
+                android:id="@+id/join_loader"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="44dp"
+                android:background="@drawable/blue_round_solid_drawable"
+                android:elevation="8dp"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline">
+
+                <ProgressBar
+                    android:id="@+id/join_loader_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+            </FrameLayout>
+
+
+            <TextView
+                android:id="@+id/button_join_meeting"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="44dp"
+                android:background="@drawable/blue_round_solid_drawable"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Join Now"
+                android:textColor="#EFF0FA"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
+                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/btn_txt_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent=".60" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/edit_text_guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_begin="72dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
 </live.hms.roomkit.animation.InsetsAnimationLinearLayout>
