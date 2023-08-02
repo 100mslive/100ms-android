@@ -1,15 +1,21 @@
 package live.hms.roomkit.ui.meeting
 
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
@@ -22,6 +28,7 @@ import live.hms.video.sdk.HMSActionResultListener
 
 class MeetingActivity : AppCompatActivity() {
 
+  var requestedPermissions : Array<String> = arrayOf()
   private var _binding: ActivityMeetingBinding? = null
 
   private val binding: ActivityMeetingBinding
@@ -82,6 +89,16 @@ class MeetingActivity : AppCompatActivity() {
     })
 
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+    // Permissions handling
+    lifecycleScope.launch {
+        meetingViewModel.events.collect {event ->
+            if(event is MeetingViewModel.Event.RequestPermission) {
+                requestedPermissions = event.permissions
+                requestPermissionLauncher.launch(event.permissions)
+            }
+        }
+    }
   }
 
   override fun onDestroy() {
@@ -100,4 +117,19 @@ class MeetingActivity : AppCompatActivity() {
         Toast.makeText(this,"Spotlight: ${it.peer.name}", Toast.LENGTH_SHORT).show()
     }
   }
+
+  private val requestPermissionLauncher = registerForActivityResult(
+    ActivityResultContracts.RequestMultiplePermissions()
+  ) {
+    // Do not prevent joining if bluetooth connect is denied.
+    if(it.filterKeys { key -> key != BLUETOOTH_CONNECT }.values.all { granted -> granted })
+      meetingViewModel.permissionGranted()
+    else {
+      // Leave the meeting
+      meetingViewModel.leaveMeeting(null)
+      // Close our activity to return to whatever the user had before
+      finish()
+    }
+  }
+
 }
