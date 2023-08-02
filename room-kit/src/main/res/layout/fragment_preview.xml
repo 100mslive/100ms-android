@@ -43,6 +43,7 @@
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/name_initials"
+                android:layout_marginTop="78dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -54,6 +55,7 @@
                 android:textSize="40sp" />
 
             <ImageView
+                android:layout_marginTop="78dp"
                 android:id="@+id/no_name_iv"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -317,6 +319,8 @@
                 android:id="@+id/edit_container_name"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="0dp"
+                app:expandedHintEnabled="false"
+                app:hintAnimationEnabled="false"
                 android:layout_height="52dp"
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="-4dp"
