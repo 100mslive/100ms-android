@@ -110,7 +110,7 @@ class MeetingViewModel(
                             _events.emit(Event.PollStarted(hmsPoll))
                         }
                     }
-                    else if (hmsPollUpdateType == HMSPollUpdateType.votesupdated) {
+                    else if (hmsPollUpdateType == HMSPollUpdateType.resultsupdated) {
                         viewModelScope.launch {
                             _events.emit(Event.PollVotesUpdated(hmsPoll))
                         }
