@@ -476,8 +476,8 @@ class MeetingFragment : Fragment() {
         } else {
             //start HLS stream
            if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
+               binding.meetingFragmentProgress?.visibility = View.VISIBLE
                meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
-
            }
 
         }
