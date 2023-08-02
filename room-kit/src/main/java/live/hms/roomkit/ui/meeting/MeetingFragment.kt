@@ -32,6 +32,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -44,6 +45,7 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
+import live.hms.roomkit.ui.meeting.chat.ChatBottomSheetFragmentArgs
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
@@ -62,6 +64,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.HMSActionResultListener
+import live.hms.video.sdk.models.HMSHlsRecordingConfig
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 
 
@@ -84,6 +87,7 @@ class MeetingFragment : Fragment() {
     var countDownTimer: CountDownTimer? = null
     var isCountdownManuallyCancelled: Boolean = false
 
+    private val args: MeetingFragmentArgs by navArgs()
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -98,13 +102,6 @@ class MeetingFragment : Fragment() {
     private var alertDialog: AlertDialog? = null
 
     private var isMeetingOngoing = false
-    private val goLiveBottomSheet by lazy {
-        HlsStreamingToggleBottomSheet(meetingUrl = settings.lastUsedMeetingUrl) {
-            if (it) {
-//                binding.buttonGoLive?.visibility = View.GONE
-            }
-        }
-    }
 
     private val rtmpBottomSheet by lazy {
         RtmpRecordBottomSheet {
@@ -297,7 +294,7 @@ class MeetingFragment : Fragment() {
         item.apply {
             when (audioDevice) {
                 AudioDevice.EARPIECE -> {
-                    setIcon(R.drawable.ic_baseline_hearing_24)
+                    setIcon(R.drawable.phone)
                 }
                 AudioDevice.SPEAKER_PHONE -> {
                     setIcon(R.drawable.ic_icon_speaker)
@@ -306,10 +303,10 @@ class MeetingFragment : Fragment() {
                     setIcon(R.drawable.ic_icon_speaker)
                 }
                 AudioDevice.BLUETOOTH -> {
-                    setIcon(R.drawable.ic_baseline_bluetooth_24)
+                    setIcon(R.drawable.bt)
                 }
                 AudioDevice.WIRED_HEADSET -> {
-                    setIcon(R.drawable.ic_baseline_headset_24)
+                    setIcon(R.drawable.wired)
                 }
                 else -> {
                     setIcon(R.drawable.ic_volume_off_24)
@@ -341,6 +338,7 @@ class MeetingFragment : Fragment() {
             binding.spacer?.visibility = View.GONE
         }
         if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
+            binding.meetingFragmentProgress?.visibility = View.GONE
 //            binding.buttonGoLive?.setImageDrawable(
 //                ContextCompat.getDrawable(
 //                    requireContext(),
@@ -475,6 +473,13 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.state.value is MeetingState.Disconnected) {
             // Handles configuration changes
             meetingViewModel.startMeeting()
+        } else {
+            //start HLS stream
+           if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
+               meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
+
+           }
+
         }
         return binding.root
     }
@@ -501,6 +506,13 @@ class MeetingFragment : Fragment() {
     private fun initViewModel() {
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
+        }
+
+        meetingViewModel.hlsToggleUpdateLiveData.observe(viewLifecycleOwner) {
+            when(it) {
+                true -> binding.meetingFragmentProgress?.visibility = View.VISIBLE
+                false -> binding.meetingFragmentProgress?.visibility = View.GONE
+            }
         }
 
         meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
@@ -947,6 +959,7 @@ class MeetingFragment : Fragment() {
         }
 
         binding.progressBar.root.visibility = View.GONE
+        binding.meetingFragmentProgress?.visibility = View.GONE
     }
 
     private fun showProgressBar() {
@@ -994,42 +1007,6 @@ class MeetingFragment : Fragment() {
             }
         }
 
-//        binding.buttonGoLive?.apply {
-//            setOnSingleClickListener(200L) {
-//                Log.v(TAG, "buttonGoLive.onClick()")
-//
-//                if (meetingViewModel.isHlsRunning()) {
-//                    inflateStopHlsDialog()
-//                    return@setOnSingleClickListener
-//                } else if (meetingViewModel.isRTMPRunning()) {
-//                    inflateStopHlsDialog()
-//                    return@setOnSingleClickListener
-//                }
-//
-//                val goLiveSelectionBottomSheet = GoLiveSelectionBottomSheet(
-//                    meetingViewModel.isAllowedToHlsStream(),
-//                    meetingViewModel.isAllowedToRtmpStream()
-//                ) {
-//                    if (it == GoLiveOption.HLS) {
-//                        if (meetingViewModel.isRecording.value == RecordingState.NOT_RECORDING_OR_STREAMING) {
-//                            goLiveBottomSheet.show(
-//                                requireActivity().supportFragmentManager,
-//                                "GoLiveBottomSheet"
-//                            )
-//                        }
-//                    } else {
-//                        rtmpBottomSheet.show(
-//                            requireActivity().supportFragmentManager,
-//                            "RTMPBottomSheet"
-//                        )
-//                    }
-//                }
-//                goLiveSelectionBottomSheet.show(
-//                    requireActivity().supportFragmentManager,
-//                    "GoLiveSelectionBottomSheet"
-//                )
-//            }
-//        }
 
         binding.buttonSettingsMenu?.apply {
 

@@ -1,11 +1,18 @@
 package live.hms.roomkit.ui.meeting
 
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
@@ -17,6 +24,7 @@ import live.hms.video.sdk.HMSActionResultListener
 
 class MeetingActivity : AppCompatActivity() {
 
+  var requestedPermissions : Array<String> = arrayOf()
   private var _binding: ActivityMeetingBinding? = null
 
   private val binding: ActivityMeetingBinding
@@ -38,9 +46,11 @@ class MeetingActivity : AppCompatActivity() {
     supportActionBar?.setDisplayShowTitleEnabled(false)
     settingsStore = SettingsStore(this)
 
+
+
     val hmsPrebuiltOption : HMSPrebuiltOptions? = intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
     val roomCode : String = intent!!.getStringExtra(ROOM_CODE)!!
-
+    binding.progressBar.visibility = View.VISIBLE
     //todo show a loader UI
     meetingViewModel.initSdk(roomCode, hmsPrebuiltOption, object : HMSActionResultListener {
       override fun onError(error: HMSException) {
@@ -52,6 +62,7 @@ class MeetingActivity : AppCompatActivity() {
 
       override fun onSuccess() {
         runOnUiThread {
+          binding.progressBar.visibility = View.GONE
           val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
           val navController = navHostFragment.navController
           val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
@@ -63,6 +74,16 @@ class MeetingActivity : AppCompatActivity() {
     })
 
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+    // Permissions handling
+    lifecycleScope.launch {
+        meetingViewModel.events.collect {event ->
+            if(event is MeetingViewModel.Event.RequestPermission) {
+                requestedPermissions = event.permissions
+                requestPermissionLauncher.launch(event.permissions)
+            }
+        }
+    }
   }
 
   override fun onDestroy() {
@@ -81,4 +102,19 @@ class MeetingActivity : AppCompatActivity() {
         Toast.makeText(this,"Spotlight: ${it.peer.name}", Toast.LENGTH_SHORT).show()
     }
   }
+
+  private val requestPermissionLauncher = registerForActivityResult(
+    ActivityResultContracts.RequestMultiplePermissions()
+  ) {
+    // Do not prevent joining if bluetooth connect is denied.
+    if(it.filterKeys { key -> key != BLUETOOTH_CONNECT }.values.all { granted -> granted })
+      meetingViewModel.permissionGranted()
+    else {
+      // Leave the meeting
+      meetingViewModel.leaveMeeting(null)
+      // Close our activity to return to whatever the user had before
+      finish()
+    }
+  }
+
 }

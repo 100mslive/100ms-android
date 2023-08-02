@@ -19,9 +19,9 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
-import live.hms.roomkit.databinding.FragmentPermissionBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.VideoCardBinding
+import live.hms.roomkit.drawableStart
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -35,10 +35,13 @@ object HMSPrebuiltTheme {
 
         this.theme = theme.copy(
             backgroundDim = "#000000",
+            primaryDefault = "#2572ED",
             borderBright = "#272A31",
             onSurfaceHigh = "#EFF0FA",
             secondaryDim = "#293042",
             backgroundDefault = "#0B0E15",
+            onPrimaryLow = "#84AAFF",
+            primaryDisabled = "#004299"
         )
     }
 
@@ -169,6 +172,13 @@ internal fun TextView.buttonEnabled() {
         HMSPrebuiltTheme.getDefaults().primary_default,
         R.drawable.blue_round_solid_drawable
     )
+
+    this.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
 }
 
 internal fun TextView.buttonDisabled() {
@@ -177,7 +187,7 @@ internal fun TextView.buttonDisabled() {
 
     this.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.primaryDisabled,
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
             HMSPrebuiltTheme.getDefaults().onprimary_low_emp
         )
     )
@@ -187,6 +197,14 @@ internal fun TextView.buttonDisabled() {
         HMSPrebuiltTheme.getDefaults().primary_disabled,
         R.drawable.blue_round_solid_drawable
     )
+
+    this.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
 }
 
 
@@ -199,6 +217,20 @@ internal fun FragmentMeetingBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
         R.drawable.ic_icon_end_call
+    )
+
+    meetingFragmentProgress?.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
+    meetingFragmentProgressBar?.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
     )
 
 
@@ -348,47 +380,6 @@ internal fun VideoCardBinding.applyTheme() {
 
 
 }
-
-internal fun FragmentPermissionBinding.applyTheme() {
-    root.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDefault,
-            HMSPrebuiltTheme.getDefaults().background_default
-        )
-    )
-
-    heading.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
-        )
-    )
-
-    subtitle.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
-        )
-
-    )
-
-    buttonGrantPermission.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.primaryDefault,
-            HMSPrebuiltTheme.getDefaults().primary_default
-        )
-    )
-
-    buttonGrantPermission.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
-        )
-    )
-
-
-}
-
 internal fun BottomSheetAudioSwitchBinding.applyTheme() {
 }
 
@@ -407,11 +398,20 @@ internal fun FragmentPreviewBinding.applyTheme() {
         R.drawable.blue_round_solid_drawable
     )
 
-
-    editContainerName.boxBackgroundColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
-        HMSPrebuiltTheme.getDefaults().surface_default
+    joinLoader.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDisabled,
+        HMSPrebuiltTheme.getDefaults().primary_disabled,
+        R.drawable.blue_round_solid_drawable
     )
+
+    joinLoaderProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
+
 
     editContainerName.boxStrokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
@@ -424,6 +424,9 @@ internal fun FragmentPreviewBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_low_emp
         )
     )
+
+
+    editTextName.isCursorVisible = true
 
     editTextName.setTextColor(
         getColorOrDefault(

@@ -5,13 +5,19 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
+import androidx.fragment.app.Fragment
 import live.hms.roomkit.R
 import live.hms.roomkit.helpers.OnSingleClickListener
 import live.hms.video.media.capturers.camera.CameraControl
@@ -42,6 +48,61 @@ fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {
 
 fun View.setOnSingleClickListener(waitDelay: Long, l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l, waitDelay))
+}
+
+var TextView.drawableStart: Drawable?
+    get() = drawables[0]
+    set(value) = setDrawables(value, drawableTop, drawableEnd, drawableBottom)
+
+var TextView.drawableTop: Drawable?
+    get() = drawables[1]
+    set(value) = setDrawables(drawableStart, value, drawableEnd, drawableBottom)
+
+var TextView.drawableEnd: Drawable?
+    get() = drawables[2]
+    set(value) = setDrawables(drawableStart, drawableTop, value, drawableBottom)
+
+var TextView.drawableBottom: Drawable?
+    get() = drawables[3]
+    set(value) = setDrawables(drawableStart, drawableTop, drawableEnd, value)
+
+@Deprecated("Consider replace with drawableStart to better support right-to-left Layout", ReplaceWith("drawableStart"))
+var TextView.drawableLeft: Drawable?
+    get() = compoundDrawables[0]
+    set(value) = setCompoundDrawablesWithIntrinsicBounds(value, drawableTop, drawableRight, drawableBottom)
+
+@Deprecated("Consider replace with drawableEnd to better support right-to-left Layout", ReplaceWith("drawableEnd"))
+var TextView.drawableRight: Drawable?
+    get() = compoundDrawables[2]
+    set(value) = setCompoundDrawablesWithIntrinsicBounds(drawableLeft, drawableTop, value, drawableBottom)
+
+private val TextView.drawables: Array<Drawable?>
+    get() = if (Build.VERSION.SDK_INT >= 17) compoundDrawablesRelative else compoundDrawables
+
+ fun TextView.setDrawables(start: Drawable? = drawableStart, top: Drawable? = drawableTop, end: Drawable? = drawableEnd, bottom: Drawable? = drawableBottom) {
+        setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom)
+}
+
+fun Fragment.hideKeyboard() {
+    view?.let { activity?.hideKeyboard(it) }
+}
+
+fun Activity.hideKeyboard() {
+    hideKeyboard(currentFocus ?: View(this))
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
+fun Context.drawabless(@DrawableRes id: Int): Drawable {
+    return if (Build.VERSION.SDK_INT >= 21) {
+        resources.getDrawable(id, null)
+    } else {
+        @Suppress("DEPRECATION")
+        resources.getDrawable(id)
+    }
 }
 
 

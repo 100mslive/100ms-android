@@ -9,6 +9,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -26,6 +27,7 @@ import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
 import live.hms.video.interactivity.HmsPollUpdateListener
+import live.hms.video.events.AgentType
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.polls.HMSPollBuilder
@@ -51,10 +53,8 @@ import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
-import live.hms.video.utils.GsonUtils.gson
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
-import live.hms.video.utils.toJsonObject
 import java.util.*
 
 
@@ -92,6 +92,8 @@ class MeetingViewModel(
 
     val hmsSDK = HMSSDK
         .Builder(application)
+        .haltPreviewJoinForPermissionsRequest(true)
+        .setFrameworkInfo(FrameworkInfo(framework = AgentType.ANDROID_NATIVE, isPrebuilt = true))
         .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
         .setLogSettings(hmsLogSettings)
         .build()
@@ -278,6 +280,8 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
+    fun isGoLiveInPreBuiltEnabled() = settings.goLiveInPrebuilt
+
     // Title at the top of the meeting
     val title = MutableLiveData<Int>()
     fun setTitle(@StringRes resId: Int) {
@@ -361,16 +365,24 @@ class MeetingViewModel(
 
     val peers: List<HMSPeer>
         get() = hmsSDK.getPeers()
+//    val permissionCompletable = CompletableDeferred<Boolean>()
 
     fun startPreview() {
         if (hmsConfig == null) {
             HMSLogger.e(TAG, "HMSConfig is null. Cannot start preview.")
             return
         }
+
         // call Preview api
         hmsSDK.preview(hmsConfig!!, object : HMSPreviewListener {
             override fun onError(error: HMSException) {
                 previewErrorData.postValue(error)
+            }
+
+            override fun onPermissionsRequested(permissions : List<String>) {
+                viewModelScope.launch {
+                    _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                }
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
@@ -1459,6 +1471,7 @@ class MeetingViewModel(
         data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
         data class PollStarted(val hmsPoll: HmsPoll) : Event()
         data class PollVotesUpdated(val hmsPoll: HmsPoll) : Event()
+        data class RequestPermission(val permissions : Array<String>) : Event()
     }
 
     private val _isHandRaised = MutableLiveData<Boolean>(false)
@@ -1545,7 +1558,7 @@ class MeetingViewModel(
     fun startHls(hlsUrl: String?, recordingConfig: HMSHlsRecordingConfig) {
         val meetingVariants = if (hlsUrl.isNullOrBlank()) {
             null
-        } else listOf(HMSHLSMeetingURLVariant(hlsUrl))
+        } else null
 
         val config = HMSHLSConfig(
             meetingVariants,
@@ -1637,7 +1650,7 @@ class MeetingViewModel(
     fun isPrebuiltDebugMode(): Boolean {
         return isPrebuiltDebug
     }
-
+    fun permissionGranted() = hmsSDK.setPermissionsAccepted()
 
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll

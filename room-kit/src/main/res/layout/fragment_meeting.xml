@@ -6,6 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".ui.meeting.MeetingActivity">
 
+    <FrameLayout
+        android:visibility="gone"
+        android:elevation="3dp"
+        android:id="@+id/meeting_fragment_progress"
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:id="@+id/meeting_fragment_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
     <include
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar" />
@@ -22,9 +37,9 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
+        android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="4dp"
-        android:orientation="horizontal">
+        android:paddingVertical="4dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/button_end_call"
@@ -149,8 +164,8 @@
             android:padding="8dp"
 
             android:visibility="gone"
-            tools:visibility="visible"
-            app:srcCompat="@drawable/ic_more_vert_24" />
+            app:srcCompat="@drawable/ic_more_vert_24"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
@@ -159,8 +174,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_controls"
-        android:layout_below="@id/top_menu"
-         />
+        android:layout_below="@id/top_menu" />
 
     <LinearLayout
         android:id="@+id/bottom_controls"
@@ -232,8 +246,7 @@
             android:layout_marginBottom="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_video"
-            android:padding="8dp"
-             />
+            android:padding="8dp" />
 
         <Space
             android:layout_width="wrap_content"
