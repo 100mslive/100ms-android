@@ -34,6 +34,8 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
         holder.bind(getItem(position))
+        // Put the cursor in the edittext as it's created.
+        holder.binding.text.requestFocus()
     }
 
     private fun selectOnlyCurrentOption(position: Int) {
