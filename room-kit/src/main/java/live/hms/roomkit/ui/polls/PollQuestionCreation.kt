@@ -62,6 +62,11 @@ class PollQuestionCreation : Fragment() {
             }
             createdQuestionList.addItemDecoration(divider)
 
+            adapter.isReady = { isReady ->
+                launchPollQuiz.isEnabled = isReady
+            }
+
+
             launchPollQuiz.setOnSingleClickListener {
                 // Clear the UI
                 // start the data
@@ -71,6 +76,8 @@ class PollQuestionCreation : Fragment() {
                 )
                 backButton.callOnClick()
             }
+            // Will be enabled later.
+            launchPollQuiz.isEnabled = false
         }
     }
 }

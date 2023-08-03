@@ -12,6 +12,8 @@ import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
+    // Will be called when a single question is added to the adapter
+    var isReady : ((ready : Boolean) -> Unit)? = null
     init {
         // Adaptor begins with the question creation ui.
         submitList(listOf(QuestionUi.QuestionCreator))
@@ -57,4 +59,13 @@ class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolde
     override fun getItemViewType(position: Int): Int =
         getItem(position).viewType
 
+    override fun onCurrentListChanged(
+        previousList: MutableList<QuestionUi>,
+        currentList: MutableList<QuestionUi>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        val questionAdded =
+            currentList.filterNot { item -> item is QuestionUi.QuestionCreator }.isNotEmpty()
+        isReady?.invoke(questionAdded)
+    }
 }
