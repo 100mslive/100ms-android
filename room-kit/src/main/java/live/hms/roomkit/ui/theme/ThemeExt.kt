@@ -474,23 +474,21 @@ internal fun FragmentPreviewBinding.applyTheme() {
     iconParticipants.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default,
-        R.drawable.gray_round_solid_drawable
     )
 
     hlsSession.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
-        R.drawable.gray_round_solid_drawable
     )
 
-    iconParticipants.setTextColor(
+    participantCountText.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
-    hlsSession.setTextColor(
+    hlsSessionText.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
