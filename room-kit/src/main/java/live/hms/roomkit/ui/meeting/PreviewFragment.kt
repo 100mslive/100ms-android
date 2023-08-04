@@ -217,7 +217,7 @@ class PreviewFragment : Fragment() {
 
         meetingViewModel.previewUpdateLiveData.observe(viewLifecycleOwner) {
             binding.liveHlsGroup.visibility = if (it.first.isHLSRoom()) View.VISIBLE else View.GONE
-            binding.iconParticipants.text = it.first.peerList.formatNames()
+            binding.participantCountText.text = it.first.peerList.formatNames()
         }
 
         binding.closeBtn.setOnSingleClickListener(300L) {
@@ -577,7 +577,7 @@ class PreviewFragment : Fragment() {
             binding.buttonSwitchCamera.visibility = View.VISIBLE
             binding.videoCardContainer.visibility = View.VISIBLE
         } else {
-            binding.topMarging.setGuidelinePercent(0.3f)
+            binding.topMarging.setGuidelinePercent(0.35f)
             binding.buttonToggleVideo.visibility = View.GONE
             binding.buttonSwitchCamera.visibility = View.GONE
             binding.videoCardContainer.visibility = View.GONE

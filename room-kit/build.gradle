@@ -75,6 +75,8 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
     implementation "androidx.navigation:navigation-ui-ktx:2.4.0"
 
+    implementation "androidx.dynamicanimation:dynamicanimation:1.1.0-alpha03"
+
     // Life Cycle
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
     implementation "androidx.lifecycle:lifecycle-common-java8:2.4.0"
