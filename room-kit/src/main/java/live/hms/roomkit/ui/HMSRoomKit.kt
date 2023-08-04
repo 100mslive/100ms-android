@@ -10,7 +10,7 @@ import live.hms.roomkit.util.ROOM_PREBUILT
 object HMSRoomKit {
 
 
-    fun launchPrebuilt(roomCode: String, activity: Activity, options: HMSPrebuiltOptions? = null) {
+    fun launchPrebuilt(roomCode: String, activity: Activity, options: HMSPrebuiltOptions? = HMSPrebuiltOptions(debugInfo = true)) {
         Intent(activity, MeetingActivity::class.java).apply {
             putExtra(ROOM_CODE, roomCode)
             putExtra(ROOM_PREBUILT, options)
