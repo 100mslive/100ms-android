@@ -147,8 +147,8 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, true)
     set(value) = putBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, value)
 
-  var goLiveInPrebuilt : Boolean
-    get() = sharedPreferences.getBoolean(GO_LIVE_IN_PREBUILT, false)
+  var useMockAPi : Boolean
+    get() = sharedPreferences.getBoolean(GO_LIVE_IN_PREBUILT, true)
     set(value) = putBoolean(GO_LIVE_IN_PREBUILT, value)
 
   var inPreBuiltDebugMode : Boolean

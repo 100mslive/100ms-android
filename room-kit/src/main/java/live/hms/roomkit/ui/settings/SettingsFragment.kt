@@ -15,11 +15,9 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.BuildConfig
 import live.hms.roomkit.databinding.FragmentSettingsBinding
-import live.hms.roomkit.ui.meeting.MeetingViewMode
 import live.hms.roomkit.util.ENV_PROD
 import live.hms.roomkit.util.ENV_QA
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.video.sdk.models.DegradationPreference
 import live.hms.video.utils.HMSLogger
 import java.util.*
@@ -501,7 +499,7 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
-        settings.goLiveInPrebuilt,
+        settings.useMockAPi,
         goLiveInPrebuiltDebugEnabled
       ) { commitHelper.setGOLiveInPrebuilt(it) }
 
