@@ -52,7 +52,7 @@ class PollsCreationFragment : Fragment(){
             timer.setOnCheckedChangeListener{_,isChecked -> pollsViewModel.setTimer(isChecked)}
             startPollButton.setOnSingleClickListener { startPoll() }
             val previousPollsAdaptor = PreviousPollsAdaptor{previousPollsInfo ->
-                findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(previousPollsInfo.pollId))
+                findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollDisplayFragment(previousPollsInfo.pollId))
             }
             previousPolls.adapter = previousPollsAdaptor
             previousPolls.layoutManager = LinearLayoutManager(context)

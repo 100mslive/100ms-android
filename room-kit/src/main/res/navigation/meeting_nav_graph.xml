@@ -167,6 +167,9 @@
         <action
             android:id="@+id/action_pollsCreationFragment_to_pollQuestionCreation"
             app:destination="@id/pollQuestionCreation" />
+        <action
+            android:id="@+id/action_pollsCreationFragment_to_pollDisplayFragment"
+            app:destination="@id/pollDisplayFragment" />
     </fragment>
     <fragment
         android:id="@+id/pollQuestionCreation"

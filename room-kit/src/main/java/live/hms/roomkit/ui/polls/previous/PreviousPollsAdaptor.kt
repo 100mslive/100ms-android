@@ -17,7 +17,7 @@ data class PreviousPollsInfo(
 
 class PreviewPollsViewBinding(
     val binding: PreviousPollsListBinding,
-    val view: (PreviousPollsInfo) -> Unit
+    val view: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(info: PreviousPollsInfo) {
@@ -34,6 +34,7 @@ class PreviewPollsViewBinding(
                 HmsPollState.CREATED -> R.drawable.polls_status_background_draft
                 HmsPollState.STOPPED -> R.drawable.polls_status_background_ended
             }
+            viewButton.setOnClickListener { view(bindingAdapterPosition) }
             status.setBackgroundResource(colorRes)
         }
     }
@@ -60,7 +61,7 @@ class PreviousPollsAdaptor(private val view: (PreviousPollsInfo) -> Unit) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PreviewPollsViewBinding {
         val binding = PreviousPollsListBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PreviewPollsViewBinding(binding, view)
+        return PreviewPollsViewBinding(binding, {position : Int -> view(getItem(position))})
     }
 
     override fun onBindViewHolder(holder: PreviewPollsViewBinding, position: Int) {
