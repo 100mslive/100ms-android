@@ -58,6 +58,12 @@
         <action
             android:id="@+id/action_MeetingFragment_to_roleChangeFragment"
             app:destination="@id/roleChangeFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_pollsCreationFragment"
+            app:destination="@id/pollsCreationFragment" />
+        <action
+            android:id="@+id/action_MeetingFragment_to_pollDisplayFragment"
+            app:destination="@id/pollDisplayFragment" />
     </fragment>
 
     <dialog
@@ -154,4 +160,28 @@
             android:id="@+id/action_roleChangeFragment_to_MeetingFragment"
             app:destination="@id/MeetingFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/pollsCreationFragment"
+        android:name="live.hms.roomkit.ui.polls.PollsCreationFragment"
+        android:label="PollsCreationFragment" >
+        <action
+            android:id="@+id/action_pollsCreationFragment_to_pollQuestionCreation"
+            app:destination="@id/pollQuestionCreation" />
+        <action
+            android:id="@+id/action_pollsCreationFragment_to_pollDisplayFragment"
+            app:destination="@id/pollDisplayFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pollQuestionCreation"
+        android:name="live.hms.roomkit.ui.polls.PollQuestionCreation"
+        android:label="PollQuestionCreation" />
+    <fragment
+        android:id="@+id/pollDisplayFragment"
+        android:name="live.hms.roomkit.ui.polls.display.PollDisplayFragment"
+        android:label="PollDisplayFragment" >
+        <argument
+            android:name="pollId"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

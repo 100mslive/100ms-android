@@ -2,6 +2,11 @@
     <!-- Base application theme. -->
     <style name="Theme.App2" parent="Theme.MaterialComponents">
         <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/blue_1</item>
+        <item name="colorPrimaryVariant">@color/primary_bg</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:listDivider">@color/primary_blue</item>
+        <item name="android:dividerHeight">8dp</item>
 
 
 
@@ -91,4 +96,55 @@
     <style name="SpinnerTheme" parent="android:Widget.Spinner">
         <item name="android:background">@drawable/stroked_round_drawable</item>
     </style>
+    <style name="HmsHeadings" parent="MaterialTextViewHeading">
+        <item name="android:fontFamily">@font/inter_semibold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="HmsPollCardText" parent="Widget.MaterialComponents.TextView">
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="HmsSubHeadings" parent="Widget.MaterialComponents.TextView">
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="QuestionNumberText" parent="Widget.MaterialComponents.TextView">
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:textColor">#C3D0E580</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="poll_display_title">
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:lineSpacingExtra">5sp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:textColor">#F2F5F9FF</item>
+    </style>
+
+    <style name="poll_display_question_numbering">
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:lineSpacingExtra">4sp</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.15</item>
+        <item name="android:textColor">#80C3D0E5</item>
+    </style>
+
+    <style name="poll_display_answer_item">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/inter_regular</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">#F2F5F9FF</item>
+    </style>
+
+    <style name="polls_question_asking_options">
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.02</item>
+        <item name="android:textColor">#CCE0ECFF</item>
+    </style>
+
 </resources>

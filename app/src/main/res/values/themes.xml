@@ -109,4 +109,5 @@
         <item name="android:background">@drawable/stroked_round_drawable</item>
         <item name="android:textColor">@color/white</item>
     </style>
+
 </resources>
