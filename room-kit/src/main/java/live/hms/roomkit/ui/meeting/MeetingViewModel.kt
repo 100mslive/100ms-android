@@ -118,9 +118,8 @@ class MeetingViewModel(
 
             }
         }
-
-  fun initSdk(
     fun getHmsRoomLayout() = hmsRoomLayout
+
 
     fun initSdk(
         roomCode: String,
