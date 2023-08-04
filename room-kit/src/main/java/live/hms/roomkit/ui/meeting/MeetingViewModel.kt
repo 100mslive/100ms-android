@@ -55,6 +55,7 @@ import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import java.util.*
+import kotlin.properties.Delegates
 
 
 class MeetingViewModel(
@@ -70,7 +71,7 @@ class MeetingViewModel(
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
-    private var isPrebuiltDebug = false
+    private var isPrebuiltDebug by Delegates.notNull<Boolean>()
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
