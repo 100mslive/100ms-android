@@ -21,11 +21,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
+import com.bumptech.glide.Glide
 import live.hms.roomkit.R
 import live.hms.roomkit.animation.ControlFocusInsetsAnimationCallback
 import live.hms.roomkit.animation.TranslateDeferringInsetsAnimationCallback
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.drawableStart
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setDrawables
@@ -43,6 +44,7 @@ import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.role.PublishParams
 import live.hms.video.utils.HMSLogger
 
@@ -76,9 +78,31 @@ class PreviewFragment : Fragment() {
     private var setTextOnce = false
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
+    private var isHlsRunning = false
+    private var isHlsPermission = false
 
-    //TODO get from the config api
-    private val startLiveStreamIng by lazy { meetingViewModel.isGoLiveInPreBuiltEnabled() }
+
+
+    private fun updateJoinButtonTextIfHlsIsEnabled() : Boolean {
+        val hlsJoinButtonFromLayoutConfig = meetingViewModel.getHmsRoomLayout()
+            ?.getPreviewLayout()?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
+
+        if (isHlsPermission && isHlsRunning.not() && hlsJoinButtonFromLayoutConfig) {
+            if (binding.buttonJoinMeeting.drawableStart == null) {
+                binding.buttonJoinMeeting.setDrawables(
+                    start = ContextCompat.getDrawable(
+                        context!!, R.drawable.ic_live
+                    )
+                )
+            }
+            binding.buttonJoinMeeting.text = "Go Live"
+            return true
+        } else {
+            binding.buttonJoinMeeting.text = "Join Now"
+            return false
+        }
+
+    }
 
     override fun onResume() {
         super.onResume()
@@ -129,6 +153,7 @@ class PreviewFragment : Fragment() {
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
+        setupUI()
 
         setupKeyboardAnimation()
 
@@ -155,11 +180,41 @@ class PreviewFragment : Fragment() {
 
     }
 
+    private fun setupUI() {
+        if (meetingViewModel.getHmsRoomLayout()
+                ?.getPreviewLayout()?.default?.elements?.previewHeader?.title.isNullOrEmpty()
+        ) {
+            binding.nameTv.visibility = View.GONE
+        } else {
+            binding.nameTv.text = meetingViewModel.getHmsRoomLayout()
+                ?.getPreviewLayout()?.default?.elements?.previewHeader?.title
+        }
+
+        if (meetingViewModel.getHmsRoomLayout()
+                ?.getPreviewLayout()?.default?.elements?.previewHeader?.subTitle.isNullOrEmpty()
+        ) {
+            binding.descriptionTv.visibility = View.GONE
+        } else {
+            binding.descriptionTv.text = meetingViewModel.getHmsRoomLayout()
+                ?.getPreviewLayout()?.default?.elements?.previewHeader?.subTitle
+        }
+
+
+        if (meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url.isNullOrEmpty()) {
+            binding.logoIv.visibility = View.INVISIBLE
+        } else {
+            binding.logoIv.visibility = View.VISIBLE
+            Glide.with(this)
+                .load(meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url)
+                .into(binding.logoIv);
+        }
+
+    }
+
     private fun setupKeyboardAnimation() {
 
         ViewCompat.setWindowInsetsAnimationCallback(
-            binding.previewBottomBar,
-            TranslateDeferringInsetsAnimationCallback(
+            binding.previewBottomBar, TranslateDeferringInsetsAnimationCallback(
                 view = binding.previewBottomBar,
                 persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
                 deferredInsetTypes = WindowInsetsCompat.Type.ime(),
@@ -172,8 +227,7 @@ class PreviewFragment : Fragment() {
         val movableOnKeybaordOpen = arrayOf(binding.buttonNetworkQuality)
         movableOnKeybaordOpen.forEach {
             ViewCompat.setWindowInsetsAnimationCallback(
-                it,
-                TranslateDeferringInsetsAnimationCallback(
+                it, TranslateDeferringInsetsAnimationCallback(
                     view = it,
                     persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
                     deferredInsetTypes = WindowInsetsCompat.Type.ime()
@@ -183,8 +237,7 @@ class PreviewFragment : Fragment() {
         }
 
         ViewCompat.setWindowInsetsAnimationCallback(
-            binding.editTextName,
-            ControlFocusInsetsAnimationCallback(binding.editTextName)
+            binding.editTextName, ControlFocusInsetsAnimationCallback(binding.editTextName)
         )
     }
 
@@ -215,9 +268,22 @@ class PreviewFragment : Fragment() {
 
     private fun initButtons() {
 
-        meetingViewModel.previewUpdateLiveData.observe(viewLifecycleOwner) {
-            binding.liveHlsGroup.visibility = if (it.first.isHLSRoom()) View.VISIBLE else View.GONE
-            binding.participantCountText.text = it.first.peerList.formatNames()
+        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
+            if (it.first == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED && it.second.peerCount != null) {
+                binding.iconParticipants.visibility = View.VISIBLE
+                binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
+            }
+            updateJoinButtonTextIfHlsIsEnabled()
+            isHlsRunning = it.second.hlsStreamingState?.running == true
+            isHlsPermission = it.second.localPeer?.hmsRole?.permission?.hlsStreaming ?: false
+
+            if (it.second.hlsStreamingState?.running == true) {
+                binding.liveHlsGroup.visibility = View.VISIBLE
+            } else {
+                binding.liveHlsGroup.visibility = View.GONE
+            }
+
+
         }
 
         binding.closeBtn.setOnSingleClickListener(300L) {
@@ -328,7 +394,7 @@ class PreviewFragment : Fragment() {
 
     private fun navigateToMeeting() {
         findNavController().navigate(
-            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(startLiveStreamIng)
+            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(updateJoinButtonTextIfHlsIsEnabled())
         )
     }
 
@@ -462,8 +528,7 @@ class PreviewFragment : Fragment() {
             }
         }
 
-        meetingViewModel.previewUpdateLiveData.observe(
-            viewLifecycleOwner,
+        meetingViewModel.previewUpdateLiveData.observe(viewLifecycleOwner,
             Observer { (room, localTracks) ->
 
                 if (setTextOnce.not()) {
@@ -527,19 +592,9 @@ class PreviewFragment : Fragment() {
                 }
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
-                    binding.buttonJoinMeeting.text = if (meetingViewModel.isPrebuiltDebugMode()) {
-                        "Enter Meeting"
-                    } else if (startLiveStreamIng) {
-                        binding.buttonJoinMeeting.setDrawables(
-                            start = ContextCompat.getDrawable(
-                                context!!, R.drawable.ic_live
-                            )
-                        )
-                        enableDisableJoinNowButton()
-                        "Go LIve"
-                    } else {
-                        "Join Now"
-                    }
+
+                    updateJoinButtonTextIfHlsIsEnabled()
+                    enableDisableJoinNowButton()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
                 } else {
@@ -609,8 +664,7 @@ class PreviewFragment : Fragment() {
     }
 
     private fun initOnBackPress() {
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     meetingViewModel.leaveMeeting()
@@ -620,18 +674,11 @@ class PreviewFragment : Fragment() {
     }
 }
 
-private fun List<HMSPeer>.formatNames(): CharSequence? {
-    var text = ""
-    var count = 0
-    var hasLocalPeer = false
-    this.forEach {
-        if (it.isLocal) {
-            hasLocalPeer = true
-        }
-    }
-    if (hasLocalPeer && this.size <= 1) {
-        return "You are the first to join"
-    } else return "${this.size - 1} other session in this room"
+private fun Int?.formatNames(): String? {
+    if (this == null) return null
+    return if (this == 0) {
+        "You are the first to join"
+    } else "${this} other session in this room"
 }
 
 fun HMSRoom.isHLSRoom(): Boolean {
