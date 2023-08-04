@@ -108,12 +108,14 @@ class MeetingViewModel(
                 ) {
                     if(hmsPollUpdateType == HMSPollUpdateType.started) {
                         viewModelScope.launch {
-                            _events.emit(Event.PollStarted(hmsPoll))
+                            if(isPrebuiltDebug)
+                                _events.emit(Event.PollStarted(hmsPoll))
                         }
                     }
                     else if (hmsPollUpdateType == HMSPollUpdateType.resultsupdated) {
                         viewModelScope.launch {
-                            _events.emit(Event.PollVotesUpdated(hmsPoll))
+                            if(isPrebuiltDebug)
+                                _events.emit(Event.PollVotesUpdated(hmsPoll))
                         }
                     }
                 }
@@ -888,7 +890,8 @@ class MeetingViewModel(
             override fun onSuccess(result: List<HmsPoll>) {
                 viewModelScope.launch {
                     result.sortedByDescending { it.startedAt }.firstOrNull()?.also { firstPoll ->
-                        _events.emit(Event.PollStarted(firstPoll))
+                        if(isPrebuiltDebug)
+                            _events.emit(Event.PollStarted(firstPoll))
                     }
                 }
             }
