@@ -7,6 +7,7 @@ import live.hms.roomkit.databinding.LayoutPollsDisplayOptionsItemBinding
 
 class DisplayAnswerOptionsViewHolder(
     val binding: LayoutPollsDisplayOptionsItemBinding,
+    private val canRoleViewVotes : Boolean,
     getItem: (Int) -> Option,
     ) : ViewHolder(binding.root){
 
@@ -36,6 +37,10 @@ class DisplayAnswerOptionsViewHolder(
             checkbox.visibility = if(option.showCheckbox) View.VISIBLE else View.GONE
             radioButton.visibility = if(option.showCheckbox) View.GONE else View.VISIBLE
             text.setText(option.text)
+            if(option.hiddenAndAnswered && !canRoleViewVotes) {
+                radioButton.isEnabled = false
+                checkbox.isEnabled = false
+            }
         }
     }
 }

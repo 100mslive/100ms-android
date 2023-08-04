@@ -17,13 +17,14 @@ import live.hms.video.polls.models.question.HMSPollQuestionType
 
 class PollDisplayQuestionHolder<T : ViewBinding>(
     val binding: T,
+    private val canRoleViewVotes : Boolean,
     val getPoll : () -> HmsPoll,
     val saveInfoText: (text : String, position : Int) -> Boolean,
     val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
     val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private val adapter = AnswerOptionsAdapter()
+    private val adapter = AnswerOptionsAdapter(canRoleViewVotes)
     var votingProgressAdapter : VotingProgressAdapter? = null
 
     // There are two different layouts.
@@ -40,16 +41,22 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
         if(question.voted) {
-            options.visibility = View.GONE
             votebutton.visibility = View.GONE
-            votingProgressBars.visibility = View.VISIBLE
-            votingProgressBars.adapter= votingProgressAdapter
-            val divider = DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
-                setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
-            }
-            votingProgressBars.addItemDecoration(divider)
+            // If results are to be hidden, then don't do the rest of the change that swaps layouts
+            if(getPoll().anonymous && !canRoleViewVotes){
+                (options.adapter as AnswerOptionsAdapter).disableOptions()
+            } else {
+                options.visibility = View.GONE
+                votingProgressBars.visibility = View.VISIBLE
+                votingProgressBars.adapter = votingProgressAdapter
+                val divider =
+                    DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
+                        setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
+                    }
+                votingProgressBars.addItemDecoration(divider)
 
-            votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
+                votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
+            }
             // But nothing will update them. They will always be zero.
 
         } else {

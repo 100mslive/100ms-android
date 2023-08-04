@@ -9,10 +9,9 @@ import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.video.polls.models.HmsPoll
-import live.hms.video.polls.models.PollStatsQuestions
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
-import kotlin.reflect.KFunction2
+import live.hms.video.sdk.models.HMSPeer
 
 
 // Now we decide what the data holder is (let's leave it the original,
@@ -29,6 +28,7 @@ data class QuestionContainer(
     var voted : Boolean = false
 )
 class PollsDisplayAdaptor(
+    val localPeer : HMSPeer,
     val getPoll : (pollId : String) -> HmsPoll,
     val saveInfoText : (question: HMSPollQuestion, answer : String, hmsPoll : HmsPoll) -> Boolean,
     val saveInfoSingleChoice : (question : HMSPollQuestion, Int?, hmsPoll : HmsPoll) -> Boolean,
@@ -78,12 +78,15 @@ class PollsDisplayAdaptor(
             HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        val questionHolder = PollDisplayQuestionHolder(view!!, { getPoll(this.pollId)}, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)
+        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll(this.pollId), localPeer), { getPoll(this.pollId)}, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
             updater.add(questionHolder)
         }
         return questionHolder
     }
+
+    private fun canViewResponses(hmsPoll: HmsPoll, localPeer: HMSPeer): Boolean =
+        hmsPoll.rolesThatCanViewResponses.contains(localPeer.hmsRole)
 
     override fun onBindViewHolder(holder: PollDisplayQuestionHolder<ViewBinding>, position: Int) {
         holder.bind(getItem(position))

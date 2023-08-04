@@ -43,6 +43,7 @@ class PollDisplayFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         pollsDisplayAdaptor = PollsDisplayAdaptor(
+            meetingViewModel.peers.find { it.isLocal }!!,
             meetingViewModel::getPollForPollId,
             meetingViewModel::saveInfoText,
             meetingViewModel::saveInfoSingleChoice,

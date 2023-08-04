@@ -1,5 +1,7 @@
 package live.hms.roomkit.ui.polls.display
 
+import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,7 +11,8 @@ import java.util.*
 
 data class Option(var text : String,
                   val showCheckbox : Boolean,
-                  var isChecked : Boolean = false, val id : String = UUID.randomUUID().toString())
+                  var isChecked : Boolean = false, val id : String = UUID.randomUUID().toString(),
+var hiddenAndAnswered : Boolean = false)
 
 /**
  * Displays options on the single/multi choice questions.
@@ -19,8 +22,17 @@ data class Option(var text : String,
  * Functions needed are:
  * answer selected, which takes the question and such
  */
-class AnswerOptionsAdapter : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
+class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean) : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
 
+    // all items have in fact changed.
+    @SuppressLint("NotifyDataSetChanged")
+    fun disableOptions() {
+        for (i in 0 until itemCount) {
+            val item = getItem(i)
+            item.hiddenAndAnswered = true
+        }
+        notifyDataSetChanged()
+    }
     companion object {
         val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<Option>() {
             override fun areItemsTheSame(oldItem: Option, newItem: Option): Boolean =
@@ -35,7 +47,7 @@ class AnswerOptionsAdapter : ListAdapter<Option, DisplayAnswerOptionsViewHolder>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DisplayAnswerOptionsViewHolder {
         val binding = LayoutPollsDisplayOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DisplayAnswerOptionsViewHolder(binding, ::getItem)
+        return DisplayAnswerOptionsViewHolder(binding,canRoleViewVotes, ::getItem)
     }
 
     override fun onBindViewHolder(holder: DisplayAnswerOptionsViewHolder, position: Int) {
