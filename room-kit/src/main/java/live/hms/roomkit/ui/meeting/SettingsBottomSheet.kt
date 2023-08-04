@@ -18,7 +18,8 @@ import live.hms.roomkit.util.viewLifecycle
 class SettingsBottomSheet(
     private val meetingViewModel: MeetingViewModel,
     private val participantsListener: () -> Unit,
-    private val openBulkRoleChange : () -> Unit
+    private val openBulkRoleChange : () -> Unit,
+    private val openPolls : () -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<SettingsBottomSheetDialogBinding>()
@@ -117,6 +118,15 @@ class SettingsBottomSheet(
                 openBulkRoleChange()
             }
             visibility = if(meetingViewModel.isAllowedToChangeRole() && meetingViewModel.isPrebuiltDebugMode()) View.VISIBLE else View.GONE
+        }
+        if(meetingViewModel.isPrebuiltDebugMode().not()) {
+            binding.btnPolls.visibility = View.GONE
+        }
+        binding.btnPolls.apply {
+            setOnSingleClickListener{
+                dismiss()
+                openPolls()
+            }
         }
         binding.btnPipMode.apply {
             setOnSingleClickListener {

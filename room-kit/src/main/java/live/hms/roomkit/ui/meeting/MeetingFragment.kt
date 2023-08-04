@@ -31,6 +31,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -117,6 +118,10 @@ class MeetingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        val poll = meetingViewModel.hasPoll()
+        if(poll != null) {
+            showPollStart(poll.pollId)
+        }
         isCountdownManuallyCancelled = false
         setupRecordingTimeView()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
@@ -624,6 +629,11 @@ class MeetingFragment : Fragment() {
                             Toast.LENGTH_LONG
                         ).show()
                     }
+                    is MeetingViewModel.Event.PollStarted -> {
+                        showPollStart(event.hmsPoll.pollId)
+                    }
+
+                    else -> null
                 }
             }
         }
@@ -804,6 +814,12 @@ class MeetingFragment : Fragment() {
             chatViewModel.peersUpdate()
             setupConfiguration()
         }
+    }
+
+    private fun showPollStart(pollId: String) {
+        Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE)
+            .setAction("Open") { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(pollId))}
+            .show()
     }
 
     private val pipReceiver by lazy {
@@ -1000,7 +1016,10 @@ class MeetingFragment : Fragment() {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
                 }, {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
-                })
+                },
+                    {
+                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
+                    })
                 settingsBottomSheet.show(
                     requireActivity().supportFragmentManager,
                     "settingsBottomSheet"

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="poll_state_live">#CB525E</color>
+    <color name="poll_state_draft">#475366</color>
+    <color name="poll_state_ended">#475366</color>
+</resources>
