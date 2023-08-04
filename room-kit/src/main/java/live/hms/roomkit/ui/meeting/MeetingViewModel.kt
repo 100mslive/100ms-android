@@ -39,7 +39,6 @@ import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.PollAnswerResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
-import live.hms.video.polls.models.question.HMSPollQuestionOption
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
@@ -1775,5 +1774,50 @@ class MeetingViewModel(
 
     fun getPollForPollId(pollId: String): HmsPoll = localHmsInteractivityCenter.polls.find{ it.pollId == pollId }!!
     fun hasPoll() : HmsPoll? = localHmsInteractivityCenter.polls.firstOrNull()
+
+    suspend fun getAllPolls() : List<HmsPoll>? {
+        val getStartedPolls = CompletableDeferred<List<HmsPoll>>()
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                getStartedPolls.complete(result)
+            }
+
+            override fun onError(error: HMSException) {
+                getStartedPolls.completeExceptionally(error)
+            }
+
+        })
+        val getCreatedPolls = CompletableDeferred<List<HmsPoll>>()
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.CREATED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                getCreatedPolls.complete(result)
+            }
+
+            override fun onError(error: HMSException) {
+                getCreatedPolls.completeExceptionally(error)
+            }
+
+        })
+        val getEndedPolls = CompletableDeferred<List<HmsPoll>>()
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.STOPPED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                getEndedPolls.complete(result)
+            }
+
+            override fun onError(error: HMSException) {
+                getEndedPolls.completeExceptionally(error)
+            }
+
+        })
+
+        return try {
+            getStartedPolls.await()
+                .plus(getCreatedPolls.await())
+                .plus(getEndedPolls.await())
+        } catch (error : HMSException) {
+
+            null
+        }
+    }
 }
 

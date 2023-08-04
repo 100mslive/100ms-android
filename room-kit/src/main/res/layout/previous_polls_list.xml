@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:layout_marginRight="16dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:fontFamily="@font/inter_regular"
+            android:textSize="16dp"
+            android:lineHeight="24px"
+            android:gravity="top|start"
+            android:lineSpacingExtra="3sp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            tools:text="Poll Title" />
+
+        <TextView
+            android:id="@+id/status"
+            android:background="@drawable/polls_status_background_ended"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:fontFamily="@font/inter_regular"
+            android:textSize="10dp"
+            android:lineHeight="16px"
+            android:gravity="top|end"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/viewButton"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="right"
+            android:backgroundTint="#2672ED"
+            android:layout_margin="16dp"
+            android:background="@drawable/polls_blue_button_shape"
+            android:text="View" />
+
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>
