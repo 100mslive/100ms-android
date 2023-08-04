@@ -362,7 +362,7 @@ class MeetingViewModel(
                 // This will keep the isRecording value updated correctly in preview. It will not be called after join.
                 _isRecording.postValue(getRecordingState(hmsRoom))
                 if (type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
-                    Log.d("PeerCountUpdated", "New peer count is : ${hmsRoom.peerCount}")
+                    Log.d(TAG, "New peer count is : ${hmsRoom.peerCount}")
                 }
             }
 
