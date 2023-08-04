@@ -32,17 +32,6 @@ object HMSPrebuiltTheme {
     fun getColours() = theme
     internal fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
         this.theme = theme
-
-        this.theme = theme.copy(
-            backgroundDim = "#000000",
-            primaryDefault = "#2572ED",
-            borderBright = "#272A31",
-            onSurfaceHigh = "#EFF0FA",
-            secondaryDim = "#293042",
-            backgroundDefault = "#0B0E15",
-            onPrimaryLow = "#84AAFF",
-            primaryDisabled = "#004299"
-        )
     }
 
     fun getDefaults() = DefaultDarkThemeColours()
@@ -57,6 +46,10 @@ object HMSPrebuiltTheme {
         )
     }
 }
+
+internal fun HMSRoomLayout.getPreviewLayout() =
+    this.data?.getOrNull(0)?.screens?.preview
+
 
 internal fun CardView.setBackgroundAndColor(
     backgroundColorStr: String?,
@@ -389,6 +382,19 @@ internal fun FragmentPreviewBinding.applyTheme() {
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    closeBtn.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.circle_secondary_40
+    )
+
+    closeBtn.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 

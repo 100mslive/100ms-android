@@ -9,7 +9,6 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -66,6 +65,7 @@ class MeetingViewModel(
 
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
+    private var hmsRoomLayout : HMSRoomLayout? = null
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
@@ -120,6 +120,9 @@ class MeetingViewModel(
         }
 
   fun initSdk(
+    fun getHmsRoomLayout() = hmsRoomLayout
+
+    fun initSdk(
         roomCode: String,
         hmsPrebuiltOptions: HMSPrebuiltOptions?,
         onHMSActionResultListener: HMSActionResultListener
@@ -166,6 +169,7 @@ class MeetingViewModel(
                                 }
 
                                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
+                                    hmsRoomLayout = layoutConfig
                                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                                     onHMSActionResultListener.onSuccess()
@@ -279,7 +283,7 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
-    fun isGoLiveInPreBuiltEnabled() = settings.goLiveInPrebuilt
+    fun isGoLiveInPreBuiltEnabled() = settings.useMockAPi
 
     // Title at the top of the meeting
     val title = MutableLiveData<Int>()
