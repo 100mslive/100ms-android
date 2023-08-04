@@ -9,6 +9,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -118,8 +119,6 @@ class MeetingViewModel(
 
             }
         }
-
-  fun initSdk(
     fun getHmsRoomLayout() = hmsRoomLayout
 
     fun initSdk(
