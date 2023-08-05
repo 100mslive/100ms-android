@@ -22,7 +22,7 @@
             android:launchMode="singleTask"
             android:supportsPictureInPicture="true"
             android:theme="@style/Theme.App2.NoActionBar"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
 
         <provider

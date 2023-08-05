@@ -630,12 +630,12 @@ class PreviewFragment : Fragment() {
         if (publishParams.allowed.contains("video")) {
             binding.buttonToggleVideo.visibility = View.VISIBLE
             binding.buttonSwitchCamera.visibility = View.VISIBLE
-            binding.videoCardContainer.visibility = View.VISIBLE
+            binding.previewView.visibility = View.VISIBLE
         } else {
             binding.topMarging.setGuidelinePercent(0.35f)
             binding.buttonToggleVideo.visibility = View.GONE
             binding.buttonSwitchCamera.visibility = View.GONE
-            binding.videoCardContainer.visibility = View.GONE
+            binding.previewView.visibility = View.GONE
         }
     }
 
