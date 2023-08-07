@@ -42,28 +42,44 @@ class PollDisplayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        pollsDisplayAdaptor = PollsDisplayAdaptor(
-            meetingViewModel.peers.find { it.isLocal }!!,
-            meetingViewModel::getPollForPollId,
-            meetingViewModel::saveInfoText,
-            meetingViewModel::saveInfoSingleChoice,
-            meetingViewModel::saveInfoMultiChoice)
 
-        poll = meetingViewModel.getPollForPollId(args.pollId)
-        lifecycleScope.launch{
-            meetingViewModel.events.onEach {
-                if(it is MeetingViewModel.Event.PollVotesUpdated) {
-                    // Update the polls? How?
-                    pollsDisplayAdaptor.updatePollVotes(it.hmsPoll)
+        lifecycleScope.launch {
+            val returnedPoll = meetingViewModel.getPollForPollId(args.pollId)
+            if(returnedPoll == null) {
+                // Close the fragment and exit
+                findNavController().popBackStack()
+                return@launch
+            }
+
+            pollsDisplayAdaptor = PollsDisplayAdaptor(
+                meetingViewModel.peers.find { it.isLocal }!!,
+                returnedPoll,
+                meetingViewModel::saveInfoText,
+                meetingViewModel::saveInfoSingleChoice,
+                meetingViewModel::saveInfoMultiChoice
+            )
+
+
+            poll = returnedPoll
+
+            lifecycleScope.launch {
+                meetingViewModel.events.onEach {
+                    if (it is MeetingViewModel.Event.PollVotesUpdated) {
+                        // Update the polls? How?
+                        pollsDisplayAdaptor.updatePollVotes(it.hmsPoll)
+                    }
+                }.collect()
+            }
+
+            with(binding) {
+                backButton.setOnSingleClickListener {
+
+                    findNavController().popBackStack()
                 }
-            }.collect()
-        }
-
-        with(binding) {
-            backButton.setOnSingleClickListener { findNavController().popBackStack() }
-            questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
-            questionsRecyclerView.adapter = pollsDisplayAdaptor
-            pollsDisplayAdaptor.displayPoll(poll)
+                questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+                questionsRecyclerView.adapter = pollsDisplayAdaptor
+                pollsDisplayAdaptor.displayPoll(poll)
+            }
         }
     }
 }

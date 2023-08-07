@@ -79,6 +79,7 @@ class MeetingFragment : Fragment() {
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
     }
 
+    private var startPollSnackBar : Snackbar? = null
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
 
@@ -816,10 +817,13 @@ class MeetingFragment : Fragment() {
         }
     }
 
+
     private fun showPollStart(pollId: String) {
-        Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE)
-            .setAction("Open") { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(pollId))}
-            .show()
+        startPollSnackBar?.dismiss()
+        startPollSnackBar = Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE).setAction("Open") {
+            findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(pollId))}
+
+        startPollSnackBar?.show()
     }
 
     private val pipReceiver by lazy {
@@ -1018,6 +1022,7 @@ class MeetingFragment : Fragment() {
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
                 },
                     {
+                        startPollSnackBar?.dismiss()
                         findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
                     })
                 settingsBottomSheet.show(
