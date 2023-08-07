@@ -83,6 +83,9 @@ class MeetingActivity : AppCompatActivity() {
           val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
           if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not())
             navController?.setGraph(R.navigation.meeting_nav_graph, intent.extras)
+          else
+            navController?.setGraph(R.navigation.no_preview_nav_graph, intent.extras)
+
           initViewModels()
         }
       }
