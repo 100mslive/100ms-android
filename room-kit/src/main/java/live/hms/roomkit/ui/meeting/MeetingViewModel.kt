@@ -1159,6 +1159,10 @@ class MeetingViewModel(
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
     }
 
+    fun isAllowedToCreatePolls() : Boolean {
+        return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
+    }
+
     fun isAllowedToEndMeeting(): Boolean {
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true
     }
