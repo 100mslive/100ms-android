@@ -635,7 +635,7 @@ class PreviewFragment : Fragment() {
             binding.topMarging.setGuidelinePercent(0.35f)
             binding.buttonToggleVideo.visibility = View.GONE
             binding.buttonSwitchCamera.visibility = View.GONE
-            binding.previewView.visibility = View.GONE
+            binding.videoCardContainer.visibility = View.GONE
         }
     }
 

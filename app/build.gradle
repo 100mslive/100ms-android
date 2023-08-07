@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId "live.hms.app2"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode project.findProperty('100MS_APP_VERSION_CODE') as int
         versionName project.findProperty('100MS_APP_VERSION_NAME')
 
