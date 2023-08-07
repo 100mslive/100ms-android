@@ -86,7 +86,7 @@ class PollsDisplayAdaptor(
     }
 
     private fun canViewResponses(hmsPoll: HmsPoll, localPeer: HMSPeer): Boolean =
-        hmsPoll.rolesThatCanViewResponses.contains(localPeer.hmsRole)
+        hmsPoll.rolesThatCanViewResponses.contains(localPeer.hmsRole) || hmsPoll.rolesThatCanViewResponses.isEmpty()
 
     override fun onBindViewHolder(holder: PollDisplayQuestionHolder<ViewBinding>, position: Int) {
         holder.bind(getItem(position))
