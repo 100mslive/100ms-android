@@ -635,7 +635,7 @@ class PreviewFragment : Fragment() {
             binding.topMarging.setGuidelinePercent(0.35f)
             binding.buttonToggleVideo.visibility = View.GONE
             binding.buttonSwitchCamera.visibility = View.GONE
-            binding.previewView.visibility = View.GONE
+            binding.videoCardContainer.visibility = View.GONE
         }
     }
 
@@ -647,8 +647,10 @@ class PreviewFragment : Fragment() {
                 imageView.setImageDrawable(drawable)
                 if (drawable == null) {
                     imageView.visibility = View.GONE
+                    binding.buttonNetworkQuality.visibility = View.GONE
                 } else {
                     imageView.visibility = View.VISIBLE
+                    binding.buttonNetworkQuality.visibility = View.VISIBLE
                 }
             }
     }
