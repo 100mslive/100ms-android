@@ -647,8 +647,10 @@ class PreviewFragment : Fragment() {
                 imageView.setImageDrawable(drawable)
                 if (drawable == null) {
                     imageView.visibility = View.GONE
+                    binding.buttonNetworkQuality.visibility = View.GONE
                 } else {
                     imageView.visibility = View.VISIBLE
+                    binding.buttonNetworkQuality.visibility = View.VISIBLE
                 }
             }
     }
