@@ -29,7 +29,7 @@ data class QuestionContainer(
 )
 class PollsDisplayAdaptor(
     val localPeer : HMSPeer,
-    val getPoll : (pollId : String) -> HmsPoll,
+    val getPoll : HmsPoll,
     val saveInfoText : (question: HMSPollQuestion, answer : String, hmsPoll : HmsPoll) -> Boolean,
     val saveInfoSingleChoice : (question : HMSPollQuestion, Int?, hmsPoll : HmsPoll) -> Boolean,
     val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll) -> Boolean
@@ -78,7 +78,7 @@ class PollsDisplayAdaptor(
             HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll(this.pollId), localPeer), { getPoll(this.pollId)}, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)
+        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
             updater.add(questionHolder)
         }
@@ -86,7 +86,7 @@ class PollsDisplayAdaptor(
     }
 
     private fun canViewResponses(hmsPoll: HmsPoll, localPeer: HMSPeer): Boolean =
-        hmsPoll.rolesThatCanViewResponses.contains(localPeer.hmsRole)
+        hmsPoll.rolesThatCanViewResponses.contains(localPeer.hmsRole) || hmsPoll.rolesThatCanViewResponses.isEmpty()
 
     override fun onBindViewHolder(holder: PollDisplayQuestionHolder<ViewBinding>, position: Int) {
         holder.bind(getItem(position))
@@ -98,7 +98,7 @@ class PollsDisplayAdaptor(
     private fun setTextAnswer(answer : String, position: Int): Boolean {
         val option = getItem(position)
         option.textAnswers = answer
-        return saveInfoText(option.question, answer, getPoll(pollId))
+        return saveInfoText(option.question, answer, getPoll)
     }
 
     fun updatePollVotes(hmsPoll: HmsPoll) {

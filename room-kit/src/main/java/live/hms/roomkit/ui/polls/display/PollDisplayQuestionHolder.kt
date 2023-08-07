@@ -18,7 +18,7 @@ import live.hms.video.polls.models.question.HMSPollQuestionType
 class PollDisplayQuestionHolder<T : ViewBinding>(
     val binding: T,
     private val canRoleViewVotes : Boolean,
-    val getPoll : () -> HmsPoll,
+    val poll : HmsPoll,
     val saveInfoText: (text : String, position : Int) -> Boolean,
     val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
     val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean
@@ -43,7 +43,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         if(question.voted) {
             votebutton.visibility = View.GONE
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
-            if(getPoll().anonymous && !canRoleViewVotes){
+            if(poll.anonymous && !canRoleViewVotes){
                 (options.adapter as AnswerOptionsAdapter).disableOptions()
             } else {
                 options.visibility = View.GONE
@@ -69,7 +69,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     private fun optionsBinder(question: QuestionContainer) {
         with(binding as LayoutPollsDisplayChoicesQuesionBinding) {
             manageVisibility(question, this)
-            questionNumbering.text = "Question ${question.question.questionID} of ${getPoll()?.questions?.size}"
+            questionNumbering.text = "Question ${question.question.questionID} of ${poll?.questions?.size}"
             questionText.text = question.question.text
             options.layoutManager = LinearLayoutManager(binding.root.context)
             // selected options could be read from the UI directly.
@@ -77,9 +77,9 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             adapter.submitList(question.question.options?.map { Option(it.text?:"", question.question.type == HMSPollQuestionType.multiChoice) })
             votebutton.setOnSingleClickListener {
                 val voted : Boolean = if(question.question.type == HMSPollQuestionType.singleChoice){
-                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), getPoll())
+                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll)
                 } else if(question.question.type == HMSPollQuestionType.multiChoice) {
-                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), getPoll())
+                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll)
                 } else {
                     saveInfoText("What?", bindingAdapterPosition)
                 }
