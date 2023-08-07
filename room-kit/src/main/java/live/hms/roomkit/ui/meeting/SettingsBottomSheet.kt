@@ -119,7 +119,7 @@ class SettingsBottomSheet(
             }
             visibility = if(meetingViewModel.isAllowedToChangeRole() && meetingViewModel.isPrebuiltDebugMode()) View.VISIBLE else View.GONE
         }
-        if(meetingViewModel.isPrebuiltDebugMode().not()) {
+        if(meetingViewModel.isPrebuiltDebugMode().not() || meetingViewModel.isAllowedToCreatePolls().not()) {
             binding.btnPolls.visibility = View.GONE
         }
         binding.btnPolls.apply {
