@@ -38,6 +38,7 @@ import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.PollAnswerResponse
+import live.hms.video.polls.models.network.HMSPollQuestionResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
@@ -1749,7 +1750,7 @@ class MeetingViewModel(
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
-                    Log.d("PollAnswer","Success $result")
+                    Log.d("PollAnswer","Success")
                 }
 
                 override fun onError(error: HMSException) {

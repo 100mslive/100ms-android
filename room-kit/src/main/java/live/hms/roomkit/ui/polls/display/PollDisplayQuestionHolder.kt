@@ -31,8 +31,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     fun bind(question : QuestionContainer) {
         when(question.question.type) {
             HMSPollQuestionType.singleChoice, HMSPollQuestionType.multiChoice -> {
-                optionsBinder(question)
                 votingProgressAdapter = VotingProgressAdapter(question.question.questionID)
+                optionsBinder(question)
             }
             HMSPollQuestionType.shortAnswer,
             HMSPollQuestionType.longAnswer -> textBinder(question)
