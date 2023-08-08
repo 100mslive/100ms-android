@@ -587,6 +587,12 @@ class MeetingViewModel(
         Log.v(TAG, "~~ hmsSDK.join called ~~")
         hmsSDK.join(hmsConfig!!, object : HMSUpdateListener {
 
+            override fun onPermissionsRequested(permissions : List<String>) {
+                viewModelScope.launch {
+                    _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                }
+            }
+
             override fun onError(error: HMSException) {
                 Log.e(TAG, "onError: $error")
                 // Show a different dialog if error is terminal else a dismissible dialog
