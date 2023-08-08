@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.polls.display
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -43,8 +42,7 @@ class PollsDisplayAdaptor(
     val updater : MutableList<PollDisplayQuestionHolder<ViewBinding>> = mutableListOf()
 
     fun displayPoll(hmsPoll: HmsPoll) {
-        val questions = hmsPoll.questions?.map { QuestionContainer(it) }
-        Log.d("PollsDisplay","Que $questions")
+        val questions = hmsPoll.questions?.map { QuestionContainer(it, voted = it.voted) }
         if(questions != null) {
             submitList(questions)
         }
@@ -102,12 +100,11 @@ class PollsDisplayAdaptor(
     }
 
     fun updatePollVotes(hmsPoll: HmsPoll) {
-        Log.d(TAG,"Received an update ${hmsPoll.result}" )
         if(hmsPoll.pollId != pollId)
             return
 
         updater.forEach { action ->
-            val questions = hmsPoll.result?.questions
+            val questions = hmsPoll.questions
             if(questions != null) {
                 action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll)
             }

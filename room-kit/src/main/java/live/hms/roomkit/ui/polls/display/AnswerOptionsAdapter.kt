@@ -47,11 +47,26 @@ class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean) : ListAdapter
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DisplayAnswerOptionsViewHolder {
         val binding = LayoutPollsDisplayOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DisplayAnswerOptionsViewHolder(binding,canRoleViewVotes, ::getItem)
+        return DisplayAnswerOptionsViewHolder(binding,canRoleViewVotes, ::getItem, ::setItemSelected)
     }
 
     override fun onBindViewHolder(holder: DisplayAnswerOptionsViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    // All items are in fact changed
+    @SuppressLint("NotifyDataSetChanged")
+    fun setItemSelected(position : Int, noOthers : Boolean) {
+        for (i in 0 until itemCount) {
+            val item = getItem(i)
+            if(i == position) {
+                item.isChecked = true
+            }
+            else if (noOthers) {
+                item.isChecked = false
+            }
+        }
+        notifyDataSetChanged()
     }
 
     fun getSelectedOptions() : List<Int>{

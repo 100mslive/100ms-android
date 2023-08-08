@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -62,14 +63,6 @@ class PollDisplayFragment : Fragment() {
 
             poll = returnedPoll
 
-            lifecycleScope.launch {
-                meetingViewModel.events.onEach {
-                    if (it is MeetingViewModel.Event.PollVotesUpdated) {
-                        // Update the polls? How?
-                        pollsDisplayAdaptor.updatePollVotes(it.hmsPoll)
-                    }
-                }.collect()
-            }
 
             with(binding) {
                 backButton.setOnSingleClickListener {
@@ -79,7 +72,22 @@ class PollDisplayFragment : Fragment() {
                 questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
+
+                // The views have to be rendered before the update Poll Votes can be called.
+                //  the delay allows for this.
+                delay(300)
+                pollsDisplayAdaptor.updatePollVotes(poll)
             }
+
+            lifecycleScope.launch {
+                meetingViewModel.events.onEach {
+                    if (it is MeetingViewModel.Event.PollVotesUpdated) {
+                        // Update the polls? How?
+                        pollsDisplayAdaptor.updatePollVotes(it.hmsPoll)
+                    }
+                }.collect()
+            }
+
         }
     }
 }
