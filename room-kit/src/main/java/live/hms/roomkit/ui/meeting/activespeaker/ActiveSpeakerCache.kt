@@ -2,7 +2,7 @@ package live.hms.roomkit.ui.meeting.activespeaker
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class ActiveSpeakerCache<T>(val capacity: Int) {
+class ActiveSpeakerCache<T>(private val capacity: Int) {
     private val TAG = ActiveSpeakerCache::class.java.simpleName
     private val speakers = ConcurrentLinkedQueue<T>()
 
