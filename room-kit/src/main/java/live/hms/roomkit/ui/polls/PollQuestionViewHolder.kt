@@ -89,12 +89,16 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
             addAnOptionTextView.setOnSingleClickListener {
                 val showCheckBox = questionTypeSpinner.selectedItemPosition == 1
                 optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
+                saveButton.isEnabled = true
             }
             deleteOptionTrashButton.setOnSingleClickListener {
                 // Delete the last option when delete is clicked.
                 optionsAdapter.submitList(optionsAdapter.currentList.dropLast(1))
+                saveButton.isEnabled = optionsAdapter.currentList.size > 1
             }
+            saveButton.isEnabled = false
             saveButton.setOnClickListener {
+                saveButton.isEnabled = false
                 val title = askAQuestionEditText.text.toString()
                 val newQuestionUi = when(questionTypeSpinner.selectedItemPosition){
                     // single, multi, short, long
