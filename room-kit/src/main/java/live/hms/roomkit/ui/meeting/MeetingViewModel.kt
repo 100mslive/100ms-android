@@ -1691,7 +1691,7 @@ class MeetingViewModel(
                 QuestionUi.QuestionCreator -> { /*Nothing to do here*/}
                 is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
                 is QuestionUi.SingleChoiceQuestion -> {
-                    val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.multiChoice)
+                    val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.singleChoice)
                         .withTitle(questionUi.withTitle)
                     questionUi.options.forEachIndexed { index : Int, option : String ->
                         singleChoiceQuestionBuilder.addQuizOption(option, questionUi.correctOptionIndex == index)
