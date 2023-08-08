@@ -9,7 +9,12 @@ class DisplayAnswerOptionsViewHolder(
     val binding: LayoutPollsDisplayOptionsItemBinding,
     private val canRoleViewVotes : Boolean,
     getItem: (Int) -> Option,
+    setItemSelected: (selected : Int, noOthers: Boolean) -> Unit,
     ) : ViewHolder(binding.root){
+
+    fun q() {
+        binding.radioButton.isChecked = false
+    }
 
     init {
         if(bindingAdapterPosition != RecyclerView.NO_POSITION) {
@@ -17,10 +22,8 @@ class DisplayAnswerOptionsViewHolder(
         }
         // Both set the same property, only one will be used.
         binding.radioButton.setOnCheckedChangeListener { _, isChecked ->
-            getItem(bindingAdapterPosition).apply {
-                this.isChecked = isChecked
-            }
-
+            if(isChecked)
+                setItemSelected(bindingAdapterPosition, true)
         }
 
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->

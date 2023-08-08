@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import live.hms.roomkit.databinding.LayoutPollsDisplayResultProgressBarsItemBinding
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.PollStatsQuestions
+import live.hms.video.polls.models.question.HMSPollQuestion
 
 data class ProgressBarInfo(
     val index : Int,
@@ -20,18 +21,19 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
     /**
      * Call this when the votes change, to change the progressbar.
      */
-    fun updateProgressBar(pollStatsQuestions: List<PollStatsQuestions>, hmsPoll: HmsPoll) {
-        val pollStatsQuestion = pollStatsQuestions.find { it.index == questionIndex }
+    fun updateProgressBar(pollStatsQuestions: List<HMSPollQuestion>, hmsPoll: HmsPoll) {
+        val pollStatsQuestion = pollStatsQuestions.find { it.questionID == questionIndex }
         if(pollStatsQuestion == null)
             return
         // votesForThisOption*100/totalVotes
         val items: List<ProgressBarInfo>? =
-            hmsPoll.questions?.get(pollStatsQuestion.index.toInt() - 1)?.options?.mapIndexed { index, it ->
-                val votesForThisOption = pollStatsQuestion.options?.get(index) ?: -1
-                val percentage : Int = if (pollStatsQuestion.attemptedTimes == 0L) {
+            hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.options?.mapIndexed { index, it ->
+                val votesForThisOption = pollStatsQuestion.options?.get(index)?.voteCount ?: -1
+
+                val percentage : Int = if (pollStatsQuestion.total == 0) {
                     100
                 } else {
-                    (votesForThisOption * 100 / pollStatsQuestion.attemptedTimes).toInt()
+                    (votesForThisOption * 100 / pollStatsQuestion.total).toInt()
                 }
                 ProgressBarInfo(
                     optionText = it.text ?: "",
