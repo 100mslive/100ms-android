@@ -371,6 +371,21 @@ internal fun VideoCardBinding.applyTheme() {
         )
     )
 
+    containerName.setCardBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+    containerName.alpha = 0.8f
+
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
 
 }
 internal fun BottomSheetAudioSwitchBinding.applyTheme() {
