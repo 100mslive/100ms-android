@@ -4,9 +4,9 @@ import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.utils.HMSLogger
 
-class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
+class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val getTracks: () -> List<MeetingTrack>) {
     private val TAG = ActiveSpeakerHandler::class.java.simpleName
-    private val speakerCache = ActiveSpeakerCache<SpeakerItem>(4)
+    private val speakerCache = ActiveSpeakerCache<SpeakerItem>(4, appendUnsorted)
 
     fun trackUpdateTrigger(tracks: List<MeetingTrack>): List<MeetingTrack> {
         synchronized(tracks) {
