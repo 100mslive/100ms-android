@@ -269,7 +269,7 @@ class PreviewFragment : Fragment() {
     private fun initButtons() {
 
         meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
-            if (it.first == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED && it.second.peerCount != null) {
+            if (it.second.peerCount != null) {
                 binding.iconParticipants.visibility = View.VISIBLE
                 binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
             }
@@ -680,7 +680,7 @@ private fun Int?.formatNames(): String? {
     if (this == null) return null
     return if (this == 0) {
         "You are the first to join"
-    } else "${this} other session in this room"
+    } else "${this} others in session"
 }
 
 fun HMSRoom.isHLSRoom(): Boolean {

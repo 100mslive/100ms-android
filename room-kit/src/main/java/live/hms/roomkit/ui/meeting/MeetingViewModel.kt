@@ -624,6 +624,12 @@ class MeetingViewModel(
                 }
             }
 
+            override fun onPermissionsRequested(permissions: List<String>) {
+                viewModelScope.launch {
+                    _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                }
+            }
+
             override fun onSessionStoreAvailable(sessionStore: HmsSessionStore) {
                 super.onSessionStoreAvailable(sessionStore)
                 sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
