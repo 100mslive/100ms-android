@@ -39,7 +39,7 @@ internal data class InsetViewState(
 )
 
 
-internal fun View.setupDraggable(
+internal fun View.makeInset(
 //  minimizeBtnListener: DraggableView.Listener,
     stickyAxis: Mode = Mode.STICKY_XY,
     animated: Boolean = true,
