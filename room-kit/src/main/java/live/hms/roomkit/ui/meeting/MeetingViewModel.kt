@@ -342,10 +342,36 @@ class MeetingViewModel(
     // Live data containing the current Speaker in the meeting
     val speakers = MutableLiveData<Array<HMSSpeaker>>()
 
-    private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
+    private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
+
+    val speakerUpdateLiveData = object : MediatorLiveData<List<MeetingTrack>>() {
+        private val speakerH = ActiveSpeakerHandler(true) { _tracks }
+        init {
+            addSource(speakers) { speakers : Array<HMSSpeaker> ->
+                val result = speakerH.speakerUpdate(speakers)
+                setValue(result.first)
+            }
+
+            // Add all tracks as they come in.
+            addSource(tracks) { value: List<MeetingTrack> ->
+                // Whenever a track is emitted call the tracks emitted.
+                val result = speakerH.trackUpdateTrigger(value)
+                setValue(result)
+            }
+
+        }
+
+    }
+
     val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
         speakers.map(activeSpeakerHandler::speakerUpdate)
     val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
+
+    // We need all the active speakers, but the very first time it should be filled.
+    //  with all the tracks.
+    //  subsequent updates that matter are:
+    //  track updates (which can add or remove tracks at the end)
+    //  Active speaker updates which modify the current ones.
 
     // Live data which changes on any change of peer
     val peerLiveData = MutableLiveData<HMSPeer>()

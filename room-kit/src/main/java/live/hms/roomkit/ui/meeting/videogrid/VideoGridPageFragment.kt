@@ -57,7 +57,8 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
   override fun initViewModels() {
     super.initViewModels()
-    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+    meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { tracks ->
+//      Log.d("VGPF","Tracks: ${tracks.size}, order: ${tracks.map { it.peer.name }}")
       val videos = getCurrentPageVideos(tracks)
       updateVideos(binding.container, videos, false)
     }
