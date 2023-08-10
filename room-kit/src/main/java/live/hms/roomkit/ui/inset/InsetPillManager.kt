@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.view.GestureDetectorCompat
 import live.hms.roomkit.R
+import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.videoview.HMSVideoView
 
 
@@ -15,10 +16,10 @@ class InsetPillManager : View.OnClickListener, GestureDetector.OnDoubleTapListen
 
 
     private var rootView: InsetPill? = null
-    private lateinit var hmsVideoView: HMSVideoView
+    private var hmsVideoView: HMSVideoView? = null
 
 
-    fun show(context: Context) {
+    fun show(context: Context, track: HMSVideoTrack) {
 
         val li = LayoutInflater.from(context)
         rootView = li.inflate(R.layout.inset_pill, null) as InsetPill
@@ -27,7 +28,9 @@ class InsetPillManager : View.OnClickListener, GestureDetector.OnDoubleTapListen
         view.keepScreenOn = true
 
         hmsVideoView = view.findViewById(R.id.hms_video_view)
-        hmsVideoView.setOnClickListener(this)
+
+        hmsVideoView?.setOnClickListener(this)
+        hmsVideoView?.addTrack(track)
 
         val gestureDetector = GestureDetectorCompat(context, this)
         gestureDetector.setOnDoubleTapListener(this)
@@ -37,7 +40,9 @@ class InsetPillManager : View.OnClickListener, GestureDetector.OnDoubleTapListen
 
     fun hide() {
         val view = rootView ?: return
+        hmsVideoView?.removeTrack()
         view.close()
+        hmsVideoView = null
         rootView = null
     }
 
