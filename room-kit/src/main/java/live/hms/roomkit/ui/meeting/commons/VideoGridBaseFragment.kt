@@ -155,11 +155,14 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
   private fun createVideoView(parent: ViewGroup): GridItemVideoBinding {
-    return GridItemVideoBinding.inflate(
+     val binding = GridItemVideoBinding.inflate(
       LayoutInflater.from(requireContext()),
       parent,
       false
     )
+    binding.videoCard.applyTheme()
+
+    return binding
   }
 
   protected fun bindSurfaceView(
@@ -228,7 +231,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
-    binding.applyTheme()
+    //binding.applyTheme()
     binding.apply {
       // Donot update the text view if not needed, this causes redraw of the entire view leading to  flicker
       if (name.text.equals(item.peer.name).not()) {
@@ -237,10 +240,15 @@ abstract class VideoGridBaseFragment : Fragment() {
       }
       // Using alpha instead of visibility to stop redraw of the entire view to stop flickering
       iconScreenShare.alpha = visibilityOpacity( (item.isScreen) )
+      val isAudioMute = item.isScreen.not() &&
+              (item.audio == null || item.audio!!.isMute)
       iconAudioOff.alpha = visibilityOpacity(
-        item.isScreen.not() &&
-            (item.audio == null || item.audio!!.isMute)
+        isAudioMute
       )
+      /*if (isAudioMute)
+      iconAudioOff.visibility  = View.VISIBLE
+      else
+        iconAudioOff.visibility = View.GONE*/
       icDegraded.alpha = visibilityOpacity(item.video?.isDegraded == true)
 
       /** [View.setVisibility] */
@@ -401,6 +409,13 @@ abstract class VideoGridBaseFragment : Fragment() {
             updateNetworkQualityView(downlinkScore ?: -1,requireContext(),this)
           }
         }
+
+        // Unused updates
+        HMSPeerUpdate.PEER_JOINED,
+        HMSPeerUpdate.PEER_LEFT,
+        HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
+        HMSPeerUpdate.NO_DOMINANT_SPEAKER,
+        HMSPeerUpdate.ROLE_CHANGED -> {}
       }
     }
   }

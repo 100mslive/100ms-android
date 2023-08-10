@@ -210,6 +210,7 @@ class PinnedVideoFragment : Fragment() {
         when (metadataNameChangedPeer.second) {
           HMSPeerUpdate.METADATA_CHANGED -> changePinnedRaiseHandState()
           HMSPeerUpdate.NAME_CHANGED -> changePinnedName()
+          else -> {}
         }
       }
       // Since the pinned person's video can also appear in the sublist, this has to be checked too
