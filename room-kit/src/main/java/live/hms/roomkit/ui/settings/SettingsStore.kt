@@ -250,7 +250,7 @@ class SettingsStore(context: Context) {
 
   var meetingMode: MeetingViewMode
     get() {
-      return  MeetingViewMode.ACTIVE_SPEAKER
+      return  MeetingViewMode.GRID
     }
     set(value) = putString(MEETING_MODE, value.toString())
 
