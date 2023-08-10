@@ -23,8 +23,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -33,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,7 +44,6 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
-import live.hms.roomkit.ui.meeting.chat.ChatBottomSheetFragmentArgs
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
@@ -56,10 +54,8 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
-import live.hms.roomkit.ui.theme.setIconTintColor
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
-import live.hms.video.audio.HMSAudioManager.AudioDevice
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -84,7 +80,6 @@ class MeetingFragment : Fragment() {
     private lateinit var currentFragment: Fragment
 
     private lateinit var settings: SettingsStore
-    private var volumeMenuIcon: MenuItem? = null
     var countDownTimer: CountDownTimer? = null
     var isCountdownManuallyCancelled: Boolean = false
 
@@ -291,37 +286,35 @@ class MeetingFragment : Fragment() {
         return false
     }
 
-    private fun updateActionVolumeMenuIcon(item: MenuItem, audioDevice: AudioDevice?) {
-        item.apply {
-            when (audioDevice) {
-                AudioDevice.EARPIECE -> {
-                    setIcon(R.drawable.phone)
+    private fun updateActionVolumeMenuIcon(
+        audioOutputType: HMSAudioManager.AudioDevice? = null
+    ) {
+        binding.iconOutputDevice?.visibility = View.VISIBLE
+        binding.iconOutputDevice?.apply {
+            when (audioOutputType) {
+                HMSAudioManager.AudioDevice.EARPIECE -> {
+                    setIconEnabled(R.drawable.phone)
                 }
-                AudioDevice.SPEAKER_PHONE -> {
-                    setIcon(R.drawable.ic_icon_speaker)
-                }
-                AudioDevice.AUTOMATIC -> {
-                    setIcon(R.drawable.ic_icon_speaker)
-                }
-                AudioDevice.BLUETOOTH -> {
-                    setIcon(R.drawable.bt)
-                }
-                AudioDevice.WIRED_HEADSET -> {
-                    setIcon(R.drawable.wired)
-                }
-                else -> {
-                    setIcon(R.drawable.ic_volume_off_24)
-                }
-            }
-        }
-    }
 
-    private fun updateActionVolumeMenuIcon(item: MenuItem) {
-        item.apply {
-            if (meetingViewModel.isPeerAudioEnabled()) {
-                setIcon(R.drawable.ic_volume_up_24)
-            } else {
-                setIcon(R.drawable.ic_volume_off_24)
+                HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                    setIconEnabled(R.drawable.ic_icon_speaker)
+                }
+
+                HMSAudioManager.AudioDevice.AUTOMATIC -> {
+                    setIconEnabled(R.drawable.ic_icon_speaker)
+                }
+
+                HMSAudioManager.AudioDevice.BLUETOOTH -> {
+                    setIconEnabled(R.drawable.bt)
+                }
+
+                HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
+                    setIconEnabled(R.drawable.wired)
+                }
+
+                else -> {
+                    setIconEnabled(R.drawable.ic_volume_off_24)
+                }
             }
         }
     }
@@ -332,11 +325,9 @@ class MeetingFragment : Fragment() {
         ) {
 //            binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
-            binding.spacer?.visibility = View.VISIBLE
         } else {
 //            binding.buttonGoLive?.visibility = View.GONE
             binding.llGoLiveParent?.visibility = View.GONE
-            binding.spacer?.visibility = View.GONE
         }
         if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
             binding.meetingFragmentProgress?.visibility = View.GONE
@@ -417,7 +408,7 @@ class MeetingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        initViewModel()
+        initObservers()
         setHasOptionsMenu(true)
         setupConfiguration()
         meetingViewModel.showAudioMuted.observe(
@@ -437,29 +428,6 @@ class MeetingFragment : Fragment() {
                 binding.buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
             }
         }
-
-        meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
-            HMSAudioManager.AudioManagerDeviceChangeListener {
-            override fun onAudioDeviceChanged(
-                device: AudioDevice?,
-                audioDevicesList: MutableSet<AudioDevice>?
-            ) {
-                volumeMenuIcon?.let {
-                    if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() == true) {
-                        if (meetingViewModel.isPeerAudioEnabled()) {
-                            updateActionVolumeMenuIcon(it, device)
-                        }
-                    } else {
-                        updateActionVolumeMenuIcon(it)
-                    }
-                }
-            }
-
-            override fun onError(error: HMSException?) {
-                Toast.makeText(requireContext(), "Error : ${error?.description}", Toast.LENGTH_LONG)
-                    .show()
-            }
-        })
     }
 
     override fun onCreateView(
@@ -504,7 +472,7 @@ class MeetingFragment : Fragment() {
         requireActivity().finish()
     }
 
-    private fun initViewModel() {
+    private fun initObservers() {
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
@@ -785,18 +753,22 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
+            binding.buttonSwitchCamera?.visibility = if (allowed) View.VISIBLE else View.GONE
         }
 
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
             (binding.buttonToggleVideo as? AppCompatImageButton)?.apply {
                 if (enabled) {
-                    setIconEnabled(R.drawable.ic_camera_toggle_on)
+                    setIconEnabled(R.drawable.avd_video_off_to_on)
+                    binding.buttonSwitchCamera?.alpha = 1.0f
+                    binding.buttonSwitchCamera?.isEnabled = true
                 } else {
-                    setIconDisabled(R.drawable.ic_camera_toggle_off)
+                    setIconDisabled(R.drawable.avd_video_on_to_off)
+                    binding.buttonSwitchCamera?.alpha = 0.5f
+                    binding.buttonSwitchCamera?.isEnabled = false
                 }
             }
         }
-
 
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
@@ -804,9 +776,9 @@ class MeetingFragment : Fragment() {
             (binding.buttonToggleAudio as? AppCompatImageButton)?.apply {
 
                 if (enabled) {
-                    setIconEnabled(R.drawable.ic_audio_toggle_on)
+                    setIconEnabled(R.drawable.avd_mic_off_to_on)
                 } else {
-                    setIconDisabled(R.drawable.ic_audio_toggle_off)
+                    setIconDisabled(R.drawable.avd_mic_on_to_off)
                 }
             }
         }
@@ -932,11 +904,11 @@ class MeetingFragment : Fragment() {
             else
                 binding.buttonShareScreen?.visibility = View.GONE
             binding.buttonSettingsMenu?.visibility = View.GONE
-            binding.buttonSettingsMenuTop?.visibility = View.VISIBLE
+//            binding.buttonSettingsMenuTop?.visibility = View.VISIBLE
         } else {
-            binding.buttonShareScreen?.visibility = View.VISIBLE
+            binding.buttonShareScreen?.visibility = View.GONE
             binding.buttonSettingsMenu?.visibility = View.VISIBLE
-            binding.buttonSettingsMenuTop?.visibility = View.GONE
+//            binding.buttonSettingsMenuTop?.visibility = View.GONE
         }
 
         if (meetingViewModel.isAllowedToShareScreen().not()) {
@@ -948,11 +920,9 @@ class MeetingFragment : Fragment() {
         ) {
 //            binding.buttonGoLive?.visibility = View.VISIBLE
             binding.llGoLiveParent?.visibility = View.VISIBLE
-            binding.spacer?.visibility = View.VISIBLE
         } else {
 //            binding.buttonGoLive?.visibility = View.GONE
             binding.llGoLiveParent?.visibility = View.GONE
-            binding.spacer?.visibility = View.GONE
         }
     }
 
@@ -985,10 +955,7 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if (meetingViewModel.isPrebuiltDebugMode().not()) {
-            //temp
-            binding.buttonShareScreen?.setIconEnabled(R.drawable.ic_chat_message)
-        } else {
+        if (meetingViewModel.isPrebuiltDebugMode()) {
             binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
         }
 
@@ -1011,7 +978,6 @@ class MeetingFragment : Fragment() {
             }
         }
 
-
         binding.buttonSettingsMenu?.apply {
 
             setOnSingleClickListener(200L) {
@@ -1029,11 +995,6 @@ class MeetingFragment : Fragment() {
                     requireActivity().supportFragmentManager,
                     "settingsBottomSheet"
                 )
-            }
-        }
-        binding.buttonSettingsMenuTop?.apply {
-            setOnSingleClickListener(200L) {
-                binding.buttonSettingsMenu?.callOnClick()
             }
         }
 
@@ -1060,7 +1021,38 @@ class MeetingFragment : Fragment() {
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
+
         updatePipEndCall()
+
+        binding.iconOutputDevice?.apply {
+            setOnSingleClickListener(200L) {
+                Log.v(TAG, "iconOutputDevice.onClick()")
+
+                AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
+                    updateActionVolumeMenuIcon(audioDevice)
+                }.show(
+                    childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+                )
+            }
+        }
+
+        updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
+
+        binding.buttonSwitchCamera?.setOnSingleClickListener(200L) {
+            meetingViewModel.flipCamera()
+            if (it.isEnabled) meetingViewModel.flipCamera()
+        }
+
+        if (meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url.isNullOrEmpty()) {
+            binding.logoIv?.visibility = View.INVISIBLE
+        } else {
+            binding.logoIv?.visibility = View.VISIBLE
+            binding.logoIv?.let {
+                Glide.with(this)
+                    .load(meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url)
+                    .into(it)
+            }
+        }
     }
 
     private fun startScreenShare() {

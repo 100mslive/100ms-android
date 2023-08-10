@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/meeting_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.meeting.MeetingActivity">
@@ -38,15 +39,17 @@
         android:layout_height="50dp"
         android:layout_alignParentTop="true"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="4dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/button_end_call"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/end_call"
-            app:srcCompat="@drawable/ic_icon_end_call" />
+        <ImageView
+            android:id="@+id/logo_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginTop="8dp"
+            android:elevation="4dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/genericlogo"/>
 
         <LinearLayout
             android:id="@+id/recording_signal_view"
@@ -113,59 +116,49 @@
             android:layout_weight="1" />
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/button_switch_camera"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/ic_switch_camera"
+            app:iconSize="24dp"
+            android:layout_marginEnd="16dp"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/icon_output_device"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:iconSize="24dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            android:src="@drawable/ic_icon_speaker"
+            android:layout_marginEnd="16dp"/>
+
+
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_raise_hand"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_marginEnd="10dp"
+            android:visibility="gone"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/raise_hand"
             android:padding="8dp"
             app:srcCompat="@drawable/ic_raise_hand" />
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center">
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/button_open_chat"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="10dp"
-                android:background="@drawable/gray_round_stroked_drawable"
-                android:contentDescription="@string/open_chat"
-                android:padding="8dp"
-                app:srcCompat="@drawable/ic_chat_message" />
-
-            <TextView
-                android:id="@+id/unread_message_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignEnd="@id/button_open_chat"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="18dp"
-                android:background="@drawable/badge_circle_20"
-                android:gravity="center"
-                android:text="@string/_0"
-                android:textSize="12sp" />
-
-        </RelativeLayout>
-
-        <androidx.appcompat.widget.AppCompatImageView
+<!--        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/button_settings_menu_top"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_gravity="center"
-            android:layout_marginStart="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/settings"
             android:padding="8dp"
-
             android:visibility="gone"
             app:srcCompat="@drawable/ic_more_vert_24"
-            tools:visibility="visible" />
+            tools:visibility="visible" />-->
 
     </LinearLayout>
 
@@ -192,10 +185,21 @@
             android:layout_weight="1" />
 
         <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/button_end_call"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@string/end_call"
+            app:srcCompat="@drawable/ic_end_call" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_toggle_audio"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_audio"
             android:padding="10dp"
@@ -210,7 +214,6 @@
             android:id="@+id/button_toggle_video"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_video"
             android:padding="8dp"
@@ -228,23 +231,43 @@
             android:orientation="vertical"
             android:paddingBottom="10dp"
             android:visibility="gone">
-
-
         </LinearLayout>
 
-        <Space
-            android:id="@+id/spacer"
+        <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:visibility="gone" />
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/button_open_chat"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@string/open_chat"
+                android:padding="8dp"
+                app:srcCompat="@drawable/ic_chat_message" />
+
+            <TextView
+                android:id="@+id/unread_message_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@id/button_open_chat"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="18dp"
+                android:background="@drawable/badge_circle_20"
+                android:gravity="center"
+                android:text="@string/_0"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_share_screen"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginBottom="10dp"
-            android:background="@drawable/gray_round_stroked_drawable"
+            android:visibility="gone"
             android:contentDescription="@string/toggle_video"
             android:padding="8dp" />
 
@@ -253,15 +276,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_settings_menu"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/settings"
             android:padding="8dp"
-            app:srcCompat="@drawable/ic_more_vert_24" />
+            app:srcCompat="@drawable/ic_settings_btn" />
 
         <Space
             android:layout_width="wrap_content"

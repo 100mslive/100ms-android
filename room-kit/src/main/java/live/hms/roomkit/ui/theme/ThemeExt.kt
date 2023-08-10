@@ -206,11 +206,20 @@ private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
 
+    (buttonEndCall as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_end_call)
     buttonEndCall.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
-        R.drawable.ic_icon_end_call
+        R.drawable.ic_end_call
     )
+
+    meetingContainer?.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+    meetingContainer?.alpha = 0.64f
 
     meetingFragmentProgress?.setBackgroundColor(
         getColorOrDefault(
@@ -225,7 +234,6 @@ internal fun FragmentMeetingBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().primary_default
         )
     )
-
 
     progressBar.containerCardProgressBar.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
@@ -285,10 +293,9 @@ internal fun FragmentMeetingBinding.applyTheme() {
     //init should be called once
     buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
 
-    (buttonOpenChat as? AppCompatImageButton)?.setIconDisabled(R.drawable.ic_chat_message)
+    (buttonOpenChat as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_chat_message)
 
-
-
+    buttonSettingsMenu?.setIconEnabled(R.drawable.ic_settings_btn)
 
     unreadMessageCount.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
@@ -303,8 +310,10 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
+    buttonSwitchCamera?.setIconEnabled(R.drawable.ic_switch_camera)
 
-    buttonSettingsMenuTop?.setIconTintColor(
+
+/*    buttonSettingsMenuTop?.setIconTintColor(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp
     )
@@ -313,7 +322,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.borderBright,
         HMSPrebuiltTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
-    )
+    )*/
 
     //bottom menu
     bottomControls.setBackgroundAndColor(
@@ -328,7 +337,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 
 
-    buttonSettingsMenu?.setIconTintColor(
+/*    buttonSettingsMenu?.setIconTintColor(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp
     )
@@ -337,7 +346,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.borderBright,
         HMSPrebuiltTheme.getDefaults().border_bright,
         R.drawable.gray_round_stroked_drawable
-    )
+    )*/
 
 
 }
