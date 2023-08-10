@@ -401,6 +401,13 @@ abstract class VideoGridBaseFragment : Fragment() {
             updateNetworkQualityView(downlinkScore ?: -1,requireContext(),this)
           }
         }
+
+        // Unused updates
+        HMSPeerUpdate.PEER_JOINED,
+        HMSPeerUpdate.PEER_LEFT,
+        HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
+        HMSPeerUpdate.NO_DOMINANT_SPEAKER,
+        HMSPeerUpdate.ROLE_CHANGED -> {}
       }
     }
   }
