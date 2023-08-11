@@ -229,7 +229,7 @@ class SettingsStore(context: Context) {
     set(value) = putString(ENVIRONMENT, value)
 
   var videoGridRows: Int
-    get() = sharedPreferences.getInt(VIDEO_GRID_ROWS, 2)
+    get() = sharedPreferences.getInt(VIDEO_GRID_ROWS, 3)
     set(value) = putInt(VIDEO_GRID_ROWS, value)
 
   var videoGridColumns: Int
