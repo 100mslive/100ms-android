@@ -13,10 +13,13 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
+import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.setIconDisabled
+import live.hms.roomkit.ui.theme.setIconEnabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
 
@@ -88,6 +91,7 @@ class VideoGridFragment : Fragment() {
         binding.insetPill.makeInset()
         binding.localHmsVideoView?.setZOrderOnTop(true)
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
+        var isMinimized = false
 
 
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
@@ -103,16 +107,40 @@ class VideoGridFragment : Fragment() {
             }
 
             localMeeting?.let {
+                //audio mute icon toggle
+               if (CustomPeerMetadata.fromJson(it.peer.metadata)?.isBRBOn == true) {
+                    binding.iconBrb.visibility = View.VISIBLE
+               } else {
+                    binding.iconBrb.visibility = View.GONE
+               }
+
+
                 if (it.audio?.isMute == true) {
-                    binding.iconAudioOff.visibility = View.VISIBLE
+                    if (isMinimized) {
+                        binding.minimizedIconAudioOff.visibility = View.VISIBLE
+                        binding.iconAudioOff.visibility = View.GONE
+                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
+                    } else {
+                        binding.iconAudioOff.visibility = View.VISIBLE
+                    }
                 } else {
-                    binding.iconAudioOff.visibility = View.INVISIBLE
+                    if (isMinimized) {
+                        binding.minimizedIconAudioOff.visibility = View.VISIBLE
+                        binding.iconAudioOff.visibility = View.GONE
+                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on)
+                    } else {
+                        binding.iconAudioOff.visibility = View.INVISIBLE
+                    }
+
                 }
 
                 if (it.video?.isMute == true) {
                     binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
-                    binding.localHmsVideoView?.visibility = View.INVISIBLE
-                    binding.nameInitials.visibility = View.VISIBLE
+
+                    binding.localHmsVideoView.visibility =
+                        if (isMinimized) View.VISIBLE else View.INVISIBLE
+
+                    binding.nameInitials.visibility = if (isMinimized) View.GONE else View.VISIBLE
                 } else {
                     binding.nameInitials.visibility = View.INVISIBLE
                     binding.localHmsVideoView?.visibility = View.VISIBLE
