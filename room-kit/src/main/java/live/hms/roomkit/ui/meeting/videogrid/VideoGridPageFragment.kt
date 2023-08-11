@@ -40,6 +40,11 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     return binding.root
   }
 
+  override fun onResume() {
+    super.onResume()
+    // Turn of sorting when we leave the first page
+    meetingViewModel.speakerUpdateLiveData.enableSorting(pageIndex == 0)
+  }
   private fun getCurrentPageVideos(tracks: List<MeetingTrack>): List<MeetingTrack?> {
     val pageVideos = ArrayList<MeetingTrack?>()
 

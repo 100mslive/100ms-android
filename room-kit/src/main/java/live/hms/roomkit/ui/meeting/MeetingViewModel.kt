@@ -38,7 +38,6 @@ import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.PollAnswerResponse
-import live.hms.video.polls.models.network.HMSPollQuestionResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
@@ -344,13 +343,25 @@ class MeetingViewModel(
 
     private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
 
-    val speakerUpdateLiveData = object : MediatorLiveData<List<MeetingTrack>>() {
-        private val speakerH = ActiveSpeakerHandler(true) { _tracks }
-        init {
+    val speakerUpdateLiveData = object : ActiveSpeakerLiveData() {
+        private val speakerH = ActiveSpeakerHandler(true,settings.videoGridRows* settings.videoGridColumns
+        ) { _tracks }
+
+        override fun addSpeakerSource() {
+//            Log.d("SpeajerSource","Added")
             addSource(speakers) { speakers : Array<HMSSpeaker> ->
+                // filter here
                 val result = speakerH.speakerUpdate(speakers)
-                setValue(result.first)
+                setValue(result.first!!)
             }
+        }
+
+        override fun removeSpeakerSource() {
+//            Log.d("SpeajerSource","Removed")
+            removeSource(speakers)
+        }
+        init {
+            addSpeakerSource()
 
             // Add all tracks as they come in.
             addSource(tracks) { value: List<MeetingTrack> ->
@@ -1063,6 +1074,8 @@ class MeetingViewModel(
             })
         }
     }
+
+    fun getAudioOutputRouteType() = hmsSDK.getAudioOutputRouteType()
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         hasValidToken = false
