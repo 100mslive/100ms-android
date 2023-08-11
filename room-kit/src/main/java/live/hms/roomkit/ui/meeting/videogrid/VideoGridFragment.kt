@@ -144,7 +144,8 @@ class VideoGridFragment : Fragment() {
                 } else {
                     binding.nameInitials.visibility = View.INVISIBLE
                     binding.localHmsVideoView?.visibility = View.VISIBLE
-                    binding.localHmsVideoView?.addTrack(it.video!!)
+                    it.video?.let {  binding.localHmsVideoView?.addTrack(it) }
+
                 }
 
             }
