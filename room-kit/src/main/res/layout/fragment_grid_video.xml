@@ -3,14 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/container_dominant_speaker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_margin="0dp">
+        android:layout_margin="0dp"
+        android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/dominant_speaker_name"
@@ -39,20 +40,69 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager_video_grid"
-        android:animateLayoutChanges="false"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        >
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager_video_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="false" />
+
+        <FrameLayout
+            android:paddingStart="@dimen/eight_dp"
+            android:paddingTop="@dimen/sizeteen_dp"
+            android:animateLayoutChanges="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.cardview.widget.CardView
+                android:clipToPadding="false"
+                android:id="@+id/inset_pill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="24dp"
+                >
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/name_initials"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_secondary_80"
+                    android:gravity="center"
+                    android:text="@string/john_doe_initials"
+                    android:textColor="@android:color/white"
+                    android:textSize="40sp"/>
+
+
+                <live.hms.videoview.HMSVideoView
+                    tools:visibility="visible"
+                    android:id="@+id/local_hms_video_view"
+                    android:layout_width="@dimen/inset_pill_width"
+                    android:layout_height="@dimen/inset_pill_height"
+                    android:elevation="24dp" />
+
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+
+
+
+
+    </FrameLayout>
+
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_dots"
         android:layout_width="wrap_content"
         android:layout_height="8dp"
+        android:layout_gravity="center"
         android:layout_margin="4dp"
         app:tabBackground="@drawable/dot_selector_4"
-        android:layout_gravity="center"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp" />
 

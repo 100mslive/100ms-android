@@ -3,9 +3,12 @@ package live.hms.roomkit.ui.inset
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.res.Resources
 import android.util.Log
 import android.view.*
 import androidx.core.view.GestureDetectorCompat
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import live.hms.roomkit.R
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -154,32 +157,41 @@ internal fun View.makeInset(
                     }
 
                     Mode.STICKY_XY -> {
-                        if (event.rawX >= xMiddle) {
-                            if (animated) v.animate().x(xMax).setDuration(DURATION_MILLIS)
-                                .setUpdateListener {
-//                                    draggableListener?.onPositionChanged(v)
-                                }.start()
-                            else v.x = xMax
-                        } else {
-                            if (animated) v.animate().x(marginStart).setDuration(DURATION_MILLIS)
-                                .setUpdateListener {
-//                                    draggableListener?.onPositionChanged(v)
-                                }.start()
-                            v.x = marginStart
-                        }
 
-                        if (event.rawY >= yMiddle) {
-                            if (animated) v.animate().y(yMax).setDuration(DURATION_MILLIS)
+                        if (event.rawX >= xMiddle) {
+
+                            val rightMarging = resources.getDimensionPixelSize(R.dimen.eight_dp)
+                            val xMaxWithPadding = Math.min(xMax, xMax - rightMarging)
+                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).x(xMaxWithPadding).setDuration(DURATION_MILLIS)
                                 .setUpdateListener {
 //                                    draggableListener?.onPositionChanged(v)
                                 }.start()
-                            else v.y = yMax
+                            else v.x = xMaxWithPadding
                         } else {
-                            if (animated) v.animate().y(marginTop).setDuration(DURATION_MILLIS)
+                            val leftMargin = resources.getDimensionPixelSize(R.dimen.eight_dp)
+                            val maxMarginStart = Math.max(marginStart, marginStart + leftMargin)
+                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).x(maxMarginStart).setDuration(DURATION_MILLIS)
                                 .setUpdateListener {
 //                                    draggableListener?.onPositionChanged(v)
                                 }.start()
-                            else v.y = marginTop
+                            v.x = maxMarginStart
+                        }
+                        val bottomMargin = resources.getDimensionPixelSize(R.dimen.sizeteen_dp)
+                        val yMaxWithPadding = Math.min(yMax, yMax - bottomMargin)
+                        if (event.rawY >= yMiddle) {
+                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).y(yMaxWithPadding).setDuration(DURATION_MILLIS)
+                                .setUpdateListener {
+//                                    draggableListener?.onPositionChanged(v)
+                                }.start()
+                            else v.y = yMaxWithPadding
+                        } else {
+                            val topMargin = resources.getDimensionPixelSize(R.dimen.sizeteen_dp)
+                            val maxMarginTop = Math.max(marginTop, marginTop + topMargin)
+                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).y(maxMarginTop).setDuration(DURATION_MILLIS)
+                                .setUpdateListener {
+//                                    draggableListener?.onPositionChanged(v)
+                                }.start()
+                            else v.y = maxMarginTop
                         }
                     }
 
@@ -203,3 +215,6 @@ internal fun View.makeInset(
     }
 }
 
+
+val Int.dp: Int
+    get() = (this / Resources.getSystem().displayMetrics.density).toInt()

@@ -12,9 +12,12 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
+import live.hms.roomkit.ui.inset.makeInset
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
 
 class VideoGridFragment : Fragment() {
@@ -82,6 +85,30 @@ class VideoGridFragment : Fragment() {
       TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
         // No text to be shown
       }.attach()
+    }
+
+    binding.applyTheme()
+    binding.insetPill.makeInset()
+    binding.localHmsVideoView?.setZOrderOnTop(true)
+    binding.localHmsVideoView?.setZOrderMediaOverlay(true)
+    meetingViewModel.tracks.observe(viewLifecycleOwner) {
+      val localMeeting = it.filter { it.isLocal }.firstOrNull()
+
+
+      localMeeting?.let {
+        if (it.video?.isMute == true) {
+          binding.nameInitials.text =NameUtils.getInitials(it.peer.name.orEmpty())
+          binding.localHmsVideoView?.visibility = View.GONE
+          binding.nameInitials.visibility = View.VISIBLE
+        } else {
+          binding.nameInitials.visibility = View.GONE
+          binding.localHmsVideoView?.visibility = View.VISIBLE
+          binding.localHmsVideoView?.addTrack(it.video!!)
+        }
+
+
+      }
+
     }
   }
 

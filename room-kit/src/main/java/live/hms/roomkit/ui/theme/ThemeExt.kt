@@ -18,6 +18,7 @@ import com.google.android.material.button.MaterialButton
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
+import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.VideoCardBinding
@@ -566,5 +567,27 @@ internal fun FragmentPreviewBinding.applyTheme() {
     buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
     buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
     buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
+
+}
+
+fun FragmentGridVideoBinding.applyTheme() {
+    nameInitials.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    insetPill.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default
+    )
+
+    nameInitials.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_80
+    )
+
 
 }
