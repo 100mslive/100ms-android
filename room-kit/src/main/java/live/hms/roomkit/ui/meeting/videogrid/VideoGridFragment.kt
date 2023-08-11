@@ -33,11 +33,7 @@ class VideoGridFragment : Fragment() {
 
     private lateinit var clipboard: ClipboardManager
 
-    private val meetingViewModel: MeetingViewModel by activityViewModels {
-        MeetingViewModelFactory(
-            requireActivity().application
-        )
-    }
+    private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     private lateinit var adapter: VideoGridAdapter
 
@@ -157,7 +153,13 @@ class VideoGridFragment : Fragment() {
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
             val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
-            adapter.totalPages = (tracks.size + itemsPerPage - 1) / itemsPerPage
+            // Without this, the extra inset adds one more tile than they should
+            val tempItems = (tracks.size + itemsPerPage - 1) - 1 // always subtract local peer inset
+            val expectedItems = tempItems/ itemsPerPage
+
+            adapter.totalPages = if(expectedItems == 0)
+                1
+            else expectedItems
         }
 
         if (settings.detectDominantSpeaker) {
