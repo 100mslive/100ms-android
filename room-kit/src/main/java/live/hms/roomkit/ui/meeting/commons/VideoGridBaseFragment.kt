@@ -102,12 +102,18 @@ abstract class VideoGridBaseFragment : Fragment() {
     layout.apply {
 
       fun normalLayout() {
-        for (child in children) {
+        // The 5th video, if there are only 5, gets spread.
+        val spread5thVideo = children.count() == 5
+        for ((index,child) in children.withIndex()) {
           childIdx = Pair(rowIdx, colIdx)
 
           val params = child.layoutParams as GridLayout.LayoutParams
+          val size = if(index == 4 && spread5thVideo) {
+            // the 5th video spans two spaces.
+            2
+          } else 1
           params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
-          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
+          params.columnSpec = GridLayout.spec(colIdx, size, 1f)
 
           if (colIdx + 1 == getNormalLayoutColumnCount()) {
             rowIdx += 1
