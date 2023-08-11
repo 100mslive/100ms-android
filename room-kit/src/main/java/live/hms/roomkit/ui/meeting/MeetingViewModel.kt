@@ -344,7 +344,8 @@ class MeetingViewModel(
     private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
 
     val speakerUpdateLiveData = object : ActiveSpeakerLiveData() {
-        private val speakerH = ActiveSpeakerHandler(true) { _tracks }
+        private val speakerH = ActiveSpeakerHandler(true,settings.videoGridRows* settings.videoGridColumns
+        ) { _tracks }
 
         override fun addSpeakerSource() {
 //            Log.d("SpeajerSource","Added")
