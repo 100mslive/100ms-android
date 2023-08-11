@@ -70,7 +70,6 @@ class PreviewFragment : Fragment() {
     private var track: MeetingTrack? = null
 
     private var isViewVisible = false
-    private var audioOutputIcon: MenuItem? = null
 
     private var participantsDialog: ParticipantsDialog? = null
     private var participantsDialogAdapter: ParticipantsAdapter? = null
@@ -158,26 +157,6 @@ class PreviewFragment : Fragment() {
         setupKeyboardAnimation()
 
         enableDisableJoinNowButton()
-
-        meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
-            HMSAudioManager.AudioManagerDeviceChangeListener {
-            override fun onAudioDeviceChanged(
-                device: HMSAudioManager.AudioDevice?,
-                listOfDevices: MutableSet<HMSAudioManager.AudioDevice>?
-            ) {
-                audioOutputIcon?.let {
-                    if (meetingViewModel.isPeerAudioEnabled()) {
-                        updateActionVolumeMenuIcon(device)
-                    }
-                }
-            }
-
-            override fun onError(error: HMSException?) {
-                HMSLogger.d(TAG, "error : ${error?.description}")
-            }
-        })
-
-
     }
 
     private fun setupUI() {
@@ -296,19 +275,15 @@ class PreviewFragment : Fragment() {
 
         binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
-                Log.v(TAG, "iconParticipants.onClick()")
+                Log.v(TAG, "iconOutputDevice.onClick()")
 
-
-                AudioOutputSwitchBottomSheet({ audioDevice, isMuted ->
+                AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
                     updateActionVolumeMenuIcon(audioDevice)
-                }).show(
+                }.show(
                     childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
-
-
             }
         }
-
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             if (it.isEnabled) track?.video.switchCamera()
@@ -596,7 +571,7 @@ class PreviewFragment : Fragment() {
                     updateJoinButtonTextIfHlsIsEnabled()
                     enableDisableJoinNowButton()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
-                    updateActionVolumeMenuIcon(meetingViewModel.hmsSDK.getAudioOutputRouteType())
+                    updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
                 } else {
                     updateActionVolumeMenuIcon()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE

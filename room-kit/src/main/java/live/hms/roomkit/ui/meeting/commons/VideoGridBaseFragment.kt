@@ -423,7 +423,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
     NetworkQualityHelper.getNetworkResource(downlinkScore, context = requireContext()).let { drawable ->
       if (downlinkScore == 0) {
-        imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertSuccess, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
+        imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
       } else {
         imageView.colorFilter = null
       }

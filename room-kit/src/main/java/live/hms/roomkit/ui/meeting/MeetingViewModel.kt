@@ -1075,6 +1075,8 @@ class MeetingViewModel(
         }
     }
 
+    fun getAudioOutputRouteType() = hmsSDK.getAudioOutputRouteType()
+
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         hasValidToken = false
         state.postValue(MeetingState.Disconnecting("Disconnecting", "Leaving meeting"))
