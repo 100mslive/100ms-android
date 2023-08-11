@@ -1,8 +1,6 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
-import android.graphics.BlendMode
-import android.graphics.ColorFilter
 import android.graphics.PorterDuff
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
@@ -11,10 +9,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
-import com.google.android.material.button.MaterialButton
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
@@ -51,7 +47,7 @@ internal fun HMSRoomLayout.getPreviewLayout() =
     this.data?.getOrNull(0)?.screens?.preview
 
 
-internal fun CardView.setBackgroundAndColor(
+internal fun CardView.setBackgroundColor(
     backgroundColorStr: String?,
     defaultBackgroundColor: String,
 ) {
@@ -206,20 +202,20 @@ private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
 
-    (buttonEndCall as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_end_call)
     buttonEndCall.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
-        R.drawable.ic_end_call
+        R.drawable.gray_round_stroked_drawable
     )
+    //(buttonEndCall as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_end_call)
 
-    meetingContainer?.setBackgroundColor(
+/*    meetingContainer.setBackgroundColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.backgroundDim,
             HMSPrebuiltTheme.getDefaults().background_default
         )
     )
-    meetingContainer?.alpha = 0.64f
+    meetingContainer.alpha = 0.64f*/
 
     meetingFragmentProgress?.setBackgroundColor(
         getColorOrDefault(
@@ -235,7 +231,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
-    progressBar.containerCardProgressBar.setBackgroundAndColor(
+    progressBar.containerCardProgressBar.setBackgroundColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default
     )
@@ -275,17 +271,24 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
+    liveTitle?.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
     tvRecordingTime?.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
 
     tvViewersCount?.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
@@ -486,7 +489,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.backgroundDim, HMSPrebuiltTheme.getDefaults().surface_default
     )
 
-    buttonNetworkQuality.setBackgroundAndColor(
+    buttonNetworkQuality.setBackgroundColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default
     )
@@ -496,7 +499,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().background_default
     )
 
-    previewBottomBar.setBackgroundAndColor(
+    previewBottomBar.setBackgroundColor(
         HMSPrebuiltTheme.getColours()?.backgroundDefault,
         HMSPrebuiltTheme.getDefaults().background_default
     )
@@ -518,12 +521,12 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
-    iconParticipants.setBackgroundAndColor(
+    iconParticipants.setBackgroundColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default,
     )
 
-    hlsSession.setBackgroundAndColor(
+    hlsSession.setBackgroundColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
     )

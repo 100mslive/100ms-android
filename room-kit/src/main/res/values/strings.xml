@@ -202,7 +202,7 @@
     <string name="rtmp_streaming_switch">RTMP streaming</string>
     <string name="go_live_str">Go Live</string>
     <string name="end_stream_str">End Stream</string>
-    <string name="live_str">Live</string>
+    <string name="live_str">LIVE</string>
     <string name="device_stats_str">Device Info</string>
     <item name="IS_INT" type="id"/>
     <string name="single_choice_text">Select one of the radio buttons to mark the correct answer.</string>
