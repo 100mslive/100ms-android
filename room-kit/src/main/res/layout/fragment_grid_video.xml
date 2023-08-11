@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
@@ -43,8 +43,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        >
+        android:layout_weight="1">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager_video_grid"
@@ -53,19 +52,62 @@
             android:animateLayoutChanges="false" />
 
         <FrameLayout
-            android:paddingStart="@dimen/eight_dp"
-            android:paddingTop="@dimen/sizeteen_dp"
-            android:animateLayoutChanges="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:paddingStart="@dimen/eight_dp"
+            android:paddingTop="@dimen/sizeteen_dp">
 
-            <androidx.cardview.widget.CardView
-                android:clipToPadding="false"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/inset_pill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:elevation="24dp"
-                >
+                android:clipToPadding="false"
+                android:elevation="24dp">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/minimized_icon_audio_off"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:alpha="0"
+                    android:src="@drawable/ic_mic_mute"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    app:layout_constraintEnd_toStartOf="@id/minimized_icon_video_off"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/minimized_icon_video_off"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="8dp"
+                    android:alpha="0"
+                    android:src="@drawable/ic_mic_mute"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    app:layout_constraintStart_toEndOf="@id/minimized_icon_audio_off"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/icon_audio_off"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_mic_mute"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/name_initials"
@@ -77,20 +119,27 @@
                     android:gravity="center"
                     android:text="@string/john_doe_initials"
                     android:textColor="@android:color/white"
-                    android:textSize="40sp"/>
+                    android:textSize="40sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
 
 
                 <live.hms.videoview.HMSVideoView
-                    tools:visibility="visible"
                     android:id="@+id/local_hms_video_view"
                     android:layout_width="@dimen/inset_pill_width"
                     android:layout_height="@dimen/inset_pill_height"
-                    android:elevation="24dp" />
+                    android:elevation="24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
 
-            </androidx.cardview.widget.CardView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
-
-
 
 
     </FrameLayout>

@@ -590,6 +590,14 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
+
+    iconAudioOff.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_32
+    )
+
+
     insetPill.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default

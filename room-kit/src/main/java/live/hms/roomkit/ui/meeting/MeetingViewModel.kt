@@ -350,8 +350,13 @@ class MeetingViewModel(
         override fun addSpeakerSource() {
 //            Log.d("SpeajerSource","Added")
             addSource(speakers) { speakers : Array<HMSSpeaker> ->
-                // filter here
-                val result = speakerH.speakerUpdate(speakers)
+
+                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> =  if (speakers.size >= 2 && speakers.find { it.peer?.isLocal == true } != null) {
+                    speakers.filter { it.peer?.isLocal == false }.toTypedArray()
+                } else
+                    speakers
+
+                val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
                 setValue(result.first!!)
             }
         }
@@ -364,9 +369,14 @@ class MeetingViewModel(
             addSpeakerSource()
 
             // Add all tracks as they come in.
-            addSource(tracks) { value: List<MeetingTrack> ->
-                // Whenever a track is emitted call the tracks emitted.
-                val result = speakerH.trackUpdateTrigger(value)
+            addSource(tracks) { meetTracks: List<MeetingTrack> ->
+                //if remote peer and local peer is present inset mode
+               val excludeLocalTrackIfRemotePeerIsPreset =  if (meetTracks.size >= 2 && meetTracks.find { it.isLocal } != null) {
+                    meetTracks.filter { !it.isLocal }.toList()
+                } else
+                    meetTracks
+
+                val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset)
                 setValue(result)
             }
 
