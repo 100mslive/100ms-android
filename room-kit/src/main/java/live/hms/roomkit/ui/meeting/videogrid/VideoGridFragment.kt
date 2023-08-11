@@ -12,52 +12,52 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
+import live.hms.roomkit.ui.inset.makeInset
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
 
 class VideoGridFragment : Fragment() {
-  companion object {
-    private const val TAG = "VideoGridFragment"
-  }
+    companion object {
+        private const val TAG = "VideoGridFragment"
+    }
 
-  private var binding by viewLifecycle<FragmentGridVideoBinding>()
-  private lateinit var settings: SettingsStore
+    private var binding by viewLifecycle<FragmentGridVideoBinding>()
+    private lateinit var settings: SettingsStore
 
-  private lateinit var clipboard: ClipboardManager
+    private lateinit var clipboard: ClipboardManager
 
-  private val meetingViewModel: MeetingViewModel by activityViewModels {
-    MeetingViewModelFactory(
-      requireActivity().application
-    )
-  }
+    private val meetingViewModel: MeetingViewModel by activityViewModels {
+        MeetingViewModelFactory(
+            requireActivity().application
+        )
+    }
 
-  private lateinit var adapter: VideoGridAdapter
+    private lateinit var adapter: VideoGridAdapter
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    clipboard = requireActivity()
-      .getSystemService(Context.CLIPBOARD_SERVICE)
-        as ClipboardManager
-  }
+        clipboard =
+            requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View {
-    binding = FragmentGridVideoBinding.inflate(inflater, container, false)
-    settings = SettingsStore(requireContext())
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentGridVideoBinding.inflate(inflater, container, false)
+        settings = SettingsStore(requireContext())
 
-    initVideoGrid()
-    initViewModels()
-    return binding.root
-  }
+        initVideoGrid()
+        initViewModels()
+        return binding.root
+    }
 
-  private fun initVideoGrid() {
-    adapter = VideoGridAdapter(this@VideoGridFragment) /* { video ->
+    private fun initVideoGrid() {
+        adapter = VideoGridAdapter(this@VideoGridFragment) /* { video ->
       Log.v(TAG, "onVideoItemClick: $video")
 
       Snackbar.make(
@@ -75,34 +75,73 @@ class VideoGridFragment : Fragment() {
       }.show()
     } */
 
-    binding.viewPagerVideoGrid.apply {
-      offscreenPageLimit = 1
-      adapter = this@VideoGridFragment.adapter
+        binding.viewPagerVideoGrid.apply {
+            offscreenPageLimit = 1
+            adapter = this@VideoGridFragment.adapter
 
-      TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
-        // No text to be shown
-      }.attach()
-    }
-  }
-
-  @SuppressLint("SetTextI18n")
-  private fun initViewModels() {
-    meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-      val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
-      adapter.totalPages = (tracks.size + itemsPerPage - 1) / itemsPerPage
-    }
-
-    if (settings.detectDominantSpeaker) {
-      meetingViewModel.pinnedTrackUiUseCase.observe(viewLifecycleOwner) { meetingTrack ->
-        if (meetingTrack == null) {
-          binding.dominantSpeakerName.setText(R.string.no_one_speaking)
-        } else {
-          binding.dominantSpeakerName.text = "Dominant Speaker: ${meetingTrack.peer.name}"
+            TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
+                // No text to be shown
+            }.attach()
         }
-      }
-    } else {
-      binding.containerDominantSpeaker.visibility = View.GONE
+
+        binding.applyTheme()
+        binding.insetPill.makeInset()
+        binding.localHmsVideoView?.setZOrderOnTop(true)
+        binding.localHmsVideoView?.setZOrderMediaOverlay(true)
+
+
+        meetingViewModel.tracks.observe(viewLifecycleOwner) {
+            val localMeeting = it.filter { it.isLocal }.firstOrNull()
+
+            //show or hide inset
+            if (it.size == 1 && localMeeting != null) {
+                binding.insetPill.visibility = View.GONE
+            } else if (it.size > 1 && localMeeting != null) {
+                binding.insetPill.visibility = View.VISIBLE
+            } else if (localMeeting == null) {
+                binding.insetPill.visibility = View.GONE
+            }
+
+            localMeeting?.let {
+                if (it.audio?.isMute == true) {
+                    binding.iconAudioOff.visibility = View.VISIBLE
+                } else {
+                    binding.iconAudioOff.visibility = View.INVISIBLE
+                }
+
+                if (it.video?.isMute == true) {
+                    binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
+                    binding.localHmsVideoView?.visibility = View.INVISIBLE
+                    binding.nameInitials.visibility = View.VISIBLE
+                } else {
+                    binding.nameInitials.visibility = View.INVISIBLE
+                    binding.localHmsVideoView?.visibility = View.VISIBLE
+                    binding.localHmsVideoView?.addTrack(it.video!!)
+                }
+
+            }
+
+        }
     }
-    binding.containerNetworkInfo.visibility = View.GONE
-  }
+
+    @SuppressLint("SetTextI18n")
+    private fun initViewModels() {
+        meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+            val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
+            adapter.totalPages = (tracks.size + itemsPerPage - 1) / itemsPerPage
+        }
+
+        if (settings.detectDominantSpeaker) {
+            meetingViewModel.pinnedTrackUiUseCase.observe(viewLifecycleOwner) { meetingTrack ->
+                if (meetingTrack == null) {
+                    binding.dominantSpeakerName.setText(R.string.no_one_speaking)
+                } else {
+                    binding.dominantSpeakerName.text = "Dominant Speaker: ${meetingTrack.peer.name}"
+                }
+            }
+        } else {
+            binding.containerDominantSpeaker.visibility = View.GONE
+        }
+        binding.containerNetworkInfo.visibility = View.GONE
+    }
 }

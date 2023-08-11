@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -9,8 +10,8 @@
         android:id="@+id/container_dominant_speaker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_margin="0dp">
+        android:layout_margin="0dp"
+        android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/dominant_speaker_name"
@@ -39,20 +40,118 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager_video_grid"
-        android:animateLayoutChanges="false"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager_video_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="false" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:paddingStart="@dimen/eight_dp"
+            android:paddingTop="@dimen/sizeteen_dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/inset_pill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:elevation="24dp">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/minimized_icon_audio_off"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:alpha="0"
+                    android:src="@drawable/ic_mic_mute"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    app:layout_constraintEnd_toStartOf="@id/minimized_icon_video_off"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/minimized_icon_video_off"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="8dp"
+                    android:alpha="0"
+                    android:src="@drawable/ic_mic_mute"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    app:layout_constraintStart_toEndOf="@id/minimized_icon_audio_off"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/icon_audio_off"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_mic_mute"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/name_initials"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_secondary_80"
+                    android:gravity="center"
+                    android:text="@string/john_doe_initials"
+                    android:textColor="@android:color/white"
+                    android:textSize="40sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+
+                <live.hms.videoview.HMSVideoView
+                    android:id="@+id/local_hms_video_view"
+                    android:layout_width="@dimen/inset_pill_width"
+                    android:layout_height="@dimen/inset_pill_height"
+                    android:elevation="24dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="visible" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
+
+
+    </FrameLayout>
+
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_dots"
         android:layout_width="wrap_content"
         android:layout_height="8dp"
+        android:layout_gravity="center"
         android:layout_margin="4dp"
         app:tabBackground="@drawable/dot_selector_4"
-        android:layout_gravity="center"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp" />
 

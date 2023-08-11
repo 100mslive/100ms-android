@@ -4,4 +4,9 @@
     <dimen name="video_list_size">120dp</dimen>
     <dimen name="audio_item_size">120dp</dimen>
     <dimen name="bottom_meeting_control_size">64dp</dimen>
+    <dimen name="inset_pill_width">104dp</dimen>
+    <dimen name="inset_pill_height">186dp</dimen>
+    <dimen name="sizeteen_dp">16dp</dimen>
+    <dimen name="eight_dp">8dp</dimen>
+    <dimen name="thirty_two_dp">32dp</dimen>
 </resources>
