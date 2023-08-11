@@ -13,6 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
+import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -107,6 +108,13 @@ class VideoGridFragment : Fragment() {
 
             localMeeting?.let {
                 //audio mute icon toggle
+               if (CustomPeerMetadata.fromJson(it.peer.metadata)?.isBRBOn == true) {
+                    binding.iconBrb.visibility = View.VISIBLE
+               } else {
+                    binding.iconBrb.visibility = View.GONE
+               }
+
+
                 if (it.audio?.isMute == true) {
                     if (isMinimized) {
                         binding.minimizedIconAudioOff.visibility = View.VISIBLE
