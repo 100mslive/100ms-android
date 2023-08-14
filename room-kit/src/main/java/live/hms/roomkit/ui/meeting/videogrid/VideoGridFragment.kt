@@ -130,7 +130,7 @@ class VideoGridFragment : Fragment() {
 
             //show or hide inset
             if (it.size == 1 && localMeeting != null) {
-                binding.insetPill.visibility = View.VISIBLE
+                binding.insetPill.visibility = View.GONE
             } else if (it.size > 1 && localMeeting != null) {
                 binding.insetPill.visibility = View.VISIBLE
             } else if (localMeeting == null) {
