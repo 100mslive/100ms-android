@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.bold
+import androidx.core.text.buildSpannedString
+import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.tabs.TabLayoutMediator
@@ -22,6 +25,9 @@ import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.ui.theme.setIconEnabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.roomkit.util.visibilityOpacity
+import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.enums.HMSPeerUpdate
 
 class VideoGridFragment : Fragment() {
     companion object {
@@ -36,6 +42,8 @@ class VideoGridFragment : Fragment() {
     private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     private lateinit var adapter: VideoGridAdapter
+    var isMinimized = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,10 +92,37 @@ class VideoGridFragment : Fragment() {
         }
 
         binding.applyTheme()
-        binding.insetPill.makeInset()
+        binding.insetPill.makeInset{
+            isMinimized = isMinimized.not()
+            binding.insetPillMaximised.visibility = if (isMinimized) View.GONE else View.VISIBLE
+        }
         binding.localHmsVideoView?.setZOrderOnTop(true)
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
-        var isMinimized = false
+
+        meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) { peerTypePair ->
+            val isLocal = peerTypePair.first.isLocal
+            if (isLocal) {
+                when (peerTypePair.second) {
+                    HMSPeerUpdate.METADATA_CHANGED -> {
+                        val isHandRaised =
+                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isHandRaised == true
+                        val isBRB =
+                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isBRBOn == true
+                        binding.iconBrb.visibility = if (isBRB) View.VISIBLE else View.GONE
+                    }
+                    // Unused updates
+                    HMSPeerUpdate.NETWORK_QUALITY_UPDATED,
+                    HMSPeerUpdate.PEER_JOINED,
+                    HMSPeerUpdate.NAME_CHANGED,
+                    HMSPeerUpdate.PEER_LEFT,
+                    HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
+                    HMSPeerUpdate.NO_DOMINANT_SPEAKER,
+                    HMSPeerUpdate.ROLE_CHANGED -> {
+                    }
+                }
+            }
+
+        }
 
 
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
@@ -95,7 +130,7 @@ class VideoGridFragment : Fragment() {
 
             //show or hide inset
             if (it.size == 1 && localMeeting != null) {
-                binding.insetPill.visibility = View.GONE
+                binding.insetPill.visibility = View.VISIBLE
             } else if (it.size > 1 && localMeeting != null) {
                 binding.insetPill.visibility = View.VISIBLE
             } else if (localMeeting == null) {
@@ -103,45 +138,33 @@ class VideoGridFragment : Fragment() {
             }
 
             localMeeting?.let {
-                //audio mute icon toggle
-               if (CustomPeerMetadata.fromJson(it.peer.metadata)?.isBRBOn == true) {
-                    binding.iconBrb.visibility = View.VISIBLE
-               } else {
-                    binding.iconBrb.visibility = View.GONE
-               }
+
 
 
                 if (it.audio?.isMute == true) {
-                    if (isMinimized) {
-                        binding.minimizedIconAudioOff.visibility = View.VISIBLE
-                        binding.iconAudioOff.visibility = View.GONE
+                    if (binding.minimizedIconAudioOff.isEnabled)
                         binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
-                    } else {
-                        binding.iconAudioOff.visibility = View.VISIBLE
-                    }
+                    binding.minimizedIconAudioOff.isEnabled = false
+                    binding.iconAudioOff.visibility = View.VISIBLE
                 } else {
-                    if (isMinimized) {
-                        binding.minimizedIconAudioOff.visibility = View.VISIBLE
-                        binding.iconAudioOff.visibility = View.GONE
+                    binding.iconAudioOff.visibility = View.INVISIBLE
+                    if (binding.minimizedIconAudioOff.isEnabled.not())
                         binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on)
-                    } else {
-                        binding.iconAudioOff.visibility = View.INVISIBLE
-                    }
-
+                    binding.minimizedIconAudioOff.isEnabled = true
                 }
 
                 if (it.video?.isMute == true) {
+                    if (binding.minimizedIconVideoOff.isEnabled)
+                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
+                    binding.minimizedIconVideoOff.isEnabled = false
+                    binding.localHmsVideoView?.visibility = View.INVISIBLE
                     binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
-
-                    binding.localHmsVideoView.visibility =
-                        if (isMinimized) View.VISIBLE else View.INVISIBLE
-
-                    binding.nameInitials.visibility = if (isMinimized) View.GONE else View.VISIBLE
                 } else {
-                    binding.nameInitials.visibility = View.INVISIBLE
+                    if (binding.minimizedIconVideoOff.isEnabled.not())
+                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on)
+                    binding.minimizedIconVideoOff.isEnabled = true
                     binding.localHmsVideoView?.visibility = View.VISIBLE
-                    it.video?.let {  binding.localHmsVideoView?.addTrack(it) }
-
+                    it.video?.let { binding.localHmsVideoView?.addTrack(it) }
                 }
 
             }
@@ -155,9 +178,9 @@ class VideoGridFragment : Fragment() {
             val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
             // Without this, the extra inset adds one more tile than they should
             val tempItems = (tracks.size + itemsPerPage - 1) - 1 // always subtract local peer inset
-            val expectedItems = tempItems/ itemsPerPage
+            val expectedItems = tempItems / itemsPerPage
 
-            adapter.totalPages = if(expectedItems == 0)
+            adapter.totalPages = if (expectedItems == 0)
                 1
             else expectedItems
         }
