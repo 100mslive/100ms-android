@@ -19,6 +19,9 @@ import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
+import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.ChatViewModelFactory
+import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -31,6 +34,9 @@ import kotlin.math.absoluteValue
  */
 private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
+    private val chatViewModel: ChatViewModel by activityViewModels {
+        ChatViewModelFactory(meetingViewModel.hmsSDK)
+    }
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
@@ -74,6 +80,14 @@ class HlsFragment : Fragment() {
                     requireActivity().supportFragmentManager,
                     "trackSelectionBottomSheet"
                 )
+            }
+        }
+
+        binding.iconSend?.setOnSingleClickListener {
+            val messageStr = binding.editTextMessage?.text.toString().trim()
+            if (messageStr.isNotEmpty()) {
+                chatViewModel.sendMessage(messageStr)
+                binding.editTextMessage?.setText("")
             }
         }
 

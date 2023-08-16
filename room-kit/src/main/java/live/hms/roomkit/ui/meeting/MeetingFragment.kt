@@ -428,6 +428,13 @@ class MeetingFragment : Fragment() {
                 binding.buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
             }
         }
+        binding.iconSend?.setOnSingleClickListener {
+            val messageStr = binding.editTextMessage?.text.toString().trim()
+            if (messageStr.isNotEmpty()) {
+                chatViewModel.sendMessage(messageStr)
+                binding.editTextMessage?.setText("")
+            }
+        }
     }
 
     override fun onCreateView(
@@ -1010,12 +1017,17 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonOpenChat.setOnSingleClickListener(1000L) {
-            Log.d(TAG, "initButtons: Chat Button clicked")
-            findNavController().navigate(
-                MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
-                    "Dummy Customer Id"
-                )
-            )
+            with(binding.chatView!!) {
+                if (visibility == View.GONE)
+                    visibility = View.VISIBLE
+                else
+                    visibility = View.GONE
+            }
+//            findNavController().navigate(
+//                MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
+//                    "Dummy Customer Id"
+//                )
+//            )
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }

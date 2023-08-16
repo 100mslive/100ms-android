@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -112,6 +113,44 @@
         android:layout_height="wrap_content"
         tools:text="Hls Text"
         />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit_text_message"
+            style="@style/TextInputLayout"
+            android:layout_width="0dp"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:minHeight="24dp"
+            android:textColor="#8F9099"
+            android:background="@drawable/send_message_background"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:hint="Send Messages to Everyone"
+            android:padding="8dp"
+            app:endIconDrawable="@drawable/send_message"
+            app:endIconMode="custom" />
+
+
+        <ImageView
+            android:id="@+id/icon_send"
+            android:layout_width="18dp"
+            android:layout_margin="8dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/send_icon" />
+
+    </LinearLayout>
+
 
 
 </RelativeLayout>
