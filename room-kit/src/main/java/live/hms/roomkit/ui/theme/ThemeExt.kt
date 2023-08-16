@@ -6,6 +6,7 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
@@ -99,7 +100,7 @@ fun getColorOrDefault(colorStr: String?, defaultColor: String): Int {
     }
 }
 
-internal fun ImageButton.setIconEnabled(
+internal fun ImageView.setIconEnabled(
     @DrawableRes disabledIconDrawableRes: Int
 ) {
     this.setBackgroundResource(R.drawable.gray_round_stroked_drawable)
@@ -124,11 +125,12 @@ internal fun ImageButton.setIconEnabled(
 }
 
 
-internal fun ImageButton.setIconDisabled(
-    @DrawableRes disabledIconDrawableRes: Int
+internal fun ImageView.setIconDisabled(
+    @DrawableRes disabledIconDrawableRes: Int,
+    @DrawableRes backgroundRes: Int = R.drawable.gray_round_solid_drawable
 ) {
     this.setImageResource(disabledIconDrawableRes)
-    this.setBackgroundResource(R.drawable.gray_round_solid_drawable)
+    this.setBackgroundResource(backgroundRes)
     background.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.secondaryDim,
@@ -590,6 +592,16 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
+    minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
+    minimizedIconAudioOff.isEnabled = false
+    minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
+    minimizedIconVideoOff.isEnabled = false
+    maximizedIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 
     iconAudioOff.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
@@ -605,6 +617,18 @@ fun FragmentGridVideoBinding.applyTheme() {
 
 
     insetPill.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default
+    )
+
+    youText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    insetPillMaximised.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default
     )
