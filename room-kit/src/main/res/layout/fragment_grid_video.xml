@@ -67,46 +67,37 @@
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/minimized_icon_audio_off"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_alignParentTop="true"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
                     android:alpha="0"
-                    android:src="@drawable/ic_mic_mute"
+                    android:src="@drawable/avd_video_on_to_off"
                     android:visibility="invisible"
-                    app:iconSize="32dp"
+                    app:iconSize="16dp"
                     app:layout_constraintEnd_toStartOf="@id/minimized_icon_video_off"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/minimized_icon_video_off"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:layout_alignParentTop="true"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginHorizontal="@dimen/eight_dp"
                     android:layout_marginTop="8dp"
                     android:alpha="0"
                     android:src="@drawable/ic_mic_mute"
                     android:visibility="invisible"
-                    app:iconSize="32dp"
+                    app:iconSize="16dp"
                     app:layout_constraintStart_toEndOf="@id/minimized_icon_audio_off"
                     app:layout_constraintTop_toTopOf="parent" />
 
 
 
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/icon_audio_off"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_mic_mute"
-                    android:visibility="invisible"
-                    app:iconSize="32dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+
 
 
                 <com.google.android.material.textview.MaterialTextView
@@ -131,12 +122,38 @@
                     android:id="@+id/local_hms_video_view"
                     android:layout_width="@dimen/inset_pill_width"
                     android:layout_height="@dimen/inset_pill_height"
-                    android:elevation="24dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/icon_audio_off"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_mic_mute"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    android:elevation="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/icon_brb"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_brb"
+                    android:visibility="invisible"
+                    app:iconSize="32dp"
+                    android:elevation="8dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
