@@ -32,7 +32,7 @@ class EndStreamBottomSheet: BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme);
+        setStyle(STYLE_NORMAL, R.style.CustomBottomSheetStyle)
     }
 
     override fun onCreateView(
