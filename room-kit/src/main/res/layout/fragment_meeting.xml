@@ -205,7 +205,7 @@
         <ImageView
             android:id="@+id/icon_send"
             android:layout_width="18dp"
-            android:layout_margin="8dp"
+            android:padding="8dp"
             android:layout_height="18dp"
             android:layout_gravity="center"
             android:layout_marginEnd="20dp"

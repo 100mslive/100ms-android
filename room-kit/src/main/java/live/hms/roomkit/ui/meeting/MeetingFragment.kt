@@ -1016,18 +1016,14 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        binding.buttonOpenChat.setOnSingleClickListener(1000L) {
+        binding.buttonOpenChat.setOnSingleClickListener {
             with(binding.chatView!!) {
-                if (visibility == View.GONE)
-                    visibility = View.VISIBLE
-                else
-                    visibility = View.GONE
+                visibility = if (visibility == View.GONE) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             }
-//            findNavController().navigate(
-//                MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
-//                    "Dummy Customer Id"
-//                )
-//            )
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
