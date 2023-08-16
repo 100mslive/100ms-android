@@ -207,4 +207,11 @@
     <item name="IS_INT" type="id"/>
     <string name="single_choice_text">Select one of the radio buttons to mark the correct answer.</string>
     <string name="multi_choice_text">Check the boxes to mark the correct answers.</string>
+    <string name="leave_description">Others will continue after you leave. You can join the session again</string>
+    <string name="leave_title">Leave</string>
+    <string name="end_session_title">End Stream</string>
+    <string name="end_stream_description">The stream will end for everyone. You can\'t undo this action</string>
+    <string name="end_stream_title">End Stream</string>
+    <string name="end_stream_description_full">This stream will end for everyone and all the activities will stop. You can\'t undo this action</string>
+    <string name="end_session">End Session</string>
 </resources>

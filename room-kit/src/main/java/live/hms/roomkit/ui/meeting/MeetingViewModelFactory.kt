@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 
 class MeetingViewModelFactory(
   private val application: Application
-) : ViewModelProvider.Factory {
+) : ViewModelProvider.NewInstanceFactory() {
 
   @Suppress("UNCHECKED_CAST")
   override fun <T : ViewModel> create(modelClass: Class<T>): T {
