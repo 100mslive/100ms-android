@@ -46,6 +46,7 @@ internal fun View.makeInset(
 //  minimizeBtnListener: DraggableView.Listener,
     stickyAxis: Mode = Mode.STICKY_XY,
     animated: Boolean = true,
+    onDoubleTap: () -> Unit,
 //    draggableListener: DraggableListener? = null,
 ) {
     var widgetInitialX = 0f
@@ -67,6 +68,11 @@ internal fun View.makeInset(
                 if (viewState.isMoving) return
                 viewState.isLongPressRegistered = true
 //                draggableListener?.onLongPress(this@setupDraggable)
+            }
+
+            override fun onDoubleTap(e: MotionEvent?): Boolean {
+                onDoubleTap.invoke()
+                return super.onDoubleTap(e)
             }
         })
 
