@@ -40,6 +40,7 @@ import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
+import live.hms.roomkit.ui.meeting.bottomsheets.LeaveBottomSheet
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
@@ -1200,116 +1201,9 @@ class MeetingFragment : Fragment() {
         binding.roleSpinner.root.performClick()
     }
 
-
     fun inflateExitFlow() {
-
-        val exitBtn = binding.buttonEndCall
-        val dialog = AlertDialog.Builder(requireContext()).create()
-        val dialogView: View? = requireActivity().layoutInflater.inflate(
-            R.layout.exit_button_list_dialog,
-            null
-        )
-        dialog.setView(dialogView)
-        // Coordinates relative to parent
-        val bx: Int = exitBtn.left
-        val by: Int = exitBtn.top
-
-        val params = WindowManager.LayoutParams()
-        params.y = by + exitBtn.height
-        params.x = 50
-        params.gravity = Gravity.TOP or Gravity.LEFT
-        dialog.window!!.attributes = params
-        dialog.window?.setDimAmount(0f)
-
-        dialog.window?.attributes?.flags =
-            dialog.window?.attributes?.flags?.and((WindowManager.LayoutParams.FLAG_DIM_BEHIND).inv())
-
-        dialog.show()
-
-        dialog.findViewById<View>(R.id.parent_view)?.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().surface_dim)
-
-        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
-            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
-                text = "Leave Meeting"
-            } else {
-                text = "Leave Studio"
-            }
-            setOnClickListener {
-                dialog.dismiss()
-                val endCallDialog = Dialog(requireContext())
-                endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
-                if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Meeting"
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding =
-                        0
-                    endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
-                        "Others will continue after you leave. You can join the meeting again."
-                } else {
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Studio"
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding =
-                        0
-                    endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
-                        "Others will continue after you leave. You can join the studio again."
-                }
-
-                endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t Leave"
-                endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "Leave"
-
-                endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-                    .setOnClickListener { endCallDialog.dismiss() }
-                endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
-                    endCallDialog.dismiss()
-                    meetingViewModel.leaveMeeting()
-                }
-                endCallDialog.show()
-            }
-        }
-
-        dialog.findViewById<TextView>(R.id.btn_end_session)?.apply {
-
-            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
-                text = "End Meeting"
-            } else {
-                text = "End Session"
-            }
-
-            if (meetingViewModel.isAllowedToEndMeeting()) {
-                visibility = View.VISIBLE
-            } else {
-                visibility = View.GONE
-            }
-            setOnClickListener {
-                dialog.dismiss()
-                val endSessionDialog = Dialog(requireContext())
-                endSessionDialog.setContentView(R.layout.exit_confirmation_dialog)
-                endSessionDialog.findViewById<TextView>(R.id.dialog_title).text = "End Session"
-                endSessionDialog.findViewById<FrameLayout>(R.id.parent_view).setBackgroundAndColor(
-                    HMSPrebuiltTheme.getColours()?.alertErrorBright,
-                    HMSPrebuiltTheme.getDefaults().error_default
-                )
-                endSessionDialog.findViewById<TextView>(R.id.dialog_title)
-                    .setTextColor(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertSuccess, HMSPrebuiltTheme.getDefaults().error_default))
-
-                endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
-                    setCompoundDrawablesWithIntrinsicBounds(
-                        R.drawable.ic_danger_big, 0, 0, 0
-                    )
-                    compoundDrawablePadding = 20
-                    setPadding(30, paddingTop, 0, paddingBottom)
-                }
-                endSessionDialog.findViewById<TextView>(R.id.dialog_description).text =
-                    "The session will end for everyone and all the activities will stop. You can’t undo this action."
-                endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"
-                endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "End Session"
-                endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-                    .setOnClickListener { endSessionDialog.dismiss() }
-                endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
-                    endSessionDialog.dismiss()
-                    meetingViewModel.endRoom(false)
-                }
-                endSessionDialog.show()
-            }
-        }
+        LeaveBottomSheet()
+            .show(childFragmentManager, "LeaveBottomSheet")
     }
 
 }

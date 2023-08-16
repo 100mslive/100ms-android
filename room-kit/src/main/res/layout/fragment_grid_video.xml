@@ -140,17 +140,17 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
-
-
     </FrameLayout>
 
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_dots"
-        android:layout_width="wrap_content"
-        android:layout_height="8dp"
+        app:tabMode="scrollable"
+        android:background="#FF0000"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
         android:layout_gravity="center"
-        android:layout_margin="4dp"
+        android:layout_marginTop="8dp"
         app:tabBackground="@drawable/dot_selector_4"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp" />
