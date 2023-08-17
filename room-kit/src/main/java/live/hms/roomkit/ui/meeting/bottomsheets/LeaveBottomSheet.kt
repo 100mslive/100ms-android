@@ -44,6 +44,7 @@ class LeaveBottomSheet() : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        updateLayout()
         binding.applyTheme()
 
         binding.leaveLayout.setOnSingleClickListener(200L) {
@@ -57,6 +58,12 @@ class LeaveBottomSheet() : BottomSheetDialogFragment() {
             dismiss()
             // Call end room API
             EndStreamBottomSheet().show(parentFragmentManager, null)
+        }
+    }
+
+    private fun updateLayout() {
+        if (meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true) {
+            binding.endSessionLayout.visibility = View.VISIBLE
         }
     }
 

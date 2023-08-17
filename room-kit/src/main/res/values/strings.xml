@@ -214,4 +214,5 @@
     <string name="end_stream_title">End Stream</string>
     <string name="end_stream_description_full">This stream will end for everyone and all the activities will stop. You can\'t undo this action</string>
     <string name="end_session">End Session</string>
+    <string name="toggle_handraise">Toggle Handraise</string>
 </resources>

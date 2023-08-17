@@ -15,14 +15,15 @@ import android.os.CountDownTimer
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
-import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -54,7 +55,6 @@ import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.error.HMSException
@@ -325,10 +325,8 @@ class MeetingFragment : Fragment() {
                 ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
         ) {
 //            binding.buttonGoLive?.visibility = View.VISIBLE
-            binding.llGoLiveParent?.visibility = View.VISIBLE
         } else {
 //            binding.buttonGoLive?.visibility = View.GONE
-            binding.llGoLiveParent?.visibility = View.GONE
         }
         if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
             binding.meetingFragmentProgress?.visibility = View.GONE
@@ -411,7 +409,6 @@ class MeetingFragment : Fragment() {
         binding.applyTheme()
         initObservers()
         setHasOptionsMenu(true)
-        setupConfiguration()
         meetingViewModel.showAudioMuted.observe(
             viewLifecycleOwner,
             Observer { activity?.invalidateOptionsMenu() })
@@ -424,9 +421,9 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
-                binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
-            } else {
                 binding.buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
+            } else {
+                binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
             }
         }
     }
@@ -486,7 +483,7 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
-            updateVideoView(it)
+            updateMeetingViewMode(it)
             requireActivity().invalidateOptionsMenu()
         }
 
@@ -746,14 +743,16 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+        meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
+            binding.space2?.visibility = if (allowed) View.VISIBLE else View.GONE
             //to show or hide mic icon [eg in HLS mode mic is not required]
             updatePipMicState(allowed, true)
         }
 
-        meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+        meetingViewModel.isLocalVideoPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
+            binding.space3?.visibility = if (allowed) View.VISIBLE else View.GONE
             binding.buttonSwitchCamera?.visibility = if (allowed) View.VISIBLE else View.GONE
         }
 
@@ -786,7 +785,6 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             chatViewModel.peersUpdate()
-            setupConfiguration()
         }
     }
 
@@ -860,32 +858,18 @@ class MeetingFragment : Fragment() {
         }
     }
 
-    private fun updateVideoView(mode: MeetingViewMode) {
-        setupConfiguration()
+    private fun updateMeetingViewMode(mode: MeetingViewMode) {
+        setupConfiguration(mode)
         currentFragment = when (mode) {
             MeetingViewMode.GRID -> VideoGridFragment()
             MeetingViewMode.PINNED -> PinnedVideoFragment()
             MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
             MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
-            is MeetingViewMode.HLS -> HlsFragment().apply {
+            is MeetingViewMode.HLS_VIEWER -> HlsFragment().apply {
                 arguments = bundleOf(
                     "hlsStreamUrl" to mode.url
                 )
             }
-        }
-
-        meetingViewModel.setTitle(mode.titleResId)
-
-        if (mode is MeetingViewMode.HLS) {
-            binding.bottomControls.visibility = View.GONE
-        } else {
-            binding.bottomControls.visibility = View.VISIBLE
-        }
-
-        if (mode == MeetingViewMode.AUDIO_ONLY || mode is MeetingViewMode.HLS) {
-            binding.buttonToggleVideo.visibility = View.GONE
-        } else {
-            binding.buttonToggleVideo.visibility = View.VISIBLE
         }
 
         childFragmentManager
@@ -895,41 +879,29 @@ class MeetingFragment : Fragment() {
             .commit()
     }
 
-    private fun setupConfiguration() {
-        if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()
-                ?.not() == true || meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS
-        ) {
-            //TODO fix on prebuilt screen share
-            if (meetingViewModel.isPrebuiltDebugMode().not())
-            binding.buttonShareScreen?.visibility = View.VISIBLE
-            else
-                binding.buttonShareScreen?.visibility = View.GONE
-            binding.buttonSettingsMenu?.visibility = View.GONE
-//            binding.buttonSettingsMenuTop?.visibility = View.VISIBLE
+    private fun setupConfiguration(mode: MeetingViewMode) {
+        if (mode is MeetingViewMode.HLS_VIEWER) {
+            binding.topMenu?.background = context?.let {
+                ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable) }
+            binding.space4?.visibility = View.VISIBLE
+            binding.buttonRaiseHand?.visibility = View.VISIBLE
         } else {
-            binding.buttonShareScreen?.visibility = View.GONE
-            binding.buttonSettingsMenu?.visibility = View.VISIBLE
-//            binding.buttonSettingsMenuTop?.visibility = View.GONE
-        }
-
-        if (meetingViewModel.isAllowedToShareScreen().not()) {
-            binding.buttonShareScreen?.visibility = View.GONE
-        }
-
-        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
-                ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
-        ) {
-//            binding.buttonGoLive?.visibility = View.VISIBLE
-            binding.llGoLiveParent?.visibility = View.VISIBLE
-        } else {
-//            binding.buttonGoLive?.visibility = View.GONE
-            binding.llGoLiveParent?.visibility = View.GONE
+            binding.topMenu?.setBackgroundColor(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.backgroundDim,
+                    HMSPrebuiltTheme.getDefaults().background_default
+                )
+            )
+            binding.space4?.visibility = View.GONE
+            binding.buttonRaiseHand?.visibility = View.GONE
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun hideProgressBar() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS).not()){
+        binding.bottomControls.visibility = View.VISIBLE
+        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
 
