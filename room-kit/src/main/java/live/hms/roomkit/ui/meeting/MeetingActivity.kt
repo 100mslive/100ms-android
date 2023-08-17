@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import kotlinx.coroutines.launch
@@ -45,9 +46,14 @@ class MeetingActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     _binding = ActivityMeetingBinding.inflate(layoutInflater)
-    WindowCompat.setDecorFitsSystemWindows(window, false)
+    //WindowCompat.setDecorFitsSystemWindows(window, false)
 
 
+    val windowInsetsController =
+      WindowCompat.getInsetsController(window, window.decorView)
+    // Configure the behavior of the hidden system bars.
+    windowInsetsController?.systemBarsBehavior =
+      WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
     setContentView(binding.root)
     supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -110,8 +116,6 @@ class MeetingActivity : AppCompatActivity() {
   }
 
   private fun initViewModels() {
-    meetingViewModel.title.observe(this) {
-    }
     meetingViewModel.isRecording.observe(this) {
       invalidateOptionsMenu()
     }

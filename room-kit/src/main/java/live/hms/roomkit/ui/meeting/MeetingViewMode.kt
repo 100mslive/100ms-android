@@ -19,7 +19,7 @@ sealed class MeetingViewMode {
     override val titleResId: Int = R.string.audio_only_view
   }
 
-  data class HLS(val url : String) : MeetingViewMode() {
+  data class HLS_VIEWER(val url : String) : MeetingViewMode() {
     override val titleResId: Int = R.string.hls_view
   }
 

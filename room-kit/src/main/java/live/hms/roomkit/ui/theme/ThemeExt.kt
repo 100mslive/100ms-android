@@ -291,7 +291,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 
     //init should be called once
-    buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
+    buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
 
     (buttonOpenChat as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_chat_message)
 
