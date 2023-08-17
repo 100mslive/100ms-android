@@ -6,6 +6,7 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
@@ -13,6 +14,8 @@ import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
+import live.hms.roomkit.databinding.EndSessionBottomSheetBinding
+import live.hms.roomkit.databinding.ExitBottomSheetBinding
 import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
@@ -99,16 +102,16 @@ fun getColorOrDefault(colorStr: String?, defaultColor: String): Int {
     }
 }
 
-internal fun ImageButton.setIconEnabled(
-    @DrawableRes disabledIconDrawableRes: Int
+internal fun ImageView.setIconEnabled(
+    @DrawableRes enabledIconDrawableRes: Int
 ) {
     this.setBackgroundResource(R.drawable.gray_round_stroked_drawable)
-    this.setImageResource(disabledIconDrawableRes)
+    this.setImageResource(enabledIconDrawableRes)
 
 
     background.setColorFilter(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getColours()?.secondaryBright,
             HMSPrebuiltTheme.getDefaults().border_bright
         ), PorterDuff.Mode.DST_OVER
     )
@@ -124,11 +127,12 @@ internal fun ImageButton.setIconEnabled(
 }
 
 
-internal fun ImageButton.setIconDisabled(
-    @DrawableRes disabledIconDrawableRes: Int
+internal fun ImageView.setIconDisabled(
+    @DrawableRes disabledIconDrawableRes: Int,
+    @DrawableRes backgroundRes: Int = R.drawable.gray_round_solid_drawable
 ) {
     this.setImageResource(disabledIconDrawableRes)
-    this.setBackgroundResource(R.drawable.gray_round_solid_drawable)
+    this.setBackgroundResource(backgroundRes)
     background.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.secondaryDim,
@@ -208,15 +212,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().error_default,
         R.drawable.gray_round_stroked_drawable
     )
-    //(buttonEndCall as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_end_call)
 
-/*    meetingContainer.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDim,
-            HMSPrebuiltTheme.getDefaults().background_default
-        )
-    )
-    meetingContainer.alpha = 0.64f*/
 
     meetingFragmentProgress?.setBackgroundColor(
         getColorOrDefault(
@@ -295,7 +291,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 
     //init should be called once
-    buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
+    buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
 
     (buttonOpenChat as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_chat_message)
 
@@ -582,6 +578,97 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
 }
 
+fun ExitBottomSheetBinding.applyTheme() {
+    endSessionRoot.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+
+    leaveTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    leaveDescription.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    iconEndSession.setIconTintColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    )
+
+    endSessionTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
+    endSessionDescription.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorBright,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
+    iconEndSession.setIconTintColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+        HMSPrebuiltTheme.getDefaults().error_default
+    )
+
+    endSessionLayout.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDim,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+}
+
+fun EndSessionBottomSheetBinding.applyTheme() {
+    root.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+
+    endSessionIcon.setIconTintColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    )
+
+    endSessionTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
+    endSessionDescription.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    endSessionButton.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default,
+        R.drawable.primary_round_drawable
+    )
+
+    endSessionButton.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+}
+
 fun FragmentGridVideoBinding.applyTheme() {
     nameInitials.setTextColor(
         getColorOrDefault(
@@ -590,6 +677,16 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
+    minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
+    minimizedIconAudioOff.isEnabled = false
+    minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
+    minimizedIconVideoOff.isEnabled = false
+    maximizedIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 
     iconAudioOff.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
@@ -609,11 +706,34 @@ fun FragmentGridVideoBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().surface_default
     )
 
+    youText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    insetPillMaximised.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default
+    )
+
     nameInitials.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_80
     )
 
+    tabLayoutDots.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+    tabLayoutDots.alpha = 0.64f
+
+/*    gridViewLinearLayout.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+    gridViewLinearLayout.alpha = 0.64f*/
 
 }

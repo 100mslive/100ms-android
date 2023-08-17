@@ -15,14 +15,15 @@ import android.os.CountDownTimer
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
-import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -40,6 +41,7 @@ import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
+import live.hms.roomkit.ui.meeting.bottomsheets.LeaveBottomSheet
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
@@ -53,7 +55,6 @@ import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.error.HMSException
@@ -324,10 +325,8 @@ class MeetingFragment : Fragment() {
                 ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
         ) {
 //            binding.buttonGoLive?.visibility = View.VISIBLE
-            binding.llGoLiveParent?.visibility = View.VISIBLE
         } else {
 //            binding.buttonGoLive?.visibility = View.GONE
-            binding.llGoLiveParent?.visibility = View.GONE
         }
         if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
             binding.meetingFragmentProgress?.visibility = View.GONE
@@ -410,7 +409,6 @@ class MeetingFragment : Fragment() {
         binding.applyTheme()
         initObservers()
         setHasOptionsMenu(true)
-        setupConfiguration()
         meetingViewModel.showAudioMuted.observe(
             viewLifecycleOwner,
             Observer { activity?.invalidateOptionsMenu() })
@@ -423,9 +421,9 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
-                binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
-            } else {
                 binding.buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
+            } else {
+                binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
             }
         }
         binding.iconSend?.setOnSingleClickListener {
@@ -492,7 +490,7 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
-            updateVideoView(it)
+            updateMeetingViewMode(it)
             requireActivity().invalidateOptionsMenu()
         }
 
@@ -752,14 +750,16 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        meetingViewModel.isLocalAudioPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+        meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
+            binding.space2?.visibility = if (allowed) View.VISIBLE else View.GONE
             //to show or hide mic icon [eg in HLS mode mic is not required]
             updatePipMicState(allowed, true)
         }
 
-        meetingViewModel.isLocalVideoPublishingAllowed.observe(viewLifecycleOwner) { allowed ->
+        meetingViewModel.isLocalVideoPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
+            binding.space3?.visibility = if (allowed) View.VISIBLE else View.GONE
             binding.buttonSwitchCamera?.visibility = if (allowed) View.VISIBLE else View.GONE
         }
 
@@ -792,7 +792,6 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             chatViewModel.peersUpdate()
-            setupConfiguration()
         }
     }
 
@@ -866,32 +865,18 @@ class MeetingFragment : Fragment() {
         }
     }
 
-    private fun updateVideoView(mode: MeetingViewMode) {
-        setupConfiguration()
+    private fun updateMeetingViewMode(mode: MeetingViewMode) {
+        setupConfiguration(mode)
         currentFragment = when (mode) {
             MeetingViewMode.GRID -> VideoGridFragment()
             MeetingViewMode.PINNED -> PinnedVideoFragment()
             MeetingViewMode.ACTIVE_SPEAKER -> ActiveSpeakerFragment()
             MeetingViewMode.AUDIO_ONLY -> AudioModeFragment()
-            is MeetingViewMode.HLS -> HlsFragment().apply {
+            is MeetingViewMode.HLS_VIEWER -> HlsFragment().apply {
                 arguments = bundleOf(
                     "hlsStreamUrl" to mode.url
                 )
             }
-        }
-
-        meetingViewModel.setTitle(mode.titleResId)
-
-        if (mode is MeetingViewMode.HLS) {
-            binding.bottomControls.visibility = View.GONE
-        } else {
-            binding.bottomControls.visibility = View.VISIBLE
-        }
-
-        if (mode == MeetingViewMode.AUDIO_ONLY || mode is MeetingViewMode.HLS) {
-            binding.buttonToggleVideo.visibility = View.GONE
-        } else {
-            binding.buttonToggleVideo.visibility = View.VISIBLE
         }
 
         childFragmentManager
@@ -901,41 +886,29 @@ class MeetingFragment : Fragment() {
             .commit()
     }
 
-    private fun setupConfiguration() {
-        if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer()
-                ?.not() == true || meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS
-        ) {
-            //TODO fix on prebuilt screen share
-            if (meetingViewModel.isPrebuiltDebugMode().not())
-            binding.buttonShareScreen?.visibility = View.VISIBLE
-            else
-                binding.buttonShareScreen?.visibility = View.GONE
-            binding.buttonSettingsMenu?.visibility = View.GONE
-//            binding.buttonSettingsMenuTop?.visibility = View.VISIBLE
+    private fun setupConfiguration(mode: MeetingViewMode) {
+        if (mode is MeetingViewMode.HLS_VIEWER) {
+            binding.topMenu?.background = context?.let {
+                ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable) }
+            binding.space4?.visibility = View.VISIBLE
+            binding.buttonRaiseHand?.visibility = View.VISIBLE
         } else {
-            binding.buttonShareScreen?.visibility = View.GONE
-            binding.buttonSettingsMenu?.visibility = View.VISIBLE
-//            binding.buttonSettingsMenuTop?.visibility = View.GONE
-        }
-
-        if (meetingViewModel.isAllowedToShareScreen().not()) {
-            binding.buttonShareScreen?.visibility = View.GONE
-        }
-
-        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
-                ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
-        ) {
-//            binding.buttonGoLive?.visibility = View.VISIBLE
-            binding.llGoLiveParent?.visibility = View.VISIBLE
-        } else {
-//            binding.buttonGoLive?.visibility = View.GONE
-            binding.llGoLiveParent?.visibility = View.GONE
+            binding.topMenu?.setBackgroundColor(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.backgroundDim,
+                    HMSPrebuiltTheme.getDefaults().background_default
+                )
+            )
+            binding.space4?.visibility = View.GONE
+            binding.buttonRaiseHand?.visibility = View.GONE
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun hideProgressBar() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS).not()){
+        binding.bottomControls.visibility = View.VISIBLE
+        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
 
@@ -1208,116 +1181,9 @@ class MeetingFragment : Fragment() {
         binding.roleSpinner.root.performClick()
     }
 
-
     fun inflateExitFlow() {
-
-        val exitBtn = binding.buttonEndCall
-        val dialog = AlertDialog.Builder(requireContext()).create()
-        val dialogView: View? = requireActivity().layoutInflater.inflate(
-            R.layout.exit_button_list_dialog,
-            null
-        )
-        dialog.setView(dialogView)
-        // Coordinates relative to parent
-        val bx: Int = exitBtn.left
-        val by: Int = exitBtn.top
-
-        val params = WindowManager.LayoutParams()
-        params.y = by + exitBtn.height
-        params.x = 50
-        params.gravity = Gravity.TOP or Gravity.LEFT
-        dialog.window!!.attributes = params
-        dialog.window?.setDimAmount(0f)
-
-        dialog.window?.attributes?.flags =
-            dialog.window?.attributes?.flags?.and((WindowManager.LayoutParams.FLAG_DIM_BEHIND).inv())
-
-        dialog.show()
-
-        dialog.findViewById<View>(R.id.parent_view)?.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().surface_dim)
-
-        dialog.findViewById<TextView>(R.id.btn_leave_studio)?.apply {
-            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
-                text = "Leave Meeting"
-            } else {
-                text = "Leave Studio"
-            }
-            setOnClickListener {
-                dialog.dismiss()
-                val endCallDialog = Dialog(requireContext())
-                endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
-                if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Meeting"
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding =
-                        0
-                    endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
-                        "Others will continue after you leave. You can join the meeting again."
-                } else {
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).text = "Leave Studio"
-                    endCallDialog.findViewById<TextView>(R.id.dialog_title).compoundDrawablePadding =
-                        0
-                    endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
-                        "Others will continue after you leave. You can join the studio again."
-                }
-
-                endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t Leave"
-                endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "Leave"
-
-                endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-                    .setOnClickListener { endCallDialog.dismiss() }
-                endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
-                    endCallDialog.dismiss()
-                    meetingViewModel.leaveMeeting()
-                }
-                endCallDialog.show()
-            }
-        }
-
-        dialog.findViewById<TextView>(R.id.btn_end_session)?.apply {
-
-            if (meetingViewModel.hmsSDK.getLocalPeer()?.isWebrtcPeer() == true) {
-                text = "End Meeting"
-            } else {
-                text = "End Session"
-            }
-
-            if (meetingViewModel.isAllowedToEndMeeting()) {
-                visibility = View.VISIBLE
-            } else {
-                visibility = View.GONE
-            }
-            setOnClickListener {
-                dialog.dismiss()
-                val endSessionDialog = Dialog(requireContext())
-                endSessionDialog.setContentView(R.layout.exit_confirmation_dialog)
-                endSessionDialog.findViewById<TextView>(R.id.dialog_title).text = "End Session"
-                endSessionDialog.findViewById<FrameLayout>(R.id.parent_view).setBackgroundAndColor(
-                    HMSPrebuiltTheme.getColours()?.alertErrorBright,
-                    HMSPrebuiltTheme.getDefaults().error_default
-                )
-                endSessionDialog.findViewById<TextView>(R.id.dialog_title)
-                    .setTextColor(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertSuccess, HMSPrebuiltTheme.getDefaults().error_default))
-
-                endSessionDialog.findViewById<TextView>(R.id.dialog_title).apply {
-                    setCompoundDrawablesWithIntrinsicBounds(
-                        R.drawable.ic_danger_big, 0, 0, 0
-                    )
-                    compoundDrawablePadding = 20
-                    setPadding(30, paddingTop, 0, paddingBottom)
-                }
-                endSessionDialog.findViewById<TextView>(R.id.dialog_description).text =
-                    "The session will end for everyone and all the activities will stop. You can’t undo this action."
-                endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text = "Don’t End"
-                endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "End Session"
-                endSessionDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-                    .setOnClickListener { endSessionDialog.dismiss() }
-                endSessionDialog.findViewById<AppCompatButton>(R.id.accept_btn).setOnClickListener {
-                    endSessionDialog.dismiss()
-                    meetingViewModel.endRoom(false)
-                }
-                endSessionDialog.show()
-            }
-        }
+        LeaveBottomSheet()
+            .show(childFragmentManager, "LeaveBottomSheet")
     }
 
 }

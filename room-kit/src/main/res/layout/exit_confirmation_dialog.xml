@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/primary_red_round_drawable"
+                android:background="@drawable/primary_round_drawable"
                 android:fontFamily="@font/inter_semibold"
                 android:text="Leave"
                 android:textAllCaps="false" />
