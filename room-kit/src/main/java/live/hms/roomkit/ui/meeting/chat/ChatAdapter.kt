@@ -17,7 +17,7 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
   companion object {
     private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
       override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
-        oldItem.messageId == newItem.messageId
+        oldItem == newItem
 
 
       override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =

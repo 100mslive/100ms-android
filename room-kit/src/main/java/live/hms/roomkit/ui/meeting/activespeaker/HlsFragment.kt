@@ -96,15 +96,27 @@ class HlsFragment : Fragment() {
 
         setPlayerStatsListener(true)
 
-        binding.chatMessages.layoutManager = LinearLayoutManager(requireContext())
-            .apply {
-                reverseLayout = false
-                stackFromEnd = true
-            }
-        binding.chatMessages.adapter = chatAdapter
+        with(binding.chatMessages) {
+            // Set the adapter
+            // Set the upside down recyclerview that starts items from the bottom
+            // Fade the ends
+
+            layoutManager = LinearLayoutManager(context)
+                .apply {
+                    reverseLayout = false
+                    stackFromEnd = true
+                }
+            isVerticalFadingEdgeEnabled = true
+            setFadingEdgeLength(140)
+            adapter = chatAdapter
+            recycledViewPool.setMaxRecycledViews(0, 0)
+        }
 
         chatViewModel.messages.observe(viewLifecycleOwner) {
             chatAdapter.submitList(it)
+            binding.chatMessages.postDelayed({
+                binding.chatMessages.smoothScrollToPosition(it.size - 1)
+            }, 300)
         }
     }
 
