@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
@@ -21,6 +22,7 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.ChatViewModelFactory
+import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
@@ -37,6 +39,7 @@ class HlsFragment : Fragment() {
     private val chatViewModel: ChatViewModel by activityViewModels {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
     }
+    private val chatAdapter = ChatAdapter()
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
@@ -83,15 +86,26 @@ class HlsFragment : Fragment() {
             }
         }
 
-        binding.iconSend?.setOnSingleClickListener {
-            val messageStr = binding.editTextMessage?.text.toString().trim()
+        binding.iconSend.setOnSingleClickListener {
+            val messageStr = binding.editTextMessage.text.toString().trim()
             if (messageStr.isNotEmpty()) {
                 chatViewModel.sendMessage(messageStr)
-                binding.editTextMessage?.setText("")
+                binding.editTextMessage.setText("")
             }
         }
 
         setPlayerStatsListener(true)
+
+        binding.chatMessages.layoutManager = LinearLayoutManager(requireContext())
+            .apply {
+                reverseLayout = false
+                stackFromEnd = true
+            }
+        binding.chatMessages.adapter = chatAdapter
+
+        chatViewModel.messages.observe(viewLifecycleOwner) {
+            chatAdapter.submitList(it)
+        }
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {

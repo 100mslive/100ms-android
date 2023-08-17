@@ -96,7 +96,7 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
     private fun initRecyclerView() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = ChatAdapter(messages, meetingViewModel::setSessionMetadata)
+//            adapter = ChatAdapter(messages, meetingViewModel::setSessionMetadata)
             scrollToPosition(messages.size - 1)
         }
     }
