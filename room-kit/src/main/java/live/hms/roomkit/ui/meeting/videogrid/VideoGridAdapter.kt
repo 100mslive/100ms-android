@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewpager2.adapter.FragmentStateAdapter
 
-class VideoGridAdapter(parentFragment: Fragment) : FragmentStateAdapter(parentFragment) {
+class VideoGridAdapter(parentFragment: Fragment,val isScreenShare: Boolean = false) : FragmentStateAdapter(parentFragment) {
 
   companion object {
     const val TAG = "VideoGridAdapter"
@@ -19,7 +19,7 @@ class VideoGridAdapter(parentFragment: Fragment) : FragmentStateAdapter(parentFr
     }
 
   override fun getItemCount() = totalPages
-  override fun createFragment(position: Int) = VideoGridPageFragment.newInstance(position)
+  override fun createFragment(position: Int) = VideoGridPageFragment.newInstance(position, isScreenShare)
   override fun getItemId(position: Int) = position.toLong()
   override fun containsItem(itemId: Long) = itemId < totalPages
 }

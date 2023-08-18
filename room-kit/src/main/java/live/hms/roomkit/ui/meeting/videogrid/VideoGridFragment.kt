@@ -7,9 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.text.bold
-import androidx.core.text.buildSpannedString
-import androidx.core.text.toSpannable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.tabs.TabLayoutMediator
@@ -18,15 +15,11 @@ import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
-import live.hms.roomkit.ui.theme.setIconEnabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.roomkit.util.visibilityOpacity
-import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 
 class VideoGridFragment : Fragment() {
@@ -41,7 +34,8 @@ class VideoGridFragment : Fragment() {
 
     private val meetingViewModel: MeetingViewModel by activityViewModels()
 
-    private lateinit var adapter: VideoGridAdapter
+    private lateinit var peerGridVideoAdapter: VideoGridAdapter
+    private lateinit var screenShareAdapter: VideoGridAdapter
     var isMinimized = false
 
 
@@ -64,31 +58,24 @@ class VideoGridFragment : Fragment() {
     }
 
     private fun initVideoGrid() {
-        adapter = VideoGridAdapter(this@VideoGridFragment) /* { video ->
-      Log.v(TAG, "onVideoItemClick: $video")
-
-      Snackbar.make(
-          binding.root,
-          "Name: ${video.peer.userName} (${video.peer.role}) \nId: ${video.peer.customerUserId}",
-          Snackbar.LENGTH_LONG,
-      ).setAction("Copy") {
-        val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(
-            requireContext(),
-            "Copied customer id of ${video.peer.userName} to clipboard",
-            Toast.LENGTH_SHORT
-        ).show()
-      }.show()
-    } */
+        peerGridVideoAdapter = VideoGridAdapter(this@VideoGridFragment)
+        screenShareAdapter = VideoGridAdapter(this@VideoGridFragment, isScreenShare = true)
 
         binding.viewPagerVideoGrid.apply {
             offscreenPageLimit = 1
-            adapter = this@VideoGridFragment.adapter
+            adapter = this@VideoGridFragment.peerGridVideoAdapter
 
             TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
                 // No text to be shown
             }.attach()
+        }
+
+        binding.viewPagerRemoteScreenShare.apply {
+            offscreenPageLimit = 1
+            adapter = this@VideoGridFragment.screenShareAdapter
+            TabLayoutMediator(binding.tabLayoutDotsRemoteScreenShare, this) { _, _ ->
+            }.attach()
+
         }
 
         binding.applyTheme()
@@ -175,12 +162,30 @@ class VideoGridFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-            val itemsPerPage = settings.videoGridRows * settings.videoGridColumns
+
+            val screenShareTrackList = tracks.filter { it.isScreen }
+            var newRowCount = 0
+            var newColumnCount = 0
+            //is screen share track is present then reduce the grid and column span else restore
+            if (screenShareTrackList.isEmpty()) {
+                binding.screenShareContainer.visibility = View.GONE
+                newRowCount = 3
+                newColumnCount = 2
+            }
+            else {
+                binding.screenShareContainer.visibility = View.VISIBLE
+                newRowCount = 1
+                newColumnCount = 2
+            }
+
+            meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value = Pair(newRowCount, newColumnCount)
+
+            val itemsPerPage = newRowCount * newColumnCount
             // Without this, the extra inset adds one more tile than they should
             val tempItems = (tracks.size + itemsPerPage - 1) - 1 // always subtract local peer inset
             val expectedItems = tempItems / itemsPerPage
-
-            adapter.totalPages = if (expectedItems == 0)
+            screenShareAdapter.totalPages = screenShareTrackList.size
+            peerGridVideoAdapter.totalPages = if (expectedItems == 0)
                 1
             else expectedItems
         }

@@ -336,6 +336,8 @@ class MeetingViewModel(
 
     private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
 
+    val updateRowAndColumnSpanForVideoPeerGrid = MutableLiveData<Pair<Int,Int>>()
+
     val speakerUpdateLiveData = object : ActiveSpeakerLiveData() {
         private val speakerH = ActiveSpeakerHandler(true,settings.videoGridRows* settings.videoGridColumns
         ) { _tracks }
@@ -354,6 +356,16 @@ class MeetingViewModel(
         override fun removeSpeakerSource() {
             removeSource(speakers)
         }
+
+        //TODO can't be null
+        fun refreshSpeaker() {
+           // speakers.postValue(speakers.value)
+        }
+
+        override fun updateMaxActiveSpeaker(rowCount: Int, columnCount: Int) {
+            speakerH.updateMaxActiveSpeaker(rowCount*columnCount)
+            refreshSpeaker()
+        }
         init {
             addSpeakerSource()
 
@@ -370,6 +382,8 @@ class MeetingViewModel(
             }
 
         }
+
+
 
     }
 
