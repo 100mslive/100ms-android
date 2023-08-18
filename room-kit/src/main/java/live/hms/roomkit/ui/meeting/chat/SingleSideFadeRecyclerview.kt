@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting.activespeaker
+package live.hms.roomkit.ui.meeting.chat
 
 import android.content.Context
 import android.util.AttributeSet
@@ -17,4 +17,14 @@ class SingleSideFadeRecyclerview  @JvmOverloads constructor(
 //        return super.getTopFadingEdgeStrength()*2
 //    }
 
+    init {
+
+        layoutManager = LinearLayoutManager(context)
+            .apply {
+                reverseLayout = false
+                stackFromEnd = true
+            }
+        isVerticalFadingEdgeEnabled = true
+        setFadingEdgeLength(140)
+    }
 }

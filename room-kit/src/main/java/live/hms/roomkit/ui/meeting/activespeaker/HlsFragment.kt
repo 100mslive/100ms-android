@@ -1,22 +1,17 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import live.hms.roomkit.R
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -25,6 +20,7 @@ import live.hms.hls_player.*
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.ChatViewModelFactory
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
+import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
@@ -104,31 +100,7 @@ class HlsFragment : Fragment() {
 
         setPlayerStatsListener(true)
 
-        with(binding.chatMessages) {
-            // Set the adapter
-            // Set the upside down recyclerview that starts items from the bottom
-            // Fade the ends
-
-            layoutManager = LinearLayoutManager(context)
-                .apply {
-                    reverseLayout = false
-                    stackFromEnd = true
-                }
-            isVerticalFadingEdgeEnabled = true
-            setFadingEdgeLength(140)
-            adapter = chatAdapter
-            recycledViewPool.setMaxRecycledViews(0, 0)
-        }
-
-        chatViewModel.messages.observe(viewLifecycleOwner) {
-            chatAdapter.submitList(it)
-            binding.chatMessages.postDelayed({
-                // Without this sometimes the view won't update.
-                chatAdapter.notifyItemChanged(it.size - 1 ,null)
-                // Scroll to the new message
-                binding.chatMessages.smoothScrollToPosition(it.size -1)
-            }, 300)
-        }
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages)
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {

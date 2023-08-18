@@ -115,7 +115,7 @@
         tools:text="Hls Text"
         />
 
-    <live.hms.roomkit.ui.meeting.activespeaker.SingleSideFadeRecyclerview
+    <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
         android:layout_alignParentStart="true"
         android:layout_width="match_parent"
