@@ -52,8 +52,7 @@
             android:layout_height="18dp"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
-            android:contentDescription="@string/audio_status"
-            android:src="@drawable/bad_network"
+            android:visibility="gone"
              />
 
         <ImageButton

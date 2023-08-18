@@ -53,7 +53,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy { it.hmsRole.name }
 
         val groups = groupedPeers.keys.map { key ->
-            ExpandableGroup(ParticipantHeaderItem("$key (${groupedPeers[key]?.size ?:0})"))
+            ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size))
                 .apply {
                     addAll(groupedPeers[key]?.map { ParticipantItem(it) }!!)
                 }
@@ -81,9 +81,6 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
 //            adapter = this@ParticipantsFragment.adapter
-            lifecycleScope.launch {
-                groupieAdapter()
-            }
         }
 
         // Search is currently disabled
@@ -112,6 +109,9 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             val peers = meetingViewModel.peers
             binding.participantCount.text = "${peers.count()}"
+            lifecycleScope.launch {
+                groupieAdapter()
+            }
         }
 
         meetingViewModel.state.observe(viewLifecycleOwner) { state ->

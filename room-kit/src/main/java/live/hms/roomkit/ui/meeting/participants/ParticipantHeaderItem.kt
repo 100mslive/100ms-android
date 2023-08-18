@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.meeting.participants
 
-import android.util.Log
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import com.xwray.groupie.ExpandableGroup
@@ -10,13 +9,13 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ParticipantHeaderItemBinding
 import live.hms.roomkit.drawableEnd
 
-class ParticipantHeaderItem(private val string: String) :
+class ParticipantHeaderItem(private val roleName: String, private val numPeers: Int? = 0) :
     BindableItem<ParticipantHeaderItemBinding>(), ExpandableItem {
     private lateinit var expandableGroup: ExpandableGroup
 
     override fun bind(viewBinding: ParticipantHeaderItemBinding, position: Int) {
 
-        viewBinding.heading.text = string
+        viewBinding.heading.text = viewBinding.root.resources.getString(R.string.participant_header_item, roleName,numPeers)
         viewBinding.root.setOnClickListener {
             expandableGroup.onToggleExpanded()
             updateExpandChevron(expandableGroup.isExpanded, viewBinding)
