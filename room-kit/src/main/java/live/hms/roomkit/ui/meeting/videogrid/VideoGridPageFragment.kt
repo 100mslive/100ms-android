@@ -17,10 +17,13 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     private const val TAG = "VideoGridPageFragment"
 
     private const val BUNDLE_PAGE_INDEX = "bundle-page-index"
+    private const val BUNDLE_IS_SCREEN_SHARE = "bundle-is-screen-share"
 
-    fun newInstance(pageIndex: Int): VideoGridPageFragment {
+    fun newInstance(pageIndex: Int, isScreenShare: Boolean): VideoGridPageFragment {
       return VideoGridPageFragment().apply {
-        arguments = bundleOf(BUNDLE_PAGE_INDEX to pageIndex)
+        arguments = bundleOf(
+          BUNDLE_PAGE_INDEX to pageIndex,
+          BUNDLE_IS_SCREEN_SHARE to isScreenShare)
       }
     }
   }
@@ -28,6 +31,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
   private var binding by viewLifecycle<FragmentVideoGridPageBinding>()
   private val pageIndex by lazy { requireArguments()[BUNDLE_PAGE_INDEX] as Int }
+  private val isScreenShare by lazy { requireArguments()[BUNDLE_IS_SCREEN_SHARE] as Boolean }
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -71,17 +75,38 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
   }
 
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    if (isScreenShare)
+      setVideoGridRowsAndColumns(1,1)
+  }
+
   override fun initViewModels() {
     super.initViewModels()
-    meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { tracks ->
-      val videos = getCurrentPageVideos(tracks)
-      updateVideos(binding.container, videos, false)
+    if (isScreenShare.not()) {
+      meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { videoGridTrack ->
+        renderCurrentPage(videoGridTrack)
+      }
+    } else {
+      meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
+        val screenShareTrack = track.filter { it.isScreen  }.toList()
+        renderCurrentPage(screenShareTrack)
+      }
     }
 
-    meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
-      refreshGridRowsAndColumns(rowCount, columnCount)
+
+    //Don't register listener if it's not screen share
+    if (isScreenShare.not()){
+      meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
+        refreshGridRowsAndColumns(rowCount, columnCount)
+      }
     }
 
     //meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
+  }
+
+  private fun renderCurrentPage(tracks: List<MeetingTrack>) {
+    val videos = getCurrentPageVideos(tracks)
+    updateVideos(binding.container, videos, false)
   }
 }

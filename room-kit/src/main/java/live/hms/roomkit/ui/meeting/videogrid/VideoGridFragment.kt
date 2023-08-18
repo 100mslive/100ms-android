@@ -35,6 +35,7 @@ class VideoGridFragment : Fragment() {
     private val meetingViewModel: MeetingViewModel by activityViewModels()
 
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
+    private lateinit var screenShareAdapter: VideoGridAdapter
     var isMinimized = false
 
 
@@ -57,23 +58,8 @@ class VideoGridFragment : Fragment() {
     }
 
     private fun initVideoGrid() {
-        peerGridVideoAdapter = VideoGridAdapter(this@VideoGridFragment) /* { video ->
-      Log.v(TAG, "onVideoItemClick: $video")
-
-      Snackbar.make(
-          binding.root,
-          "Name: ${video.peer.userName} (${video.peer.role}) \nId: ${video.peer.customerUserId}",
-          Snackbar.LENGTH_LONG,
-      ).setAction("Copy") {
-        val clip = ClipData.newPlainText("Customer Id", video.peer.customerUserId)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(
-            requireContext(),
-            "Copied customer id of ${video.peer.userName} to clipboard",
-            Toast.LENGTH_SHORT
-        ).show()
-      }.show()
-    } */
+        peerGridVideoAdapter = VideoGridAdapter(this@VideoGridFragment)
+        screenShareAdapter = VideoGridAdapter(this@VideoGridFragment, isScreenShare = true)
 
         binding.viewPagerVideoGrid.apply {
             offscreenPageLimit = 1
@@ -82,6 +68,14 @@ class VideoGridFragment : Fragment() {
             TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
                 // No text to be shown
             }.attach()
+        }
+
+        binding.viewPagerRemoteScreenShare.apply {
+            offscreenPageLimit = 1
+            adapter = this@VideoGridFragment.screenShareAdapter
+            TabLayoutMediator(binding.tabLayoutDotsRemoteScreenShare, this) { _, _ ->
+            }.attach()
+
         }
 
         binding.applyTheme()
@@ -174,10 +168,12 @@ class VideoGridFragment : Fragment() {
             var newColumnCount = 0
             //is screen share track is present then reduce the grid and column span else restore
             if (screenShareTrackList.isEmpty()) {
+                binding.screenShareContainer.visibility = View.GONE
                 newRowCount = 3
                 newColumnCount = 2
             }
             else {
+                binding.screenShareContainer.visibility = View.VISIBLE
                 newRowCount = 1
                 newColumnCount = 2
             }
@@ -188,7 +184,7 @@ class VideoGridFragment : Fragment() {
             // Without this, the extra inset adds one more tile than they should
             val tempItems = (tracks.size + itemsPerPage - 1) - 1 // always subtract local peer inset
             val expectedItems = tempItems / itemsPerPage
-
+            screenShareAdapter.totalPages = screenShareTrackList.size
             peerGridVideoAdapter.totalPages = if (expectedItems == 0)
                 1
             else expectedItems

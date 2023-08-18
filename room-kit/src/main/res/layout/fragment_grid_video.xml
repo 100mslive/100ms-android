@@ -45,7 +45,7 @@
         android:id="@+id/screen_share_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_weight="8"
         android:visibility="gone"
         tools:visibility="visible">
 
@@ -72,7 +72,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="7">
+        android:layout_weight="2">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager_video_grid"
