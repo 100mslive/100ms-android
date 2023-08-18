@@ -58,8 +58,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                     addAll(groupedPeers[key]?.map { ParticipantItem(it) }!!)
                 }
         }
-        adapter.clear()
-        adapter.addAll(groups)
+        adapter.update(groups)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

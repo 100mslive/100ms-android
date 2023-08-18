@@ -14,7 +14,6 @@ class ParticipantHeaderItem(private val roleName: String, private val numPeers: 
     private lateinit var expandableGroup: ExpandableGroup
 
     override fun bind(viewBinding: ParticipantHeaderItemBinding, position: Int) {
-
         viewBinding.heading.text = viewBinding.root.resources.getString(R.string.participant_header_item, roleName,numPeers)
         viewBinding.root.setOnClickListener {
             expandableGroup.onToggleExpanded()
