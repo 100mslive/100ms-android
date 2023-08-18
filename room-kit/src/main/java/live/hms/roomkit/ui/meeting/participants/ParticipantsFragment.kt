@@ -12,6 +12,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.xwray.groupie.ExpandableGroup
+import com.xwray.groupie.GroupieAdapter
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -24,6 +26,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<FragmentParticipantsBinding>()
     private var alertDialog: AlertDialog? = null
+    val adapter = GroupieAdapter()
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -31,7 +34,6 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         )
     }
 
-    lateinit var adapter: ParticipantsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,17 +45,32 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    private fun groupieAdapter() {
+        binding.recyclerView.adapter = adapter
+        // Group people by roles.
+        val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy { it.hmsRole.name }
+
+        val groups = groupedPeers.keys.map { key ->
+            ExpandableGroup(ParticipantHeaderItem("$key (${groupedPeers[key]?.size ?:0})"))
+                .apply {
+                    addAll(groupedPeers[key]?.map { ParticipantItem(it) }!!)
+                }
+        }
+        adapter.clear()
+        adapter.addAll(groups)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
-        adapter =
-            ParticipantsAdapter(
-                meetingViewModel.isAllowedToChangeRole(),
-                meetingViewModel.isAllowedToRemovePeers(),
-                meetingViewModel.isAllowedToMutePeers(),
-                meetingViewModel.isAllowedToAskUnmutePeers(),
-                this::onSheetClicked
-            )
+//        adapter =
+//            ParticipantsAdapter(
+//                meetingViewModel.isAllowedToChangeRole(),
+//                meetingViewModel.isAllowedToRemovePeers(),
+//                meetingViewModel.isAllowedToMutePeers(),
+//                meetingViewModel.isAllowedToAskUnmutePeers(),
+//                this::onSheetClicked
+//            )
         initViews()
     }
 
@@ -61,15 +78,17 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         binding.participantCount.text = "0"
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-            adapter = this@ParticipantsFragment.adapter
+//            adapter = this@ParticipantsFragment.adapter
+            groupieAdapter()
         }
 
+        // Search is currently disabled
         binding.textInputSearch.apply {
             addTextChangedListener { text ->
                 val items = meetingViewModel
                     .peers
                     .filter { text.isNullOrEmpty() || it.name.contains(text.toString(), true) }
-                adapter.setItems(items)
+//                adapter.setItems(items)
             }
         }
     }
@@ -88,7 +107,6 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     private fun initViewModels() {
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             val peers = meetingViewModel.peers
-            adapter.setItems(peers)
             binding.participantCount.text = "${peers.count()}"
         }
 
