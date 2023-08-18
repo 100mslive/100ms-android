@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 /**
  * Meant to listen to the adapter and set up the observerables that will
  * be needed across various classes.
+ * Meant to work with the [SingleSideFadeRecyclerview]
  */
 class ChatUseCase {
     fun initiate(messages: MutableLiveData<ArrayList<ChatMessage>>,
