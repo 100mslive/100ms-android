@@ -9,7 +9,6 @@
         <item name="android:dividerHeight">8dp</item>
 
 
-
         <item name="colorOnSurface">@android:color/white</item>
         <item name="colorOnBackground">@android:color/white</item>
         <item name="colorOnPrimarySurface">@android:color/white</item>
@@ -50,8 +49,7 @@
         <item name="fontFamily">@font/clan_pro_medium</item>
     </style>
 
-    <style name="MaterialSwitch" parent="Widget.AppCompat.CompoundButton.Switch">
-    </style>
+    <style name="MaterialSwitch" parent="Widget.AppCompat.CompoundButton.Switch"></style>
 
     <style name="MaterialImageButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:layout_width">wrap_content</item>
@@ -66,18 +64,15 @@
         <item name="iconGravity">textStart</item>
     </style>
 
-    <style name="AppBottomSheetDialogTheme"
-        parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+    <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
 
         <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
     </style>
 
-    <style name="CustomBottomSheetStyle"
-        parent="Widget.Design.BottomSheet.Modal">
+    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
 
         <item name="android:background">@drawable/shape_round_dialog</item>
     </style>
-
 
 
     <style name="RoleChangeAlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
@@ -96,11 +91,13 @@
     <style name="SpinnerTheme" parent="android:Widget.Spinner">
         <item name="android:background">@drawable/stroked_round_drawable</item>
     </style>
+
     <style name="HmsHeadings" parent="MaterialTextViewHeading">
         <item name="android:fontFamily">@font/inter_semibold</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">20sp</item>
     </style>
+
     <style name="HmsPollCardText" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/inter_regular</item>
         <item name="android:textColor">@color/white</item>
@@ -112,6 +109,7 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">14sp</item>
     </style>
+
     <style name="QuestionNumberText" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/inter_regular</item>
         <item name="android:textColor">#C3D0E580</item>
@@ -145,6 +143,20 @@
         <item name="android:textSize">14sp</item>
         <item name="android:letterSpacing">0.02</item>
         <item name="android:textColor">#CCE0ECFF</item>
+    </style>
+
+    <style name="Theme.Android100ms" parent="Theme.MaterialComponents.Light" />
+
+    <style name="Theme.Android100ms.Fullscreen" parent="Theme.Android100ms">
+        <item name="android:actionBarStyle">@style/Widget.Theme.Android100ms.ActionBar.Fullscreen
+        </item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="ThemeOverlay.Android100ms.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
+        <item name="fullscreenTextColor">@color/light_blue_A200</item>
     </style>
 
 </resources>

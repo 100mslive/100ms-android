@@ -458,8 +458,6 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
-
-
     editContainerName.boxStrokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default

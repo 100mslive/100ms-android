@@ -46,15 +46,6 @@ class MeetingActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     _binding = ActivityMeetingBinding.inflate(layoutInflater)
-    //WindowCompat.setDecorFitsSystemWindows(window, false)
-
-
-    val windowInsetsController =
-      WindowCompat.getInsetsController(window, window.decorView)
-    // Configure the behavior of the hidden system bars.
-    windowInsetsController?.systemBarsBehavior =
-      WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
     setContentView(binding.root)
     supportActionBar?.setDisplayShowTitleEnabled(false)
     settingsStore = SettingsStore(this)

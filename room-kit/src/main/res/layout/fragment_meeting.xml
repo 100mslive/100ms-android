@@ -5,6 +5,7 @@
     android:id="@+id/meeting_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.meeting.MeetingActivity">
 
     <FrameLayout
@@ -28,10 +29,19 @@
 
     <include
         android:id="@+id/role_spinner"
+        android:visibility="gone"
         layout="@layout/layout_role_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/top_menu" />
+
+    <!-- Webrtc/HLS view-->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/top_menu"
+        android:layout_above="@id/bottom_controls" />
 
     <!-- Header menu -->
     <LinearLayout
@@ -141,27 +151,7 @@
             android:src="@drawable/ic_icon_speaker"
             android:layout_marginEnd="16dp"/>
 
-<!--        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/button_settings_menu_top"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@drawable/gray_round_stroked_drawable"
-            android:contentDescription="@string/settings"
-            android:padding="8dp"
-            android:visibility="gone"
-            app:srcCompat="@drawable/ic_more_vert_24"
-            tools:visibility="visible" />-->
-
     </LinearLayout>
-
-    <!-- Webrtc/HLS view-->
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/top_menu"
-        android:layout_above="@id/bottom_controls" />
 
     <!-- Footer menu -->
     <LinearLayout
