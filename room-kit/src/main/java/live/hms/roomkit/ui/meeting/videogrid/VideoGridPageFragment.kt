@@ -62,13 +62,13 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
   private fun refreshGridRowsAndColumns(rowCount: Int, columnCount: Int) {
       //update row and columns span useful when remote screen share
-      // remote screen share [enabled] =  3 * 3 --> 1 * 2
-      // remote screen share [disabled] = 1 * 2 --> 3 * 3
+      // remote screen share [enabled] =  3 * 2 --> 1 * 2
+      // remote screen share [disabled] = 1 * 2 --> 3 * 2
       val shouldUpdate = shouldUpdateRowOrGrid(rowCount, columnCount)
       //don't update if row and column are same
       if (shouldUpdate.not()) return
       setVideoGridRowsAndColumns(rowCount, columnCount)
-      meetingViewModel.speakerUpdateLiveData.refresh()
+      meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
   }
 
   override fun initViewModels() {
@@ -78,7 +78,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       updateVideos(binding.container, videos, false)
     }
 
-    meetingViewModel.updateRowAndColumnForGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
+    meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
       refreshGridRowsAndColumns(rowCount, columnCount)
     }
 

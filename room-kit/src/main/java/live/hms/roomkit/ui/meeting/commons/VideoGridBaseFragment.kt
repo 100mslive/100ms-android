@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting.commons
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -63,8 +64,9 @@ abstract class VideoGridBaseFragment : Fragment() {
   private lateinit var gridLayout : GridLayout
 
   //setting init value
-  private var gridRowCount = settings.videoGridRows
-  private var gridColumnCount = settings.videoGridColumns
+  //TODO put a better default value
+  private var gridRowCount = 0
+  private var gridColumnCount = 0
 
   data class RenderedViewPair(
     val binding: GridItemVideoBinding,
@@ -100,7 +102,6 @@ abstract class VideoGridBaseFragment : Fragment() {
   fun setVideoGridRowsAndColumns(rows: Int, columns: Int) {
     gridRowCount = rows
     gridColumnCount = columns
-
   }
 
   protected val maxItems: Int
@@ -288,6 +289,14 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    setVideoGridRowsAndColumns(settings.videoGridRows, settings.videoGridColumns)
+    return super.onCreateView(inflater, container, savedInstanceState)
+  }
   protected fun unbindSurfaceView(
     binding: VideoCardBinding,
     item: MeetingTrack,
