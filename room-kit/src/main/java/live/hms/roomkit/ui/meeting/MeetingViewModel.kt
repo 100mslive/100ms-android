@@ -364,8 +364,14 @@ class MeetingViewModel(
             removeSource(speakers)
         }
 
+        //TODO can't be null
+        fun refreshSpeaker() {
+           // speakers.postValue(speakers.value)
+        }
+
         override fun updateMaxActiveSpeaker(rowCount: Int, columnCount: Int) {
             speakerH.updateMaxActiveSpeaker(rowCount*columnCount)
+            refreshSpeaker()
         }
         init {
             addSpeakerSource()

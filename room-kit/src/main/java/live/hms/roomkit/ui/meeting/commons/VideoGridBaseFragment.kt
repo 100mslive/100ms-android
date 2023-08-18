@@ -289,13 +289,9 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
+  override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
     setVideoGridRowsAndColumns(settings.videoGridRows, settings.videoGridColumns)
-    return super.onCreateView(inflater, container, savedInstanceState)
   }
   protected fun unbindSurfaceView(
     binding: VideoCardBinding,
