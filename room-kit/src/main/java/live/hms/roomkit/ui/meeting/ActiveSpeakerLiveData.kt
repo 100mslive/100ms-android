@@ -18,4 +18,9 @@ abstract class ActiveSpeakerLiveData : MediatorLiveData<List<MeetingTrack>>() {
 
     abstract fun addSpeakerSource()
     abstract fun removeSpeakerSource()
+
+    //refresh is required when row or column count is changed
+    fun refresh() {
+        setValue(value)
+    }
 }

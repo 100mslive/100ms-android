@@ -62,6 +62,10 @@ abstract class VideoGridBaseFragment : Fragment() {
   private var wasLastSpeakingViewIndex = 0
   private lateinit var gridLayout : GridLayout
 
+  //setting init value
+  private var gridRowCount = settings.videoGridRows
+  private var gridColumnCount = settings.videoGridColumns
+
   data class RenderedViewPair(
     val binding: GridItemVideoBinding,
     val meetingTrack: MeetingTrack,
@@ -71,16 +75,20 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected val renderedViews = ArrayList<RenderedViewPair>()
   private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
 
+  internal fun shouldUpdateRowOrGrid(rowCount: Int, columnCount: Int) : Boolean{
+    return !(rowCount == gridRowCount && columnCount == gridColumnCount)
+  }
+
   //Normal layout
-  private fun getNormalLayoutRowCount() = min(max(1, renderedViews.size), settings.videoGridRows)
+  private fun getNormalLayoutRowCount() = min(max(1, renderedViews.size), gridRowCount)
   private fun getNormalLayoutColumnCount(): Int
     {
-      val maxColumns = settings.videoGridColumns
+      val maxColumns = gridColumnCount
       val result = max(1, (renderedViews.size + getNormalLayoutRowCount() - 1) / getNormalLayoutRowCount())
       if (result > maxColumns) {
         val videos = renderedViews.map { it.meetingTrack }
         throw IllegalStateException(
-          "At most ${settings.videoGridRows * maxColumns} videos are allowed. Provided $videos"
+          "At most ${gridRowCount * maxColumns} videos are allowed. Provided $videos"
         )
       }
       return result
@@ -89,9 +97,14 @@ abstract class VideoGridBaseFragment : Fragment() {
   private fun getPipLayoutRowCount() = max(1, ceil(renderedViews.size/2.0).toInt())
   private fun getPipLayoutColumnCount(): Int = min(renderedViews.size, 2)
 
+  fun setVideoGridRowsAndColumns(rows: Int, columns: Int) {
+    gridRowCount = rows
+    gridColumnCount = columns
+
+  }
 
   protected val maxItems: Int
-    get() = settings.videoGridRows * settings.videoGridColumns
+    get() = gridRowCount * gridColumnCount
 
   private fun updateGridLayoutDimensions(layout: GridLayout, isPipMode: Boolean) {
 
