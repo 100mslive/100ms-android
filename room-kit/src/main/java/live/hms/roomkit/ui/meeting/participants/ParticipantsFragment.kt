@@ -9,11 +9,13 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
+import kotlinx.coroutines.launch
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -45,7 +47,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    private fun groupieAdapter() {
+    private suspend fun groupieAdapter() {
         binding.recyclerView.adapter = adapter
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy { it.hmsRole.name }
@@ -79,7 +81,9 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
 //            adapter = this@ParticipantsFragment.adapter
-            groupieAdapter()
+            lifecycleScope.launch {
+                groupieAdapter()
+            }
         }
 
         // Search is currently disabled
