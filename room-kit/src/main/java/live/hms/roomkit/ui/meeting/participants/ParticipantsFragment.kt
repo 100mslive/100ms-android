@@ -47,8 +47,8 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
-    private suspend fun groupieAdapter() {
-        binding.recyclerView.adapter = adapter
+    // This is only suspending so it can run in the background
+    private suspend fun updateParticipantsAdapter() {
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy { it.hmsRole.name }
 
@@ -105,11 +105,12 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
 
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
+        binding.recyclerView.adapter = adapter
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             val peers = meetingViewModel.peers
             binding.participantCount.text = "${peers.count()}"
             lifecycleScope.launch {
-                groupieAdapter()
+                updateParticipantsAdapter()
             }
         }
 
