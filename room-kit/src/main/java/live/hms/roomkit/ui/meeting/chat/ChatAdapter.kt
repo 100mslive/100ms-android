@@ -57,4 +57,13 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
     holder.bind(getItem(position))
   }
+
+  override fun onBindViewHolder(
+    holder: ChatMessageViewHolder,
+    position: Int,
+    payloads: MutableList<Any>
+  ) {
+    super.onBindViewHolder(holder, position, payloads)
+    // Skip doing anything maybe it just relayouts
+  }
 }

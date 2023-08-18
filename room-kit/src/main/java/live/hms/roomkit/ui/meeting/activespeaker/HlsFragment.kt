@@ -123,7 +123,10 @@ class HlsFragment : Fragment() {
         chatViewModel.messages.observe(viewLifecycleOwner) {
             chatAdapter.submitList(it)
             binding.chatMessages.postDelayed({
-                binding.chatMessages.smoothScrollToPosition(it.size - 1)
+                // Without this sometimes the view won't update.
+                chatAdapter.notifyItemChanged(it.size - 1 ,null)
+                // Scroll to the new message
+                binding.chatMessages.smoothScrollToPosition(it.size -1)
             }, 300)
         }
     }
