@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="0dp"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/dominant_speaker_name"
@@ -40,10 +41,38 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/screen_share_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager_remote_screen_share"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="false" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout_dots_remote_screen_share"
+            android:layout_width="wrap_content"
+            android:layout_height="8dp"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="4dp"
+            app:tabBackground="@drawable/dot_selector_4"
+            app:tabGravity="center"
+            app:tabIndicatorHeight="0dp" />
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="7">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager_video_grid"
@@ -59,75 +88,74 @@
             android:paddingTop="@dimen/sizeteen_dp">
 
 
-
             <androidx.constraintlayout.widget.ConstraintLayout
-                tools:background="@android:color/holo_red_dark"
                 android:id="@+id/inset_pill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:elevation="24dp">
+                android:elevation="24dp"
+                tools:background="@android:color/holo_red_dark">
 
                 <ImageView
                     android:id="@+id/minimized_icon_audio_off"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@drawable/avd_mic_off_to_on"
-                    android:scaleType="fitXY"
                     android:layout_marginHorizontal="@dimen/eight_dp"
                     android:layout_marginVertical="@dimen/eight_dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/avd_mic_off_to_on"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/minimized_icon_video_off"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:layout_marginVertical="@dimen/eight_dp"
                     android:id="@+id/minimized_icon_video_off"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
+                    android:layout_marginVertical="@dimen/eight_dp"
                     android:layout_marginEnd="@dimen/eight_dp"
-                    android:src="@drawable/avd_video_on_to_off"
                     android:scaleType="fitXY"
-                    app:layout_constraintEnd_toStartOf="@id/you_text"
+                    android:src="@drawable/avd_video_on_to_off"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/you_text"
                     app:layout_constraintStart_toEndOf="@id/minimized_icon_audio_off"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:text="YOU"
-                    android:fontFamily="@font/inter_semibold"
-                    android:paddingEnd="@dimen/eight_dp"
                     android:id="@+id/you_text"
-                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/eight_dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:gravity="center"
+                    android:paddingEnd="@dimen/eight_dp"
+                    android:text="YOU"
                     android:textAlignment="center"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toEndOf="@id/minimized_icon_video_off"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/maximized_icon"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:src="@drawable/icon_maximised"
                     android:layout_marginEnd="@dimen/eight_dp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:src="@drawable/icon_maximised"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/you_text"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    tools:visibility="gone"
                     android:id="@+id/inset_pill_maximised"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_width="@dimen/inset_pill_width"
-                    android:layout_height="@dimen/inset_pill_height">
+                    android:layout_height="@dimen/inset_pill_height"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:visibility="gone">
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/name_initials"
@@ -146,7 +174,6 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-
                     <live.hms.videoview.HMSVideoView
                         android:id="@+id/local_hms_video_view"
                         android:layout_width="@dimen/inset_pill_width"
@@ -163,10 +190,10 @@
                         android:layout_height="32dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="8dp"
+                        android:elevation="8dp"
                         android:src="@drawable/ic_mic_mute"
                         android:visibility="invisible"
                         app:iconSize="32dp"
-                        android:elevation="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -174,12 +201,12 @@
                         android:id="@+id/icon_brb"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:layout_marginTop="8dp"
                         android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:elevation="8dp"
                         android:src="@drawable/ic_brb"
                         android:visibility="invisible"
                         app:iconSize="32dp"
-                        android:elevation="8dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
