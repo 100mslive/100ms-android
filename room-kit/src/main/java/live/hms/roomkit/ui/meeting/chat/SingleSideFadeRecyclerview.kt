@@ -13,15 +13,14 @@ class SingleSideFadeRecyclerview  @JvmOverloads constructor(
 
     // Don't fade the bottom, only the top
     override fun getBottomFadingEdgeStrength(): Float = 0f
-//    override fun getTopFadingEdgeStrength(): Float {
-//        return super.getTopFadingEdgeStrength()*2
-//    }
+    override fun getTopFadingEdgeStrength(): Float {
+        return super.getTopFadingEdgeStrength()*2
+    }
 
     init {
 
         layoutManager = LinearLayoutManager(context)
             .apply {
-                reverseLayout = false
                 stackFromEnd = true
             }
         isVerticalFadingEdgeEnabled = true
