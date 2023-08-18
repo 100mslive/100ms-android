@@ -35,24 +35,24 @@ class ParticipantsAdapter(
       }
     }
 
-    fun bind(item: HMSPeer) {
-      with(binding) {
-        name.text = item.name
-        iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
-        if (VIEW_TYPE.PREVIEW == type){
-          iconAudioOff.visibility = View.GONE
-          iconVideoOff.visibility = View.GONE
-        } else {
-          iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
-          iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
-        }
-
-        peerRole.text = item.hmsRole.name
-        // Show change role option only if the role of the local peer allows
-        //  and if it's not the local peer itself.
-        peerSettings.visibility = v(isAllowedToChangeRole || isAllowedToAskUnmutePeer || isAllowedToMutePeer || isAllowedToKickPeer )
-      }
-    }
+//    fun bind(item: HMSPeer) {
+//      with(binding) {
+//        name.text = item.name
+//        iconScreenShare.visibility = v(item.auxiliaryTracks.isNotEmpty())
+//        if (VIEW_TYPE.PREVIEW == type){
+//          iconAudioOff.visibility = View.GONE
+//          iconVideoOff.visibility = View.GONE
+//        } else {
+//          iconAudioOff.visibility = v(item.audioTrack?.isMute != false)
+//          iconVideoOff.visibility = v(item.videoTrack?.isMute != false)
+//        }
+//
+//        peerRole.text = item.hmsRole.name
+//        // Show change role option only if the role of the local peer allows
+//        //  and if it's not the local peer itself.
+//        peerSettings.visibility = v(isAllowedToChangeRole || isAllowedToAskUnmutePeer || isAllowedToMutePeer || isAllowedToKickPeer )
+//      }
+//    }
 
   }
 
@@ -88,7 +88,7 @@ class ParticipantsAdapter(
   }
 
   override fun onBindViewHolder(holder: PeerViewHolder, position: Int) {
-    holder.bind(items[position])
+//    holder.bind(items[position])
   }
 
   override fun getItemCount(): Int = items.size

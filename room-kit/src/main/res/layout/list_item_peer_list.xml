@@ -12,43 +12,25 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="horizontal">
 
-        <LinearLayout
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/name"
+            style="@style/MaterialTextViewHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:maxWidth="200dp"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter_semibold"
+            android:textSize="14sp"
+            android:textColor="#EFF0FA"
+            tools:text="@string/john_doe" />
 
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/name"
-                style="@style/MaterialTextViewHeading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxWidth="200dp"
-                android:layout_gravity="start"
-                android:gravity="start"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:maxLines="1"
-                android:layout_weight="1"
-                android:fontFamily="@font/inter_semibold"
-                android:textSize="14sp"
-                android:textColor="#EFF0FA"
-                tools:text="@string/john_doe" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/peerRole"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginTop="4dp"
-                android:src="@drawable/ic_settings_24"
-                android:textStyle="bold"
-                tools:text="host" />
-
-
-        </LinearLayout>
 
         <Space
             android:layout_width="0dp"
@@ -56,44 +38,32 @@
             android:layout_weight="1" />
 
         <ImageView
-            android:id="@+id/icon_screen_share"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="4dp"
-            android:contentDescription="@string/screen_share"
-            android:src="@drawable/ic_mobile_screen_share_24"
-             />
-
-        <ImageView
-            android:id="@+id/icon_video_off"
+            android:id="@+id/handraise"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
             android:contentDescription="@string/video_status"
-            android:src="@drawable/ic_videocam_off_24" />
+            android:src="@drawable/raise_hand_modern" />
 
         <ImageView
-            android:id="@+id/icon_audio_off"
+            android:id="@+id/bad_network_indicator"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
             android:contentDescription="@string/audio_status"
-            android:src="@drawable/ic_mic_off_24"
+            android:src="@drawable/bad_network"
              />
 
         <ImageButton
             android:id="@+id/peerSettings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:paddingStart="8dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="8dp"
-            android:src="@drawable/ic_more_vert_24" />
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="8dp"
+            android:src="@drawable/participants_overflow" />
 
 
     </LinearLayout>

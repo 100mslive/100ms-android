@@ -15,6 +15,6 @@
     android:fontFamily="@font/inter_semibold"
     android:textSize="14sp"
     android:textColor="#C5C6D0"
-    android:drawableEnd="@drawable/chevron_up"
+    android:drawableEnd="@drawable/chevron_down"
     />
 </androidx.appcompat.widget.LinearLayoutCompat>

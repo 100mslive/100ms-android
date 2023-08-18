@@ -10,7 +10,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ParticipantHeaderItemBinding
 import live.hms.roomkit.drawableEnd
 
-class ParticipantHeaderItem(private val string : String) : BindableItem<ParticipantHeaderItemBinding>(), ExpandableItem {
+class ParticipantHeaderItem(private val string: String) :
+    BindableItem<ParticipantHeaderItemBinding>(), ExpandableItem {
     private lateinit var expandableGroup: ExpandableGroup
 
     override fun bind(viewBinding: ParticipantHeaderItemBinding, position: Int) {
@@ -23,21 +24,20 @@ class ParticipantHeaderItem(private val string : String) : BindableItem<Particip
     }
 
     private fun updateExpandChevron(expanded: Boolean, viewBinding: ParticipantHeaderItemBinding) {
-        viewBinding.heading.drawableEnd = AppCompatResources.getDrawable(viewBinding.root.context,
-            if(expanded)
-            R.drawable.chevron_down
-        else
-            R.drawable.chevron_up)
+        val chevron = if (expanded) R.drawable.chevron_up
+        else R.drawable.chevron_down
+
+        viewBinding.heading.drawableEnd = AppCompatResources.getDrawable(
+            viewBinding.root.context, chevron
+        )
     }
 
-    override fun getLayout(): Int  =
-        R.layout.participant_header_item
+    override fun getLayout(): Int = R.layout.participant_header_item
 
     override fun initializeViewBinding(view: View): ParticipantHeaderItemBinding =
         ParticipantHeaderItemBinding.bind(view)
 
     override fun setExpandableGroup(onToggleListener: ExpandableGroup) {
-        Log.d("Participants","Setting toggle")
         this.expandableGroup = onToggleListener
     }
 
