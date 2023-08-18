@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/top_menu" />
 
+    <!-- Header menu -->
     <LinearLayout
         android:id="@+id/top_menu"
         android:layout_width="match_parent"
@@ -140,20 +141,6 @@
             android:src="@drawable/ic_icon_speaker"
             android:layout_marginEnd="16dp"/>
 
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/button_raise_hand"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="10dp"
-            android:visibility="gone"
-            android:background="@drawable/gray_round_stroked_drawable"
-            android:contentDescription="@string/raise_hand"
-            android:padding="8dp"
-            app:srcCompat="@drawable/ic_raise_hand" />
-
-
 <!--        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/button_settings_menu_top"
             android:layout_width="40dp"
@@ -168,6 +155,7 @@
 
     </LinearLayout>
 
+    <!-- Webrtc/HLS view-->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
@@ -175,6 +163,7 @@
         android:layout_below="@id/top_menu"
         android:layout_above="@id/bottom_controls" />
 
+    <!-- Footer menu -->
     <LinearLayout
         android:id="@+id/bottom_controls"
         android:layout_width="match_parent"
@@ -186,9 +175,10 @@
         android:orientation="horizontal">
 
         <Space
+            android:id="@+id/space_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="2" />
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/button_end_call"
@@ -198,6 +188,7 @@
             app:srcCompat="@drawable/ic_end_call" />
 
         <Space
+            android:id="@+id/space_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
@@ -212,6 +203,7 @@
             app:srcCompat="@drawable/ic_audio_toggle_off" />
 
         <Space
+            android:id="@+id/space_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
@@ -226,18 +218,27 @@
             app:srcCompat="@drawable/ic_camera_toggle_off" />
 
         <Space
+            android:id="@+id/space_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_weight="1" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/button_raise_hand"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/gray_round_stroked_drawable"
+            android:contentDescription="@string/raise_hand"
+            android:padding="8dp"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ic_hand_raise" />
+
+        <Space
+            android:id="@+id/space_5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
-
-        <LinearLayout
-            android:id="@+id/ll_go_live_parent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="10dp"
-            android:visibility="gone">
-        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -278,6 +279,7 @@
             android:padding="8dp" />
 
         <Space
+            android:id="@+id/space_6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
@@ -291,9 +293,10 @@
             app:srcCompat="@drawable/ic_settings_btn" />
 
         <Space
+            android:id="@+id/space_7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="2" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.util.Log
-import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
@@ -287,12 +286,6 @@ class MeetingViewModel(
 
     fun isGoLiveInPreBuiltEnabled() = settings.useMockAPi
 
-    // Title at the top of the meeting
-    val title = MutableLiveData<Int>()
-    fun setTitle(@StringRes resId: Int) {
-        this.title.postValue(resId)
-    }
-
     var showAudioMuted = MutableLiveData(false)
         private set
 
@@ -331,8 +324,8 @@ class MeetingViewModel(
     private var hmsRoom: HMSRoom? = null
 
     // Live data for enabling/disabling mute buttons
-    val isLocalAudioPublishingAllowed = MutableLiveData(false)
-    val isLocalVideoPublishingAllowed = MutableLiveData(false)
+    val isLocalAudioPresent = MutableLiveData(false)
+    val isLocalVideoPresent = MutableLiveData(false)
 
     // Live data containing all the current tracks in a meeting
     private val _liveDataTracks = MutableLiveData(_tracks)
@@ -837,12 +830,12 @@ class MeetingViewModel(
                         if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                             when (track.type) {
                                 HMSTrackType.AUDIO -> {
-                                    isLocalAudioPublishingAllowed.postValue(true)
+                                    isLocalAudioPresent.postValue(true)
                                     isLocalAudioEnabled.postValue(!track.isMute)
                                 }
 
                                 HMSTrackType.VIDEO -> {
-                                    isLocalVideoPublishingAllowed.postValue(true)
+                                    isLocalVideoPresent.postValue(true)
                                     isLocalVideoEnabled.postValue(!track.isMute)
                                 }
                             }
@@ -854,11 +847,11 @@ class MeetingViewModel(
                         if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                             when (track.type) {
                                 HMSTrackType.AUDIO -> {
-                                    isLocalAudioPublishingAllowed.postValue(false)
+                                    isLocalAudioPresent.postValue(false)
                                 }
 
                                 HMSTrackType.VIDEO -> {
-                                    isLocalVideoPublishingAllowed.postValue(false)
+                                    isLocalVideoPresent.postValue(false)
                                 }
                             }
                         }
@@ -1031,10 +1024,10 @@ class MeetingViewModel(
         role?.name?.startsWith("hls-") == true
 
     private fun switchToHlsView(streamUrl: String) =
-        meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
+        meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
 
     private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
-        if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS) {
+        if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS_VIEWER) {
             meetingViewMode.postValue(MeetingViewMode.ACTIVE_SPEAKER)
         }
     }
