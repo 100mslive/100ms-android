@@ -1,5 +1,7 @@
 package live.hms.roomkit.ui.meeting
 
+import android.animation.Animator
+import android.animation.Animator.AnimatorListener
 import android.app.Activity
 import android.app.Dialog
 import android.app.PictureInPictureParams
@@ -12,9 +14,12 @@ import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -30,14 +35,15 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
@@ -54,7 +60,6 @@ import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
-import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.error.HMSException
@@ -132,6 +137,7 @@ class MeetingFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
+        handler.removeCallbacks(hideRunnable)
     }
 
     var resultLauncher =
@@ -858,8 +864,10 @@ class MeetingFragment : Fragment() {
         }
     }
 
+    private val handler = Handler(Looper.myLooper()!!)
+    private val hideRunnable = Runnable { hideControlBars() }
+
     private fun updateMeetingViewMode(mode: MeetingViewMode) {
-        setupConfiguration(mode)
         currentFragment = when (mode) {
             MeetingViewMode.GRID -> VideoGridFragment()
             MeetingViewMode.PINNED -> PinnedVideoFragment()
@@ -877,24 +885,207 @@ class MeetingFragment : Fragment() {
             .replace(R.id.fragment_container, currentFragment)
             .addToBackStack(null)
             .commit()
+
+        setupConfiguration(mode)
     }
 
+    var controlBarsVisible = true
     private fun setupConfiguration(mode: MeetingViewMode) {
         if (mode is MeetingViewMode.HLS_VIEWER) {
-            binding.topMenu?.background = context?.let {
-                ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable) }
-            binding.space4?.visibility = View.VISIBLE
-            binding.buttonRaiseHand?.visibility = View.VISIBLE
+            configureHLSView()
         } else {
-            binding.topMenu?.setBackgroundColor(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.backgroundDim,
-                    HMSPrebuiltTheme.getDefaults().background_default
-                )
-            )
-            binding.space4?.visibility = View.GONE
-            binding.buttonRaiseHand?.visibility = View.GONE
+            configureWebrtcView()
         }
+    }
+
+    private fun configureWebrtcView() {
+        val fragmentContainerParam = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        )
+
+        fragmentContainerParam.addRule(RelativeLayout.BELOW, R.id.top_menu)
+        fragmentContainerParam.addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
+        binding.fragmentContainer.layoutParams = fragmentContainerParam
+
+        binding.topMenu?.visibility = View.VISIBLE
+        binding.bottomControls.visibility  = View.VISIBLE
+        binding.topMenu?.setBackgroundColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.backgroundDim,
+                HMSPrebuiltTheme.getDefaults().background_default
+            )
+        )
+        binding.bottomControls.setBackgroundColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.backgroundDim,
+                HMSPrebuiltTheme.getDefaults().background_default
+            )
+        )
+        binding.space4?.visibility = View.GONE
+        binding.buttonRaiseHand?.visibility = View.GONE
+
+    }
+
+    private fun configureHLSView() {
+        updateBindings()
+
+        goFullScreen()
+
+        delayedHide(5000)
+    }
+
+    private fun updateBindings() {
+        val fragmentContainerParam = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.MATCH_PARENT
+        )
+        fragmentContainerParam.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        fragmentContainerParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        binding.fragmentContainer.layoutParams = fragmentContainerParam
+
+        binding.topMenu?.background = context?.let {
+            ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable)
+        }
+
+        binding.bottomControls.background = context?.let {
+            ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable_2)
+        }
+
+        binding.space4?.visibility = View.VISIBLE
+        binding.buttonRaiseHand?.visibility = View.VISIBLE
+
+        binding.fragmentContainer.setOnSingleClickListener(500L) {
+            if (controlBarsVisible)
+                hideControlBars()
+            else
+                showControlBars()
+        }
+    }
+
+    private fun goFullScreen() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            activity?.let {
+                it.window.decorView.windowInsetsController?.show(
+                    WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
+                )
+            }
+
+        } else {
+            activity?.let {
+                it.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE or
+                        View.SYSTEM_UI_FLAG_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            }
+        }
+    }
+
+    private fun showControlBars() {
+        binding.topMenu?.animate()
+            ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {
+                    binding.topMenu?.visibility = View.VISIBLE
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    binding.topMenu?.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                    // Hide control bars
+                    delayedHide(3000)
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                    binding.topMenu?.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                }
+
+                override fun onAnimationRepeat(animation: Animator?) {
+
+                }
+
+            })?.start()
+
+        val screenHeight = activity!!.window.decorView.height
+        binding.bottomControls.animate()
+            ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {
+                    binding.bottomControls.visibility = View.VISIBLE
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    binding.bottomControls.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                    binding.bottomControls.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                }
+
+                override fun onAnimationRepeat(animation: Animator?) {
+
+                }
+
+            })?.start()
+    }
+
+    private fun hideControlBars() {
+        val topMenu = binding.topMenu
+        val bottomMenu = binding.bottomControls
+        val screenHeight = activity!!.window.decorView.height
+        topMenu?.animate()
+            ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
+            ?.setListener(object : AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {
+                    topMenu.visibility = View.VISIBLE
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    topMenu.visibility = View.GONE
+                    controlBarsVisible = false
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                    topMenu.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                }
+
+                override fun onAnimationRepeat(animation: Animator?) {
+
+                }
+
+            })?.start()
+
+        bottomMenu.animate()
+            ?.translationY((bottomMenu.height.toFloat()))?.setDuration(300)
+            ?.setListener(object : AnimatorListener {
+                override fun onAnimationStart(animation: Animator?) {
+                    bottomMenu.visibility = View.VISIBLE
+                }
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    bottomMenu.visibility = View.GONE
+                    controlBarsVisible = false
+                }
+
+                override fun onAnimationCancel(animation: Animator?) {
+                    bottomMenu.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                }
+
+                override fun onAnimationRepeat(animation: Animator?) {
+
+                }
+
+            })?.start()
+    }
+
+    private fun delayedHide(delayMillis: Int) {
+        handler.removeCallbacks(hideRunnable)
+        handler.postDelayed(hideRunnable, delayMillis.toLong())
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
