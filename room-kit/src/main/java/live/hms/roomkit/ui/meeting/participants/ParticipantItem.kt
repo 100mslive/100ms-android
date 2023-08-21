@@ -59,7 +59,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
 
     private fun getMenuForGroup(peer: HMSPeer): Int {
         val isHandRaised = CustomPeerMetadata.fromJson(peer.metadata)?.isHandRaised == true
-                && peer.hmsRole.name.lowercase() != "broadcaster"
+                && peer.hmsRole.name.lowercase() != "broadcaster" && peer.hmsRole.name.lowercase() != "host"
 
         return if(isHandRaised)
             R.menu.menu_participant_hand_raise

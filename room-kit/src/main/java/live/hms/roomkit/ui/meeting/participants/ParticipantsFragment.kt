@@ -52,7 +52,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     private suspend fun updateParticipantsAdapter() {
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy {
-            if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true && it.hmsRole.name != "broadcaster")
+            if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true && it.hmsRole.name.lowercase() != "broadcaster" && it.hmsRole.name.lowercase() != "host")
                 "Hand Raised"
             else
                 it.hmsRole.name
