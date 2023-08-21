@@ -30,6 +30,11 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -137,8 +142,10 @@ class MeetingFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         settings.unregisterOnSharedPreferenceChangeListener(onSettingsChangeListener)
-        handler.removeCallbacks(hideRunnable)
+        cancelCallback()
     }
+
+    private fun cancelCallback() = handler.removeCallbacks(hideRunnable)
 
     var resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -910,6 +917,11 @@ class MeetingFragment : Fragment() {
 
         binding.topMenu?.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
+        if(!controlBarsVisible) {
+            showControlBars(false)
+            cancelCallback()
+        }
+
         binding.topMenu?.setBackgroundColor(
             getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.backgroundDim,
@@ -925,14 +937,17 @@ class MeetingFragment : Fragment() {
         binding.space4?.visibility = View.GONE
         binding.buttonRaiseHand?.visibility = View.GONE
 
+        WindowCompat.setDecorFitsSystemWindows(activity!!.window, true)
+
+        showSystemBars()
     }
 
     private fun configureHLSView() {
         updateBindings()
 
-        goFullScreen()
+        //hideSystemBars()
 
-        delayedHide(5000)
+        delayedHide(3000)
     }
 
     private fun updateBindings() {
@@ -959,42 +974,72 @@ class MeetingFragment : Fragment() {
             if (controlBarsVisible)
                 hideControlBars()
             else
-                showControlBars()
+                showControlBars(true)
         }
     }
 
-    private fun goFullScreen() {
-        if (Build.VERSION.SDK_INT >= 30) {
+    private fun hideSystemBars() {
             activity?.let {
-                it.window.decorView.windowInsetsController?.show(
-                    WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-                )
-            }
+                val windowInsetsController = WindowCompat.getInsetsController(it.window, it.window.decorView)
+                windowInsetsController?.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        } else {
-            activity?.let {
-                it.window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE or
-                        View.SYSTEM_UI_FLAG_FULLSCREEN or
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                // Step 1
+                WindowCompat.setDecorFitsSystemWindows(it.window, false)
+                // step 2
+                windowInsetsController?.isAppearanceLightNavigationBars = true
+
+                // step 3
+                view?.let { it1 ->
+                    ViewCompat.setOnApplyWindowInsetsListener(it1) { view, windowInsets ->
+                        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                        // Apply the insets as a margin to the view. Here the system is setting
+                        // only the bottom, left, and right dimensions, but apply whichever insets are
+                        // appropriate to your layout. You can also update the view padding
+                        // if that's more appropriate.
+                        val params = it1.layoutParams as ViewGroup.MarginLayoutParams
+                        params.leftMargin = insets.left
+                        params.bottomMargin = insets.bottom
+                        params.rightMargin = insets.right
+                        it1.layoutParams = params
+
+                        // Return CONSUMED if you don't want want the window insets to keep being
+                        // passed down to descendant views.
+                        WindowInsetsCompat.CONSUMED
+                    }
+                }
+
+                // step  4
+                windowInsetsController?.hide(WindowInsetsCompat.Type.navigationBars())
             }
+    }
+
+    private fun showSystemBars() {
+
+        activity?.let {
+            val windowInsetsController = WindowCompat.getInsetsController(it.window, it.window.decorView)
+            windowInsetsController?.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+            windowInsetsController?.show(WindowInsetsCompat.Type.navigationBars())
         }
     }
 
-    private fun showControlBars() {
+    private fun showControlBars(shouldHideAfterDelay : Boolean) {
         binding.topMenu?.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {
                     binding.topMenu?.visibility = View.VISIBLE
+                    showSystemBars()
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
                     binding.topMenu?.visibility = View.VISIBLE
                     controlBarsVisible = true
-                    // Hide control bars
-                    delayedHide(3000)
+                    if (shouldHideAfterDelay) {
+                        // Hide control bars
+                        delayedHide(3000)
+                    }
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {
@@ -1046,6 +1091,7 @@ class MeetingFragment : Fragment() {
                 override fun onAnimationEnd(animation: Animator?) {
                     topMenu.visibility = View.GONE
                     controlBarsVisible = false
+                    hideSystemBars()
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {
@@ -1084,7 +1130,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun delayedHide(delayMillis: Int) {
-        handler.removeCallbacks(hideRunnable)
+        cancelCallback()
         handler.postDelayed(hideRunnable, delayMillis.toLong())
     }
 
