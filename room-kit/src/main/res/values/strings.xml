@@ -204,7 +204,7 @@
     <string name="end_stream_str">End Stream</string>
     <string name="live_str">LIVE</string>
     <string name="device_stats_str">Device Info</string>
-    <item name="IS_INT" type="id"/>
+    <item name="IS_INT" type="id" />
     <string name="single_choice_text">Select one of the radio buttons to mark the correct answer.</string>
     <string name="multi_choice_text">Check the boxes to mark the correct answers.</string>
     <string name="leave_description">Others will continue after you leave. You can join the session again</string>
@@ -216,4 +216,7 @@
     <string name="end_session">End Session</string>
     <string name="toggle_handraise">Toggle Handraise</string>
     <string name="participant_header_item">%1$s (%2$d)</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

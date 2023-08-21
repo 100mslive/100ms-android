@@ -12,6 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import live.hms.hls_player.HmsHlsPlayer
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -46,11 +48,6 @@ class HlsFragment : Fragment() {
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
     val displayHlsCuesUseCase = DisplayHlsCuesUseCase { text -> binding.hlsCues.text = text }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

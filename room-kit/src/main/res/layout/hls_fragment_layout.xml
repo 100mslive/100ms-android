@@ -3,10 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- Player view -->
     <androidx.media3.ui.PlayerView
         android:id="@+id/hls_view"
+        app:use_controller="false"
+        app:resize_mode="zoom"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -20,7 +24,7 @@
         android:background="#80000000"
         android:orientation="vertical"
         android:padding="10dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/stats_view"
@@ -109,6 +113,7 @@
     <TextView
         android:layout_alignParentBottom="true"
         android:id="@+id/hlsCues"
+        android:visibility="gone"
         android:textSize="12pt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

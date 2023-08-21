@@ -56,6 +56,10 @@ class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private
         // updateVideos(binding.container, videos)
     }
 
+    fun updateMaxActiveSpeaker(maxActiveSpeaker: Int) {
+        speakerCache.updateMaxActiveSpeaker(maxActiveSpeaker)
+    }
+
     data class SpeakerItem(
         val peerId: String,
         val peerName: String

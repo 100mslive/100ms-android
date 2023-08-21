@@ -294,6 +294,7 @@
                 android:drawablePadding="0dp"
                 app:icon="@drawable/avd_mic_on_to_off"
                 app:iconGravity="start"
+                android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -304,6 +305,7 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 android:background="@drawable/gray_round_solid_drawable"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
@@ -318,6 +320,7 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
                 android:src="@drawable/ic_switch_camera"
