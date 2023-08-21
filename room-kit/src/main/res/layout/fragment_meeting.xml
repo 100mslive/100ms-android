@@ -154,6 +154,44 @@
 
     <!-- Footer menu -->
     <LinearLayout
+        android:id="@+id/chatView"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:layout_above="@id/bottom_controls"
+        android:layout_margin="8dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit_text_message"
+            style="@style/TextInputLayout"
+            android:layout_width="0dp"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:minHeight="24dp"
+            android:textColor="#8F9099"
+            android:background="@drawable/send_message_background"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:hint="Send Message to Everyone"
+            android:padding="8dp"
+            app:endIconDrawable="@drawable/send_message"
+            app:endIconMode="custom" />
+
+
+        <ImageView
+            android:id="@+id/icon_send"
+            android:layout_width="18dp"
+            android:padding="8dp"
+            android:layout_height="18dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/send_icon" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/bottom_controls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,19 +1,16 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.R
@@ -22,6 +19,11 @@ import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
+import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.ChatViewModelFactory
+import live.hms.roomkit.ui.meeting.chat.ChatAdapter
+import live.hms.roomkit.ui.meeting.chat.ChatUseCase
+import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -34,6 +36,10 @@ import kotlin.math.absoluteValue
  */
 private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
+    private val chatViewModel: ChatViewModel by activityViewModels {
+        ChatViewModelFactory(meetingViewModel.hmsSDK)
+    }
+    private val chatAdapter = ChatAdapter()
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
@@ -81,7 +87,17 @@ class HlsFragment : Fragment() {
             }
         }
 
+        binding.iconSend.setOnSingleClickListener {
+            val messageStr = binding.editTextMessage.text.toString().trim()
+            if (messageStr.isNotEmpty()) {
+                chatViewModel.sendMessage(messageStr)
+                binding.editTextMessage.setText("")
+            }
+        }
+
         setPlayerStatsListener(true)
+
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages)
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {

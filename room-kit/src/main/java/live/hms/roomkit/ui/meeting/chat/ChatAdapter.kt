@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemChatBinding
@@ -11,30 +13,22 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ChatAdapter(
-  private val messages: ArrayList<ChatMessage>,
-  private val onPin : (String?) -> Unit
-) : RecyclerView.Adapter<ChatAdapter.ChatMessageViewHolder>() {
+class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+  companion object {
+    private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
+      override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
+        oldItem == newItem
+
+
+      override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
+        oldItem == newItem
+    }
+  }
 
   private val dateFormatter = SimpleDateFormat("EEE, d MMM HH:mm", Locale.getDefault())
 
   inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
     RecyclerView.ViewHolder(binding.root) {
-
-    init {
-      binding.messageOptionsImageButton.setOnClickListener {
-        val popup = PopupMenu(it.context, it)
-        popup.menuInflater
-          .inflate(R.menu.menu_chat, popup.menu)
-        popup.show()
-        popup.setOnMenuItemClickListener {
-          onPin(with(messages[bindingAdapterPosition]) {
-            "$senderName: $message"
-          })
-          true
-        }
-      }
-    }
 
     fun bind(message: ChatMessage) {
       binding.name.text = "${message.senderName}${getRecipientText(message)}"
@@ -61,8 +55,15 @@ class ChatAdapter(
   }
 
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
-    holder.bind(messages[position])
+    holder.bind(getItem(position))
   }
 
-  override fun getItemCount() = messages.size
+  override fun onBindViewHolder(
+    holder: ChatMessageViewHolder,
+    position: Int,
+    payloads: MutableList<Any>
+  ) {
+    super.onBindViewHolder(holder, position, payloads)
+    // Skip doing anything maybe it just relayouts
+  }
 }

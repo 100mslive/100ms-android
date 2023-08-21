@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    >
 
     <!-- Player view -->
     <androidx.media3.ui.PlayerView
@@ -118,6 +119,57 @@
         android:layout_height="wrap_content"
         tools:text="Hls Text"
         />
+
+    <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
+        android:id="@+id/chatMessages"
+        android:layout_alignParentStart="true"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        tools:listitem="@layout/list_item_chat"
+        android:layout_above="@+id/chatView"
+        />
+
+    <RelativeLayout
+        android:id="@+id/chatView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:background="@drawable/send_message_background"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="8dp">
+
+        <EditText
+            android:id="@+id/edit_text_message"
+            style="@style/TextInputLayout"
+            android:layout_width="wrap_content"
+            android:layout_toLeftOf="@id/icon_send"
+            android:layout_alignBottom="@id/icon_send"
+            android:layout_alignTop="@id/icon_send"
+            android:layout_alignParentLeft="true"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:minHeight="24dp"
+            android:background="@drawable/send_message_background"
+            android:textColor="#8F9099"
+            android:layout_height="wrap_content"
+            android:hint="Send Messages to Everyone"
+            android:padding="8dp"
+            android:layout_marginLeft="8dp"
+            app:endIconDrawable="@drawable/send_message"
+            app:endIconMode="custom" />
+
+
+        <ImageView
+            android:id="@+id/icon_send"
+            android:layout_width="wrap_content"
+            android:padding="8dp"
+            android:layout_alignParentRight="true"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/send_icon" />
+
+    </RelativeLayout>
+
 
 
 </RelativeLayout>
