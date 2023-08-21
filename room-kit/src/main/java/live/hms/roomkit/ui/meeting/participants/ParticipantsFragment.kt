@@ -58,21 +58,34 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                 it.hmsRole.name
         }
 
+
+        val canChangeRole = meetingViewModel.isAllowedToChangeRole()
+        val canMutePeers = meetingViewModel.isAllowedToMutePeers()
+        val canRemovePeers = meetingViewModel.isAllowedToRemovePeers()
+
         val groups = groupedPeers.keys.map { key ->
             ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size))
                 .apply {
-                    addAll(groupedPeers[key]?.map { ParticipantItem(it, meetingViewModel::togglePeerMute
-                    ) { remotePeerId ->
-                        val toRole = meetingViewModel.getAvailableRoles()
-                            .find { role-> role.name.contains("viewer") || role.name.contains("guest") }
-                        if (toRole != null) {
-                            meetingViewModel.changeRole(remotePeerId, toRole.name, true)
-                        }
-                    }
+                    addAll(groupedPeers[key]?.map {
+                        ParticipantItem(it,
+                            meetingViewModel::togglePeerMute,
+                            ::togglePeerMedia,
+                            canChangeRole,
+                            canMutePeers,
+                            canRemovePeers
+                        )
                     }!!)
                 }
         }
         adapter.update(groups)
+    }
+
+    private fun togglePeerMedia(remotePeerId : String) {
+            val toRole = meetingViewModel.getAvailableRoles()
+                .find { role-> role.name.contains("viewer") || role.name.contains("guest") }
+            if (toRole != null) {
+                meetingViewModel.changeRole(remotePeerId, toRole.name, true)
+            }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

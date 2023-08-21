@@ -18,12 +18,16 @@ import live.hms.video.sdk.models.role.HMSRole
 class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val toggleTrack: (hmsPeer: HMSRemotePeer, type: HMSTrackType) -> Unit,
                       private val changeRole: (remotePeerId: String) -> Unit,
+                      private val isAllowedToChangeRole : Boolean,
+                      private val isAllowedToMutePeers : Boolean,
+                      private val isAllowedToRemovePeers : Boolean
                       ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.name.text = hmsPeer.name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer.metadata, viewBinding)
-        viewBinding.peerSettings.visibility = if(hmsPeer.isLocal)
+        // Don't show the settings if they aren't allowed to change anything at all.
+        viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
             View.GONE
         else View.VISIBLE
 
