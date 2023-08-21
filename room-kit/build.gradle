@@ -47,7 +47,15 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        viewBinding true
+        dataBinding {
+            enabled true
+        }
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.8"
     }
 
     publishing {
