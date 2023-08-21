@@ -17,6 +17,7 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
+import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
@@ -50,12 +51,25 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     // This is only suspending so it can run in the background
     private suspend fun updateParticipantsAdapter() {
         // Group people by roles.
-        val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy { it.hmsRole.name }
+        val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy {
+            if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true && it.hmsRole.name != "broadcaster")
+                "Hand Raised"
+            else
+                it.hmsRole.name
+        }
 
         val groups = groupedPeers.keys.map { key ->
             ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size))
                 .apply {
-                    addAll(groupedPeers[key]?.map { ParticipantItem(it) }!!)
+                    addAll(groupedPeers[key]?.map { ParticipantItem(it, meetingViewModel::togglePeerMute
+                    ) { remotePeerId ->
+                        val toRole = meetingViewModel.getAvailableRoles()
+                            .find { role-> role.name.contains("viewer") || role.name.contains("guest") }
+                        if (toRole != null) {
+                            meetingViewModel.changeRole(remotePeerId, toRole.name, true)
+                        }
+                    }
+                    }!!)
                 }
         }
         adapter.update(groups)
@@ -150,4 +164,5 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                 }
             })
     }
+
 }

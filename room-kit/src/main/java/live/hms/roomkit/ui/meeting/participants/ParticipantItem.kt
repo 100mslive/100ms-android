@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting.participants
 import android.view.View
+import androidx.appcompat.widget.PopupMenu
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemPeerListBinding
@@ -8,13 +9,66 @@ import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
+import live.hms.video.media.tracks.HMSTrack
+import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSRemotePeer
+import live.hms.video.sdk.models.role.HMSRole
 
-class ParticipantItem(private val hmsPeer : HMSPeer) : BindableItem<ListItemPeerListBinding>(){
+class ParticipantItem(private val hmsPeer: HMSPeer,
+                      private val toggleTrack: (hmsPeer: HMSRemotePeer, type: HMSTrackType) -> Unit,
+                      private val changeRole: (remotePeerId: String) -> Unit,
+                      ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.name.text = hmsPeer.name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer.metadata, viewBinding)
+        viewBinding.peerSettings.visibility = if(hmsPeer.isLocal)
+            View.GONE
+        else View.VISIBLE
+
+        viewBinding.peerSettings.setOnClickListener {
+            with(PopupMenu(viewBinding.root.context, viewBinding.peerSettings)) {
+                inflate(getMenuForGroup(hmsPeer))
+                setOnMenuItemClickListener { menuItem ->
+                    when(menuItem.itemId) {
+                        R.id.remove_from_stage -> {
+                            // TODO role change to WHAT? Either guest or hls-viewer
+                            changeRole(hmsPeer.peerID)
+                            true
+                        }
+
+                        R.id.toggle_audio -> {
+                            // Toggle audio
+                            toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.AUDIO)
+                            true
+                        }
+                        R.id.toggle_video -> {
+                            // Toggle video
+                            toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.VIDEO)
+                            true
+                        }
+
+                        else -> false
+                    }
+                }
+                show()
+            }
+        }
+    }
+
+    private fun getMenuForGroup(peer: HMSPeer): Int {
+        val isHandRaised = CustomPeerMetadata.fromJson(peer.metadata)?.isHandRaised == true
+                && peer.hmsRole.name.lowercase() != "broadcaster"
+
+        return if(isHandRaised)
+            R.menu.menu_participant_hand_raise
+        else
+            when(peer.hmsRole.name.lowercase()) {
+                "broadcaster" -> R.menu.menu_broadcaster
+    //                "hls-viewer" -> R.menu
+                else -> R.menu.menu_participant
+            }
     }
 
     private fun updateHandRaise(metadata: String, viewBinding: ListItemPeerListBinding) {
