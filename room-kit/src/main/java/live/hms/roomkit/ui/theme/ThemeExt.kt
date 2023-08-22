@@ -20,6 +20,7 @@ import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.databinding.ItemGridOptionBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.video.signal.init.HMSRoomLayout
@@ -733,5 +734,39 @@ fun FragmentGridVideoBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().background_default
     )
     gridViewLinearLayout.alpha = 0.64f*/
+
+}
+
+fun ItemGridOptionBinding.applyTheme() {
+    rootLayout.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+
+    participantImage.drawable.setTint(
+        getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    badge.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceBrighter,
+            HMSPrebuiltTheme.getDefaults().surface_bright
+        )
+    )
+
+    participantCountText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 
 }

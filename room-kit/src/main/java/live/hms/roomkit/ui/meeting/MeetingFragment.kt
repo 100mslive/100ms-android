@@ -1199,19 +1199,32 @@ class MeetingFragment : Fragment() {
 
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
-                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel, {
-                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
-                }, {
-                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
-                },
-                    {
-                        startPollSnackBar?.dismiss()
-                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
-                    })
-                settingsBottomSheet.show(
-                    requireActivity().supportFragmentManager,
-                    "settingsBottomSheet"
-                )
+                if (meetingViewModel.isPrebuiltDebugMode().not()){
+                    GridOptionBottomSheet(
+                        onScreenShareClicked = {},
+                        onBRBClicked = {},
+                        onPeerListClicked = {},
+                        onRaiseHandClicked = {},
+                        onRecordingClicked = {},
+                    ).show(
+                        childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+                    )
+
+                } else {
+                    val settingsBottomSheet = SettingsBottomSheet(meetingViewModel, {
+                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
+                    }, {
+                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
+                    },
+                        {
+                            startPollSnackBar?.dismiss()
+                            findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
+                        })
+                    settingsBottomSheet.show(
+                        requireActivity().supportFragmentManager,
+                        "settingsBottomSheet"
+                    )
+                }
             }
         }
 
