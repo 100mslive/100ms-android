@@ -1,8 +1,6 @@
 package live.hms.roomkit.ui.meeting.participants
 
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
@@ -11,9 +9,18 @@ import androidx.recyclerview.widget.RecyclerView
 class HeaderItemDecoration(
     @ColorInt background: Int,
     private val sidePaddingPixels: Int,
+    private val roundedBorderPixels : Float,
     @param:LayoutRes private val headerViewType: Int
 ) : RecyclerView.ItemDecoration() {
     private val paint: Paint
+
+    private val corners = floatArrayOf(
+        roundedBorderPixels, roundedBorderPixels,   // Top left radius in px
+        roundedBorderPixels, roundedBorderPixels,   // Top right radius in px
+        roundedBorderPixels, roundedBorderPixels,     // Bottom right radius in px
+        roundedBorderPixels, roundedBorderPixels      // Bottom left radius in px
+    )
+
 
     init {
         paint = Paint()
@@ -54,7 +61,7 @@ class HeaderItemDecoration(
                 val child = parent.getChildAt(i - 1)
                 bottom = lm!!.getDecoratedBottom(child) + child.translationY
                 foundHeader = false
-                c.drawRect(left, top, right, bottom, paint)
+                drawRoundedBorder(top, bottom, left, right, c, paint)
             }
             if (!isHeader) continue
             foundHeader = true
@@ -68,6 +75,20 @@ class HeaderItemDecoration(
         //  final list item. It's fine if that's itself or its child.
         val child = parent.getChildAt(parent.childCount - 1)
         bottom = lm!!.getDecoratedBottom(child) + child.translationY
-        c.drawRect(left, top, right, bottom, paint)
+//        c.drawRect(left, top, right, bottom, paint)
+        drawRoundedBorder(top, bottom, left, right, c, paint)
+    }
+
+    private fun drawRoundedBorder(
+        top: Float,
+        bottom: Float,
+        left: Float,
+        right: Float,
+        canvas: Canvas,
+        mPaint: Paint
+    ) {
+        val path = Path()
+        path.addRoundRect(RectF(left, top, right, bottom), corners, Path.Direction.CW)
+        canvas.drawPath(path, mPaint)
     }
 }

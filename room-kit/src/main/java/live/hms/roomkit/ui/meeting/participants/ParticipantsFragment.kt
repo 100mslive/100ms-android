@@ -7,11 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
@@ -24,7 +27,6 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSPeer
-
 class ParticipantsFragment : BottomSheetDialogFragment() {
 
     private val TAG = "ParticipantsFragment"
@@ -118,7 +120,18 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         binding.participantCount.text = "0"
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
-//            adapter = this@ParticipantsFragment.adapter
+            addItemDecoration(
+                HeaderItemDecoration(
+                    ContextCompat.getColor(context, R.color.participants_border_color),
+                    8,
+                    16f,
+                    R.layout.participant_header_item
+                )
+            )
+            val divider = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL).apply {
+                setDrawable(resources.getDrawable(R.drawable.participants_divider)!!)
+            }
+            addItemDecoration(divider)
         }
 
         // Search is currently disabled
