@@ -5,6 +5,8 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginVertical="2dp"
+    android:layout_marginHorizontal="@dimen/four_dp"
     android:paddingHorizontal="@dimen/four_dp"
     android:paddingVertical="@dimen/eight_dp"
     tools:background="@android:color/holo_red_dark">

@@ -29,6 +29,7 @@ class GridOptionBottomSheet(
     private val onPeerListClicked: () -> Unit,
     private val onBRBClicked: () -> Unit,
     private val onRaiseHandClicked: () -> Unit,
+    private val onNameChange: () -> Unit,
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
@@ -64,7 +65,17 @@ class GridOptionBottomSheet(
         }
         gridOptionAdapter.spanCount = 3
         binding.optionsGrid.apply {
-            layoutManager = GridLayoutManager(context, gridOptionAdapter.spanCount).apply {
+            addItemDecoration(
+                InsetItemDecoration(
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+                        HMSPrebuiltTheme.getDefaults().background_default
+                    ), resources.getDimension(R.dimen.four_dp).toInt(), "inset", "inset"
+                )
+            )
+            layoutManager = GridLayoutManager(
+                context, gridOptionAdapter.spanCount
+            ).apply {
                 spanSizeLookup = gridOptionAdapter.spanSizeLookup
             }
             adapter = gridOptionAdapter
@@ -75,19 +86,58 @@ class GridOptionBottomSheet(
             getString(R.string.screen_share),
             R.drawable.ic_share_screen,
             onScreenShareClicked,
-            isSelected = false
+            isSelected = meetingViewModel.isScreenShared()
+        )
+
+        val brbOption = GridOptionItem(
+            getString(R.string.brb), R.drawable.ic_brb, {
+                onBRBClicked.invoke()
+                dismiss()
+            }, isSelected = meetingViewModel.isBRBOn()
+        )
+
+        val raiseHandOption = GridOptionItem(
+            getString(R.string.raise_hand), R.drawable.ic_raise_hand, {
+                onRaiseHandClicked.invoke()
+                dismiss()
+            }, isSelected = false
+        )
+
+        val peerListOption = GridOptionItem(
+            getString(R.string.peer_list), R.drawable.ic_icon_people, {
+                onPeerListClicked.invoke()
+                dismiss()
+            }, isSelected = false,
+        )
+
+        val nameChangeOption = GridOptionItem(
+            getString(R.string.change_name), R.drawable.person_icon, {
+                onNameChange.invoke()
+                dismiss()
+            }, isSelected = false,
         )
 
 
-
-        val group : Group = Section().apply {
+        val group: Group = Section().apply {
+            add(peerListOption)
+            add(brbOption)
             add(screenShareOption)
+            add(raiseHandOption)
+            add(nameChangeOption)
+        }
+        gridOptionAdapter.update(listOf(group))
+
+        meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
+            screenShareOption.setSelectedButton(it)
         }
 
+        meetingViewModel.isHandRaised.observe(viewLifecycleOwner) {
+            raiseHandOption.setSelectedButton(it)
+        }
 
-
-
-        gridOptionAdapter.update(listOf(group))
+        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
+            peerListOption.setParticpantCountUpdate(it.second.peerCount)
+        }
 
 
     }

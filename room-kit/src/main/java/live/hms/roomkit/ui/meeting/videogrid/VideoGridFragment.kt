@@ -21,6 +21,7 @@ import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import org.webrtc.RendererCommon
 
 class VideoGridFragment : Fragment() {
     companion object {
@@ -127,7 +128,7 @@ class VideoGridFragment : Fragment() {
             localMeeting?.let {
 
 
-
+                binding.localHmsVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
                 if (it.audio?.isMute == true) {
                     if (binding.minimizedIconAudioOff.isEnabled)
                         binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)

@@ -18,16 +18,17 @@ class GridOptionItem(
 ) : BindableItem<ItemGridOptionBinding>() {
 
     private val SELECTION_UPDATE = "SELECTION_UPDATE"
-    private val UN_SELECTION_UPDATE = "UN_SELECTION_UPDATE"
+    private val PARTICPANT_COUNt_UPDATE = "PARTICPANT_COUNt_UPDATE"
 
 
     override fun bind(viewBinding: ItemGridOptionBinding, position: Int) {
         //themes
+        viewBinding.participantImage.setImageResource(icon)
         viewBinding.applyTheme()
 
 
         viewBinding.subtitle.text = title
-        viewBinding.participantImage.setImageResource(icon)
+
 
         if (particpantCount != null) {
             viewBinding.badge.visibility = View.VISIBLE
@@ -40,7 +41,7 @@ class GridOptionItem(
             onClick()
         }
 
-
+        setSelectedView(isSelected, viewBinding)
     }
 
     private fun setSelectedView(isSelected: Boolean, v: ItemGridOptionBinding) {
@@ -53,14 +54,21 @@ class GridOptionItem(
                 HMSPrebuiltTheme.getDefaults().surface_bright
             )
         }
-
-        v.participantImage.setImageResource(icon)
     }
 
     override fun bind(v: ItemGridOptionBinding, position: Int, payloads: MutableList<Any>) {
         when {
             payloads.contains(SELECTION_UPDATE) -> {
                 setSelectedView(isSelected, v)
+            }
+
+            payloads.contains(PARTICPANT_COUNt_UPDATE) -> {
+                if (particpantCount != null) {
+                    v.badge.visibility = View.VISIBLE
+                    v.participantCountText.text = particpantCount.toString()
+                } else {
+                    v.badge.visibility = View.GONE
+                }
             }
 
             else -> bind(v, position)
@@ -77,6 +85,11 @@ class GridOptionItem(
     fun setSelectedButton(isSelected: Boolean) {
         this.isSelected = isSelected
         notifyChanged(SELECTION_UPDATE)
+    }
+
+    fun setParticpantCountUpdate(count: Int?) {
+        this.particpantCount = count
+        notifyChanged(PARTICPANT_COUNt_UPDATE)
     }
 
     override fun initializeViewBinding(view: View) = ItemGridOptionBinding.bind(view)
