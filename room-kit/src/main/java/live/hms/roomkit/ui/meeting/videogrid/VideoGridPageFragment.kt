@@ -107,6 +107,6 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
   private fun renderCurrentPage(tracks: List<MeetingTrack>) {
     val videos = getCurrentPageVideos(tracks)
-    updateVideos(binding.container, videos, false)
+    updateVideos(binding.container, videos, false, isScreenShare)
   }
 }
