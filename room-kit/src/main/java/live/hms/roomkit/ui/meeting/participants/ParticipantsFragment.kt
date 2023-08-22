@@ -91,14 +91,6 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
-//        adapter =
-//            ParticipantsAdapter(
-//                meetingViewModel.isAllowedToChangeRole(),
-//                meetingViewModel.isAllowedToRemovePeers(),
-//                meetingViewModel.isAllowedToMutePeers(),
-//                meetingViewModel.isAllowedToAskUnmutePeers(),
-//                this::onSheetClicked
-//            )
         initViews()
     }
 
@@ -133,6 +125,10 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         binding.recyclerView.adapter = adapter
+        // Initial updating of views
+        lifecycleScope.launch {
+            updateParticipantsAdapter()
+        }
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             val peers = meetingViewModel.peers
             binding.participantCount.text = "${peers.count()}"
