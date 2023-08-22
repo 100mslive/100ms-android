@@ -156,11 +156,11 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     meetingViewModel.activeSpeakersUpdatedTracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
-      updateVideos(binding.container, tracks, false)
+      updateVideos(binding.container, tracks)
     }
 
     meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
-      updateVideos(binding.container, videos, false)
+      updateVideos(binding.container, videos)
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
     }
@@ -188,6 +188,10 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         binding.screenShare.statsView.text = statsPair.first
       }
     }
+  }
+
+  override fun isScreenshare(): Boolean {
+   return false
   }
 
   private var screenShareStats : StatsInterpreter? = null
