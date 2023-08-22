@@ -125,6 +125,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                     ContextCompat.getColor(context, R.color.participants_border_color),
                     8,
                     16f,
+                    24f,
                     R.layout.participant_header_item
                 )
             )

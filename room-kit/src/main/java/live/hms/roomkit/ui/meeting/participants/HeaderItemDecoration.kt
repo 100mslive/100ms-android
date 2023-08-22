@@ -5,11 +5,13 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
+import kotlin.math.exp
 
 class HeaderItemDecoration(
     @ColorInt background: Int,
     private val sidePaddingPixels: Int,
     private val roundedBorderPixels : Float,
+    private val expandedGroupSpacing : Float,
     @param:LayoutRes private val headerViewType: Int
 ) : RecyclerView.ItemDecoration() {
     private val paint: Paint
@@ -88,7 +90,7 @@ class HeaderItemDecoration(
         mPaint: Paint
     ) {
         val path = Path()
-        path.addRoundRect(RectF(left, top, right, bottom), corners, Path.Direction.CW)
+        path.addRoundRect(RectF(left, top, right, bottom - expandedGroupSpacing), corners, Path.Direction.CW)
         canvas.drawPath(path, mPaint)
     }
 }
