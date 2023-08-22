@@ -156,11 +156,11 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     meetingViewModel.activeSpeakersUpdatedTracks.observe(viewLifecycleOwner) { tracks ->
       HMSLogger.v(TAG, "tracks update received 🎼 [size=${tracks.size}]")
-      updateVideos(binding.container, tracks)
+      updateVideos(binding.container, tracks, false)
     }
 
     meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
-      updateVideos(binding.container, videos)
+      updateVideos(binding.container, videos, false)
       // Active speaker should be updated via, tracks AND actual active speakers.
       applySpeakerUpdates(speakers)
     }
