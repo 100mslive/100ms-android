@@ -126,10 +126,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     private fun initViewModels() {
         binding.recyclerView.adapter = adapter
         // Initial updating of views
-        lifecycleScope.launch {
-            updateParticipantsAdapter()
-        }
-        meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
+        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
             val peers = meetingViewModel.peers
             binding.participantCount.text = "${peers.count()}"
             lifecycleScope.launch {
