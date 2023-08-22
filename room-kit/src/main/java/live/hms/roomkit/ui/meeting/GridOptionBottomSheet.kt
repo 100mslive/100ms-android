@@ -129,6 +129,7 @@ class GridOptionBottomSheet(
 
         meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
             screenShareOption.setSelectedButton(it)
+            peerListOption.setParticpantCountUpdate(meetingViewModel.peers.size)
         }
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) {

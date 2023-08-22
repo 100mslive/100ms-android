@@ -20,6 +20,8 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 
@@ -86,6 +88,19 @@ class VideoGridFragment : Fragment() {
         }
         binding.localHmsVideoView?.setZOrderOnTop(true)
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
+
+        binding.screenShareClose.setOnClickListener {
+            meetingViewModel.stopScreenshare(object : HMSActionResultListener{
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess() {
+                    meetingViewModel.isScreenShare.postValue(false)
+                }
+
+            })
+        }
 
         meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) { peerTypePair ->
             val isLocal = peerTypePair.first.isLocal
@@ -177,6 +192,12 @@ class VideoGridFragment : Fragment() {
                 binding.screenShareContainer.visibility = View.VISIBLE
                 newRowCount = 1
                 newColumnCount = 2
+            }
+
+            if (screenShareTrackList.find { it.isLocal } !=null){
+                binding.localScreenShareContainer.visibility = View.VISIBLE
+            } else {
+                binding.localScreenShareContainer.visibility = View.GONE
             }
 
             meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value = Pair(newRowCount, newColumnCount)

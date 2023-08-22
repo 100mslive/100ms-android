@@ -357,6 +357,8 @@ internal fun FragmentActiveSpeakerBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.backgroundDim,
         HMSPrebuiltTheme.getDefaults().background_default
     )
+
+
 }
 
 internal fun VideoCardBinding.applyTheme() {
@@ -675,6 +677,40 @@ fun FragmentGridVideoBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
+
+    localScreenShareContainer.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
+    icScreenshare.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    screenShareText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    screenShareClose.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    screenShareClose.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default,
+        R.drawable.blue_round_solid_drawable)
+
+
 
     minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
     minimizedIconAudioOff.isEnabled = false
