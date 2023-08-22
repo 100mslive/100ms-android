@@ -16,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
@@ -30,6 +31,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     private var binding by viewLifecycle<FragmentParticipantsBinding>()
     private var alertDialog: AlertDialog? = null
     val adapter = GroupieAdapter()
+    private lateinit var handRaisedKey :String
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -44,13 +46,14 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentParticipantsBinding.inflate(inflater, container, false)
+        handRaisedKey = requireContext().resources.getString(R.string.hand_raised_group)
         initViewModels()
         return binding.root
     }
 
     // This is only suspending so it can run in the background
     private suspend fun updateParticipantsAdapter() {
-        val handRaisedKey = "Hand Raised"
+
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy {
             if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true && it.hmsRole.name.lowercase() != "broadcaster" && it.hmsRole.name.lowercase() != "host")
