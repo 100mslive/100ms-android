@@ -399,6 +399,7 @@ class MeetingViewModel(
 
     // Live data which changes on any change of peer
     val peerLiveData = MutableLiveData<HMSPeer>()
+    val participantPeerUpdate = MutableLiveData<Unit>()
     private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
     val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
@@ -700,6 +701,7 @@ class MeetingViewModel(
                     }
                 )
                 updatePolls()
+                participantPeerUpdate.postValue(Unit)
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -716,10 +718,12 @@ class MeetingViewModel(
                             _liveDataTracks.postValue(_tracks)
                             peerLiveData.postValue(hmsPeer)
                         }
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.PEER_JOINED -> {
                         peerLiveData.postValue(hmsPeer)
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
@@ -752,6 +756,7 @@ class MeetingViewModel(
                                 exitHlsViewIfRequired(false)
                             }
                         }
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.METADATA_CHANGED -> {
@@ -760,6 +765,7 @@ class MeetingViewModel(
                         } else {
                             _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
                         }
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.NAME_CHANGED -> {
@@ -768,12 +774,13 @@ class MeetingViewModel(
                         } else {
                             _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
                         }
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
                         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+                        participantPeerUpdate.postValue(Unit)
                     }
-
                     else -> Unit
                 }
             }
@@ -884,6 +891,7 @@ class MeetingViewModel(
                     HMSTrackUpdate.TRACK_DEGRADED -> _liveDataTracks.postValue(_tracks)
                     HMSTrackUpdate.TRACK_RESTORED -> _liveDataTracks.postValue(_tracks)
                 }
+                participantPeerUpdate.postValue(Unit)
             }
 
             override fun onMessageReceived(message: HMSMessage) {
