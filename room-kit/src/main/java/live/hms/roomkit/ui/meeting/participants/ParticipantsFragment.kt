@@ -50,10 +50,11 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
 
     // This is only suspending so it can run in the background
     private suspend fun updateParticipantsAdapter() {
+        val handRaisedKey = "Hand Raised"
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy {
             if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true && it.hmsRole.name.lowercase() != "broadcaster" && it.hmsRole.name.lowercase() != "host")
-                "Hand Raised"
+                handRaisedKey
             else
                 it.hmsRole.name
         }
@@ -63,22 +64,38 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         val canMutePeers = meetingViewModel.isAllowedToMutePeers()
         val canRemovePeers = meetingViewModel.isAllowedToRemovePeers()
 
-        val groups = groupedPeers.keys.map { key ->
-            ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size))
-                .apply {
-                    addAll(groupedPeers[key]?.map {
-                        ParticipantItem(it,
-                            meetingViewModel::togglePeerMute,
-                            ::togglePeerMedia,
-                            canChangeRole,
-                            canMutePeers,
-                            canRemovePeers
-                        )
-                    }!!)
-                }
+        val groups = mutableListOf<ExpandableGroup>()
+        // Keep hand raised on top.
+        if(groupedPeers[handRaisedKey] != null) {
+            groups.add(keyToGroup(handRaisedKey, groupedPeers, canChangeRole, canMutePeers, canRemovePeers))
         }
+
+        groups.addAll(groupedPeers.keys.filterNot { it == handRaisedKey }.map { key ->
+            keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers)
+        })
+
         adapter.update(groups)
     }
+
+    private fun keyToGroup(
+        key: String,
+        groupedPeers: Map<String, List<HMSPeer>>,
+        canChangeRole: Boolean,
+        canMutePeers: Boolean,
+        canRemovePeers: Boolean
+    ) : ExpandableGroup =
+        ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size))
+            .apply {
+                addAll(groupedPeers[key]?.map {
+                    ParticipantItem(it,
+                        meetingViewModel::togglePeerMute,
+                        ::togglePeerMedia,
+                        canChangeRole,
+                        canMutePeers,
+                        canRemovePeers
+                    )
+                }!!)
+            }
 
     private fun togglePeerMedia(remotePeerId : String) {
             val toRole = meetingViewModel.getAvailableRoles()
