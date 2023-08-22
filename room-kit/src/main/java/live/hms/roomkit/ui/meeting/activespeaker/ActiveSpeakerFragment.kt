@@ -190,6 +190,10 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
     }
   }
 
+  override fun isScreenshare(): Boolean {
+   return false
+  }
+
   private var screenShareStats : StatsInterpreter? = null
   private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
 

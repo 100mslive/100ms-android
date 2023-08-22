@@ -34,7 +34,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -1196,7 +1195,7 @@ class MeetingFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
                 if (meetingViewModel.isPrebuiltDebugMode().not()){
-                    GridOptionBottomSheet(
+                    SessionOptionBottomSheet(
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()) },

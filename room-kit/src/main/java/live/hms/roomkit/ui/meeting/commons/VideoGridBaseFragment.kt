@@ -310,7 +310,8 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun updateVideos(
     layout: GridLayout,
     newVideos: List<MeetingTrack?>,
-    isVideoGrid: Boolean
+    isVideoGrid: Boolean,
+    isScreenShare: Boolean = false
   ) {
     gridLayout = layout
     var requiresGridLayoutUpdate = false
@@ -345,7 +346,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           if (isFragmentVisible) {
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
-            bindSurfaceView(renderedViewPair.binding.videoCard, newVideo)
+            bindSurfaceView(renderedViewPair.binding.videoCard, newVideo, if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
             //handling simulcast case since we are updating local reference it thinks it's an update instead of rebinding it
             renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
@@ -383,7 +384,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
           // Bind surfaceView when view is visible to user
           if (isFragmentVisible) {
-            bindSurfaceView(videoBinding.videoCard, newVideo)
+            bindSurfaceView(videoBinding.videoCard, newVideo, if (isScreenShare) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
           }
 
           videoBinding.videoCard.raisedHand.alpha =
@@ -542,7 +543,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   fun bindViews() {
     renderedViews.forEach { renderedView ->
-      bindSurfaceView(renderedView.binding.videoCard, renderedView.meetingTrack)
+      bindSurfaceView(renderedView.binding.videoCard, renderedView.meetingTrack, if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
 
       meetingViewModel.statsToggleLiveData.observe(this) {
         if (it) {
@@ -604,4 +605,6 @@ abstract class VideoGridBaseFragment : Fragment() {
       applyMetadataUpdates(it)
     }
   }
+
+  abstract fun isScreenshare(): Boolean
 }

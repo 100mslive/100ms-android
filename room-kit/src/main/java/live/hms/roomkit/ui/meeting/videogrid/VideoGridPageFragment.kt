@@ -105,6 +105,10 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     //meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
   }
 
+  override fun isScreenshare(): Boolean {
+    return isScreenShare
+  }
+
   private fun renderCurrentPage(tracks: List<MeetingTrack>) {
     val videos = getCurrentPageVideos(tracks)
     updateVideos(binding.container, videos, false)

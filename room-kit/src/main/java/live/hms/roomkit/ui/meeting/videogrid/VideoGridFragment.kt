@@ -187,11 +187,13 @@ class VideoGridFragment : Fragment() {
                 binding.screenShareContainer.visibility = View.GONE
                 newRowCount = 3
                 newColumnCount = 2
+                binding.divider.setGuidelinePercent(0f)
             }
             else {
                 binding.screenShareContainer.visibility = View.VISIBLE
                 newRowCount = 1
                 newColumnCount = 2
+                binding.divider.setGuidelinePercent(0.75f)
             }
 
             if (screenShareTrackList.find { it.isLocal } !=null){
@@ -212,17 +214,6 @@ class VideoGridFragment : Fragment() {
             else expectedItems
         }
 
-        if (settings.detectDominantSpeaker) {
-            meetingViewModel.pinnedTrackUiUseCase.observe(viewLifecycleOwner) { meetingTrack ->
-                if (meetingTrack == null) {
-                    binding.dominantSpeakerName.setText(R.string.no_one_speaking)
-                } else {
-                    binding.dominantSpeakerName.text = "Dominant Speaker: ${meetingTrack.peer.name}"
-                }
-            }
-        } else {
-            binding.containerDominantSpeaker.visibility = View.GONE
-        }
-        binding.containerNetworkInfo.visibility = View.GONE
+
     }
 }
