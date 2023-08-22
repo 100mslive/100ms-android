@@ -20,6 +20,7 @@ import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.databinding.ItemGridOptionBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.video.signal.init.HMSRoomLayout
@@ -356,6 +357,8 @@ internal fun FragmentActiveSpeakerBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.backgroundDim,
         HMSPrebuiltTheme.getDefaults().background_default
     )
+
+
 }
 
 internal fun VideoCardBinding.applyTheme() {
@@ -675,6 +678,40 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
+    localScreenShareContainer.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
+    icScreenshare.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    screenShareText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    screenShareClose.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    screenShareClose.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default,
+        R.drawable.blue_round_solid_drawable)
+
+
+
     minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
     minimizedIconAudioOff.isEnabled = false
     minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
@@ -733,5 +770,39 @@ fun FragmentGridVideoBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().background_default
     )
     gridViewLinearLayout.alpha = 0.64f*/
+
+}
+
+fun ItemGridOptionBinding.applyTheme() {
+    rootLayout.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+
+    participantImage.drawable.setTint(
+        getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    badge.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceBrighter,
+            HMSPrebuiltTheme.getDefaults().surface_bright
+        )
+    )
+
+    participantCountText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 
 }

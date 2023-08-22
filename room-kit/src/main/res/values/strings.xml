@@ -120,6 +120,7 @@
     <string name="grid_view">Grid View</string>
     <string name="active_speaker_view">Active Speaker View</string>
     <string name="screen_share">Screen Share</string>
+    <string name="brb">BRB</string>
     <string name="audio_status">Audio Status</string>
     <string name="video_status">Video Status</string>
     <string name="audio_level">Audio Level</string>
@@ -160,7 +161,9 @@
     <string name="disable_auto_simulcast">Disable Auto Simulcast</string>
     <string name="is_prebuilt_debug_enabled">Prebuilt (NonDebug/Debug)</string>
     <string name="go_live_in_prebuilt_debug_enabled">Use Mock API</string>
-    <string name="raise_hand">✋ Raise Hand</string>
+    <string name="raise_hand">Raise Hand</string>
+    <string name="peer_list">Participant(s)</string>
+    <string name="change_name">Change Name</string>
     <string name="pip_mode">PIP mode</string>
     <string name="lower_hand">Lower Hand</string>
     <string name="name_change_dialog">Type in the new name</string>

@@ -274,6 +274,7 @@ class MeetingViewModel(
     val previewUpdateLiveData: LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
     val hlsToggleUpdateLiveData: LiveData<Boolean> = hlsToggleUpdateData
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
+    val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {

@@ -159,7 +159,7 @@ class MeetingFragment : Fragment() {
 
                     override fun onSuccess() {
                         // success
-                        binding.buttonShareScreen?.setIconEnabled(R.drawable.ic_share_screen)
+                        meetingViewModel.isScreenShare.postValue(true)
                     }
                 })
             }
@@ -1186,11 +1186,7 @@ class MeetingFragment : Fragment() {
                         )
                     )
                 } else {
-                    if (meetingViewModel.isScreenShared()) {
-                        stopScreenShare()
-                    } else {
-                        startScreenShare()
-                    }
+                    startOrStopScreenShare()
                 }
             }
         }
@@ -1199,19 +1195,33 @@ class MeetingFragment : Fragment() {
 
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
-                val settingsBottomSheet = SettingsBottomSheet(meetingViewModel, {
-                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
-                }, {
-                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
-                },
-                    {
-                        startPollSnackBar?.dismiss()
-                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
-                    })
-                settingsBottomSheet.show(
-                    requireActivity().supportFragmentManager,
-                    "settingsBottomSheet"
-                )
+                if (meetingViewModel.isPrebuiltDebugMode().not()){
+                    GridOptionBottomSheet(
+                        onScreenShareClicked = { startOrStopScreenShare() },
+                        onBRBClicked = { meetingViewModel.toggleBRB() },
+                        onPeerListClicked = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()) },
+                        onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
+                        onNameChange = { meetingViewModel.requestNameChange() },
+                        onRecordingClicked = {},
+                    ).show(
+                        childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+                    )
+
+                } else {
+                    val settingsBottomSheet = SettingsBottomSheet(meetingViewModel, {
+                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment())
+                    }, {
+                        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
+                    },
+                        {
+                            startPollSnackBar?.dismiss()
+                            findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
+                        })
+                    settingsBottomSheet.show(
+                        requireActivity().supportFragmentManager,
+                        "settingsBottomSheet"
+                    )
+                }
             }
         }
 
@@ -1273,6 +1283,14 @@ class MeetingFragment : Fragment() {
         }
     }
 
+    private fun startOrStopScreenShare() {
+        if (meetingViewModel.isScreenShared()) {
+            stopScreenShare()
+        } else {
+            startScreenShare()
+        }
+    }
+
     private fun startScreenShare() {
         val mediaProjectionManager: MediaProjectionManager? = requireContext().getSystemService(
             Context.MEDIA_PROJECTION_SERVICE
@@ -1291,7 +1309,7 @@ class MeetingFragment : Fragment() {
             }
 
             override fun onSuccess() {
-                binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
+                meetingViewModel.isScreenShare.postValue(false)
             }
         })
     }
