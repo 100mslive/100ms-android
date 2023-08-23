@@ -9,7 +9,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ParticipantHeaderItemBinding
 import live.hms.roomkit.drawableEnd
 
-class ParticipantHeaderItem(private val roleName: String, private val numPeers: Int? = 0) :
+class ParticipantHeaderItem(private val roleName: String, private val numPeers: Int? = 0, val expanded : (String, Boolean) -> Unit) :
     BindableItem<ParticipantHeaderItemBinding>(), ExpandableItem {
     private lateinit var expandableGroup: ExpandableGroup
 
@@ -17,6 +17,7 @@ class ParticipantHeaderItem(private val roleName: String, private val numPeers: 
         viewBinding.heading.text = viewBinding.root.resources.getString(R.string.participant_header_item, roleName,numPeers)
         viewBinding.root.setOnClickListener {
             expandableGroup.onToggleExpanded()
+            expanded(roleName, expandableGroup.isExpanded)
             updateExpandChevron(expandableGroup.isExpanded, viewBinding)
         }
     }

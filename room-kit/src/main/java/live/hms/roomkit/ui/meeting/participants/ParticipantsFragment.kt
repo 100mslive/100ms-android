@@ -36,6 +36,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     private lateinit var handRaisedKey :String
     private var filterText : String? = null
     private fun isSearching() = !filterText.isNullOrEmpty()
+    private val expandedGroups = mutableMapOf<String,Boolean>()
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -87,6 +88,11 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         adapter.update(groups)
     }
 
+
+    private fun expandedGroups( rolename : String, expanded : Boolean) {
+        expandedGroups[rolename] = expanded
+    }
+
     private fun keyToGroup(
         key: String,
         groupedPeers: Map<String, List<HMSPeer>>,
@@ -94,7 +100,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         canMutePeers: Boolean,
         canRemovePeers: Boolean
     ) : ExpandableGroup =
-        ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size))
+        ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size, ::expandedGroups))
             .apply {
                 addAll(groupedPeers[key]?.map {
                     ParticipantItem(it,
@@ -105,6 +111,10 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                         canRemovePeers
                     )
                 }!!)
+                // If the group was expanded, open it again.
+                if(expandedGroups[key] == true){
+                    onToggleExpanded()
+                }
             }
 
     private fun togglePeerMedia(remotePeerId : String) {
