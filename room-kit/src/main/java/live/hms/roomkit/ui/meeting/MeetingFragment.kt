@@ -1201,7 +1201,15 @@ class MeetingFragment : Fragment() {
                         onPeerListClicked = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()) },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
                         onNameChange = {  },
-                        onRecordingClicked = {},
+                        onRecordingClicked = {
+                            if (meetingViewModel.isRecordingState().not()) {
+                                meetingViewModel.recordMeeting(true)
+                            } else {
+                                meetingViewModel.stopRecording()
+                            }
+
+
+                        },
                     ).show(
                         childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                     )

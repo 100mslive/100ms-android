@@ -1416,8 +1416,8 @@ class MeetingViewModel(
 
     fun recordMeeting(
         isRecording: Boolean,
-        rtmpInjectUrls: List<String>,
-        inputWidthHeight: HMSRtmpVideoResolution?
+        rtmpInjectUrls: List<String> = emptyList(),
+        inputWidthHeight: HMSRtmpVideoResolution? = null
     ) {
         // It's streaming if there are rtmp urls present.
 
@@ -1925,6 +1925,10 @@ class MeetingViewModel(
 
             null
         }
+    }
+
+    fun isRecordingState(): Boolean {
+        return isRecording.value == RecordingState.STREAMING_AND_RECORDING || isRecording.value == RecordingState.STREAMING || isRecording.value == RecordingState.RECORDING
     }
 }
 

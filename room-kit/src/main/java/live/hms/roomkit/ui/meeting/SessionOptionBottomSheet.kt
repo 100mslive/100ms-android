@@ -123,7 +123,7 @@ class SessionOptionBottomSheet(
         gridOptionAdapter.update(listOf(group))
 
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
-            val isRecording = recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING
+            val isRecording = meetingViewModel.isRecordingState()
             recordingOption.setSelectedButton(isRecording)
             recordingOption.setText(if (isRecording) getString(R.string.stop_recording) else getString(R.string.record_meeting))
         }
