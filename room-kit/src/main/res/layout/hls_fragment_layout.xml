@@ -154,8 +154,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/send_messages_to_everyone"
             android:padding="8dp"
-            android:layout_marginStart="8dp"
-            app:endIconMode="custom" />
+            android:layout_marginStart="8dp" />
 
 
         <ImageView
