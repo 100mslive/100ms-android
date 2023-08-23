@@ -104,7 +104,6 @@ class SessionOptionBottomSheet(
             }, isSelected = false,
         )
 
-        meetingViewModel.isRecording
         val recordingOption = GridOptionItem(
             getString(R.string.record_meeting), R.drawable.ic_record_button_24, {
                 onRecordingClicked.invoke()
