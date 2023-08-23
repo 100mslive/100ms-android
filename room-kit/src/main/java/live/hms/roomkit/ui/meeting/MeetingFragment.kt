@@ -56,6 +56,8 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
+import live.hms.roomkit.ui.meeting.chat.ChatAdapter
+import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
@@ -79,7 +81,7 @@ val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
 val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 
 class MeetingFragment : Fragment() {
-
+    private val chatAdapter = ChatAdapter()
     companion object {
         private const val TAG = "MeetingFragment"
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
@@ -445,6 +447,7 @@ class MeetingFragment : Fragment() {
                 binding.editTextMessage?.setText("")
             }
         }
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages!!)
     }
 
     override fun onCreateView(
@@ -1251,6 +1254,7 @@ class MeetingFragment : Fragment() {
                     View.GONE
                 }
             }
+            binding.chatMessages!!.visibility = binding.chatView!!.visibility
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }

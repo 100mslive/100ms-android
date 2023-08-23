@@ -53,6 +53,9 @@ class HeaderItemDecoration(
         var bottom : Float = 0f
         var left : Float = 0f
         var right : Float = 0f
+        // Avoid a crash when there are zero items, such as can happen while searching.
+        if(parent.childCount == 0)
+            return
 
         var foundHeader = false
         for (i in 0 until parent.childCount) {

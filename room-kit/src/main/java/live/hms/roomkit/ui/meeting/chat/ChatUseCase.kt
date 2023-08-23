@@ -17,10 +17,13 @@ class ChatUseCase {
         messages.observe(viewlifecycleOwner) {
             chatAdapter.submitList(it)
             recyclerview.postDelayed({
+                val position = it.size - 1
+                if(position < 0)
+                    return@postDelayed
                 // Without this sometimes the view won't update.
-                chatAdapter.notifyItemChanged(it.size - 1 ,null)
+                chatAdapter.notifyItemChanged(position ,null)
                 // Scroll to the new message
-                recyclerview.smoothScrollToPosition(it.size -1)
+                recyclerview.smoothScrollToPosition(position)
             }, 300)
         }
     }

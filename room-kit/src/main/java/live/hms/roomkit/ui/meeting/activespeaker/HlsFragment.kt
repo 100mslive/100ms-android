@@ -169,7 +169,7 @@ class HlsFragment : Fragment() {
 
                 @SuppressLint("SetTextI18n")
                 override fun onEventUpdate(playerStats: PlayerStatsModel) {
-                    updateLiveButtonVisibility(playerStats)
+//                    updateLiveButtonVisibility(playerStats)
                     if(isStatsDisplayActive) {
                         updateStatsView(playerStats)
                     }
