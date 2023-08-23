@@ -34,6 +34,8 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     private var alertDialog: AlertDialog? = null
     val adapter = GroupieAdapter()
     private lateinit var handRaisedKey :String
+    private var filterText : String? = null
+    private fun isSearching() = !filterText.isNullOrEmpty()
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -54,10 +56,13 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
     }
 
     // This is only suspending so it can run in the background
-    private suspend fun updateParticipantsAdapter() {
+    private suspend fun updateParticipantsAdapter(peerList: List<HMSPeer>) {
+        // Don't throw away results when it's searching
+        //  ideally this should be replaced with just updating the
+        //  peers but still with the search query.
 
         // Group people by roles.
-        val groupedPeers : Map<String, List<HMSPeer>> = meetingViewModel.peers.groupBy {
+        val groupedPeers : Map<String, List<HMSPeer>> = peerList.groupBy {
             if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true && it.hmsRole.name.lowercase() != "broadcaster" && it.hmsRole.name.lowercase() != "host")
                 handRaisedKey
             else
@@ -135,14 +140,28 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
             addItemDecoration(divider)
         }
 
-        // Search is currently disabled
+        // Search disables conventional updates.
         binding.textInputSearch.apply {
             addTextChangedListener { text ->
-                val items = meetingViewModel
-                    .peers
-                    .filter { text.isNullOrEmpty() || it.name.contains(text.toString(), true) }
-//                adapter.setItems(items)
+                lifecycleScope.launch {
+                    filterText = text.toString()
+                    updateParticipantsAdapter(getSearchFilteredPeersIfNeeded())
+                }
             }
+        }
+    }
+
+    private fun getSearchFilteredPeersIfNeeded() : List<HMSPeer> {
+        val text = filterText
+
+        return if(!isSearching())
+            meetingViewModel.peers
+        else
+            meetingViewModel.peers.filter {
+            text.isNullOrEmpty() || it.name.contains(
+                text.toString(),
+                true
+            )
         }
     }
 
@@ -164,7 +183,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
             val peers = meetingViewModel.peers
             binding.participantCount.text = "${peers.count()}"
             lifecycleScope.launch {
-                updateParticipantsAdapter()
+                updateParticipantsAdapter(getSearchFilteredPeersIfNeeded())
             }
         }
 
