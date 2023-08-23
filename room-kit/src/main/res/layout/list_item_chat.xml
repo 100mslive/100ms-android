@@ -61,6 +61,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:padding="8dp"
+        android:visibility="gone"
         android:src="@drawable/ic_baseline_more_vert_24"
         android:onClick="showPopup"
         app:layout_constraintRight_toRightOf="parent"
