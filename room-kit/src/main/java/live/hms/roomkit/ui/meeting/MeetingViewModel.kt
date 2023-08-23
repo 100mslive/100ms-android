@@ -1928,7 +1928,7 @@ class MeetingViewModel(
     }
 
     fun isRecordingState(): Boolean {
-        return isRecording.value == RecordingState.STREAMING_AND_RECORDING || isRecording.value == RecordingState.STREAMING || isRecording.value == RecordingState.RECORDING
+        return isRecording.value == RecordingState.STREAMING_AND_RECORDING  || isRecording.value == RecordingState.RECORDING
     }
 }
 
