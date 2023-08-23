@@ -22,6 +22,13 @@
             android:elevation="24dp"
             tools:background="@android:color/holo_red_dark">
 
+            <androidx.constraintlayout.widget.Group
+                android:visibility="gone"
+                android:id="@+id/minimised_inset"
+                app:constraint_referenced_ids="minimized_icon_audio_off,minimized_icon_video_off,you_text,maximized_icon, maximized_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
             <ImageView
                 android:id="@+id/minimized_icon_audio_off"
                 android:layout_width="16dp"

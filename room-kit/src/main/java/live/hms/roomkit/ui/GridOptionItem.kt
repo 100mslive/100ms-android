@@ -10,7 +10,7 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
 
 class GridOptionItem(
-    private val title: String,
+    private var title: String,
     @DrawableRes val icon: Int,
     private val onClick: () -> Unit,
     var isSelected: Boolean = false,
@@ -18,6 +18,7 @@ class GridOptionItem(
 ) : BindableItem<ItemGridOptionBinding>() {
 
     private val SELECTION_UPDATE = "SELECTION_UPDATE"
+    private val TEXT_UPDATE = "TEXT_UPDATE"
     private val PARTICPANT_COUNt_UPDATE = "PARTICPANT_COUNt_UPDATE"
 
 
@@ -71,6 +72,10 @@ class GridOptionItem(
                 }
             }
 
+            payloads.contains(TEXT_UPDATE) -> {
+                v.subtitle.text = title
+            }
+
             else -> bind(v, position)
         }
     }
@@ -85,6 +90,11 @@ class GridOptionItem(
     fun setSelectedButton(isSelected: Boolean) {
         this.isSelected = isSelected
         notifyChanged(SELECTION_UPDATE)
+    }
+
+    fun setText(text: String) {
+        this.title = text
+        notifyChanged(TEXT_UPDATE)
     }
 
     fun setParticpantCountUpdate(count: Int?) {

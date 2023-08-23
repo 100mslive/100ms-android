@@ -85,6 +85,7 @@ class VideoGridFragment : Fragment() {
         binding.insetPill.makeInset{
             isMinimized = isMinimized.not()
             binding.insetPillMaximised.visibility = if (isMinimized) View.GONE else View.VISIBLE
+            binding.minimisedInset.visibility = if (isMinimized.not()) View.GONE else View.VISIBLE
         }
         binding.localHmsVideoView?.setZOrderOnTop(true)
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
