@@ -1255,6 +1255,13 @@ class MeetingFragment : Fragment() {
                 }
             }
             binding.chatMessages!!.visibility = binding.chatView!!.visibility
+            // Scroll to the latest message if it's visible
+            if(binding.chatMessages!!.visibility == View.VISIBLE) {
+                val position = chatAdapter.itemCount - 1
+                if(position >= 0) {
+                    binding.chatMessages!!.smoothScrollToPosition(position)
+                }
+            }
         }
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
