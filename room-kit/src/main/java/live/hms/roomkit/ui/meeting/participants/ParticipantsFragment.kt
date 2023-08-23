@@ -135,6 +135,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         binding.participantCount.text = "0"
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
+            itemAnimator = null
             addItemDecoration(
                 HeaderItemDecoration(
                     ContextCompat.getColor(context, R.color.participants_border_color),
