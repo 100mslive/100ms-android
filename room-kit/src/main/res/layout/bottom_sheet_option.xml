@@ -55,7 +55,7 @@
             android:background="@drawable/gray_line_vertical_divider" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginVertical="@dimen/eight_dp"
+            android:layout_marginVertical="@dimen/sizeteen_dp"
             android:id="@+id/options_grid"
             android:nestedScrollingEnabled="false"
             android:layout_width="match_parent"

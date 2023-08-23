@@ -104,9 +104,10 @@ class SessionOptionBottomSheet(
             }, isSelected = false,
         )
 
-        val nameChangeOption = GridOptionItem(
-            getString(R.string.change_name), R.drawable.person_icon, {
-                onNameChange.invoke()
+        meetingViewModel.isRecording
+        val recordingOption = GridOptionItem(
+            getString(R.string.record_meeting), R.drawable.ic_record_button_24, {
+                onRecordingClicked.invoke()
                 dismiss()
             }, isSelected = false,
         )
@@ -117,9 +118,15 @@ class SessionOptionBottomSheet(
             add(brbOption)
             add(screenShareOption)
             add(raiseHandOption)
-            add(nameChangeOption)
+            add(recordingOption)
         }
         gridOptionAdapter.update(listOf(group))
+
+        meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
+            val isRecording = recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING
+            recordingOption.setSelectedButton(isRecording)
+            recordingOption.setText(if (isRecording) getString(R.string.stop_recording) else getString(R.string.record_meeting))
+        }
 
         meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
             screenShareOption.setSelectedButton(it)

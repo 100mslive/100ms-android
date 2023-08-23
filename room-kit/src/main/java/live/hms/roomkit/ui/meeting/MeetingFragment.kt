@@ -1200,7 +1200,7 @@ class MeetingFragment : Fragment() {
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()) },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
-                        onNameChange = { meetingViewModel.requestNameChange() },
+                        onNameChange = {  },
                         onRecordingClicked = {},
                     ).show(
                         childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
