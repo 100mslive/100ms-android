@@ -160,8 +160,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         tools:listitem="@layout/list_item_chat"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="78dp"
+        android:layout_alignBottom="@id/chatView"
         />
 
     <RelativeLayout
