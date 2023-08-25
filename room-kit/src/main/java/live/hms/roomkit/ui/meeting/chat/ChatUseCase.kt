@@ -37,17 +37,6 @@ class ChatUseCase {
                 smoothScroller.targetPosition = position
                 recyclerview.layoutManager!!.startSmoothScroll(smoothScroller)
             }
-//            recyclerview.postDelayed({
-//                val position = it.size - 1
-//                Log.d("Postiionscroll","ChatUseCase $position")
-//                if(position < 0)
-//                    return@postDelayed
-//                // Without this sometimes the view won't update.
-//                chatAdapter.notifyItemChanged(position ,null)
-//                // Scroll to the new message
-//                Log.d("Postiionscroll","Numitems ${recyclerview.adapter!!.itemCount}")
-//                recyclerview.smoothScrollToPosition(position)
-//            }, 500)
         }
     }
 }
