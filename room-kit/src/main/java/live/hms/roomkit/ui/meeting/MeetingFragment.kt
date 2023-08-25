@@ -444,7 +444,7 @@ class MeetingFragment : Fragment() {
                 binding.editTextMessage?.setText("")
             }
         }
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages!!)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages!!, chatViewModel)
     }
 
     override fun onCreateView(
@@ -1277,6 +1277,7 @@ class MeetingFragment : Fragment() {
                 val position = chatAdapter.itemCount - 1
                 if(position >= 0) {
                     binding.chatMessages!!.smoothScrollToPosition(position)
+                    chatViewModel.unreadMessagesCount.postValue(0)
                 }
             }
         }

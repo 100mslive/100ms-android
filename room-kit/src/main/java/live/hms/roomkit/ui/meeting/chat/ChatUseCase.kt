@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting.chat
 
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -19,7 +20,8 @@ class ChatUseCase {
     fun initiate(messages: MutableLiveData<ArrayList<ChatMessage>>,
                  viewlifecycleOwner: LifecycleOwner,
                  chatAdapter: ChatAdapter,
-                 recyclerview: SingleSideFadeRecyclerview) {
+                 recyclerview: SingleSideFadeRecyclerview,
+    chatViewModel: ChatViewModel) {
 
         recyclerview.adapter = chatAdapter
         messages.observe(viewlifecycleOwner) {
@@ -31,11 +33,13 @@ class ChatUseCase {
                 // Scroll to the new message
                 val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(recyclerview.context) {
                     override fun getVerticalSnapPreference(): Int {
-                        return SNAP_TO_END
+                        return SNAP_TO_START
                     }
                 }
                 smoothScroller.targetPosition = position
                 recyclerview.layoutManager!!.startSmoothScroll(smoothScroller)
+                if(recyclerview.visibility == View.VISIBLE)
+                    chatViewModel.unreadMessagesCount.postValue(0)
             }
         }
     }
