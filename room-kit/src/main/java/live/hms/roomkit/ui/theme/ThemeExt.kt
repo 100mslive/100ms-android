@@ -133,9 +133,10 @@ internal fun ImageView.setIconEnabled(
     val mDensity = getResources().getDisplayMetrics().density;
     val r: Float = 10 * mDensity
     val radii = floatArrayOf(r, r, r, r, r, r, r, r)
+
     shapedrawable.shape = RoundRectShape(radii, null, null)
     shapedrawable.paint.color =  getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryBright,
         HMSPrebuiltTheme.getDefaults().border_bright
     )
     shapedrawable.paint.isAntiAlias = true
