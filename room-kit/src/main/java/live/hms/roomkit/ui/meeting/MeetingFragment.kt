@@ -30,10 +30,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -1040,6 +1037,7 @@ class MeetingFragment : Fragment() {
                 override fun onAnimationStart(animation: Animator?) {
                     binding.topMenu?.visibility = View.VISIBLE
                     showSystemBars()
+                    moveChat(up = true, bottomMenuHeight = binding.topMenu!!.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
@@ -1086,6 +1084,24 @@ class MeetingFragment : Fragment() {
             })?.start()
     }
 
+    private fun moveChat(up: Boolean, bottomMenuHeight: Float) {
+        with(binding.chatView!!){
+            if(up) {
+                (layoutParams as RelativeLayout.LayoutParams).apply {
+                    removeRule(RelativeLayout.ALIGN_BOTTOM)
+                    addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
+                    updateMargins(bottom = bottomMenuHeight.toInt() + 16)
+                }
+            } else {
+                (layoutParams as RelativeLayout.LayoutParams).apply {
+                    removeRule(RelativeLayout.ABOVE)
+                    addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, R.id.meeting_container)
+                    updateMargins(bottom = 8)
+                }
+            }
+        }
+
+    }
     private fun hideControlBars() {
         val topMenu = binding.topMenu
         val bottomMenu = binding.bottomControls
@@ -1095,6 +1111,7 @@ class MeetingFragment : Fragment() {
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {
                     topMenu.visibility = View.VISIBLE
+                    moveChat(up = false, topMenu!!.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {

@@ -122,6 +122,7 @@
 
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
+        android:visibility="gone"
         android:layout_alignParentStart="true"
         android:layout_width="match_parent"
         android:layout_height="300dp"
@@ -131,6 +132,7 @@
 
     <RelativeLayout
         android:id="@+id/chatView"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
