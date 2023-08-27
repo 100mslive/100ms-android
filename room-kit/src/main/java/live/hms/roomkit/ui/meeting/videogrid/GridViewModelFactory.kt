@@ -3,7 +3,6 @@ package live.hms.roomkit.ui.meeting.videogrid
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import live.hms.roomkit.ui.meeting.MeetingViewModel
 
 class GridViewModelFactory(
     private val application: Application
