@@ -36,6 +36,7 @@ class VideoGridFragment : Fragment() {
     private lateinit var clipboard: ClipboardManager
 
     private val meetingViewModel: MeetingViewModel by activityViewModels()
+    private val gridViewModel: GridViewModel by activityViewModels()
 
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
@@ -54,7 +55,7 @@ class VideoGridFragment : Fragment() {
     ): View {
         binding = FragmentGridVideoBinding.inflate(inflater, container, false)
         settings = SettingsStore(requireContext())
-
+        gridViewModel.initHMSSDK(meetingViewModel.hmsSDK)
         initVideoGrid()
         initViewModels()
         return binding.root
@@ -129,7 +130,7 @@ class VideoGridFragment : Fragment() {
         }
 
 
-        meetingViewModel.tracks.observe(viewLifecycleOwner) {
+        gridViewModel.getTrackLiveData().observe(viewLifecycleOwner) {
             val localMeeting = it.filter { it.isLocal }.firstOrNull()
 
             //show or hide inset
@@ -178,7 +179,7 @@ class VideoGridFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
-        meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+        gridViewModel.getTrackLiveData().observe(viewLifecycleOwner) { tracks ->
 
             val screenShareTrackList = tracks.filter { it.isScreen }
             var newRowCount = 0
@@ -203,7 +204,7 @@ class VideoGridFragment : Fragment() {
                 binding.localScreenShareContainer.visibility = View.GONE
             }
 
-            meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value = Pair(newRowCount, newColumnCount)
+            gridViewModel.updateRowAndColumnSpanForVideoPeerGrid.value = Pair(newRowCount, newColumnCount)
 
             val itemsPerPage = newRowCount * newColumnCount
             // Without this, the extra inset adds one more tile than they should

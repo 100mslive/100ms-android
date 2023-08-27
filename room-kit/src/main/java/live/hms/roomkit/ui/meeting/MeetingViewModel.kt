@@ -335,62 +335,9 @@ class MeetingViewModel(
     // Live data containing the current Speaker in the meeting
     val speakers = MutableLiveData<Array<HMSSpeaker>>()
 
-    private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
 
     val updateRowAndColumnSpanForVideoPeerGrid = MutableLiveData<Pair<Int,Int>>()
 
-    val speakerUpdateLiveData = object : ActiveSpeakerLiveData() {
-        private val speakerH = ActiveSpeakerHandler(true,settings.videoGridRows* settings.videoGridColumns
-        ) { _tracks }
-
-        override fun addSpeakerSource() {
-            addSource(speakers) { speakers : Array<HMSSpeaker> ->
-
-                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> =
-                    speakers.filter { it.peer?.isLocal == false }.toTypedArray()
-
-                val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
-                setValue(result.first)
-            }
-        }
-
-        override fun removeSpeakerSource() {
-            removeSource(speakers)
-        }
-
-        //TODO can't be null
-        fun refreshSpeaker() {
-           // speakers.postValue(speakers.value)
-        }
-
-        override fun updateMaxActiveSpeaker(rowCount: Int, columnCount: Int) {
-            speakerH.updateMaxActiveSpeaker(rowCount*columnCount)
-            refreshSpeaker()
-        }
-        init {
-            addSpeakerSource()
-
-            // Add all tracks as they come in.
-            addSource(tracks) { meetTracks: List<MeetingTrack> ->
-                //if remote peer and local peer is present inset mode
-               val excludeLocalTrackIfRemotePeerIsPreset =  if (meetTracks.size > 1) {
-                    meetTracks.filter { !it.isLocal }.toList()
-                } else
-                    meetTracks
-
-                val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset)
-                setValue(result)
-            }
-
-        }
-
-
-
-    }
-
-    val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
-        speakers.map(activeSpeakerHandler::speakerUpdate)
-    val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
     // We need all the active speakers, but the very first time it should be filled.
     //  with all the tracks.

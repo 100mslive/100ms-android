@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import live.hms.roomkit.databinding.FragmentVideoGridPageBinding
-import live.hms.roomkit.ui.meeting.MeetingTrack
-import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.util.viewLifecycle
 import kotlin.math.min
 
@@ -28,7 +26,6 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     }
   }
 
-
   private var binding by viewLifecycle<FragmentVideoGridPageBinding>()
   private val pageIndex by lazy { requireArguments()[BUNDLE_PAGE_INDEX] as Int }
   private val isScreenShare by lazy { requireArguments()[BUNDLE_IS_SCREEN_SHARE] as Boolean }
@@ -47,10 +44,10 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
   override fun onResume() {
     super.onResume()
     // Turn of sorting when we leave the first page
-    meetingViewModel.speakerUpdateLiveData.enableSorting(pageIndex == 0)
+    gridViewModel.speakerUpdateLiveData.enableSorting(pageIndex == 0)
   }
-  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): List<MeetingTrack?> {
-    val pageVideos = ArrayList<MeetingTrack?>()
+  private fun getCurrentPageVideos(tracks: List<live.hms.video.sdk.reactive.MeetingTrack>): List<live.hms.video.sdk.reactive.MeetingTrack?> {
+    val pageVideos = ArrayList<live.hms.video.sdk.reactive.MeetingTrack?>()
 
     // Range is [fromIndex, toIndex] -- Notice the bounds
     val itemsCount = maxItems
@@ -72,7 +69,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       //don't update if row and column are same
       if (shouldUpdate.not()) return
       setVideoGridRowsAndColumns(rowCount, columnCount)
-      meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
+      gridViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -84,11 +81,11 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
   override fun initViewModels() {
     super.initViewModels()
     if (isScreenShare.not()) {
-      meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { videoGridTrack ->
+      gridViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { videoGridTrack ->
         renderCurrentPage(videoGridTrack)
       }
     } else {
-      meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
+      gridViewModel.getTrackLiveData().observe(viewLifecycleOwner) { track ->
         val screenShareTrack = track.filter { it.isScreen  }.toList()
         renderCurrentPage(screenShareTrack)
       }
@@ -97,7 +94,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
     //Don't register listener if it's not screen share
     if (isScreenShare.not()){
-      meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
+      gridViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
         refreshGridRowsAndColumns(rowCount, columnCount)
       }
     }
@@ -109,7 +106,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     return isScreenShare
   }
 
-  private fun renderCurrentPage(tracks: List<MeetingTrack>) {
+  private fun renderCurrentPage(tracks: List<live.hms.video.sdk.reactive.MeetingTrack>) {
     val videos = getCurrentPageVideos(tracks)
     updateVideos(binding.container, videos, false)
   }

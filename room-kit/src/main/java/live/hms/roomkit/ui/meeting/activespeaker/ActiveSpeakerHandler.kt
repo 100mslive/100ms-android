@@ -3,11 +3,11 @@ package live.hms.roomkit.ui.meeting.activespeaker
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.utils.HMSLogger
-class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val numActiveSpeakerVideos : Int = 4, private val getTracks: () -> List<MeetingTrack>) {
+class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val numActiveSpeakerVideos : Int = 4, private val getTracks: () -> ArrayList<live.hms.video.sdk.reactive.MeetingTrack>) {
     private val TAG = ActiveSpeakerHandler::class.java.simpleName
     private val speakerCache = ActiveSpeakerCache<SpeakerItem>(numActiveSpeakerVideos, appendUnsorted)
 
-    fun trackUpdateTrigger(tracks: List<MeetingTrack>): List<MeetingTrack> {
+    fun trackUpdateTrigger(tracks: List<live.hms.video.sdk.reactive.MeetingTrack>): List<live.hms.video.sdk.reactive.MeetingTrack> {
         synchronized(tracks) {
             // Update lru just to keep it as much filled as possible
 
@@ -28,7 +28,7 @@ class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private
         }
     }
 
-    fun speakerUpdate(speakers: Array<HMSSpeaker>): Pair<List<MeetingTrack>, Array<HMSSpeaker>> {
+    fun speakerUpdate(speakers: Array<HMSSpeaker>): Pair<List<live.hms.video.sdk.reactive.MeetingTrack>, Array<HMSSpeaker>> {
         HMSLogger.v(
             TAG,
             "speakers update received 🎙 [size=${speakers.size}, names=${speakers.map { it.peer?.name }}] "
@@ -42,7 +42,7 @@ class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private
         return Pair(update(), speakers)
     }
 
-    private fun update(): List<MeetingTrack> {
+    private fun update(): List<live.hms.video.sdk.reactive.MeetingTrack> {
         // Update all the videos which aren't screenshares
 
         val order = speakerCache.getAllItems()

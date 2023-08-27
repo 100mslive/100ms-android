@@ -59,7 +59,7 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
-import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.roomkit.ui.meeting.videogrid.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment

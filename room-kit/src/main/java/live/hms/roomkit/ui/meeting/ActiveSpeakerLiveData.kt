@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting
 
 import androidx.lifecycle.MediatorLiveData
+import live.hms.video.sdk.reactive.MeetingTrack
 
 abstract class ActiveSpeakerLiveData : MediatorLiveData<List<MeetingTrack>>() {
 

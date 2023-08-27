@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting.commons
+package live.hms.roomkit.ui.meeting.videogrid
 
 import android.content.Context
 import android.os.Bundle
@@ -19,9 +19,7 @@ import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
-import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
-import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
@@ -52,8 +50,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     private const val TAG = "VideoGridBase"
   }
 
-  protected val settings: SettingsStore by lazy { SettingsStore(requireContext()) }
-  protected val meetingViewModel by activityViewModels<MeetingViewModel>()
+
 
   // Determined using the onResume() and onPause()
   var isFragmentVisible = false
@@ -70,12 +67,13 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   data class RenderedViewPair(
     val binding: GridItemVideoBinding,
-    val meetingTrack: MeetingTrack,
+    val meetingTrack: live.hms.video.sdk.reactive.MeetingTrack,
     val statsInterpreter: StatsInterpreter?,
   )
 
   protected val renderedViews = ArrayList<RenderedViewPair>()
   private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
+  protected val gridViewModel by activityViewModels<GridViewModel>()
 
   internal fun shouldUpdateRowOrGrid(rowCount: Int, columnCount: Int) : Boolean{
     return !(rowCount == gridRowCount && columnCount == gridColumnCount)
@@ -190,7 +188,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   protected fun bindSurfaceView(
     binding: VideoCardBinding,
-    item: MeetingTrack,
+    item: live.hms.video.sdk.reactive.MeetingTrack,
     scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
   ) {
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
@@ -201,7 +199,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       item.video?.let { track ->
         view.setScalingType(scalingType)
         view.addTrack(track)
-        view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
+//        view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
         binding.hmsVideoView.setOnLongClickListener {
           (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
@@ -251,7 +249,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     })
   }
 
-  protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
+  protected fun bindVideo(binding: VideoCardBinding, item: live.hms.video.sdk.reactive.MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
     //binding.applyTheme()
@@ -291,11 +289,11 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    setVideoGridRowsAndColumns(settings.videoGridRows, settings.videoGridColumns)
+    setVideoGridRowsAndColumns(3, 2)
   }
   protected fun unbindSurfaceView(
     binding: VideoCardBinding,
-    item: MeetingTrack,
+    item: live.hms.video.sdk.reactive.MeetingTrack,
     metadata: String = ""
   ) {
     Log.d(TAG,"unbindSurfaceView for :: ${item.peer.name}")
@@ -309,7 +307,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   protected fun updateVideos(
     layout: GridLayout,
-    newVideos: List<MeetingTrack?>,
+    newVideos: List<live.hms.video.sdk.reactive.MeetingTrack?>,
     isVideoGrid: Boolean,
     isScreenShare: Boolean = false
   ) {
@@ -365,21 +363,21 @@ abstract class VideoGridBaseFragment : Fragment() {
           val videoBinding = createVideoView(layout)
           var statsInterpreter: StatsInterpreter? = null
           if (!isVideoGrid) {
-            statsInterpreter = StatsInterpreter(settings.showStats)
-            meetingViewModel.statsToggleLiveData.observe(this) {
-              if (it) {
-                videoBinding.videoCard.statsView.visibility = View.VISIBLE
-                statsInterpreter.initiateStats(
-                  viewLifecycleOwner,
-                  meetingViewModel.getStats(),
-                  newVideo.video,
-                  newVideo.audio,
-                  newVideo.peer.isLocal
-                ) { videoBinding.videoCard.statsView.text = it }
-              } else {
-                videoBinding.videoCard.statsView.visibility = View.GONE
-              }
-            }
+//            statsInterpreter = StatsInterpreter(settings.showStats)
+//            meetingViewModel.statsToggleLiveData.observe(this) {
+//              if (it) {
+//                videoBinding.videoCard.statsView.visibility = View.VISIBLE
+//                statsInterpreter.initiateStats(
+//                  viewLifecycleOwner,
+//                  meetingViewModel.getStats(),
+//                  newVideo.video,
+//                  newVideo.audio,
+//                  newVideo.peer.isLocal
+//                ) { videoBinding.videoCard.statsView.text = it }
+//              } else {
+//                videoBinding.videoCard.statsView.visibility = View.GONE
+//              }
+//            }
           }
 
           // Bind surfaceView when view is visible to user
@@ -480,7 +478,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           videoCard.audioLevel.apply {
             text = "$level"
           }
-          if (level >= settings.silenceAudioLevelThreshold) {
+          if (level >= 10) {
             hideOrShowGridsForPip(index)
             wasLastSpeakingViewIndex = index
           }
@@ -488,7 +486,7 @@ abstract class VideoGridBaseFragment : Fragment() {
             level >= 70 -> {
               container.strokeWidth = 6
             }
-            70 > level && level >= settings.silenceAudioLevelThreshold -> {
+            70 > level && level >= 10 -> {
               container.strokeWidth = 4
             }
             else -> {
@@ -497,7 +495,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
         }
 
-        videoCard.audioLevel.visibility = if (meetingViewModel.isPrebuiltDebugMode()) View.VISIBLE else View.INVISIBLE
+        videoCard.audioLevel.visibility = View.INVISIBLE
       }
     }
   }
@@ -545,20 +543,20 @@ abstract class VideoGridBaseFragment : Fragment() {
     renderedViews.forEach { renderedView ->
       bindSurfaceView(renderedView.binding.videoCard, renderedView.meetingTrack, if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
 
-      meetingViewModel.statsToggleLiveData.observe(this) {
-        if (it) {
-          renderedView.binding.videoCard.statsView.visibility = View.VISIBLE
-          renderedView.statsInterpreter?.initiateStats(
-            viewLifecycleOwner,
-            meetingViewModel.getStats(),
-            renderedView.meetingTrack.video,
-            renderedView.meetingTrack.audio,
-            renderedView.meetingTrack.peer.isLocal
-          ) { string -> renderedView.binding.videoCard.statsView.text = string }
-        } else {
-          renderedView.binding.videoCard.statsView.visibility = View.GONE
-        }
-      }
+//      meetingViewModel.statsToggleLiveData.observe(this) {
+//        if (it) {
+//          renderedView.binding.videoCard.statsView.visibility = View.VISIBLE
+//          renderedView.statsInterpreter?.initiateStats(
+//            viewLifecycleOwner,
+//            meetingViewModel.getStats(),
+//            renderedView.meetingTrack.video,
+//            renderedView.meetingTrack.audio,
+//            renderedView.meetingTrack.peer.isLocal
+//          ) { string -> renderedView.binding.videoCard.statsView.text = string }
+//        } else {
+//          renderedView.binding.videoCard.statsView.visibility = View.GONE
+//        }
+//      }
     }
   }
 
@@ -601,9 +599,10 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   @CallSuper
   open fun initViewModels() {
-    meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) {
-      applyMetadataUpdates(it)
-    }
+    //TODO add flow from sdk side
+//    meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) {
+//      applyMetadataUpdates(it)
+//    }
   }
 
   abstract fun isScreenshare(): Boolean

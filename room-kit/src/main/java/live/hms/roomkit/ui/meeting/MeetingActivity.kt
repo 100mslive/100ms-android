@@ -21,6 +21,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
+import live.hms.roomkit.ui.meeting.videogrid.GridViewModel
+import live.hms.roomkit.ui.meeting.videogrid.GridViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.ROOM_CODE
 import live.hms.roomkit.util.ROOM_PREBUILT
@@ -40,6 +42,12 @@ class MeetingActivity : AppCompatActivity() {
   private val meetingViewModel: MeetingViewModel by viewModels {
     MeetingViewModelFactory(
       application,
+    )
+  }
+
+  private val gridViewModel : GridViewModel by viewModels {
+    GridViewModelFactory(
+      application
     )
   }
 
