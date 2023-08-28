@@ -1,4 +1,4 @@
-package live.hms.roomkit.helpers
+package live.hms.common.util.helpers
 
 import android.view.View
 

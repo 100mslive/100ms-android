@@ -1,4 +1,4 @@
-package live.hms.roomkit.util
+package live.hms.common.util
 
 import android.widget.EditText
 import java.util.*

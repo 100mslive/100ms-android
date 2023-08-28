@@ -1,4 +1,4 @@
-package live.hms.roomkit.util
+package live.hms.common.util
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -12,8 +12,7 @@ import android.view.*
 import android.view.accessibility.AccessibilityManager
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
-import live.hms.roomkit.R
-import live.hms.roomkit.helpers.OnSingleClickListener
+import live.hms.common.util.helpers.OnSingleClickListener
 import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -80,7 +79,7 @@ fun Bitmap.saveCaptureToLocalCache(context: Context) : Uri? {
 
     val imagePath = File(context.cacheDir, "images")
     val newFile = File(imagePath, "image.png")
-    return FileProvider.getUriForFile(context, "live.hms.roomkit.provider", newFile)
+    return null
 
   }
 
@@ -98,9 +97,6 @@ fun Activity.openShareIntent(uri: Uri) {
     startActivity(Intent.createChooser(shareIntent, "Choose an app"))
 }
 
-fun HMSVideoTrack?.isValid(): Boolean {
- return !(this == null || this.isMute || this.isDegraded)
-}
 
 
 fun Context.showTileListDialog(
@@ -138,6 +134,8 @@ fun SurfaceViewRenderer.onBitMap(onBitmap: (Bitmap?) -> Unit, scale : Float = 1.
     }
   }, scale)
 }
+
+
 
 fun Context.showSimulcastDialog(hmsVideoTrack: HMSRemoteVideoTrack?) {
     if (hmsVideoTrack == null)
@@ -196,17 +194,7 @@ fun Context.showMirrorOptions(surfaceViewRenderer: SurfaceViewRenderer?) {
 }
 
 
-fun SurfaceViewRenderer.setInit() {
-    setTag(R.id.IS_INT,true)
-}
 
-fun SurfaceViewRenderer.setRelease() {
-    setTag(R.id.IS_INT,false)
-}
-
-fun SurfaceViewRenderer.isInit() : Boolean {
-    return (getTag(R.id.IS_INT) as? Boolean) == true
-}
 
 fun HMSVideoTrack?.switchCamera() {
     (this as? HMSLocalVideoTrack)?.switchCamera()

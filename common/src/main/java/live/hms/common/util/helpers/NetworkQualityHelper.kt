@@ -1,9 +1,9 @@
-package live.hms.roomkit.helpers
+package live.hms.common.util.helpers
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import live.hms.roomkit.R
+import live.hms.common.R
 
 class NetworkQualityHelper {
 
