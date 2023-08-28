@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -22,12 +21,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import live.hms.common.util.NameUtils
+import live.hms.common.util.openShareIntent
+import live.hms.common.util.setCameraGestureListener
+import live.hms.common.util.setOnSingleClickListener
+import live.hms.common.util.switchCamera
 import live.hms.roomkit.R
 import live.hms.roomkit.animation.ControlFocusInsetsAnimationCallback
 import live.hms.roomkit.animation.TranslateDeferringInsetsAnimationCallback
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.drawableStart
-import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.common.util.helpers.NetworkQualityHelper
 import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
@@ -37,16 +41,13 @@ import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.*
 import live.hms.video.audio.HMSAudioManager
-import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.role.PublishParams
-import live.hms.video.utils.HMSLogger
 
 
 class PreviewFragment : Fragment() {

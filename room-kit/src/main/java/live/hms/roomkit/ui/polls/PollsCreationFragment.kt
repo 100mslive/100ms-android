@@ -16,7 +16,7 @@ import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
 import live.hms.roomkit.ui.polls.previous.PreviousPollsInfo
-import live.hms.roomkit.util.setOnSingleClickListener
+import live.hms.common.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 
 /**

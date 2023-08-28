@@ -4,16 +4,14 @@ import androidx.appcompat.widget.PopupMenu
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemPeerListBinding
-import live.hms.roomkit.helpers.NetworkQualityHelper
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.common.util.helpers.NetworkQualityHelper
+import live.hms.common.util.helpers.CustomPeerMetadata
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
-import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
-import live.hms.video.sdk.models.role.HMSRole
 
 class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val toggleTrack: (hmsPeer: HMSRemotePeer, type: HMSTrackType) -> Unit,

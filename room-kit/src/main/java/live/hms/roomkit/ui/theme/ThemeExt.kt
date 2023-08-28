@@ -1,13 +1,18 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
-import android.graphics.PorterDuff
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Shader
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RectShape
+import android.graphics.drawable.shapes.RoundRectShape
 import android.view.View
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.cardview.widget.CardView
@@ -103,19 +108,20 @@ fun getColorOrDefault(colorStr: String?, defaultColor: String): Int {
     }
 }
 
+fun View.backgroundGradientDrawable(@ColorInt startColor: Int, @ColorInt endColor: Int): Unit {
+    val h = this.height.toFloat()
+    val shapeDrawable = ShapeDrawable(RectShape())
+    shapeDrawable.paint.shader =
+        LinearGradient(0f, 0f, 0f, h, startColor, endColor, Shader.TileMode.REPEAT)
+    this.background = shapeDrawable
+}
+
 internal fun ImageView.setIconEnabled(
     @DrawableRes enabledIconDrawableRes: Int
 ) {
     this.setBackgroundResource(R.drawable.gray_round_stroked_drawable)
+    this.setBackgroundColor(resources.getColor(android.R.color.transparent))
     this.setImageResource(enabledIconDrawableRes)
-
-
-    background.setColorFilter(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.secondaryBright,
-            HMSPrebuiltTheme.getDefaults().border_bright
-        ), PorterDuff.Mode.DST_OVER
-    )
 
     drawable.setTint(
         getColorOrDefault(
@@ -123,6 +129,22 @@ internal fun ImageView.setIconEnabled(
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+    val shapedrawable = ShapeDrawable()
+    val mDensity = getResources().getDisplayMetrics().density;
+    val r: Float = 10 * mDensity
+    val radii = floatArrayOf(r, r, r, r, r, r, r, r)
+
+    shapedrawable.shape = RoundRectShape(radii, null, null)
+    shapedrawable.paint.color =  getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.secondaryBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+    shapedrawable.paint.isAntiAlias = true
+    shapedrawable.paint.strokeWidth = r/3
+    shapedrawable.paint.style = Paint.Style.STROKE
+
+
+    background = shapedrawable
 
     (drawable as? Animatable)?.start()
 }

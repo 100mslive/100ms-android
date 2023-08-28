@@ -9,7 +9,7 @@ import android.widget.EditText
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import live.hms.roomkit.R
-import live.hms.roomkit.util.NameUtils.isValidUserName
+import live.hms.common.util.NameUtils.isValidUserName
 
 
 class ChangeNameDialogFragment : DialogFragment() {

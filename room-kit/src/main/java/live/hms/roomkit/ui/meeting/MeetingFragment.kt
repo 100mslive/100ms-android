@@ -56,7 +56,6 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
-import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
@@ -703,8 +702,8 @@ class MeetingFragment : Fragment() {
                     if (settings.showReconnectingProgressBars) {
                         updateProgressBarUI(state.heading, state.message)
                         showProgressBar()
-                        if (currentFragment is VideoGridBaseFragment)
-                            (currentFragment as VideoGridBaseFragment).unbindViews()
+                        if (currentFragment is live.hms.videogrid.VideoGridBaseFragment)
+                            (currentFragment as live.hms.videogrid.VideoGridBaseFragment).unbindViews()
                     }
                 }
 
@@ -730,8 +729,8 @@ class MeetingFragment : Fragment() {
                 }
                 is MeetingState.Reconnected -> {
                     hideProgressBar()
-                    if (currentFragment is VideoGridBaseFragment)
-                        (currentFragment as VideoGridBaseFragment).bindViews()
+                    if (currentFragment is live.hms.videogrid.VideoGridBaseFragment)
+                        (currentFragment as live.hms.videogrid.VideoGridBaseFragment).bindViews()
 
                     isMeetingOngoing = true
                 }

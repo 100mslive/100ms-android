@@ -13,16 +13,18 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.common.util.helpers.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
-import live.hms.roomkit.util.NameUtils
+import live.hms.common.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.videogrid.GridViewModel
+import live.hms.videogrid.VideoGridAdapter
 import org.webrtc.RendererCommon
 
 class VideoGridFragment : Fragment() {
@@ -36,6 +38,7 @@ class VideoGridFragment : Fragment() {
     private lateinit var clipboard: ClipboardManager
 
     private val meetingViewModel: MeetingViewModel by activityViewModels()
+    private val gridViewModel: GridViewModel by activityViewModels()
 
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
@@ -54,7 +57,7 @@ class VideoGridFragment : Fragment() {
     ): View {
         binding = FragmentGridVideoBinding.inflate(inflater, container, false)
         settings = SettingsStore(requireContext())
-
+        gridViewModel.initHMSSDK(meetingViewModel.hmsSDK)
         initVideoGrid()
         initViewModels()
         return binding.root
@@ -129,7 +132,7 @@ class VideoGridFragment : Fragment() {
         }
 
 
-        meetingViewModel.tracks.observe(viewLifecycleOwner) {
+        gridViewModel.getTrackLiveData().observe(viewLifecycleOwner) {
             val localMeeting = it.filter { it.isLocal }.firstOrNull()
 
             //show or hide inset
@@ -178,7 +181,7 @@ class VideoGridFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
-        meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+        gridViewModel.getTrackLiveData().observe(viewLifecycleOwner) { tracks ->
 
             val screenShareTrackList = tracks.filter { it.isScreen }
             var newRowCount = 0
@@ -203,7 +206,7 @@ class VideoGridFragment : Fragment() {
                 binding.localScreenShareContainer.visibility = View.GONE
             }
 
-            meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value = Pair(newRowCount, newColumnCount)
+            gridViewModel.updateRowAndColumnSpanForVideoPeerGrid.value = Pair(newRowCount, newColumnCount)
 
             val itemsPerPage = newRowCount * newColumnCount
             // Without this, the extra inset adds one more tile than they should

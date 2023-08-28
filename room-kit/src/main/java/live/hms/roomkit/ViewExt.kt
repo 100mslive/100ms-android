@@ -19,7 +19,7 @@ import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
 import live.hms.roomkit.R
-import live.hms.roomkit.helpers.OnSingleClickListener
+import live.hms.common.util.helpers.OnSingleClickListener
 import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -270,72 +270,3 @@ fun SurfaceViewRenderer.isInit() : Boolean {
 }
 
 
-fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
-
-    val cameraControl: CameraControl = (track as? HMSLocalVideoTrack)?.getCameraControl() ?: return
-    var lastZoom = cameraControl.getMinZoom()
-
-    val gestureDetector = GestureDetectorCompat(context, object : GestureDetector.SimpleOnGestureListener() {
-
-        override fun onDown(e: MotionEvent) = true
-        override fun onSingleTapUp(event: MotionEvent): Boolean {
-            if (cameraControl.isTapToFocusSupported())
-            cameraControl.setTapToFocusAt(
-                 event.x,
-                 event.y,
-                viewWidth = width,
-                viewHeight = height
-            )
-            return true
-        }
-
-        override fun onDoubleTap(e: MotionEvent): Boolean {
-
-            val cachePath = File(context.cacheDir, "images")
-            cachePath.mkdirs()
-            val imageSavePath = File(cachePath, "image.jpeg")
-
-            cameraControl.captureImageAtMaxSupportedResolution(imageSavePath) { it ->
-
-                val fileSaveUri = FileProvider.getUriForFile(
-                    context,
-                    "live.hms.roomkit.provider",
-                    imageSavePath
-                )
-
-                onImageCapture.invoke(fileSaveUri)
-            }
-            return true
-        }
-
-        override fun onLongPress(e: MotionEvent) {
-            onLongPress.invoke()
-        }
-
-
-
-    })
-
-    val scaleGestureDetector = ScaleGestureDetector(
-        context,
-        object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-            override fun onScale(detector: ScaleGestureDetector): Boolean {
-                if (cameraControl.isZoomSupported()) {
-                    lastZoom *= detector.scaleFactor
-                    cameraControl.setZoom(lastZoom)
-                    return true
-                }
-                return false
-            }
-        })
-
-    this.setOnTouchListener { _, event ->
-        var didConsume = scaleGestureDetector.onTouchEvent(event)
-        if (!scaleGestureDetector.isInProgress) {
-            didConsume = gestureDetector.onTouchEvent(event)
-        }
-        didConsume
-    }
-
-
-}

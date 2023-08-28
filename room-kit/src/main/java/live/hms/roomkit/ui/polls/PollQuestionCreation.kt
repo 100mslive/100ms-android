@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.util.setOnSingleClickListener
+import live.hms.common.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 
 /**

@@ -11,12 +11,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.Flow
 import live.hms.roomkit.databinding.ListItemVideoBinding
-import live.hms.roomkit.helpers.NetworkQualityHelper
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.common.util.helpers.NetworkQualityHelper
+import live.hms.common.util.helpers.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.util.NameUtils
+import live.hms.common.util.NameUtils
 import live.hms.roomkit.util.visibility
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSPeerUpdate

@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
 import android.Manifest.permission.BLUETOOTH_CONNECT
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -10,10 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import kotlinx.coroutines.launch
@@ -21,6 +17,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
+import live.hms.videogrid.GridViewModel
+import live.hms.videogrid.GridViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.ROOM_CODE
 import live.hms.roomkit.util.ROOM_PREBUILT
@@ -41,6 +39,12 @@ class MeetingActivity : AppCompatActivity() {
     MeetingViewModelFactory(
       application,
     )
+  }
+
+  private val gridViewModel : live.hms.videogrid.GridViewModel by viewModels {
+      live.hms.videogrid.GridViewModelFactory(
+          application
+      )
   }
 
   override fun onCreate(savedInstanceState: Bundle?) {
