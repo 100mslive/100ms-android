@@ -155,11 +155,13 @@
     <!-- Footer menu -->
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
+        android:visibility="gone"
         android:layout_alignParentStart="true"
         android:layout_width="match_parent"
         android:layout_height="300dp"
+        android:paddingBottom="?attr/actionBarSize"
         tools:listitem="@layout/list_item_chat"
-        android:layout_above="@+id/chatView"
+        android:layout_alignBottom="@id/chatView"
         />
 
     <RelativeLayout

@@ -1,7 +1,15 @@
 package live.hms.roomkit.ui.meeting.chat
 
+import android.util.Log
+import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.LinearSmoothScroller
+
+import androidx.recyclerview.widget.RecyclerView
+
+
+
 
 /**
  * Meant to listen to the adapter and set up the observerables that will
@@ -12,19 +20,27 @@ class ChatUseCase {
     fun initiate(messages: MutableLiveData<ArrayList<ChatMessage>>,
                  viewlifecycleOwner: LifecycleOwner,
                  chatAdapter: ChatAdapter,
-                 recyclerview: SingleSideFadeRecyclerview) {
+                 recyclerview: SingleSideFadeRecyclerview,
+    chatViewModel: ChatViewModel) {
+
         recyclerview.adapter = chatAdapter
         messages.observe(viewlifecycleOwner) {
             chatAdapter.submitList(it)
-            recyclerview.postDelayed({
-                val position = it.size - 1
-                if(position < 0)
-                    return@postDelayed
+            val position = it.size - 1
+            if(position >= 0) {
                 // Without this sometimes the view won't update.
-                chatAdapter.notifyItemChanged(position ,null)
+                chatAdapter.notifyItemInserted(position)
                 // Scroll to the new message
-                recyclerview.smoothScrollToPosition(position)
-            }, 300)
+                val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(recyclerview.context) {
+                    override fun getVerticalSnapPreference(): Int {
+                        return SNAP_TO_START
+                    }
+                }
+                smoothScroller.targetPosition = position
+                recyclerview.layoutManager!!.startSmoothScroll(smoothScroller)
+                if(recyclerview.visibility == View.VISIBLE)
+                    chatViewModel.unreadMessagesCount.postValue(0)
+            }
         }
     }
 }
