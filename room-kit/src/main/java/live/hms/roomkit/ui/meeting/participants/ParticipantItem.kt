@@ -5,7 +5,7 @@ import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemPeerListBinding
 import live.hms.common.util.helpers.NetworkQualityHelper
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.common.util.helpers.CustomPeerMetadata
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality

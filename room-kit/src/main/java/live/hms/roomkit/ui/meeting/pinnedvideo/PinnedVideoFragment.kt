@@ -11,8 +11,9 @@ import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import live.hms.common.util.NameUtils
 import live.hms.roomkit.databinding.FragmentPinnedVideoBinding
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.common.util.helpers.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
@@ -231,7 +232,7 @@ class PinnedVideoFragment : Fragment() {
     if (newName != null) {
       with(binding.pinVideo) {
         name.text = newName
-        nameInitials.text = NameUtils.getInitials(newName)
+        nameInitials.text = live.hms.common.util.NameUtils.getInitials(newName)
       }
     }
   }

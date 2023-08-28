@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting.videogrid
+package live.hms.videogrid
 
 import android.app.Application
 import androidx.lifecycle.ViewModel

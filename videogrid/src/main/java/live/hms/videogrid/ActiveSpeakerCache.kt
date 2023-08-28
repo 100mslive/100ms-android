@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting.activespeaker
+package live.hms.videogrid
 
 import java.util.concurrent.ConcurrentLinkedQueue
 

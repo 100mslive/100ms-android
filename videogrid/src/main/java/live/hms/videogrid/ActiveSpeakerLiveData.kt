@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting
+package live.hms.videogrid
 
 import androidx.lifecycle.MediatorLiveData
 import live.hms.video.sdk.reactive.MeetingTrack

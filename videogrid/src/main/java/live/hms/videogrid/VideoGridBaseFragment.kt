@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting.videogrid
+package live.hms.videogrid
 
 import android.content.Context
 import android.os.Bundle
@@ -13,34 +13,18 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import live.hms.roomkit.R
-import live.hms.roomkit.databinding.GridItemVideoBinding
-import live.hms.roomkit.databinding.VideoCardBinding
-import live.hms.roomkit.helpers.NetworkQualityHelper
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
-import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.util.MediaPlayerManager
-import live.hms.roomkit.util.NameUtils
-import live.hms.roomkit.util.contextSafe
-import live.hms.roomkit.util.isValid
-import live.hms.roomkit.util.onBitMap
-import live.hms.roomkit.util.openShareIntent
-import live.hms.roomkit.util.saveCaptureToLocalCache
-import live.hms.roomkit.util.setCameraGestureListener
-import live.hms.roomkit.util.showMirrorOptions
-import live.hms.roomkit.util.showSimulcastDialog
-import live.hms.roomkit.util.showTileListDialog
-import live.hms.roomkit.util.vibrateStrong
-import live.hms.roomkit.util.visibilityOpacity
-import live.hms.video.media.tracks.HMSLocalVideoTrack
-import live.hms.video.media.tracks.HMSRemoteVideoTrack
+import live.hms.common.util.NameUtils
+import live.hms.common.util.helpers.CustomPeerMetadata
+import live.hms.common.util.helpers.NetworkQualityHelper
+import live.hms.common.util.setCameraGestureListener
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.videogrid.databinding.HmsGridItemBinding
+import live.hms.videogrid.databinding.HmsVideoCardBinding
+import live.hms.videogrid.utils.contextSafe
+import live.hms.videogrid.utils.visibilityOpacity
 import live.hms.videoview.HMSVideoView
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
@@ -77,13 +61,11 @@ abstract class VideoGridBaseFragment : Fragment() {
   private var gridColumnCount = 0
 
   data class RenderedViewPair(
-    val binding: GridItemVideoBinding,
+    val binding: HmsGridItemBinding,
     val meetingTrack: live.hms.video.sdk.reactive.MeetingTrack,
-    val statsInterpreter: StatsInterpreter?,
   )
 
   protected val renderedViews = ArrayList<RenderedViewPair>()
-  private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
   protected val gridViewModel by activityViewModels<GridViewModel>()
 
   internal fun shouldUpdateRowOrGrid(rowCount: Int, columnCount: Int) : Boolean{
@@ -186,19 +168,20 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   }
 
-  private fun createVideoView(parent: ViewGroup): GridItemVideoBinding {
-     val binding = GridItemVideoBinding.inflate(
+  private fun createVideoView(parent: ViewGroup): HmsGridItemBinding {
+     val binding = HmsGridItemBinding.inflate(
       LayoutInflater.from(requireContext()),
       parent,
       false
     )
-    binding.videoCard.applyTheme()
+    //TODO add
+    //binding.videoCard.applyTheme()
 
     return binding
   }
 
   protected fun bindSurfaceView(
-    binding: VideoCardBinding,
+    binding: HmsVideoCardBinding,
     item: live.hms.video.sdk.reactive.MeetingTrack,
     scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
   ) {
@@ -217,7 +200,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           true
         }
         binding.hmsVideoView.setCameraGestureListener(item.video, {
-          activity?.openShareIntent(it)
+
         },
         onLongPress = {(binding.hmsVideoView as? SurfaceViewRenderer)?.let { surfaceView -> openDialog(surfaceView, item.video, item.peer.name.orEmpty()) }})
       }
@@ -231,36 +214,18 @@ abstract class VideoGridBaseFragment : Fragment() {
   ) {
 
     contextSafe { context, activity ->
-      context.showTileListDialog (
-        isLocalTrack = videoTrack is HMSLocalVideoTrack,
-        onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
-        onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
-        onMirror = { context.showMirrorOptions(surfaceView)}
-      )
+//      context.showTileListDialog (
+//        isLocalTrack = videoTrack is HMSLocalVideoTrack,
+//        onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
+//        onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
+//        onMirror = { context.showMirrorOptions(surfaceView)}
+//      )
     }
   }
 
-  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {
+  private fun captureVideoFrame(surfaceView: SurfaceViewRenderer?, videoTrack: HMSVideoTrack?) {}
 
-    //safe check incase video
-    if (videoTrack.isValid().not()){
-      return
-    }
-
-    contextSafe { context, activity -> mediaPlayerManager.startPlay(R.raw.camera_shut, context )}
-    surfaceView?.vibrateStrong()
-
-    surfaceView?.onBitMap(onBitmap = { bitmap ->
-      contextSafe { context, activity ->
-        //stores the bitmap in local cache thus avoiding any permission
-        val uri = bitmap?.saveCaptureToLocalCache(context)
-        //the uri is used to open share intent
-        uri?.let { activity.openShareIntent(it) }
-      }
-    })
-  }
-
-  protected fun bindVideo(binding: VideoCardBinding, item: live.hms.video.sdk.reactive.MeetingTrack) {
+  protected fun bindVideo(binding: HmsVideoCardBinding, item: live.hms.video.sdk.reactive.MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
     //binding.applyTheme()
@@ -303,7 +268,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     setVideoGridRowsAndColumns(3, 2)
   }
   protected fun unbindSurfaceView(
-    binding: VideoCardBinding,
+    binding: HmsVideoCardBinding,
     item: live.hms.video.sdk.reactive.MeetingTrack,
     metadata: String = ""
   ) {
@@ -357,7 +322,7 @@ abstract class VideoGridBaseFragment : Fragment() {
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo, if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
             //handling simulcast case since we are updating local reference it thinks it's an update instead of rebinding it
-            renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
+            //renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
           val downlinkScore = newVideo.peer.networkQuality?.downlinkQuality
           updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
@@ -372,7 +337,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
           // Create a new view
           val videoBinding = createVideoView(layout)
-          var statsInterpreter: StatsInterpreter? = null
+//          var statsInterpreter: StatsInterpreter? = null
           if (!isVideoGrid) {
 //            statsInterpreter = StatsInterpreter(settings.showStats)
 //            meetingViewModel.statsToggleLiveData.observe(this) {
@@ -403,7 +368,7 @@ abstract class VideoGridBaseFragment : Fragment() {
             visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isBRBOn == true)
 
           layout.addView(videoBinding.root)
-          newRenderedViews.add(RenderedViewPair(videoBinding, newVideo, statsInterpreter))
+          newRenderedViews.add(RenderedViewPair(videoBinding, newVideo))
         }
       }
     }
@@ -460,7 +425,8 @@ abstract class VideoGridBaseFragment : Fragment() {
   fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
     NetworkQualityHelper.getNetworkResource(downlinkScore, context).let { drawable ->
       if (downlinkScore == 0) {
-        imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
+        //TODO
+        //imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
       } else {
         imageView.colorFilter = null
       }

@@ -6,7 +6,7 @@ import androidx.annotation.MainThread
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.databinding.ListItemAudioBinding
-import live.hms.roomkit.util.NameUtils
+import live.hms.common.util.NameUtils
 import live.hms.roomkit.util.visibility
 
 class AudioItemsAdapter : RecyclerView.Adapter<AudioItemsAdapter.AudioViewHolder>() {

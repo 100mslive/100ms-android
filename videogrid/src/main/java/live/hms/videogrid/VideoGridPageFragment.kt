@@ -1,12 +1,12 @@
-package live.hms.roomkit.ui.meeting.videogrid
+package live.hms.videogrid
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import live.hms.roomkit.databinding.FragmentVideoGridPageBinding
-import live.hms.roomkit.util.viewLifecycle
+import live.hms.common.databinding.FragmentVideoGridPageBinding
+import live.hms.videogrid.utils.viewLifecycle
 import kotlin.math.min
 
 class VideoGridPageFragment : VideoGridBaseFragment() {

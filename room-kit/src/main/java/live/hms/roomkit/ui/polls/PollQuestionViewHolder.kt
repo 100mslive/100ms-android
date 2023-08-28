@@ -12,7 +12,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
-import live.hms.roomkit.util.setOnSingleClickListener
+import live.hms.common.util.setOnSingleClickListener
 
 private var count : Long = 0
 sealed class QuestionUi(open val index : Long, open val viewType : Int, open val requiredToAnswer : Boolean){

@@ -9,7 +9,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.databinding.HlsBottomSheetDialogBinding
 import live.hms.roomkit.ui.meeting.participants.meetingToHlsUrl
-import live.hms.roomkit.util.setOnSingleClickListener
+import live.hms.common.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSHlsRecordingConfig
 

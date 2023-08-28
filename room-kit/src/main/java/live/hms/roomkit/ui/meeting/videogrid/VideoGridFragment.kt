@@ -13,16 +13,18 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.common.util.helpers.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
-import live.hms.roomkit.util.NameUtils
+import live.hms.common.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.videogrid.GridViewModel
+import live.hms.videogrid.VideoGridAdapter
 import org.webrtc.RendererCommon
 
 class VideoGridFragment : Fragment() {

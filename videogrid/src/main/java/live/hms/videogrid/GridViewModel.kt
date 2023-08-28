@@ -1,12 +1,10 @@
-package live.hms.roomkit.ui.meeting.videogrid
+package live.hms.videogrid
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
-import live.hms.roomkit.ui.meeting.ActiveSpeakerLiveData
-import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.video.sdk.HMSAudioListener
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.HMSSpeaker

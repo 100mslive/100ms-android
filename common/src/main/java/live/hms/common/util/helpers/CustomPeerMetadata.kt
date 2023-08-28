@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.meeting
+package live.hms.common.util.helpers
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException

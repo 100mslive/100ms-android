@@ -1,6 +1,5 @@
-package live.hms.roomkit.ui.meeting.activespeaker
+package live.hms.videogrid
 
-import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.utils.HMSLogger
 class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val numActiveSpeakerVideos : Int = 4, private val getTracks: () -> ArrayList<live.hms.video.sdk.reactive.MeetingTrack>) {

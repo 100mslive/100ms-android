@@ -1,6 +1,6 @@
-package live.hms.roomkit.ui.meeting.videogrid
+package live.hms.videogrid
 
-import live.hms.roomkit.ui.meeting.MeetingTrack
+import live.hms.video.sdk.reactive.MeetingTrack
 
 data class VideoGridPageItem(
   val id: Long,
