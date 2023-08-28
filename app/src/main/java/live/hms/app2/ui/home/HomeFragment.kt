@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,7 +27,6 @@ import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.EmailUtils
 import live.hms.app2.util.*
-import live.hms.roomkit.util.NameUtils.isValidUserName
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.HMSRoomKit
 import live.hms.roomkit.ui.meeting.*
@@ -248,6 +248,15 @@ class HomeFragment : Fragment() {
             }
         }
     }
+
+    fun isValidUserName(editText: EditText): Boolean {
+        val username = editText.text.toString()
+        if (username.isEmpty()) {
+            return false
+        }
+        return true
+    }
+
 
     private fun enableButton() {
         binding.btnJoinNow.isEnabled = true
