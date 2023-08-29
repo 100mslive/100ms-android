@@ -26,6 +26,7 @@ import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 class ParticipantsFragment : BottomSheetDialogFragment() {
 
@@ -74,15 +75,16 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         val canChangeRole = meetingViewModel.isAllowedToChangeRole()
         val canMutePeers = meetingViewModel.isAllowedToMutePeers()
         val canRemovePeers = meetingViewModel.isAllowedToRemovePeers()
+        val localPeer = meetingViewModel.hmsSDK.getLocalPeer()!!
 
         val groups = mutableListOf<ExpandableGroup>()
         // Keep hand raised on top.
         if(groupedPeers[handRaisedKey] != null) {
-            groups.add(keyToGroup(handRaisedKey, groupedPeers, canChangeRole, canMutePeers, canRemovePeers))
+            groups.add(keyToGroup(handRaisedKey, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer))
         }
 
         groups.addAll(groupedPeers.keys.filterNot { it == handRaisedKey }.map { key ->
-            keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers)
+            keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer)
         })
 
         adapter.update(groups)
@@ -98,17 +100,20 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
         groupedPeers: Map<String, List<HMSPeer>>,
         canChangeRole: Boolean,
         canMutePeers: Boolean,
-        canRemovePeers: Boolean
+        canRemovePeers: Boolean,
+        localPeer : HMSLocalPeer
     ) : ExpandableGroup =
         ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size, ::expandedGroups))
             .apply {
                 addAll(groupedPeers[key]?.map {
                     ParticipantItem(it,
+                        localPeer,
                         meetingViewModel::togglePeerMute,
-                        ::togglePeerMedia,
+                        ::changePeerRole,
                         canChangeRole,
                         canMutePeers,
-                        canRemovePeers
+                        canRemovePeers,
+                        meetingViewModel.participantLabelInfo
                     )
                 }!!)
                 // If the group was expanded, open it again.
@@ -117,13 +122,8 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                 }
             }
 
-    private fun togglePeerMedia(remotePeerId : String) {
-            val toRole = meetingViewModel.getAvailableRoles()
-                .find { role-> role.name.contains("viewer") || role.name.contains("guest") }
-            if (toRole != null) {
-                meetingViewModel.changeRole(remotePeerId, toRole.name, true)
-            }
-    }
+    private fun changePeerRole(remotePeerId : String, toRole : String) =
+        meetingViewModel.changeRole(remotePeerId, toRole, true)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
