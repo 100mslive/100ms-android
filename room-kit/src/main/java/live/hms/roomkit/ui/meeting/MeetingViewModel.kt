@@ -970,6 +970,15 @@ class MeetingViewModel(
         })
     }
 
+    private fun getCurrentRoleChangeRequest() = pendingRoleChange
+
+    fun getTrackForRolePendingChangeRequest(rolePreviewListener: RolePreviewListener) {
+        val request = getCurrentRoleChangeRequest()
+        request?.suggestedRole?.let { role ->
+            hmsSDK.preview(role, rolePreviewListener)
+        }
+    }
+
     private fun getMeetingTrack(trackId: String?): MeetingTrack? {
         return if (trackId == null)
             null

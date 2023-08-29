@@ -162,12 +162,14 @@ class VideoGridFragment : Fragment() {
                         binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
                     binding.minimizedIconVideoOff.isEnabled = false
                     binding.localHmsVideoView?.visibility = View.INVISIBLE
+                    binding.localHmsVideoView?.alpha = 0f
                     binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
                 } else {
                     if (binding.minimizedIconVideoOff.isEnabled.not())
                         binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on)
                     binding.minimizedIconVideoOff.isEnabled = true
                     binding.localHmsVideoView?.visibility = View.VISIBLE
+                    binding.localHmsVideoView?.alpha = 1f
                     it.video?.let { binding.localHmsVideoView?.addTrack(it) }
                 }
 

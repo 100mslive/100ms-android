@@ -18,9 +18,9 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingTop="24dp"
-            android:paddingBottom="16dp">
+            android:paddingHorizontal="24dp"
+            android:paddingTop="16dp"
+            >
 
             <TextView
                 android:id="@+id/title"
@@ -50,12 +50,13 @@
         <View
             android:id="@+id/border5"
             android:layout_width="match_parent"
-            android:layout_height="0.5px"
-            android:layout_marginHorizontal="16dp"
+            android:layout_height="1dp"
+            android:layout_marginVertical="16dp"
             android:background="@drawable/gray_line_vertical_divider" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginVertical="@dimen/sizeteen_dp"
+            android:layout_marginBottom="@dimen/sizeteen_dp"
+            android:layout_marginHorizontal="20dp"
             android:id="@+id/options_grid"
             android:nestedScrollingEnabled="false"
             android:layout_width="match_parent"

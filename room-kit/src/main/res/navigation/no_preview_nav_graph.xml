@@ -18,6 +18,10 @@
             app:nullable="false" />
 
         <action
+            android:id="@+id/action_MeetingFragment_to_RolePreviewFragment"
+            app:destination="@id/RolePreviewFragment" />
+
+        <action
             android:id="@+id/action_MeetingFragment_to_ChatBottomSheetFragment"
             app:destination="@id/ChatBottomSheetFragment" />
         <action
@@ -73,6 +77,19 @@
         <action
             android:id="@+id/action_ParticipantsFragment_to_BottomSheetRoleChange"
             app:destination="@id/BottomSheetRoleChange" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/RolePreviewFragment"
+        android:name="live.hms.roomkit.ui.role.RolePreviewFragment"
+        android:label="@string/role_preview_fragment"
+        tools:layout="@layout/fragment_participants">
+
+        <action
+            app:launchSingleTop="true"
+            android:id="@+id/action_RolePreviewFragment_to_MeetingFragment"
+            app:destination="@id/MeetingFragment" />
+
     </fragment>
 
     <fragment

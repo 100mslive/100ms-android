@@ -64,7 +64,7 @@ class SessionOptionBottomSheet(
                     getColorOrDefault(
                         HMSPrebuiltTheme.getColours()?.backgroundDefault,
                         HMSPrebuiltTheme.getDefaults().background_default
-                    ), resources.getDimension(R.dimen.four_dp).toInt(), "inset", "inset"
+                    ), resources.getDimension(R.dimen.twelve_dp).toInt(), "inset", "inset"
                 )
             )
             layoutManager = GridLayoutManager(

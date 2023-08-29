@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.Shader
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
@@ -25,9 +26,11 @@ import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.databinding.FragmentRolePreviewBinding
 import live.hms.roomkit.databinding.ItemGridOptionBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
+import live.hms.roomkit.ui.role.RolePreviewFragment
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -131,16 +134,17 @@ internal fun ImageView.setIconEnabled(
     )
     val shapedrawable = ShapeDrawable()
     val mDensity = getResources().getDisplayMetrics().density;
-    val r: Float = 10 * mDensity
+    val r: Float = getResources().getDimension(R.dimen.eight_dp)
     val radii = floatArrayOf(r, r, r, r, r, r, r, r)
 
-    shapedrawable.shape = RoundRectShape(radii, null, null)
+    shapedrawable.shape = RoundRectShape(radii, null, radii.map { it/4 }.toFloatArray())
     shapedrawable.paint.color =  getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.secondaryBright,
         HMSPrebuiltTheme.getDefaults().border_bright
     )
+
     shapedrawable.paint.isAntiAlias = true
-    shapedrawable.paint.strokeWidth = r/3
+    shapedrawable.paint.strokeWidth = getResources().getDimension(R.dimen.two_dp) / 1.5f
     shapedrawable.paint.style = Paint.Style.STROKE
 
 
@@ -442,6 +446,87 @@ internal fun VideoCardBinding.applyTheme() {
 internal fun BottomSheetAudioSwitchBinding.applyTheme() {
 }
 
+internal fun FragmentRolePreviewBinding.applyTheme() {
+    buttonJoinMeeting.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    buttonJoinMeeting.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    previewCard.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDim, HMSPrebuiltTheme.getDefaults().surface_default
+    )
+
+
+    videoContainerBackground.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+
+    previewBottomBar.setBackgroundColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+
+    nameInitials.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_80
+    )
+
+    nameInitials.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
+        )
+    )
+
+
+    buttonJoinMeeting.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    declineButton.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+        HMSPrebuiltTheme.getDefaults().background_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+
+    declineButton.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+
+//    buttonJoinMeeting.setBackgroundColor(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.primaryDefault,
+//            HMSPrebuiltTheme.getDefaults().primary_default
+//        )
+//    )
+
+    //only init state
+    buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
+    buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
+    buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
+
+}
+//internal fun FragmentRolePreview.applyTheme() {
+//
+//}
 internal fun FragmentPreviewBinding.applyTheme() {
 
     buttonJoinMeeting.setTextColor(
