@@ -199,7 +199,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (earlyExit) return
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
-        view.setScalingType(scalingType)
+        view.setScalingType(if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
         view.addTrack(track)
         view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE

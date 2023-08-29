@@ -973,6 +973,31 @@ class MeetingViewModel(
         })
     }
 
+    fun getCurrentRoleChangeRequest() = pendingRoleChange
+
+    fun getTrackForRolePendingChangeRequest(rolePreviewListener: RolePreviewListener) {
+        val request = getCurrentRoleChangeRequest()
+        request?.suggestedRole?.let { role ->
+            hmsSDK.preview(role, object : RolePreviewListener {
+                override fun onError(error: HMSException) {
+                    rolePreviewListener.onError(error)
+                }
+
+                override fun onTracks(localTracks: Array<HMSTrack>) {
+                    rolePreviewListener.onTracks(localTracks)
+                }
+
+                override fun onPermissionsRequested(permissions : List<String>) {
+                    viewModelScope.launch {
+                        _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                    }
+                }
+
+
+            })
+        }
+    }
+
     private fun getMeetingTrack(trackId: String?): MeetingTrack? {
         return if (trackId == null)
             null
@@ -1020,28 +1045,42 @@ class MeetingViewModel(
         state.postValue(MeetingState.Ongoing())
     }
 
-    fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {
-        hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener {
-            override fun onSuccess() {
-                Log.i(TAG, "Successfully accepted change role request for $hmsRoleChangeRequest")
-            }
+    fun changeRoleAccept(onSuccess:() -> Unit = {}, onFailure:() -> Unit = {}) {
+        pendingRoleChange?.let {
+            hmsSDK.acceptChangeRole(it, object : HMSActionResultListener {
+                override fun onSuccess() {
+                    setStatetoOngoing()
+                    updateThemeBasedOnCurrentRole(it.suggestedRole)
+                    onSuccess.invoke()
+                }
 
-            override fun onError(error: HMSException) {
-                Log.e(TAG, "Error while accepting change role request :: ${error.description}")
-                state.postValue(MeetingState.NonFatalFailure(error))
-            }
-        })
+                override fun onError(error: HMSException) {
+                    onFailure.invoke()
+                    setStatetoOngoing()
+                    Log.e(TAG, "Error while accepting change role request :: ${error.description}")
+                    state.postValue(MeetingState.NonFatalFailure(error))
+                }
+            })
+
+        }
     }
 
-    private fun isHlsPeer(role: HMSRole?): Boolean =
-        role?.name?.startsWith("hls-") == true
+    private fun updateThemeBasedOnCurrentRole(suggestedRole: HMSRole) {
+        hmsRoomLayout?.data?.findLast { it?.role == suggestedRole.name }?.themes?.getOrNull(0)?.palette?.let {
+            setTheme(it)
+        }
+    }
+
+    private fun isHlsPeer(localRole: HMSRole?) : Boolean{
+          return  hmsRoomLayout?.data?.findLast { it?.role ==  localRole?.name }?.screens?.conferencing?.hlsLiveStreaming != null
+    }
 
     private fun switchToHlsView(streamUrl: String) =
         meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
 
     private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
         if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS_VIEWER) {
-            meetingViewMode.postValue(MeetingViewMode.ACTIVE_SPEAKER)
+            meetingViewMode.postValue(MeetingViewMode.GRID)
         }
     }
 

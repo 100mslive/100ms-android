@@ -54,6 +54,8 @@
         android:fontFamily="@font/inter_semibold"
         android:lineHeight="16sp"
         android:textSize="12sp"
+        android:gravity="center"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/participant_image"

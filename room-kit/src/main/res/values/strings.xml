@@ -6,6 +6,7 @@
     <string name="meeting_fragment">Meeting Fragment</string>
     <string name="chat_fragment">Chat Fragment</string>
     <string name="participants_fragment">Participants Fragment</string>
+    <string name="role_preview_fragment">Role Preview Fragment</string>
 
 
     <string name="environment">Environment</string>

@@ -2,7 +2,6 @@ package live.hms.roomkit.ui.meeting
 
 import android.util.Log
 import live.hms.video.signal.init.HMSRoomLayout
-import live.hms.video.signal.init.OnStageExp
 
 class ParticipantLabelInfo() {
     private var hmsRoomLayout : HMSRoomLayout? = null
@@ -14,9 +13,10 @@ class ParticipantLabelInfo() {
         this.hmsRoomLayout = hmsRoomLayout
         hmsRoomLayout?.data
             ?.forEach {data ->
-                if(data?.role != null) {
-                    roleMap[data.role] = data
+                data?.role?.let {
+                    roleMap[it] = data
                 }
+
             }
     }
 }
