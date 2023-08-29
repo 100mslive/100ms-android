@@ -86,7 +86,6 @@
         tools:layout="@layout/fragment_participants">
 
         <action
-            app:launchSingleTop="true"
             android:id="@+id/action_RolePreviewFragment_to_MeetingFragment"
             app:destination="@id/MeetingFragment" />
 

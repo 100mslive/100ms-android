@@ -454,6 +454,22 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
         )
     )
 
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsecondary_med_emp
+        )
+    )
+
+
+
     buttonJoinMeeting.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default,

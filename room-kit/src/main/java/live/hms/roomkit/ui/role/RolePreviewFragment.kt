@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -50,6 +51,7 @@ class RolePreviewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
+        initOnBackPress()
 
         binding.nameInitials.visibility = View.VISIBLE
         binding.previewView.visibility = View.GONE
@@ -125,18 +127,34 @@ class RolePreviewFragment : Fragment() {
             override fun onTracks(localTracks: Array<HMSTrack>) {
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
+                        var isAudioRequired : Boolean = false
+                        var isVideoRequired : Boolean = false
                         localTracks.forEach {
                             if (it is HMSLocalVideoTrack) {
+                                isVideoRequired = true
                                 localVideoTrack = it
                                 binding.previewView.addTrack(it)
                                 binding.buttonToggleVideo.visibility = View.VISIBLE
                                 setLocalVideoTrackState(it.isMute)
                             } else if (it is HMSLocalAudioTrack) {
                                 localAudioTrack = it
+                                isAudioRequired = true
                                 binding.buttonToggleAudio.visibility = View.VISIBLE
                                 setLocalAudioTrackState(it.isMute)
                             }
                         }
+
+                        if (isAudioRequired.not() && isVideoRequired.not()) {
+                            binding.heading.visibility = View.GONE
+                            binding.subheading.visibility = View.GONE
+                        } else if (isAudioRequired && isVideoRequired.not()) {
+                            binding.subheading.text = getString(R.string.audio_only_subheading)
+                        } else if (isAudioRequired.not() && isVideoRequired) {
+                            binding.subheading.text = getString(R.string.video_only_subheading)
+                        } else {
+                            binding.subheading.text = getString(R.string.audio_video_subheading)
+                        }
+                        binding.subheading.visibility = View.VISIBLE
                     }
                 }
             }
@@ -164,14 +182,28 @@ class RolePreviewFragment : Fragment() {
         }
     }
 
+
+    private fun initOnBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    binding?.previewView?.removeTrack()
+                    findNavController().popBackStack()
+                }
+            })
+    }
+
+
+
     override fun onStop() {
         super.onStop()
         //binding.previewView.removeTrack()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.previewView.removeTrack()
     }
 
     override fun onDetach() {
