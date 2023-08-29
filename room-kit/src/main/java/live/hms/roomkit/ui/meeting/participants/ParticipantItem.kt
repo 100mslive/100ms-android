@@ -1,5 +1,7 @@
 package live.hms.roomkit.ui.meeting.participants
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
@@ -48,8 +50,8 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                             true
                         }
                         R.id.remove_from_stage -> {
-                            // TODO What role is supposed to be picked for offstage
                             val role = participantLabelInfo.onStageExp(viewerPeer.hmsRole.name)?.offStageRoles?.firstOrNull()
+                            Log.d("RolesChangingTo","$role offstage")
                             if(role != null)
                                 changeRole(hmsPeer.peerID, role)
                             true
@@ -75,17 +77,26 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
     }
 
     private fun getMenuForGroup(forPeer: HMSPeer): Int {
-        val isHandRaised = CustomPeerMetadata.fromJson(forPeer.metadata)?.isHandRaised == true
-                && forPeer.hmsRole.name.lowercase() != "broadcaster" && forPeer.hmsRole.name.lowercase() != "host"
+        val isOffStageRole =
+            participantLabelInfo.onStageExp("broadcaster")?.offStageRoles?.contains(
+                forPeer.hmsRole.name
+            ) == true
+        val isOnStageButNotBroadcasterRole = participantLabelInfo.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
 
-        return if(isHandRaised)
+        val isHandRaised = CustomPeerMetadata.fromJson(forPeer.metadata)?.isHandRaised == true
+                // You have to be in the offstage roles to be categorized as hand raised
+                && isOffStageRole
+
+        return if (isHandRaised)
             R.menu.menu_participant_hand_raise
-        else
-            when(forPeer.hmsRole.name.lowercase()) {
-                "broadcaster" -> R.menu.menu_broadcaster
-    //                "hls-viewer" -> R.menu
-                else -> R.menu.menu_participant
-            }
+        else if (isOffStageRole) {
+            R.menu.menu_participant
+        } else if(isOnStageButNotBroadcasterRole) {
+            R.menu.menu_participant_onstage_not_broadcaster
+        }
+        else {
+            R.menu.menu_broadcaster
+        }
     }
 
     private fun updateHandRaise(metadata: String, viewBinding: ListItemPeerListBinding) {
