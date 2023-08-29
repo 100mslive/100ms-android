@@ -14,6 +14,11 @@
         android:title="Lower Hand"
         />
     <item
+        android:id="@+id/toggle_audio"
+        android:icon="@drawable/ic_mic_toggle_off"
+        android:title="Audio toggle"
+        />
+    <item
         android:id="@+id/toggle_video"
         android:icon="@drawable/ic_videocam_off_24"
         android:title="Toggle Video"
