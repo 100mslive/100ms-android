@@ -136,8 +136,8 @@ class SessionOptionBottomSheet(
             raiseHandOption.setSelectedButton(it)
         }
 
-        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
-            peerListOption.setParticpantCountUpdate(it.second.peerCount)
+        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
+            peerListOption.setParticpantCountUpdate(it)
         }
 
 

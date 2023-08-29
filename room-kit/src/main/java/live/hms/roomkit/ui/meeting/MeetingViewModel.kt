@@ -456,13 +456,13 @@ class MeetingViewModel(
                 // This will keep the isRecording value updated correctly in preview. It will not be called after join.
                 _isRecording.postValue(getRecordingState(hmsRoom))
                 if (type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
-                    Log.d(TAG, "New peer count is : ${hmsRoom.peerCount}")
+                    peerCount.postValue(hmsRoom.peerCount)
                 }
             }
 
         })
     }
-
+    val peerCount = MutableLiveData(0)
     fun setLocalVideoEnabled(enabled: Boolean) {
 
         hmsSDK.getLocalPeer()?.videoTrack?.apply {
@@ -790,6 +790,7 @@ class MeetingViewModel(
                 Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
 
                 when (type) {
+                    HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> peerCount.postValue(hmsRoom.peerCount)
                     HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)

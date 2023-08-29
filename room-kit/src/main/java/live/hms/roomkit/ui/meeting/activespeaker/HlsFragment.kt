@@ -97,7 +97,7 @@ class HlsFragment : Fragment() {
 
         setPlayerStatsListener(true)
 
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel)
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {
