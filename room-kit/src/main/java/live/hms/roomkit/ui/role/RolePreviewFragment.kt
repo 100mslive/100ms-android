@@ -10,7 +10,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentRolePreviewBinding
-import live.hms.roomkit.databinding.RolePreviewBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
