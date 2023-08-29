@@ -51,8 +51,9 @@ class RolePreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
 
-        findNavController()
         binding.nameInitials.visibility = View.VISIBLE
+        binding.previewView.visibility = View.GONE
+
         binding.buttonToggleVideo.setOnClickListener {
             localVideoTrack?.let { videoTrack ->
                 if (videoTrack.isMute) {
@@ -147,11 +148,11 @@ class RolePreviewFragment : Fragment() {
         if (mute.not()) {
             binding.previewView.visibility = View.VISIBLE
             binding.nameInitials.visibility = View.GONE
-            binding.buttonToggleAudio.setIconEnabled(R.drawable.avd_video_off_to_on)
+            binding.buttonToggleVideo.setIconEnabled(R.drawable.avd_video_off_to_on)
         } else {
             binding.previewView.visibility = View.GONE
             binding.nameInitials.visibility = View.VISIBLE
-            binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_video_on_to_off)
+            binding.buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
         }
     }
 

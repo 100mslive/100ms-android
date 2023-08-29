@@ -978,7 +978,23 @@ class MeetingViewModel(
     fun getTrackForRolePendingChangeRequest(rolePreviewListener: RolePreviewListener) {
         val request = getCurrentRoleChangeRequest()
         request?.suggestedRole?.let { role ->
-            hmsSDK.preview(role, rolePreviewListener)
+            hmsSDK.preview(role, object : RolePreviewListener {
+                override fun onError(error: HMSException) {
+                    rolePreviewListener.onError(error)
+                }
+
+                override fun onTracks(localTracks: Array<HMSTrack>) {
+                    rolePreviewListener.onTracks(localTracks)
+                }
+
+                override fun onPermissionsRequested(permissions : List<String>) {
+                    viewModelScope.launch {
+                        _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                    }
+                }
+
+
+            })
         }
     }
 
@@ -1050,22 +1066,21 @@ class MeetingViewModel(
     }
 
     private fun updateThemeBasedOnCurrentRole(suggestedRole: HMSRole) {
-        val isHlsPeer = isHlsPeer(suggestedRole)
-        exitHlsViewIfRequired(isHlsPeer)
-        if (isHlsPeer) {
-            switchToHlsViewIfRequired(suggestedRole, hmsRoom?.hlsUrl)
+        hmsRoomLayout?.data?.findLast { it?.role == suggestedRole.name }?.themes?.getOrNull(0)?.palette?.let {
+            setTheme(it)
         }
     }
 
-    private fun isHlsPeer(role: HMSRole?): Boolean =
-        role?.name?.startsWith("hls-") == true
+    private fun isHlsPeer(localRole: HMSRole?) : Boolean{
+          return  hmsRoomLayout?.data?.findLast { it?.role ==  localRole?.name }?.screens?.conferencing?.hlsLiveStreaming != null
+    }
 
     private fun switchToHlsView(streamUrl: String) =
         meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
 
     private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
         if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS_VIEWER) {
-            meetingViewMode.postValue(MeetingViewMode.ACTIVE_SPEAKER)
+            meetingViewMode.postValue(MeetingViewMode.GRID)
         }
     }
 
