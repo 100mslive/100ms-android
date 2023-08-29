@@ -13,6 +13,7 @@ import live.hms.roomkit.databinding.FragmentRolePreviewBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.ui.theme.setIconEnabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.contextSafe
@@ -51,7 +52,7 @@ class RolePreviewFragment : Fragment() {
         binding.applyTheme()
 
         findNavController()
-
+        binding.nameInitials.visibility = View.VISIBLE
         binding.buttonToggleVideo.setOnClickListener {
             localVideoTrack?.let { videoTrack ->
                 if (videoTrack.isMute) {
@@ -63,7 +64,7 @@ class RolePreviewFragment : Fragment() {
                     binding.previewView.visibility = View.GONE
                     binding.nameInitials.visibility = View.VISIBLE
                     videoTrack.setMute(true)
-                    binding.buttonToggleVideo.setIconEnabled(R.drawable.avd_video_on_to_off)
+                    binding.buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
                 }
             }
         }
@@ -78,16 +79,28 @@ class RolePreviewFragment : Fragment() {
             localAudioTrack?.let { audioTrack ->
                 if (audioTrack.isMute) {
                     audioTrack.setMute(false)
-                    binding.buttonToggleVideo.setIconEnabled(R.drawable.avd_mic_off_to_on)
+                    binding.buttonToggleAudio.setIconEnabled(R.drawable.avd_mic_off_to_on)
                 } else {
                     audioTrack.setMute(true)
-                    binding.buttonToggleVideo.setIconEnabled(R.drawable.avd_mic_on_to_off)
+                    binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
                 }
             }
         }
 
         binding.buttonJoinMeeting.setOnClickListener {
-            findNavController().navigate(RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(false))
+            meetingViewModel.changeRoleAccept(onSuccess = {
+                contextSafe { context, activity ->
+                    activity.runOnUiThread {
+                        findNavController().navigate(
+                            RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
+                                false
+                            )
+                        )
+
+                    }
+                }
+            })
+
         }
 
         binding.declineButton.setOnClickListener {
@@ -98,9 +111,12 @@ class RolePreviewFragment : Fragment() {
             override fun onError(error: HMSException) {
                 //TODO add error handling
                 contextSafe { context, activity ->
-                    Toast.makeText(
-                        requireContext(), error.message, Toast.LENGTH_SHORT
-                    ).show()
+                    activity.runOnUiThread {
+                        Toast.makeText(
+                            requireContext(), error.message, Toast.LENGTH_SHORT
+                        ).show()
+
+                    }
                 }
                 findNavController().popBackStack()
             }
@@ -113,9 +129,11 @@ class RolePreviewFragment : Fragment() {
                                 localVideoTrack = it
                                 binding.previewView.addTrack(it)
                                 binding.buttonToggleVideo.visibility = View.VISIBLE
+                                setLocalVideoTrackState(it.isMute)
                             } else if (it is HMSLocalAudioTrack) {
                                 localAudioTrack = it
                                 binding.buttonToggleAudio.visibility = View.VISIBLE
+                                setLocalAudioTrackState(it.isMute)
                             }
                         }
                     }
@@ -125,9 +143,38 @@ class RolePreviewFragment : Fragment() {
         })
     }
 
+    private fun setLocalVideoTrackState(mute: Boolean) {
+        if (mute.not()) {
+            binding.previewView.visibility = View.VISIBLE
+            binding.nameInitials.visibility = View.GONE
+            binding.buttonToggleAudio.setIconEnabled(R.drawable.avd_video_off_to_on)
+        } else {
+            binding.previewView.visibility = View.GONE
+            binding.nameInitials.visibility = View.VISIBLE
+            binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_video_on_to_off)
+        }
+    }
+
+    private fun setLocalAudioTrackState(mute: Boolean) {
+        if (mute.not()) {
+            binding.buttonToggleAudio.setIconEnabled(R.drawable.avd_mic_off_to_on)
+        } else {
+            binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        //binding.previewView.removeTrack()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+    }
+
     override fun onDetach() {
         super.onDetach()
-        binding.previewView.removeTrack()
     }
 
 

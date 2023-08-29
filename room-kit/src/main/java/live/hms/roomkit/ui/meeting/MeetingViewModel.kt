@@ -973,7 +973,7 @@ class MeetingViewModel(
         })
     }
 
-    private fun getCurrentRoleChangeRequest() = pendingRoleChange
+    fun getCurrentRoleChangeRequest() = pendingRoleChange
 
     fun getTrackForRolePendingChangeRequest(rolePreviewListener: RolePreviewListener) {
         val request = getCurrentRoleChangeRequest()
@@ -1029,17 +1029,32 @@ class MeetingViewModel(
         state.postValue(MeetingState.Ongoing())
     }
 
-    fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {
-        hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener {
-            override fun onSuccess() {
-                Log.i(TAG, "Successfully accepted change role request for $hmsRoleChangeRequest")
-            }
+    fun changeRoleAccept(onSuccess:() -> Unit = {}, onFailure:() -> Unit = {}) {
+        pendingRoleChange?.let {
+            hmsSDK.acceptChangeRole(it, object : HMSActionResultListener {
+                override fun onSuccess() {
+                    setStatetoOngoing()
+                    updateThemeBasedOnCurrentRole(it.suggestedRole)
+                    onSuccess.invoke()
+                }
 
-            override fun onError(error: HMSException) {
-                Log.e(TAG, "Error while accepting change role request :: ${error.description}")
-                state.postValue(MeetingState.NonFatalFailure(error))
-            }
-        })
+                override fun onError(error: HMSException) {
+                    onFailure.invoke()
+                    setStatetoOngoing()
+                    Log.e(TAG, "Error while accepting change role request :: ${error.description}")
+                    state.postValue(MeetingState.NonFatalFailure(error))
+                }
+            })
+
+        }
+    }
+
+    private fun updateThemeBasedOnCurrentRole(suggestedRole: HMSRole) {
+        val isHlsPeer = isHlsPeer(suggestedRole)
+        exitHlsViewIfRequired(isHlsPeer)
+        if (isHlsPeer) {
+            switchToHlsViewIfRequired(suggestedRole, hmsRoom?.hlsUrl)
+        }
     }
 
     private fun isHlsPeer(role: HMSRole?): Boolean =

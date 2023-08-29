@@ -675,7 +675,7 @@ class MeetingFragment : Fragment() {
 
                 is MeetingState.RoleChangeRequest -> {
 
-                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
+                    findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRolePreviewFragment())
 //                    alertDialog?.dismiss()
 //                    alertDialog = null
 //                    hideProgressBar()
@@ -879,7 +879,7 @@ class MeetingFragment : Fragment() {
         }
     }
 
-    private val handler = Handler(Looper.myLooper()!!)
+    private val handler by lazy { Handler(Looper.myLooper()!!) }
     private val hideRunnable = Runnable { hideControlBars() }
 
     private fun updateMeetingViewMode(mode: MeetingViewMode) {
