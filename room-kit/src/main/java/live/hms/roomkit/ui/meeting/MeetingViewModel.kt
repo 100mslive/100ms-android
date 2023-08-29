@@ -67,6 +67,8 @@ class MeetingViewModel(
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null
+        val participantLabelInfo = ParticipantLabelInfo()
+
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
@@ -171,6 +173,7 @@ class MeetingViewModel(
 
                                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                                     hmsRoomLayout = layoutConfig
+                                    participantLabelInfo.setParticipantLabelInfo(hmsRoomLayout)
                                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                                     onHMSActionResultListener.onSuccess()
