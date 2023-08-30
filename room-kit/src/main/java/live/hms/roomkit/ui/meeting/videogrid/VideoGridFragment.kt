@@ -130,7 +130,7 @@ class VideoGridFragment : Fragment() {
         }
 
         meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (video, speakers) ->
-            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level)
+            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level?:0)
 
         }
 
