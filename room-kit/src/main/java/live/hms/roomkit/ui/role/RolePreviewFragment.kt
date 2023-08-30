@@ -9,6 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentRolePreviewBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -26,7 +27,7 @@ import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.sdk.RolePreviewListener
 
-class RolePreviewFragment : Fragment() {
+class RolePreviewFragment : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<FragmentRolePreviewBinding>()
 
@@ -90,10 +91,17 @@ class RolePreviewFragment : Fragment() {
             }
         }
 
+        binding.buttonSwitchCamera.setOnClickListener {
+            localVideoTrack?.let { videoTrack ->
+                videoTrack.switchCamera()
+            }
+        }
+
         binding.buttonJoinMeeting.setOnClickListener {
             meetingViewModel.changeRoleAccept(onSuccess = {
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
+                        binding.previewView.removeTrack()
                         findNavController().navigate(
                             RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
                                 false
@@ -107,12 +115,20 @@ class RolePreviewFragment : Fragment() {
         }
 
         binding.declineButton.setOnClickListener {
-            findNavController().popBackStack()
+            meetingViewModel.setStatetoOngoing()
+            binding.previewView.removeTrack()
+            findNavController().navigate(
+                RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
+                    false
+                )
+            )
+
         }
 
         meetingViewModel.getTrackForRolePendingChangeRequest(object : RolePreviewListener {
             override fun onError(error: HMSException) {
                 //TODO add error handling
+                meetingViewModel.setStatetoOngoing()
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
                         Toast.makeText(
@@ -121,7 +137,7 @@ class RolePreviewFragment : Fragment() {
 
                     }
                 }
-                findNavController().popBackStack()
+                dismissAllowingStateLoss()
             }
 
             override fun onTracks(localTracks: Array<HMSTrack>) {
@@ -135,6 +151,8 @@ class RolePreviewFragment : Fragment() {
                                 localVideoTrack = it
                                 binding.previewView.addTrack(it)
                                 binding.buttonToggleVideo.visibility = View.VISIBLE
+                                binding.buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
+                                binding.buttonSwitchCamera.visibility = View.VISIBLE
                                 setLocalVideoTrackState(it.isMute)
                             } else if (it is HMSLocalAudioTrack) {
                                 localAudioTrack = it
@@ -188,8 +206,14 @@ class RolePreviewFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
+                    binding.previewView.removeTrack()
+                    meetingViewModel.setStatetoOngoing()
                     binding?.previewView?.removeTrack()
-                    findNavController().popBackStack()
+                    findNavController().navigate(
+                        RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
+                            false
+                        )
+                    )
                 }
             })
     }
@@ -203,7 +227,7 @@ class RolePreviewFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        binding.previewView.removeTrack()
+
     }
 
     override fun onDetach() {

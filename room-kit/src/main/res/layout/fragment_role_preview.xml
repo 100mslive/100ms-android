@@ -116,10 +116,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/heading"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:paddingVertical="@dimen/eight_dp"
+                android:paddingBottom="@dimen/eight_dp"
+
                 android:paddingHorizontal="16dp"
                 android:textSize="14sp"
-                android:visibility="gone"
+
                 android:lineHeight="20sp"
                 android:fontFamily="@font/inter_regular"
                 android:text="Setup your audio and video before joining"
@@ -132,7 +133,8 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="@dimen/sizeteen_dp"
+                android:layout_marginVertical="@dimen/eight_dp"
                 android:background="@drawable/gray_round_solid_drawable"
                 android:contentDescription="@string/toggle_video"
                 android:drawablePadding="0dp"
@@ -148,14 +150,15 @@
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginVertical="@dimen/eight_dp"
                 android:background="@drawable/gray_round_solid_drawable"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
+                android:layout_marginBottom="@dimen/sizeteen_dp"
                 android:src="@drawable/avd_video_on_to_off"
                 android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
-                app:layout_constraintTop_toBottomOf="@+id/heading" />
+                app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_switch_camera"
@@ -163,14 +166,15 @@
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginVertical="@dimen/eight_dp"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
                 android:src="@drawable/ic_switch_camera"
                 android:visibility="gone"
+                android:layout_marginBottom="@dimen/sizeteen_dp"
                 app:iconSize="24dp"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/icon_output_device"
