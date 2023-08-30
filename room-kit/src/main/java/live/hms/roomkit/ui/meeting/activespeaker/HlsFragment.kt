@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.R
@@ -36,9 +35,7 @@ import kotlin.math.absoluteValue
  */
 private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
-    private val chatViewModel: ChatViewModel by activityViewModels {
-        ChatViewModelFactory(meetingViewModel.hmsSDK)
-    }
+    private val chatViewModel: ChatViewModel by activityViewModels()
     private val chatAdapter = ChatAdapter()
 
     private val args: HlsFragmentArgs by navArgs()
@@ -96,7 +93,9 @@ class HlsFragment : Fragment() {
         }
 
         setPlayerStatsListener(true)
-
+        meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
+            chatViewModel.receivedMessage(it)
+        }
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel)
     }
 
