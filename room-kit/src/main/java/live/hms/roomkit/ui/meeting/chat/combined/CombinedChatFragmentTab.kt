@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.ChatViewModelFactory
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
@@ -17,7 +18,9 @@ import live.hms.roomkit.util.viewLifecycle
 class CombinedChatFragmentTab : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedTabChatBinding>()
     val meetingViewModel : MeetingViewModel by activityViewModels()
-    private val chatViewModel: ChatViewModel by activityViewModels()
+    private val chatViewModel: ChatViewModel by activityViewModels {
+        ChatViewModelFactory(meetingViewModel.hmsSDK)
+    }
     private val chatAdapter = ChatAdapter()
 
     override fun onCreateView(
