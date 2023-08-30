@@ -44,12 +44,12 @@ class AudioLevelView(context: Context, attrs: AttributeSet) : FrameLayout(contex
 
     private fun mapAudioLevelToScale(level: Int) = when {
         level >= 90 -> 1.0f
-        level > 80 -> 0.85f
-        level >= 70 -> 0.75f
-        level in 50..69 -> 0.65f
-        level in 40..49 -> 0.55f
-        level in 30..39 -> 0.45f
-        level in 10..29 -> 0.35f
+        level > 80 -> 0.8f
+        level >= 70 -> 0.6f
+        level in 50..69 -> 0.5f
+        level in 40..49 -> 0.4f
+        level in 30..39 -> 0.3f
+        level in 10..29 -> 0.2f
         else -> {
             0.15f
         }
@@ -102,7 +102,7 @@ class AudioLevelView(context: Context, attrs: AttributeSet) : FrameLayout(contex
         val middleBarHeight = middleBarAnimation?.animatedValue as? Float
         val sideBarHeight = sideBarAnimation?.animatedValue as? Float
 
-       
+
         if (showAudioLevel && middleBarHeight != null && sideBarHeight != null) {
             val audioLevelWidth = 3 * barWidth + 2 * barPadding
             val xOffsetBase = (width - audioLevelWidth) / 2
