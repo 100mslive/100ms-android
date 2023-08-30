@@ -117,26 +117,6 @@
     </ScrollView>
 
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/audio_level"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/container_name"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/circle_secondary_24"
-        android:gravity="center"
-        android:text="@string/_hyphen"
-        android:visibility="gone"
-        android:textColor="@android:color/white"
-        android:textSize="10sp"
-        android:textStyle="bold" />
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/raised_hand"
@@ -163,6 +143,19 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         />
+
+    <live.hms.roomkit.ui.meeting.audiomode.AudioLevelView
+        android:alpha="0"
+        android:id="@+id/audio_level"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        />
+
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/is_brb"

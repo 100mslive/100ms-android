@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Looper
@@ -25,12 +26,16 @@ import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.roundToInt
 
 
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
   setOnClickListener(OnSingleClickListener(l))
 }
 
+private fun getDip(): Float = Resources.getSystem().displayMetrics.density
+fun Float.dp() = this * getDip()
+fun Int.dp() = (this * getDip()).roundToInt()
 fun View.setOnSingleClickListener(l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l))
 }
