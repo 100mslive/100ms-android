@@ -94,6 +94,13 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       }
     }
 
+    if (isScreenShare.not())
+    meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
+      // Active speaker should be updated via, tracks AND actual active speakers.
+      applySpeakerUpdates(speakers)
+    }
+
+
 
     //Don't register listener if it's not screen share
     if (isScreenShare.not()){

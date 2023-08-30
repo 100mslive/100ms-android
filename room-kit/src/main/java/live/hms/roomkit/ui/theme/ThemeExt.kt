@@ -430,6 +430,12 @@ internal fun VideoCardBinding.applyTheme() {
         R.drawable.circle_secondary_32
     )
 
+    audioLevel.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_32
+    )
+
     raisedHand.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,
@@ -851,6 +857,14 @@ fun FragmentGridVideoBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
+
+    iconAudioLevel.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_32
+    )
+
+
 
     iconBrb.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,

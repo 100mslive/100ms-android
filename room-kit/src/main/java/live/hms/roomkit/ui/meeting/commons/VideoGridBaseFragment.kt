@@ -268,6 +268,11 @@ abstract class VideoGridBaseFragment : Fragment() {
       iconAudioOff.alpha = visibilityOpacity(
         isAudioMute
       )
+
+      audioLevel.alpha = visibilityOpacity(
+        isAudioMute.not()
+      )
+
       /*if (isAudioMute)
       iconAudioOff.visibility  = View.VISIBLE
       else
@@ -470,34 +475,13 @@ abstract class VideoGridBaseFragment : Fragment() {
 
       renderedView.binding.apply {
         if (track == null || track.isMute) {
-          videoCard.audioLevel.apply {
-            text = "-"
-          }
-          container.strokeWidth = 0
+          videoCard.audioLevel.update(null)
         } else {
           val level = speakers.find { it.hmsTrack?.trackId == track.trackId }?.level ?: 0
-
-          videoCard.audioLevel.apply {
-            text = "$level"
-          }
-          if (level >= settings.silenceAudioLevelThreshold) {
-            hideOrShowGridsForPip(index)
-            wasLastSpeakingViewIndex = index
-          }
-          when {
-            level >= 70 -> {
-              container.strokeWidth = 6
-            }
-            70 > level && level >= settings.silenceAudioLevelThreshold -> {
-              container.strokeWidth = 4
-            }
-            else -> {
-              container.strokeWidth = 0
-            }
-          }
+          videoCard.audioLevel.update(level)
         }
 
-        videoCard.audioLevel.visibility = if (meetingViewModel.isPrebuiltDebugMode()) View.VISIBLE else View.INVISIBLE
+        videoCard.audioLevel.visibility = View.VISIBLE
       }
     }
   }

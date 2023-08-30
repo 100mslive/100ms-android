@@ -20,6 +20,7 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.roomkit.util.visibilityOpacity
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
@@ -128,6 +129,11 @@ class VideoGridFragment : Fragment() {
 
         }
 
+        meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (video, speakers) ->
+            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level?:0)
+
+        }
+
 
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
             val localMeeting = it.filter { it.isLocal }.firstOrNull()
@@ -150,8 +156,10 @@ class VideoGridFragment : Fragment() {
                         binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
                     binding.minimizedIconAudioOff.isEnabled = false
                     binding.iconAudioOff.visibility = View.VISIBLE
+                    binding.iconAudioLevel.alpha = visibilityOpacity(false)
                 } else {
                     binding.iconAudioOff.visibility = View.INVISIBLE
+                    binding.iconAudioLevel.alpha = visibilityOpacity(true)
                     if (binding.minimizedIconAudioOff.isEnabled.not())
                         binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on)
                     binding.minimizedIconAudioOff.isEnabled = true
