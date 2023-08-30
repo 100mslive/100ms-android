@@ -69,7 +69,7 @@
     <string name="video_codec">Video Codec</string>
     <string name="log_level_100ms_sdk">Log Level 100ms Sdk</string>
     <string name="log_level_webrtc">Log Level WebRTC</string>
-    <string name="search_participants">Find what you’re looking for</string>
+    <string name="search_participants">Search for participants</string>
     <string name="video_bitrate">Video Bitrate</string>
     <string name="role">Role</string>
     <string name="change_role_request">Change Role Request</string>
