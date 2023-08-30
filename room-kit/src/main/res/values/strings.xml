@@ -228,4 +228,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="hand_raised_group">Hand Raised</string>
     <string name="send_messages_to_everyone">Send Messages to Everyone</string>
+    <string name="audio_only_subheading">Setup your audio before joining</string>
+    <string name="video_only_subheading">Setup your video before joining</string>
+    <string name="audio_video_subheading">Setup your audio and video before joining</string>
 </resources>

@@ -93,15 +93,48 @@
         app:cardCornerRadius="16dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:animateLayoutChanges="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <TextView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:paddingTop="24dp"
+                android:paddingHorizontal="16dp"
+                android:textSize="20sp"
+                android:paddingBottom="@dimen/eight_dp"
+                android:lineHeight="24sp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="You’re invited to join the stage"
+                android:id="@+id/heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                app:layout_constraintTop_toBottomOf="@+id/heading"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:paddingBottom="@dimen/eight_dp"
+
+                android:paddingHorizontal="16dp"
+                android:textSize="14sp"
+
+                android:lineHeight="20sp"
+                android:fontFamily="@font/inter_regular"
+                android:text="Setup your audio and video before joining"
+                android:id="@+id/subheading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_toggle_audio"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="@dimen/sizeteen_dp"
+                android:layout_marginVertical="@dimen/eight_dp"
                 android:background="@drawable/gray_round_solid_drawable"
                 android:contentDescription="@string/toggle_video"
                 android:drawablePadding="0dp"
@@ -109,7 +142,7 @@
                 app:icon="@drawable/avd_mic_on_to_off"
                 app:iconGravity="start"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_toggle_video"
@@ -117,14 +150,15 @@
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginVertical="@dimen/eight_dp"
                 android:background="@drawable/gray_round_solid_drawable"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
+                android:layout_marginBottom="@dimen/sizeteen_dp"
                 android:src="@drawable/avd_video_on_to_off"
                 android:visibility="gone"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/button_switch_camera"
@@ -132,14 +166,15 @@
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginVertical="@dimen/eight_dp"
                 android:contentDescription="@string/toggle_video"
                 android:enabled="false"
                 android:src="@drawable/ic_switch_camera"
                 android:visibility="gone"
+                android:layout_marginBottom="@dimen/sizeteen_dp"
                 app:iconSize="24dp"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/icon_output_device"
@@ -174,7 +209,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline" />
+                app:layout_constraintTop_toBottomOf="@+id/button_toggle_audio" />
 
             <TextView
                 android:id="@+id/decline_button"
@@ -197,12 +232,6 @@
                 app:layout_constraintTop_toBottomOf="@id/button_join_meeting" />
 
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/edit_text_guideline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_begin="72dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
