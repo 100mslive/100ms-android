@@ -25,8 +25,6 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
     }
   }
 
-  private val dateFormatter = SimpleDateFormat("EEE, d MMM HH:mm", Locale.getDefault())
-
   inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
@@ -34,7 +32,6 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
       binding.name.text = "${message.senderName}${getRecipientText(message)}"
       binding.message.text = message.message
       binding.blueBar.visibility = if (message.isSentByMe) View.VISIBLE else View.GONE
-      binding.time.text = dateFormatter.format(message.time)
     }
 
     private fun getRecipientText(message: ChatMessage): String =
