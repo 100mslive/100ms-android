@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.R
