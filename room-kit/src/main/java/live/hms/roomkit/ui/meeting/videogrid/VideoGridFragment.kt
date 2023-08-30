@@ -128,6 +128,12 @@ class VideoGridFragment : Fragment() {
 
         }
 
+        meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (video, speakers) ->
+            if (binding.iconAudioLevel.visibility == View.VISIBLE)
+            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level)
+
+        }
+
 
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
             val localMeeting = it.filter { it.isLocal }.firstOrNull()
@@ -150,8 +156,10 @@ class VideoGridFragment : Fragment() {
                         binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
                     binding.minimizedIconAudioOff.isEnabled = false
                     binding.iconAudioOff.visibility = View.VISIBLE
+                    binding.iconAudioLevel.visibility = View.INVISIBLE
                 } else {
                     binding.iconAudioOff.visibility = View.INVISIBLE
+                    binding.iconAudioLevel.visibility = View.VISIBLE
                     if (binding.minimizedIconAudioOff.isEnabled.not())
                         binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on)
                     binding.minimizedIconAudioOff.isEnabled = true

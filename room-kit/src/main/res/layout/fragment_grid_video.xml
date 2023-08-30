@@ -122,6 +122,19 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:visibility="visible" />
 
+                <live.hms.roomkit.ui.meeting.audiomode.AudioLevelView
+                    android:visibility="visible"
+                    android:id="@+id/icon_audio_level"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="5dp"
+                    app:layout_constraintStart_toStartOf="@id/icon_audio_off"
+                    app:layout_constraintLeft_toLeftOf="@id/icon_audio_off"
+                    app:layout_constraintBottom_toBottomOf="@+id/icon_audio_off"
+                    app:layout_constraintTop_toTopOf="@id/icon_audio_off"
+                    />
+
+
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/icon_audio_off"
                     android:layout_width="32dp"
