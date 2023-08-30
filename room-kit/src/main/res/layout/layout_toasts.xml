@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/errorToasts"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_above="@+id/chatMessages"
+    android:layout_margin="16dp"
+    android:background="@drawable/send_message_background"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/toastText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawableStart="@drawable/raise_hand_modern"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Somebody raised their hand"
+        android:textColor="#EFF0FA"
+        android:textSize="14dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/toastActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:background="@drawable/grey_round_solid_drawable"
+        android:text="View"
+        android:textColor="#FFFFFF" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/toastCancelButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:src="@drawable/close_modern" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

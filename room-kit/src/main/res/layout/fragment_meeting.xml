@@ -152,6 +152,50 @@
 
     </LinearLayout>
 
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/errorToasts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:padding="8dp"
+        android:background="@drawable/send_message_background"
+        android:orientation="horizontal"
+        android:layout_above="@+id/chatMessages"
+        >
+        <TextView
+            android:id="@+id/toastText"
+            android:text="Somebody raised their hand"
+            android:drawablePadding="8dp"
+            android:drawableStart="@drawable/raise_hand_modern"
+            android:layout_width="wrap_content"
+            android:textColor="#EFF0FA"
+            android:fontFamily="@font/inter_semibold"
+            android:textSize="14dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/toastActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/grey_round_solid_drawable"
+            android:text="View"
+            />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/toastCancelButton"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:src="@drawable/close_modern"
+            />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
     <!-- Footer menu -->
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
@@ -163,6 +207,7 @@
         tools:listitem="@layout/list_item_chat"
         android:layout_alignBottom="@id/chatView"
         />
+
 
     <RelativeLayout
         android:id="@+id/chatView"
@@ -202,6 +247,7 @@
             android:src="@drawable/send_icon" />
 
     </RelativeLayout>
+
 
     <LinearLayout
         android:id="@+id/bottom_controls"
