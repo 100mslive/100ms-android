@@ -1267,20 +1267,24 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonOpenChat.setOnSingleClickListener {
-            with(binding.chatView!!) {
-                visibility = if (visibility == View.GONE) {
-                    View.VISIBLE
-                } else {
-                    View.GONE
+            if(true) {
+                findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToChatParticipantCombinedFragment())
+            } else {
+                with(binding.chatView!!) {
+                    visibility = if (visibility == View.GONE) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
                 }
-            }
-            binding.chatMessages!!.visibility = binding.chatView!!.visibility
-            // Scroll to the latest message if it's visible
-            if(binding.chatMessages!!.visibility == View.VISIBLE) {
-                val position = chatAdapter.itemCount - 1
-                if(position >= 0) {
-                    binding.chatMessages!!.smoothScrollToPosition(position)
-                    chatViewModel.unreadMessagesCount.postValue(0)
+                binding.chatMessages!!.visibility = binding.chatView!!.visibility
+                // Scroll to the latest message if it's visible
+                if (binding.chatMessages!!.visibility == View.VISIBLE) {
+                    val position = chatAdapter.itemCount - 1
+                    if (position >= 0) {
+                        binding.chatMessages!!.smoothScrollToPosition(position)
+                        chatViewModel.unreadMessagesCount.postValue(0)
+                    }
                 }
             }
         }
