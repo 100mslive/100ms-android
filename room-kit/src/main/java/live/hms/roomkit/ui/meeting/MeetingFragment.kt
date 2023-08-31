@@ -3,7 +3,6 @@ package live.hms.roomkit.ui.meeting
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.app.Activity
-import android.app.Dialog
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
 import android.content.Context
@@ -20,13 +19,11 @@ import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -63,7 +60,7 @@ import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
 import live.hms.roomkit.ui.notification.HMSNotification
-import live.hms.roomkit.ui.notification.NotificationAdapter
+import live.hms.roomkit.ui.notification.HMSNotificationAdapter
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
@@ -1494,7 +1491,7 @@ class MeetingFragment : Fragment() {
             if (notificationManager == null) {
                 binding.notifcationCardList?.apply {
                     layoutManager = notificationManager.init(context)
-                    adapter = NotificationAdapter(
+                    adapter = HMSNotificationAdapter(
                         listOf(
                             HMSNotification("Test", isDismissible = true, isError = true),
                             HMSNotification("Test", isDismissible = true, isError = true),

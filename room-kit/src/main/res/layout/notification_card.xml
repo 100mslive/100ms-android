@@ -1,10 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="52dp"
-    android:layout_marginHorizontal="@dimen/eight_dp"
-    app:cardCornerRadius="@dimen/sizeteen_dp">
+    android:background="@drawable/gray_round_solid_drawable"
+    android:elevation="@dimen/eight_dp"
+    android:paddingVertical="@dimen/eight_dp"
+    android:paddingEnd="@dimen/eight_dp"
+    app:cardCornerRadius="@dimen/sizeteen_dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="true">
 
 
-</com.google.android.material.card.MaterialCardView>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <View
+            android:id="@+id/ribbon"
+            android:layout_width="@dimen/eight_dp"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="@dimen/sizeteen_dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/heading"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/eight_dp"
+            android:layout_marginEnd="@dimen/sizeteen_dp"
+            android:fontFamily="@font/inter_semibold"
+            android:lineHeight="20sp"
+            android:maxLines="2"
+            android:textAlignment="textStart"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/icon"
+            app:layout_constraintRight_toLeftOf="@id/action_button"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="HeadingHeadingHeadingHeadingHeadingHeadingHeadingHeadingHeading" />
+
+
+        <TextView
+            android:id="@+id/action_button"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="@dimen/sizeteen_dp"
+            android:layout_marginEnd="@dimen/eight_dp"
+            android:background="@drawable/blue_round_solid_drawable"
+            android:gravity="center"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="Join Now"
+            android:textColor="#EFF0FA"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/cross_icon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/cross_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginHorizontal="@dimen/eight_dp"
+            android:src="@drawable/ic_close_16"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/action_button"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

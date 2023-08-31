@@ -2,15 +2,13 @@ package live.hms.roomkit.ui.notification
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.databinding.NotificationCardBinding
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.video.sdk.models.HMSPeer
 
-class NotificationAdapter(
+class HMSNotificationAdapter(
     private var notifications: List<HMSNotification> = emptyList()
-) : RecyclerView.Adapter<NotificationAdapter.NotificationCardViewHolder>() {
+) : RecyclerView.Adapter<HMSNotificationAdapter.NotificationCardViewHolder>() {
 
 
     fun setItems(notifications: List<HMSNotification>) {
