@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="52dp"
     android:background="@drawable/gray_round_solid_drawable"
-    android:elevation="@dimen/eight_dp"
+    android:elevation="40dp"
     app:cardCornerRadius="@dimen/sizeteen_dp">
 
     <View

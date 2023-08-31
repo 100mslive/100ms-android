@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.notification
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
@@ -38,6 +39,9 @@ class HMSNotificationAdapter(
                     HMSPrebuiltTheme.getDefaults().onsurface_high_emp
                 )
             )
+
+            actionButton.visibility =
+                if (notifications.actionButtonText.isEmpty()) View.GONE else View.VISIBLE
 
             actionButton.text = notifications.actionButtonText
 

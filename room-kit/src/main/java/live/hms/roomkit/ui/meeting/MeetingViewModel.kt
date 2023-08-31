@@ -2008,5 +2008,17 @@ class MeetingViewModel(
             changeRole(handRaisePeer.peerID, roleNameToChangeTo, false)
         }
     }
+
+    fun triggerErrorNotification(message: String) {
+        hmsNotificationEvent.postValue(
+            HMSNotification(
+                title = "Error ${message}",
+                isError = true,
+                isDismissible = true,
+                icon = R.drawable.ic_alert_triangle,
+                type = HMSNotificationType.Error
+            )
+        )
+    }
 }
 

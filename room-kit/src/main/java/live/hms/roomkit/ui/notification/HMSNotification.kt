@@ -12,11 +12,12 @@ data class HMSNotification(
     val isError: Boolean  = false,
     @DrawableRes val icon: Int = R.drawable.person_icon,
     val type: HMSNotificationType = HMSNotificationType.Default,
-    val actionButtonText: String = "Dummy",
+    val actionButtonText: String = "",
 )
 
 sealed class HMSNotificationType {
     object ScreenShare : HMSNotificationType()
+    object Error : HMSNotificationType()
     object Default : HMSNotificationType()
     data class BringOnStage(val handRaisePeer: HMSPeer) : HMSNotificationType()
 }
