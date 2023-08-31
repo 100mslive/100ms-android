@@ -13,9 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         app:tabMode="fixed"
+        app:tabPadding="8dp"
+        app:tabBackground="@drawable/participant_tab_header"
         app:tabSelectedTextColor="@color/participants_tab_selected_header_color"
         app:tabTextColor="@color/participants_tab_unselected_header_color"
-        app:tabIndicatorColor="@android:color/holo_orange_dark"
         android:id="@+id/tab_layout"
         android:layout_width="match_parent">
 
