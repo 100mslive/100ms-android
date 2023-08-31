@@ -35,9 +35,7 @@ class ChatParticipantCombinedFragment : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
     val meetingViewModel : MeetingViewModel by activityViewModels()
-    private val chatViewModel: ChatViewModel by activityViewModels {
-        ChatViewModelFactory(meetingViewModel.hmsSDK)
-    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

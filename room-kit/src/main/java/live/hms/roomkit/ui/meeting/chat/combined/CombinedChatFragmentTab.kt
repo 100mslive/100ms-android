@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.ChatViewModelFactory
@@ -18,9 +19,7 @@ import live.hms.roomkit.util.viewLifecycle
 class CombinedChatFragmentTab : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedTabChatBinding>()
     val meetingViewModel : MeetingViewModel by activityViewModels()
-    private val chatViewModel: ChatViewModel by activityViewModels {
-        ChatViewModelFactory(meetingViewModel.hmsSDK)
-    }
+    private val chatViewModel : ChatViewModel by activityViewModels()
     private val chatAdapter = ChatAdapter()
 
     override fun onCreateView(
@@ -40,14 +39,15 @@ class CombinedChatFragmentTab : Fragment() {
             }
         }
 
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel)
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel)
     }
 
 }
