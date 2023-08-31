@@ -8,9 +8,11 @@
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#191B23"
         >
     <com.google.android.material.tabs.TabLayout
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:layout_weight="1"
         app:tabMode="fixed"
         app:tabBackground="@drawable/participant_tab_header"
@@ -28,6 +30,7 @@
         <com.google.android.material.tabs.TabItem
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:padding="12dp"
             android:text="Participants"/>
 
     </com.google.android.material.tabs.TabLayout>
@@ -38,7 +41,7 @@
             android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:background="@android:color/black"
+            android:background="@android:color/transparent"
             android:src="@drawable/ic_close_16"
             />
     </androidx.appcompat.widget.LinearLayoutCompat>
