@@ -947,10 +947,12 @@ fun ItemGridOptionBinding.applyTheme() {
 
 fun NotificationCardBinding.applyTheme() {
 
-    card.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().surface_dim
-        )
+    card.setBackgroundAndColor(
+
+        HMSPrebuiltTheme.getColours()?.surfaceDim,
+        HMSPrebuiltTheme.getDefaults().surface_dim
+        ,
+        R.drawable.blue_round_solid_drawable
     )
 
     ribbon.setBackgroundColor(
