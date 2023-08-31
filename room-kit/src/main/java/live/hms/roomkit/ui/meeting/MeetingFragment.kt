@@ -37,6 +37,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DefaultItemAnimator
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,9 @@ import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
+import live.hms.roomkit.ui.notification.CardStackLayoutManager
+import live.hms.roomkit.ui.notification.HMSNotification
+import live.hms.roomkit.ui.notification.NotificationAdapter
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
@@ -87,6 +91,7 @@ class MeetingFragment : Fragment() {
     private var startPollSnackBar : Snackbar? = null
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
+    private var notificationManager : CardStackLayoutManager ? = null
 
     private lateinit var settings: SettingsStore
     var countDownTimer: CountDownTimer? = null
@@ -418,6 +423,7 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
+        triggerNotification()
         setHasOptionsMenu(true)
         meetingViewModel.showAudioMuted.observe(
             viewLifecycleOwner,
@@ -1480,6 +1486,34 @@ class MeetingFragment : Fragment() {
 
             })
         binding.roleSpinner.root.performClick()
+    }
+
+    fun triggerNotification() {
+        contextSafe { context, activity ->
+            //Lazily setup notification manager
+            if (notificationManager == null) {
+                binding.notifcationCardList?.apply {
+                    layoutManager = notificationManager.init(context)
+                    adapter = NotificationAdapter(
+                        listOf(
+                            HMSNotification("Test", isDismissible = true, isError = true),
+                            HMSNotification("Test", isDismissible = true, isError = true),
+                            HMSNotification("Test", isDismissible = true, isError = true),
+                            HMSNotification("Test", isDismissible = true, isError = true),
+                            HMSNotification("Test", isDismissible = true, isError = true)
+                        )
+                    )
+                    itemAnimator.apply {
+                        if (this is DefaultItemAnimator) {
+                            supportsChangeAnimations = false
+                        }
+                    }
+                }
+            }
+
+
+
+        }
     }
 
     fun inflateExitFlow() {

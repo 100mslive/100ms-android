@@ -28,6 +28,7 @@ import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.FragmentRolePreviewBinding
 import live.hms.roomkit.databinding.ItemGridOptionBinding
+import live.hms.roomkit.databinding.NotificationCardBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.ui.role.RolePreviewFragment
@@ -942,4 +943,13 @@ fun ItemGridOptionBinding.applyTheme() {
         )
     )
 
+}
+
+fun NotificationCardBinding.applyTheme() {
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().surface_dim
+        )
+    )
 }

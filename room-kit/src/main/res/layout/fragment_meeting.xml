@@ -202,6 +202,16 @@
             android:src="@drawable/send_icon" />
 
     </RelativeLayout>
+    
+    <live.hms.roomkit.ui.notification.CardStackView
+        android:elevation="@dimen/eight_dp"
+        android:layout_marginBottom="@dimen/sizeteen_dp"
+        android:layout_above="@id/bottom_controls"
+        android:id="@+id/notifcation_card_list"
+        android:layout_width="match_parent"
+        android:padding="4dp"
+        android:clipToPadding="false"
+        android:layout_height="72dp"/>
 
     <LinearLayout
         android:id="@+id/bottom_controls"
