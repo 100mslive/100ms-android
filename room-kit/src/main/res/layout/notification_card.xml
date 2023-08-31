@@ -42,7 +42,7 @@
             android:fontFamily="@font/inter_semibold"
             android:lineHeight="20sp"
             android:maxLines="2"
-            android:textAlignment="textStart"
+            android:gravity="center_vertical"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@+id/icon"
