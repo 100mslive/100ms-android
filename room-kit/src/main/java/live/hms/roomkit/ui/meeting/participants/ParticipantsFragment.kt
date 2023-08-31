@@ -123,7 +123,7 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
             }
 
     private fun changePeerRole(remotePeerId : String, toRole : String) =
-        meetingViewModel.changeRole(remotePeerId, toRole, true)
+        meetingViewModel.changeRole(remotePeerId, toRole, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
