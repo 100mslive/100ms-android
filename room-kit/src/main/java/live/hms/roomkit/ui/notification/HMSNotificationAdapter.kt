@@ -3,11 +3,17 @@ package live.hms.roomkit.ui.notification
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.NotificationCardBinding
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.setBackgroundAndColor
 
 class HMSNotificationAdapter(
-    private var notifications: List<HMSNotification> = emptyList()
+    private var notifications: List<HMSNotification> = emptyList(),
+    val onDismissClicked: () -> Unit,
+    val onActionButtonClicked: (String) -> Unit
 ) : RecyclerView.Adapter<HMSNotificationAdapter.NotificationCardViewHolder>() {
 
 
@@ -24,6 +30,38 @@ class HMSNotificationAdapter(
 
         fun bind(notifications: HMSNotification) = binding.apply {
             applyTheme()
+            heading.text = notifications.title
+            icon.setImageResource(notifications.icon)
+            icon.drawable.setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+
+            actionButton.text = notifications.actionButtonText
+
+
+            actionButton.setBackgroundAndColor(
+                if (notifications.isError) HMSPrebuiltTheme.getColours()?.alertErrorDefault else HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                HMSPrebuiltTheme.getDefaults().secondary_default,
+                R.drawable.blue_round_solid_drawable
+            )
+
+            actionButton.setOnClickListener {
+                onActionButtonClicked(notifications.actionButtonText)
+            }
+
+
+            if (notifications.isError) ribbon.visibility = ViewGroup.VISIBLE
+            else ribbon.visibility = ViewGroup.GONE
+
+            if (notifications.isDismissible) crossIcon.visibility = ViewGroup.VISIBLE
+            else crossIcon.visibility = ViewGroup.GONE
+
+            crossIcon.setOnClickListener {
+                onDismissClicked()
+            }
         }
     }
 

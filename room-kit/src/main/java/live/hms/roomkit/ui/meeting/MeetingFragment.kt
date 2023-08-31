@@ -420,7 +420,6 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
-        triggerNotification()
         setHasOptionsMenu(true)
         meetingViewModel.showAudioMuted.observe(
             viewLifecycleOwner,
@@ -1494,11 +1493,17 @@ class MeetingFragment : Fragment() {
                     adapter = HMSNotificationAdapter(
                         listOf(
                             HMSNotification("Test", isDismissible = true, isError = true),
-                            HMSNotification("Test", isDismissible = true, isError = true),
-                            HMSNotification("Test", isDismissible = true, isError = true),
-                            HMSNotification("Test", isDismissible = true, isError = true),
-                            HMSNotification("Test", isDismissible = true, isError = true)
-                        )
+                            HMSNotification("Test 2", isDismissible = true, ),
+                            HMSNotification("Test 3", isDismissible = true, isError = true),
+                            HMSNotification("Test 4", isDismissible = true, isError = true),
+                            HMSNotification("Test 5", isDismissible = true, isError = true)
+                        ),
+                        onActionButtonClicked = {
+                            Toast.makeText(context, "Action clicked", Toast.LENGTH_SHORT).show()
+                        },
+                        onDismissClicked = {
+                            binding.notifcationCardList?.swipe()
+                        }
                     )
                     itemAnimator.apply {
                         if (this is DefaultItemAnimator) {
