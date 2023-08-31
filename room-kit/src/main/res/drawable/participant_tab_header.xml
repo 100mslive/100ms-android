@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#272A31" />
-    <stroke
-        android:width="12dp"
-        android:color="#191B23" />
-    <corners android:radius="12dp" />
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/participant_tab_header_selected" android:state_selected="true"/>
+    <item android:drawable="@drawable/participant_tab_header_unselected"/>
+</selector>

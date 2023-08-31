@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         app:tabMode="fixed"
-        app:tabPadding="8dp"
         app:tabBackground="@drawable/participant_tab_header"
         app:tabSelectedTextColor="@color/participants_tab_selected_header_color"
         app:tabTextColor="@color/participants_tab_unselected_header_color"
@@ -23,6 +22,7 @@
         <com.google.android.material.tabs.TabItem
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
+            android:padding="12dp"
             android:text="Chat"/>
 
         <com.google.android.material.tabs.TabItem
