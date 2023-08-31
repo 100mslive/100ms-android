@@ -13,7 +13,7 @@ import live.hms.roomkit.ui.theme.setBackgroundAndColor
 class HMSNotificationAdapter(
     private var notifications: List<HMSNotification> = emptyList(),
     val onDismissClicked: () -> Unit,
-    val onActionButtonClicked: (String) -> Unit
+    val onActionButtonClicked: (HMSNotificationType) -> Unit
 ) : RecyclerView.Adapter<HMSNotificationAdapter.NotificationCardViewHolder>() {
 
 
@@ -49,7 +49,7 @@ class HMSNotificationAdapter(
             )
 
             actionButton.setOnClickListener {
-                onActionButtonClicked(notifications.actionButtonText)
+                onActionButtonClicked(notifications.type)
             }
 
 

@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.notification
 
 import androidx.annotation.DrawableRes
 import live.hms.roomkit.R
+import live.hms.video.sdk.models.HMSPeer
 import org.w3c.dom.Text
 
 data class HMSNotification(
@@ -17,4 +18,5 @@ data class HMSNotification(
 sealed class HMSNotificationType {
     object ScreenShare : HMSNotificationType()
     object Default : HMSNotificationType()
+    data class BringOnStage(val handRaisePeer: HMSPeer) : HMSNotificationType()
 }

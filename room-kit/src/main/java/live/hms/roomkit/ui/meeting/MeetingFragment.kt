@@ -63,6 +63,7 @@ import live.hms.roomkit.ui.notification.CardStackLayoutManager
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationAdapter
 import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
+import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
@@ -91,14 +92,13 @@ class MeetingFragment : Fragment() {
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
     private var notificationManager : CardStackLayoutManager ? = null
-    private val hmsNotificationAdapter by lazy { HMSNotificationAdapter(
-        onActionButtonClicked = {
-            Toast.makeText(context, "Action clicked", Toast.LENGTH_SHORT).show()
-        },
-        onDismissClicked = {
-            binding.notifcationCardList?.swipe()
-        })
+    private val hmsNotificationAdapter by lazy {
+        HMSNotificationAdapter(
+            onActionButtonClicked = ::handleNotificationButtonClick,
+            onDismissClicked = ::handleNotificationDismissClick)
     }
+
+
 
     private lateinit var settings: SettingsStore
     var countDownTimer: CountDownTimer? = null
@@ -1530,6 +1530,20 @@ class MeetingFragment : Fragment() {
             }
         }
     }
+
+    private fun handleNotificationButtonClick(type: HMSNotificationType) {
+        when(type){
+            is HMSNotificationType.BringOnStage -> {
+                meetingViewModel.requestBringOnStage(type.handRaisePeer)
+            }
+            else -> {}
+        }
+    }
+
+    private fun handleNotificationDismissClick() {
+        binding.notifcationCardList?.swipe()
+    }
+
 
     fun inflateExitFlow() {
         LeaveBottomSheet()
