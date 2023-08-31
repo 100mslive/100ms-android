@@ -356,7 +356,6 @@ class MeetingFragment : Fragment() {
                 binding.liveTitle?.text = "Live"
             }
             binding.tvViewersCount?.visibility = View.VISIBLE
-            binding.tvViewersCount?.text = (meetingViewModel.hmsSDK.getPeers().size - 1).toString()
             setupRecordingTimeView()
         } else {
 //            binding.buttonGoLive?.setImageDrawable(
@@ -490,6 +489,10 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
+        meetingViewModel.peerCount.observe(viewLifecycleOwner) { peerCount ->
+            if(peerCount != null)
+                binding.tvViewersCount?.text = peerCount.toString()
+        }
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }

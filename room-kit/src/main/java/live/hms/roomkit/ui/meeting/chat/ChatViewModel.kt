@@ -108,13 +108,17 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun addMessage(message: ChatMessage) {
     // Check if the last sender was also the same person
-    _messages.add(message)
-    messages.postValue(_messages)
+    if(_messages.find { it.messageId == message.messageId } == null) {
+      if(!message.isSentByMe) {
+        unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
+      }
+      _messages.add(message)
+      messages.postValue(_messages)
+    }
   }
 
   fun receivedMessage(message: ChatMessage) {
     Log.v(TAG, "receivedMessage: $message")
-    unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
     addMessage(message.appendMessageIdForTest())
   }
 

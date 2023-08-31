@@ -4,13 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.ChatViewModelFactory
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
@@ -32,9 +35,7 @@ class ChatParticipantCombinedFragment : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
     val meetingViewModel : MeetingViewModel by activityViewModels()
-    private val chatViewModel: ChatViewModel by activityViewModels {
-        ChatViewModelFactory(meetingViewModel.hmsSDK)
-    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,5 +54,18 @@ class ChatParticipantCombinedFragment : Fragment() {
         TabLayoutMediator(tabLayout, binding.pager) { tab, position ->
             tab.text = if(position == 0 ) "CHAT" else "PARTICIPANTS"
         }.attach()
+        initOnBackPress()
+        binding.closeCombinedTabButton.setOnSingleClickListener {
+            findNavController().popBackStack()
+        }
+    }
+    private fun initOnBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    findNavController().popBackStack()
+                }
+            })
     }
 }
