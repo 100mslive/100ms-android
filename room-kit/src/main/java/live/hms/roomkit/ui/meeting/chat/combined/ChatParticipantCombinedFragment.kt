@@ -26,7 +26,8 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int).
 
-        return if (position == 0) CombinedChatFragmentTab()
+        return if (position == 0)
+            CombinedChatFragmentTab()
         else
             ParticipantsFragment()
     }
