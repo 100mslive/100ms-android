@@ -210,7 +210,7 @@
         android:paddingHorizontal="@dimen/eight_dp"
         android:paddingVertical="@dimen/sizeteen_dp"
         android:clipToPadding="false"
-        android:layout_height="100dp"/>
+        android:layout_height="85dp"/>
 
     <LinearLayout
         android:id="@+id/bottom_controls"
