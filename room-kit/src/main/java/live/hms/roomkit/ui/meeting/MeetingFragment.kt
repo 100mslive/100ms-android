@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -61,6 +62,7 @@ import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationAdapter
+import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
@@ -89,6 +91,14 @@ class MeetingFragment : Fragment() {
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
     private var notificationManager : CardStackLayoutManager ? = null
+    private val hmsNotificationAdapter by lazy { HMSNotificationAdapter(
+        onActionButtonClicked = {
+            Toast.makeText(context, "Action clicked", Toast.LENGTH_SHORT).show()
+        },
+        onDismissClicked = {
+            binding.notifcationCardList?.swipe()
+        })
+    }
 
     private lateinit var settings: SettingsStore
     var countDownTimer: CountDownTimer? = null
@@ -812,6 +822,10 @@ class MeetingFragment : Fragment() {
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             chatViewModel.peersUpdate()
         }
+
+        meetingViewModel.hmsNotificationEvent.observe(viewLifecycleOwner) {
+            triggerNotification(it)
+        }
     }
 
 
@@ -1484,37 +1498,36 @@ class MeetingFragment : Fragment() {
         binding.roleSpinner.root.performClick()
     }
 
-    fun triggerNotification() {
-        contextSafe { context, activity ->
-            //Lazily setup notification manager
-            if (notificationManager == null) {
-                binding.notifcationCardList?.apply {
-                    layoutManager = notificationManager.init(context)
-                    adapter = HMSNotificationAdapter(
-                        listOf(
-                            HMSNotification("Test", isDismissible = true, isError = true),
-                            HMSNotification("Test 2", isDismissible = true, ),
-                            HMSNotification("Test 3", isDismissible = true, isError = true),
-                            HMSNotification("Test 4", isDismissible = true, isError = true),
-                            HMSNotification("Test 5", isDismissible = true, isError = true)
-                        ),
-                        onActionButtonClicked = {
-                            Toast.makeText(context, "Action clicked", Toast.LENGTH_SHORT).show()
-                        },
-                        onDismissClicked = {
-                            binding.notifcationCardList?.swipe()
-                        }
-                    )
-                    itemAnimator.apply {
-                        if (this is DefaultItemAnimator) {
-                            supportsChangeAnimations = false
-                        }
+    private fun triggerNotification(hmsNotification: HMSNotification) {
+        initNotificationUI()
+        appendNotification(hmsNotification)
+    }
+
+    private fun appendNotification(hmsNotification: HMSNotification) {
+        val old = hmsNotificationAdapter.getItems()
+        val new = mutableListOf<HMSNotification>().apply {
+            addAll(old)
+            add(notificationManager!!.topPosition, hmsNotification)
+
+        }
+        val callback = HMSNotificationDiffCallBack(old, new)
+        val result = DiffUtil.calculateDiff(callback)
+        hmsNotificationAdapter.setItems(new)
+        result.dispatchUpdatesTo(hmsNotificationAdapter)
+    }
+
+    private fun initNotificationUI() {
+        if (notificationManager == null && binding.notifcationCardList?.context != null) {
+            notificationManager = notificationManager.init(binding.notifcationCardList!!.context)
+            binding.notifcationCardList?.apply {
+                layoutManager = notificationManager
+                adapter = hmsNotificationAdapter
+                itemAnimator.apply {
+                    if (this is DefaultItemAnimator) {
+                        supportsChangeAnimations = false
                     }
                 }
             }
-
-
-
         }
     }
 

@@ -13,15 +13,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
@@ -278,6 +281,7 @@ class MeetingViewModel(
     val hlsToggleUpdateLiveData: LiveData<Boolean> = hlsToggleUpdateData
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
     val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
+    val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {
@@ -513,6 +517,7 @@ class MeetingViewModel(
     }
 
     fun toggleLocalAudio() {
+        hmsNotificationEvent.postValue(HMSNotification(title = "Test ${System.currentTimeMillis()} ", icon = R.drawable.person_icon, isDismissible = true))
         // If mute then enable audio, if not mute, disable it
         hmsSDK.getLocalPeer()?.audioTrack?.let { setLocalAudioEnabled(it.isMute) }
     }

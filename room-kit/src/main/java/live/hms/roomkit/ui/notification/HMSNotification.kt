@@ -5,6 +5,7 @@ import live.hms.roomkit.R
 import org.w3c.dom.Text
 
 data class HMSNotification(
+    val id: String = System.currentTimeMillis().toString(),
     val title: String,
     val isDismissible: Boolean = true,
     val isError: Boolean  = false,
