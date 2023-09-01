@@ -4,12 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -33,20 +31,27 @@ import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.util.*
+import live.hms.roomkit.ui.theme.buttonDisabled
+import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.roomkit.ui.theme.getPreviewLayout
+import live.hms.roomkit.ui.theme.setIconDisabled
+import live.hms.roomkit.ui.theme.setIconEnabled
+import live.hms.roomkit.util.NameUtils
+import live.hms.roomkit.util.contextSafe
+import live.hms.roomkit.util.openShareIntent
+import live.hms.roomkit.util.setCameraGestureListener
+import live.hms.roomkit.util.setOnSingleClickListener
+import live.hms.roomkit.util.switchCamera
+import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.audio.HMSAudioManager
-import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import live.hms.video.sdk.models.enums.HMSRoomUpdate
 import live.hms.video.sdk.models.role.PublishParams
-import live.hms.video.utils.HMSLogger
 
 
 class PreviewFragment : Fragment() {
@@ -438,12 +443,9 @@ class PreviewFragment : Fragment() {
 
                 is MeetingState.Failure -> {
                     disableJoinLoader()
-                    contextSafe { context, activity ->
-                        Toast.makeText(
-                            activity, "${it.exceptions}", Toast.LENGTH_LONG
-                        ).show()
+                    it.exceptions.forEach { exception ->
+                        meetingViewModel.triggerErrorNotification(exception.message, isDismissible = false)
                     }
-
                 }
 
                 is MeetingState.ForceLeave -> {
@@ -465,20 +467,9 @@ class PreviewFragment : Fragment() {
         meetingViewModel.previewErrorLiveData.observe(viewLifecycleOwner) { error ->
             if (error.isTerminal) {
                 isPreviewLoaded = false
-                enableDisableJoinNowButton()
-                AlertDialog.Builder(requireContext()).setTitle(error.name)
-                    .setMessage(error.toString()).setCancelable(false)
-                    .setPositiveButton(R.string.ok) { dialog, _ ->
-                        dialog.dismiss()
-                        goToHomePage()
-                    }.setNeutralButton(R.string.bug_report) { _, _ ->
-                        requireContext().startActivity(
-                            EmailUtils.getNonFatalLogIntent(requireContext())
-                        )
-                        alertDialog = null
-                    }.create().show()
+               meetingViewModel.triggerErrorNotification(error.message, isDismissible = false)
             } else {
-                Toast.makeText(context, error.description, Toast.LENGTH_LONG).show()
+                meetingViewModel.triggerErrorNotification(error.message)
             }
         }
 

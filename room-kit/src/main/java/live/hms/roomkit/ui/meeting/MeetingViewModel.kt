@@ -2012,12 +2012,12 @@ class MeetingViewModel(
         }
     }
 
-    fun triggerErrorNotification(message: String) {
+    fun triggerErrorNotification(message: String, isDismissible: Boolean = true) {
         hmsNotificationEvent.postValue(
             HMSNotification(
                 title = "Error ${message}",
                 isError = true,
-                isDismissible = true,
+                isDismissible = isDismissible,
                 icon = R.drawable.ic_alert_triangle,
                 type = HMSNotificationType.Error
             )
