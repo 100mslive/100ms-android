@@ -1209,10 +1209,10 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
-                            val direction = if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
-                                MeetingFragmentDirections.actionMeetingFragmentToChatParticipantCombinedFragment()
-                            } else {
+                            val direction = if( meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                                 MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
+                            } else {
+                                MeetingFragmentDirections.actionMeetingFragmentToChatParticipantCombinedFragment(showParticipants = true)
                             }
                             findNavController().navigate(direction)
                         },
