@@ -146,6 +146,7 @@ class MeetingActivity : AppCompatActivity() {
     }
 
     private fun appendNotification(hmsNotification: HMSNotification) {
+        binding.notifcationCardList.visibility = View.VISIBLE
         val old = hmsNotificationAdapter.getItems()
         val new = mutableListOf<HMSNotification>().apply {
             addAll(old)
@@ -164,17 +165,21 @@ class MeetingActivity : AppCompatActivity() {
             notificationManager = notificationManager.init(this, object : CardStackListener{
                 override fun onCardDragging(direction: Direction?, ratio: Float) {}
 
-                override fun onCardSwiped(direction: Direction?) {
-                    //if a non dismissable card is swiped re appear
-                }
+                override fun onCardSwiped(direction: Direction?) {}
 
                 override fun onCardRewound() {}
 
                 override fun onCardCanceled() {}
 
-                override fun onCardAppeared(view: View?, position: Int) {}
+                override fun onCardAppeared(view: View?, position: Int) {
+                    binding.notifcationCardList.visibility = View.VISIBLE
+                }
 
-                override fun onCardDisappeared(view: View?, position: Int) {}
+                override fun onCardDisappeared(view: View?, position: Int) {
+                    if ((notificationManager?.topPosition?:0) + 1 == hmsNotificationAdapter.itemCount) {
+                      binding.notifcationCardList.visibility = View.GONE
+                    }
+                }
 
             })
             binding.notifcationCardList?.apply {
