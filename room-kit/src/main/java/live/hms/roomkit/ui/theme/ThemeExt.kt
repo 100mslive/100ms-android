@@ -1,16 +1,15 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,9 +17,10 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.cardview.widget.CardView
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.setPadding
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.EndSessionBottomSheetBinding
@@ -34,7 +34,6 @@ import live.hms.roomkit.databinding.ItemGridOptionBinding
 import live.hms.roomkit.databinding.NotificationCardBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
-import live.hms.roomkit.ui.role.RolePreviewFragment
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -140,13 +139,13 @@ internal fun ImageView.setIconEnabled(
     val r: Float = getResources().getDimension(R.dimen.eight_dp)
     val radii = floatArrayOf(r, r, r, r, r, r, r, r)
 
-    shapedrawable.shape = RoundRectShape(radii, null, radii.map { it / 4 }.toFloatArray())
+    shapedrawable.shape = RoundRectShape(radii, null, null)
     shapedrawable.paint.color = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.secondaryBright, HMSPrebuiltTheme.getDefaults().border_bright
     )
 
     shapedrawable.paint.isAntiAlias = true
-    shapedrawable.paint.strokeWidth = getResources().getDimension(R.dimen.two_dp) / 1.5f
+    shapedrawable.paint.strokeWidth = getResources().getDimension(R.dimen.two_dp)
     shapedrawable.paint.style = Paint.Style.STROKE
 
 
@@ -158,13 +157,23 @@ internal fun ImageView.setIconEnabled(
 internal fun ShapeableImageView.setIconEnabled(
     @DrawableRes enabledIconDrawableRes: Int
 ) {
-
-
-    shapeAppearanceModel = shapeAppearanceModel.toBuilder()
-        .setAllCornerSizes(resources.getDimension(R.dimen.eight_dp))
-        .build()
+    val radius = resources.getDimension(R.dimen.eight_dp).toInt()
 
     this.setBackgroundColor(resources.getColor(android.R.color.transparent))
+
+    shapeAppearanceModel =
+        shapeAppearanceModel.toBuilder().setAllCorners(CornerFamily.ROUNDED, radius.toFloat())
+            .build()
+
+    this.strokeColor = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.secondaryBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+    this.strokeWidth = resources.getDimension(R.dimen.two_dp)
+
     this.setImageResource(enabledIconDrawableRes)
 
     drawable.setTint(
@@ -210,9 +219,10 @@ internal fun ShapeableImageView.setIconDisabled(
 
     val radius = resources.getDimension(R.dimen.eight_dp).toInt()
 
-    shapeAppearanceModel = shapeAppearanceModel.toBuilder()
-        .setAllCornerSizes(radius.toFloat())
-        .build()
+    this.strokeWidth = 0f
+
+    shapeAppearanceModel =
+        shapeAppearanceModel.toBuilder().setAllCornerSizes(radius.toFloat()).build()
 
     this.setBackgroundColor(
         getColorOrDefault(
