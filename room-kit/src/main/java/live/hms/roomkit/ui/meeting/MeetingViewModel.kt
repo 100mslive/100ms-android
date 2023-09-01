@@ -7,7 +7,6 @@ import android.media.AudioManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
-import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,6 +17,7 @@ import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.polls.PollCreationInfo
@@ -68,6 +68,7 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null

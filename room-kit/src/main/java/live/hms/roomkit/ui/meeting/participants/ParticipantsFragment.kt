@@ -113,7 +113,8 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                         canChangeRole,
                         canMutePeers,
                         canRemovePeers,
-                        meetingViewModel.prebuiltInfoContainer
+                        meetingViewModel.prebuiltInfoContainer,
+                        meetingViewModel.participantPreviousRoleChangeUseCase
                     )
                 }!!)
                 // If the group was expanded, open it again.
