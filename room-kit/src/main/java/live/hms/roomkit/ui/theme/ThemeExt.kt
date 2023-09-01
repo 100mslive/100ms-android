@@ -965,11 +965,10 @@ fun ItemGridOptionBinding.applyTheme() {
         )
     )
 
-    badge.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceBrighter,
-            HMSPrebuiltTheme.getDefaults().surface_bright
-        )
+    participantCountText.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBrighter,
+        HMSPrebuiltTheme.getDefaults().surface_bright,
+        R.drawable.blue_round_solid_drawable
     )
 
     participantCountText.setTextColor(
