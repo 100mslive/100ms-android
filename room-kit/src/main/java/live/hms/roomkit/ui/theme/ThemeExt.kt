@@ -915,6 +915,19 @@ fun FragmentGridVideoBinding.applyTheme() {
         R.drawable.circle_secondary_32
     )
 
+    iconOption.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    iconOption.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
 
     insetPill.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
