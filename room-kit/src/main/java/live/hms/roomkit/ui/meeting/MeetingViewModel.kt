@@ -13,15 +13,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.notification.HMSNotification
+import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
@@ -278,6 +282,7 @@ class MeetingViewModel(
     val hlsToggleUpdateLiveData: LiveData<Boolean> = hlsToggleUpdateData
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
     val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
+    val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {
@@ -513,6 +518,7 @@ class MeetingViewModel(
     }
 
     fun toggleLocalAudio() {
+        //hmsNotificationEvent.postValue(HMSNotification(title = "Test ${System.currentTimeMillis()} ", icon = R.drawable.person_icon, isDismissible = true))
         // If mute then enable audio, if not mute, disable it
         hmsSDK.getLocalPeer()?.audioTrack?.let { setLocalAudioEnabled(it.isMute) }
     }
@@ -764,6 +770,7 @@ class MeetingViewModel(
                     }
 
                     HMSPeerUpdate.METADATA_CHANGED -> {
+                        triggerBringOnStageNotificationIfHandRaised(hmsPeer)
                         if (hmsPeer.isLocal) {
                             updateSelfHandRaised(hmsPeer as HMSLocalPeer)
                         } else {
@@ -955,6 +962,24 @@ class MeetingViewModel(
         })
     }
 
+    private fun triggerBringOnStageNotificationIfHandRaised(handRaisedPeer: HMSPeer) {
+        //cuurent user has bring on stage permission
+        if(hasBringOnStageRolePermission(hmsSDK.getLocalPeer()?.hmsRole)) {
+            if (CustomPeerMetadata.fromJson(handRaisedPeer.metadata)?.isHandRaised == true) {
+                hmsNotificationEvent.postValue(
+                    HMSNotification(
+                        title = "${handRaisedPeer.name} raised hand",
+                        isDismissible = false,
+                        icon = R.drawable.hand_raised,
+                        actionButtonText = "Bring on stage",
+                        type = HMSNotificationType.BringOnStage(handRaisedPeer)
+                    )
+                )
+            }
+        }
+
+    }
+
     private fun updatePolls() {
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
@@ -1073,6 +1098,10 @@ class MeetingViewModel(
 
     private fun isHlsPeer(localRole: HMSRole?) : Boolean{
           return  hmsRoomLayout?.data?.findLast { it?.role ==  localRole?.name }?.screens?.conferencing?.hlsLiveStreaming != null
+    }
+
+    private fun hasBringOnStageRolePermission(localRole: HMSRole?) : Boolean{
+        return  hmsRoomLayout?.data?.findLast { it?.role ==  localRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole == localRole?.name
     }
 
     private fun switchToHlsView(streamUrl: String) =
@@ -1972,6 +2001,24 @@ class MeetingViewModel(
 
     fun isRecordingState(): Boolean {
         return isRecording.value == RecordingState.STREAMING_AND_RECORDING  || isRecording.value == RecordingState.RECORDING
+    }
+
+    fun requestBringOnStage(handRaisePeer: HMSPeer) {
+        hmsSDK.getLocalPeer()?.hmsRole?.name?.let {roleNameToChangeTo ->
+            changeRole(handRaisePeer.peerID, roleNameToChangeTo, false)
+        }
+    }
+
+    fun triggerErrorNotification(message: String) {
+        hmsNotificationEvent.postValue(
+            HMSNotification(
+                title = "Error ${message}",
+                isError = true,
+                isDismissible = true,
+                icon = R.drawable.ic_alert_triangle,
+                type = HMSNotificationType.Error
+            )
+        )
     }
 }
 

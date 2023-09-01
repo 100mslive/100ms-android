@@ -3,7 +3,6 @@ package live.hms.roomkit.ui.meeting
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.app.Activity
-import android.app.Dialog
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
 import android.content.Context
@@ -20,13 +19,11 @@ import android.util.Log
 import android.view.*
 import android.widget.AdapterView
 import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
@@ -37,6 +34,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +59,11 @@ import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
+import live.hms.roomkit.ui.notification.CardStackLayoutManager
+import live.hms.roomkit.ui.notification.HMSNotification
+import live.hms.roomkit.ui.notification.HMSNotificationAdapter
+import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
+import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
@@ -87,6 +91,14 @@ class MeetingFragment : Fragment() {
     private var startPollSnackBar : Snackbar? = null
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
+    private var notificationManager : CardStackLayoutManager ? = null
+    private val hmsNotificationAdapter by lazy {
+        HMSNotificationAdapter(
+            onActionButtonClicked = ::handleNotificationButtonClick,
+            onDismissClicked = ::handleNotificationDismissClick)
+    }
+
+
 
     private lateinit var settings: SettingsStore
     var countDownTimer: CountDownTimer? = null
@@ -810,6 +822,10 @@ class MeetingFragment : Fragment() {
         meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
             chatViewModel.peersUpdate()
         }
+
+        meetingViewModel.hmsNotificationEvent.observe(viewLifecycleOwner) {
+            triggerNotification(it)
+        }
     }
 
 
@@ -1481,6 +1497,53 @@ class MeetingFragment : Fragment() {
             })
         binding.roleSpinner.root.performClick()
     }
+
+    private fun triggerNotification(hmsNotification: HMSNotification) {
+        initNotificationUI()
+        appendNotification(hmsNotification)
+    }
+
+    private fun appendNotification(hmsNotification: HMSNotification) {
+        val old = hmsNotificationAdapter.getItems()
+        val new = mutableListOf<HMSNotification>().apply {
+            addAll(old)
+            add(notificationManager!!.topPosition, hmsNotification)
+
+        }
+        val callback = HMSNotificationDiffCallBack(old, new)
+        val result = DiffUtil.calculateDiff(callback)
+        hmsNotificationAdapter.setItems(new)
+        result.dispatchUpdatesTo(hmsNotificationAdapter)
+    }
+
+    private fun initNotificationUI() {
+        if (notificationManager == null && binding.notifcationCardList?.context != null) {
+            notificationManager = notificationManager.init(binding.notifcationCardList!!.context)
+            binding.notifcationCardList?.apply {
+                layoutManager = notificationManager
+                adapter = hmsNotificationAdapter
+                itemAnimator.apply {
+                    if (this is DefaultItemAnimator) {
+                        supportsChangeAnimations = false
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleNotificationButtonClick(type: HMSNotificationType) {
+        when(type){
+            is HMSNotificationType.BringOnStage -> {
+                meetingViewModel.requestBringOnStage(type.handRaisePeer)
+            }
+            else -> {}
+        }
+    }
+
+    private fun handleNotificationDismissClick() {
+        binding.notifcationCardList?.swipe()
+    }
+
 
     fun inflateExitFlow() {
         LeaveBottomSheet()

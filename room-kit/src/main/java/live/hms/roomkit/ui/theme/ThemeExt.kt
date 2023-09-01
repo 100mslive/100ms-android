@@ -28,6 +28,7 @@ import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.databinding.FragmentRolePreviewBinding
 import live.hms.roomkit.databinding.ItemGridOptionBinding
+import live.hms.roomkit.databinding.NotificationCardBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.ui.role.RolePreviewFragment
@@ -56,8 +57,7 @@ object HMSPrebuiltTheme {
     }
 }
 
-internal fun HMSRoomLayout.getPreviewLayout() =
-    this.data?.getOrNull(0)?.screens?.preview
+internal fun HMSRoomLayout.getPreviewLayout() = this.data?.getOrNull(0)?.screens?.preview
 
 
 internal fun CardView.setBackgroundColor(
@@ -137,10 +137,9 @@ internal fun ImageView.setIconEnabled(
     val r: Float = getResources().getDimension(R.dimen.eight_dp)
     val radii = floatArrayOf(r, r, r, r, r, r, r, r)
 
-    shapedrawable.shape = RoundRectShape(radii, null, radii.map { it/4 }.toFloatArray())
-    shapedrawable.paint.color =  getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.secondaryBright,
-        HMSPrebuiltTheme.getDefaults().border_bright
+    shapedrawable.shape = RoundRectShape(radii, null, radii.map { it / 4 }.toFloatArray())
+    shapedrawable.paint.color = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.secondaryBright, HMSPrebuiltTheme.getDefaults().border_bright
     )
 
     shapedrawable.paint.isAntiAlias = true
@@ -340,16 +339,16 @@ internal fun FragmentMeetingBinding.applyTheme() {
     buttonSwitchCamera?.setIconEnabled(R.drawable.ic_switch_camera)
 
 
-/*    buttonSettingsMenuTop?.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    )
+    /*    buttonSettingsMenuTop?.setIconTintColor(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
 
-    buttonSettingsMenuTop?.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright,
-        R.drawable.gray_round_stroked_drawable
-    )*/
+        buttonSettingsMenuTop?.setBackgroundAndColor(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright,
+            R.drawable.gray_round_stroked_drawable
+        )*/
 
     //bottom menu
     bottomControls.setBackgroundAndColor(
@@ -362,18 +361,16 @@ internal fun FragmentMeetingBinding.applyTheme() {
     (buttonToggleAudio as? AppCompatImageButton)?.setIconDisabled(R.drawable.ic_audio_toggle_off)
 
 
+    /*    buttonSettingsMenu?.setIconTintColor(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
 
-
-/*    buttonSettingsMenu?.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    )
-
-    buttonSettingsMenu?.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright,
-        R.drawable.gray_round_stroked_drawable
-    )*/
+        buttonSettingsMenu?.setBackgroundAndColor(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright,
+            R.drawable.gray_round_stroked_drawable
+        )*/
 
 
 }
@@ -449,6 +446,7 @@ internal fun VideoCardBinding.applyTheme() {
     )
 
 }
+
 internal fun BottomSheetAudioSwitchBinding.applyTheme() {
 }
 
@@ -546,6 +544,7 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
     buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
 
 }
+
 //internal fun FragmentRolePreview.applyTheme() {
 //
 //}
@@ -710,8 +709,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
 fun ExitBottomSheetBinding.applyTheme() {
     endSessionRoot.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDim,
-        HMSPrebuiltTheme.getDefaults().background_default
+        HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().background_default
     )
 
     leaveTitle.setTextColor(
@@ -762,8 +760,7 @@ fun ExitBottomSheetBinding.applyTheme() {
 
 fun EndSessionBottomSheetBinding.applyTheme() {
     root.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDim,
-        HMSPrebuiltTheme.getDefaults().background_default
+        HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().background_default
     )
 
     endSessionIcon.setIconTintColor(
@@ -835,9 +832,11 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
-    screenShareClose.setBackgroundAndColor(HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+    screenShareClose.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
-        R.drawable.blue_round_solid_drawable)
+        R.drawable.blue_round_solid_drawable
+    )
 
 
 
@@ -902,11 +901,11 @@ fun FragmentGridVideoBinding.applyTheme() {
     )
     tabLayoutDots.alpha = 0.64f
 
-/*    gridViewLinearLayout.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.backgroundDim,
-        HMSPrebuiltTheme.getDefaults().background_default
-    )
-    gridViewLinearLayout.alpha = 0.64f*/
+    /*    gridViewLinearLayout.setBackgroundAndColor(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+        gridViewLinearLayout.alpha = 0.64f*/
 
 }
 
@@ -917,8 +916,10 @@ fun ItemGridOptionBinding.applyTheme() {
     )
 
     participantImage.drawable.setTint(
-        getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
     )
 
     subtitle.setTextColor(
@@ -941,5 +942,53 @@ fun ItemGridOptionBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+
+}
+
+fun NotificationCardBinding.applyTheme() {
+
+    card.setBackgroundAndColor(
+
+        HMSPrebuiltTheme.getColours()?.surfaceDim,
+        HMSPrebuiltTheme.getDefaults().surface_dim
+        ,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    ribbon.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
+
+    crossIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    actionButton.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    actionButton.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
 
 }
