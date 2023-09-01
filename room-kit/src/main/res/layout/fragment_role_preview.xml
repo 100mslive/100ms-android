@@ -128,10 +128,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/button_toggle_audio"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:padding="0.5dp"
+                app:contentPadding="@dimen/eight_dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="@dimen/sizeteen_dp"
                 android:layout_marginVertical="@dimen/eight_dp"
@@ -144,12 +146,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/button_toggle_video"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginStart="24dp"
+                android:padding="0.5dp"
+                app:contentPadding="@dimen/eight_dp"
                 android:layout_marginVertical="@dimen/eight_dp"
                 android:background="@drawable/gray_round_solid_drawable"
                 android:contentDescription="@string/toggle_video"
@@ -160,11 +164,13 @@
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
                 app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/button_switch_camera"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
+                android:padding="0.5dp"
+                app:contentPadding="@dimen/eight_dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginVertical="@dimen/eight_dp"
                 android:contentDescription="@string/toggle_video"
@@ -176,12 +182,14 @@
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
                 app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/icon_output_device"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
+                android:padding="0.5dp"
+                app:contentPadding="@dimen/eight_dp"
                 android:layout_marginEnd="16dp"
                 android:visibility="gone"
                 app:iconSize="24dp"

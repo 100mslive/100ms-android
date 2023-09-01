@@ -37,6 +37,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -793,7 +794,7 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.isLocalVideoEnabled.observe(viewLifecycleOwner) { enabled ->
-            (binding.buttonToggleVideo as? AppCompatImageButton)?.apply {
+            (binding.buttonToggleVideo)?.apply {
                 if (enabled) {
                     setIconEnabled(R.drawable.avd_video_off_to_on)
                     binding.buttonSwitchCamera?.alpha = 1.0f
@@ -809,7 +810,7 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
             updatePipMicState(isMicOn = enabled)
-            (binding.buttonToggleAudio as? AppCompatImageButton)?.apply {
+            (binding.buttonToggleAudio as? ShapeableImageView)?.apply {
 
                 if (enabled) {
                     setIconEnabled(R.drawable.avd_mic_off_to_on)

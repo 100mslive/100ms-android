@@ -133,19 +133,23 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/button_switch_camera"
             android:layout_width="40dp"
+            android:padding="0.5dp"
+            app:contentPadding="@dimen/eight_dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_switch_camera"
             app:iconSize="24dp"
             android:layout_marginEnd="16dp"/>
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/icon_output_device"
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:iconSize="24dp"
+            android:padding="0.5dp"
+            app:contentPadding="@dimen/eight_dp"
             android:visibility="gone"
             android:src="@drawable/ic_icon_speaker"
             android:layout_marginEnd="16dp"/>
@@ -241,13 +245,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/button_toggle_audio"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:padding="0.5dp"
+            app:contentPadding="@dimen/eight_dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_audio"
-            android:padding="10dp"
             app:srcCompat="@drawable/ic_audio_toggle_off" />
 
         <Space
@@ -256,13 +261,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/button_toggle_video"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:padding="0.5dp"
+            app:contentPadding="@dimen/eight_dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/toggle_video"
-            android:padding="8dp"
             app:srcCompat="@drawable/ic_camera_toggle_off" />
 
         <Space
@@ -272,13 +278,14 @@
             android:visibility="gone"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/button_raise_hand"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:padding="0.5dp"
+            app:contentPadding="@dimen/eight_dp"
             android:background="@drawable/gray_round_stroked_drawable"
             android:contentDescription="@string/raise_hand"
-            android:padding="8dp"
             android:visibility="gone"
             app:srcCompat="@drawable/ic_hand_raise" />
 
@@ -293,14 +300,15 @@
             android:layout_height="match_parent"
             android:gravity="center">
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/button_open_chat"
+                android:padding="0.5dp"
+                app:contentPadding="@dimen/eight_dp"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:contentDescription="@string/open_chat"
-                android:padding="8dp"
                 app:srcCompat="@drawable/ic_chat_message" />
 
             <TextView
@@ -317,14 +325,16 @@
 
         </RelativeLayout>
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/button_share_screen"
             android:layout_width="40dp"
+            android:padding="0.5dp"
+            app:contentPadding="@dimen/eight_dp"
             android:layout_height="40dp"
             android:layout_marginBottom="10dp"
             android:visibility="gone"
             android:contentDescription="@string/toggle_video"
-            android:padding="8dp" />
+             />
 
         <Space
             android:id="@+id/space_6"
@@ -332,12 +342,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/button_settings_menu"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:padding="0.5dp"
+            app:contentPadding="@dimen/eight_dp"
             android:contentDescription="@string/settings"
-            android:padding="8dp"
             app:srcCompat="@drawable/ic_settings_btn" />
 
         <Space

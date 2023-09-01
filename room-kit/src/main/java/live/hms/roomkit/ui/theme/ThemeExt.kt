@@ -121,38 +121,6 @@ fun View.backgroundGradientDrawable(@ColorInt startColor: Int, @ColorInt endColo
     this.background = shapeDrawable
 }
 
-internal fun ImageView.setIconEnabled(
-    @DrawableRes enabledIconDrawableRes: Int
-) {
-    this.setBackgroundResource(R.drawable.gray_round_stroked_drawable)
-    this.setBackgroundColor(resources.getColor(android.R.color.transparent))
-    this.setImageResource(enabledIconDrawableRes)
-
-    drawable.setTint(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-    val shapedrawable = ShapeDrawable()
-    val mDensity = getResources().getDisplayMetrics().density;
-    val r: Float = getResources().getDimension(R.dimen.eight_dp)
-    val radii = floatArrayOf(r, r, r, r, r, r, r, r)
-
-    shapedrawable.shape = RoundRectShape(radii, null, null)
-    shapedrawable.paint.color = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.secondaryBright, HMSPrebuiltTheme.getDefaults().border_bright
-    )
-
-    shapedrawable.paint.isAntiAlias = true
-    shapedrawable.paint.strokeWidth = getResources().getDimension(R.dimen.two_dp)
-    shapedrawable.paint.style = Paint.Style.STROKE
-
-
-    background = shapedrawable
-
-    (drawable as? Animatable)?.start()
-}
 
 internal fun ShapeableImageView.setIconEnabled(
     @DrawableRes enabledIconDrawableRes: Int
@@ -387,7 +355,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
     //init should be called once
     buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
 
-    (buttonOpenChat as? AppCompatImageButton)?.setIconEnabled(R.drawable.ic_chat_message)
+    (buttonOpenChat)?.setIconEnabled(R.drawable.ic_chat_message)
 
     buttonSettingsMenu?.setIconEnabled(R.drawable.ic_settings_btn)
 
@@ -424,9 +392,9 @@ internal fun FragmentMeetingBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().background_default,
     )
 
-    (buttonToggleVideo as? AppCompatImageButton)?.setIconDisabled(R.drawable.ic_camera_toggle_off)
+    (buttonToggleVideo)?.setIconDisabled(R.drawable.ic_camera_toggle_off)
 
-    (buttonToggleAudio as? AppCompatImageButton)?.setIconDisabled(R.drawable.ic_audio_toggle_off)
+    (buttonToggleAudio)?.setIconDisabled(R.drawable.ic_audio_toggle_off)
 
 
     /*    buttonSettingsMenu?.setIconTintColor(
