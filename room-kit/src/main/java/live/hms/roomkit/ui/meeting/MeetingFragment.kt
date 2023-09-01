@@ -92,12 +92,7 @@ class MeetingFragment : Fragment() {
     private var startPollSnackBar : Snackbar? = null
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
-    private var notificationManager : CardStackLayoutManager ? = null
-    private val hmsNotificationAdapter by lazy {
-        HMSNotificationAdapter(
-            onActionButtonClicked = ::handleNotificationButtonClick,
-            onDismissClicked = ::handleNotificationDismissClick)
-    }
+
 
 
 
@@ -648,7 +643,7 @@ class MeetingFragment : Fragment() {
 
                 is MeetingState.NonFatalFailure -> {
                     val message = state.exception.message
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    meetingViewModel.triggerErrorNotification(message)
                 }
 
                 is MeetingState.Failure -> {
@@ -692,29 +687,6 @@ class MeetingFragment : Fragment() {
                 is MeetingState.RoleChangeRequest -> {
 
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRolePreviewFragment())
-//                    alertDialog?.dismiss()
-//                    alertDialog = null
-//                    hideProgressBar()
-//
-//                    val dialog = Dialog(requireContext())
-//                    dialog.setContentView(R.layout.change_role_request_dialog)
-//
-//                    dialog.findViewById<TextView>(R.id.change_role_text).text =
-//                        "${state.hmsRoleChangeRequest.requestedBy?.name} wants to change your role to : \n" + state.hmsRoleChangeRequest.suggestedRole.name
-//
-//                    dialog.findViewById<AppCompatButton>(R.id.cancel_btn).setOnClickListener {
-//                        dialog.dismiss()
-//                        meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
-//                    }
-//
-//                    dialog.findViewById<AppCompatButton>(R.id.accept_role_change_btn)
-//                        .setOnClickListener {
-//                            dialog.dismiss()
-//                            meetingViewModel.changeRoleAccept(state.hmsRoleChangeRequest)
-//                            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
-//                        }
-//
-//                    dialog.show()
                 }
 
                 is MeetingState.Reconnecting -> {
@@ -824,9 +796,6 @@ class MeetingFragment : Fragment() {
             chatViewModel.peersUpdate()
         }
 
-        meetingViewModel.hmsNotificationEvent.observe(viewLifecycleOwner) {
-            triggerNotification(it)
-        }
     }
 
 
@@ -1498,53 +1467,6 @@ class MeetingFragment : Fragment() {
             })
         binding.roleSpinner.root.performClick()
     }
-
-    private fun triggerNotification(hmsNotification: HMSNotification) {
-        initNotificationUI()
-        appendNotification(hmsNotification)
-    }
-
-    private fun appendNotification(hmsNotification: HMSNotification) {
-        val old = hmsNotificationAdapter.getItems()
-        val new = mutableListOf<HMSNotification>().apply {
-            addAll(old)
-            add(notificationManager!!.topPosition, hmsNotification)
-
-        }
-        val callback = HMSNotificationDiffCallBack(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        hmsNotificationAdapter.setItems(new)
-        result.dispatchUpdatesTo(hmsNotificationAdapter)
-    }
-
-    private fun initNotificationUI() {
-        if (notificationManager == null && binding.notifcationCardList?.context != null) {
-            notificationManager = notificationManager.init(binding.notifcationCardList!!.context)
-            binding.notifcationCardList?.apply {
-                layoutManager = notificationManager
-                adapter = hmsNotificationAdapter
-                itemAnimator.apply {
-                    if (this is DefaultItemAnimator) {
-                        supportsChangeAnimations = false
-                    }
-                }
-            }
-        }
-    }
-
-    private fun handleNotificationButtonClick(type: HMSNotificationType) {
-        when(type){
-            is HMSNotificationType.BringOnStage -> {
-                meetingViewModel.requestBringOnStage(type.handRaisePeer)
-            }
-            else -> {}
-        }
-    }
-
-    private fun handleNotificationDismissClick() {
-        binding.notifcationCardList?.swipe()
-    }
-
 
     fun inflateExitFlow() {
         LeaveBottomSheet()

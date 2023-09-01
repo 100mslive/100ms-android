@@ -77,35 +77,35 @@ class SessionOptionBottomSheet(
 
 
         val screenShareOption = GridOptionItem(
-            getString(R.string.screen_share),
+            resources.getString(R.string.start_screen_share),
             R.drawable.ic_share_screen,
             onScreenShareClicked,
             isSelected = meetingViewModel.isScreenShared()
         )
 
         val brbOption = GridOptionItem(
-            getString(R.string.brb), R.drawable.ic_brb, {
+            resources.getString(R.string.brb), R.drawable.ic_brb, {
                 onBRBClicked.invoke()
                 dismiss()
             }, isSelected = meetingViewModel.isBRBOn()
         )
 
         val raiseHandOption = GridOptionItem(
-            getString(R.string.raise_hand), R.drawable.ic_raise_hand, {
+            resources.getString(R.string.raise_hands), R.drawable.ic_raise_hand, {
                 onRaiseHandClicked.invoke()
                 dismiss()
             }, isSelected = false
         )
 
         val peerListOption = GridOptionItem(
-            getString(R.string.peer_list), R.drawable.ic_icon_people, {
+            resources.getString(R.string.peer_list), R.drawable.ic_icon_people, {
                 onPeerListClicked.invoke()
                 dismiss()
             }, isSelected = false,
         )
 
         val recordingOption = GridOptionItem(
-            getString(R.string.record_meeting), R.drawable.ic_record_button_24, {
+            resources.getString(R.string.record_meeting), R.drawable.ic_record_button_24, {
                 onRecordingClicked.invoke()
                 dismiss()
             }, isSelected = false,
@@ -124,12 +124,13 @@ class SessionOptionBottomSheet(
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
             val isRecording = meetingViewModel.isRecordingState()
             recordingOption.setSelectedButton(isRecording)
-            recordingOption.setText(if (isRecording) getString(R.string.stop_recording) else getString(R.string.record_meeting))
+            recordingOption.setText(if (isRecording) resources.getString(R.string.stop_recording) else resources.getString(R.string.record_meeting))
         }
 
         meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
             screenShareOption.setSelectedButton(it)
             peerListOption.setParticpantCountUpdate(meetingViewModel.peers.size)
+            screenShareOption.setText(if (it) resources.getString(R.string.stop_share_screen) else resources.getString(R.string.start_screen_share))
         }
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) {

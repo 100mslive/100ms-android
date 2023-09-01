@@ -207,14 +207,6 @@
 
     </RelativeLayout>
     
-    <live.hms.roomkit.ui.notification.CardStackView
-        android:layout_above="@id/bottom_controls"
-        android:id="@+id/notifcation_card_list"
-        android:layout_width="match_parent"
-        android:paddingHorizontal="@dimen/eight_dp"
-        android:paddingVertical="@dimen/sizeteen_dp"
-        android:clipToPadding="false"
-        android:layout_height="85dp"/>
 
     <LinearLayout
         android:id="@+id/bottom_controls"
@@ -237,7 +229,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:contentDescription="@string/end_call"
-            app:srcCompat="@drawable/ic_end_call" />
+            app:srcCompat="@drawable/ic_leave" />
 
         <Space
             android:id="@+id/space_2"

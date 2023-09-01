@@ -139,8 +139,6 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
             override fun onTracks(localTracks: Array<HMSTrack>) {
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
-                        Log.d("RolePreviewFragment", "onTracks: ${localTracks.size} and ${binding.toString()}")
-                        viewLifecycleOwner.lifecycleScope.launch {
                             var isAudioRequired: Boolean = false
                             var isVideoRequired: Boolean = false
                             localTracks.forEach {
@@ -155,7 +153,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
                                 } else if (it is HMSLocalAudioTrack) {
                                     localAudioTrack = it
                                     isAudioRequired = true
-                                    //  binding.buttonToggleAudio.visibility = View.VISIBLE
+                                    binding.buttonToggleAudio.visibility = View.VISIBLE
                                     setLocalAudioTrackState(it.isMute)
                                 }
                             }
@@ -174,7 +172,6 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
                         }
 
 
-                    }
                 }
             }
 
