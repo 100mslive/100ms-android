@@ -1,14 +1,13 @@
 package live.hms.roomkit.ui.meeting.participants
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.widget.PopupMenu
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemPeerListBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
-import live.hms.roomkit.ui.meeting.ParticipantLabelInfo
+import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
@@ -24,7 +23,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val isAllowedToChangeRole : Boolean,
                       private val isAllowedToMutePeers : Boolean,
                       private val isAllowedToRemovePeers : Boolean,
-                      private val participantLabelInfo : ParticipantLabelInfo
+                      private val prebuiltInfoContainer : PrebuiltInfoContainer
                       ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.name.text = hmsPeer.name
@@ -44,13 +43,13 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                     when(menuItem.itemId) {
                         R.id.bring_on_stage -> {
                             // You must have a role to bring on stage
-                            val role = participantLabelInfo.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
+                            val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
                             if(role != null)
                                 changeRole(hmsPeer.peerID, role)
                             true
                         }
                         R.id.remove_from_stage -> {
-                            val role = participantLabelInfo.onStageExp(viewerPeer.hmsRole.name)?.offStageRoles?.firstOrNull()
+                            val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.offStageRoles?.firstOrNull()
                             Log.d("RolesChangingTo","$role offstage")
                             if(role != null)
                                 changeRole(hmsPeer.peerID, role)
@@ -78,10 +77,10 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
 
     private fun getMenuForGroup(forPeer: HMSPeer): Int {
         val isOffStageRole =
-            participantLabelInfo.onStageExp("broadcaster")?.offStageRoles?.contains(
+            prebuiltInfoContainer.onStageExp("broadcaster")?.offStageRoles?.contains(
                 forPeer.hmsRole.name
             ) == true
-        val isOnStageButNotBroadcasterRole = participantLabelInfo.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
+        val isOnStageButNotBroadcasterRole = prebuiltInfoContainer.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
 
         val isHandRaised = CustomPeerMetadata.fromJson(forPeer.metadata)?.isHandRaised == true
                 // You have to be in the offstage roles to be categorized as hand raised

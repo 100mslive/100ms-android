@@ -71,7 +71,7 @@ class MeetingViewModel(
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null
-        val participantLabelInfo = ParticipantLabelInfo()
+    val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK.getLocalPeer()!!) }
 
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
@@ -177,7 +177,7 @@ class MeetingViewModel(
 
                                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                                     hmsRoomLayout = layoutConfig
-                                    participantLabelInfo.setParticipantLabelInfo(hmsRoomLayout)
+                                    prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
                                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                                     onHMSActionResultListener.onSuccess()
