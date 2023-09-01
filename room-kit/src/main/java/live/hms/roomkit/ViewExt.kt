@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Looper
@@ -18,12 +19,10 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
-import live.hms.roomkit.R
 import live.hms.roomkit.helpers.OnSingleClickListener
 import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 import live.hms.video.media.tracks.HMSLocalVideoTrack
-
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.videoview.HMSVideoView
@@ -267,6 +266,23 @@ fun SurfaceViewRenderer.setRelease() {
 
 fun SurfaceViewRenderer.isInit() : Boolean {
     return (getTag(R.id.IS_INT) as? Boolean) == true
+}
+
+fun View.setGradient(startColor: Int, endColor: Int) {
+    val colors = intArrayOf(
+        startColor,
+        endColor    )
+
+    //create a new gradient color
+
+    //create a new gradient color
+    val gd = GradientDrawable(
+        GradientDrawable.Orientation.TOP_BOTTOM, colors
+    )
+    gd.cornerRadius = 0f
+    //apply the button background to newly created drawable gradient
+    //apply the button background to newly created drawable gradient
+    this.setBackground(gd)
 }
 
 

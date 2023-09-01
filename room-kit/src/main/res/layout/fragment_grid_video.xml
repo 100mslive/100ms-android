@@ -10,12 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        android:paddingStart="@dimen/eight_dp"
-        android:paddingTop="@dimen/sizeteen_dp">
+        android:clipToPadding="false"
+        android:paddingHorizontal="@dimen/eight_dp"
+        >
 
         <androidx.cardview.widget.CardView
             android:id="@+id/inset_pill"
             app:cardCornerRadius="@dimen/sizeteen_dp"
+            android:layout_gravity="bottom|right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 

@@ -140,9 +140,11 @@
                 android:background="@drawable/gray_round_solid_drawable"
                 android:contentDescription="@string/toggle_video"
                 android:drawablePadding="0dp"
+                tools:visibility="visible"
                 android:visibility="gone"
                 app:icon="@drawable/avd_mic_on_to_off"
                 app:iconGravity="start"
+                app:layout_constraintBottom_toTopOf="@id/button_join_meeting"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
@@ -161,6 +163,7 @@
                 android:layout_marginBottom="@dimen/sizeteen_dp"
                 android:src="@drawable/avd_video_on_to_off"
                 android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@id/button_join_meeting"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_audio"
                 app:layout_constraintTop_toBottomOf="@+id/subheading" />
 
@@ -179,6 +182,7 @@
                 android:visibility="gone"
                 android:layout_marginBottom="@dimen/sizeteen_dp"
                 app:iconSize="24dp"
+                app:layout_constraintBottom_toTopOf="@id/button_join_meeting"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
                 app:layout_constraintTop_toBottomOf="@+id/subheading" />
 

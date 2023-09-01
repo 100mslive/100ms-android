@@ -963,8 +963,10 @@ class MeetingViewModel(
     }
 
     private fun triggerBringOnStageNotificationIfHandRaised(handRaisedPeer: HMSPeer) {
-        //cuurent user has bring on stage permission
-        if(hasBringOnStageRolePermission(hmsSDK.getLocalPeer()?.hmsRole)) {
+        //triggerd user has on stage role permission
+        if(hasBringOnStageRolePermission(currentRole = hmsSDK.getLocalPeer()?.hmsRole, handRaisedPeerRole = handRaisedPeer.hmsRole)
+            && hmsSDK.getLocalPeer()?.hmsRole?.name == "broadcaster"
+        ) {
             if (CustomPeerMetadata.fromJson(handRaisedPeer.metadata)?.isHandRaised == true) {
                 hmsNotificationEvent.postValue(
                     HMSNotification(
@@ -1100,8 +1102,9 @@ class MeetingViewModel(
           return  hmsRoomLayout?.data?.findLast { it?.role ==  localRole?.name }?.screens?.conferencing?.hlsLiveStreaming != null
     }
 
-    private fun hasBringOnStageRolePermission(localRole: HMSRole?) : Boolean{
-        return  hmsRoomLayout?.data?.findLast { it?.role ==  localRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole == localRole?.name
+    //Checks if hand raised peer is eligble for viewer on stage
+    private fun hasBringOnStageRolePermission(currentRole : HMSRole?, handRaisedPeerRole: HMSRole?) : Boolean{
+        return  hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole == handRaisedPeerRole?.name
     }
 
     private fun switchToHlsView(streamUrl: String) =
@@ -2000,7 +2003,7 @@ class MeetingViewModel(
     }
 
     fun isRecordingState(): Boolean {
-        return isRecording.value == RecordingState.STREAMING_AND_RECORDING  || isRecording.value == RecordingState.RECORDING
+        return isRecording.value == RecordingState.RECORDING
     }
 
     fun requestBringOnStage(handRaisePeer: HMSPeer) {
@@ -2009,12 +2012,12 @@ class MeetingViewModel(
         }
     }
 
-    fun triggerErrorNotification(message: String) {
+    fun triggerErrorNotification(message: String, isDismissible: Boolean = true) {
         hmsNotificationEvent.postValue(
             HMSNotification(
                 title = "Error ${message}",
                 isError = true,
-                isDismissible = true,
+                isDismissible = isDismissible,
                 icon = R.drawable.ic_alert_triangle,
                 type = HMSNotificationType.Error
             )

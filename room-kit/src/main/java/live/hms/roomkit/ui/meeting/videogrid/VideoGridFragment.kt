@@ -223,6 +223,8 @@ class VideoGridFragment : Fragment() {
             peerGridVideoAdapter.totalPages = if (expectedItems == 0)
                 1
             else expectedItems
+
+            binding.tabLayoutDots.visibility = if(peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
         }
 
 

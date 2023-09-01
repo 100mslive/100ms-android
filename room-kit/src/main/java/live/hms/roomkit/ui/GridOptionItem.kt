@@ -2,6 +2,7 @@ package live.hms.roomkit.ui
 
 import android.view.View
 import androidx.annotation.DrawableRes
+import com.google.android.material.shape.CornerFamily
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ItemGridOptionBinding
@@ -32,10 +33,11 @@ class GridOptionItem(
 
 
         if (particpantCount != null) {
-            viewBinding.badge.visibility = View.VISIBLE
+
+            viewBinding.participantCountText.visibility = View.VISIBLE
             viewBinding.participantCountText.text = particpantCount.toString()
         } else {
-            viewBinding.badge.visibility = View.GONE
+            viewBinding.participantCountText.visibility = View.GONE
         }
 
         viewBinding.root.setOnClickListener {
@@ -46,38 +48,38 @@ class GridOptionItem(
     }
 
     private fun setSelectedView(isSelected: Boolean, v: ItemGridOptionBinding) {
-        if (isSelected.not()) v.root.setBackgroundAndColor(
+        if (isSelected.not()) v.rootLayout.setBackgroundAndColor(
             HMSPrebuiltTheme.getColours()?.backgroundDefault,
-            HMSPrebuiltTheme.getDefaults().background_default
+            HMSPrebuiltTheme.getDefaults().background_default,
+            R.drawable.blue_round_solid_drawable
         ) else {
-            v.root.setBackgroundAndColor(
+            v.rootLayout.setBackgroundAndColor(
                 HMSPrebuiltTheme.getColours()?.surfaceBrighter,
-                HMSPrebuiltTheme.getDefaults().surface_bright
+                HMSPrebuiltTheme.getDefaults().surface_bright,
+                R.drawable.blue_round_solid_drawable
             )
         }
     }
 
     override fun bind(v: ItemGridOptionBinding, position: Int, payloads: MutableList<Any>) {
-        when {
-            payloads.contains(SELECTION_UPDATE) -> {
-                setSelectedView(isSelected, v)
-            }
 
-            payloads.contains(PARTICPANT_COUNt_UPDATE) -> {
-                if (particpantCount != null) {
-                    v.badge.visibility = View.VISIBLE
-                    v.participantCountText.text = particpantCount.toString()
-                } else {
-                    v.badge.visibility = View.GONE
-                }
-            }
-
-            payloads.contains(TEXT_UPDATE) -> {
-                v.subtitle.text = title
-            }
-
-            else -> bind(v, position)
+        if (payloads.contains(SELECTION_UPDATE)) {
+            setSelectedView(isSelected, v)
         }
+        if (payloads.contains(PARTICPANT_COUNt_UPDATE)) {
+            if (particpantCount != null) {
+                v.participantCountText.visibility = View.VISIBLE
+                v.participantCountText.text = particpantCount.toString()
+            } else {
+                v.participantCountText.visibility = View.GONE
+            }
+        }
+        if (payloads.contains(TEXT_UPDATE)) {
+            v.subtitle.text = title
+        }
+
+        bind(v, position)
+
     }
 
 
