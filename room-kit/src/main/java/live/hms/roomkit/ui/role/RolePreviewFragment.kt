@@ -159,8 +159,9 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
                             }
 
                             if (isAudioRequired.not() && isVideoRequired.not()) {
-                                binding.heading.visibility = View.GONE
-                                binding.subheading.visibility = View.GONE
+                                binding.heading.visibility = View.VISIBLE
+                                binding.subheading.visibility = View.VISIBLE
+                                binding.subheading.text = getString(R.string.audio_video_subheading_no)
                             } else if (isAudioRequired && isVideoRequired.not()) {
                                 binding.subheading.text = getString(R.string.audio_only_subheading)
                             } else if (isAudioRequired.not() && isVideoRequired) {
