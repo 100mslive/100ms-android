@@ -256,8 +256,8 @@ class PreviewFragment : Fragment() {
                 binding.iconParticipants.visibility = View.VISIBLE
                 binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
             }
-            updateJoinButtonTextIfHlsIsEnabled()
             isHlsRunning = it.second.hlsStreamingState?.running == true
+            updateJoinButtonTextIfHlsIsEnabled()
 
             if (it.second.hlsStreamingState?.running == true) {
                 binding.liveHlsGroup.visibility = View.VISIBLE
