@@ -92,12 +92,7 @@ class MeetingFragment : Fragment() {
     private var startPollSnackBar : Snackbar? = null
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
-    private var notificationManager : CardStackLayoutManager ? = null
-    private val hmsNotificationAdapter by lazy {
-        HMSNotificationAdapter(
-            onActionButtonClicked = ::handleNotificationButtonClick,
-            onDismissClicked = ::handleNotificationDismissClick)
-    }
+
 
 
 
@@ -801,9 +796,6 @@ class MeetingFragment : Fragment() {
             chatViewModel.peersUpdate()
         }
 
-        meetingViewModel.hmsNotificationEvent.observe(viewLifecycleOwner) {
-            triggerNotification(it)
-        }
     }
 
 
@@ -1475,54 +1467,6 @@ class MeetingFragment : Fragment() {
             })
         binding.roleSpinner.root.performClick()
     }
-
-    private fun triggerNotification(hmsNotification: HMSNotification) {
-        initNotificationUI()
-        appendNotification(hmsNotification)
-    }
-
-    private fun appendNotification(hmsNotification: HMSNotification) {
-        val old = hmsNotificationAdapter.getItems()
-        val new = mutableListOf<HMSNotification>().apply {
-            addAll(old)
-            add(notificationManager!!.topPosition, hmsNotification)
-
-        }
-        val callback = HMSNotificationDiffCallBack(old, new)
-        val result = DiffUtil.calculateDiff(callback)
-        hmsNotificationAdapter.setItems(new)
-        result.dispatchUpdatesTo(hmsNotificationAdapter)
-    }
-
-    private fun initNotificationUI() {
-        if (notificationManager == null && binding.notifcationCardList?.context != null) {
-            notificationManager = notificationManager.init(binding.notifcationCardList!!.context)
-            binding.notifcationCardList?.apply {
-                layoutManager = notificationManager
-                adapter = hmsNotificationAdapter
-                itemAnimator.apply {
-                    if (this is DefaultItemAnimator) {
-                        supportsChangeAnimations = false
-                    }
-                }
-            }
-        }
-    }
-
-    private fun handleNotificationButtonClick(type: HMSNotificationType) {
-        when(type){
-            is HMSNotificationType.BringOnStage -> {
-                meetingViewModel.requestBringOnStage(type.handRaisePeer)
-                handleNotificationDismissClick()
-            }
-            else -> {}
-        }
-    }
-
-    private fun handleNotificationDismissClick() {
-        binding.notifcationCardList?.swipe()
-    }
-
 
     fun inflateExitFlow() {
         LeaveBottomSheet()
