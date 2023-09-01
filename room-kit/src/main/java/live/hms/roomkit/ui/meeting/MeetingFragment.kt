@@ -25,7 +25,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.*
@@ -1165,7 +1164,13 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
-                            findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()) },
+                            val direction = if( meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
+                                MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
+                            } else {
+                                MeetingFragmentDirections.actionMeetingFragmentToChatParticipantCombinedFragment(showParticipants = true)
+                            }
+                            findNavController().navigate(direction)
+                        },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
                         onNameChange = {  },
                         onRecordingClicked = {
@@ -1211,7 +1216,7 @@ class MeetingFragment : Fragment() {
         }
 
         binding.buttonOpenChat.setOnSingleClickListener {
-            if(true) {
+            if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                 findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToChatParticipantCombinedFragment())
             } else {
                 with(binding.chatView!!) {

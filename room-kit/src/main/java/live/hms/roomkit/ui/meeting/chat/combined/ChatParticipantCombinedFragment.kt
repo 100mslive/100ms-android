@@ -8,15 +8,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.meeting.ChatViewModelFactory
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.util.viewLifecycle
 class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -36,6 +35,7 @@ class ChatParticipantCombinedFragment : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
     val meetingViewModel : MeetingViewModel by activityViewModels()
+    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,6 +59,10 @@ class ChatParticipantCombinedFragment : Fragment() {
         binding.closeCombinedTabButton.setOnSingleClickListener {
             findNavController().popBackStack()
         }
+        if(args.showParticipants)
+            binding.pager.post {
+                binding.pager.setCurrentItem(1, true)
+            }
     }
     private fun initOnBackPress() {
         requireActivity().onBackPressedDispatcher.addCallback(
