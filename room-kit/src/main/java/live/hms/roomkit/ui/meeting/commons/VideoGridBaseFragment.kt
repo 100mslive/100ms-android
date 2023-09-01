@@ -270,8 +270,13 @@ abstract class VideoGridBaseFragment : Fragment() {
       )
 
       audioLevel.alpha = visibilityOpacity(
-        isAudioMute.not()
+        isAudioMute.not() || isScreenshare().not()
       )
+
+      binding.iconMaximised.visibility = if (isScreenshare()) View.VISIBLE else View.GONE
+      binding.iconMaximised.setOnClickListener {
+        meetingViewModel.triggerScreenShareBottomSheet(item.video)
+      }
 
       /*if (isAudioMute)
       iconAudioOff.visibility  = View.VISIBLE

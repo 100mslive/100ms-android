@@ -243,6 +243,11 @@ class VideoGridFragment : Fragment() {
             binding.tabLayoutDots.visibility = if(peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
         }
 
+        meetingViewModel.hmsScreenShareBottomSheetEvent.observe(viewLifecycleOwner) {
+            ScreenShareFragement(it).show(
+                childFragmentManager, VideoGridFragment.TAG
+            )
+        }
 
     }
 
