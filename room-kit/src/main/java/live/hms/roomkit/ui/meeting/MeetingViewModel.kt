@@ -18,6 +18,7 @@ import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.polls.PollCreationInfo
@@ -68,10 +69,11 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null
-        val participantLabelInfo = ParticipantLabelInfo()
+    val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
 
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
@@ -177,7 +179,7 @@ class MeetingViewModel(
 
                                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                                     hmsRoomLayout = layoutConfig
-                                    participantLabelInfo.setParticipantLabelInfo(hmsRoomLayout)
+                                    prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
                                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                                     onHMSActionResultListener.onSuccess()

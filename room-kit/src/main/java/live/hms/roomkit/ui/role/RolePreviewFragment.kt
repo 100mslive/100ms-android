@@ -28,6 +28,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSTrack
+import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.RolePreviewListener
 
 class RolePreviewFragment : BottomSheetDialogFragment() {
@@ -101,20 +102,28 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
         }
 
         binding.buttonJoinMeeting.setOnClickListener {
-            meetingViewModel.changeRoleAccept(onSuccess = {
-                contextSafe { context, activity ->
-                    activity.runOnUiThread {
-                        binding.previewView.removeTrack()
-                        findNavController().navigate(
-                            RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
-                                false
-                            )
-                        )
-
-                    }
+            meetingViewModel.participantPreviousRoleChangeUseCase.setPreviousRole(meetingViewModel.hmsSDK.getLocalPeer()!!, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    Log.e("RolePreviewFragment","Error $error")
                 }
-            })
 
+                override fun onSuccess() {
+                    meetingViewModel.changeRoleAccept(onSuccess = {
+                        contextSafe { context, activity ->
+                            activity.runOnUiThread {
+                                binding.previewView.removeTrack()
+                                findNavController().navigate(
+                                    RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
+                                        false
+                                    )
+                                )
+
+                            }
+                        }
+                    })
+                }
+
+            })
         }
 
         binding.declineButton.setOnClickListener {
