@@ -8,6 +8,7 @@ import android.app.RemoteAction
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.drawable.Icon
 import android.media.projection.MediaProjectionManager
 import android.os.Build
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
+import live.hms.roomkit.setGradient
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
@@ -956,13 +958,18 @@ class MeetingFragment : Fragment() {
         fragmentContainerParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         binding.fragmentContainer.layoutParams = fragmentContainerParam
 
-        binding.topMenu?.background = context?.let {
-            ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable)
-        }
+        binding.topMenu.setGradient(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+            , Color.TRANSPARENT)
 
-        binding.bottomControls.background = context?.let {
-            ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable_2)
-        }
+
+        binding.bottomControls.setGradient(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+            , Color.TRANSPARENT)
 
         binding.space4?.visibility = View.VISIBLE
         binding.buttonRaiseHand?.visibility = View.VISIBLE

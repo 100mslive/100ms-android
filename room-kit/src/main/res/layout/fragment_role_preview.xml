@@ -64,6 +64,7 @@
         </androidx.cardview.widget.CardView>
 
         <FrameLayout
+            android:id="@+id/preview_gradient"
             android:layout_width="match_parent"
             android:layout_height="216dp"
             android:background="@drawable/bg_gradient_drawable"
