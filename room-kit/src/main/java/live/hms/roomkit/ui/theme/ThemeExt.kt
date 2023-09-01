@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
@@ -34,6 +35,7 @@ import live.hms.roomkit.databinding.ItemGridOptionBinding
 import live.hms.roomkit.databinding.NotificationCardBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
+import live.hms.roomkit.setGradient
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -585,6 +587,12 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
 //
 //}
 internal fun FragmentPreviewBinding.applyTheme() {
+
+    previewGradient.setGradient(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.backgroundDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+    , Color.TRANSPARENT)
 
     buttonJoinMeeting.setTextColor(
         getColorOrDefault(

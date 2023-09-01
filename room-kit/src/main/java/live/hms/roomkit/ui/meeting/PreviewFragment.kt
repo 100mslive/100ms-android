@@ -83,7 +83,6 @@ class PreviewFragment : Fragment() {
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
     private var isHlsRunning = false
-    private var isHlsPermission = false
 
 
 
@@ -91,7 +90,7 @@ class PreviewFragment : Fragment() {
         val hlsJoinButtonFromLayoutConfig = meetingViewModel.getHmsRoomLayout()
             ?.getPreviewLayout()?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
 
-        if (isHlsPermission && isHlsRunning.not() && hlsJoinButtonFromLayoutConfig) {
+        if (isHlsRunning.not() && hlsJoinButtonFromLayoutConfig) {
             if (binding.buttonJoinMeeting.drawableStart == null) {
                 binding.buttonJoinMeeting.setDrawables(
                     start = ContextCompat.getDrawable(
@@ -259,7 +258,6 @@ class PreviewFragment : Fragment() {
             }
             updateJoinButtonTextIfHlsIsEnabled()
             isHlsRunning = it.second.hlsStreamingState?.running == true
-            isHlsPermission = it.second.localPeer?.hmsRole?.permission?.hlsStreaming ?: false
 
             if (it.second.hlsStreamingState?.running == true) {
                 binding.liveHlsGroup.visibility = View.VISIBLE
