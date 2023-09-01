@@ -486,7 +486,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           videoCard.audioLevel.update(level)
         }
 
-        videoCard.audioLevel.visibility = View.VISIBLE
+        videoCard.audioLevel.visibility = if (isScreenshare().not()) View.VISIBLE else View.GONE
       }
     }
   }
