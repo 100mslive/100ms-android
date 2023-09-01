@@ -648,7 +648,7 @@ class MeetingFragment : Fragment() {
 
                 is MeetingState.NonFatalFailure -> {
                     val message = state.exception.message
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    meetingViewModel.triggerErrorNotification(message)
                 }
 
                 is MeetingState.Failure -> {
@@ -1536,6 +1536,7 @@ class MeetingFragment : Fragment() {
         when(type){
             is HMSNotificationType.BringOnStage -> {
                 meetingViewModel.requestBringOnStage(type.handRaisePeer)
+                handleNotificationDismissClick()
             }
             else -> {}
         }
