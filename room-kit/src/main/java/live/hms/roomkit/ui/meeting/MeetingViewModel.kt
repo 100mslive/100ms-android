@@ -73,7 +73,7 @@ class MeetingViewModel(
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null
-    val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK.getLocalPeer()!!) }
+    val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
 
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =

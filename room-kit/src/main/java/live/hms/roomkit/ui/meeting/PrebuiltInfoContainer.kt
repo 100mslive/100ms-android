@@ -1,11 +1,13 @@
 package live.hms.roomkit.ui.meeting
 
+import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.signal.init.HMSRoomLayout
 
-class PrebuiltInfoContainer(private val localPeer : HMSLocalPeer) {
+class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     private var hmsRoomLayout : HMSRoomLayout? = null
     private val roleMap : MutableMap<String, HMSRoomLayout.HMSRoomLayoutData> = mutableMapOf()
+    private val localPeer by lazy { hmssdk.getLocalPeer()!! }
 
     fun isChatOverlay() = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
         ?.default?.elements?.chat?.overlayView == true
