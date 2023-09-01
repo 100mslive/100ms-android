@@ -465,6 +465,27 @@ internal fun VideoCardBinding.applyTheme() {
         R.drawable.circle_secondary_32
     )
 
+    iconAudioOff.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    iconMaximised.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+
+    iconMaximised.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_32
+    )
+
     audioLevel.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,
@@ -477,10 +498,24 @@ internal fun VideoCardBinding.applyTheme() {
         R.drawable.circle_secondary_32
     )
 
+    raisedHand.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
     isBrb.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
+    )
+
+    isBrb.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
     )
 
 }

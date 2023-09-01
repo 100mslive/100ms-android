@@ -285,6 +285,7 @@ class MeetingViewModel(
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
     val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
     val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
+    val hmsScreenShareBottomSheetEvent = SingleLiveEvent<String>()
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {
@@ -2025,6 +2026,12 @@ class MeetingViewModel(
                 actionButtonText = actionButtonText
             )
         )
+    }
+
+    fun triggerScreenShareBottomSheet(video: HMSVideoTrack?) {
+        video?.trackId?.let {
+            hmsScreenShareBottomSheetEvent.postValue(it)
+        }
     }
 }
 
