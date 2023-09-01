@@ -13,12 +13,15 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
+import live.hms.roomkit.ui.meeting.AudioOutputSwitchBottomSheet
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.util.NameUtils
+import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.roomkit.util.visibilityOpacity
 import live.hms.video.error.HMSException
@@ -83,10 +86,23 @@ class VideoGridFragment : Fragment() {
         }
 
         binding.applyTheme()
+        binding.iconOption.setOnClickListener {
+            LocalTileBottomSheet {
+                contextSafe { context, activity ->
+                    toggleInsetUI(isMinimised = true)
+                }
+            }.show(
+                childFragmentManager, VideoGridFragment.TAG
+            )
+        }
+
+        binding.maximizedIcon.setOnClickListener {
+            toggleInsetUI(isMinimised = false)
+        }
         binding.insetPill.makeInset{
             isMinimized = isMinimized.not()
-            binding.insetPillMaximised.visibility = if (isMinimized) View.GONE else View.VISIBLE
-            binding.minimisedInset.visibility = if (isMinimized.not()) View.GONE else View.VISIBLE
+            binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
+
         }
         binding.localHmsVideoView?.setZOrderOnTop(true)
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
@@ -228,5 +244,12 @@ class VideoGridFragment : Fragment() {
         }
 
 
+    }
+
+    private fun toggleInsetUI(isMinimised: Boolean) {
+        binding.insetPillMaximised.visibility =
+            if (isMinimised) View.GONE else View.VISIBLE
+        binding.minimisedInset.visibility =
+            if (isMinimised.not()) View.GONE else View.VISIBLE
     }
 }

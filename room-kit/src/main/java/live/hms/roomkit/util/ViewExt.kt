@@ -17,6 +17,7 @@ import androidx.core.view.GestureDetectorCompat
 import live.hms.roomkit.R
 import live.hms.roomkit.helpers.OnSingleClickListener
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
+import live.hms.roomkit.ui.notification.CardStackListener
 import live.hms.roomkit.ui.notification.Direction
 import live.hms.roomkit.ui.notification.StackFrom
 import live.hms.roomkit.ui.notification.SwipeableMethod
@@ -295,10 +296,10 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
 }
 
 
-fun CardStackLayoutManager?.init(context: Context) : CardStackLayoutManager {
+fun CardStackLayoutManager?.init(context: Context, listener: CardStackListener) : CardStackLayoutManager {
     var layoutManager = this
     if (layoutManager == null)
-        layoutManager = CardStackLayoutManager(context).apply {
+        layoutManager = CardStackLayoutManager(context, listener).apply {
             setStackFrom(StackFrom.Bottom)
             setVisibleCount(3)
             setTranslationInterval(8.0f)

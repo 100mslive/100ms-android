@@ -8,6 +8,7 @@ import android.app.RemoteAction
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.drawable.Icon
 import android.media.projection.MediaProjectionManager
 import android.os.Build
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
+import live.hms.roomkit.setGradient
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
@@ -112,7 +114,6 @@ class MeetingFragment : Fragment() {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
     }
 
-    private var alertDialog: AlertDialog? = null
 
     private var isMeetingOngoing = false
 
@@ -537,23 +538,10 @@ class MeetingFragment : Fragment() {
                         }
                     }
                     is MeetingViewModel.Event.CameraSwitchEvent -> {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                context,
-                                "Camera Switch ${event.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                       //Silently ignore
                     }
                     is MeetingViewModel.Event.RTMPError -> {
-                        withContext(Dispatchers.Main) {
-//                            binding.buttonGoLive?.visibility = View.VISIBLE
-                            Toast.makeText(
-                                context,
-                                "RTMP error ${event.exception}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                        meetingViewModel.triggerErrorNotification("RTMP error ${event.exception}")
                     }
                     is MeetingViewModel.Event.ChangeTrackMuteRequest -> {
                         withContext(Dispatchers.Main) {
@@ -597,34 +585,22 @@ class MeetingFragment : Fragment() {
                     }
                     null -> {
                     }
-                    is MeetingViewModel.Event.HlsNotStarted -> Toast.makeText(
-                        requireContext(),
-                        event.reason,
-                        Toast.LENGTH_LONG
-                    ).show()
-                    is MeetingViewModel.Event.Hls.HlsError -> Toast.makeText(
-                        requireContext(),
-                        event.throwable.message,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    is MeetingViewModel.Event.HlsNotStarted -> meetingViewModel.triggerErrorNotification(event.reason)
+                    is MeetingViewModel.Event.Hls.HlsError -> meetingViewModel.triggerErrorNotification(event.throwable.message)
                     is MeetingViewModel.Event.RecordEvent -> {
-                        Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+                        meetingViewModel.triggerErrorNotification(event.message)
                         Log.d("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.RtmpEvent -> {
-                        Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+                        meetingViewModel.triggerErrorNotification(event.message)
                         Log.d("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.ServerRecordEvent -> {
-                        Toast.makeText(requireContext(), event.message, Toast.LENGTH_LONG).show()
+                        meetingViewModel.triggerErrorNotification(event.message)
                         Log.d("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.HlsEvent, is MeetingViewModel.Event.HlsRecordingEvent -> {
-                        Toast.makeText(
-                            requireContext(),
-                            (event as MeetingViewModel.Event.MessageEvent).message,
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Log.d("RecordingState", "HlsEvent: ${event}")
                     }
                     is MeetingViewModel.Event.PollStarted -> {
                         showPollStart(event.hmsPoll.pollId)
@@ -647,45 +623,19 @@ class MeetingFragment : Fragment() {
                 }
 
                 is MeetingState.Failure -> {
-                    alertDialog?.dismiss()
-                    alertDialog = null
-
                     cleanup()
                     hideProgressBar()
-
-                    val builder = AlertDialog.Builder(requireContext())
-                        .setMessage(
-                            "${state.exceptions.size} failures: \n" + state.exceptions.joinToString(
-                                "\n\n"
-                            ) { "$it" })
-                        .setTitle(R.string.error)
-                        .setCancelable(false)
-
-                    builder.setPositiveButton(R.string.retry) { dialog, _ ->
-                        meetingViewModel.startMeeting()
-                        dialog.dismiss()
-                        alertDialog = null
-                    }
-
-                    builder.setNegativeButton(R.string.leave) { dialog, _ ->
-                        meetingViewModel.leaveMeeting()
-                        goToHomePage()
-                        dialog.dismiss()
-                        alertDialog = null
-                    }
-
-                    builder.setNeutralButton(R.string.bug_report) { _, _ ->
-                        requireContext().startActivity(
-                            EmailUtils.getNonFatalLogIntent(requireContext())
-                        )
-                        alertDialog = null
-                    }
-
-                    alertDialog = builder.create().apply { show() }
+                    meetingViewModel.triggerErrorNotification("${state.exceptions.size} failures: \n" + state.exceptions.joinToString(
+                        "\n\n"
+                    ) { "$it" },
+                        isDismissible = false,
+                        actionButtonText = resources.getString(R.string.retry),
+                        type = HMSNotificationType.TerminalError
+                    )
                 }
 
                 is MeetingState.RoleChangeRequest -> {
-
+                    //TODO remove from nav graph
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRolePreviewFragment())
                 }
 
@@ -956,13 +906,18 @@ class MeetingFragment : Fragment() {
         fragmentContainerParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
         binding.fragmentContainer.layoutParams = fragmentContainerParam
 
-        binding.topMenu?.background = context?.let {
-            ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable)
-        }
+        binding.topMenu.setGradient(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+            , Color.TRANSPARENT)
 
-        binding.bottomControls.background = context?.let {
-            ContextCompat.getDrawable(it, R.drawable.bg_gradient_drawable_2)
-        }
+
+        binding.bottomControls.setGradient(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+            , Color.TRANSPARENT)
 
         binding.space4?.visibility = View.VISIBLE
         binding.buttonRaiseHand?.visibility = View.VISIBLE

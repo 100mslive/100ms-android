@@ -24,6 +24,8 @@ import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
+import live.hms.roomkit.ui.notification.CardStackListener
+import live.hms.roomkit.ui.notification.Direction
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationAdapter
 import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
@@ -144,6 +146,7 @@ class MeetingActivity : AppCompatActivity() {
     }
 
     private fun appendNotification(hmsNotification: HMSNotification) {
+        binding.notifcationCardList.visibility = View.VISIBLE
         val old = hmsNotificationAdapter.getItems()
         val new = mutableListOf<HMSNotification>().apply {
             addAll(old)
@@ -159,7 +162,26 @@ class MeetingActivity : AppCompatActivity() {
 
     private fun initNotificationUI() {
         if (notificationManager == null && binding.notifcationCardList?.context != null) {
-            notificationManager = notificationManager.init(binding.notifcationCardList!!.context)
+            notificationManager = notificationManager.init(this, object : CardStackListener{
+                override fun onCardDragging(direction: Direction?, ratio: Float) {}
+
+                override fun onCardSwiped(direction: Direction?) {}
+
+                override fun onCardRewound() {}
+
+                override fun onCardCanceled() {}
+
+                override fun onCardAppeared(view: View?, position: Int) {
+                    binding.notifcationCardList.visibility = View.VISIBLE
+                }
+
+                override fun onCardDisappeared(view: View?, position: Int) {
+                    if ((notificationManager?.topPosition?:0) + 1 == hmsNotificationAdapter.itemCount) {
+                      binding.notifcationCardList.visibility = View.GONE
+                    }
+                }
+
+            })
             binding.notifcationCardList?.apply {
                 layoutManager = notificationManager
                 adapter = hmsNotificationAdapter
@@ -177,6 +199,10 @@ class MeetingActivity : AppCompatActivity() {
         when (type) {
             is HMSNotificationType.BringOnStage -> {
                 meetingViewModel.requestBringOnStage(type.handRaisePeer)
+                handleNotificationDismissClick()
+            }
+            is HMSNotificationType.TerminalError -> {
+                meetingViewModel.startMeeting()
                 handleNotificationDismissClick()
             }
 
