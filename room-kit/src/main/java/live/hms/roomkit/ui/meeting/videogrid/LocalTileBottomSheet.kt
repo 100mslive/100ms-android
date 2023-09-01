@@ -101,6 +101,7 @@ class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit) : BottomSheetDialo
 
         binding.earpieceBtn.setOnSingleClickListener(200L) {
             onMinimizeClicked.invoke()
+            dismissAllowingStateLoss()
         }
 
     }
