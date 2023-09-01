@@ -18,6 +18,7 @@ data class HMSNotification(
 sealed class HMSNotificationType {
     object ScreenShare : HMSNotificationType()
     object Error : HMSNotificationType()
+    object TerminalError : HMSNotificationType()
     object Default : HMSNotificationType()
     data class BringOnStage(val handRaisePeer: HMSPeer) : HMSNotificationType()
 }
