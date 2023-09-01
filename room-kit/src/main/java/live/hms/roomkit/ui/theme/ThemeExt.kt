@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
@@ -17,7 +18,9 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.cardview.widget.CardView
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.imageview.ShapeableImageView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.EndSessionBottomSheetBinding
@@ -152,11 +155,34 @@ internal fun ImageView.setIconEnabled(
     (drawable as? Animatable)?.start()
 }
 
+internal fun ShapeableImageView.setIconEnabled(
+    @DrawableRes enabledIconDrawableRes: Int
+) {
+
+
+    shapeAppearanceModel = shapeAppearanceModel.toBuilder()
+        .setAllCornerSizes(resources.getDimension(R.dimen.eight_dp))
+        .build()
+
+    this.setBackgroundColor(resources.getColor(android.R.color.transparent))
+    this.setImageResource(enabledIconDrawableRes)
+
+    drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    (drawable as? Animatable)?.start()
+}
+
 
 internal fun ImageView.setIconDisabled(
     @DrawableRes disabledIconDrawableRes: Int,
     @DrawableRes backgroundRes: Int = R.drawable.gray_round_solid_drawable
 ) {
+
     this.setImageResource(disabledIconDrawableRes)
     this.setBackgroundResource(backgroundRes)
     background.setTint(
@@ -176,6 +202,38 @@ internal fun ImageView.setIconDisabled(
     (drawable as? Animatable)?.start()
 
 }
+
+internal fun ShapeableImageView.setIconDisabled(
+    @DrawableRes disabledIconDrawableRes: Int,
+    @DrawableRes backgroundRes: Int = R.drawable.gray_round_solid_drawable
+) {
+
+    val radius = resources.getDimension(R.dimen.eight_dp).toInt()
+
+    shapeAppearanceModel = shapeAppearanceModel.toBuilder()
+        .setAllCornerSizes(radius.toFloat())
+        .build()
+
+    this.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.secondaryDim,
+            HMSPrebuiltTheme.getDefaults().secondary_dim
+        )
+    )
+    this.setImageResource(disabledIconDrawableRes)
+
+
+    drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    (drawable as? Animatable)?.start()
+
+}
+
 
 internal fun TextView.buttonEnabled() {
     this.isEnabled = true
@@ -950,8 +1008,7 @@ fun NotificationCardBinding.applyTheme() {
     card.setBackgroundAndColor(
 
         HMSPrebuiltTheme.getColours()?.surfaceDim,
-        HMSPrebuiltTheme.getDefaults().surface_dim
-        ,
+        HMSPrebuiltTheme.getDefaults().surface_dim,
         R.drawable.blue_round_solid_drawable
     )
 
