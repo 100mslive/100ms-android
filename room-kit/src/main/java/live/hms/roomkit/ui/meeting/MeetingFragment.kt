@@ -692,29 +692,6 @@ class MeetingFragment : Fragment() {
                 is MeetingState.RoleChangeRequest -> {
 
                     findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRolePreviewFragment())
-//                    alertDialog?.dismiss()
-//                    alertDialog = null
-//                    hideProgressBar()
-//
-//                    val dialog = Dialog(requireContext())
-//                    dialog.setContentView(R.layout.change_role_request_dialog)
-//
-//                    dialog.findViewById<TextView>(R.id.change_role_text).text =
-//                        "${state.hmsRoleChangeRequest.requestedBy?.name} wants to change your role to : \n" + state.hmsRoleChangeRequest.suggestedRole.name
-//
-//                    dialog.findViewById<AppCompatButton>(R.id.cancel_btn).setOnClickListener {
-//                        dialog.dismiss()
-//                        meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
-//                    }
-//
-//                    dialog.findViewById<AppCompatButton>(R.id.accept_role_change_btn)
-//                        .setOnClickListener {
-//                            dialog.dismiss()
-//                            meetingViewModel.changeRoleAccept(state.hmsRoleChangeRequest)
-//                            meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
-//                        }
-//
-//                    dialog.show()
                 }
 
                 is MeetingState.Reconnecting -> {
