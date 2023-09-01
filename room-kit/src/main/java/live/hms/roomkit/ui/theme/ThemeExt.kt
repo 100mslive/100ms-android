@@ -172,7 +172,7 @@ internal fun ShapeableImageView.setIconEnabled(
         )
     )
 
-    this.strokeWidth = resources.getDimension(R.dimen.two_dp)
+    this.strokeWidth = resources.getDimension(R.dimen.one_dp)
 
     this.setImageResource(enabledIconDrawableRes)
 
