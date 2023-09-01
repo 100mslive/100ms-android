@@ -237,7 +237,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:contentDescription="@string/end_call"
-            app:srcCompat="@drawable/ic_end_call" />
+            app:srcCompat="@drawable/ic_leave" />
 
         <Space
             android:id="@+id/space_2"

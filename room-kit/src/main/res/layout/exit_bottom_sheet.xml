@@ -25,7 +25,7 @@
                     android:id="@+id/leave_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_leave_icon" />
+                    android:src="@drawable/ic_leave" />
 
                 <TextView
                     android:id="@+id/leave_title"
