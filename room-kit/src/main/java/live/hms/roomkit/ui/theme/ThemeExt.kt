@@ -205,7 +205,7 @@ internal fun ShapeableImageView.setIconDisabled(
 
     drawable.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -681,7 +681,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
-    
+
 
 
     editTextName.isCursorVisible = true
