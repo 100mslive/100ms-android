@@ -8,8 +8,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
@@ -60,7 +60,7 @@ companion object {
         binding.pager.adapter = pagerAdapter
         val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout)
         TabLayoutMediator(tabLayout, binding.pager) { tab, position ->
-            tab.text = if(position == 0 ) "CHAT" else "PARTICIPANTS"
+            tab.text = if(position == 0 ) "Chat" else "Participants"
         }.attach()
         initOnBackPress()
         binding.closeCombinedTabButton.setOnSingleClickListener {
