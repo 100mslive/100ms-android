@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minHeight="300dp"
+    android:minHeight="400dp"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@android:color/black"
     android:orientation="vertical">
@@ -36,9 +36,11 @@
             android:minHeight="24dp"
             android:background="@drawable/send_message_background"
             android:textColor="#8F9099"
+            android:gravity="center_vertical"
             android:layout_height="wrap_content"
             android:hint="@string/send_messages_to_everyone"
-            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:layout_marginStart="8dp" />
 
 

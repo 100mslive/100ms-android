@@ -155,7 +155,8 @@
             android:textColor="#8F9099"
             android:layout_height="wrap_content"
             android:hint="@string/send_messages_to_everyone"
-            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
             android:layout_marginStart="8dp" />
 
 
