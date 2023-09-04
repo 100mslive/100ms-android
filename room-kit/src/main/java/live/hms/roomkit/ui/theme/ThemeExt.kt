@@ -674,6 +674,16 @@ internal fun FragmentPreviewBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().primary_default
     )
 
+    editContainerName.defaultHintTextColor = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
+
+    editContainerName.requestFocus()
+
     editContainerName.hintTextColor = ColorStateList.valueOf(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.primaryDefault,
