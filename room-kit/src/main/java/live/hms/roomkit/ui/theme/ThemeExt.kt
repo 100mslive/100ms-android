@@ -3,23 +3,20 @@ package live.hms.roomkit.ui.theme
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.LinearGradient
-import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.Shader
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
-import android.graphics.drawable.shapes.RoundRectShape
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.view.setPadding
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
@@ -36,6 +33,7 @@ import live.hms.roomkit.databinding.NotificationCardBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
+import live.hms.roomkit.util.EmailUtils
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -137,7 +135,7 @@ internal fun ShapeableImageView.setIconEnabled(
 
     this.strokeColor = ColorStateList.valueOf(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.secondaryBright,
+            HMSPrebuiltTheme.getColours()?.borderBright,
             HMSPrebuiltTheme.getDefaults().border_bright
         )
     )
@@ -205,7 +203,7 @@ internal fun ShapeableImageView.setIconDisabled(
 
     drawable.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -538,7 +536,7 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
         )
     )
 
-    heading.setTextColor(
+    subheading.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsecondary_med_emp
@@ -661,6 +659,14 @@ internal fun FragmentPreviewBinding.applyTheme() {
         R.drawable.blue_round_solid_drawable
     )
 
+    joinLoaderProgress.indeterminateDrawable.colorFilter = PorterDuffColorFilter(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        ),
+        PorterDuff.Mode.SRC_IN
+    )
+
     joinLoaderProgress.progressTintList = ColorStateList.valueOf(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryLow,
@@ -668,18 +674,36 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
+
     editContainerName.boxStrokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default
     )
 
-    editContainerName.hintTextColor = ColorStateList.valueOf(
+    editContainerName.defaultHintTextColor = ColorStateList.valueOf(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
         )
     )
 
+
+    editContainerName.requestFocus()
+
+    editContainerName.hintTextColor = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
+
+    joinLoaderProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
 
     editTextName.isCursorVisible = true
 
@@ -714,15 +738,15 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
     nameTv.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
     descriptionTv.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
-            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
@@ -880,6 +904,13 @@ fun FragmentGridVideoBinding.applyTheme() {
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    iconOption.setBackgroundColor(
+        getColorOrDefault(
+            EmailUtils.addAlpha(HMSPrebuiltTheme.getColours()?.surfaceDefault!!, 0.6),
+            HMSPrebuiltTheme.getDefaults().surface_default
         )
     )
 

@@ -45,13 +45,16 @@ class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private
     private fun update(): List<MeetingTrack> {
         // Update all the videos which aren't screenshares
 
-        val order = speakerCache.getAllItems()
-        val videos = order.mapNotNull { orderedItem ->
-            getTracks().find { givenTrack ->
-                givenTrack.peer.peerID == orderedItem.peerId && givenTrack.isScreen.not()
+        synchronized(getTracks()){
+            val order = speakerCache.getAllItems()
+            return  order.mapNotNull { orderedItem ->
+                getTracks().find { givenTrack ->
+                    givenTrack.peer.peerID == orderedItem.peerId && givenTrack.isScreen.not()
+                }
             }
         }
-        return videos
+
+
         // Always bind videos after this function is called
         // updateVideos(binding.container, videos)
     }
