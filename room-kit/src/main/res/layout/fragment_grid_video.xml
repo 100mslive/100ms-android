@@ -298,7 +298,7 @@
         app:tabBackground="@drawable/dot_selector_4"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
-        app:tabMode="scrollable" />
+        app:tabMode="fixed" />
 
 
 
