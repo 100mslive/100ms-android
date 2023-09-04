@@ -1079,7 +1079,7 @@ class MeetingViewModel(
         pendingRoleChange?.let {
             hmsSDK.acceptChangeRole(it, object : HMSActionResultListener {
                 override fun onSuccess() {
-                    toggleRaiseHand(false)
+              //      toggleRaiseHand(false)
                     setStatetoOngoing()
                     updateThemeBasedOnCurrentRole(it.suggestedRole)
                     onSuccess.invoke()
