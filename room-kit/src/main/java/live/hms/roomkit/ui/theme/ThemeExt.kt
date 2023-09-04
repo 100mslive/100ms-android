@@ -4,6 +4,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.Shader
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
@@ -661,6 +663,14 @@ internal fun FragmentPreviewBinding.applyTheme() {
         R.drawable.blue_round_solid_drawable
     )
 
+    joinLoaderProgress.indeterminateDrawable.colorFilter = PorterDuffColorFilter(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        ),
+        PorterDuff.Mode.SRC_IN
+    )
+
     joinLoaderProgress.progressTintList = ColorStateList.valueOf(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryLow,
@@ -692,7 +702,12 @@ internal fun FragmentPreviewBinding.applyTheme() {
     )
 
 
-
+    joinLoaderProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
 
     editTextName.isCursorVisible = true
 

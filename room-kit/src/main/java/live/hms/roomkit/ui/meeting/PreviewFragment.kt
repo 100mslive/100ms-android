@@ -360,14 +360,14 @@ class PreviewFragment : Fragment() {
 
     private fun enableJoinLoader() {
         binding.joinLoader.visibility = View.VISIBLE
-        binding.editContainerName.isEnabled = false
-        binding.editTextName.isEnabled = false
+//        binding.editContainerName.isEnabled = false
+      //  binding.editTextName.isEnabled = false
     }
 
     private fun disableJoinLoader() {
         binding.joinLoader.visibility = View.INVISIBLE
-        binding.editContainerName.isEnabled = true
-        binding.editTextName.isEnabled = true
+      //  binding.editContainerName.isEnabled = true
+       // binding.editTextName.isEnabled = true
     }
 
     private fun navigateToMeeting() {
