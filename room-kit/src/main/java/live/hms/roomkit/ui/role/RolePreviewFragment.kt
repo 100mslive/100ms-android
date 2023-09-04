@@ -98,28 +98,29 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
         }
 
         binding.buttonJoinMeeting.setOnClickListener {
-            meetingViewModel.participantPreviousRoleChangeUseCase.setPreviousRole(meetingViewModel.hmsSDK.getLocalPeer()!!, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
-                    Log.e("RolePreviewFragment","Error $error")
-                }
+            meetingViewModel.participantPreviousRoleChangeUseCase.setPreviousRole(meetingViewModel.hmsSDK.getLocalPeer()!!,
+                object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {
+                        Log.e("RolePreviewFragment", "Error $error")
+                    }
 
-                override fun onSuccess() {
-                    meetingViewModel.changeRoleAccept(onSuccess = {
-                        contextSafe { context, activity ->
-                            activity.runOnUiThread {
-                                binding.previewView.removeTrack()
-                                findNavController().navigate(
-                                    RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
-                                        false
+                    override fun onSuccess() {
+                        meetingViewModel.changeRoleAccept(onSuccess = {
+                            contextSafe { context, activity ->
+                                activity.runOnUiThread {
+                                    binding.previewView.removeTrack()
+                                    findNavController().navigate(
+                                        RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
+                                            false
+                                        )
                                     )
-                                )
 
+                                }
                             }
-                        }
-                    })
-                }
+                        })
+                    }
 
-            })
+                }, toggleHandraise = true)
         }
 
         binding.declineButton.setOnClickListener {
@@ -144,38 +145,38 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
             override fun onTracks(localTracks: Array<HMSTrack>) {
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
-                            var isAudioRequired: Boolean = false
-                            var isVideoRequired: Boolean = false
-                            localTracks.forEach {
-                                if (it is HMSLocalVideoTrack) {
-                                    isVideoRequired = true
-                                    localVideoTrack = it
-                                    binding.previewView.addTrack(it)
-                                    binding.buttonToggleVideo.visibility = View.VISIBLE
-                                    binding.buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
-                                    binding.buttonSwitchCamera.visibility = View.VISIBLE
-                                    setLocalVideoTrackState(it.isMute)
-                                } else if (it is HMSLocalAudioTrack) {
-                                    localAudioTrack = it
-                                    isAudioRequired = true
-                                    binding.buttonToggleAudio.visibility = View.VISIBLE
-                                    setLocalAudioTrackState(it.isMute)
-                                }
+                        var isAudioRequired: Boolean = false
+                        var isVideoRequired: Boolean = false
+                        localTracks.forEach {
+                            if (it is HMSLocalVideoTrack) {
+                                isVideoRequired = true
+                                localVideoTrack = it
+                                binding.previewView.addTrack(it)
+                                binding.buttonToggleVideo.visibility = View.VISIBLE
+                                binding.buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
+                                binding.buttonSwitchCamera.visibility = View.VISIBLE
+                                setLocalVideoTrackState(it.isMute)
+                            } else if (it is HMSLocalAudioTrack) {
+                                localAudioTrack = it
+                                isAudioRequired = true
+                                binding.buttonToggleAudio.visibility = View.VISIBLE
+                                setLocalAudioTrackState(it.isMute)
                             }
-
-                            if (isAudioRequired.not() && isVideoRequired.not()) {
-                                binding.heading.visibility = View.VISIBLE
-                                binding.subheading.visibility = View.VISIBLE
-                                binding.subheading.text = getString(R.string.audio_video_subheading_no)
-                            } else if (isAudioRequired && isVideoRequired.not()) {
-                                binding.subheading.text = getString(R.string.audio_only_subheading)
-                            } else if (isAudioRequired.not() && isVideoRequired) {
-                                binding.subheading.text = getString(R.string.video_only_subheading)
-                            } else {
-                                binding.subheading.text = getString(R.string.audio_video_subheading)
-                            }
-                            binding.subheading.visibility = View.VISIBLE
                         }
+
+                        if (isAudioRequired.not() && isVideoRequired.not()) {
+                            binding.heading.visibility = View.VISIBLE
+                            binding.subheading.visibility = View.VISIBLE
+                            binding.subheading.text = getString(R.string.audio_video_subheading_no)
+                        } else if (isAudioRequired && isVideoRequired.not()) {
+                            binding.subheading.text = getString(R.string.audio_only_subheading)
+                        } else if (isAudioRequired.not() && isVideoRequired) {
+                            binding.subheading.text = getString(R.string.video_only_subheading)
+                        } else {
+                            binding.subheading.text = getString(R.string.audio_video_subheading)
+                        }
+                        binding.subheading.visibility = View.VISIBLE
+                    }
 
 
                 }
@@ -206,8 +207,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
 
 
     private fun initOnBackPress() {
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     binding.previewView.removeTrack()
