@@ -14,14 +14,11 @@
         android:animateLayoutChanges="true"
         android:orientation="vertical">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingTop="24dp"
-            android:paddingBottom="16dp">
+
 
             <TextView
+                android:paddingTop="24dp"
+                android:paddingLeft="16dp"
                 android:id="@+id/audio_ot"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -31,8 +28,20 @@
                 android:text="You"
                 android:textSize="16sp" />
 
+            <TextView
+                android:paddingBottom="16dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="16dp"
+                android:id="@+id/role_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawablePadding="8dp"
+                android:fontFamily="@font/inter_regular"
+                android:lineHeight="16dp"
+                android:textSize="13sp" />
 
-        </FrameLayout>
+
 
 
         <View

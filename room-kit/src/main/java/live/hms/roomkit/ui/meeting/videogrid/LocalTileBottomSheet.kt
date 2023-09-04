@@ -64,8 +64,18 @@ class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit) : BottomSheetDialo
             binding.border5
         )
 
+        binding.roleName.apply {
+            setTextColor(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+        }
+
 
         binding.audioOt.text = "${meetingViewModel.hmsSDK.getLocalPeer()?.name} (You)"
+        binding.roleName.text = "${meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.name.orEmpty()} "
         btnArray.forEach {
             it.setTextColor(
                 getColorOrDefault(
