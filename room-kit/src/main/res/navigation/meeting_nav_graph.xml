@@ -199,14 +199,5 @@
             android:name="pollId"
             app:argType="string" />
     </fragment>
-    <fragment
-        android:id="@+id/chatParticipantCombinedFragment"
-        android:name="live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment"
-        android:label="ChatParticipantCombinedFragment" >
-        <argument
-            android:name="showParticipants"
-            app:argType="boolean"
-            android:defaultValue="false" />
-    </fragment>
 
 </navigation>
