@@ -264,6 +264,7 @@
             android:layout_height="8dp"
             android:layout_gravity="bottom|center"
             android:layout_margin="4dp"
+            app:tabMode="fixed"
             app:tabBackground="@drawable/dot_selector_4"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp" />
@@ -285,7 +286,7 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout_dots"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="10dp"
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
@@ -297,7 +298,7 @@
         app:tabBackground="@drawable/dot_selector_4"
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
-        app:tabMode="scrollable" />
+        app:tabMode="fixed" />
 
 
 
