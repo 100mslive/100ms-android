@@ -25,7 +25,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
@@ -34,8 +33,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.snackbar.Snackbar
@@ -57,14 +54,13 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
+import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
-import live.hms.roomkit.ui.notification.CardStackLayoutManager
-import live.hms.roomkit.ui.notification.HMSNotification
-import live.hms.roomkit.ui.notification.HMSNotificationAdapter
-import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
 import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -977,16 +973,16 @@ class MeetingFragment : Fragment() {
     }
 
     private fun showControlBars(shouldHideAfterDelay : Boolean) {
-        binding.topMenu?.animate()
+        binding.topMenu.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {
-                    binding.topMenu?.visibility = View.VISIBLE
+                    binding.topMenu.visibility = View.VISIBLE
                     showSystemBars()
-                    moveChat(up = true, bottomMenuHeight = binding.topMenu!!.height.toFloat())
+                    moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
-                    binding.topMenu?.visibility = View.VISIBLE
+                    binding.topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                     if (shouldHideAfterDelay) {
                         // Hide control bars
@@ -1181,7 +1177,6 @@ class MeetingFragment : Fragment() {
                                     ChatParticipantCombinedFragment.TAG
                                 )
                             }
-                            findNavController().navigate(direction)
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
                         onNameChange = {  },
@@ -1229,7 +1224,10 @@ class MeetingFragment : Fragment() {
 
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
-                findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToChatParticipantCombinedFragment())
+                ChatParticipantCombinedFragment().show(
+                    childFragmentManager,
+                    ChatParticipantCombinedFragment.TAG
+                )
             } else {
                 with(binding.chatView!!) {
                     visibility = if (visibility == View.GONE) {
