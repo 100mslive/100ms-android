@@ -137,7 +137,7 @@ internal fun ShapeableImageView.setIconEnabled(
 
     this.strokeColor = ColorStateList.valueOf(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.secondaryBright,
+            HMSPrebuiltTheme.getColours()?.borderBright,
             HMSPrebuiltTheme.getDefaults().border_bright
         )
     )
@@ -538,7 +538,7 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
         )
     )
 
-    heading.setTextColor(
+    subheading.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsecondary_med_emp
@@ -668,6 +668,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
         )
     )
 
+
     editContainerName.boxStrokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default
@@ -675,10 +676,12 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
     editContainerName.hintTextColor = ColorStateList.valueOf(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
         )
     )
+
+    
 
 
     editTextName.isCursorVisible = true
@@ -714,15 +717,15 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
     nameTv.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
     descriptionTv.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
-            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
