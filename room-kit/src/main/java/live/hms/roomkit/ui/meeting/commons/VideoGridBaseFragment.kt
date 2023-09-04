@@ -270,8 +270,11 @@ abstract class VideoGridBaseFragment : Fragment() {
       )
 
       audioLevel.alpha = visibilityOpacity(
-        isAudioMute.not() || isScreenshare().not()
+        isAudioMute.not()
       )
+      
+      if (isScreenshare())
+        audioLevel.alpha = visibilityOpacity(false)
 
       binding.iconMaximised.visibility = if (isScreenshare()) View.VISIBLE else View.GONE
       binding.iconMaximised.setOnClickListener {
@@ -486,7 +489,6 @@ abstract class VideoGridBaseFragment : Fragment() {
           videoCard.audioLevel.update(level)
         }
 
-        videoCard.audioLevel.visibility = if (isScreenshare().not()) View.VISIBLE else View.GONE
       }
     }
   }

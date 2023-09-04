@@ -1079,6 +1079,7 @@ class MeetingViewModel(
         pendingRoleChange?.let {
             hmsSDK.acceptChangeRole(it, object : HMSActionResultListener {
                 override fun onSuccess() {
+                    toggleRaiseHand(false)
                     setStatetoOngoing()
                     updateThemeBasedOnCurrentRole(it.suggestedRole)
                     onSuccess.invoke()
@@ -1634,11 +1635,16 @@ class MeetingViewModel(
     val isHandRaised: LiveData<Boolean> = _isHandRaised
 
 
-    fun toggleRaiseHand() {
+    fun toggleRaiseHand(forceEnableHandRaise : Boolean?=null) {
         val localPeer = hmsSDK.getLocalPeer()!!
-        val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
-        val isHandRaised = currentMetadata!!.isHandRaised
-        val newMetadataJson = currentMetadata.copy(isHandRaised = !isHandRaised).toJson()
+        val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata) ?: return
+
+        val isHandRaised  = if (forceEnableHandRaise == null) {
+            currentMetadata.isHandRaised.not()
+        } else {
+            forceEnableHandRaise
+        }
+        val newMetadataJson = currentMetadata.copy(isHandRaised = isHandRaised).toJson()
 
         hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
