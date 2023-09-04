@@ -68,9 +68,6 @@
         <action
             android:id="@+id/action_MeetingFragment_to_pollDisplayFragment"
             app:destination="@id/pollDisplayFragment" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_chatParticipantCombinedFragment"
-            app:destination="@id/chatParticipantCombinedFragment" />
     </fragment>
 
     <dialog
