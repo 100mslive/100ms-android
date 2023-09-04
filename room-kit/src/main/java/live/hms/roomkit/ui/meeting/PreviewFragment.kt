@@ -496,6 +496,7 @@ class PreviewFragment : Fragment() {
             Observer { (room, localTracks) ->
 
                 if (setTextOnce.not()) {
+                    binding.nameInitials.visibility = View.VISIBLE
                     binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
                     binding.editTextName.setText(
                         room.localPeer?.name.orEmpty(), TextView.BufferType.EDITABLE
