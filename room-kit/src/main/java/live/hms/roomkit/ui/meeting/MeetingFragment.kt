@@ -1164,10 +1164,22 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
-                            val direction = if( meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
-                                MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
+                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
+                                childFragmentManager
+                                    .beginTransaction()
+                                    .add(R.id.fragment_container, ParticipantsFragment())
+                                    .addToBackStack(null)
+                                    .commit()
                             } else {
-                                MeetingFragmentDirections.actionMeetingFragmentToChatParticipantCombinedFragment(showParticipants = true)
+                                val args = Bundle()
+                                    .apply { putBoolean(OPEN_TO_PARTICIPANTS, true) }
+
+                                ChatParticipantCombinedFragment()
+                                    .apply { arguments = args }
+                                    .show(
+                                    childFragmentManager,
+                                    ChatParticipantCombinedFragment.TAG
+                                )
                             }
                             findNavController().navigate(direction)
                         },

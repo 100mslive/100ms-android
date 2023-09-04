@@ -31,11 +31,18 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
             ParticipantsFragment()
     }
 }
-class ChatParticipantCombinedFragment : Fragment() {
+const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"
+class ChatParticipantCombinedFragment : BottomSheetDialogFragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
     val meetingViewModel : MeetingViewModel by activityViewModels()
-    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
+//    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
+companion object {
+    val TAG: String = "CombinedChatFragmentTag"
+}
+
+    private fun getShowParticipants() : Boolean =
+        arguments?.getBoolean(OPEN_TO_PARTICIPANTS, false) == true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,7 +66,8 @@ class ChatParticipantCombinedFragment : Fragment() {
         binding.closeCombinedTabButton.setOnSingleClickListener {
             findNavController().popBackStack()
         }
-        if(args.showParticipants)
+
+        if(getShowParticipants())
             binding.pager.post {
                 binding.pager.setCurrentItem(1, true)
             }
