@@ -108,7 +108,7 @@
                 android:paddingBottom="@dimen/eight_dp"
                 android:lineHeight="24sp"
                 android:fontFamily="@font/inter_semibold"
-                android:text="You’re invited to join the stage"
+                android:text="You’re invited to join"
                 android:id="@+id/heading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
