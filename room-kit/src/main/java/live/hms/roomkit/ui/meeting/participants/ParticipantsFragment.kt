@@ -9,6 +9,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -28,7 +29,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
-class ParticipantsFragment : BottomSheetDialogFragment() {
+class ParticipantsFragment : Fragment() {
 
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<FragmentParticipantsBinding>()
@@ -123,8 +124,8 @@ class ParticipantsFragment : BottomSheetDialogFragment() {
                 }
             }
 
-    private fun changePeerRole(remotePeerId : String, toRole : String) =
-        meetingViewModel.changeRole(remotePeerId, toRole, false)
+    private fun changePeerRole(remotePeerId : String, toRole : String, force : Boolean) =
+        meetingViewModel.changeRole(remotePeerId, toRole, force)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
