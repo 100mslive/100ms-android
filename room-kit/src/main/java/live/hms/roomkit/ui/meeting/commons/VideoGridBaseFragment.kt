@@ -269,12 +269,14 @@ abstract class VideoGridBaseFragment : Fragment() {
         isAudioMute
       )
 
-      audioLevel.alpha = visibilityOpacity(
-        isAudioMute.not()
-      )
-      
+
+
       if (isScreenshare())
         audioLevel.alpha = visibilityOpacity(false)
+      else
+        audioLevel.alpha = visibilityOpacity(
+          isAudioMute.not()
+        )
 
       binding.iconMaximised.visibility = if (isScreenshare()) View.VISIBLE else View.GONE
       binding.iconMaximised.setOnClickListener {
