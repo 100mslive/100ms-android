@@ -25,6 +25,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.*
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
@@ -184,7 +185,10 @@ abstract class VideoGridBaseFragment : Fragment() {
       false
     )
     binding.videoCard.applyTheme()
-
+    binding.rootContainer.setBackgroundAndColor(
+      HMSPrebuiltTheme.getColours()?.backgroundDefault,
+      HMSPrebuiltTheme.getDefaults().background_default
+    )
     return binding
   }
 

@@ -47,6 +47,7 @@
     <string name="share_screen">Share Screen</string>
     <string name="stop_share_screen">Stop Share Screen</string>
     <string name="record_meeting">Start recording</string>
+    <string name="start_record_meeting">Start recording</string>
     <string name="start_screen_share">Start Screen Share</string>
     <string name="stop_record_meeting">Record Meeting</string>
     <string name="show_participants">Show Participants</string>
