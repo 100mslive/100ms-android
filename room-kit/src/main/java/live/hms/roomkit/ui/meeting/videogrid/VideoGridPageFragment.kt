@@ -73,6 +73,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       if (shouldUpdate.not()) return
       setVideoGridRowsAndColumns(rowCount, columnCount)
       meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
+      meetingViewModel.updateGridLayoutDimensions.value = true
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {

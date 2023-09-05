@@ -25,6 +25,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.*
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
@@ -102,12 +103,13 @@ abstract class VideoGridBaseFragment : Fragment() {
   fun setVideoGridRowsAndColumns(rows: Int, columns: Int) {
     gridRowCount = rows
     gridColumnCount = columns
+    Log.d("VGBF","  (screenshar : ${isScreenshare()}) grid row count ${gridRowCount} else column count ${gridColumnCount}")
   }
 
   protected val maxItems: Int
     get() = gridRowCount * gridColumnCount
 
-  private fun updateGridLayoutDimensions(layout: GridLayout, isPipMode: Boolean) {
+  private fun updateGridLayoutDimensions(layout: GridLayout) {
 
     var childIdx: Pair<Int, Int>? = null
     var colIdx = 0
@@ -115,6 +117,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     layout.apply {
 
+      Log.d("VGBF","  (screenshar : ${isScreenshare()}) grid row count ${gridRowCount} else column count ${gridColumnCount}")
       fun normalLayout() {
         // The 5th video, if there are only 5, gets spread.
         val spread5thVideo = childCount == 5
@@ -129,8 +132,12 @@ abstract class VideoGridBaseFragment : Fragment() {
             2
           } else 1
 
+          if (isScreenshare().not()) {
+            Log.d("VGBF","(row, coulmn) : (${rowIdx}, ${colIdx})")
+          }
+
           params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
-          params.columnSpec = GridLayout.spec(colIdx, size, 1f)
+          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
 
           if (colIdx + 1 == getNormalLayoutColumnCount()) {
             rowIdx += 1
@@ -146,28 +153,6 @@ abstract class VideoGridBaseFragment : Fragment() {
         columnCount = getNormalLayoutColumnCount()
       }
 
-      fun pipLayout() {
-
-        for (child in children) {
-          childIdx = Pair(rowIdx, colIdx)
-          val params = child.layoutParams as GridLayout.LayoutParams
-          params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
-          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
-
-          //
-          if ((colIdx + 1) % 2 == 0) {
-            rowIdx += 1
-            colIdx = 0
-          } else {
-            colIdx += 1
-          }
-        }
-
-        requestLayout()
-
-        rowCount = getNormalLayoutRowCount()
-        columnCount = getPipLayoutColumnCount()
-      }
 
         normalLayout()
 
@@ -184,7 +169,10 @@ abstract class VideoGridBaseFragment : Fragment() {
       false
     )
     binding.videoCard.applyTheme()
-
+    binding.rootContainer.setBackgroundAndColor(
+      HMSPrebuiltTheme.getColours()?.backgroundDefault,
+      HMSPrebuiltTheme.getDefaults().background_default
+    )
     return binding
   }
 
@@ -306,6 +294,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
+    Log.d("VGBF","  (screenshar : ${isScreenshare()}) init")
     setVideoGridRowsAndColumns(settings.videoGridRows, settings.videoGridColumns)
   }
   protected fun unbindSurfaceView(
@@ -425,7 +414,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
 
     if (requiresGridLayoutUpdate) {
-      updateGridLayoutDimensions(layout, isPipMode = false)
+      updateGridLayoutDimensions(layout)
     }
   }
 
@@ -526,7 +515,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       //force pip mode layout refresh
       hideOrShowGridsForPip(null)
       if (::gridLayout.isInitialized)
-        updateGridLayoutDimensions(gridLayout, isPipMode = false)
+        updateGridLayoutDimensions(gridLayout)
       wasLastModePip = false
       return
     }

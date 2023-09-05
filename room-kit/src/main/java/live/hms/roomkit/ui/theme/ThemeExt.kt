@@ -21,6 +21,18 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
+import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
+import live.hms.roomkit.databinding.ChangeNameFragmentBinding
+import live.hms.roomkit.databinding.EndSessionBottomSheetBinding
+import live.hms.roomkit.databinding.ExitBottomSheetBinding
+import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
+import live.hms.roomkit.databinding.FragmentGridVideoBinding
+import live.hms.roomkit.databinding.FragmentMeetingBinding
+import live.hms.roomkit.databinding.FragmentPreviewBinding
+import live.hms.roomkit.databinding.FragmentRolePreviewBinding
+import live.hms.roomkit.databinding.ItemGridOptionBinding
+import live.hms.roomkit.databinding.NotificationCardBinding
+import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.util.EmailUtils
@@ -410,6 +422,63 @@ internal fun FragmentActiveSpeakerBinding.applyTheme() {
 
 }
 
+internal fun ChangeNameFragmentBinding.applyTheme() {
+    title.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    closeBtn.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
+    newName.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
+    newName.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    changeNameDec.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    changeName.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    changeName.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+}
 internal fun VideoCardBinding.applyTheme() {
     nameInitials.setTextColor(
         getColorOrDefault(
