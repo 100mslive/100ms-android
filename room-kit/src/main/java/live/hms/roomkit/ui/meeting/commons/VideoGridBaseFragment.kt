@@ -103,6 +103,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   fun setVideoGridRowsAndColumns(rows: Int, columns: Int) {
     gridRowCount = rows
     gridColumnCount = columns
+    Log.d("VGBF","  (screenshar : ${isScreenshare()}) grid row count ${gridRowCount} else column count ${gridColumnCount}")
   }
 
   protected val maxItems: Int
@@ -116,6 +117,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
     layout.apply {
 
+      Log.d("VGBF","  (screenshar : ${isScreenshare()}) grid row count ${gridRowCount} else column count ${gridColumnCount}")
       fun normalLayout() {
         // The 5th video, if there are only 5, gets spread.
         val spread5thVideo = childCount == 5
@@ -130,8 +132,12 @@ abstract class VideoGridBaseFragment : Fragment() {
             2
           } else 1
 
+          if (isScreenshare().not()) {
+            Log.d("VGBF","(row, coulmn) : (${rowIdx}, ${colIdx})")
+          }
+
           params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
-          params.columnSpec = GridLayout.spec(colIdx, size, 1f)
+          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
 
           if (colIdx + 1 == getNormalLayoutColumnCount()) {
             rowIdx += 1
@@ -147,28 +153,6 @@ abstract class VideoGridBaseFragment : Fragment() {
         columnCount = getNormalLayoutColumnCount()
       }
 
-      fun pipLayout() {
-
-        for (child in children) {
-          childIdx = Pair(rowIdx, colIdx)
-          val params = child.layoutParams as GridLayout.LayoutParams
-          params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
-          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
-
-          //
-          if ((colIdx + 1) % 2 == 0) {
-            rowIdx += 1
-            colIdx = 0
-          } else {
-            colIdx += 1
-          }
-        }
-
-        requestLayout()
-
-        rowCount = getNormalLayoutRowCount()
-        columnCount = getPipLayoutColumnCount()
-      }
 
         normalLayout()
 
@@ -310,6 +294,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
+    Log.d("VGBF","  (screenshar : ${isScreenshare()}) init")
     setVideoGridRowsAndColumns(settings.videoGridRows, settings.videoGridColumns)
   }
   protected fun unbindSurfaceView(
