@@ -969,6 +969,7 @@ class MeetingViewModel(
         //triggerd user has on stage role permission
         if(hasBringOnStageRolePermission(currentRole = hmsSDK.getLocalPeer()?.hmsRole, handRaisedPeerRole = handRaisedPeer.hmsRole)
             && hmsSDK.getLocalPeer()?.hmsRole?.name == "broadcaster"
+            && getOnStageRole(hmsSDK.getLocalPeer()?.hmsRole).isNullOrEmpty().not()
         ) {
             if (CustomPeerMetadata.fromJson(handRaisedPeer.metadata)?.isHandRaised == true) {
                 hmsNotificationEvent.postValue(
@@ -977,7 +978,7 @@ class MeetingViewModel(
                         isDismissible = false,
                         icon = R.drawable.hand_raised,
                         actionButtonText = "Bring on stage",
-                        type = HMSNotificationType.BringOnStage(handRaisedPeer)
+                        type = HMSNotificationType.BringOnStage(handRaisedPeer, getOnStageRole(hmsSDK.getLocalPeer()?.hmsRole).orEmpty())
                     )
                 )
             }
@@ -1108,8 +1109,10 @@ class MeetingViewModel(
 
     //Checks if hand raised peer is eligble for viewer on stage
     private fun hasBringOnStageRolePermission(currentRole : HMSRole?, handRaisedPeerRole: HMSRole?) : Boolean{
-        return  hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole == handRaisedPeerRole?.name
+        return  hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.offStageRoles?.contains(handRaisedPeerRole?.name)?:false
     }
+
+    private fun getOnStageRole(currentRole : HMSRole?) = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole
 
     private fun switchToHlsView(streamUrl: String) =
         meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
@@ -2015,10 +2018,8 @@ class MeetingViewModel(
         return isRecording.value == RecordingState.RECORDING
     }
 
-    fun requestBringOnStage(handRaisePeer: HMSPeer) {
-        hmsSDK.getLocalPeer()?.hmsRole?.name?.let {roleNameToChangeTo ->
-            changeRole(handRaisePeer.peerID, roleNameToChangeTo, false)
-        }
+    fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
+        changeRole(handRaisePeer.peerID, onStageRole, false)
     }
 
     fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {

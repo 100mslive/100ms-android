@@ -20,5 +20,5 @@ sealed class HMSNotificationType {
     object Error : HMSNotificationType()
     object TerminalError : HMSNotificationType()
     object Default : HMSNotificationType()
-    data class BringOnStage(val handRaisePeer: HMSPeer) : HMSNotificationType()
+    data class BringOnStage(val handRaisePeer: HMSPeer,val  onStageRole: String) : HMSNotificationType()
 }
