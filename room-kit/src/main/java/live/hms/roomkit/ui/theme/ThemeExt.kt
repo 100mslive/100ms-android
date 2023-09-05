@@ -1122,3 +1122,12 @@ internal fun ListItemPeerListBinding.applyTheme() {
         )
     )
 }
+
+internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderDefault,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+}

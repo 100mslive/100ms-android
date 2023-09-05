@@ -18,18 +18,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/participant_count"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginHorizontal="16dp"
+            />
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/container_search"
+                android:layout_marginHorizontal="16dp"
                 style="@style/TextInputLayout"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 app:startIconDrawable="@drawable/ic_search_24">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -39,17 +41,6 @@
                     android:hint="@string/search_participants"
                     android:inputType="textNoSuggestions" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/participant_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="8dp"
-                android:gravity="center"
-         />
-
-        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

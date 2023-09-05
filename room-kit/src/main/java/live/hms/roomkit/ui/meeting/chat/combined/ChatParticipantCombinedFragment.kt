@@ -1,11 +1,18 @@
 package live.hms.roomkit.ui.meeting.chat.combined
 
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.ui.text.android.TextLayout
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -13,12 +20,14 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
+import live.hms.roomkit.util.viewLifecycle
 
 
 class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -38,15 +47,28 @@ const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"
 class ChatParticipantCombinedFragment : BottomSheetDialogFragment() {
     private lateinit var binding : LayoutChatParticipantCombinedBinding//by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
-    val meetingViewModel : MeetingViewModel by activityViewModels()
+    val meetingViewModel by activityViewModels<MeetingViewModel>()
 //    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
 companion object {
     val TAG: String = "CombinedChatFragmentTag"
 }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+//        setStyle(STYLE_NORMAL, R.style.CustomBottomSheetStyle);
+    }
+
     private fun getShowParticipants() : Boolean =
         arguments?.getBoolean(OPEN_TO_PARTICIPANTS, false) == true
 
+    private fun addObservers() {
+        Log.d("asdadasf","Updating ")
+        initOnBackPress()
+        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
+
+            binding.tabLayout.getTabAt(1)?.setText("$it")
+        }
+    }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bottomSheet = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
         val view = View.inflate(context, R.layout.layout_chat_participant_combined, null)
@@ -56,10 +78,11 @@ companion object {
 
         pagerAdapter = ChatParticipantAdapter(this)
         binding.pager.adapter = pagerAdapter
-        val tabLayout = binding.tabLayout
-        TabLayoutMediator(tabLayout, binding.pager) { tab, position ->
+        TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             tab.text = if(position == 0 ) "Chat" else "Participants"
-        }.attach()
+        }.apply {
+            attach()
+        }
 
         binding.closeCombinedTabButton.setOnSingleClickListener {
             findNavController().popBackStack()
@@ -75,13 +98,12 @@ companion object {
                 state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
-
         return bottomSheet
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initOnBackPress()
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        addObservers()
     }
 
     private fun initOnBackPress() {

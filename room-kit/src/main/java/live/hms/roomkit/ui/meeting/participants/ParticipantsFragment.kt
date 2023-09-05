@@ -132,9 +132,11 @@ class ParticipantsFragment : Fragment() {
         initOnBackPress()
         initViews()
     }
+    private fun updateParticipantCount(count : Int) {
+        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
+    }
 
     private fun initViews() {
-        binding.participantCount.text = "0"
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             itemAnimator = null
@@ -193,12 +195,11 @@ class ParticipantsFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         // Initial updating of views
         meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
-            val peers = meetingViewModel.peers
-            binding.participantCount.text = "${peers.count()}"
             lifecycleScope.launch {
                 updateParticipantsAdapter(getSearchFilteredPeersIfNeeded())
             }
         }
+        meetingViewModel.peerCount.observe(viewLifecycleOwner,::updateParticipantCount)
 
         meetingViewModel.state.observe(viewLifecycleOwner) { state ->
             if (state is MeetingState.NonFatalFailure) {

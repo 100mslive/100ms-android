@@ -9,13 +9,10 @@
     android:layout_gravity="top"
     app:layout_widthPercent="100%"
     app:layout_heightPercent="@dimen/tall_bottom_sheet"
-
-    android:background="@android:color/black"
     android:orientation="vertical">
 
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
-        android:background="@android:color/black"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
