@@ -1,15 +1,29 @@
 package live.hms.roomkit.ui.meeting.chat.combined
 
+import android.app.Dialog
+import android.content.Context
+import android.content.DialogInterface
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.Shape
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.ui.text.android.TextLayout
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
@@ -17,7 +31,10 @@ import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
+
+
 class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = 2
@@ -31,39 +48,70 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
             ParticipantsFragment()
     }
 }
-class ChatParticipantCombinedFragment : Fragment() {
-    private var binding by viewLifecycle<LayoutChatParticipantCombinedBinding>()
+const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"
+class ChatParticipantCombinedFragment : BottomSheetDialogFragment() {
+    private lateinit var binding : LayoutChatParticipantCombinedBinding//by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
-    val meetingViewModel : MeetingViewModel by activityViewModels()
-    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
+    val meetingViewModel by activityViewModels<MeetingViewModel>()
+//    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
+companion object {
+    val TAG: String = "CombinedChatFragmentTag"
+}
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        binding = LayoutChatParticipantCombinedBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.RoundedTabDialogTheme);
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun getShowParticipants() : Boolean =
+        arguments?.getBoolean(OPEN_TO_PARTICIPANTS, false) == true
+
+    private fun addObservers() {
+        Log.d("asdadasf","Updating ")
+        initOnBackPress()
+        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
+
+            binding.tabLayout.getTabAt(1)?.setText("$it")
+        }
+    }
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val bottomSheet = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        val view = View.inflate(context, R.layout.layout_chat_participant_combined, null)
+
+        binding = LayoutChatParticipantCombinedBinding.bind(view)
+        bottomSheet.setContentView(view)
+
         pagerAdapter = ChatParticipantAdapter(this)
         binding.pager.adapter = pagerAdapter
-        val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout)
-        TabLayoutMediator(tabLayout, binding.pager) { tab, position ->
-            tab.text = if(position == 0 ) "CHAT" else "PARTICIPANTS"
-        }.attach()
-        initOnBackPress()
+        TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
+            tab.text = if(position == 0 ) "Chat" else "Participants"
+        }.apply {
+            attach()
+        }
+
         binding.closeCombinedTabButton.setOnSingleClickListener {
             findNavController().popBackStack()
         }
-        if(args.showParticipants)
+
+        if(getShowParticipants())
             binding.pager.post {
                 binding.pager.setCurrentItem(1, true)
             }
+        bottomSheet.setOnShowListener {
+            BottomSheetBehavior.from(view.parent as View).apply {
+                skipCollapsed = true
+                state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+        binding.applyTheme()
+        return bottomSheet
     }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        addObservers()
+    }
+
     private fun initOnBackPress() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,

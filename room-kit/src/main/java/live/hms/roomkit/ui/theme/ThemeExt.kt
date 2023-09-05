@@ -15,11 +15,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.*
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.databinding.ChangeNameFragmentBinding
 import live.hms.roomkit.databinding.EndSessionBottomSheetBinding
@@ -1169,5 +1171,35 @@ fun NotificationCardBinding.applyTheme() {
         )
     )
 
+
+}
+
+internal fun ParticipantHeaderItemBinding.applyTheme() {
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+}
+// ParticipantItem binding
+internal fun ListItemPeerListBinding.applyTheme() {
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
+
+internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
+    backingLinearLayout.background = root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.borderDefault,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            setColorFilter(color, PorterDuff.Mode.ADD);
+        }
 
 }

@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.percentlayout.widget.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@android:color/black"
+    >
+<LinearLayout
+    android:layout_gravity="top"
+    app:layout_widthPercent="100%"
+    app:layout_heightPercent="@dimen/tall_bottom_sheet"
     android:orientation="vertical">
 
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
-        android:background="@android:color/black"
         android:layout_weight="1"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -35,9 +39,11 @@
             android:minHeight="24dp"
             android:background="@drawable/send_message_background"
             android:textColor="#8F9099"
+            android:gravity="center_vertical"
             android:layout_height="wrap_content"
             android:hint="@string/send_messages_to_everyone"
-            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
             android:layout_marginStart="8dp" />
 
 
@@ -54,3 +60,4 @@
 
 
 </LinearLayout>
+</androidx.percentlayout.widget.PercentFrameLayout>

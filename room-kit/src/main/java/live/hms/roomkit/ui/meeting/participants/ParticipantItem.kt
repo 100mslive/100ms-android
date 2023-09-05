@@ -9,6 +9,7 @@ import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
@@ -21,7 +22,7 @@ import live.hms.video.sdk.models.HMSRemotePeer
 class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val viewerPeer : HMSLocalPeer,
                       private val toggleTrack: (hmsPeer: HMSRemotePeer, type: HMSTrackType) -> Unit,
-                      private val changeRole: (remotePeerId: String, roleToChangeTo : String) -> Unit,
+                      private val changeRole: (remotePeerId: String, roleToChangeTo : String, force : Boolean) -> Unit,
                       private val isAllowedToChangeRole : Boolean,
                       private val isAllowedToMutePeers : Boolean,
                       private val isAllowedToRemovePeers : Boolean,
@@ -29,6 +30,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase
                       ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
+        viewBinding.applyTheme()
         viewBinding.name.text = hmsPeer.name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer.metadata, viewBinding)
@@ -55,7 +57,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                                 override fun onSuccess() {
                                     val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
                                     if(role != null)
-                                        changeRole(hmsPeer.peerID, role)
+                                        changeRole(hmsPeer.peerID, role, false)
                                 }
                             })
 
@@ -65,7 +67,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                             val role = participantPreviousRoleChangeUseCase.getPreviousRole(hmsPeer)
                             Log.d("RolesChangingTo","$role")
                             if(role != null)
-                                changeRole(hmsPeer.peerID, role)
+                                changeRole(hmsPeer.peerID, role, true)
                             true
                         }
 

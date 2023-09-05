@@ -61,7 +61,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
@@ -76,7 +76,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
@@ -91,7 +91,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
@@ -119,7 +119,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   fun receivedMessage(message: ChatMessage) {
     Log.v(TAG, "receivedMessage: $message")
-    addMessage(message.appendMessageIdForTest())
+    addMessage(message)
   }
 
   fun peersUpdate() {
@@ -145,11 +145,4 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   init {
     peersUpdate() // Load up local peers into the chat members.
   }
-}
-
-fun ChatMessage.appendMessageIdForTest(): ChatMessage {
-  return if(BuildConfig.DEBUG)
-    this.copy(message = "${this.messageId?.takeLast(8)}: ${this.message}" )
-  else
-    this
 }

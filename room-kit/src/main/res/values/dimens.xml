@@ -13,4 +13,6 @@
     <dimen name="four_dp">4dp</dimen>
     <dimen name="twelve_dp">12dp</dimen>
     <dimen name="thirty_two_dp">32dp</dimen>
+    <dimen name="tall_bottom_sheet">90%</dimen>
+    <dimen name="curve">12dp</dimen>
 </resources>
