@@ -105,7 +105,7 @@ class SessionOptionBottomSheet(
         )
 
         val recordingOption = GridOptionItem(
-            resources.getString(R.string.record_meeting), R.drawable.ic_record_button_24, {
+            resources.getString(R.string.start_record_meeting), R.drawable.ic_record_button_24, {
                 onRecordingClicked.invoke()
                 dismiss()
             }, isSelected = false,
@@ -115,8 +115,10 @@ class SessionOptionBottomSheet(
         val group: Group = Section().apply {
             add(peerListOption)
             add(brbOption)
+            if (meetingViewModel.isAllowedToShareScreen())
             add(screenShareOption)
             add(raiseHandOption)
+            if (meetingViewModel.isAllowedToBrowserRecord() || meetingViewModel.isAllowedToHlsStream())
             add(recordingOption)
         }
         gridOptionAdapter.update(listOf(group))
@@ -124,7 +126,7 @@ class SessionOptionBottomSheet(
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
             val isRecording = meetingViewModel.isRecordingState()
             recordingOption.setSelectedButton(isRecording)
-            recordingOption.setText(if (isRecording) resources.getString(R.string.stop_recording) else resources.getString(R.string.record_meeting))
+            recordingOption.setText(if (isRecording) resources.getString(R.string.stop_recording) else resources.getString(R.string.start_recording))
         }
 
         meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {

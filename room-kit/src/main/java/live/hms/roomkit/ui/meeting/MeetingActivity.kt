@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
 import android.Manifest.permission.BLUETOOTH_CONNECT
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -10,10 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -198,7 +194,7 @@ class MeetingActivity : AppCompatActivity() {
     private fun handleNotificationButtonClick(type: HMSNotificationType) {
         when (type) {
             is HMSNotificationType.BringOnStage -> {
-                meetingViewModel.requestBringOnStage(type.handRaisePeer)
+                meetingViewModel.requestBringOnStage(type.handRaisePeer, type.onStageRole)
                 handleNotificationDismissClick()
             }
             is HMSNotificationType.TerminalError -> {

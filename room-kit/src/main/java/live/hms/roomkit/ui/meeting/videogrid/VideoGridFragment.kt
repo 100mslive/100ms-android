@@ -14,6 +14,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
 import live.hms.roomkit.ui.meeting.AudioOutputSwitchBottomSheet
+import live.hms.roomkit.ui.meeting.ChangeNameDialogFragment
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -87,11 +88,17 @@ class VideoGridFragment : Fragment() {
 
         binding.applyTheme()
         binding.iconOption.setOnClickListener {
-            LocalTileBottomSheet {
+            LocalTileBottomSheet(onMinimizeClicked = {
                 contextSafe { context, activity ->
                     toggleInsetUI(isMinimised = true)
                 }
-            }.show(
+            }, onNameChange = {
+                contextSafe { context, activity ->
+                    ChangeNameDialogFragment().show(
+                        childFragmentManager, ChangeNameDialogFragment.TAG
+                    )
+                }
+            }).show(
                 childFragmentManager, VideoGridFragment.TAG
             )
         }
@@ -99,7 +106,7 @@ class VideoGridFragment : Fragment() {
         binding.maximizedIcon.setOnClickListener {
             toggleInsetUI(isMinimised = false)
         }
-        binding.insetPill.makeInset{
+        binding.insetPill.makeInset {
             isMinimized = isMinimized.not()
             binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
 
@@ -108,7 +115,7 @@ class VideoGridFragment : Fragment() {
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
 
         binding.screenShareClose.setOnClickListener {
-            meetingViewModel.stopScreenshare(object : HMSActionResultListener{
+            meetingViewModel.stopScreenshare(object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
 
                 }
@@ -129,7 +136,13 @@ class VideoGridFragment : Fragment() {
                             CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isHandRaised == true
                         val isBRB =
                             CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isBRBOn == true
-                        binding.iconBrb.visibility = if (isBRB) View.VISIBLE else View.GONE
+
+                        if (isBRB || isHandRaised) {
+                            binding.iconBrb.visibility = View.VISIBLE
+                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.ic_brb else R.drawable.raise_hand_modern)
+                        } else {
+                            binding.iconBrb.visibility = View.GONE
+                        }
                     }
                     // Unused updates
                     HMSPeerUpdate.NETWORK_QUALITY_UPDATED,
@@ -146,7 +159,7 @@ class VideoGridFragment : Fragment() {
         }
 
         meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (video, speakers) ->
-            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level?:0)
+            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level ?: 0)
 
         }
 
@@ -215,21 +228,21 @@ class VideoGridFragment : Fragment() {
                 newRowCount = 3
                 newColumnCount = 2
                 binding.divider.setGuidelinePercent(0f)
-            }
-            else {
+            } else {
                 binding.screenShareContainer.visibility = View.VISIBLE
                 newRowCount = 1
                 newColumnCount = 2
                 binding.divider.setGuidelinePercent(0.75f)
             }
 
-            if (screenShareTrackList.find { it.isLocal } !=null){
+            if (screenShareTrackList.find { it.isLocal } != null) {
                 binding.localScreenShareContainer.visibility = View.VISIBLE
             } else {
                 binding.localScreenShareContainer.visibility = View.GONE
             }
 
-            meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value = Pair(newRowCount, newColumnCount)
+            meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
+                Pair(newRowCount, newColumnCount)
 
             val itemsPerPage = newRowCount * newColumnCount
             // Without this, the extra inset adds one more tile than they should
@@ -240,7 +253,8 @@ class VideoGridFragment : Fragment() {
                 1
             else expectedItems
 
-            binding.tabLayoutDots.visibility = if(peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
+            binding.tabLayoutDots.visibility =
+                if (peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
         }
 
         meetingViewModel.hmsScreenShareBottomSheetEvent.observe(viewLifecycleOwner) {
