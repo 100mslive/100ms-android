@@ -60,7 +60,7 @@ companion object {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        setStyle(STYLE_NORMAL, R.style.CustomBottomSheetStyle);
+        setStyle(STYLE_NORMAL, R.style.RoundedTabDialogTheme);
     }
 
     private fun getShowParticipants() : Boolean =
