@@ -15,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.imageview.ShapeableImageView
@@ -1192,11 +1193,13 @@ internal fun ListItemPeerListBinding.applyTheme() {
     )
 }
 
-internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
-    root.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.borderDefault,
-            HMSPrebuiltTheme.getDefaults().background_default
-        )
-    )
+internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
+    backingLinearLayout.background = root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.borderDefault,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            setColorFilter(color, PorterDuff.Mode.ADD);
+        }
+
 }

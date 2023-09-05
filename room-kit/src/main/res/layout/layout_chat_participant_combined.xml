@@ -7,6 +7,7 @@
     android:nestedScrollingEnabled="false"
     >
 <LinearLayout
+    android:id="@+id/backingLinearLayout"
     android:background="@drawable/gray_shape_round_dialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,12 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginHorizontal="8dp"
-        android:background="@drawable/gray_shape_round_dialog"
+        app:tabTextAppearance="@style/RoundedTabsTextStyle"
+        style="@style/RoundedTabLayoutStyle"
         android:layout_weight="1"
         app:tabMode="fixed"
-        app:tabBackground="@drawable/participant_tab_header"
-        app:tabSelectedTextColor="@color/participants_tab_selected_header_color"
-        app:tabTextColor="@color/participants_tab_unselected_header_color"
         android:id="@+id/tab_layout"
         android:layout_width="match_parent">
 

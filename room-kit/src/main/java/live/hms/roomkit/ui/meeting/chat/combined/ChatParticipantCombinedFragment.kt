@@ -3,6 +3,10 @@ package live.hms.roomkit.ui.meeting.chat.combined
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.Shape
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -27,6 +31,7 @@ import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 
 
@@ -98,6 +103,7 @@ companion object {
                 state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
+        binding.applyTheme()
         return bottomSheet
     }
 
