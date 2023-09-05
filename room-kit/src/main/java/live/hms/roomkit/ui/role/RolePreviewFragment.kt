@@ -121,10 +121,12 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
                     }
 
                 }, toggleHandraise = true)
+
         }
 
         binding.declineButton.setOnClickListener {
             meetingViewModel.setStatetoOngoing()
+            meetingViewModel.toggleRaiseHand(forceLowerHandRaise = true)
             binding.previewView.removeTrack()
             findNavController().navigate(
                 RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
