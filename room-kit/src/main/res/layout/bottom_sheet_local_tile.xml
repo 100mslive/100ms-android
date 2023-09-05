@@ -64,6 +64,26 @@
             android:text="Minimise Your Tile"
             android:visibility="visible" />
 
+        <View
+            android:id="@+id/border6"
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/gray_line_vertical_divider" />
+
+        <TextView
+            android:id="@+id/change_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/change_name"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Change Name"
+            android:visibility="visible" />
+
 
     </LinearLayout>
 

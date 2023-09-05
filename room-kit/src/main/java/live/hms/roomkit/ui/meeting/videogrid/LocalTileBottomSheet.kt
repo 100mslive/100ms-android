@@ -18,7 +18,7 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 
-class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit) : BottomSheetDialogFragment() {
+class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit, val onNameChange: () -> Unit) : BottomSheetDialogFragment() {
 
     companion object {
         private const val TAG = "LeaveBottomSheet"
@@ -57,11 +57,11 @@ class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit) : BottomSheetDialo
         )
 
         var btnArray = arrayOf(
-            binding.earpieceBtn, binding.audioOt
+            binding.earpieceBtn, binding.audioOt, binding.changeName
         )
 
         val borders = arrayOf(
-            binding.border5
+            binding.border5,binding.border6
         )
 
         binding.roleName.apply {
@@ -111,6 +111,11 @@ class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit) : BottomSheetDialo
 
         binding.earpieceBtn.setOnSingleClickListener(200L) {
             onMinimizeClicked.invoke()
+            dismissAllowingStateLoss()
+        }
+
+        binding.changeName.setOnSingleClickListener(200L) {
+            onNameChange.invoke()
             dismissAllowingStateLoss()
         }
 
