@@ -2,14 +2,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/participant_tab_header_selected_left"
         android:state_selected="true"
-        android:state_first="true"/>
-    <item android:drawable="@drawable/participant_tab_header_selected_right"
-        android:state_selected="true"
-        android:state_first="false"/>
+        />
     <item android:drawable="@drawable/participant_tab_header_unselected_right"
         android:state_selected="false"
-        android:state_last="true"/>
-    <item android:drawable="@drawable/participant_tab_header_unselected_left"
-        android:state_selected="false"
-        android:state_last="false"/>
+        />
 </selector>
