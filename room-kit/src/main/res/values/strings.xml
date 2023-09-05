@@ -235,4 +235,5 @@
     <string name="video_only_subheading">Setup your video before joining</string>
     <string name="audio_video_subheading">Setup your audio and video before joining</string>
     <string name="audio_video_subheading_no">Setup before joining</string>
+    <string name="participants_heading">Participants $d</string>
 </resources>

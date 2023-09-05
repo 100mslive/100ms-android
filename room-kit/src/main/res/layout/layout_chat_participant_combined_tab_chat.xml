@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.percentlayout.widget.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minHeight="400dp"
-    xmlns:tools="http://schemas.android.com/tools"
+    >
+<LinearLayout
+    android:layout_gravity="top"
+    app:layout_widthPercent="100%"
+    app:layout_heightPercent="@dimen/tall_bottom_sheet"
+
     android:background="@android:color/black"
     android:orientation="vertical">
 
@@ -57,3 +63,4 @@
 
 
 </LinearLayout>
+</androidx.percentlayout.widget.PercentFrameLayout>

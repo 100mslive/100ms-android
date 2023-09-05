@@ -20,17 +20,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
-import live.hms.roomkit.databinding.EndSessionBottomSheetBinding
-import live.hms.roomkit.databinding.ExitBottomSheetBinding
-import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
-import live.hms.roomkit.databinding.FragmentGridVideoBinding
-import live.hms.roomkit.databinding.FragmentMeetingBinding
-import live.hms.roomkit.databinding.FragmentPreviewBinding
-import live.hms.roomkit.databinding.FragmentRolePreviewBinding
-import live.hms.roomkit.databinding.ItemGridOptionBinding
-import live.hms.roomkit.databinding.NotificationCardBinding
-import live.hms.roomkit.databinding.VideoCardBinding
+import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.util.EmailUtils
@@ -1112,4 +1102,23 @@ fun NotificationCardBinding.applyTheme() {
     )
 
 
+}
+
+internal fun ParticipantHeaderItemBinding.applyTheme() {
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+}
+// ParticipantItem binding
+internal fun ListItemPeerListBinding.applyTheme() {
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 }

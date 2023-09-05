@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.percentlayout.widget.PercentFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_gravity="top"
+    app:layout_widthPercent="100%"
+    app:layout_heightPercent="@dimen/tall_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
@@ -39,9 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="8dp"
-                android:background="@drawable/badge_circle_30"
                 android:gravity="center"
-                android:text="@string/_0"
          />
 
         </LinearLayout>
@@ -49,12 +54,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_marginTop="12dp"
             android:paddingHorizontal="16dp"
-            android:layout_weight="1"
             tools:listitem="@layout/list_item_peer_list" />
     </LinearLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.percentlayout.widget.PercentFrameLayout>

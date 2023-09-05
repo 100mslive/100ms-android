@@ -1,23 +1,26 @@
 package live.hms.roomkit.ui.meeting.chat.combined
 
+import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
-import live.hms.roomkit.util.viewLifecycle
+
+
 class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = 2
@@ -33,7 +36,7 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
 }
 const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"
 class ChatParticipantCombinedFragment : BottomSheetDialogFragment() {
-    private var binding by viewLifecycle<LayoutChatParticipantCombinedBinding>()
+    private lateinit var binding : LayoutChatParticipantCombinedBinding//by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
     val meetingViewModel : MeetingViewModel by activityViewModels()
 //    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
@@ -44,25 +47,20 @@ companion object {
     private fun getShowParticipants() : Boolean =
         arguments?.getBoolean(OPEN_TO_PARTICIPANTS, false) == true
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
-        binding = LayoutChatParticipantCombinedBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val bottomSheet = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        val view = View.inflate(context, R.layout.layout_chat_participant_combined, null)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        binding = LayoutChatParticipantCombinedBinding.bind(view)
+        bottomSheet.setContentView(view)
+
         pagerAdapter = ChatParticipantAdapter(this)
         binding.pager.adapter = pagerAdapter
-        val tabLayout = view.findViewById<TabLayout>(R.id.tab_layout)
+        val tabLayout = binding.tabLayout
         TabLayoutMediator(tabLayout, binding.pager) { tab, position ->
             tab.text = if(position == 0 ) "Chat" else "Participants"
         }.attach()
-        initOnBackPress()
+
         binding.closeCombinedTabButton.setOnSingleClickListener {
             findNavController().popBackStack()
         }
@@ -71,7 +69,21 @@ companion object {
             binding.pager.post {
                 binding.pager.setCurrentItem(1, true)
             }
+        bottomSheet.setOnShowListener {
+            BottomSheetBehavior.from(view.parent as View).apply {
+                skipCollapsed = true
+                state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+
+        return bottomSheet
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initOnBackPress()
+    }
+
     private fun initOnBackPress() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,

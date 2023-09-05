@@ -28,7 +28,6 @@
             android:layout_weight="1"
             android:fontFamily="@font/inter_semibold"
             android:textSize="14sp"
-            android:textColor="#EFF0FA"
             tools:text="@string/john_doe" />
 
 

@@ -8,12 +8,15 @@ import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ParticipantHeaderItemBinding
 import live.hms.roomkit.drawableEnd
+import live.hms.roomkit.ui.theme.applyTheme
 
 class ParticipantHeaderItem(private val roleName: String, private val numPeers: Int? = 0, val expanded : (String, Boolean) -> Unit) :
     BindableItem<ParticipantHeaderItemBinding>(), ExpandableItem {
     private lateinit var expandableGroup: ExpandableGroup
-
+// heading is onsurface medium
+    // background is border default
     override fun bind(viewBinding: ParticipantHeaderItemBinding, position: Int) {
+        viewBinding.applyTheme()
         viewBinding.heading.text = viewBinding.root.resources.getString(R.string.participant_header_item, roleName,numPeers)
         viewBinding.root.setOnClickListener {
             expandableGroup.onToggleExpanded()

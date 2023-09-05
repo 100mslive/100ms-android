@@ -9,6 +9,7 @@ import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
@@ -29,6 +30,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase
                       ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
+        viewBinding.applyTheme()
         viewBinding.name.text = hmsPeer.name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer.metadata, viewBinding)
