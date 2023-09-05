@@ -285,6 +285,7 @@ class MeetingViewModel(
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
     val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
     val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
+    val updateGridLayoutDimensions = SingleLiveEvent<Boolean>()
     val hmsScreenShareBottomSheetEvent = SingleLiveEvent<String>()
 
     fun setMeetingViewMode(mode: MeetingViewMode) {

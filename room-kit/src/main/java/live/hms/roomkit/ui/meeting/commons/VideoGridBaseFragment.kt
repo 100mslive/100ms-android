@@ -109,7 +109,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected val maxItems: Int
     get() = gridRowCount * gridColumnCount
 
-  private fun updateGridLayoutDimensions(layout: GridLayout, isPipMode: Boolean) {
+  private fun updateGridLayoutDimensions(layout: GridLayout) {
 
     var childIdx: Pair<Int, Int>? = null
     var colIdx = 0
@@ -414,7 +414,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
 
     if (requiresGridLayoutUpdate) {
-      updateGridLayoutDimensions(layout, isPipMode = false)
+      updateGridLayoutDimensions(layout)
     }
   }
 
@@ -515,7 +515,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       //force pip mode layout refresh
       hideOrShowGridsForPip(null)
       if (::gridLayout.isInitialized)
-        updateGridLayoutDimensions(gridLayout, isPipMode = false)
+        updateGridLayoutDimensions(gridLayout)
       wasLastModePip = false
       return
     }
@@ -585,6 +585,11 @@ abstract class VideoGridBaseFragment : Fragment() {
   open fun initViewModels() {
     meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) {
       applyMetadataUpdates(it)
+    }
+
+    meetingViewModel.updateGridLayoutDimensions.observe(viewLifecycleOwner) {
+      if (it)
+      updateGridLayoutDimensions(gridLayout)
     }
   }
 
