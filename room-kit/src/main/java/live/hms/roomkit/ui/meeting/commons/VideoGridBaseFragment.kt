@@ -586,11 +586,6 @@ abstract class VideoGridBaseFragment : Fragment() {
     meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) {
       applyMetadataUpdates(it)
     }
-
-    meetingViewModel.updateGridLayoutDimensions.observe(viewLifecycleOwner) {
-      if (it)
-      updateGridLayoutDimensions(gridLayout)
-    }
   }
 
   abstract fun isScreenshare(): Boolean
