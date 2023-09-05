@@ -129,7 +129,13 @@ class VideoGridFragment : Fragment() {
                             CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isHandRaised == true
                         val isBRB =
                             CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isBRBOn == true
-                        binding.iconBrb.visibility = if (isBRB) View.VISIBLE else View.GONE
+
+                        if (isBRB || isHandRaised) {
+                            binding.iconBrb.visibility =  View.VISIBLE
+                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.ic_brb else R.drawable.raise_hand_modern)
+                        } else {
+                            binding.iconBrb.visibility = View.GONE
+                        }
                     }
                     // Unused updates
                     HMSPeerUpdate.NETWORK_QUALITY_UPDATED,
