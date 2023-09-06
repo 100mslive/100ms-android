@@ -90,7 +90,7 @@ companion object {
         }
 
         binding.closeCombinedTabButton.setOnSingleClickListener {
-            findNavController().popBackStack()
+            dismissAllowingStateLoss()
         }
 
         if(getShowParticipants())
@@ -117,7 +117,7 @@ companion object {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().popBackStack()
+                    dismissAllowingStateLoss()
                 }
             })
     }
