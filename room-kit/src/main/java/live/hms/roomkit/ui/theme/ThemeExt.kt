@@ -1234,6 +1234,10 @@ internal fun ListItemPeerListBinding.applyTheme() {
 }
 
 internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
+    closeCombinedTabButton.setColorFilter(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    )
     backingLinearLayout.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
         .apply {
             val color = getColorOrDefault(
@@ -1271,7 +1275,6 @@ internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
 
     chatTab.background = getTabStateList()
     participantTab.background = getTabStateList()
-//    chatTab.background = LayerDrawable(selectedBaseDrawable.toTypedArray())
 
 }
 
@@ -1326,7 +1329,16 @@ private fun getChatBackgroundDrawable(): ShapeDrawable {
 }
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+    // Emptyview
 
+    emptyTitle.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+
+    emptyDescription.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    // Chat
     chatView.background = getChatBackgroundDrawable()
     editTextMessage.background = getChatBackgroundDrawable()
     editTextMessage.setTextColor(
@@ -1334,6 +1346,10 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
     )
+
+    editTextMessage.setHintTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
 }
 
 internal fun ListItemChatBinding.applyTheme() {
