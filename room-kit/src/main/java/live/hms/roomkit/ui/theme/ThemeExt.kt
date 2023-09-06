@@ -425,12 +425,21 @@ internal fun ChangeNameFragmentBinding.applyTheme() {
         )
     )
 
-    root.setBackgroundColor(
+    border.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDim,
-            HMSPrebuiltTheme.getDefaults().background_default
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
         )
     )
+
+
+    standardBottomSheet.background =root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.backgroundDim,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            setColorFilter(color, PorterDuff.Mode.ADD);
+        }
 
     newName.setBackgroundColor(
         getColorOrDefault(

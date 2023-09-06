@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -46,12 +47,16 @@ class AudioOutputSwitchBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.root.setBackgroundColor(
-            getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.backgroundDefault,
-                HMSPrebuiltTheme.getDefaults().background_default
-            )
-        )
+
+
+        binding.root.background = resources.getDrawable(R.drawable.gray_shape_round_dialog)
+            .apply {
+                val color = getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.backgroundDefault,
+                    HMSPrebuiltTheme.getDefaults().background_default)
+                setColorFilter(color, PorterDuff.Mode.ADD);
+            }
+
 
         var btnArray = arrayOf(
             binding.muteBtn,
