@@ -39,19 +39,7 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
             requireActivity().application
         )
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme);
-
-        if (savedInstanceState == null) {
-            swappingOrientation = true
-            activity?.apply {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            }
-        }
-    }
-
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
