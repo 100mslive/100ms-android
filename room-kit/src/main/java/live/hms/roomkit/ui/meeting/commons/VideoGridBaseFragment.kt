@@ -322,11 +322,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   ) {
     gridLayout = layout
     var requiresGridLayoutUpdate = false
-
-    val currentGridColumnSpan = "${gridRowCount}x${gridColumnCount}"
-    if (currentGridColumnSpan != lastGridColumnSpan){
-      requiresGridLayoutUpdate = true
-    }
+    
     val newRenderedViews = ArrayList<RenderedViewPair>()
 
     // Remove all the views which are not required now
