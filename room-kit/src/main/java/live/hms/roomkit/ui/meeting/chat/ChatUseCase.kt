@@ -1,7 +1,7 @@
 package live.hms.roomkit.ui.meeting.chat
 
-import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -17,14 +17,20 @@ import androidx.recyclerview.widget.RecyclerView
  * Meant to work with the [SingleSideFadeRecyclerview]
  */
 class ChatUseCase {
-    fun initiate(messages: MutableLiveData<ArrayList<ChatMessage>>,
-                 viewlifecycleOwner: LifecycleOwner,
-                 chatAdapter: ChatAdapter,
-                 recyclerview: SingleSideFadeRecyclerview,
-    chatViewModel: ChatViewModel) {
+    fun initiate(
+        messages: MutableLiveData<ArrayList<ChatMessage>>,
+        viewlifecycleOwner: LifecycleOwner,
+        chatAdapter: ChatAdapter,
+        recyclerview: SingleSideFadeRecyclerview,
+        chatViewModel: ChatViewModel,
+        emptyIndicator: ImageView? = null,
+//        canShowIndicator : () -> Boolean = {true}
+    ) {
 
         recyclerview.adapter = chatAdapter
+        toggleEmptyIndicator(emptyIndicator, messages.value)
         messages.observe(viewlifecycleOwner) {
+            toggleEmptyIndicator(emptyIndicator, it)
             chatAdapter.submitList(it)
             val position = it.size - 1
             if(position >= 0) {
@@ -41,6 +47,17 @@ class ChatUseCase {
                 if(recyclerview.visibility == View.VISIBLE)
                     chatViewModel.unreadMessagesCount.postValue(0)
             }
+        }
+    }
+
+    private fun toggleEmptyIndicator(
+        emptyIndicator: ImageView?,
+        messages: ArrayList<ChatMessage>?,
+    ) {
+        emptyIndicator?.visibility = if( messages.isNullOrEmpty() ) {
+            View.VISIBLE
+        } else {
+            View.GONE
         }
     }
 }

@@ -11,13 +11,25 @@
     app:layout_heightPercent="@dimen/tall_bottom_sheet"
     android:orientation="vertical">
 
-    <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
-        android:id="@+id/chatMessages"
-        android:layout_weight="1"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="1"
+        >
+    <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
+        android:id="@+id/chatMessages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:listitem="@layout/list_item_chat"
         />
+    <ImageView
+        android:id="@+id/emptyIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/message_svg"
+        android:layout_gravity="center"
+        />
+    </FrameLayout>
 
     <RelativeLayout
         android:id="@+id/chatView"
