@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemChatBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,6 +28,9 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
 
   inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
     RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.applyTheme()
+    }
 
     fun bind(message: ChatMessage) {
       binding.name.text = "${message.senderName}${getRecipientText(message)}"

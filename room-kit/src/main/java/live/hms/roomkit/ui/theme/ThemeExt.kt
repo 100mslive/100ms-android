@@ -1330,6 +1330,13 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
     )
+}
 
+internal fun ListItemChatBinding.applyTheme() {
+    val color = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
 
+    name.setTextColor(color)
+    message.setTextColor(color)
 }
