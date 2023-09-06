@@ -1315,7 +1315,7 @@ fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
 }
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
-    val backgroundDrawable = ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
+    val backgroundDrawable = getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
         .apply {
             val color = getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.surfaceBright,
