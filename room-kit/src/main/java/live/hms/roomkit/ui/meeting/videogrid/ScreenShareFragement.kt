@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.meeting.videogrid
 
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,7 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
     companion object {
         private const val TAG = "ScreenShareFragement"
     }
+    private var swappingOrientation = false
 
     private var binding by viewLifecycle<BottomSheetScreenShareBinding>()
 
@@ -40,6 +42,13 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme);
+
+        if(savedInstanceState == null) {
+            swappingOrientation = true
+            activity?.apply {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+        }
     }
 
     override fun onCreateView(
@@ -105,6 +114,17 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         contextSafe { context, activity ->
             binding.localVideoView.removeTrack()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if(!swappingOrientation) {
+           contextSafe { context, activity ->
+               activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+           }
+        }
+        swappingOrientation = false
     }
 
 
