@@ -22,13 +22,42 @@
         android:layout_height="match_parent"
         tools:listitem="@layout/list_item_chat"
         />
-    <ImageView
-        android:id="@+id/emptyIndicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/message_svg"
-        android:layout_gravity="center"
-        />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/emptyIndicator"
+            android:paddingHorizontal="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/message_svg"
+                android:layout_marginBottom="16dp"
+                android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/emptyTitle"
+                android:layout_width="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:textSize="20sp"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Start a conversation"
+                />
+            <TextView
+                android:id="@+id/emptyDescription"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:fontFamily="@font/inter_regular"
+                android:textSize="14sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="There are no messages here yet. Start a conversation by sending a message."
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </FrameLayout>
 
     <RelativeLayout

@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting.chat
 
 import android.view.View
-import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -23,7 +22,7 @@ class ChatUseCase {
         chatAdapter: ChatAdapter,
         recyclerview: SingleSideFadeRecyclerview,
         chatViewModel: ChatViewModel,
-        emptyIndicator: ImageView? = null,
+        emptyIndicator: View? = null,
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
@@ -51,7 +50,7 @@ class ChatUseCase {
     }
 
     private fun toggleEmptyIndicator(
-        emptyIndicator: ImageView?,
+        emptyIndicator: View?,
         messages: ArrayList<ChatMessage>?,
     ) {
         emptyIndicator?.visibility = if( messages.isNullOrEmpty() ) {
