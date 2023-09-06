@@ -423,25 +423,25 @@ abstract class VideoGridBaseFragment : Fragment() {
   }
 
   private fun applyMetadataUpdates(peerTypePair: Pair<HMSPeer, HMSPeerUpdate>) {
-    val isUpdatedPeerRendered =
+    val renderedViewPair =
       renderedViews.find { it.meetingTrack.peer.peerID == peerTypePair.first.peerID }
-    if (isUpdatedPeerRendered != null) {
+    if (renderedViewPair != null) {
       when (peerTypePair.second) {
         HMSPeerUpdate.METADATA_CHANGED -> {
-          val isHandRaised = CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isHandRaised == true
-          val isBRB = CustomPeerMetadata.fromJson(isUpdatedPeerRendered.meetingTrack.peer.metadata)?.isBRBOn == true
-          isUpdatedPeerRendered.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
-          isUpdatedPeerRendered.binding.videoCard.isBrb.alpha = visibilityOpacity(isBRB)
+          val isHandRaised = CustomPeerMetadata.fromJson(renderedViewPair.meetingTrack.peer.metadata)?.isHandRaised == true
+          val isBRB = CustomPeerMetadata.fromJson(renderedViewPair.meetingTrack.peer.metadata)?.isBRBOn == true
+          renderedViewPair.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
+          renderedViewPair.binding.videoCard.isBrb.alpha = visibilityOpacity(isBRB)
         }
         HMSPeerUpdate.NAME_CHANGED -> {
-          with(isUpdatedPeerRendered.binding.videoCard) {
-            name.text = isUpdatedPeerRendered.meetingTrack.peer.name
-            nameInitials.text = NameUtils.getInitials(isUpdatedPeerRendered.meetingTrack.peer.name)
+          with(renderedViewPair.binding.videoCard) {
+            name.text = renderedViewPair.meetingTrack.peer.name
+            nameInitials.text = NameUtils.getInitials(renderedViewPair.meetingTrack.peer.name)
           }
         }
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
           val downlinkScore = peerTypePair.first.networkQuality?.downlinkQuality
-          isUpdatedPeerRendered.binding.videoCard.networkQuality.apply {
+          renderedViewPair.binding.videoCard.networkQuality.apply {
             updateNetworkQualityView(downlinkScore ?: -1,requireContext(),this)
           }
         }
@@ -463,11 +463,13 @@ abstract class VideoGridBaseFragment : Fragment() {
       } else {
         imageView.colorFilter = null
       }
-      imageView.setImageDrawable(drawable)
-      if (drawable == null){
-        imageView.visibility = View.GONE
-      }else{
-        imageView.visibility = View.VISIBLE
+      if (imageView.drawable != drawable) {
+        imageView.setImageDrawable(drawable)
+        if (drawable == null) {
+          imageView.visibility = View.GONE
+        } else {
+          imageView.visibility = View.VISIBLE
+        }
       }
     }
   }
