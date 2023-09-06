@@ -1,11 +1,7 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import android.graphics.Shader
+import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
@@ -17,6 +13,9 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.cardview.widget.CardView
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
@@ -96,7 +95,7 @@ internal fun View.setBackgroundAndColor(
 ) {
     this.backgroundTintList =
         ColorStateList.valueOf(getColorOrDefault(backgroundColorStr, defaultBackgroundColor))
-    val normalDrawable: Drawable = this.context.resources.getDrawable(backGroundDrawableRes)
+    val normalDrawable: Drawable = ResourcesCompat.getDrawable(this.context.resources, backGroundDrawableRes, null)!!
     val wrapDrawable: Drawable = DrawableCompat.wrap(normalDrawable)
     DrawableCompat.setTint(
         wrapDrawable, getColorOrDefault(backgroundColorStr, defaultBackgroundColor)
@@ -1194,12 +1193,31 @@ internal fun ListItemPeerListBinding.applyTheme() {
 }
 
 internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
-    backingLinearLayout.background = root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
+    backingLinearLayout.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
         .apply {
             val color = getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.borderDefault,
                 HMSPrebuiltTheme.getDefaults().background_default)
-            setColorFilter(color, PorterDuff.Mode.ADD);
+            colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
 
+}
+
+internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+    val backgroundDrawable = ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.borderDefault,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+        }
+    chatView.background = backgroundDrawable
+    editTextMessage.background = backgroundDrawable
+    editTextMessage.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
 }
