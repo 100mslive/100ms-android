@@ -2,17 +2,17 @@ package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
 import android.graphics.*
-import android.graphics.drawable.Animatable
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.*
 import android.graphics.drawable.shapes.RectShape
+import android.graphics.drawable.shapes.RoundRectShape
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -36,6 +36,7 @@ import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.util.EmailUtils
+import live.hms.roomkit.util.dp
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -1202,6 +1203,75 @@ internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
 
+    tabLayout.tabTextColors = ColorStateList(
+        arrayOf(
+            intArrayOf( android.R.attr.state_selected),
+            intArrayOf( -android.R.attr.state_selected)
+        ), intArrayOf(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp),
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                HMSPrebuiltTheme.getDefaults().onsurface_low_emp)
+        )
+    )
+    tabLayout.background = getShape()
+        //ResourcesCompat.getDrawable(this.root.resources,R.drawable.tab_layout_bg, null)!!
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                HMSPrebuiltTheme.getDefaults().surface_default)
+            colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+        }
+
+    val tabGroup = (tabLayout.getChildAt(0) as ViewGroup)
+    val chatTab = tabGroup.getChildAt(0)
+    val participantTab = tabGroup.getChildAt(1)
+
+    chatTab.background = getTabStateList()
+    participantTab.background = getTabStateList()
+//    chatTab.background = LayerDrawable(selectedBaseDrawable.toTypedArray())
+
+}
+
+fun getShape(): ShapeDrawable {
+    val eightDp = 8.dp().toFloat()
+    val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)
+    return ShapeDrawable(
+        RoundRectShape(
+            lines, null,
+            null
+        )
+    )
+}
+fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
+
+    val unselectedDrawable = getShape()
+        //ResourcesCompat.getDrawable(this.root.resources,R.drawable.k, null)!!
+        .apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                    HMSPrebuiltTheme.getDefaults().surface_default)
+            )
+        }
+    val d2= getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.k, null)!!
+    .apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceBright,
+                HMSPrebuiltTheme.getDefaults().surface_bright)
+        )
+    }
+    val selectedInner = InsetDrawable(d2,8)
+    val selectedDrawable = LayerDrawable(listOf(unselectedDrawable, selectedInner).toTypedArray())
+
+    val stateList = StateListDrawable()
+    stateList.addState(intArrayOf(android.R.attr.state_selected), selectedDrawable)
+    stateList.addState(intArrayOf(-android.R.attr.state_selected), unselectedDrawable)
+
+    return stateList
 }
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
@@ -1220,4 +1290,6 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
     )
+
+
 }

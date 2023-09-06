@@ -146,11 +146,7 @@
     </style>
 
     <style name="RoundedTabLayoutStyle" parent="Widget.Design.TabLayout">
-        <item name="tabBackground">@drawable/tabs_selector</item>
         <item name="tabIndicator">@null</item>
-        <item name="android:background">@drawable/tab_layout_bg</item>
-        <item name="tabSelectedTextColor">@color/participants_tab_selected_header_color</item>
-        <item name="tabTextColor">@color/participants_tab_unselected_header_color</item>
     </style>
     <style name="RoundedTabsTextStyle" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
