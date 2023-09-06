@@ -113,18 +113,20 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         super.onDismiss(dialog)
         contextSafe { context, activity ->
             binding.localVideoView.removeTrack()
+            if(!swappingOrientation) {
+                contextSafe { context, activity ->
+                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                }
+            }
+            swappingOrientation = false
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
-        if(!swappingOrientation) {
-           contextSafe { context, activity ->
-               activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-           }
-        }
-        swappingOrientation = false
+
+
     }
 
 
