@@ -29,6 +29,7 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
     companion object {
         private const val TAG = "ScreenShareFragement"
     }
+
     private var swappingOrientation = false
 
     private var binding by viewLifecycle<BottomSheetScreenShareBinding>()
@@ -43,7 +44,7 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme);
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             swappingOrientation = true
             activity?.apply {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -87,10 +88,28 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
             )
         )
 
+        binding.rotateBtn.drawable.setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+
+        binding.rotateBtn.setOnClickListener {
+            contextSafe { context, activity ->
+                if (swappingOrientation.not()) {
+                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                } else {
+                    activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                }
+                swappingOrientation = !swappingOrientation
+            }
+        }
+
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
         }
-        
+
         binding.root.setBackgroundColor(
             getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.backgroundDefault,
@@ -113,18 +132,16 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         super.onDismiss(dialog)
         contextSafe { context, activity ->
             binding.localVideoView.removeTrack()
-            if(!swappingOrientation) {
-                contextSafe { context, activity ->
-                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
-            }
+
+
+            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
             swappingOrientation = false
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
 
 
     }
