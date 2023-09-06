@@ -14,6 +14,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 
 class CombinedChatFragmentTab : Fragment() {
@@ -39,7 +40,7 @@ class CombinedChatFragmentTab : Fragment() {
             }
         }
 
-
+        binding.applyTheme()
         return binding.root
     }
 
