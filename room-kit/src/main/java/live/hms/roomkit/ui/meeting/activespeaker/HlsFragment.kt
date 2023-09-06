@@ -23,6 +23,7 @@ import live.hms.roomkit.ui.meeting.ChatViewModelFactory
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -59,7 +60,7 @@ class HlsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.applyTheme()
         binding.btnSeekLive.setOnClickListener {
             player.seekToLivePosition()
         }

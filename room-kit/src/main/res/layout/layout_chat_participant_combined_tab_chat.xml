@@ -30,8 +30,6 @@
             style="@style/TextInputLayout"
             android:layout_width="wrap_content"
             android:layout_toStartOf="@id/icon_send"
-            android:layout_alignBottom="@id/icon_send"
-            android:layout_alignTop="@id/icon_send"
             android:layout_alignParentStart="true"
             android:textSize="14sp"
             android:fontFamily="@font/inter_regular"
@@ -48,7 +46,9 @@
             android:id="@+id/icon_send"
             android:layout_width="wrap_content"
             android:padding="8dp"
+            android:layout_alignTop="@id/edit_text_message"
             android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/edit_text_message"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/send_icon" />
