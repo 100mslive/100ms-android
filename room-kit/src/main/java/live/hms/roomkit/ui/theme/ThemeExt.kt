@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
@@ -259,7 +258,8 @@ internal fun TextView.buttonDisabled() {
 private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
-
+    chatView.background = getChatBackgroundDrawable()
+    editTextMessage.background = getChatBackgroundDrawable()
     buttonEndCall.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default,
@@ -1314,8 +1314,8 @@ fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
     return stateList
 }
 
-internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
-    val backgroundDrawable = getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
+private fun getChatBackgroundDrawable(): ShapeDrawable {
+    return getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
         .apply {
             val color = getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.surfaceBright,
@@ -1323,8 +1323,12 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
             colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
-    chatView.background = backgroundDrawable
-    editTextMessage.background = backgroundDrawable
+}
+
+internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+
+    chatView.background = getChatBackgroundDrawable()
+    editTextMessage.background = getChatBackgroundDrawable()
     editTextMessage.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
@@ -1340,3 +1344,9 @@ internal fun ListItemChatBinding.applyTheme() {
     name.setTextColor(color)
     message.setTextColor(color)
 }
+
+internal fun HlsFragmentLayoutBinding.applyTheme() {
+    chatView.background = getChatBackgroundDrawable()
+    editTextMessage.background = getChatBackgroundDrawable()
+}
+

@@ -23,7 +23,6 @@
         android:id="@+id/chatView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/send_message_background"
         android:layout_margin="8dp">
 
         <EditText
@@ -37,8 +36,6 @@
             android:textSize="14sp"
             android:fontFamily="@font/inter_regular"
             android:minHeight="24dp"
-            android:background="@drawable/send_message_background"
-            android:textColor="#8F9099"
             android:gravity="center_vertical"
             android:layout_height="wrap_content"
             android:hint="@string/send_messages_to_everyone"

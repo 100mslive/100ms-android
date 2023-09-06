@@ -22,9 +22,6 @@
     </style>
 
     <style name="TextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="boxBackgroundColor">#191B23</item>
-        <item name="boxStrokeWidth">0dp</item>
-        <item name="boxStrokeWidthFocused">0dp</item>
         <item name="hintTextColor">#8F9099</item>
         <item name="android:textColor">#EFF0FA</item>
     </style>
