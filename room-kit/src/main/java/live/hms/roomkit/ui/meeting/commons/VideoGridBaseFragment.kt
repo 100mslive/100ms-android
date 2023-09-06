@@ -75,6 +75,8 @@ abstract class VideoGridBaseFragment : Fragment() {
     val statsInterpreter: StatsInterpreter?,
   )
 
+  private var lastGridColumnSpan : String? = null
+
   protected val renderedViews = ArrayList<RenderedViewPair>()
   private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
 
@@ -151,6 +153,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
         rowCount = getNormalLayoutRowCount()
         columnCount = getNormalLayoutColumnCount()
+        lastGridColumnSpan = "${gridRowCount}x${gridColumnCount}"
       }
 
 
@@ -319,6 +322,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   ) {
     gridLayout = layout
     var requiresGridLayoutUpdate = false
+    
     val newRenderedViews = ArrayList<RenderedViewPair>()
 
     // Remove all the views which are not required now
