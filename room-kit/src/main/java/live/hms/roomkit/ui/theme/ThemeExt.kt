@@ -1208,8 +1208,8 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
     val backgroundDrawable = ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
         .apply {
             val color = getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.borderDefault,
-                HMSPrebuiltTheme.getDefaults().background_default)
+                HMSPrebuiltTheme.getColours()?.surfaceBright,
+                HMSPrebuiltTheme.getDefaults().surface_bright)
             colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
