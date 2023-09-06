@@ -425,9 +425,15 @@ internal fun ChangeNameFragmentBinding.applyTheme() {
         )
     )
 
+    border.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
 
 
-    root.background = resources.getDrawable(R.drawable.gray_shape_round_dialog)
+    standardBottomSheet.background =root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
         .apply {
             val color = getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.backgroundDim,

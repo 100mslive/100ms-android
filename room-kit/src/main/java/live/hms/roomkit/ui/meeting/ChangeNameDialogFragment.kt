@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -27,6 +28,12 @@ class ChangeNameDialogFragment : BottomSheetDialogFragment() {
         const val TAG = "ChangeNameDialogFragment"
     }
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme);
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -49,6 +56,8 @@ class ChangeNameDialogFragment : BottomSheetDialogFragment() {
                 dismiss()
             }
         }
+
+
 
         cancelButton.setOnClickListener {
             dismissAllowingStateLoss()
