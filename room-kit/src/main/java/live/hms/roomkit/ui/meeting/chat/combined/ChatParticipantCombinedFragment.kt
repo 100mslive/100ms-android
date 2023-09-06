@@ -90,7 +90,7 @@ companion object {
         }
 
         binding.closeCombinedTabButton.setOnSingleClickListener {
-            dismiss()
+            dismissAllowingStateLoss()
         }
 
         if(getShowParticipants())
@@ -117,7 +117,7 @@ companion object {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    dismiss()
+                    dismissAllowingStateLoss()
                 }
             })
     }
