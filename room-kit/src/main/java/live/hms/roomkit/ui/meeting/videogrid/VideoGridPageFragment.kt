@@ -8,6 +8,8 @@ import androidx.core.os.bundleOf
 import live.hms.roomkit.databinding.FragmentVideoGridPageBinding
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.viewLifecycle
 import kotlin.math.min
 
@@ -82,8 +84,22 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       setVideoGridRowsAndColumns(1,1)
   }
 
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    binding.container.setBackgroundAndColor(
+      HMSPrebuiltTheme.getColours()?.backgroundDefault,
+      HMSPrebuiltTheme.getDefaults().background_default
+    )
+  }
   override fun initViewModels() {
     super.initViewModels()
+
+    if (isScreenShare.not()){
+      meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
+        refreshGridRowsAndColumns(rowCount, columnCount)
+      }
+    }
+
     if (isScreenShare.not()) {
       meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { videoGridTrack ->
         renderCurrentPage(videoGridTrack)
@@ -95,20 +111,15 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       }
     }
 
-    if (isScreenShare.not())
-    meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
-      // Active speaker should be updated via, tracks AND actual active speakers.
-      applySpeakerUpdates(speakers)
-    }
-
-
-
-    //Don't register listener if it's not screen share
-    if (isScreenShare.not()){
-      meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
-        refreshGridRowsAndColumns(rowCount, columnCount)
+    if (isScreenShare.not()) {
+      meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (videos, speakers) ->
+        // Active speaker should be updated via, tracks AND actual active speakers.
+        applySpeakerUpdates(speakers)
       }
     }
+
+    //Don't register listener if it's not screen share
+
 
     //meetingViewModel.speakers.observe(viewLifecycleOwner) { applySpeakerUpdates(it) }
   }

@@ -1639,14 +1639,14 @@ class MeetingViewModel(
     val isHandRaised: LiveData<Boolean> = _isHandRaised
 
 
-    fun toggleRaiseHand(forceEnableHandRaise : Boolean?=null) {
+    fun toggleRaiseHand(forceLowerHandRaise : Boolean?=null) {
         val localPeer = hmsSDK.getLocalPeer()!!
         val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata) ?: return
 
-        val isHandRaised  = if (forceEnableHandRaise == null) {
+        val isHandRaised  = if (forceLowerHandRaise == null) {
             currentMetadata.isHandRaised.not()
         } else {
-            forceEnableHandRaise
+            forceLowerHandRaise.not()
         }
         val newMetadataJson = currentMetadata.copy(isHandRaised = isHandRaised).toJson()
 

@@ -21,18 +21,6 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
-import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
-import live.hms.roomkit.databinding.ChangeNameFragmentBinding
-import live.hms.roomkit.databinding.EndSessionBottomSheetBinding
-import live.hms.roomkit.databinding.ExitBottomSheetBinding
-import live.hms.roomkit.databinding.FragmentActiveSpeakerBinding
-import live.hms.roomkit.databinding.FragmentGridVideoBinding
-import live.hms.roomkit.databinding.FragmentMeetingBinding
-import live.hms.roomkit.databinding.FragmentPreviewBinding
-import live.hms.roomkit.databinding.FragmentRolePreviewBinding
-import live.hms.roomkit.databinding.ItemGridOptionBinding
-import live.hms.roomkit.databinding.NotificationCardBinding
-import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.util.EmailUtils
@@ -438,12 +426,21 @@ internal fun ChangeNameFragmentBinding.applyTheme() {
         )
     )
 
-    root.setBackgroundColor(
+    border.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDim,
-            HMSPrebuiltTheme.getDefaults().background_default
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
         )
     )
+
+
+    standardBottomSheet.background =root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.backgroundDim,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            setColorFilter(color, PorterDuff.Mode.ADD);
+        }
 
     newName.setBackgroundColor(
         getColorOrDefault(
@@ -966,6 +963,49 @@ fun FragmentGridVideoBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
+    tabLayoutDots.setBackgroundColor(Color.TRANSPARENT)
+    tabLayoutDots.backgroundTintList = ColorStateList.valueOf(
+            Color.TRANSPARENT
+    )
+
+    tabLayoutDotsRemoteScreenShare.setBackgroundColor(Color.TRANSPARENT)
+    tabLayoutDotsRemoteScreenShare.backgroundTintList = ColorStateList.valueOf(
+        Color.TRANSPARENT
+    )
+
+    tabLayoutDots.tabIconTint = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    tabLayoutDots.setSelectedTabIndicatorColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    tabLayoutDotsRemoteScreenShare.setSelectedTabIndicatorColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    tabLayoutDotsRemoteScreenShare.tabIconTint = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+
+
+
+
+    tabLayoutDotsRemoteScreenShare.setBackgroundColor(Color.TRANSPARENT)
 
     iconOption.setBackgroundColor(
         getColorOrDefault(
@@ -976,7 +1016,7 @@ fun FragmentGridVideoBinding.applyTheme() {
 
     localScreenShareContainer.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
             HMSPrebuiltTheme.getDefaults().surface_default
         )
     )
