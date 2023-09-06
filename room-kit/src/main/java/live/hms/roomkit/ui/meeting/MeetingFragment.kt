@@ -859,10 +859,9 @@ class MeetingFragment : Fragment() {
 
         binding.topMenu?.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
-        if(!controlBarsVisible) {
-            showControlBars(false)
-            cancelCallback()
-        }
+        showControlBars(false)
+        cancelCallback()
+
 
         binding.topMenu?.setBackgroundColor(
             getColorOrDefault(
@@ -973,6 +972,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun showControlBars(shouldHideAfterDelay : Boolean) {
+        controlBarsVisible = true
         binding.topMenu.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {
@@ -1047,6 +1047,7 @@ class MeetingFragment : Fragment() {
         val topMenu = binding.topMenu
         val bottomMenu = binding.bottomControls
         val screenHeight = activity!!.window.decorView.height
+        controlBarsVisible = false
         topMenu?.animate()
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
