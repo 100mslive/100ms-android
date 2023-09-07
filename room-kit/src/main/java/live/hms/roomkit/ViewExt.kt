@@ -13,6 +13,8 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityManager
+import android.view.animation.Interpolator
+import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.DrawableRes
@@ -47,6 +49,24 @@ fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {
 
 fun View.setOnSingleClickListener(waitDelay: Long, l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l, waitDelay))
+}
+fun View.startBounceAnimationUpwards(offset: Int = 0, animationDuration: Long = 350, interpolator: Interpolator = OvershootInterpolator(0.4f)) {
+    if (scaleX != 1.0f || alpha != 1.0f)
+    this?.animate()?.setStartDelay(offset.toLong())
+        ?.setInterpolator(interpolator)
+        ?.alpha(1.0f)?.scaleX(1.0f)?.translationY(0.0f)?.setDuration(animationDuration)?.start()
+}
+
+fun View.initAnimState(alphaOnly: Boolean = false, littleLessTranslate : Boolean = false,  isUpwardsAnimation: Boolean = true) {
+    val height = 72.0f * this.resources.displayMetrics.density * if (isUpwardsAnimation) 1 else -1
+    if (alphaOnly.not())
+        this.apply {
+            translationY =  if (littleLessTranslate)  height/2 else height
+            scaleX = 0.8f
+            alpha = 0.0f
+        }
+    else
+        this.alpha = 0f
 }
 
 var TextView.drawableStart: Drawable?

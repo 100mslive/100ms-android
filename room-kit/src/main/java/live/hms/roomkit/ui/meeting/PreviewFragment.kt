@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -27,7 +28,9 @@ import live.hms.roomkit.databinding.FragmentPreviewBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.hideKeyboard
+import live.hms.roomkit.initAnimState
 import live.hms.roomkit.setDrawables
+import live.hms.roomkit.startBounceAnimationUpwards
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -52,6 +55,7 @@ import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.sdk.models.role.PublishParams
+import live.hms.videoview.VideoViewStateChangeListener
 
 
 class PreviewFragment : Fragment() {
@@ -83,6 +87,7 @@ class PreviewFragment : Fragment() {
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
     private var isHlsRunning = false
+    private var isFirstRender : Boolean = true
 
 
 
@@ -123,7 +128,7 @@ class PreviewFragment : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-    private fun bindVideo() {
+    private fun bindVideo(isFirstRender: Boolean = false) {
         if (track?.video?.isMute == false) {
             track?.video?.let {
                 binding.previewView.addTrack(it)
@@ -131,10 +136,30 @@ class PreviewFragment : Fragment() {
                     activity?.openShareIntent(it)
                 }, {})
             }
-            binding.previewView.visibility = View.VISIBLE
+            if (isFirstRender) {
+                binding.previewView.initAnimState(alphaOnly = true)
+                binding.previewView.visibility = View.VISIBLE
+                binding.previewView.addVideoViewStateChangeListener(object : VideoViewStateChangeListener{
+                    override fun onFirstFrameRendered() {
+                        super.onFirstFrameRendered()
+                        contextSafe { context, activity ->
+                            activity.runOnUiThread {
+                                if (isFirstRender) {
+                                    binding?.previewGradient?.startBounceAnimationUpwards(animationDuration = 650, interpolator = AccelerateDecelerateInterpolator())
+                                    binding?.previewView?.startBounceAnimationUpwards()
+                                }
+                            }
+                        }
+                    }
+                })
+            } else {
+                binding.previewView.visibility = View.VISIBLE
+            }
+
         } else {
             binding.previewView.visibility = View.GONE
         }
+
     }
 
     private fun unbindVideo() {
@@ -152,18 +177,48 @@ class PreviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initIntroAnimation()
         binding.applyTheme()
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
         setupUI()
-
+        startFixedIntroAnimation()
         setupKeyboardAnimation()
 
         enableDisableJoinNowButton()
     }
 
+    private fun startFixedIntroAnimation() {
+        var animationOffset = 350
+        binding.apply {
+            previewBottomBar.startBounceAnimationUpwards(animationOffset)
+            animationOffset += 50
+            editContainerName.startBounceAnimationUpwards(animationOffset)
+            buttonJoinMeeting.startBounceAnimationUpwards(animationOffset)
+        }
+    }
+
+    private fun initIntroAnimation() {
+        with(binding) {
+            previewBottomBar.initAnimState()
+            buttonToggleAudio.initAnimState(littleLessTranslate = true)
+            buttonToggleVideo.initAnimState(littleLessTranslate = true)
+            buttonSwitchCamera.initAnimState(littleLessTranslate = true)
+            buttonNetworkQuality.initAnimState(littleLessTranslate = true)
+            iconOutputDevice.initAnimState(littleLessTranslate = true)
+            editContainerName.initAnimState()
+            buttonJoinMeeting.initAnimState()
+            hlsSession.initAnimState(isUpwardsAnimation = false)
+            iconParticipants.initAnimState(isUpwardsAnimation = false)
+            previewGradient.initAnimState(alphaOnly = true)
+
+
+        }
+    }
+
     private fun setupUI() {
+        var introAnimationOffset = 450
         if (meetingViewModel.getHmsRoomLayout()
                 ?.getPreviewLayout()?.default?.elements?.previewHeader?.title.isNullOrEmpty()
         ) {
@@ -190,7 +245,11 @@ class PreviewFragment : Fragment() {
             Glide.with(this)
                 .load(meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url)
                 .into(binding.logoIv);
+            introAnimationOffset += 50
+
         }
+
+
 
     }
 
@@ -255,12 +314,14 @@ class PreviewFragment : Fragment() {
             if (it.second.peerCount != null) {
                 binding.iconParticipants.visibility = View.VISIBLE
                 binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
+                binding.iconParticipants.startBounceAnimationUpwards()
             }
             isHlsRunning = it.second.hlsStreamingState?.running == true
             updateJoinButtonTextIfHlsIsEnabled()
 
             if (it.second.hlsStreamingState?.running == true) {
                 binding.liveHlsGroup.visibility = View.VISIBLE
+                binding.hlsSession.startBounceAnimationUpwards()
             } else {
                 binding.liveHlsGroup.visibility = View.GONE
             }
@@ -520,8 +581,9 @@ class PreviewFragment : Fragment() {
                             track?.video = it
 
                             if (isViewVisible) {
-                                bindVideo()
+                                bindVideo(isFirstRender = isFirstRender)
                             }
+                            isFirstRender = false
                         }
                     }
                 }
@@ -586,8 +648,11 @@ class PreviewFragment : Fragment() {
         if (publishParams == null) return
 
 
+
         if (publishParams.allowed.contains("audio")) {
             binding.buttonToggleAudio.visibility = View.VISIBLE
+            binding.buttonToggleAudio.startBounceAnimationUpwards()
+            binding.iconOutputDevice.startBounceAnimationUpwards()
         } else {
             binding.buttonToggleAudio.visibility = View.GONE
         }
@@ -595,6 +660,10 @@ class PreviewFragment : Fragment() {
         if (publishParams.allowed.contains("video")) {
             binding.buttonToggleVideo.visibility = View.VISIBLE
             binding.buttonSwitchCamera.visibility = View.VISIBLE
+
+            binding.buttonToggleVideo.startBounceAnimationUpwards()
+            binding.buttonSwitchCamera.startBounceAnimationUpwards()
+
             binding.videoCardContainer.visibility = View.VISIBLE
         } else {
             binding.topMarging.setGuidelinePercent(0.35f)
@@ -616,6 +685,7 @@ class PreviewFragment : Fragment() {
                 } else {
                     imageView.visibility = View.VISIBLE
                     binding.buttonNetworkQuality.visibility = View.VISIBLE
+                    binding.buttonNetworkQuality.startBounceAnimationUpwards()
                 }
             }
     }
