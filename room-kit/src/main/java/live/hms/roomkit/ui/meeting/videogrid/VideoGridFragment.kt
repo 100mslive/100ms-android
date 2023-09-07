@@ -159,7 +159,7 @@ class VideoGridFragment : Fragment() {
             val localMeeting = it.filter { it.isLocal }.firstOrNull()
 
             //show or hide inset
-            if (it.size == 1 && localMeeting != null) {
+            if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2) ) {
                 binding.insetPill.visibility = View.GONE
             } else if (it.size > 1 && localMeeting != null) {
                 binding.insetPill.visibility = View.VISIBLE
@@ -226,7 +226,7 @@ class VideoGridFragment : Fragment() {
                 binding.divider.setGuidelinePercent(0.75f)
             }
 
-           
+
 
             meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
                 Pair(newRowCount, newColumnCount)

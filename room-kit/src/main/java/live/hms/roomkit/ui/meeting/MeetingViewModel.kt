@@ -387,10 +387,15 @@ class MeetingViewModel(
             // Add all tracks as they come in.
             addSource(tracks) { meetTracks: List<MeetingTrack> ->
                 //if remote peer and local peer is present inset mode
-               val excludeLocalTrackIfRemotePeerIsPreset =  if (meetTracks.size > 1) {
-                    meetTracks.filter { !it.isLocal }.toList()
-                } else
-                    meetTracks
+
+               val excludeLocalTrackIfRemotePeerIsPreset =
+                   //Don't inset when local peer and local screen share track is found
+                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2)
+                       meetTracks
+                 else if(meetTracks.size > 1)
+                       meetTracks.filter { !it.isLocal }.toList()
+                    else
+                        meetTracks
 
                 val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset)
                 setValue(result)
@@ -2071,7 +2076,7 @@ class MeetingViewModel(
             hmsNotificationEvent.postValue(
                 HMSNotification(
                     title = "You are sharing your screen",
-                    isError = false,
+                    isError = true,
                     isDismissible = false,
                     icon = R.drawable.share_screen_on,
                     type = HMSNotificationType.ScreenShare,
