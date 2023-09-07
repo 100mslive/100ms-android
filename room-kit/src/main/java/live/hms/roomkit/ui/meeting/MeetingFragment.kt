@@ -1453,11 +1453,14 @@ class MeetingFragment : Fragment() {
     }
 
     fun inflateExitFlow() {
-        if (meetingViewModel.isAllowedToHlsStream().not() && meetingViewModel.isAllowedToEndMeeting().not()) {
-            EndStreamBottomSheet().show(parentFragmentManager, null)
+        if (meetingViewModel.isAllowedToEndMeeting()
+            || ( meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning()))
+             {
+             MultipleLeaveOptionBottomSheet()
+                 .show(childFragmentManager, "LeaveBottomSheet")
+
         } else {
-            MultipleLeaveOptionBottomSheet()
-                .show(childFragmentManager, "LeaveBottomSheet")
+            EndStreamBottomSheet().show(parentFragmentManager, null)
         }
     }
 

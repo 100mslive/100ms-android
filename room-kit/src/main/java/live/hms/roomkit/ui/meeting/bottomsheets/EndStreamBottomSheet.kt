@@ -46,7 +46,29 @@ class EndStreamBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
 
-        if (meetingViewModel.isAllowedToHlsStream().not()) {
+        if (meetingViewModel.isAllowedToEndMeeting()) {
+            binding.endSessionTitle.text = "End Session"
+            binding.endSessionButton.text = "End Session"
+            binding.endSessionDescription.text =
+                "The session will end for everyone in the room immediately."
+
+            binding.endSessionButton.setOnSingleClickListener(200L) {
+                if (meetingViewModel.isHlsRunning()) meetingViewModel.stopHls()
+
+                meetingViewModel.endRoom(false)
+            }
+        } else if (meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning()) {
+            binding.endSessionTitle.text = "End Stream"
+            binding.endSessionButton.text = "End Stream"
+            binding.endSessionDescription.text =
+                "The stream will end for everyone after they’ve watched it."
+
+            binding.endSessionButton.setOnSingleClickListener(200L) {
+                if (meetingViewModel.isHlsRunning()) meetingViewModel.stopHls()
+
+                meetingViewModel.leaveMeeting()
+            }
+        } else {
             binding.endSessionTitle.text = "Leave Session"
             binding.endSessionDescription.text =
                 "Others will continue after you leave. You can join the session again."
@@ -54,23 +76,11 @@ class EndStreamBottomSheet : BottomSheetDialogFragment() {
             binding.endSessionButton.setOnSingleClickListener(200L) {
                 meetingViewModel.leaveMeeting()
             }
-        } else {
-            val isStreamIng = meetingViewModel.isHlsRunning() || meetingViewModel.isRTMPRunning()
 
-            binding.endSessionTitle.text = if (isStreamIng) "End Stream" else "End Session"
-            binding.endSessionButton.text = if (isStreamIng) "End Stream" else "End Session"
-            binding.endSessionDescription.text =
-                if (isStreamIng) "The stream will end for everyone after they’ve watched it." else "The session will end for everyone in the room immediately."
 
-            binding.endSessionButton.setOnSingleClickListener(200L) {
-                if (meetingViewModel.isHlsRunning()) meetingViewModel.stopHls()
 
-                meetingViewModel.endRoom(false)
-            }
+            HMSLogger.d(TAG, "Calling end session ...")
+
+
         }
-
-        HMSLogger.d(TAG, "Calling end session ...")
-
-
     }
-}

@@ -46,13 +46,21 @@ class MultipleLeaveOptionBottomSheet() : BottomSheetDialogFragment() {
         binding.applyTheme()
 
         binding.leaveTitle.text = "Leave"
-        binding.leaveDescription.text = "Others will continue after you leave. You can join the session again."
+        binding.leaveDescription.text =
+            "Others will continue after you leave. You can join the session again."
 
 
-        val isStreamIng =  meetingViewModel.isHlsRunning() || meetingViewModel.isRTMPRunning()
-
-        binding.endSessionTitle.text = if (isStreamIng) "End Stream" else "End Session"
-        binding.endSessionDescription.text = if (isStreamIng) "The stream will end for everyone after they’ve watched it." else "The session will end for everyone in the room immediately."
+        if (meetingViewModel.isAllowedToEndMeeting()) {
+            binding.endSessionTitle.text = "End Session"
+            binding.endSessionDescription.text =
+                "The session will end for everyone in the room immediately."
+        } else if (meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning()) {
+            binding.endSessionTitle.text = "End Stream"
+            binding.endSessionDescription.text =
+                "The stream will end for everyone after they’ve watched it."
+        } else {
+            dismissAllowingStateLoss()
+        }
 
         binding.leaveLayout.setOnSingleClickListener(200L) {
             HMSLogger.d(TAG, "Calling Leave ...")
