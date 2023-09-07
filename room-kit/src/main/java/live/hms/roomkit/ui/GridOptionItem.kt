@@ -16,11 +16,13 @@ class GridOptionItem(
     private val onClick: () -> Unit,
     var isSelected: Boolean = false,
     var particpantCount: Int? = null,
+    var showProgress: Boolean = false,
 ) : BindableItem<ItemGridOptionBinding>() {
 
     private val SELECTION_UPDATE = "SELECTION_UPDATE"
     private val TEXT_UPDATE = "TEXT_UPDATE"
     private val PARTICPANT_COUNt_UPDATE = "PARTICPANT_COUNt_UPDATE"
+    private val PROGRESS_UPDATE = "PROGRESS_UPDATE"
 
 
     override fun bind(viewBinding: ItemGridOptionBinding, position: Int) {
@@ -78,6 +80,16 @@ class GridOptionItem(
             v.subtitle.text = title
         }
 
+        if (payloads.contains(PROGRESS_UPDATE)) {
+            if (showProgress) {
+                v.progressBar.visibility = View.VISIBLE
+                v.nonpregressGroup.visibility = View.INVISIBLE
+            } else {
+                v.progressBar.visibility = View.GONE
+                v.nonpregressGroup.visibility = View.VISIBLE
+            }
+        }
+
         bind(v, position)
 
     }
@@ -102,6 +114,11 @@ class GridOptionItem(
     fun setParticpantCountUpdate(count: Int?) {
         this.particpantCount = count
         notifyChanged(PARTICPANT_COUNt_UPDATE)
+    }
+
+    fun showProgress(enable: Boolean) {
+        this.showProgress = enable
+        notifyChanged(PROGRESS_UPDATE)
     }
 
     override fun initializeViewBinding(view: View) = ItemGridOptionBinding.bind(view)
