@@ -144,10 +144,12 @@ class VideoGridFragment : Fragment() {
                             binding.iconBrb.visibility = View.GONE
                         }
                     }
+                    HMSPeerUpdate.NAME_CHANGED -> {
+                        binding.nameInitials.text = NameUtils.getInitials(meetingViewModel.hmsSDK.getLocalPeer()?.name.orEmpty())
+                    }
                     // Unused updates
                     HMSPeerUpdate.NETWORK_QUALITY_UPDATED,
                     HMSPeerUpdate.PEER_JOINED,
-                    HMSPeerUpdate.NAME_CHANGED,
                     HMSPeerUpdate.PEER_LEFT,
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
                     HMSPeerUpdate.NO_DOMINANT_SPEAKER,
