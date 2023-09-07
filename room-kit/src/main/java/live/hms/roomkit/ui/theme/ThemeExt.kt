@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
@@ -173,10 +174,10 @@ internal fun ImageView.setIconDisabled(
 
 internal fun ShapeableImageView.setIconDisabled(
     @DrawableRes disabledIconDrawableRes: Int,
-    @DrawableRes backgroundRes: Int = R.drawable.gray_round_solid_drawable
+    @DimenRes radiusREs: Int = R.dimen.eight_dp,
 ) {
 
-    val radius = resources.getDimension(R.dimen.eight_dp).toInt()
+    val radius = resources.getDimension(radiusREs).toInt()
 
     this.strokeWidth = 0f
 
@@ -1071,9 +1072,9 @@ fun FragmentGridVideoBinding.applyTheme() {
 
 
 
-    minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
+    minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off, radiusREs = R.dimen.two_dp)
     minimizedIconAudioOff.isEnabled = false
-    minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
+    minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, radiusREs = R.dimen.two_dp)
     minimizedIconVideoOff.isEnabled = false
     maximizedIcon.drawable.setTint(
         getColorOrDefault(
