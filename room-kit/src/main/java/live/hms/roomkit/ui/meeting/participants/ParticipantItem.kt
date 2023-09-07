@@ -32,7 +32,12 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                       ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
-        viewBinding.name.text = hmsPeer.name
+        val name = if(hmsPeer.isLocal){
+            "${hmsPeer.name} (You)"
+        } else {
+            hmsPeer.name
+        }
+        viewBinding.name.text = name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer.metadata, viewBinding)
         updateSpeaking(hmsPeer.audioTrack?.isMute, viewBinding)
