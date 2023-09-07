@@ -52,7 +52,19 @@ object HMSPrebuiltTheme {
     }
 }
 
-internal fun HMSRoomLayout.getPreviewLayout() = this.data?.getOrNull(0)?.screens?.preview
+internal fun HMSRoomLayout.getPreviewLayout(roleName : String?) : HMSRoomLayout.HMSRoomLayoutData.Screens.Preview? {
+   return if (roleName.isNullOrEmpty())
+        this.data?.getOrNull(0)?.screens?.preview
+    else
+        this.data?.find { it?.role == roleName }?.screens?.preview
+}
+
+internal fun HMSRoomLayout.getCurrentRoleData(roleName : String?) : HMSRoomLayout.HMSRoomLayoutData? {
+    return if (roleName.isNullOrEmpty())
+        this.data?.getOrNull(0)
+    else
+        this.data?.find { it?.role == roleName }
+}
 
 
 internal fun CardView.setBackgroundColor(

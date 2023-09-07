@@ -39,6 +39,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonDisabled
 import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.roomkit.ui.theme.getCurrentRoleData
 import live.hms.roomkit.ui.theme.getPreviewLayout
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.ui.theme.setIconEnabled
@@ -90,12 +91,13 @@ class PreviewFragment : Fragment() {
     private var nameEditText: String? = null
     private var isHlsRunning = false
     private var isFirstRender : Boolean = true
+    private var startHlsStream : Boolean = false
 
 
 
-    private fun updateJoinButtonTextIfHlsIsEnabled() : Boolean {
+    private fun updateJoinButtonTextIfHlsIsEnabled(roleName: String?): Boolean {
         val hlsJoinButtonFromLayoutConfig = meetingViewModel.getHmsRoomLayout()
-            ?.getPreviewLayout()?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
+            ?.getPreviewLayout(roleName)?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
 
         if (isHlsRunning.not() && hlsJoinButtonFromLayoutConfig) {
             if (binding.buttonJoinMeeting.drawableStart == null) {
@@ -106,9 +108,11 @@ class PreviewFragment : Fragment() {
                 )
             }
             binding.buttonJoinMeeting.text = "Go Live"
+            startHlsStream = true
             return true
         } else {
             binding.buttonJoinMeeting.text = "Join Now"
+            startHlsStream = false
             return false
         }
 
@@ -186,7 +190,6 @@ class PreviewFragment : Fragment() {
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
-        setupUI()
         startFixedIntroAnimation()
         setupKeyboardAnimation()
 
@@ -216,40 +219,46 @@ class PreviewFragment : Fragment() {
             hlsSession.initAnimState(isUpwardsAnimation = false)
             iconParticipants.initAnimState(isUpwardsAnimation = false)
             previewGradient.initAnimState(alphaOnly = true)
+            descriptionTv.initAnimState(alphaOnly = true)
+            logoIv.initAnimState(alphaOnly = true)
+            nameTv.initAnimState(alphaOnly = true)
 
 
         }
     }
 
-    private fun setupUI() {
+    private fun setupUI(roleName: String) {
         var introAnimationOffset = 450
         if (meetingViewModel.getHmsRoomLayout()
-                ?.getPreviewLayout()?.default?.elements?.previewHeader?.title.isNullOrEmpty()
+                ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.title.isNullOrEmpty()
         ) {
             binding.nameTv.visibility = View.GONE
         } else {
             binding.nameTv.text = meetingViewModel.getHmsRoomLayout()
-                ?.getPreviewLayout()?.default?.elements?.previewHeader?.title
+                ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.title
+            binding.nameTv.startBounceAnimationUpwards()
         }
 
         if (meetingViewModel.getHmsRoomLayout()
-                ?.getPreviewLayout()?.default?.elements?.previewHeader?.subTitle.isNullOrEmpty()
+                ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.subTitle.isNullOrEmpty()
         ) {
             binding.descriptionTv.visibility = View.GONE
         } else {
             binding.descriptionTv.text = meetingViewModel.getHmsRoomLayout()
-                ?.getPreviewLayout()?.default?.elements?.previewHeader?.subTitle
+                ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.subTitle
+            binding.descriptionTv.startBounceAnimationUpwards()
         }
 
 
-        if (meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url.isNullOrEmpty()) {
+        if (meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url.isNullOrEmpty()) {
             binding.logoIv.visibility = View.INVISIBLE
         } else {
             binding.logoIv.visibility = View.VISIBLE
             Glide.with(this)
-                .load(meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url)
+                .load(meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url)
                 .into(binding.logoIv);
             introAnimationOffset += 50
+            binding.logoIv.startBounceAnimationUpwards()
 
         }
 
@@ -321,7 +330,7 @@ class PreviewFragment : Fragment() {
                 binding.iconParticipants.startBounceAnimationUpwards()
             }
             isHlsRunning = it.second.hlsStreamingState?.running == true
-            updateJoinButtonTextIfHlsIsEnabled()
+            updateJoinButtonTextIfHlsIsEnabled(it?.second?.localPeer?.hmsRole?.name)
 
             if (it.second.hlsStreamingState?.running == true) {
                 binding.liveHlsGroup.visibility = View.VISIBLE
@@ -437,7 +446,7 @@ class PreviewFragment : Fragment() {
 
     private fun navigateToMeeting() {
         findNavController().navigate(
-            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(updateJoinButtonTextIfHlsIsEnabled())
+            PreviewFragmentDirections.actionPreviewFragmentToMeetingFragment(startHlsStream = startHlsStream)
         )
     }
 
@@ -561,6 +570,7 @@ class PreviewFragment : Fragment() {
             Observer { (room, localTracks) ->
 
                 if (setTextOnce.not()) {
+                    setupUI(room.localPeer?.hmsRole?.name.orEmpty())
                     binding.nameInitials.visibility = View.VISIBLE
                     binding.nameInitials.text = NameUtils.getInitials(room.localPeer!!.name)
                     binding.editTextName.setText(
@@ -624,7 +634,7 @@ class PreviewFragment : Fragment() {
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
 
-                    updateJoinButtonTextIfHlsIsEnabled()
+                    updateJoinButtonTextIfHlsIsEnabled(room?.localPeer?.hmsRole?.name)
                     enableDisableJoinNowButton()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
