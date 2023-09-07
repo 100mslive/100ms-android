@@ -2030,7 +2030,7 @@ class MeetingViewModel(
     }
 
     fun isRecordingState(): Boolean {
-        return isRecording.value == RecordingState.RECORDING
+        return isRecording.value == RecordingState.RECORDING || isRecording.value == RecordingState.STREAMING_AND_RECORDING
     }
 
     fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
