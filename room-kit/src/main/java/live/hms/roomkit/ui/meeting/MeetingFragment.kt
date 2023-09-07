@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.Icon
 import android.media.projection.MediaProjectionManager
 import android.os.Build
@@ -360,6 +361,7 @@ class MeetingFragment : Fragment() {
                 binding.liveTitle?.text = "Live"
             }
             binding.tvViewersCount?.visibility = View.VISIBLE
+            binding.tvViewersCountCard.visibility = View.VISIBLE
             setupRecordingTimeView()
         } else {
 //            binding.buttonGoLive?.setImageDrawable(
@@ -377,6 +379,7 @@ class MeetingFragment : Fragment() {
 //                )
             binding.recordingSignalView?.visibility = View.GONE
             binding.tvViewersCount?.visibility = View.GONE
+            binding.tvViewersCountCard.visibility = View.GONE
         }
     }
 
@@ -911,7 +914,7 @@ class MeetingFragment : Fragment() {
             HMSPrebuiltTheme.getColours()?.backgroundDim,
             HMSPrebuiltTheme.getDefaults().background_default
         )
-            , Color.TRANSPARENT)
+        , Color.TRANSPARENT, GradientDrawable.Orientation.BOTTOM_TOP)
 
         binding.space4?.visibility = View.VISIBLE
         binding.buttonRaiseHand?.visibility = View.VISIBLE
@@ -1335,17 +1338,7 @@ class MeetingFragment : Fragment() {
         }
     }
 
-    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
-        super.onPictureInPictureModeChanged(isInPictureInPictureMode)
-        //hiding views for pip/non-pip layout !
-        if (isInPictureInPictureMode) {
-            binding.bottomControls.visibility = View.GONE
-            binding.topMenu?.visibility = View.GONE
-        } else {
-            binding.bottomControls.visibility = View.VISIBLE
-            binding.topMenu?.visibility = View.VISIBLE
-        }
-    }
+
 
     private fun openMusicDialog() {
         findNavController().navigate(R.id.musicChooserSheet)

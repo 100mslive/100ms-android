@@ -20,6 +20,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
+import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.util.EmailUtils
@@ -314,19 +315,21 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
-    liveTitle?.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
+    liveTitle?.setTextColor(Color.WHITE)
 
-    liveTitle?.setBackgroundColor(
+    liveTitleCard.backgroundTintList = ColorStateList.valueOf(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.alertErrorDefault,
             HMSPrebuiltTheme.getDefaults().error_default
         )
     )
+
+//    liveTitleCard?.setBackgroundColor(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+//            HMSPrebuiltTheme.getDefaults().error_default
+//        )
+//    )
 
     tvRecordingTime?.setTextColor(
         getColorOrDefault(
@@ -341,6 +344,22 @@ internal fun FragmentMeetingBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+
+    tvViewersCount.drawableLeft?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+//    tvViewersCount.backgroundTintList = ColorStateList.valueOf(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.borderBright,
+//            HMSPrebuiltTheme.getDefaults().surface_default
+//        )
+//    )
+
+
 
 
     //init should be called once
@@ -830,10 +849,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
     )
 
     hlsSessionText.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
+       Color.WHITE
     )
 
 
