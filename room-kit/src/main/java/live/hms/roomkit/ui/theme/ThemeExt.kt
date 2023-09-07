@@ -1113,6 +1113,13 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
+    rootLayout.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
     icScreenshare.drawable.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,

@@ -21,6 +21,7 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.videoview.VideoViewStateChangeListener
 import org.webrtc.RendererCommon
 
 
@@ -106,6 +107,20 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         )
         binding.localVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         binding.localVideoView.enableZoomAndPan(true)
+        binding.localVideoView.addVideoViewStateChangeListener(object : VideoViewStateChangeListener{
+            override fun onResolutionChange(newWidth: Int, newHeight: Int) {
+                super.onResolutionChange(newWidth, newHeight)
+                contextSafe { context, activity ->
+                    activity.runOnUiThread {
+                        if (newWidth!=0 && newHeight!=0 && newWidth>newHeight) {
+                            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                        } else {
+                            activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                        }
+                    }
+                }
+            }
+        })
         meetingViewModel.tracks.observe(viewLifecycleOwner) { it ->
 
             val track = it.find { it.video?.trackId == screenShareTrackId }?.video

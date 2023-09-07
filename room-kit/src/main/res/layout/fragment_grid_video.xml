@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -283,7 +284,7 @@
         app:layout_constraintTop_toTopOf="@id/divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tab_layout_dots"
         android:animateLayoutChanges="false" />
 
 
@@ -293,8 +294,9 @@
         android:layout_height="10dp"
         android:layout_gravity="center"
         android:background="#FF0000"
-        android:layout_marginBottom="@dimen/eight_dp"
+        android:layout_marginVertical="@dimen/four_dp"
         android:elevation="@dimen/sizeteen_dp"
+        app:layout_constraintTop_toBottomOf="@id/view_pager_video_grid"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
