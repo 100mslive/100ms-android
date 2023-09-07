@@ -15,4 +15,6 @@
     <dimen name="thirty_two_dp">32dp</dimen>
     <dimen name="tall_bottom_sheet">90%</dimen>
     <dimen name="curve">12dp</dimen>
+    <dimen name="spacing_d2">16dp</dimen>
+    <dimen name="spacing_d4">32dp</dimen>
 </resources>
