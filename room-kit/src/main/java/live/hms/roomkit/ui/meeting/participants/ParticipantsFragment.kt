@@ -119,7 +119,7 @@ class ParticipantsFragment : Fragment() {
                     )
                 }!!)
                 // If the group was expanded, open it again.
-                if(expandedGroups[key] == true){
+                if(expandedGroups[key] == true || expandedGroups[key] == null){
                     onToggleExpanded()
                 }
             }
