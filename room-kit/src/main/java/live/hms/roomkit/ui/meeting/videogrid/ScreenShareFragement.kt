@@ -126,6 +126,8 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
             val track = it.find { it.video?.trackId == screenShareTrackId }?.video
             if (track != null) {
                 binding.localVideoView.addTrack(track)
+            } else {
+                dismissAllowingStateLoss()
             }
         }
 
