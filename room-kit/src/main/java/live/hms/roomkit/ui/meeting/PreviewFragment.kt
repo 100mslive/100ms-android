@@ -88,7 +88,7 @@ class PreviewFragment : Fragment() {
     private var setTextOnce = false
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
-    private var isHlsRunning : Boolean? = null
+    private var isHlsRunning = false
     private var isFirstRender : Boolean = true
 
 
@@ -97,7 +97,7 @@ class PreviewFragment : Fragment() {
         val hlsJoinButtonFromLayoutConfig = meetingViewModel.getHmsRoomLayout()
             ?.getPreviewLayout()?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
 
-        if (isHlsRunning != false && hlsJoinButtonFromLayoutConfig) {
+        if (isHlsRunning.not() && hlsJoinButtonFromLayoutConfig) {
             if (binding.buttonJoinMeeting.drawableStart == null) {
                 binding.buttonJoinMeeting.setDrawables(
                     start = ContextCompat.getDrawable(
