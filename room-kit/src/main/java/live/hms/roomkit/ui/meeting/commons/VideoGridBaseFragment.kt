@@ -173,7 +173,7 @@ abstract class VideoGridBaseFragment : Fragment() {
     )
     binding.videoCard.applyTheme()
     binding.rootContainer.setBackgroundAndColor(
-      HMSPrebuiltTheme.getColours()?.backgroundDefault,
+      HMSPrebuiltTheme.getColours()?.backgroundDim,
       HMSPrebuiltTheme.getDefaults().background_default
     )
     return binding
