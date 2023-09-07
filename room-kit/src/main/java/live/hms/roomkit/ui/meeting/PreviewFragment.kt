@@ -19,8 +19,10 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.animation.ControlFocusInsetsAnimationCallback
 import live.hms.roomkit.animation.TranslateDeferringInsetsAnimationCallback
@@ -139,14 +141,16 @@ class PreviewFragment : Fragment() {
             if (isFirstRender) {
                 binding.previewView.initAnimState(alphaOnly = true)
                 binding.previewView.visibility = View.VISIBLE
-                binding.previewView.addVideoViewStateChangeListener(object : VideoViewStateChangeListener{
+                binding.previewView.addVideoViewStateChangeListener(object : VideoViewStateChangeListener {
                     override fun onFirstFrameRendered() {
                         super.onFirstFrameRendered()
                         contextSafe { context, activity ->
                             activity.runOnUiThread {
                                 if (isFirstRender) {
-                                    binding?.previewGradient?.startBounceAnimationUpwards(animationDuration = 650, interpolator = AccelerateDecelerateInterpolator())
-                                    binding?.previewView?.startBounceAnimationUpwards()
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        binding?.previewGradient?.startBounceAnimationUpwards(animationDuration = 650, interpolator = AccelerateDecelerateInterpolator())
+                                        binding?.previewView?.startBounceAnimationUpwards()
+                                    }
                                 }
                             }
                         }
