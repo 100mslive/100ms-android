@@ -145,8 +145,8 @@ class PreviewFragment : Fragment() {
                         contextSafe { context, activity ->
                             activity.runOnUiThread {
                                 if (isFirstRender) {
-                                    binding.previewGradient.startBounceAnimationUpwards(animationDuration = 650, interpolator = AccelerateDecelerateInterpolator())
-                                    binding.previewView.startBounceAnimationUpwards()
+                                    binding?.previewGradient?.startBounceAnimationUpwards(animationDuration = 650, interpolator = AccelerateDecelerateInterpolator())
+                                    binding?.previewView?.startBounceAnimationUpwards()
                                 }
                             }
                         }
