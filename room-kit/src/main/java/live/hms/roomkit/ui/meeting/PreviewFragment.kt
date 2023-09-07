@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -144,7 +145,7 @@ class PreviewFragment : Fragment() {
                         contextSafe { context, activity ->
                             activity.runOnUiThread {
                                 if (isFirstRender) {
-                                    binding.previewGradient.startBounceAnimationUpwards(100)
+                                    binding.previewGradient.startBounceAnimationUpwards(animationDuration = 650, interpolator = AccelerateDecelerateInterpolator())
                                     binding.previewView.startBounceAnimationUpwards()
                                 }
                             }

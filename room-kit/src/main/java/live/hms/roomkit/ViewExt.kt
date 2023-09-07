@@ -13,6 +13,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityManager
+import android.view.animation.Interpolator
 import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -49,11 +50,11 @@ fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {
 fun View.setOnSingleClickListener(waitDelay: Long, l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l, waitDelay))
 }
-fun View.startBounceAnimationUpwards(offset: Int = 0) {
+fun View.startBounceAnimationUpwards(offset: Int = 0, animationDuration: Long = 350, interpolator: Interpolator = OvershootInterpolator(0.4f)) {
     if (scaleX != 1.0f || alpha != 1.0f)
     this?.animate()?.setStartDelay(offset.toLong())
-        ?.setInterpolator(OvershootInterpolator(0.4f))
-        ?.alpha(1.0f)?.scaleX(1.0f)?.translationY(0.0f)?.setDuration(350)?.start()
+        ?.setInterpolator(interpolator)
+        ?.alpha(1.0f)?.scaleX(1.0f)?.translationY(0.0f)?.setDuration(animationDuration)?.start()
 }
 
 fun View.initAnimState(alphaOnly: Boolean = false, littleLessTranslate : Boolean = false,  isUpwardsAnimation: Boolean = true) {
