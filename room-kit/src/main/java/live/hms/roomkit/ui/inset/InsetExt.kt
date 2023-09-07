@@ -165,42 +165,7 @@ internal fun View.makeInset(
                     }
 
                     Mode.STICKY_XY -> {
-
-                        if (event.rawX >= xMiddle) {
-
-                            val rightMarging = resources.getDimensionPixelSize(R.dimen.eight_dp)
-                            val xMaxWithPadding = Math.min(xMax, xMax - rightMarging)
-                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).x(xMaxWithPadding).setDuration(DURATION_MILLIS)
-                                .setUpdateListener {
-//                                    draggableListener?.onPositionChanged(v)
-                                }.start()
-                            else v.x = xMaxWithPadding
-                        } else {
-                            val leftMargin = resources.getDimensionPixelSize(R.dimen.eight_dp)
-                            val maxMarginStart = Math.max(marginStart, marginStart + leftMargin)
-                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).x(maxMarginStart).setDuration(DURATION_MILLIS)
-                                .setUpdateListener {
-//                                    draggableListener?.onPositionChanged(v)
-                                }.start()
-                            v.x = maxMarginStart
-                        }
-                        val bottomMargin = resources.getDimensionPixelSize(R.dimen.sizeteen_dp)
-                        val yMaxWithPadding = Math.min(yMax, yMax - bottomMargin)
-                        if (event.rawY >= yMiddle) {
-                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).y(yMaxWithPadding).setDuration(DURATION_MILLIS)
-                                .setUpdateListener {
-//                                    draggableListener?.onPositionChanged(v)
-                                }.start()
-                            else v.y = yMaxWithPadding
-                        } else {
-                            val topMargin = resources.getDimensionPixelSize(R.dimen.sizeteen_dp)
-                            val maxMarginTop = Math.max(marginTop, marginTop + topMargin)
-                            if (animated) v.animate().setInterpolator(FastOutLinearInInterpolator()).y(maxMarginTop).setDuration(DURATION_MILLIS)
-                                .setUpdateListener {
-//                                    draggableListener?.onPositionChanged(v)
-                                }.start()
-                            else v.y = maxMarginTop
-                        }
+                        resetUI(event.rawX, event.rawY)
                     }
 
                     else -> {
@@ -221,6 +186,58 @@ internal fun View.makeInset(
         }
         true
     }
+}
+
+internal fun View.resetUI(currentX : Float,  currentY : Float, animated: Boolean = true) {
+    val xMiddle = (this.parent as View).width/2
+    val yMiddle = (this.parent as View).height/2
+    val viewParent = this.parent as View
+    val parentHeight = viewParent.height
+    val parentWidth = viewParent.width
+    val xMax = parentWidth - this.width - this.marginEnd()
+    val yMax = parentHeight - this.height - this.marginBottom()
+
+    val marginStart = marginStart()
+    val marginTop = marginTop()
+    val marginEnd = marginEnd()
+    val marginBottom = marginBottom()
+
+    if (currentX >= xMiddle) {
+
+        val rightMarging = resources.getDimensionPixelSize(R.dimen.eight_dp)
+        val xMaxWithPadding = Math.min(xMax, xMax - rightMarging)
+        if (animated) this.animate().setInterpolator(FastOutLinearInInterpolator()).x(xMaxWithPadding).setDuration(DURATION_MILLIS)
+            .setUpdateListener {
+//                                    draggableListener?.onPositionChanged(v)
+            }.start()
+        else this.x = xMaxWithPadding
+    } else {
+        val leftMargin = resources.getDimensionPixelSize(R.dimen.eight_dp)
+        val maxMarginStart = Math.max(marginStart, marginStart + leftMargin)
+        if (animated) this.animate().setInterpolator(FastOutLinearInInterpolator()).x(maxMarginStart).setDuration(DURATION_MILLIS)
+            .setUpdateListener {
+//                                    draggableListener?.onPositionChanged(v)
+            }.start()
+        this.x = maxMarginStart
+    }
+    val bottomMargin = resources.getDimensionPixelSize(R.dimen.sizeteen_dp)
+    val yMaxWithPadding = Math.min(yMax, yMax - bottomMargin)
+    if (currentY >= yMiddle) {
+        if (animated) this.animate().setInterpolator(FastOutLinearInInterpolator()).y(yMaxWithPadding).setDuration(DURATION_MILLIS)
+            .setUpdateListener {
+//                                    draggableListener?.onPositionChanged(v)
+            }.start()
+        else this.y = yMaxWithPadding
+    } else {
+        val topMargin = resources.getDimensionPixelSize(R.dimen.sizeteen_dp)
+        val maxMarginTop = Math.max(marginTop, marginTop + topMargin)
+        if (animated) this.animate().setInterpolator(FastOutLinearInInterpolator()).y(maxMarginTop).setDuration(DURATION_MILLIS)
+            .setUpdateListener {
+//                                    draggableListener?.onPositionChanged(v)
+            }.start()
+        else this.y = maxMarginTop
+    }
+
 }
 
 

@@ -13,6 +13,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.ui.inset.makeInset
+import live.hms.roomkit.ui.inset.resetUI
 import live.hms.roomkit.ui.meeting.AudioOutputSwitchBottomSheet
 import live.hms.roomkit.ui.meeting.ChangeNameDialogFragment
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
@@ -270,10 +271,11 @@ class VideoGridFragment : Fragment() {
     private fun toggleInsetUI(isMinimised: Boolean) {
         binding.insetPillMaximised.visibility =
             if (isMinimised) View.GONE else View.VISIBLE
-        binding.insetPillMaximised.requestLayout()
-        binding.rootLayout.requestLayout()
-        binding.insetPillMaximised.performClick()
+
         binding.minimisedInset.visibility =
             if (isMinimised.not()) View.GONE else View.VISIBLE
+
+        if (isMinimised.not())
+        binding.insetPill.resetUI(binding.insetPill.x, binding.insetPill.y)
     }
 }
