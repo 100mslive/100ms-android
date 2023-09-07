@@ -271,6 +271,7 @@ class VideoGridFragment : Fragment() {
         binding.insetPillMaximised.visibility =
             if (isMinimised) View.GONE else View.VISIBLE
         binding.insetPillMaximised.requestLayout()
+        binding.rootLayout.requestLayout()
         binding.insetPillMaximised.performClick()
         binding.minimisedInset.visibility =
             if (isMinimised.not()) View.GONE else View.VISIBLE
