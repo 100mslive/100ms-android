@@ -16,10 +16,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/spacing_d2"
         android:orientation="vertical">
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/container_search"
-                style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:startIconDrawable="@drawable/ic_search_24">
@@ -36,7 +36,7 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/spacing_d2"
             tools:listitem="@layout/list_item_peer_list" />
     </LinearLayout>
 

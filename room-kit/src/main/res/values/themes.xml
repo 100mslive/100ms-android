@@ -21,10 +21,6 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="TextInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="hintTextColor">#8F9099</item>
-        <item name="android:textColor">#EFF0FA</item>
-    </style>
 
     <style name="AutoCompleteTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="android:layout_marginTop">6dp</item>
