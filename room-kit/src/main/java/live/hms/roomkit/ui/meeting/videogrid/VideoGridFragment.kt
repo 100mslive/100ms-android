@@ -200,7 +200,7 @@ class VideoGridFragment : Fragment() {
                     if (binding.minimizedIconVideoOff.isEnabled)
                         binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
                     binding.minimizedIconVideoOff.isEnabled = false
-                    binding.localHmsVideoView?.visibility = View.INVISIBLE
+                    binding.localHmsVideoView?.visibility = View.GONE
                     binding.localHmsVideoView?.alpha = 0f
                     binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
                 } else {
