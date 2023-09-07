@@ -598,7 +598,7 @@ class MeetingFragment : Fragment() {
                     is MeetingViewModel.Event.HlsNotStarted -> meetingViewModel.triggerErrorNotification(event.reason)
                     is MeetingViewModel.Event.Hls.HlsError -> meetingViewModel.triggerErrorNotification(event.throwable.message)
                     is MeetingViewModel.Event.RecordEvent -> {
-                        meetingViewModel.triggerErrorNotification(event.message)
+//                        meetingViewModel.triggerErrorNotification(event.message)
                         Log.d("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.RtmpEvent -> {

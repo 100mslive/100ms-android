@@ -109,8 +109,10 @@ class SessionOptionBottomSheet(
         val recordingOption = GridOptionItem(
             resources.getString(R.string.start_record_meeting), R.drawable.ic_record_button_24, {
                 onRecordingClicked.invoke(Runnable {
-                    dismissAllowingStateLoss()
+
                 })
+
+                dismissAllowingStateLoss()
             }, isSelected = false,
         )
 

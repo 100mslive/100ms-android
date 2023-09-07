@@ -184,7 +184,7 @@ class VideoGridFragment : Fragment() {
                 binding.localHmsVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
                 if (it.audio?.isMute == true) {
                     if (binding.minimizedIconAudioOff.isEnabled)
-                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
+                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off , R.dimen.two_dp )
                     binding.minimizedIconAudioOff.isEnabled = false
                     binding.iconAudioOff.visibility = View.VISIBLE
                     binding.iconAudioLevel.alpha = visibilityOpacity(false)
@@ -192,20 +192,20 @@ class VideoGridFragment : Fragment() {
                     binding.iconAudioOff.visibility = View.INVISIBLE
                     binding.iconAudioLevel.alpha = visibilityOpacity(true)
                     if (binding.minimizedIconAudioOff.isEnabled.not())
-                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on)
+                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on, R.dimen.two_dp)
                     binding.minimizedIconAudioOff.isEnabled = true
                 }
 
                 if (it.video?.isMute == true) {
                     if (binding.minimizedIconVideoOff.isEnabled)
-                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
+                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, R.dimen.two_dp)
                     binding.minimizedIconVideoOff.isEnabled = false
                     binding.localHmsVideoView?.visibility = View.GONE
                     binding.localHmsVideoView?.alpha = 0f
                     binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
                 } else {
                     if (binding.minimizedIconVideoOff.isEnabled.not())
-                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on)
+                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on, R.dimen.two_dp)
                     binding.minimizedIconVideoOff.isEnabled = true
                     binding.localHmsVideoView?.visibility = View.VISIBLE
                     binding.localHmsVideoView?.alpha = 1f
@@ -270,6 +270,8 @@ class VideoGridFragment : Fragment() {
     private fun toggleInsetUI(isMinimised: Boolean) {
         binding.insetPillMaximised.visibility =
             if (isMinimised) View.GONE else View.VISIBLE
+        binding.insetPillMaximised.requestLayout()
+        binding.insetPillMaximised.performClick()
         binding.minimisedInset.visibility =
             if (isMinimised.not()) View.GONE else View.VISIBLE
     }
