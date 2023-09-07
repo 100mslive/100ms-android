@@ -9,18 +9,19 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.BottomSheetStopRecordingBinding
 import live.hms.roomkit.databinding.ChangeNameFragmentBinding
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.NameUtils.isValidUserName
 import live.hms.roomkit.util.viewLifecycle
 
 
-class ChangeNameDialogFragment : BottomSheetDialogFragment() {
+class StopRecordingBottomSheet(val onStopRecordingClicked: () -> Unit) : BottomSheetDialogFragment() {
 
-    private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private var binding by viewLifecycle<ChangeNameFragmentBinding>()
+
+    private var binding by viewLifecycle<BottomSheetStopRecordingBinding>()
     companion object {
-        const val TAG = "ChangeNameDialogFragment"
+        const val TAG = "StopRecordingBottomSheet"
     }
 
 
@@ -34,30 +35,20 @@ class ChangeNameDialogFragment : BottomSheetDialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = ChangeNameFragmentBinding.inflate(inflater, container, false)
+        binding = BottomSheetStopRecordingBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        val newName = binding.newName
         val submitButton = binding.changeName
         val cancelButton = binding.closeBtn
 
-        newName.requestFocus()
-        val imm = activity!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
-
         submitButton.setOnClickListener {
-            if (isValidUserName(newName)) {
-                val name = newName.text.toString()
-                meetingViewModel.changeName(name)
-                dismiss()
-            }
+            onStopRecordingClicked()
+            dismiss()
         }
-
-
 
         cancelButton.setOnClickListener {
             dismissAllowingStateLoss()

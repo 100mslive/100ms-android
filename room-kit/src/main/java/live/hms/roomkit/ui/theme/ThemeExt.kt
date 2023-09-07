@@ -511,6 +511,60 @@ internal fun ChangeNameFragmentBinding.applyTheme() {
     )
 
 }
+
+internal fun BottomSheetStopRecordingBinding.applyTheme() {
+    title.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    title.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    closeBtn.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    standardBottomSheet.background =root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDim,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            setColorFilter(color, PorterDuff.Mode.ADD);
+        }
+
+
+    changeNameDec.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    changeName.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    changeName.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+}
 internal fun VideoCardBinding.applyTheme() {
     nameInitials.setTextColor(
         getColorOrDefault(
@@ -864,7 +918,9 @@ internal fun FragmentPreviewBinding.applyTheme() {
     )
 
     hlsSessionText.setTextColor(
-       Color.WHITE
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getDefaults().border_bright)
     )
 
 

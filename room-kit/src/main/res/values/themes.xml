@@ -62,7 +62,7 @@
     </style>
 
     <style name="AppBottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
-
+        <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
     </style>
 

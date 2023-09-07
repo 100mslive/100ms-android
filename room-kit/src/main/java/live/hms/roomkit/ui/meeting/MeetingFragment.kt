@@ -1204,7 +1204,14 @@ class MeetingFragment : Fragment() {
                             if (meetingViewModel.isRecordingState().not()) {
                                 meetingViewModel.recordMeeting(true, runnable = it)
                             } else {
-                                meetingViewModel.stopRecording()
+                                StopRecordingBottomSheet {
+                                    contextSafe { context, activity ->
+                                        meetingViewModel.stopRecording()
+                                    }
+                                }.show(
+                                    childFragmentManager,
+                                    StopRecordingBottomSheet.TAG
+                                )
                             }
 
 
