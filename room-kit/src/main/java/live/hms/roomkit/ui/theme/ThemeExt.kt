@@ -353,6 +353,20 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
+    recordingSignal.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    recordingSignalProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
 //    tvViewersCount.backgroundTintList = ColorStateList.valueOf(
 //        getColorOrDefault(
 //            HMSPrebuiltTheme.getColours()?.borderBright,
@@ -1155,6 +1169,13 @@ fun FragmentGridVideoBinding.applyTheme() {
 }
 
 fun ItemGridOptionBinding.applyTheme() {
+    progressBar.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
     rootLayout.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.backgroundDefault,
         HMSPrebuiltTheme.getDefaults().background_default

@@ -504,6 +504,22 @@ class MeetingFragment : Fragment() {
             chatViewModel.receivedMessage(it)
         }
 
+        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.recordingSignalView.visibility = View.VISIBLE
+            } else {
+                binding.recordingSignalView.visibility = View.GONE
+            }
+        }
+
+
+        meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
+            val isRecording = meetingViewModel.isRecordingState()
+            binding.recordingSignal.visibility =  if (isRecording) View.VISIBLE else View.GONE
+        }
+
+
+
         meetingViewModel.hlsToggleUpdateLiveData.observe(viewLifecycleOwner) {
             when(it) {
                 true -> binding.meetingFragmentProgress?.visibility = View.VISIBLE
@@ -1186,7 +1202,7 @@ class MeetingFragment : Fragment() {
                         onNameChange = {  },
                         onRecordingClicked = {
                             if (meetingViewModel.isRecordingState().not()) {
-                                meetingViewModel.recordMeeting(true)
+                                meetingViewModel.recordMeeting(true, runnable = it)
                             } else {
                                 meetingViewModel.stopRecording()
                             }

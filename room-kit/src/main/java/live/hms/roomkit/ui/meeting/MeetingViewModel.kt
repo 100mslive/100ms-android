@@ -339,6 +339,7 @@ class MeetingViewModel(
     // Live data for enabling/disabling mute buttons
     val isLocalAudioPresent = MutableLiveData(false)
     val isLocalVideoPresent = MutableLiveData(false)
+    val isRecordingInProgess = MutableLiveData(false)
 
     // Live data containing all the current tracks in a meeting
     private val _liveDataTracks = MutableLiveData(_tracks)
@@ -1500,10 +1501,11 @@ class MeetingViewModel(
     fun recordMeeting(
         isRecording: Boolean,
         rtmpInjectUrls: List<String> = emptyList(),
-        inputWidthHeight: HMSRtmpVideoResolution? = null
+        inputWidthHeight: HMSRtmpVideoResolution? = null,
+        runnable: Runnable? = null
     ) {
         // It's streaming if there are rtmp urls present.
-
+        isRecordingInProgess.postValue(true)
         Log.v(TAG, "Starting recording. url: $rtmpInjectUrls")
         hmsSDK.startRtmpOrRecording(
             HMSRecordingConfig(
@@ -1513,12 +1515,15 @@ class MeetingViewModel(
                 inputWidthHeight
             ), object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
+                    isRecordingInProgess.postValue(false)
                     Log.d(TAG, "RTMP recording error: $error")
                     // restore the current state
+                    runnable?.run()
                     viewModelScope.launch { _events.emit(Event.RTMPError(error)) }
                 }
 
                 override fun onSuccess() {
+                    isRecordingInProgess.postValue(false)
                     Log.d(TAG, "RTMP recording Success")
                 }
 

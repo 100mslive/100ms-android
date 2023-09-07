@@ -93,6 +93,27 @@
 
             </androidx.cardview.widget.CardView>
 
+            <ProgressBar
+                android:id="@+id/recording_signal_progress"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:layout_marginLeft="@dimen/eight_dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+            <ImageView
+                android:id="@+id/recording_signal"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:layout_marginLeft="@dimen/eight_dp"
+                android:src="@drawable/ic_record_button_24"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
             <FrameLayout
                 android:id="@+id/tv_viewers_count_card"
                 android:layout_height="wrap_content"
@@ -109,7 +130,6 @@
                     android:fontFamily="@font/inter_semibold"
                     android:textSize="10sp"
                     android:paddingVertical="@dimen/two_dp"
-                    android:background="@drawable/stroked_drawable"
                     android:visibility="visible"
                     tools:text="2.0k" />
 

@@ -43,6 +43,7 @@ class GridOptionItem(
         }
 
         viewBinding.root.setOnClickListener {
+            if (showProgress.not())
             onClick()
         }
 

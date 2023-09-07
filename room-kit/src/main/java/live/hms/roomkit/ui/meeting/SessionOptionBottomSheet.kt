@@ -16,11 +16,12 @@ import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 
 class SessionOptionBottomSheet(
     private val onScreenShareClicked: () -> Unit,
-    private val onRecordingClicked: () -> Unit,
+    private val onRecordingClicked: (runnable : Runnable) -> Unit,
     private val onPeerListClicked: () -> Unit,
     private val onBRBClicked: () -> Unit,
     private val onRaiseHandClicked: () -> Unit,
@@ -107,8 +108,9 @@ class SessionOptionBottomSheet(
 
         val recordingOption = GridOptionItem(
             resources.getString(R.string.start_record_meeting), R.drawable.ic_record_button_24, {
-                onRecordingClicked.invoke()
-                dismiss()
+                onRecordingClicked.invoke(Runnable {
+                    contextSafe { context, activity ->   dismissAllowingStateLoss() }
+                })
             }, isSelected = false,
         )
 
@@ -123,6 +125,10 @@ class SessionOptionBottomSheet(
             add(recordingOption)
         }
         gridOptionAdapter.update(listOf(group))
+
+        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
+            recordingOption.showProgress(it)
+        }
 
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
             val isRecording = meetingViewModel.isRecordingState()
