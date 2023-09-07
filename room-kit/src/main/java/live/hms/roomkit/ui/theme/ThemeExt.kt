@@ -1338,9 +1338,19 @@ internal fun ParticipantHeaderItemBinding.applyTheme() {
 }
 // ParticipantItem binding
 internal fun ListItemPeerListBinding.applyTheme() {
+    badNetworkIndicator.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
+        HMSPrebuiltTheme.getDefaults().secondary_dim,
+        R.drawable.badge_circle_20
+    )
+    muteUnmuteIcon.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
+        HMSPrebuiltTheme.getDefaults().secondary_dim,
+        R.drawable.badge_circle_20
+    )
     handraise.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-        HMSPrebuiltTheme.getDefaults().onsurface_med_emp,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
+        HMSPrebuiltTheme.getDefaults().secondary_dim,
         R.drawable.badge_circle_20
     )
     name.setTextColor(
