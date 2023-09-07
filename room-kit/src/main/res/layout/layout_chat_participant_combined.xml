@@ -11,44 +11,45 @@
     android:background="@drawable/gray_shape_round_dialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="@dimen/spacing_d2"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
-    <com.google.android.material.tabs.TabLayout
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginHorizontal="8dp"
-        app:tabTextAppearance="@style/RoundedTabsTextStyle"
-        style="@style/RoundedTabLayoutStyle"
-        android:layout_weight="1"
-        app:tabMode="fixed"
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent">
-
-        <com.google.android.material.tabs.TabItem
+        <com.google.android.material.tabs.TabLayout
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:padding="6dp"
-            />
+            android:layout_marginLeft="@dimen/spacing_d2"
+            android:layout_marginTop="4dp"
+            app:tabTextAppearance="@style/RoundedTabsTextStyle"
+            style="@style/RoundedTabLayoutStyle"
+            android:layout_weight="1"
+            app:tabMode="fixed"
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent">
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:padding="6dp"
-            />
+            <com.google.android.material.tabs.TabItem
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:padding="6dp"
+                />
 
-    </com.google.android.material.tabs.TabLayout>
+            <com.google.android.material.tabs.TabItem
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:padding="6dp"
+                />
+
+        </com.google.android.material.tabs.TabLayout>
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/closeCombinedTabButton"
             android:layout_width="wrap_content"
             android:layout_gravity="center"
             android:layout_height="wrap_content"
-            android:padding="8dp"
+            android:padding="@dimen/spacing_d2"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_close_16"
             />

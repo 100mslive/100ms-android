@@ -7,29 +7,19 @@
     >
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_gravity="top"
-    app:layout_widthPercent="100%"
     app:layout_heightPercent="@dimen/tall_bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
+    android:paddingHorizontal="@dimen/spacing_d2"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/spacing_d2"
         android:orientation="vertical">
-        <TextView
-            android:id="@+id/participant_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            android:layout_marginHorizontal="16dp"
-            />
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/container_search"
-                android:layout_marginHorizontal="16dp"
-                style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:startIconDrawable="@drawable/ic_search_24">
@@ -46,8 +36,7 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="12dp"
-            android:paddingHorizontal="16dp"
+            android:layout_marginTop="@dimen/spacing_d2"
             tools:listitem="@layout/list_item_peer_list" />
     </LinearLayout>
 

@@ -443,11 +443,11 @@ class MeetingFragment : Fragment() {
                 binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
             }
         }
-        binding.iconSend?.setOnSingleClickListener {
-            val messageStr = binding.editTextMessage?.text.toString().trim()
+        binding.iconSend.setOnSingleClickListener {
+            val messageStr = binding.editTextMessage.text.toString().trim()
             if (messageStr.isNotEmpty()) {
                 chatViewModel.sendMessage(messageStr)
-                binding.editTextMessage?.setText("")
+                binding.editTextMessage.setText("")
             }
         }
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages!!, chatViewModel)
@@ -1263,9 +1263,9 @@ class MeetingFragment : Fragment() {
                         View.GONE
                     }
                 }
-                binding.chatMessages!!.visibility = binding.chatView!!.visibility
+                binding.chatMessages.visibility = binding.chatView.visibility
                 // Scroll to the latest message if it's visible
-                if (binding.chatMessages!!.visibility == View.VISIBLE) {
+                if (binding.chatMessages.visibility == View.VISIBLE) {
                     val position = chatAdapter.itemCount - 1
                     if (position >= 0) {
                         binding.chatMessages!!.smoothScrollToPosition(position)

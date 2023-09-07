@@ -26,6 +26,7 @@ import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
@@ -119,7 +120,7 @@ class ParticipantsFragment : Fragment() {
                     )
                 }!!)
                 // If the group was expanded, open it again.
-                if(expandedGroups[key] == true){
+                if(expandedGroups[key] == true || expandedGroups[key] == null){
                     onToggleExpanded()
                 }
             }
@@ -129,11 +130,12 @@ class ParticipantsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.applyTheme()
         initOnBackPress()
         initViews()
     }
     private fun updateParticipantCount(count : Int) {
-        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
+//        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
     }
 
     private fun initViews() {
