@@ -133,7 +133,7 @@ class ParticipantsFragment : Fragment() {
         initViews()
     }
     private fun updateParticipantCount(count : Int) {
-        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
+//        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
     }
 
     private fun initViews() {
