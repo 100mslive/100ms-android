@@ -1519,7 +1519,16 @@ class MeetingViewModel(
                     Log.d(TAG, "RTMP recording error: $error")
                     // restore the current state
                     runnable?.run()
-                    viewModelScope.launch { _events.emit(Event.RTMPError(error)) }
+                    hmsNotificationEvent.postValue(
+                        HMSNotification(
+                            isError = true,
+                            title = "Recording failed to start",
+                            isDismissible = false,
+                            icon = R.drawable.record_off,
+                            actionButtonText = "Retry",
+                            type = HMSNotificationType.RecordingFailedToStart
+                        )
+                    )
                 }
 
                 override fun onSuccess() {
