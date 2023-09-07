@@ -226,6 +226,11 @@ class VideoGridFragment : Fragment() {
                 binding.divider.setGuidelinePercent(0.75f)
             }
 
+            if (screenShareTrackList.size <=1){
+                binding.tabLayoutDotsRemoteScreenShare.visibility = View.GONE
+            } else {
+                binding.tabLayoutDotsRemoteScreenShare.visibility = View.VISIBLE
+            }
 
 
             meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
