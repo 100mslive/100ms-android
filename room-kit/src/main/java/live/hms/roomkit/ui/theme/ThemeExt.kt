@@ -1338,6 +1338,11 @@ internal fun ParticipantHeaderItemBinding.applyTheme() {
 }
 // ParticipantItem binding
 internal fun ListItemPeerListBinding.applyTheme() {
+    handraise.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp,
+        R.drawable.badge_circle_20
+    )
     name.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
