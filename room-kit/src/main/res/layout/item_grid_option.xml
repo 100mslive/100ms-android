@@ -13,6 +13,23 @@
 
     tools:background="@android:color/holo_red_dark">
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/nonpregressGroup"
+        app:constraint_referenced_ids="participant_image,subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toTopOf="@id/participant_image"
+        app:layout_constraintBottom_toBottomOf="@id/subtitle"
+        app:layout_constraintStart_toStartOf="@id/participant_image"
+        app:layout_constraintEnd_toEndOf="@id/participant_image"
+        android:layout_width="20dp"
+        android:layout_height="20dp"/>
+
     <ImageView
         android:layout_marginTop="@dimen/eight_dp"
         android:id="@+id/participant_image"

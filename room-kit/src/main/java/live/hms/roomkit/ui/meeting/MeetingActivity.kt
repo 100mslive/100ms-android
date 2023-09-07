@@ -201,6 +201,10 @@ class MeetingActivity : AppCompatActivity() {
                 meetingViewModel.startMeeting()
                 handleNotificationDismissClick()
             }
+            is HMSNotificationType.RecordingFailedToStart -> {
+                meetingViewModel.recordMeeting(true)
+                handleNotificationDismissClick()
+            }
 
             else -> {}
         }

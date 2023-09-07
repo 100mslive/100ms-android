@@ -288,7 +288,7 @@ fun SurfaceViewRenderer.isInit() : Boolean {
     return (getTag(R.id.IS_INT) as? Boolean) == true
 }
 
-fun View.setGradient(startColor: Int, endColor: Int) {
+fun View.setGradient(startColor: Int, endColor: Int, orientation : GradientDrawable.Orientation = GradientDrawable.Orientation.TOP_BOTTOM) {
     val colors = intArrayOf(
         startColor,
         endColor    )
@@ -297,7 +297,7 @@ fun View.setGradient(startColor: Int, endColor: Int) {
 
     //create a new gradient color
     val gd = GradientDrawable(
-        GradientDrawable.Orientation.TOP_BOTTOM, colors
+        orientation, colors
     )
     gd.cornerRadius = 0f
     //apply the button background to newly created drawable gradient

@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
@@ -15,6 +18,7 @@ import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 
@@ -49,12 +53,14 @@ class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit, val onNameChange: 
 
 
 
-        binding.root.setBackgroundColor(
-            getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.backgroundDefault,
-                HMSPrebuiltTheme.getDefaults().background_default
-            )
-        )
+        binding.rootLayout.background = ResourcesCompat.getDrawable(resources,R.drawable.gray_shape_round_dialog, null)!!
+            .apply {
+                val color = getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.borderDefault,
+                    HMSPrebuiltTheme.getDefaults().background_default)
+                colorFilter =
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+            }
 
         var btnArray = arrayOf(
             binding.earpieceBtn, binding.audioOt, binding.changeName
@@ -102,7 +108,7 @@ class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit, val onNameChange: 
         borders.forEach {
             it.setBackgroundColor(
                 getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.borderDefault,
+                    HMSPrebuiltTheme.getColours()?.borderBright,
                     HMSPrebuiltTheme.getDefaults().border_bright
                 )
             )

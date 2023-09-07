@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
+import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
@@ -20,6 +21,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
+import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
@@ -173,10 +175,10 @@ internal fun ImageView.setIconDisabled(
 
 internal fun ShapeableImageView.setIconDisabled(
     @DrawableRes disabledIconDrawableRes: Int,
-    @DrawableRes backgroundRes: Int = R.drawable.gray_round_solid_drawable
+    @DimenRes radiusREs: Int = R.dimen.eight_dp,
 ) {
 
-    val radius = resources.getDimension(R.dimen.eight_dp).toInt()
+    val radius = resources.getDimension(radiusREs).toInt()
 
     this.strokeWidth = 0f
 
@@ -315,19 +317,21 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
-    liveTitle?.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
+    liveTitle?.setTextColor(Color.WHITE)
 
-    liveTitle?.setBackgroundColor(
+    liveTitleCard.backgroundTintList = ColorStateList.valueOf(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.alertErrorDefault,
             HMSPrebuiltTheme.getDefaults().error_default
         )
     )
+
+//    liveTitleCard?.setBackgroundColor(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+//            HMSPrebuiltTheme.getDefaults().error_default
+//        )
+//    )
 
     tvRecordingTime?.setTextColor(
         getColorOrDefault(
@@ -342,6 +346,36 @@ internal fun FragmentMeetingBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+
+    tvViewersCount.drawableLeft?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    recordingSignal.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    recordingSignalProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+//    tvViewersCount.backgroundTintList = ColorStateList.valueOf(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.borderBright,
+//            HMSPrebuiltTheme.getDefaults().surface_default
+//        )
+//    )
+
+
 
 
     //init should be called once
@@ -473,6 +507,60 @@ internal fun ChangeNameFragmentBinding.applyTheme() {
     changeName.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+}
+
+internal fun BottomSheetStopRecordingBinding.applyTheme() {
+    title.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    title.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    closeBtn.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    standardBottomSheet.background =root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog)
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDim,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            setColorFilter(color, PorterDuff.Mode.ADD);
+        }
+
+
+    changeNameDec.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    changeName.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.blue_round_solid_drawable
+    )
+
+    changeName.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
@@ -832,9 +920,8 @@ internal fun FragmentPreviewBinding.applyTheme() {
 
     hlsSessionText.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
+            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getDefaults().border_bright)
     )
 
 
@@ -1056,9 +1143,9 @@ fun FragmentGridVideoBinding.applyTheme() {
 
 
 
-    minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off)
+    minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off, radiusREs = R.dimen.two_dp)
     minimizedIconAudioOff.isEnabled = false
-    minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off)
+    minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, radiusREs = R.dimen.two_dp)
     minimizedIconVideoOff.isEnabled = false
     maximizedIcon.drawable.setTint(
         getColorOrDefault(
@@ -1139,6 +1226,13 @@ fun FragmentGridVideoBinding.applyTheme() {
 }
 
 fun ItemGridOptionBinding.applyTheme() {
+    progressBar.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
     rootLayout.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.backgroundDefault,
         HMSPrebuiltTheme.getDefaults().background_default

@@ -35,26 +35,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/minimized_icon_audio_off"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginHorizontal="@dimen/eight_dp"
                 android:layout_marginVertical="@dimen/eight_dp"
                 android:scaleType="fitXY"
+                app:contentPadding="@dimen/two_dp"
                 android:src="@drawable/avd_mic_off_to_on"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/minimized_icon_video_off"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/minimized_icon_video_off"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginVertical="@dimen/eight_dp"
                 android:layout_marginEnd="@dimen/eight_dp"
                 android:scaleType="fitXY"
+                app:contentPadding="@dimen/two_dp"
                 android:src="@drawable/avd_video_on_to_off"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/you_text"
