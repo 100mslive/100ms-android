@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting.bottomsheets
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,7 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.utils.HMSLogger
 
-class LeaveBottomSheet() : BottomSheetDialogFragment() {
+class MultipleLeaveOptionBottomSheet() : BottomSheetDialogFragment() {
 
     companion object {
         private const val TAG = "LeaveBottomSheet"
@@ -44,8 +43,16 @@ class LeaveBottomSheet() : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        updateLayout()
         binding.applyTheme()
+
+        binding.leaveTitle.text = "Leave"
+        binding.leaveDescription.text = "Others will continue after you leave. You can join the session again."
+
+
+        val isStreamIng =  meetingViewModel.isHlsRunning() || meetingViewModel.isRTMPRunning()
+
+        binding.endSessionTitle.text = if (isStreamIng) "End Stream" else "End Session"
+        binding.endSessionDescription.text = if (isStreamIng) "The stream will end for everyone after they’ve watched it." else "The session will end for everyone in the room immediately."
 
         binding.leaveLayout.setOnSingleClickListener(200L) {
             HMSLogger.d(TAG, "Calling Leave ...")

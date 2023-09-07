@@ -47,7 +47,8 @@ import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
-import live.hms.roomkit.ui.meeting.bottomsheets.LeaveBottomSheet
+import live.hms.roomkit.ui.meeting.bottomsheets.EndStreamBottomSheet
+import live.hms.roomkit.ui.meeting.bottomsheets.MultipleLeaveOptionBottomSheet
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.disconnectCallPipEvent
@@ -1452,8 +1453,12 @@ class MeetingFragment : Fragment() {
     }
 
     fun inflateExitFlow() {
-        LeaveBottomSheet()
-            .show(childFragmentManager, "LeaveBottomSheet")
+        if (meetingViewModel.isAllowedToHlsStream().not() && meetingViewModel.isAllowedToEndMeeting().not()) {
+            EndStreamBottomSheet().show(parentFragmentManager, null)
+        } else {
+            MultipleLeaveOptionBottomSheet()
+                .show(childFragmentManager, "LeaveBottomSheet")
+        }
     }
 
 }

@@ -973,6 +973,8 @@ internal fun FragmentPreviewBinding.applyTheme() {
 }
 
 fun ExitBottomSheetBinding.applyTheme() {
+
+
     endSessionRoot.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().background_default
     )
@@ -991,9 +993,9 @@ fun ExitBottomSheetBinding.applyTheme() {
         )
     )
 
-    iconEndSession.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
-        HMSPrebuiltTheme.getDefaults().error_default
+    leaveIcon.setIconTintColor(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
     )
 
     endSessionTitle.setTextColor(
@@ -1024,9 +1026,16 @@ fun ExitBottomSheetBinding.applyTheme() {
 }
 
 fun EndSessionBottomSheetBinding.applyTheme() {
-    root.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().background_default
-    )
+
+    root.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDim,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+        }
+
 
     endSessionIcon.setIconTintColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
@@ -1035,14 +1044,14 @@ fun EndSessionBottomSheetBinding.applyTheme() {
 
     endSessionTitle.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
             HMSPrebuiltTheme.getDefaults().error_default
         )
     )
 
     endSessionDescription.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )

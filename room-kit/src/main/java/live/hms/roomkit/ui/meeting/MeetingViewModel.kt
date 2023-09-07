@@ -1340,6 +1340,8 @@ class MeetingViewModel(
     fun isAllowedToHlsStream(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.permission?.hlsStreaming == true
 
+    fun isAllowedToEndRoom() :Boolean = hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true
+
     fun isAllowedToShareScreen(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.publishParams?.allowed?.contains("screen") == true
 
