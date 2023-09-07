@@ -1404,20 +1404,14 @@ internal fun FragmentParticipantsBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.surfaceDefault,
             HMSPrebuiltTheme.getDefaults().surface_default
         )
-        setBackgroundColor(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default
-        ))
+
     }
     with(textInputSearch) {
-        setBackgroundColor(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default
-        ))
 
         setTextColor(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.surfaceBright,
             HMSPrebuiltTheme.getDefaults().surface_bright
         ))
+        background = getChatBackgroundDrawable()
     }
 }
