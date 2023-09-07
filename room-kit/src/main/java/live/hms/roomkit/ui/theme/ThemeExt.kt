@@ -1388,7 +1388,7 @@ internal fun FragmentParticipantsBinding.applyTheme() {
         // text color
         // hint color
         // background color
-        defaultHintTextColor = ColorStateList.valueOf(
+        hintTextColor = ColorStateList.valueOf(
             getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.onSurfaceLow,
                 HMSPrebuiltTheme.getDefaults().onsurface_low_emp
@@ -1414,6 +1414,7 @@ internal fun FragmentParticipantsBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.surfaceDefault,
             HMSPrebuiltTheme.getDefaults().surface_default
         ))
+
         setTextColor(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.surfaceBright,
             HMSPrebuiltTheme.getDefaults().surface_bright
