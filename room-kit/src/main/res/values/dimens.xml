@@ -17,4 +17,6 @@
     <dimen name="curve">12dp</dimen>
     <dimen name="spacing_d2">16dp</dimen>
     <dimen name="spacing_d4">32dp</dimen>
+    <dimen name="participant_item_icon">24dp</dimen>
+    <dimen name="participant_item_icon_padding">4dp</dimen>
 </resources>

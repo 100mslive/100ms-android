@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.meeting.participants
 import android.util.Log
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.res.ResourcesCompat
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemPeerListBinding
@@ -31,9 +32,15 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                       ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
-        viewBinding.name.text = hmsPeer.name
+        val name = if(hmsPeer.isLocal){
+            "${hmsPeer.name} (You)"
+        } else {
+            hmsPeer.name
+        }
+        viewBinding.name.text = name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer.metadata, viewBinding)
+        updateSpeaking(hmsPeer.audioTrack?.isMute, viewBinding)
         // Don't show the settings if they aren't allowed to change anything at all.
         viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
             View.GONE
@@ -88,6 +95,17 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                 show()
             }
         }
+    }
+
+    private fun updateSpeaking(isMute: Boolean?, viewBinding: ListItemPeerListBinding) {
+        val drawable = if (isMute == true || isMute == null) {
+            // Mute
+            R.drawable.ic_audio_toggle_off
+        }
+        else {
+            R.drawable.speaking_icon
+        }
+        viewBinding.muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(viewBinding.root.resources, drawable, null))
     }
 
     private fun getMenuForGroup(forPeer: HMSPeer): Int {
