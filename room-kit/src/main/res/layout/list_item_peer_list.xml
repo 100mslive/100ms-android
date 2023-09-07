@@ -19,7 +19,6 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name"
-            style="@style/MaterialTextViewHeading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxWidth="200dp"
@@ -39,28 +38,40 @@
 
         <ImageView
             android:id="@+id/handraise"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="@dimen/participant_item_icon"
+            android:layout_height="@dimen/participant_item_icon"
             android:layout_gravity="center"
+            android:padding="@dimen/participant_item_icon_padding"
             android:layout_marginLeft="8dp"
             android:contentDescription="@string/video_status"
             android:src="@drawable/raise_hand_modern" />
 
         <ImageView
             android:id="@+id/bad_network_indicator"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="@dimen/participant_item_icon"
+            android:layout_height="@dimen/participant_item_icon"
             android:layout_gravity="center"
             android:layout_marginLeft="8dp"
+            android:padding="@dimen/participant_item_icon_padding"
             android:visibility="gone"
              />
+
+        <ImageView
+            android:id="@+id/muteUnmuteIcon"
+            android:layout_width="@dimen/participant_item_icon"
+            android:layout_height="@dimen/participant_item_icon"
+            android:padding="@dimen/participant_item_icon_padding"
+            android:layout_marginLeft="8dp"
+            />
+
 
         <ImageButton
             android:id="@+id/peerSettings"
             android:background="@android:color/transparent"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
+            android:layout_width="@dimen/participant_item_icon"
+            android:layout_height="@dimen/participant_item_icon"
             android:layout_gravity="center"
+            android:padding="@dimen/participant_item_icon_padding"
             android:layout_marginLeft="8dp"
             android:src="@drawable/participants_overflow" />
 
