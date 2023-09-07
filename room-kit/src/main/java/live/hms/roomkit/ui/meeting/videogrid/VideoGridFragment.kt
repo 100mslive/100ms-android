@@ -115,18 +115,6 @@ class VideoGridFragment : Fragment() {
         binding.localHmsVideoView?.setZOrderOnTop(true)
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
 
-        binding.screenShareClose.setOnClickListener {
-            meetingViewModel.stopScreenshare(object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
-
-                }
-
-                override fun onSuccess() {
-                    meetingViewModel.isScreenShare.postValue(false)
-                }
-
-            })
-        }
 
         meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) { peerTypePair ->
             val isLocal = peerTypePair.first.isLocal
@@ -222,7 +210,7 @@ class VideoGridFragment : Fragment() {
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
 
-            val screenShareTrackList = tracks.filter { it.isScreen }
+            val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
             var newRowCount = 0
             var newColumnCount = 0
             //is screen share track is present then reduce the grid and column span else restore
@@ -238,11 +226,7 @@ class VideoGridFragment : Fragment() {
                 binding.divider.setGuidelinePercent(0.75f)
             }
 
-            if (screenShareTrackList.find { it.isLocal } != null) {
-                binding.localScreenShareContainer.visibility = View.VISIBLE
-            } else {
-                binding.localScreenShareContainer.visibility = View.GONE
-            }
+           
 
             meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
                 Pair(newRowCount, newColumnCount)

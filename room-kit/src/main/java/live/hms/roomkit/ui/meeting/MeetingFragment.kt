@@ -272,20 +272,6 @@ class MeetingFragment : Fragment() {
             }
 
             R.id.action_stop_share_screen -> {
-                meetingViewModel.stopScreenshare(object : HMSActionResultListener {
-                    override fun onError(error: HMSException) {
-                        Toast.makeText(
-                            activity,
-                            " stop screenshare :: $error.description",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-
-                    override fun onSuccess() {
-                        //success
-                        binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
-                    }
-                })
             }
 
             R.id.pip_mode -> {
@@ -516,6 +502,9 @@ class MeetingFragment : Fragment() {
         }
 
 
+        meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
+            meetingViewModel.triggerScreenShareNotification(it)
+        }
 
         meetingViewModel.hlsToggleUpdateLiveData.observe(viewLifecycleOwner) {
             when(it) {
@@ -1325,19 +1314,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun stopScreenShare() {
-        meetingViewModel.stopScreenshare(object : HMSActionResultListener {
-            override fun onError(error: HMSException) {
-                Toast.makeText(
-                    activity,
-                    " stop screenshare :: $error.description",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-
-            override fun onSuccess() {
-                meetingViewModel.isScreenShare.postValue(false)
-            }
-        })
+        meetingViewModel.stopScreenshare()
     }
 
     //entry point to start PIP mode

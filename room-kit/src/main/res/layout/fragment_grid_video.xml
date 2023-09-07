@@ -204,61 +204,11 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/local_screen_share_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:elevation="7dp"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <ImageView
-                android:id="@+id/ic_screenshare"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:src="@drawable/ic_share_screen"
-                app:layout_constraintBottom_toTopOf="@+id/screen_share_text"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed" />
-
-            <TextView
-                android:id="@+id/screen_share_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/inter_bold"
-                android:text="You are sharing your screen"
-                android:textSize="17sp"
-                app:layout_constraintBottom_toTopOf="@+id/screen_share_close"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ic_screenshare" />
-
-            <TextView
-                android:id="@+id/screen_share_close"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:fontFamily="@font/inter_semibold"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="64dp"
-                android:paddingVertical="16dp"
-                android:text="Stop Screen Share"
-                android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/screen_share_text" />
-
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager_remote_screen_share"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
             android:animateLayoutChanges="false" />
 
         <com.google.android.material.tabs.TabLayout
@@ -267,7 +217,7 @@
             android:layout_height="10dp"
             android:layout_gravity="bottom|center"
             app:tabMode="fixed"
-            android:layout_marginBottom="@dimen/eight_dp"
+            android:layout_marginVertical="@dimen/four_dp"
             android:elevation="@dimen/sizeteen_dp"
             app:tabBackground="@drawable/dot_selector_4"
             app:tabGravity="center"

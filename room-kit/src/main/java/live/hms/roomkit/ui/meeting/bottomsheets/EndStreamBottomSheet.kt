@@ -84,3 +84,4 @@ class EndStreamBottomSheet : BottomSheetDialogFragment() {
 
         }
     }
+    }

@@ -285,6 +285,7 @@ class MeetingViewModel(
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
     val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
     val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
+    val hmsRemoveNotificationEvent = MutableLiveData<HMSNotificationType>()
     val updateGridLayoutDimensions = SingleLiveEvent<Boolean>()
     val hmsScreenShareBottomSheetEvent = SingleLiveEvent<String>()
 
@@ -1580,8 +1581,15 @@ class MeetingViewModel(
 
     fun isScreenShared() = hmsSDK.isScreenShared()
 
-    fun stopScreenshare(actionListener: HMSActionResultListener) {
-        hmsSDK.stopScreenshare(actionListener)
+    fun stopScreenshare() {
+        hmsSDK.stopScreenshare(object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+            }
+
+            override fun onSuccess() {
+                isScreenShare.postValue(false)
+            }
+        })
     }
 
     fun startAudioshare(
@@ -2056,6 +2064,24 @@ class MeetingViewModel(
         video?.trackId?.let {
             hmsScreenShareBottomSheetEvent.postValue(it)
         }
+    }
+
+    fun triggerScreenShareNotification(showScreenshare: Boolean) {
+        if (showScreenshare) {
+            hmsNotificationEvent.postValue(
+                HMSNotification(
+                    title = "You are sharing your screen",
+                    isError = false,
+                    isDismissible = false,
+                    icon = R.drawable.share_screen_on,
+                    type = HMSNotificationType.ScreenShare,
+                    actionButtonText = "Stop"
+                )
+            )
+        } else {
+            hmsRemoveNotificationEvent.postValue(HMSNotificationType.ScreenShare)
+        }
+
     }
 }
 
