@@ -354,7 +354,10 @@ class MeetingFragment : Fragment() {
 //            )
 //            binding.buttonGoLive?.setBackgroundAndColor(DefaultTheme.getColours()?.alertErrorDefault,
 //                DefaultTheme.getDefaults().error_default)
-            binding.recordingSignalView?.visibility = View.VISIBLE
+            binding.liveTitleCard?.visibility = View.VISIBLE
+            binding.tvViewersCountCard?.visibility = View.VISIBLE
+            binding.recordingSignal.visibility = View.VISIBLE
+
             if (meetingViewModel.isRTMPRunning()) {
                 binding.liveTitle?.text = "Live with RTMP"
             } else {
@@ -363,21 +366,14 @@ class MeetingFragment : Fragment() {
             binding.tvViewersCount?.visibility = View.VISIBLE
             binding.tvViewersCountCard.visibility = View.VISIBLE
             setupRecordingTimeView()
+        } else if (recordingState == RecordingState.RECORDING ){
+            binding.liveTitleCard?.visibility = View.GONE
+            binding.recordingSignal.visibility = View.VISIBLE
+            binding.tvViewersCount?.visibility = View.GONE
+            binding.tvViewersCountCard.visibility = View.GONE
         } else {
-//            binding.buttonGoLive?.setImageDrawable(
-//                ContextCompat.getDrawable(
-//                    requireContext(),
-//                    R.drawable.ic_radar
-//                )
-//            )
-//            binding.buttonGoLive?.backgroundTintList =
-//                ColorStateList.valueOf(
-//                    ContextCompat.getColor(
-//                        requireContext(),
-//                        R.color.primary_blue
-//                    )
-//                )
-            binding.recordingSignalView?.visibility = View.GONE
+            binding.recordingSignal.visibility = View.GONE
+            binding.liveTitleCard?.visibility = View.GONE
             binding.tvViewersCount?.visibility = View.GONE
             binding.tvViewersCountCard.visibility = View.GONE
         }
@@ -506,9 +502,9 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
             if (it) {
-                binding.recordingSignalView.visibility = View.VISIBLE
+                binding.recordingSignalProgress.visibility = View.VISIBLE
             } else {
-                binding.recordingSignalView.visibility = View.GONE
+                binding.recordingSignalProgress.visibility = View.GONE
             }
         }
 
@@ -1301,7 +1297,7 @@ class MeetingFragment : Fragment() {
         }
 
         if (meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url.isNullOrEmpty()) {
-            binding.logoIv?.visibility = View.INVISIBLE
+            binding.logoIv?.visibility = View.GONE
         } else {
             binding.logoIv?.visibility = View.VISIBLE
             binding.logoIv?.let {

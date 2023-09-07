@@ -20,6 +20,7 @@
             android:paddingHorizontal="24dp">
 
             <TextView
+                android:gravity="center_vertical"
                 android:drawableStart="@drawable/ic_alert_triangle"
                 android:id="@+id/title"
                 android:layout_width="match_parent"
