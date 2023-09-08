@@ -5,7 +5,7 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.math.exp
+
 
 class HeaderItemDecoration(
     @ColorInt background: Int,
@@ -27,7 +27,7 @@ class HeaderItemDecoration(
     init {
         paint = Paint()
         paint.color = background
-        paint.strokeWidth = 1.5f;
+        paint.strokeWidth = 0f
         paint.style = Paint.Style.STROKE;
     }
 
