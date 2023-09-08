@@ -48,6 +48,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
 
         viewBinding.peerSettings.setOnClickListener {
             with(PopupMenu(viewBinding.root.context, viewBinding.peerSettings)) {
+                setForceShowIcon(true)
                 inflate(getMenuForGroup(hmsPeer))
                 // Hide bring on stage if it's not a broadcaster looking at it.
                 menu.findItem(R.id.bring_on_stage)?.isVisible = viewerPeer.hmsRole.name == "broadcaster"

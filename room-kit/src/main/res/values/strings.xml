@@ -237,4 +237,7 @@
     <string name="audio_video_subheading">Setup your audio and video before joining</string>
     <string name="audio_video_subheading_no">Setup before joining</string>
     <string name="participants_heading">Participants (%1$d)</string>
+    <string name="menu_item_mute_audio">Mute Audio</string>
+    <string name="menu_item_mute_video">Mute Video</string>
+    <string name="bring_on_stage">Bring on Stage</string>
 </resources>
