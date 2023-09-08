@@ -133,6 +133,12 @@ class VideoGridFragment : Fragment() {
                             binding.iconBrb.visibility = View.GONE
                         }
                     }
+                    HMSPeerUpdate.HAND_RAISED_CHANGED -> {
+                        if (peerTypePair.first.isHandRaised()) {
+                            binding.iconBrb.visibility = View.VISIBLE
+                            binding.iconBrb.setImageResource(R.drawable.raise_hand_modern)
+                        }
+                    }
                     HMSPeerUpdate.NAME_CHANGED -> {
                         binding.nameInitials.text = NameUtils.getInitials(meetingViewModel.hmsSDK.getLocalPeer()?.name.orEmpty())
                     }

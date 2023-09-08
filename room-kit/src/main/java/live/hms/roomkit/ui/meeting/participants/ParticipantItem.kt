@@ -39,7 +39,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
         }
         viewBinding.name.text = name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
-        updateHandRaise(hmsPeer.metadata, viewBinding)
+        updateHandRaise(hmsPeer, viewBinding)
         updateSpeaking(hmsPeer.audioTrack?.isMute, viewBinding)
         // Don't show the settings if they aren't allowed to change anything at all.
         viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
@@ -115,7 +115,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
             ) == true
         val isOnStageButNotBroadcasterRole = prebuiltInfoContainer.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
 
-        val isHandRaised = CustomPeerMetadata.fromJson(forPeer.metadata)?.isHandRaised == true
+        val isHandRaised = forPeer.isHandRaised()
                 // You have to be in the offstage roles to be categorized as hand raised
                 && isOffStageRole
 
@@ -131,8 +131,8 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
         }
     }
 
-    private fun updateHandRaise(metadata: String, viewBinding: ListItemPeerListBinding) {
-        val isHandRaised = CustomPeerMetadata.fromJson(metadata)?.isHandRaised == true
+    private fun updateHandRaise(hmsPeer: HMSPeer, viewBinding: ListItemPeerListBinding) {
+        val isHandRaised = hmsPeer.isHandRaised()
         viewBinding.handraise.visibility = if(isHandRaised)
             View.VISIBLE
         else

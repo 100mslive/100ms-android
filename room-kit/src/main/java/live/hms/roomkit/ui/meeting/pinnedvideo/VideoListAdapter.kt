@@ -89,7 +89,7 @@ class VideoListAdapter(
       }
 
       val isHandRaised: Boolean =
-        CustomPeerMetadata.fromJson(item.track.peer.metadata)?.isHandRaised == true
+        item.track.peer.isHandRaised()
       binding.raisedHand.visibility = visibility(isHandRaised)
 
       binding.root.setOnClickListener { onVideoItemClick(item.track) }

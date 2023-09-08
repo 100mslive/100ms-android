@@ -780,7 +780,8 @@ class MeetingViewModel(
                         participantPeerUpdate.postValue(Unit)
                     }
 
-                    HMSPeerUpdate.METADATA_CHANGED -> {
+                    HMSPeerUpdate.METADATA_CHANGED,
+                    HMSPeerUpdate.HAND_RAISED_CHANGED -> {
                         triggerBringOnStageNotificationIfHandRaised(hmsPeer)
                         if (hmsPeer.isLocal) {
                             updateSelfHandRaised(hmsPeer as HMSLocalPeer)
@@ -979,7 +980,7 @@ class MeetingViewModel(
             && hmsSDK.getLocalPeer()?.hmsRole?.name == "broadcaster"
             && getOnStageRole(hmsSDK.getLocalPeer()?.hmsRole).isNullOrEmpty().not()
         ) {
-            if (CustomPeerMetadata.fromJson(handRaisedPeer.metadata)?.isHandRaised == true) {
+            if (handRaisedPeer.isHandRaised()) {
                 hmsNotificationEvent.postValue(
                     HMSNotification(
                         title = "${handRaisedPeer.name} raised hand",
@@ -1046,7 +1047,7 @@ class MeetingViewModel(
     }
 
     private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
-        val isSelfHandRaised = CustomPeerMetadata.fromJson(hmsPeer.metadata)?.isHandRaised == true
+        val isSelfHandRaised = hmsPeer.isHandRaised()
         _isHandRaised.postValue(isSelfHandRaised)
         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.METADATA_CHANGED))
     }
@@ -1668,27 +1669,41 @@ class MeetingViewModel(
     val isHandRaised: LiveData<Boolean> = _isHandRaised
 
 
-    fun toggleRaiseHand(forceLowerHandRaise : Boolean?=null) {
-        val localPeer = hmsSDK.getLocalPeer()!!
-        val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata) ?: return
-
-        val isHandRaised  = if (forceLowerHandRaise == null) {
-            currentMetadata.isHandRaised.not()
-        } else {
-            forceLowerHandRaise.not()
+    fun toggleRaiseHand() {
+        val localPeer = hmsSDK.getLocalPeer()
+        localPeer?.let {
+            if (it.isHandRaised()) {
+                lowerLocalPeerHand()
+            } else {
+                raiseLocalPeerHand()
+            }
+        }?: kotlin.run {
+            Log.e(TAG, "Local Peer not present")
         }
-        val newMetadataJson = currentMetadata.copy(isHandRaised = isHandRaised).toJson()
+    }
 
-        hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
+    private fun raiseLocalPeerHand() {
+        hmsSDK.raiseLocalPeerHand(object : HMSActionResultListener{
             override fun onError(error: HMSException) {
-                Log.d(TAG, "There was an error $error")
+                Log.e(TAG, "Error while raising hand $error")
             }
 
             override fun onSuccess() {
-                Log.d(TAG, "Metadata update succeeded")
+                Log.d(TAG, "Successfully raised hand")
             }
         })
+    }
 
+    fun lowerLocalPeerHand() {
+        hmsSDK.lowerLocalPeerHand(object : HMSActionResultListener{
+            override fun onError(error: HMSException) {
+                Log.e(TAG, "Error while lowering hand $error")
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Successfully lowered hand")
+            }
+        })
     }
 
     fun sendHlsMetadata(metaDataModel: HMSHLSTimedMetadata) {

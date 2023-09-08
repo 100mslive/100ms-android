@@ -68,7 +68,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
     screenShareTrack?.let { meetingTrack ->
       binding.screenShare.raisedHand.alpha =
-        visibilityOpacity(CustomPeerMetadata.fromJson(meetingTrack.peer.metadata)?.isHandRaised == true)
+        visibilityOpacity(meetingTrack.peer.isHandRaised())
       bindSurfaceView(
         binding.screenShare,
         meetingTrack,
@@ -238,7 +238,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
         iconAudioOff.visibility = View.GONE
         iconScreenShare.visibility = View.GONE
         audioLevel.visibility = View.GONE
-        raisedHand.alpha = visibilityOpacity(CustomPeerMetadata.fromJson(screen.peer.metadata)?.isHandRaised == true)
+        raisedHand.alpha = visibilityOpacity(screen.peer.isHandRaised())
       }
       binding.screenShareContainer.visibility = View.VISIBLE
     }

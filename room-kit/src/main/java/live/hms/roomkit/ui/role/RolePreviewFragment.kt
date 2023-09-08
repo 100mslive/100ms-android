@@ -126,7 +126,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
 
         binding.declineButton.setOnClickListener {
             meetingViewModel.setStatetoOngoing()
-            meetingViewModel.toggleRaiseHand(forceLowerHandRaise = true)
+            meetingViewModel.lowerLocalPeerHand()
             binding.previewView.removeTrack()
             findNavController().navigate(
                 RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
