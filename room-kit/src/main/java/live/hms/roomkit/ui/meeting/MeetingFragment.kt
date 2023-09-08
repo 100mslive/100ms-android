@@ -47,7 +47,7 @@ import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
-import live.hms.roomkit.ui.meeting.bottomsheets.EndStreamBottomSheet
+import live.hms.roomkit.ui.meeting.bottomsheets.LeaveCallBottomSheet
 import live.hms.roomkit.ui.meeting.bottomsheets.MultipleLeaveOptionBottomSheet
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipBroadcastReceiver
 import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils
@@ -1430,14 +1430,19 @@ class MeetingFragment : Fragment() {
     }
 
     fun inflateExitFlow() {
-        if (meetingViewModel.isAllowedToEndMeeting()
-            || ( meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning()))
-             {
-             MultipleLeaveOptionBottomSheet()
-                 .show(childFragmentManager, "LeaveBottomSheet")
-
+        if (meetingViewModel.isAllowedToEndMeeting()) {
+            if (meetingViewModel.isHlsRunning()) {
+                if (meetingViewModel.isAllowedToHlsStream()) {
+                    MultipleLeaveOptionBottomSheet().show(childFragmentManager, "LeaveBottomSheet")
+                } else {
+                    LeaveCallBottomSheet().show(parentFragmentManager, null)
+                }
+            } else {
+                MultipleLeaveOptionBottomSheet()
+                    .show(childFragmentManager, "LeaveBottomSheet")
+            }
         } else {
-            EndStreamBottomSheet().show(parentFragmentManager, null)
+            LeaveCallBottomSheet().show(parentFragmentManager, null)
         }
     }
 
