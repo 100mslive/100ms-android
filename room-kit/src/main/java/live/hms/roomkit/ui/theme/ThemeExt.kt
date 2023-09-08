@@ -1593,7 +1593,7 @@ fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
         val audioIcon = if(options.audioIsOn) {
             R.drawable.participants_menu_audio_muted
         } else {
-            R.drawable.ic_audio_toggle_on
+            R.drawable.participants_menu_audio_unmuted
         }
         toggleAudio.drawableStart = ResourcesCompat.getDrawable(
             this.root.resources,

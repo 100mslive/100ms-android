@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting.participants
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.PopupWindow
@@ -16,7 +17,9 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
+import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSTrackType
+import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
@@ -30,7 +33,8 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val isAllowedToMutePeers : Boolean,
                       private val isAllowedToRemovePeers : Boolean,
                       private val prebuiltInfoContainer : PrebuiltInfoContainer,
-                      private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase
+                      private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
+                      private val requestPeerLeave : (hmsPeer: HMSRemotePeer, reason: String) -> Unit
                       ) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
@@ -65,15 +69,42 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                 popBinding.onStage.visibility = if(bringOnStage || bringOffStage) View.VISIBLE else View.GONE
                 if(bringOnStage) {
                     popBinding.onStage.text = "Bring OnStage"
+                    popBinding.onStage.setOnClickListener {
+                        participantPreviousRoleChangeUseCase.setPreviousRole(hmsPeer, object :
+                            HMSActionResultListener {
+                                override fun onError(error: HMSException) {
+                                    // Throw error
+                                    Log.d("BringOnStageError","$error")
+                                }
+
+                                override fun onSuccess() {
+                                    val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
+                                    if(role != null)
+                                        changeRole(hmsPeer.peerID, role, false)
+                                }
+                            })
+                        mypopupWindow.dismiss()
+                    }
                 }
                 if(bringOffStage){
                     popBinding.onStage.text = "Remove From Stage"
+                    popBinding.onStage.setOnClickListener {
+                        val role = participantPreviousRoleChangeUseCase.getPreviousRole(hmsPeer)
+                            Log.d("RolesChangingTo","$role")
+                            if(role != null)
+                                changeRole(hmsPeer.peerID, role, true)
+                        mypopupWindow.dismiss()
+                    }
                 }
                 popBinding.toggleAudio.visibility = if(audioIsOn != null) View.VISIBLE else View.GONE
                 if(audioIsOn == true)
                     popBinding.toggleAudio.text = "Mute Audio"
                 else if (audioIsOn == false){
                     popBinding.toggleAudio.text = "Unmute Audio"
+                }
+                popBinding.toggleAudio.setOnClickListener {
+                    toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.AUDIO)
+                    mypopupWindow.dismiss()
                 }
 
                 popBinding.toggleVideo.visibility = if(videoIsOn != null) View.VISIBLE else View.GONE
@@ -83,9 +114,17 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                 else if (videoIsOn == false){
                     popBinding.toggleVideo.text = "Unmute Video"
                 }
+                popBinding.toggleVideo.setOnClickListener {
+                    toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.VIDEO)
+                    mypopupWindow.dismiss()
+                }
 
-                popBinding.raiseHand.visibility = if(lowerHand) View.VISIBLE else View.GONE
+                popBinding.raiseHand.visibility = View.GONE//if(lowerHand) View.VISIBLE else View.GONE
                 popBinding.removeParticipant.visibility = if(removeParticipant) View.VISIBLE else View.GONE
+                popBinding.removeParticipant.setOnClickListener {
+                    requestPeerLeave(hmsPeer as HMSRemotePeer, "Exit")
+                    mypopupWindow.dismiss()
+                }
             }
 
 //            with(PopupMenu(viewBinding.root.context, viewBinding.peerSettings)) {
