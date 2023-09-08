@@ -16,6 +16,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/inset_pill"
+            android:visibility="gone"
             app:cardCornerRadius="@dimen/sizeteen_dp"
             android:layout_gravity="bottom|right"
             android:layout_width="wrap_content"
@@ -198,7 +199,8 @@
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager_remote_screen_share"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/tab_layout_dots_remote_screen_share"
@@ -210,11 +212,11 @@
             android:layout_height="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_gravity="bottom|center"
             app:tabMode="fixed"
             android:layout_marginVertical="@dimen/four_dp"
             android:elevation="@dimen/sizeteen_dp"
-            app:layout_constraintTop_toBottomOf="@id/view_pager_remote_screen_share"
             app:tabBackground="@drawable/dot_selector_4"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp" />

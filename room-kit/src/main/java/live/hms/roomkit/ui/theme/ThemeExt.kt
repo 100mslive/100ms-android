@@ -1131,7 +1131,7 @@ fun FragmentGridVideoBinding.applyTheme() {
 
     rootLayout.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
             HMSPrebuiltTheme.getDefaults().surface_default
         )
     )
