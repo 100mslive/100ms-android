@@ -43,12 +43,13 @@
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/closeCombinedTabButton"
-                android:layout_width="@dimen/participant_item_icon"
-                android:layout_height="@dimen/participant_item_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:layout_gravity="center"
-                android:background="@android:color/transparent"
                 android:padding="@dimen/spacing_d2"
-                android:src="@drawable/ic_close_16" />
+                android:layout_marginHorizontal="@dimen/spacing_d2"
+                android:background="@drawable/ic_close_16" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.viewpager2.widget.ViewPager2

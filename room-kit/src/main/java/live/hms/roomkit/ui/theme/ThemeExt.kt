@@ -22,7 +22,6 @@ import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableLeft
-import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.util.EmailUtils
@@ -1354,9 +1353,17 @@ internal fun ListItemPeerListBinding.applyTheme() {
 }
 
 internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
-    closeCombinedTabButton.setColorFilter(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-        HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    closeCombinedTabButton.setBackgroundDrawable(ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.ic_close_16, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+            )
+        )
+    }
     )
     backingLinearLayout.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
         .apply {
