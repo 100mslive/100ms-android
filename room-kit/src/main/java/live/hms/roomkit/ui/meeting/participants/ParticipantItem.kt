@@ -1,10 +1,13 @@
 package live.hms.roomkit.ui.meeting.participants
-import android.util.Log
+import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.widget.PopupMenu
+import android.widget.PopupWindow
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.res.ResourcesCompat
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.CustomMenuLayoutBinding
 import live.hms.roomkit.databinding.ListItemPeerListBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
@@ -13,12 +16,11 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
-import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSTrackType
-import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
+import org.webrtc.ContextUtils.getApplicationContext
 
 class ParticipantItem(private val hmsPeer: HMSPeer,
                       private val viewerPeer : HMSLocalPeer,
@@ -47,54 +49,93 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
         else View.VISIBLE
 
         viewBinding.peerSettings.setOnClickListener {
-            with(PopupMenu(viewBinding.root.context, viewBinding.peerSettings)) {
-                setForceShowIcon(true)
-                inflate(getMenuForGroup(hmsPeer))
-                // Hide bring on stage if it's not a broadcaster looking at it.
-                menu.findItem(R.id.bring_on_stage)?.isVisible = viewerPeer.hmsRole.name == "broadcaster"
-                setOnMenuItemClickListener { menuItem ->
-                    when(menuItem.itemId) {
-                        R.id.bring_on_stage -> {
-                            // You must have a role to bring on stage
-                            participantPreviousRoleChangeUseCase.setPreviousRole(hmsPeer, object :HMSActionResultListener {
-                                override fun onError(error: HMSException) {
-                                    // Throw error
-                                    Log.d("BringOnStageError","$error")
-                                }
+            val inflater: LayoutInflater = getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
-                                override fun onSuccess() {
-                                    val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
-                                    if(role != null)
-                                        changeRole(hmsPeer.peerID, role, false)
-                                }
-                            })
-
-                            true
-                        }
-                        R.id.remove_from_stage -> {
-                            val role = participantPreviousRoleChangeUseCase.getPreviousRole(hmsPeer)
-                            Log.d("RolesChangingTo","$role")
-                            if(role != null)
-                                changeRole(hmsPeer.peerID, role, true)
-                            true
-                        }
-
-                        R.id.toggle_audio -> {
-                            // Toggle audio
-                            toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.AUDIO)
-                            true
-                        }
-                        R.id.toggle_video -> {
-                            // Toggle video
-                            toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.VIDEO)
-                            true
-                        }
-
-                        else -> false
-                    }
-                }
-                show()
+            val view = inflater.inflate(R.layout.custom_menu_layout, null)
+            val popBinding = CustomMenuLayoutBinding.bind(view)
+            popBinding.applyTheme(getMenuOptions(hmsPeer))
+            val mypopupWindow = PopupWindow(view, 400, LinearLayoutCompat.LayoutParams.WRAP_CONTENT, true)
+            mypopupWindow.showAsDropDown(it)
+            mypopupWindow.contentView.setOnClickListener {
+                mypopupWindow.dismiss()
             }
+            val options = getMenuOptions(hmsPeer)
+            with(options) {
+//                val bringOnStage : Boolean,
+                popBinding.onStage.visibility = if(bringOnStage || bringOffStage) View.VISIBLE else View.GONE
+                if(bringOnStage) {
+                    popBinding.onStage.text = "Bring OnStage"
+                }
+                if(bringOffStage){
+                    popBinding.onStage.text = "Remove From Stage"
+                }
+                popBinding.toggleAudio.visibility = if(audioIsOn != null) View.VISIBLE else View.GONE
+                if(audioIsOn == true)
+                    popBinding.toggleAudio.text = "Mute Audio"
+                else if (audioIsOn == false){
+                    popBinding.toggleAudio.text = "Unmute Audio"
+                }
+
+                popBinding.toggleVideo.visibility = if(videoIsOn != null) View.VISIBLE else View.GONE
+                if(videoIsOn == true) {
+                    popBinding.toggleVideo.text = "Mute Video"
+                }
+                else if (videoIsOn == false){
+                    popBinding.toggleVideo.text = "Unmute Video"
+                }
+
+                popBinding.raiseHand.visibility = if(lowerHand) View.VISIBLE else View.GONE
+                popBinding.removeParticipant.visibility = if(removeParticipant) View.VISIBLE else View.GONE
+            }
+
+//            with(PopupMenu(viewBinding.root.context, viewBinding.peerSettings)) {
+//                setForceShowIcon(true)
+//                inflate(getMenuForGroup(hmsPeer))
+//                // Hide bring on stage if it's not a broadcaster looking at it.
+//                menu.findItem(R.id.bring_on_stage)?.isVisible = viewerPeer.hmsRole.name == "broadcaster"
+//                setOnMenuItemClickListener { menuItem ->
+//                    when(menuItem.itemId) {
+//                        R.id.bring_on_stage -> {
+//                            // You must have a role to bring on stage
+//                            participantPreviousRoleChangeUseCase.setPreviousRole(hmsPeer, object :HMSActionResultListener {
+//                                override fun onError(error: HMSException) {
+//                                    // Throw error
+//                                    Log.d("BringOnStageError","$error")
+//                                }
+//
+//                                override fun onSuccess() {
+//                                    val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
+//                                    if(role != null)
+//                                        changeRole(hmsPeer.peerID, role, false)
+//                                }
+//                            })
+//
+//                            true
+//                        }
+//                        R.id.remove_from_stage -> {
+//                            val role = participantPreviousRoleChangeUseCase.getPreviousRole(hmsPeer)
+//                            Log.d("RolesChangingTo","$role")
+//                            if(role != null)
+//                                changeRole(hmsPeer.peerID, role, true)
+//                            true
+//                        }
+//
+//                        R.id.toggle_audio -> {
+//                            // Toggle audio
+//                            toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.AUDIO)
+//                            true
+//                        }
+//                        R.id.toggle_video -> {
+//                            // Toggle video
+//                            toggleTrack(hmsPeer as HMSRemotePeer, HMSTrackType.VIDEO)
+//                            true
+//                        }
+//
+//                        else -> false
+//                    }
+//                }
+//                show()
+//            }
         }
     }
 
@@ -109,7 +150,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
         viewBinding.muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(viewBinding.root.resources, drawable, null))
     }
 
-    private fun getMenuForGroup(forPeer: HMSPeer): Int {
+    private fun getMenuOptions(forPeer: HMSPeer) : EnabledMenuOptions {
         val isOffStageRole =
             prebuiltInfoContainer.onStageExp("broadcaster")?.offStageRoles?.contains(
                 forPeer.hmsRole.name
@@ -120,17 +161,38 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                 // You have to be in the offstage roles to be categorized as hand raised
                 && isOffStageRole
 
-        return if (isHandRaised)
-            R.menu.menu_participant_hand_raise
-        else if (isOffStageRole) {
-            R.menu.menu_participant
-        } else if(isOnStageButNotBroadcasterRole) {
-            R.menu.menu_participant_onstage_not_broadcaster
-        }
-        else {
-            R.menu.menu_broadcaster
-        }
+        return EnabledMenuOptions(
+            bringOnStage = isOffStageRole,
+            bringOffStage = isOnStageButNotBroadcasterRole,
+            lowerHand = isHandRaised,
+            removeParticipant = isAllowedToRemovePeers,
+            toggleMedia = isAllowedToMutePeers,
+            audioIsOn = if(!isAllowedToMutePeers) null else hmsPeer.audioTrack?.isMute == false,
+            videoIsOn = if(!isAllowedToMutePeers) null else hmsPeer.videoTrack?.isMute == false
+        )
     }
+//    private fun getMenuForGroup(forPeer: HMSPeer): Int {
+//        val isOffStageRole =
+//            prebuiltInfoContainer.onStageExp("broadcaster")?.offStageRoles?.contains(
+//                forPeer.hmsRole.name
+//            ) == true
+//        val isOnStageButNotBroadcasterRole = prebuiltInfoContainer.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
+//
+//        val isHandRaised = CustomPeerMetadata.fromJson(forPeer.metadata)?.isHandRaised == true
+//                // You have to be in the offstage roles to be categorized as hand raised
+//                && isOffStageRole
+//
+//        return if (isHandRaised)
+//            R.menu.menu_participant_hand_raise
+//        else if (isOffStageRole) {
+//            R.menu.menu_participants_all
+//        } else if(isOnStageButNotBroadcasterRole) {
+//            R.menu.menu_participant_onstage_not_broadcaster
+//        }
+//        else {
+//            R.menu.menu_broadcaster
+//        }
+//    }
 
     private fun updateHandRaise(metadata: String, viewBinding: ListItemPeerListBinding) {
         val isHandRaised = CustomPeerMetadata.fromJson(metadata)?.isHandRaised == true

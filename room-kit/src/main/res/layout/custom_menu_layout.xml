@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/menuBackingLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:showDividers="middle"
+    >
+
+    <TextView
+        android:id="@+id/onStage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/inter_semibold"
+        android:paddingVertical="@dimen/spacing_d2"
+        android:text="Bring On Stage"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/raiseHand"
+        android:layout_width="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/raise_hand_modern"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/inter_semibold"
+        android:paddingVertical="@dimen/spacing_d2"
+        android:text="Lower Hand"
+        android:textSize="14sp" />
+    <TextView
+        android:id="@+id/toggleAudio"
+        android:layout_width="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_audio_toggle_on"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/inter_semibold"
+        android:paddingVertical="@dimen/spacing_d2"
+        android:text="Toggle Audio"
+        android:textSize="14sp"
+        />
+    <TextView
+        android:id="@+id/toggleVideo"
+        android:layout_width="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_videocam_off_24"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/inter_semibold"
+        android:paddingVertical="@dimen/spacing_d2"
+        android:text="Toggle Video"
+        android:textSize="14sp"
+        />
+
+    <TextView
+        android:id="@+id/removeParticipant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/inter_semibold"
+        android:paddingVertical="@dimen/spacing_d2"
+        android:text="Remove Participant"
+        android:textSize="14sp" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
