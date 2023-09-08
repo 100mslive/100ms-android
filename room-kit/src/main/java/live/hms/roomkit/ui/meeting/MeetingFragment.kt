@@ -1431,16 +1431,8 @@ class MeetingFragment : Fragment() {
 
     fun inflateExitFlow() {
         if (meetingViewModel.isAllowedToEndMeeting()) {
-            if (meetingViewModel.isHlsRunning()) {
-                if (meetingViewModel.isAllowedToHlsStream()) {
-                    MultipleLeaveOptionBottomSheet().show(childFragmentManager, "LeaveBottomSheet")
-                } else {
-                    LeaveCallBottomSheet().show(parentFragmentManager, null)
-                }
-            } else {
-                MultipleLeaveOptionBottomSheet()
-                    .show(childFragmentManager, "LeaveBottomSheet")
-            }
+            MultipleLeaveOptionBottomSheet()
+                .show(childFragmentManager, "LeaveBottomSheet")
         } else {
             LeaveCallBottomSheet().show(parentFragmentManager, null)
         }
