@@ -828,6 +828,12 @@ class MeetingViewModel(
                             getRecordingState(hmsRoom)
                         )
                         showRecordInfo(hmsRoom)
+
+                        if (hmsRoom.browserRecordingState?.initialising == true)
+                            isRecordingInProgess.postValue(true)
+                        else  (hmsRoom.browserRecordingState?.running == true)
+                        isRecordingInProgess.postValue(false)
+
                     }
 
                     HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> {
@@ -1539,7 +1545,6 @@ class MeetingViewModel(
                 }
 
                 override fun onSuccess() {
-                    isRecordingInProgess.postValue(false)
                     Log.d(TAG, "RTMP recording Success")
                 }
 
