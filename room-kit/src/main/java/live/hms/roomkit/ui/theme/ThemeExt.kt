@@ -586,6 +586,29 @@ internal fun VideoCardBinding.applyTheme() {
         )
     )
 
+
+    degradedHeader.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    degradeddec.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+
+    degradedView.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+
     nameInitials.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,

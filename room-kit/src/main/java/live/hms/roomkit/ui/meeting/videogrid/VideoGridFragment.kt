@@ -306,4 +306,9 @@ class VideoGridFragment : Fragment() {
             updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, localMeeting)
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, null)
+    }
 }

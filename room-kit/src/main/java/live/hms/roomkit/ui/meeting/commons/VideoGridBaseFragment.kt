@@ -278,7 +278,8 @@ abstract class VideoGridBaseFragment : Fragment() {
       iconAudioOff.visibility  = View.VISIBLE
       else
         iconAudioOff.visibility = View.GONE*/
-      icDegraded.alpha = visibilityOpacity(item.video?.isDegraded == true)
+      degradedView.alpha = visibilityOpacity(item.video?.isDegraded == true)
+      degradedView.visibility = if (item.video?.isDegraded == true) View.VISIBLE else View.INVISIBLE
 
       /** [View.setVisibility] */
       val surfaceViewVisibility = if (item.video == null
