@@ -604,7 +604,7 @@ internal fun VideoCardBinding.applyTheme() {
 
     degradedView.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
             HMSPrebuiltTheme.getDefaults().background_default
         )
     )
