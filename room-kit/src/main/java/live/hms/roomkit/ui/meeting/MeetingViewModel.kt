@@ -806,7 +806,7 @@ class MeetingViewModel(
 
             override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
                 Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
-
+                peerCount.postValue(hmsRoom.peerCount)
                 when (type) {
                     HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> peerCount.postValue(hmsRoom.peerCount)
                     HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED -> {
