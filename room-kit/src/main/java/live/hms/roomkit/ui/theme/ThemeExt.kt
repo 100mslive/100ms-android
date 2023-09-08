@@ -1499,24 +1499,27 @@ internal fun FragmentParticipantsBinding.applyTheme() {
         // text color
         // hint color
         // background color
-        hintTextColor = ColorStateList.valueOf(
-            getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-            )
-        )
+        defaultHintTextColor = ColorStateList.valueOf(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        ))
         startIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_search_24, null)
-            ?.apply { setTint(getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-            )) }
-
+            ?.apply { colorFilter = PorterDuffColorFilter(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                    HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+                ),
+                PorterDuff.Mode.SRC_IN
+            ) }
     }
     with(textInputSearch) {
-
+        setHintTextColor(ColorStateList.valueOf(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )))
         setTextColor(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceBright,
-            HMSPrebuiltTheme.getDefaults().surface_bright
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         ))
         background = getChatBackgroundDrawable()
     }
