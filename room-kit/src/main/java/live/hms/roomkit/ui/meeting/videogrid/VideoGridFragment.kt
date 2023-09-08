@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import live.hms.roomkit.databinding.FragmentGridVideoBinding
 import live.hms.roomkit.initAnimState
 import live.hms.roomkit.startBounceAnimationUpwards
 import live.hms.roomkit.ui.inset.makeInset
+import live.hms.roomkit.ui.inset.resetUI
 import live.hms.roomkit.ui.meeting.ChangeNameDialogFragment
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
@@ -101,6 +103,7 @@ class VideoGridFragment : Fragment() {
         binding.iconOption.setOnClickListener {
             LocalTileBottomSheet(onMinimizeClicked = {
                 contextSafe { context, activity ->
+                    isMinimized = true
                     toggleInsetUI(isMinimised = true)
                 }
             }, onNameChange = {
@@ -116,9 +119,9 @@ class VideoGridFragment : Fragment() {
 
         binding.maximizedIcon.setOnClickListener {
             toggleInsetUI(isMinimised = false)
+//            binding.insetPill.resetUI(binding.insetPill.x, binding.insetPill.y, false)
         }
         binding.insetPill.makeInset {
-            isMinimized = isMinimized.not()
             binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
 
         }
@@ -220,6 +223,8 @@ class VideoGridFragment : Fragment() {
         meetingTrack: MeetingTrack?
     ) {
 
+        Log.d(TAG, "updateVideoViewLayout: video on ${isVideoOff.not()} ${meetingTrack?.video?.isMute}")
+
          insetPillMaximised.forEachIndexed { index, view ->
              if (view is HMSVideoView) {
                  view.removeTrack()
@@ -237,7 +242,7 @@ class VideoGridFragment : Fragment() {
             }
 
             insetPillMaximised.addView(hmsVideoView)
-            hmsVideoView.startBounceAnimationUpwards(offset = 300, interpolator = LinearInterpolator() )
+            hmsVideoView.startBounceAnimationUpwards(offset = 250, interpolator = LinearInterpolator() )
         }
 
     }
@@ -294,6 +299,8 @@ class VideoGridFragment : Fragment() {
     }
 
     private fun toggleInsetUI(isMinimised: Boolean) {
+
+        this.isMinimized = isMinimised
         binding.insetPillMaximised.visibility =
             if (isMinimised) View.GONE else View.VISIBLE
 
@@ -307,8 +314,5 @@ class VideoGridFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, null)
-    }
+
 }
