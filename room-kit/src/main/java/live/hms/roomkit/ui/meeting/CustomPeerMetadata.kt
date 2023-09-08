@@ -10,7 +10,7 @@ data class CustomPeerMetadata(
     @SerializedName("isBRBOn")
     val isBRBOn: Boolean,
     @SerializedName("name")
-    val name: String,
+    val name: String? = null,
     @SerializedName("prevRole")
     val prevRole : String? = null
 ) {

@@ -22,7 +22,6 @@ import com.google.android.material.shape.CornerFamily
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableLeft
-import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.util.EmailUtils
@@ -616,7 +615,7 @@ internal fun VideoCardBinding.applyTheme() {
     )
 
     iconAudioOff.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
@@ -637,19 +636,19 @@ internal fun VideoCardBinding.applyTheme() {
 
 
     iconMaximised.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
 
     audioLevel.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
 
     raisedHand.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
@@ -662,7 +661,7 @@ internal fun VideoCardBinding.applyTheme() {
     )
 
     isBrb.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
@@ -1354,15 +1353,23 @@ internal fun ListItemPeerListBinding.applyTheme() {
 }
 
 internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
-    closeCombinedTabButton.setColorFilter(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-        HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    closeCombinedTabButton.setBackgroundDrawable(ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.ic_close_16, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+            )
+        )
+    }
     )
     backingLinearLayout.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
         .apply {
             val color = getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.borderDefault,
-                HMSPrebuiltTheme.getDefaults().background_default)
+                HMSPrebuiltTheme.getColours()?.surfaceDim,
+                HMSPrebuiltTheme.getDefaults().surface_dim)
             colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
@@ -1441,8 +1448,8 @@ private fun getChatBackgroundDrawable(): ShapeDrawable {
     return getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
         .apply {
             val color = getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.surfaceBright,
-                HMSPrebuiltTheme.getDefaults().surface_bright)
+                HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                HMSPrebuiltTheme.getDefaults().surface_default)
             colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
@@ -1473,12 +1480,13 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
 }
 
 internal fun ListItemChatBinding.applyTheme() {
-    val color = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
 
-    name.setTextColor(color)
-    message.setTextColor(color)
+    name.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    message.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 }
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {
@@ -1491,29 +1499,27 @@ internal fun FragmentParticipantsBinding.applyTheme() {
         // text color
         // hint color
         // background color
-        hintTextColor = ColorStateList.valueOf(
-            getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-            )
-        )
+        defaultHintTextColor = ColorStateList.valueOf(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        ))
         startIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_search_24, null)
-            ?.apply { setTint(getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-            )) }
-
-        boxStrokeColor = getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default
-        )
-
+            ?.apply { colorFilter = PorterDuffColorFilter(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                    HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+                ),
+                PorterDuff.Mode.SRC_IN
+            ) }
     }
     with(textInputSearch) {
-
+        setHintTextColor(ColorStateList.valueOf(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )))
         setTextColor(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceBright,
-            HMSPrebuiltTheme.getDefaults().surface_bright
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         ))
         background = getChatBackgroundDrawable()
     }

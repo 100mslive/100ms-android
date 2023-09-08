@@ -49,30 +49,20 @@ class MultipleLeaveOptionBottomSheet() : BottomSheetDialogFragment() {
         binding.leaveDescription.text =
             "Others will continue after you leave. You can join the session again."
 
+        binding.endSessionTitle.text =
+            if (meetingViewModel.isHlsRunning()) "End Session" else "End for All"
+        binding.endSessionDescription.text =
+            if (meetingViewModel.isHlsRunning()) "The session and stream will end for everyone. You can’t undo this action." else "The session will end for everyone. You can’t undo this action."
 
-        if (meetingViewModel.isAllowedToEndMeeting()) {
-            binding.endSessionTitle.text = "End Session"
-            binding.endSessionDescription.text =
-                "The session will end for everyone in the room immediately."
-        } else if (meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning()) {
-            binding.endSessionTitle.text = "End Stream"
-            binding.endSessionDescription.text =
-                "The stream will end for everyone after they’ve watched it."
-        } else {
+
+        binding.leaveLayout.setOnSingleClickListener(200L) {
+            LeaveCallBottomSheet().show(parentFragmentManager, null)
             dismissAllowingStateLoss()
         }
 
-        binding.leaveLayout.setOnSingleClickListener(200L) {
-            HMSLogger.d(TAG, "Calling Leave ...")
-            // Call leave room API
-            meetingViewModel.leaveMeeting()
-        }
-
         binding.endSessionLayout.setOnSingleClickListener(200L) {
-            HMSLogger.d(TAG, "Ending Session ...")
-            dismiss()
-            // Call end room API
-            EndStreamBottomSheet().show(parentFragmentManager, null)
+            EndCallBottomSheet().show(parentFragmentManager, null)
+            dismissAllowingStateLoss()
         }
     }
 
