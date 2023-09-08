@@ -26,7 +26,9 @@ import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
@@ -143,9 +145,13 @@ class ParticipantsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             itemAnimator = null
             addItemDecoration(
+                // Border bright
                 HeaderItemDecoration(
-                    ContextCompat.getColor(context, R.color.participants_border_color),
-                    8,
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.borderBright,
+                        HMSPrebuiltTheme.getDefaults().border_bright
+                    ),
+                    0,
                     16f,
                     24f,
                     R.layout.participant_header_item

@@ -1315,12 +1315,11 @@ internal fun ParticipantHeaderItemBinding.applyTheme() {
                 HMSPrebuiltTheme.getDefaults().onsurface_med_emp
             )
         )
-
-
     }
-
-
-
+    headerbottom.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    ))
 }
 // ParticipantItem binding
 internal fun ListItemPeerListBinding.applyTheme() {

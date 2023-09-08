@@ -8,7 +8,4 @@
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
-    <color name="participants_border_color">#272A31</color>
-    <color name="participants_tab_selected_header_color">#EFF0FA</color>
-    <color name="participants_tab_unselected_header_color">#8F9099</color>
 </resources>
