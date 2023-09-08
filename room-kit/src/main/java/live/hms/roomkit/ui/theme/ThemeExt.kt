@@ -616,7 +616,7 @@ internal fun VideoCardBinding.applyTheme() {
     )
 
     iconAudioOff.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
@@ -637,19 +637,19 @@ internal fun VideoCardBinding.applyTheme() {
 
 
     iconMaximised.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
 
     audioLevel.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
 
     raisedHand.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
@@ -662,7 +662,7 @@ internal fun VideoCardBinding.applyTheme() {
     )
 
     isBrb.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_default,
         R.drawable.circle_secondary_32
     )
