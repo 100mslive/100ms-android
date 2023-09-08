@@ -104,14 +104,14 @@ class VideoGridFragment : Fragment() {
             )
         }
 
-        binding.maximizedIcon.setOnClickListener {
-            toggleInsetUI(isMinimised = false)
-        }
-        binding.insetPill.makeInset {
-            isMinimized = isMinimized.not()
-            binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
-
-        }
+//        binding.maximizedIcon.setOnClickListener {
+//            toggleInsetUI(isMinimised = false)
+//        }
+//        binding.insetPill.makeInset {
+//            isMinimized = isMinimized.not()
+//            binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
+//
+//        }
 //        binding.localHmsVideoView?.setZOrderOnTop(true)
 //        binding.localHmsVideoView?.setZOrderMediaOverlay(true)
 
