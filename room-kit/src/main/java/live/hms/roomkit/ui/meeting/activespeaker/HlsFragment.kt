@@ -9,6 +9,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player.Listener
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+import androidx.media3.ui.AspectRatioFrameLayout.ResizeMode
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
 import live.hms.hls_player.HmsHlsPlayer
@@ -24,6 +30,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.util.contextSafe
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -119,14 +126,37 @@ class HlsFragment : Fragment() {
     fun resumePlay() {
 
         binding.hlsView.player = player.getNativePlayer()
-
+        
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
             override fun onPlaybackFailure(error : HmsHlsException) {
                 Log.d("HMSHLSPLAYER","From App, error: $error")
             }
 
+            @SuppressLint("UnsafeOptInUsageError")
             override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
+                contextSafe { context, activity ->
+                    activity.runOnUiThread {
+                        viewLifecycleOwner.lifecycleScope.launch {
+
+                            if (player.getNativePlayer().videoSize.height !=0 && player.getNativePlayer().videoSize.width !=0) {
+                                val width = player.getNativePlayer().videoSize.width
+                                val height = player.getNativePlayer().videoSize.height
+
+                                //landscape play
+                                if (width > height) {
+                                    binding.hlsView.resizeMode = RESIZE_MODE_FIT
+                                } else {
+                                    binding.hlsView.resizeMode = RESIZE_MODE_ZOOM
+                                }
+                            }
+                        }
+
+                    }
+                }
+                if (p1 == HmsHlsPlaybackState.playing) {
+                    binding.hlsView.resizeMode = RESIZE_MODE_FIT
+                }
                 Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
 
