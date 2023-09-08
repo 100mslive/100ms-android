@@ -21,6 +21,8 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/container_search"
                 android:layout_width="match_parent"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp"
                 android:layout_height="wrap_content"
                 app:startIconDrawable="@drawable/ic_search_24">
 
