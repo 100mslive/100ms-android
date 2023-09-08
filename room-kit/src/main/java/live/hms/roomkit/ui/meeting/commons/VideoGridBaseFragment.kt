@@ -288,7 +288,6 @@ abstract class VideoGridBaseFragment : Fragment() {
       } else {
         View.VISIBLE
       }
-
       if (hmsVideoView.visibility != surfaceViewVisibility) {
         hmsVideoView.visibility = surfaceViewVisibility
       }

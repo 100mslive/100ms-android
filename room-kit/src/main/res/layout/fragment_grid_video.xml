@@ -117,15 +117,6 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
 
-                <live.hms.videoview.HMSVideoView
-                    android:id="@+id/local_hms_video_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
 
                 <live.hms.roomkit.ui.meeting.audiomode.AudioLevelView
                     android:visibility="visible"
