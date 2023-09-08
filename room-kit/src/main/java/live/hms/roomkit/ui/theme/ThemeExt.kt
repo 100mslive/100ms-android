@@ -24,6 +24,7 @@ import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
+import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.dp
 import live.hms.video.signal.init.HMSRoomLayout
@@ -1521,5 +1522,130 @@ internal fun FragmentParticipantsBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         ))
         background = getChatBackgroundDrawable()
+    }
+}
+
+private fun backgroundShape(inset : Boolean = false): ShapeDrawable {
+    val eightDp = 8.dp().toFloat()
+    val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)
+    return if(inset) {ShapeDrawable(
+        RoundRectShape(
+            lines, RectF(1f,1f,1f,1f),
+            lines
+        ))} else {
+        ShapeDrawable(
+            RoundRectShape(
+                lines, null,
+                null
+            )   )
+    }
+}
+fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
+    // border bright
+    with(menuBackingLayout){
+        dividerDrawable = ResourcesCompat.getDrawable(resources, R.drawable.menu_item_participants_divider, null)
+        ?.apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.borderBright,
+                    HMSPrebuiltTheme.getDefaults().border_bright)
+            )
+        }
+        background = LayerDrawable(
+            arrayOf(backgroundShape()
+            .apply {
+                paint.color = getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                    HMSPrebuiltTheme.getDefaults().surface_default)
+            },
+                backgroundShape(true)
+                    .apply {
+                        paint.color = getColorOrDefault(
+                            HMSPrebuiltTheme.getColours()?.borderBright,
+                            HMSPrebuiltTheme.getDefaults().border_bright)
+                    }
+            )
+        )
+    }
+    val textColors = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    )
+    onStage.setTextColor(textColors)
+    raiseHand.setTextColor(textColors)
+    removeParticipant.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    ))
+
+    onStage.drawableStart = ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.participant_bring_on_stage, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+    }
+    if(options.audioIsOn != null) {
+        val audioIcon = if(options.audioIsOn) {
+            R.drawable.participants_menu_audio_muted
+        } else {
+            R.drawable.participants_menu_audio_unmuted
+        }
+        toggleAudio.drawableStart = ResourcesCompat.getDrawable(
+            this.root.resources,
+            audioIcon, null
+        )?.apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+        }
+    }
+    if(options.videoIsOn != null) {
+        val videoIcon = if(options.videoIsOn) {
+            R.drawable.participants_menu_video_muteed
+        } else {
+            R.drawable.ic_videocam_24
+        }
+        toggleVideo.drawableStart = ResourcesCompat.getDrawable(
+            this.root.resources,
+            videoIcon, null
+        )?.apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+        }
+    }
+    raiseHand.drawableStart = ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.lower_hand_modern, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+    }
+
+    removeParticipant.drawableStart = ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.remove_participant_item, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+                HMSPrebuiltTheme.getDefaults().error_default
+            )
+        )
     }
 }

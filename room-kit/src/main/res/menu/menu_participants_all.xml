@@ -18,4 +18,9 @@
         android:icon="@drawable/ic_videocam_off_24"
         android:title="@string/menu_item_mute_video"
         />
+    <item
+        android:title="Remove Participant"
+        android:icon="@drawable/ic_baseline_remove_circle_24"
+        android:id="@+id/remove_participant"
+        />
 </menu>

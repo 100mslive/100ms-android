@@ -118,7 +118,8 @@ class ParticipantsFragment : Fragment() {
                         canMutePeers,
                         canRemovePeers,
                         meetingViewModel.prebuiltInfoContainer,
-                        meetingViewModel.participantPreviousRoleChangeUseCase
+                        meetingViewModel.participantPreviousRoleChangeUseCase,
+                        meetingViewModel::requestPeerLeave
                     )
                 }!!)
                 // If the group was expanded, open it again.
