@@ -357,10 +357,10 @@ class MeetingViewModel(
         override fun addSpeakerSource() {
             addSource(speakers) { speakers : Array<HMSSpeaker> ->
 
-                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> =
-                    speakers.filter { it.peer?.isLocal == false }.toTypedArray()
+//                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> =
+//                    speakers.filter { it.peer?.isLocal == false }.toTypedArray()
 
-                val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
+                val result = speakerH.speakerUpdate(speakers)
                 setValue(result.first)
             }
         }
@@ -385,16 +385,16 @@ class MeetingViewModel(
             addSource(tracks) { meetTracks: List<MeetingTrack> ->
                 //if remote peer and local peer is present inset mode
 
-               val excludeLocalTrackIfRemotePeerIsPreset =
-                   //Don't inset when local peer and local screen share track is found
-                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2)
-                       meetTracks
-                 else if(meetTracks.size > 1)
-                       meetTracks.filter { !it.isLocal }.toList()
-                    else
-                        meetTracks
+//               val excludeLocalTrackIfRemotePeerIsPreset =
+//                   //Don't inset when local peer and local screen share track is found
+//                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2)
+//                       meetTracks
+//                 else if(meetTracks.size > 1)
+//                       meetTracks.filter { !it.isLocal }.toList()
+//                    else
+//                        meetTracks
 
-                val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset)
+                val result = speakerH.trackUpdateTrigger(meetTracks)
                 setValue(result)
             }
 

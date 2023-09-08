@@ -112,98 +112,99 @@ class VideoGridFragment : Fragment() {
             binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
 
         }
-        binding.localHmsVideoView?.setZOrderOnTop(true)
-        binding.localHmsVideoView?.setZOrderMediaOverlay(true)
+//        binding.localHmsVideoView?.setZOrderOnTop(true)
+//        binding.localHmsVideoView?.setZOrderMediaOverlay(true)
 
 
-        meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) { peerTypePair ->
-            val isLocal = peerTypePair.first.isLocal
-            if (isLocal) {
-                when (peerTypePair.second) {
-                    HMSPeerUpdate.METADATA_CHANGED -> {
-                        val isHandRaised =
-                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isHandRaised == true
-                        val isBRB =
-                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isBRBOn == true
+//        meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) { peerTypePair ->
+//            val isLocal = peerTypePair.first.isLocal
+//            if (isLocal) {
+//                when (peerTypePair.second) {
+//                    HMSPeerUpdate.METADATA_CHANGED -> {
+//                        val isHandRaised =
+//                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isHandRaised == true
+//                        val isBRB =
+//                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isBRBOn == true
+//
+//                        if (isBRB || isHandRaised) {
+//                            binding.iconBrb.visibility = View.VISIBLE
+//                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.ic_brb else R.drawable.raise_hand_modern)
+//                        } else {
+//                            binding.iconBrb.visibility = View.GONE
+//                        }
+//                    }
+//                    HMSPeerUpdate.NAME_CHANGED -> {
+//                        binding.nameInitials.text = NameUtils.getInitials(meetingViewModel.hmsSDK.getLocalPeer()?.name.orEmpty())
+//                    }
+//                    // Unused updates
+//                    HMSPeerUpdate.NETWORK_QUALITY_UPDATED,
+//                    HMSPeerUpdate.PEER_JOINED,
+//                    HMSPeerUpdate.PEER_LEFT,
+//                    HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
+//                    HMSPeerUpdate.NO_DOMINANT_SPEAKER,
+//                    HMSPeerUpdate.ROLE_CHANGED -> {
+//                    }
+//                }
+//            }
+//
+//        }
 
-                        if (isBRB || isHandRaised) {
-                            binding.iconBrb.visibility = View.VISIBLE
-                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.ic_brb else R.drawable.raise_hand_modern)
-                        } else {
-                            binding.iconBrb.visibility = View.GONE
-                        }
-                    }
-                    HMSPeerUpdate.NAME_CHANGED -> {
-                        binding.nameInitials.text = NameUtils.getInitials(meetingViewModel.hmsSDK.getLocalPeer()?.name.orEmpty())
-                    }
-                    // Unused updates
-                    HMSPeerUpdate.NETWORK_QUALITY_UPDATED,
-                    HMSPeerUpdate.PEER_JOINED,
-                    HMSPeerUpdate.PEER_LEFT,
-                    HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
-                    HMSPeerUpdate.NO_DOMINANT_SPEAKER,
-                    HMSPeerUpdate.ROLE_CHANGED -> {
-                    }
-                }
-            }
-
-        }
-
-        meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (video, speakers) ->
-            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level ?: 0)
-
-        }
-
-
-        meetingViewModel.tracks.observe(viewLifecycleOwner) {
-            val localMeeting = it.filter { it.isLocal }.firstOrNull()
-
-            //show or hide inset
-            if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2) ) {
-                binding.insetPill.visibility = View.GONE
-            } else if (it.size > 1 && localMeeting != null) {
-                binding.insetPill.visibility = View.VISIBLE
-            } else if (localMeeting == null) {
-                binding.insetPill.visibility = View.GONE
-            }
-
-            localMeeting?.let {
+//        meetingViewModel.activeSpeakers.observe(viewLifecycleOwner) { (video, speakers) ->
+//            binding.iconAudioLevel.update(speakers.find { it.peer?.isLocal == true }?.level ?: 0)
+//
+//        }
 
 
-                binding.localHmsVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
-                if (it.audio?.isMute == true) {
-                    if (binding.minimizedIconAudioOff.isEnabled)
-                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off , R.dimen.two_dp )
-                    binding.minimizedIconAudioOff.isEnabled = false
-                    binding.iconAudioOff.visibility = View.VISIBLE
-                    binding.iconAudioLevel.alpha = visibilityOpacity(false)
-                } else {
-                    binding.iconAudioOff.visibility = View.INVISIBLE
-                    binding.iconAudioLevel.alpha = visibilityOpacity(true)
-                    if (binding.minimizedIconAudioOff.isEnabled.not())
-                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on, R.dimen.two_dp)
-                    binding.minimizedIconAudioOff.isEnabled = true
-                }
-
-                if (it.video?.isMute == true) {
-                    if (binding.minimizedIconVideoOff.isEnabled)
-                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, R.dimen.two_dp)
-                    binding.minimizedIconVideoOff.isEnabled = false
-                    binding.localHmsVideoView?.visibility = View.GONE
-                    binding.localHmsVideoView?.alpha = 0f
-                    binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
-                } else {
-                    if (binding.minimizedIconVideoOff.isEnabled.not())
-                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on, R.dimen.two_dp)
-                    binding.minimizedIconVideoOff.isEnabled = true
-                    binding.localHmsVideoView?.visibility = View.VISIBLE
-                    binding.localHmsVideoView?.alpha = 1f
-                    it.video?.let { binding.localHmsVideoView?.addTrack(it) }
-                }
-
-            }
-
-        }
+//        meetingViewModel.tracks.observe(viewLifecycleOwner) {
+//
+//            val localMeeting = it.filter { it.isLocal }.firstOrNull()
+//
+//            //show or hide inset
+//            if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2) ) {
+//                binding.insetPill.visibility = View.GONE
+//            } else if (it.size > 1 && localMeeting != null) {
+//                binding.insetPill.visibility = View.VISIBLE
+//            } else if (localMeeting == null) {
+//                binding.insetPill.visibility = View.GONE
+//            }
+//
+//            localMeeting?.let {
+//
+//
+////                binding.localHmsVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FILL)
+//                if (it.audio?.isMute == true) {
+//                    if (binding.minimizedIconAudioOff.isEnabled)
+//                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off , R.dimen.two_dp )
+//                    binding.minimizedIconAudioOff.isEnabled = false
+//                    binding.iconAudioOff.visibility = View.VISIBLE
+//                    binding.iconAudioLevel.alpha = visibilityOpacity(false)
+//                } else {
+//                    binding.iconAudioOff.visibility = View.INVISIBLE
+//                    binding.iconAudioLevel.alpha = visibilityOpacity(true)
+//                    if (binding.minimizedIconAudioOff.isEnabled.not())
+//                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on, R.dimen.two_dp)
+//                    binding.minimizedIconAudioOff.isEnabled = true
+//                }
+//
+//                if (it.video?.isMute == true) {
+//                    if (binding.minimizedIconVideoOff.isEnabled)
+//                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, R.dimen.two_dp)
+//                    binding.minimizedIconVideoOff.isEnabled = false
+//                    binding.localHmsVideoView?.visibility = View.GONE
+//                    binding.localHmsVideoView?.alpha = 0f
+//                    binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
+//                } else {
+//                    if (binding.minimizedIconVideoOff.isEnabled.not())
+//                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on, R.dimen.two_dp)
+//                    binding.minimizedIconVideoOff.isEnabled = true
+//                    binding.localHmsVideoView?.visibility = View.VISIBLE
+//                    binding.localHmsVideoView?.alpha = 1f
+//                    it.video?.let { binding.localHmsVideoView?.addTrack(it) }
+//                }
+//
+//            }
+//
+//        }
     }
 
     @SuppressLint("SetTextI18n")
