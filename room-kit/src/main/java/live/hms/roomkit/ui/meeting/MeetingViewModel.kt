@@ -46,10 +46,7 @@ import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
-import live.hms.video.sdk.models.enums.AudioMixingMode
-import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import live.hms.video.sdk.models.enums.HMSRoomUpdate
-import live.hms.video.sdk.models.enums.HMSTrackUpdate
+import live.hms.video.sdk.models.enums.*
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
@@ -919,6 +916,8 @@ class MeetingViewModel(
 
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
+                if(message.type != HMSMessageType.CHAT)
+                    return
                 broadcastsReceived.postValue(
                     ChatMessage(
                         message.sender?.name.orEmpty(),
