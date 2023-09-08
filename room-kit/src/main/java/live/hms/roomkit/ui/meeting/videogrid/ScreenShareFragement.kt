@@ -106,7 +106,6 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
             )
         )
         binding.localVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
-        binding.localVideoView.enableZoomAndPan(true)
         binding.localVideoView.addVideoViewStateChangeListener(object : VideoViewStateChangeListener{
             override fun onResolutionChange(newWidth: Int, newHeight: Int) {
                 super.onResolutionChange(newWidth, newHeight)

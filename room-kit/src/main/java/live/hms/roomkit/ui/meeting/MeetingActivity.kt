@@ -134,6 +134,10 @@ class MeetingActivity : AppCompatActivity() {
             triggerNotification(it)
         }
 
+        meetingViewModel.hmsRemoveNotificationEvent.observe(this) {
+            tryRemovingNotification(it)
+        }
+
     }
 
     private fun triggerNotification(hmsNotification: HMSNotification) {
@@ -141,12 +145,44 @@ class MeetingActivity : AppCompatActivity() {
         appendNotification(hmsNotification)
     }
 
+
     private fun appendNotification(hmsNotification: HMSNotification) {
         binding.notifcationCardList.visibility = View.VISIBLE
+        //hack
         val old = hmsNotificationAdapter.getItems()
+        if (hmsNotification.type == HMSNotificationType.ScreenShare) {
+           val hasScreenShareType = old.find { it.type == HMSNotificationType.ScreenShare }
+           if (hasScreenShareType != null) {
+               return
+           }
+        }
+
         val new = mutableListOf<HMSNotification>().apply {
             addAll(old)
             add(notificationManager!!.topPosition, hmsNotification)
+
+        }
+        val callback = HMSNotificationDiffCallBack(old, new)
+        val result = DiffUtil.calculateDiff(callback)
+        hmsNotificationAdapter.setItems(new)
+        result.dispatchUpdatesTo(hmsNotificationAdapter)
+    }
+
+    private fun tryRemovingNotification(HMSNotificationType: HMSNotificationType) {
+
+        if (hmsNotificationAdapter.getItems().isEmpty()) {
+            return
+        }
+
+        val old = hmsNotificationAdapter.getItems()
+
+        val getMatchingNotfictionTypeIndexToRemove = hmsNotificationAdapter.getItems().indexOfFirst { it.type == HMSNotificationType }
+        if (getMatchingNotfictionTypeIndexToRemove == -1)
+            return
+
+        val new = mutableListOf<HMSNotification>().apply {
+            addAll(old)
+            removeAt(getMatchingNotfictionTypeIndexToRemove)
 
         }
         val callback = HMSNotificationDiffCallBack(old, new)
@@ -203,6 +239,11 @@ class MeetingActivity : AppCompatActivity() {
             }
             is HMSNotificationType.RecordingFailedToStart -> {
                 meetingViewModel.recordMeeting(true)
+                handleNotificationDismissClick()
+            }
+
+            is HMSNotificationType.ScreenShare -> {
+                meetingViewModel.stopScreenshare()
                 handleNotificationDismissClick()
             }
 

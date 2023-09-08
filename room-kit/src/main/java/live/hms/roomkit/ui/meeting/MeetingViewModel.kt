@@ -285,6 +285,7 @@ class MeetingViewModel(
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
     val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
     val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
+    val hmsRemoveNotificationEvent = MutableLiveData<HMSNotificationType>()
     val updateGridLayoutDimensions = SingleLiveEvent<Boolean>()
     val hmsScreenShareBottomSheetEvent = SingleLiveEvent<String>()
 
@@ -386,10 +387,15 @@ class MeetingViewModel(
             // Add all tracks as they come in.
             addSource(tracks) { meetTracks: List<MeetingTrack> ->
                 //if remote peer and local peer is present inset mode
-               val excludeLocalTrackIfRemotePeerIsPreset =  if (meetTracks.size > 1) {
-                    meetTracks.filter { !it.isLocal }.toList()
-                } else
-                    meetTracks
+
+               val excludeLocalTrackIfRemotePeerIsPreset =
+                   //Don't inset when local peer and local screen share track is found
+                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2)
+                       meetTracks
+                 else if(meetTracks.size > 1)
+                       meetTracks.filter { !it.isLocal }.toList()
+                    else
+                        meetTracks
 
                 val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset)
                 setValue(result)
@@ -1340,6 +1346,8 @@ class MeetingViewModel(
     fun isAllowedToHlsStream(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.permission?.hlsStreaming == true
 
+    fun isAllowedToEndRoom() :Boolean = hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true
+
     fun isAllowedToShareScreen(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.publishParams?.allowed?.contains("screen") == true
 
@@ -1578,8 +1586,15 @@ class MeetingViewModel(
 
     fun isScreenShared() = hmsSDK.isScreenShared()
 
-    fun stopScreenshare(actionListener: HMSActionResultListener) {
-        hmsSDK.stopScreenshare(actionListener)
+    fun stopScreenshare() {
+        hmsSDK.stopScreenshare(object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+            }
+
+            override fun onSuccess() {
+                isScreenShare.postValue(false)
+            }
+        })
     }
 
     fun startAudioshare(
@@ -2054,6 +2069,24 @@ class MeetingViewModel(
         video?.trackId?.let {
             hmsScreenShareBottomSheetEvent.postValue(it)
         }
+    }
+
+    fun triggerScreenShareNotification(showScreenshare: Boolean) {
+        if (showScreenshare) {
+            hmsNotificationEvent.postValue(
+                HMSNotification(
+                    title = "You are sharing your screen",
+                    isError = true,
+                    isDismissible = false,
+                    icon = R.drawable.share_screen_on,
+                    type = HMSNotificationType.ScreenShare,
+                    actionButtonText = "Stop"
+                )
+            )
+        } else {
+            hmsRemoveNotificationEvent.postValue(HMSNotificationType.ScreenShare)
+        }
+
     }
 }
 

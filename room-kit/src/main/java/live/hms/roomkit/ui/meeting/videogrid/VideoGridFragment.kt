@@ -115,18 +115,6 @@ class VideoGridFragment : Fragment() {
         binding.localHmsVideoView?.setZOrderOnTop(true)
         binding.localHmsVideoView?.setZOrderMediaOverlay(true)
 
-        binding.screenShareClose.setOnClickListener {
-            meetingViewModel.stopScreenshare(object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
-
-                }
-
-                override fun onSuccess() {
-                    meetingViewModel.isScreenShare.postValue(false)
-                }
-
-            })
-        }
 
         meetingViewModel.peerMetadataNameUpdate.observe(viewLifecycleOwner) { peerTypePair ->
             val isLocal = peerTypePair.first.isLocal
@@ -171,7 +159,7 @@ class VideoGridFragment : Fragment() {
             val localMeeting = it.filter { it.isLocal }.firstOrNull()
 
             //show or hide inset
-            if (it.size == 1 && localMeeting != null) {
+            if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2) ) {
                 binding.insetPill.visibility = View.GONE
             } else if (it.size > 1 && localMeeting != null) {
                 binding.insetPill.visibility = View.VISIBLE
@@ -222,7 +210,7 @@ class VideoGridFragment : Fragment() {
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
 
-            val screenShareTrackList = tracks.filter { it.isScreen }
+            val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
             var newRowCount = 0
             var newColumnCount = 0
             //is screen share track is present then reduce the grid and column span else restore
@@ -238,11 +226,12 @@ class VideoGridFragment : Fragment() {
                 binding.divider.setGuidelinePercent(0.75f)
             }
 
-            if (screenShareTrackList.find { it.isLocal } != null) {
-                binding.localScreenShareContainer.visibility = View.VISIBLE
+            if (screenShareTrackList.size <=1){
+                binding.tabLayoutDotsRemoteScreenShare.visibility = View.GONE
             } else {
-                binding.localScreenShareContainer.visibility = View.GONE
+                binding.tabLayoutDotsRemoteScreenShare.visibility = View.VISIBLE
             }
+
 
             meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
                 Pair(newRowCount, newColumnCount)

@@ -52,7 +52,19 @@ object HMSPrebuiltTheme {
     }
 }
 
-internal fun HMSRoomLayout.getPreviewLayout() = this.data?.getOrNull(0)?.screens?.preview
+internal fun HMSRoomLayout.getPreviewLayout(roleName : String?) : HMSRoomLayout.HMSRoomLayoutData.Screens.Preview? {
+   return if (roleName.isNullOrEmpty())
+        this.data?.getOrNull(0)?.screens?.preview
+    else
+        this.data?.find { it?.role == roleName }?.screens?.preview
+}
+
+internal fun HMSRoomLayout.getCurrentRoleData(roleName : String?) : HMSRoomLayout.HMSRoomLayoutData? {
+    return if (roleName.isNullOrEmpty())
+        this.data?.getOrNull(0)
+    else
+        this.data?.find { it?.role == roleName }
+}
 
 
 internal fun CardView.setBackgroundColor(
@@ -961,6 +973,8 @@ internal fun FragmentPreviewBinding.applyTheme() {
 }
 
 fun ExitBottomSheetBinding.applyTheme() {
+
+
     endSessionRoot.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().background_default
     )
@@ -979,9 +993,9 @@ fun ExitBottomSheetBinding.applyTheme() {
         )
     )
 
-    iconEndSession.setIconTintColor(
-        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
-        HMSPrebuiltTheme.getDefaults().error_default
+    leaveIcon.setIconTintColor(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
     )
 
     endSessionTitle.setTextColor(
@@ -1012,9 +1026,16 @@ fun ExitBottomSheetBinding.applyTheme() {
 }
 
 fun EndSessionBottomSheetBinding.applyTheme() {
-    root.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDim, HMSPrebuiltTheme.getDefaults().background_default
-    )
+
+    root.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDim,
+                HMSPrebuiltTheme.getDefaults().background_default)
+            colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+        }
+
 
     endSessionIcon.setIconTintColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
@@ -1023,14 +1044,14 @@ fun EndSessionBottomSheetBinding.applyTheme() {
 
     endSessionTitle.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.alertErrorBrighter,
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
             HMSPrebuiltTheme.getDefaults().error_default
         )
     )
 
     endSessionDescription.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
@@ -1107,12 +1128,6 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
-    localScreenShareContainer.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default
-        )
-    )
 
     rootLayout.setBackgroundColor(
         getColorOrDefault(
@@ -1120,34 +1135,6 @@ fun FragmentGridVideoBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().surface_default
         )
     )
-
-    icScreenshare.drawable.setTint(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-
-    screenShareText.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-
-    screenShareClose.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-
-    screenShareClose.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
-        HMSPrebuiltTheme.getDefaults().error_default,
-        R.drawable.blue_round_solid_drawable
-    )
-
 
 
     minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off, radiusREs = R.dimen.two_dp)
