@@ -167,6 +167,7 @@ class VideoGridFragment : Fragment() {
         }
         binding.nameInitials.text = NameUtils.getInitials(meetingViewModel.hmsSDK.getLocalPeer()?.name.orEmpty())
 
+        var lastVideoMuteState : Boolean? = null
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
             localMeeting = it.filter { it.isLocal }.firstOrNull()
 
@@ -196,20 +197,25 @@ class VideoGridFragment : Fragment() {
                 }
 
                 if (it.video?.isMute == true) {
+
                     if (binding.minimizedIconVideoOff.isEnabled)
                         binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, R.dimen.two_dp)
                     binding.minimizedIconVideoOff.isEnabled = false
 
-                    if (isMinimized.not())
+                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
                     updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, it)
+                    lastVideoMuteState = true
                     binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
                 } else {
+
+
                     if (binding.minimizedIconVideoOff.isEnabled.not())
                         binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on, R.dimen.two_dp)
                     binding.minimizedIconVideoOff.isEnabled = true
 
-                    if (isMinimized.not())
+                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
                     updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, it)
+                    lastVideoMuteState = false
                 }
 
             }
