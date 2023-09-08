@@ -1,66 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:nestedScrollingEnabled="false"
-    >
-<LinearLayout
-    android:id="@+id/backingLinearLayout"
-    android:background="@drawable/gray_shape_round_dialog"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="12dp"
-    android:paddingBottom="@dimen/spacing_d2"
-    android:orientation="vertical">
+    android:nestedScrollingEnabled="false">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-        <com.google.android.material.tabs.TabLayout
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/spacing_d2"
-            android:layout_marginTop="4dp"
-            app:tabTextAppearance="@style/RoundedTabsTextStyle"
-            style="@style/RoundedTabLayoutStyle"
-            android:layout_weight="1"
-            app:tabMode="fixed"
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:padding="6dp"
-                />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:padding="6dp"
-                />
-
-        </com.google.android.material.tabs.TabLayout>
-
-        <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/closeCombinedTabButton"
-            android:layout_width="@dimen/participant_item_icon"
-            android:layout_height="@dimen/participant_item_icon"
-            android:layout_gravity="center"
-            android:padding="@dimen/spacing_d2"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_close_16"
-            />
-    </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/pager"
+    <LinearLayout
+        android:id="@+id/backingLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:minHeight="300dp"
-         />
+        android:background="@drawable/gray_shape_round_dialog"
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        android:paddingBottom="@dimen/spacing_d2">
 
-</LinearLayout>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab_layout"
+                style="@style/RoundedTabLayoutStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/spacing_d2"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                app:tabMode="fixed"
+                app:tabTextAppearance="@style/RoundedTabsTextStyle">
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp" />
+
+            </com.google.android.material.tabs.TabLayout>
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:id="@+id/closeCombinedTabButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_gravity="center"
+                android:padding="@dimen/spacing_d2"
+                android:layout_marginHorizontal="@dimen/spacing_d2"
+                android:background="@drawable/ic_close_16" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="300dp" />
+
+    </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
