@@ -1,8 +1,10 @@
 package live.hms.roomkit.ui.meeting.participants
 import android.content.Context
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.PopupWindow
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.res.ResourcesCompat
@@ -57,8 +59,9 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
 
             val view = inflater.inflate(R.layout.custom_menu_layout, null)
             val popBinding = CustomMenuLayoutBinding.bind(view)
+
             popBinding.applyTheme(getMenuOptions(hmsPeer))
-            val mypopupWindow = PopupWindow(view, 400, LinearLayoutCompat.LayoutParams.WRAP_CONTENT, true)
+            val mypopupWindow = PopupWindow(view, 400, view.context.resources.getDimension(R.dimen.twohundred_dp).toInt(), true)
             mypopupWindow.showAsDropDown(it)
             mypopupWindow.contentView.setOnClickListener {
                 mypopupWindow.dismiss()
