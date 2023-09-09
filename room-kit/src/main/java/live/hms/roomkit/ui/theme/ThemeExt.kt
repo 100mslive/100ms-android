@@ -1594,6 +1594,12 @@ private fun backgroundShape(inset : Boolean = false): ShapeDrawable {
 }
 fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
     // border bright
+    toggleAudio.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+    toggleVideo.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
     with(menuBackingLayout){
         dividerDrawable = ResourcesCompat.getDrawable(resources, R.drawable.menu_item_participants_divider, null)
         ?.apply {

@@ -7,5 +7,7 @@ data class EnabledMenuOptions(
     val removeParticipant : Boolean,
     val toggleMedia : Boolean,
     val audioIsOn : Boolean? = null,
-    val videoIsOn : Boolean? = null
+    val videoIsOn : Boolean? = null,
+    val showToggleAudio : Boolean,
+    val showToggleVideo : Boolean,
 )

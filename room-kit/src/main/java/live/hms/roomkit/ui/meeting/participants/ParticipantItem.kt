@@ -96,7 +96,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                         mypopupWindow.dismiss()
                     }
                 }
-                popBinding.toggleAudio.visibility = if(audioIsOn != null) View.VISIBLE else View.GONE
+                popBinding.toggleAudio.visibility = if(audioIsOn != null && showToggleAudio) View.VISIBLE else View.GONE
                 if(audioIsOn == true)
                     popBinding.toggleAudio.text = "Mute Audio"
                 else if (audioIsOn == false){
@@ -107,7 +107,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
                     mypopupWindow.dismiss()
                 }
 
-                popBinding.toggleVideo.visibility = if(videoIsOn != null) View.VISIBLE else View.GONE
+                popBinding.toggleVideo.visibility = if(videoIsOn != null && showToggleVideo) View.VISIBLE else View.GONE
                 if(videoIsOn == true) {
                     popBinding.toggleVideo.text = "Mute Video"
                 }
@@ -207,7 +207,9 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
             removeParticipant = isAllowedToRemovePeers,
             toggleMedia = isAllowedToMutePeers,
             audioIsOn = if(!isAllowedToMutePeers) null else hmsPeer.audioTrack?.isMute == false,
-            videoIsOn = if(!isAllowedToMutePeers) null else hmsPeer.videoTrack?.isMute == false
+            videoIsOn = if(!isAllowedToMutePeers) null else hmsPeer.videoTrack?.isMute == false,
+            showToggleAudio = hmsPeer.hmsRole.publishParams?.allowed?.contains("audio") == true,
+            showToggleVideo  = hmsPeer.hmsRole.publishParams?.allowed?.contains("video") == true
         )
     }
 //    private fun getMenuForGroup(forPeer: HMSPeer): Int {
