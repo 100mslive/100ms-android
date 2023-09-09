@@ -479,6 +479,10 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
+        meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
+                binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
+        }
+
         meetingViewModel.peerCount.observe(viewLifecycleOwner) { peerCount ->
             if(peerCount != null)
                 binding.tvViewersCount?.text = peerCount.toString()

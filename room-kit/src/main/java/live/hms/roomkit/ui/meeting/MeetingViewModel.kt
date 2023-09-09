@@ -1136,6 +1136,7 @@ class MeetingViewModel(
         }
     }
 
+    val showHlsStreamYetToStartError = MutableLiveData<Boolean>(false)
     private fun switchToHlsViewIfRequired(role: HMSRole?, streamUrl: String?) {
         var started = false
         val isHlsPeer = isHlsPeer(role)
@@ -1144,15 +1145,21 @@ class MeetingViewModel(
             switchToHlsView(streamUrl)
         }
 
+        if (isHlsPeer && streamUrl == null) {
+            showHlsStreamYetToStartError.postValue(true)
+        } else {
+            showHlsStreamYetToStartError.postValue(false)
+        }
+
         // Only send errors for those who are hls peers
         if (!started && isHlsPeer) {
             val reasons = mutableListOf<String>()
             if (streamUrl == null) {
                 reasons.add("Stream url was null")
             }
-            HMSCoroutineScope.launch {
-                _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
-            }
+//            HMSCoroutineScope.launch {
+//                _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
+//            }
         }
     }
 

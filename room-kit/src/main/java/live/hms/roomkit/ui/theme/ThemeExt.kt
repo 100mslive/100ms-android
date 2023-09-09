@@ -281,6 +281,31 @@ internal fun FragmentMeetingBinding.applyTheme() {
         R.drawable.gray_round_stroked_drawable
     )
 
+    streamYetToStart.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    streamYetToStart.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.ic_circle_solid
+    )
+    hlsYetToStartHeader.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    hlsYetToStartDec.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 
     meetingFragmentProgress?.setBackgroundColor(
         getColorOrDefault(
