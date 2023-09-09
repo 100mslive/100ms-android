@@ -1540,6 +1540,10 @@ internal fun ListItemChatBinding.applyTheme() {
 internal fun HlsFragmentLayoutBinding.applyTheme() {
     chatView.background = getChatBackgroundDrawable()
     editTextMessage.background = getChatBackgroundDrawable()
+
+    progressBar.progressTintList = ColorStateList.valueOf(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 }
 
 internal fun FragmentParticipantsBinding.applyTheme() {

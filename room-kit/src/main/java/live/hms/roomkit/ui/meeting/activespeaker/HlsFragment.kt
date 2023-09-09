@@ -9,7 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player
 import androidx.media3.common.Player.Listener
+import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
@@ -126,6 +128,33 @@ class HlsFragment : Fragment() {
     fun resumePlay() {
 
         binding.hlsView.player = player.getNativePlayer()
+        player.getNativePlayer().addListener(object : Player.Listener {
+            @SuppressLint("UnsafeOptInUsageError")
+            override fun onSurfaceSizeChanged(width: Int, height: Int) {
+                super.onSurfaceSizeChanged(width, height)
+
+            }
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
+                super.onVideoSizeChanged(videoSize)
+                viewLifecycleOwner.lifecycleScope.launch {
+
+                    if (videoSize.height !=0 && videoSize.width !=0) {
+                        val width = videoSize.width
+                        val height = videoSize.height
+
+                        //landscape play
+                        if (width > height) {
+                            binding.hlsView.resizeMode = RESIZE_MODE_FIT
+                        } else {
+                            binding.hlsView.resizeMode = RESIZE_MODE_ZOOM
+                        }
+                        binding.progressBar.visibility = View.GONE
+                        binding.hlsView.visibility = View.VISIBLE
+                    }
+                }
+
+            }
+        })
         
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
@@ -137,25 +166,8 @@ class HlsFragment : Fragment() {
             override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
-                        viewLifecycleOwner.lifecycleScope.launch {
-
-                            if (player.getNativePlayer().videoSize.height !=0 && player.getNativePlayer().videoSize.width !=0) {
-                                val width = player.getNativePlayer().videoSize.width
-                                val height = player.getNativePlayer().videoSize.height
-
-                                //landscape play
-                                if (width > height) {
-                                    binding.hlsView.resizeMode = RESIZE_MODE_FIT
-                                } else {
-                                    binding.hlsView.resizeMode = RESIZE_MODE_ZOOM
-                                }
-                            }
-                        }
 
                     }
-                }
-                if (p1 == HmsHlsPlaybackState.playing) {
-                    binding.hlsView.resizeMode = RESIZE_MODE_FIT
                 }
                 Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
