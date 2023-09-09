@@ -53,7 +53,6 @@ import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
-import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.properties.Delegates
@@ -357,8 +356,11 @@ class MeetingViewModel(
         override fun addSpeakerSource() {
             addSource(speakers) { speakers : Array<HMSSpeaker> ->
 
-                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> =
+                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> = if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
                     speakers.filter { it.peer?.isLocal == false }.toTypedArray()
+                } else {
+                    speakers
+                }
 
                 val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
                 setValue(result.first)
@@ -387,9 +389,9 @@ class MeetingViewModel(
 
                val excludeLocalTrackIfRemotePeerIsPreset =
                    //Don't inset when local peer and local screen share track is found
-                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2)
+                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
                        meetTracks
-                 else if(meetTracks.size > 1)
+                 else if(meetTracks.size > 1 &&  hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
                        meetTracks.filter { !it.isLocal }.toList()
                     else
                         meetTracks
@@ -1124,6 +1126,8 @@ class MeetingViewModel(
     private fun hasBringOnStageRolePermission(currentRole : HMSRole?, handRaisedPeerRole: HMSRole?) : Boolean{
         return  hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.offStageRoles?.contains(handRaisedPeerRole?.name)?:false
     }
+
+    fun hasInsetEnabled(currentRole : HMSRole?) : Boolean = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.videoTileLayout?.grid?.enableLocalTileInset?:false
 
     private fun getOnStageRole(currentRole : HMSRole?) = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole
 

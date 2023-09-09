@@ -172,9 +172,9 @@ class VideoGridFragment : Fragment() {
             localMeeting = it.filter { it.isLocal }.firstOrNull()
 
             //show or hide inset
-            if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2) ) {
+            if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2)) {
                 binding.insetPill.visibility = View.GONE
-            } else if (it.size > 1 && localMeeting != null) {
+            } else if (it.size > 1 && localMeeting != null && meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole)) {
                 binding.insetPill.visibility = View.VISIBLE
             } else if (localMeeting == null) {
                 binding.insetPill.visibility = View.GONE
@@ -238,7 +238,7 @@ class VideoGridFragment : Fragment() {
              }
          }
 
-        if (isVideoOff) return
+        if (isVideoOff || binding.insetPill.visibility == View.INVISIBLE || binding.insetPill.visibility == View.GONE) return
 
         if (meetingTrack?.video?.isMute == false && meetingTrack.video != null) {
             val hmsVideoView = HMSVideoView(requireContext()).apply {

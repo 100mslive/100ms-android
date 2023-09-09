@@ -483,10 +483,11 @@ class MeetingFragment : Fragment() {
                 binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
         }
 
-        meetingViewModel.peerCount.observe(viewLifecycleOwner) { peerCount ->
-            if(peerCount != null)
-                binding.tvViewersCount?.text = peerCount.toString()
+        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
+            binding.tvViewersCount?.text =meetingViewModel.peers.size.toString()
+
         }
+
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
