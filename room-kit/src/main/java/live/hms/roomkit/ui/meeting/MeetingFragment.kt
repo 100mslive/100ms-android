@@ -891,7 +891,7 @@ class MeetingFragment : Fragment() {
     private fun configureHLSView() {
         updateBindings()
 
-        //hideSystemBars()
+        hideSystemBars()
 
         delayedHide(3000)
     }
