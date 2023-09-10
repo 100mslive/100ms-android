@@ -1129,6 +1129,8 @@ class MeetingViewModel(
 
     fun hasInsetEnabled(currentRole : HMSRole?) : Boolean = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.videoTileLayout?.grid?.enableLocalTileInset?:false
 
+    fun isBRBEnabled() = hmsRoomLayout?.data?.findLast { it?.role ==  hmsSDK.getLocalPeer()?.hmsRole?.name }?.screens?.conferencing?.default?.elements?.brb != null
+    fun isParticpantListEnabled() = hmsRoomLayout?.data?.findLast { it?.role ==  hmsSDK.getLocalPeer()?.hmsRole?.name }?.screens?.conferencing?.default?.elements?.participantList != null
     private fun getOnStageRole(currentRole : HMSRole?) = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole
 
     private fun switchToHlsView(streamUrl: String) =
