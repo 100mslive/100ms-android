@@ -140,7 +140,7 @@ class VideoGridFragment : Fragment() {
 
                         if (isBRB || isHandRaised) {
                             binding.iconBrb.visibility = View.VISIBLE
-                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.ic_brb else R.drawable.raise_hand_modern)
+                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.video_tile_brb else R.drawable.video_tile_hand)
                         } else {
                             binding.iconBrb.visibility = View.GONE
                         }
