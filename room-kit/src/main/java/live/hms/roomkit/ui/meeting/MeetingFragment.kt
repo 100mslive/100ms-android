@@ -1156,24 +1156,8 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if (meetingViewModel.isPrebuiltDebugMode()) {
-            binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
-        }
 
-        binding.buttonShareScreen?.apply {
-            setOnSingleClickListener(200L) {
-                Log.v(TAG, "buttonShareScreen.onClick()")
-                if (meetingViewModel.isPrebuiltDebugMode().not()) {
-                    findNavController().navigate(
-                        MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
-                            "Dummy Customer Id"
-                        )
-                    )
-                } else {
-                    startOrStopScreenShare()
-                }
-            }
-        }
+
 
         binding.buttonSettingsMenu?.apply {
 
