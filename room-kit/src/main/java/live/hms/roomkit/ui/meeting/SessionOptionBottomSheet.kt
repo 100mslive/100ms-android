@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.meeting
 
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -128,9 +129,7 @@ class SessionOptionBottomSheet(
         }
         gridOptionAdapter.update(listOf(group))
 
-        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
-            recordingOption.showProgress(it)
-        }
+
 
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
             val isRecording = meetingViewModel.isRecordingState()
@@ -153,6 +152,10 @@ class SessionOptionBottomSheet(
         }
 
 
+        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
+            Log.d("SessionOptionBottoSheet", "isRecordingInProgess: $it")
+            recordingOption.showProgress(it)
+        }
 
     }
 
