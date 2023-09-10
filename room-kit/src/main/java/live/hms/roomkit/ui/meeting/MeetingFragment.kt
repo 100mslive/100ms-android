@@ -331,7 +331,7 @@ class MeetingFragment : Fragment() {
         } else {
 //            binding.buttonGoLive?.visibility = View.GONE
         }
-        if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
+        if (recordingState == RecordingState.STREAMING_AND_RECORDING ) {
             binding.meetingFragmentProgress?.visibility = View.GONE
 //            binding.buttonGoLive?.setImageDrawable(
 //                ContextCompat.getDrawable(
@@ -358,7 +358,20 @@ class MeetingFragment : Fragment() {
             binding.recordingSignal.visibility = View.VISIBLE
             binding.tvViewersCount?.visibility = View.GONE
             binding.tvViewersCountCard.visibility = View.GONE
-        } else {
+        } else if (recordingState == RecordingState.STREAMING) {
+            binding.liveTitleCard?.visibility = View.VISIBLE
+            binding.tvViewersCountCard?.visibility = View.VISIBLE
+            binding.recordingSignal.visibility = View.GONE
+
+            if (meetingViewModel.isRTMPRunning()) {
+                binding.liveTitle?.text = "Live with RTMP"
+            } else {
+                binding.liveTitle?.text = "Live"
+            }
+            binding.tvViewersCount?.visibility = View.VISIBLE
+            binding.tvViewersCountCard.visibility = View.VISIBLE
+        }
+        else {
             binding.recordingSignal.visibility = View.GONE
             binding.liveTitleCard?.visibility = View.GONE
             binding.tvViewersCount?.visibility = View.GONE

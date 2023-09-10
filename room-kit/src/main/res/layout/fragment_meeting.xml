@@ -106,7 +106,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:paddingBottom="16dp"
+        android:paddingBottom="8dp"
         android:paddingTop="8dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
@@ -116,6 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:elevation="4dp"
+            android:layout_marginEnd="@dimen/eight_dp"
             android:layout_marginStart="16dp"
             android:scaleType="fitXY"
             android:src="@drawable/genericlogo"/>
@@ -124,9 +125,7 @@
             android:id="@+id/recording_signal_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:visibility="visible"
             tools:visibility="visible">
 
@@ -167,7 +166,6 @@
                 android:layout_height="20dp"
                 android:visibility="gone"
                 tools:visibility="visible"
-                android:layout_marginLeft="@dimen/eight_dp"
                 android:src="@drawable/ic_record_button_24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
