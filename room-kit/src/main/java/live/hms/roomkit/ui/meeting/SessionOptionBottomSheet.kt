@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import android.annotation.SuppressLint
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
@@ -53,6 +54,7 @@ class SessionOptionBottomSheet(
         return binding.root
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         applyTheme()
@@ -119,7 +121,9 @@ class SessionOptionBottomSheet(
 
 
         val group: Group = Section().apply {
+            if (meetingViewModel.isParticpantListEnabled())
             add(peerListOption)
+            if (meetingViewModel.isBRBEnabled())
             add(brbOption)
             if (meetingViewModel.isAllowedToShareScreen())
             add(screenShareOption)
@@ -147,6 +151,7 @@ class SessionOptionBottomSheet(
             raiseHandOption.setSelectedButton(it)
         }
 
+        if (meetingViewModel.isParticpantListEnabled())
         meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
             peerListOption.setParticpantCountUpdate(meetingViewModel.peers.size)
         }
