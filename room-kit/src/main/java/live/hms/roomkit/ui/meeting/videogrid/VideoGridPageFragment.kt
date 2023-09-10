@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting.videogrid
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,8 +75,8 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       //don't update if row and column are same
       if (shouldUpdate.not()) return
       setVideoGridRowsAndColumns(rowCount, columnCount)
-      meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
-      meetingViewModel.updateGridLayoutDimensions.value = true
+    meetingViewModel.updateGridLayoutDimensions.value = true
+    meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
   }
 
   override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -97,6 +98,15 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     if (isScreenShare.not()){
       meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.observe(viewLifecycleOwner) { (rowCount, columnCount) ->
         refreshGridRowsAndColumns(rowCount, columnCount)
+      }
+    }
+
+    if (isScreenShare.not()){
+      meetingViewModel.updateGridLayoutDimensions.observe(viewLifecycleOwner) { shouldUpdate ->
+        Log.d(TAG, "fatal updateGridLayoutDimensions: $shouldUpdate ${pageIndex}")
+        if (shouldUpdate) {
+          renderCurrentPage(emptyList())
+        }
       }
     }
 

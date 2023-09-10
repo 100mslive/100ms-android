@@ -533,6 +533,7 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
             updateMeetingViewMode(it)
+            Log.d(TAG, "Meeting view mode changed to $it")
             requireActivity().invalidateOptionsMenu()
         }
 
@@ -871,6 +872,13 @@ class MeetingFragment : Fragment() {
     }
 
     private fun configureWebrtcView() {
+
+
+        binding.topMenu?.visibility = View.VISIBLE
+        binding.bottomControls.visibility  = View.VISIBLE
+        showControlBars(false)
+        cancelCallback()
+
         val fragmentContainerParam = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.MATCH_PARENT
@@ -880,10 +888,6 @@ class MeetingFragment : Fragment() {
         fragmentContainerParam.addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
         binding.fragmentContainer.layoutParams = fragmentContainerParam
 
-        binding.topMenu?.visibility = View.VISIBLE
-        binding.bottomControls.visibility  = View.VISIBLE
-        showControlBars(false)
-        cancelCallback()
 
 
         binding.topMenu?.setBackgroundColor(
