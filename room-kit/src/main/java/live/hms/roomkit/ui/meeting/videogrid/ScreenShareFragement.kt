@@ -105,6 +105,7 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
                 HMSPrebuiltTheme.getDefaults().background_default
             )
         )
+        binding.localVideoView.enableZoomAndPan(true)
         binding.localVideoView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         binding.localVideoView.addVideoViewStateChangeListener(object : VideoViewStateChangeListener{
             override fun onResolutionChange(newWidth: Int, newHeight: Int) {
