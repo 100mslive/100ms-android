@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="@dimen/spacing_d1">
+    android:paddingHorizontal="@dimen/spacing_d1">
 
     <View
         android:id="@+id/blue_bar"

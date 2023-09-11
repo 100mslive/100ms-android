@@ -274,6 +274,10 @@ private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
     chatView.background = getChatBackgroundDrawable()
+    iconSend.drawable.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+    ))
     editTextMessage.background = getChatBackgroundDrawable()
     buttonEndCall.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
@@ -1505,7 +1509,6 @@ private fun getChatBackgroundDrawable(): ShapeDrawable {
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
     // Emptyview
-
     emptyTitle.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
@@ -1525,6 +1528,10 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
     editTextMessage.setHintTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
         HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
+    iconSend.drawable.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+    ))
 }
 
 internal fun ListItemChatBinding.applyTheme() {
@@ -1543,6 +1550,10 @@ internal fun ListItemChatBinding.applyTheme() {
 internal fun HlsFragmentLayoutBinding.applyTheme() {
     chatView.background = getChatBackgroundDrawable()
     editTextMessage.background = getChatBackgroundDrawable()
+    iconSend.drawable.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+    ))
 
     progressBar.progressTintList = ColorStateList.valueOf(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
