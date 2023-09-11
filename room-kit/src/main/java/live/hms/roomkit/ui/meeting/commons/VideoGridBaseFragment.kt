@@ -17,6 +17,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.GridItemVideoBinding
 import live.hms.roomkit.databinding.VideoCardBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.roomkit.hide
+import live.hms.roomkit.show
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -190,10 +192,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (earlyExit) return
     binding.hmsVideoView.let { view ->
       item.video?.let { track ->
-        view.setScalingType(if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
+        if (isScreenshare()) view.setScalingType( RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         view.addTrack(track)
-        view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
-        binding.hmsVideoView.visibility = if (item.video?.isDegraded == true ) View.INVISIBLE else View.VISIBLE
+       // view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
+        if (item.video?.isDegraded == true ) binding.hmsVideoView.hide() else binding.hmsVideoView.show()
         binding.hmsVideoView.setOnLongClickListener {
           (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
           true
@@ -269,7 +271,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           isAudioMute.not()
         )
 
-      binding.iconMaximised.visibility = if (isScreenshare()) View.VISIBLE else View.GONE
+      binding.iconMaximised.alpha = visibilityOpacity(isScreenshare())
       binding.iconMaximised.setOnClickListener {
         meetingViewModel.triggerScreenShareBottomSheet(item.video)
       }
@@ -279,7 +281,6 @@ abstract class VideoGridBaseFragment : Fragment() {
       else
         iconAudioOff.visibility = View.GONE*/
       degradedView.alpha = visibilityOpacity(item.video?.isDegraded == true)
-      degradedView.visibility = if (item.video?.isDegraded == true) View.VISIBLE else View.INVISIBLE
       Log.d(TAG,"bindVideo for :: ${item.peer.name} isDegraded :: ${item.video?.isDegraded} visibility :: ${item.video} ")
 
       /** [View.setVisibility] */

@@ -41,7 +41,15 @@ fun View.setOnSingleClickListener(l: View.OnClickListener) {
 fun View.setOnSingleClickListener(l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l))
 }
+fun View.show() {
+    if (this.visibility != View.VISIBLE)
+        this.visibility = View.VISIBLE
+}
 
+fun View.hide() {
+    if (this.visibility != View.INVISIBLE)
+        this.visibility = View.INVISIBLE
+}
 // Keep the listener at last such that we can use kotlin lambda
 fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {
   setOnClickListener(OnSingleClickListener(l, waitDelay))
@@ -58,10 +66,10 @@ fun View.startBounceAnimationUpwards(offset: Int = 0, animationDuration: Long = 
 }
 
 fun View.initAnimState(alphaOnly: Boolean = false, littleLessTranslate : Boolean = false,  isUpwardsAnimation: Boolean = true) {
-    val height = 72.0f * this.resources.displayMetrics.density * if (isUpwardsAnimation) 1 else -1
+    val height = 200.0f  * (if (isUpwardsAnimation) 1 else -1)
     if (alphaOnly.not())
         this.apply {
-            translationY =  if (littleLessTranslate)  height/2 else height
+            translationY =  if (littleLessTranslate)  (height/2).toFloat() else height
             scaleX = 0.8f
             alpha = 0.0f
         }

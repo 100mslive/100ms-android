@@ -52,6 +52,7 @@ class VideoGridFragment : Fragment() {
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
     var isMinimized = false
+    var lastVideoMuteState : Boolean? = null
 
     var localMeeting : MeetingTrack? = null
 
@@ -73,6 +74,28 @@ class VideoGridFragment : Fragment() {
         initViewModels()
         return binding.root
     }
+
+    override fun onPause() {
+        super.onPause()
+        if (localMeeting?.video == null) return
+        wasLocalVideoTrackVideoOn = (localMeeting?.video?.isMute?:true) == false
+        updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, localMeeting)
+        meetingViewModel.setLocalVideoEnabled(false)
+        lastVideoMuteState = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (wasLocalVideoTrackVideoOn == true) {
+            meetingViewModel.setLocalVideoEnabled(true)
+            if (isMinimized.not())
+            updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, localMeeting)
+            lastVideoMuteState = false
+        }
+    }
+
+    private var wasLocalVideoTrackVideoOn : Boolean? =null
+
 
     private fun initVideoGrid() {
         peerGridVideoAdapter = VideoGridAdapter(this@VideoGridFragment)
@@ -103,7 +126,6 @@ class VideoGridFragment : Fragment() {
         binding.iconOption.setOnClickListener {
             LocalTileBottomSheet(onMinimizeClicked = {
                 contextSafe { context, activity ->
-                    isMinimized = true
                     toggleInsetUI(isMinimised = true)
                 }
             }, onNameChange = {
@@ -119,7 +141,6 @@ class VideoGridFragment : Fragment() {
 
         binding.maximizedIcon.setOnClickListener {
             toggleInsetUI(isMinimised = false)
-//            binding.insetPill.resetUI(binding.insetPill.x, binding.insetPill.y, false)
         }
         binding.insetPill.makeInset {
             binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
@@ -173,7 +194,7 @@ class VideoGridFragment : Fragment() {
         }
         binding.nameInitials.text = NameUtils.getInitials(meetingViewModel.hmsSDK.getLocalPeer()?.name.orEmpty())
 
-        var lastVideoMuteState : Boolean? = null
+
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
             localMeeting = it.filter { it.isLocal }.firstOrNull()
 

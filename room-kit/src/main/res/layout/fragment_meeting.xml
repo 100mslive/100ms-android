@@ -136,6 +136,7 @@
                 android:clipChildren="true"
                 android:clipToOutline="true"
                 android:layout_marginStart="2dp"
+                android:layout_marginEnd="@dimen/eight_dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
