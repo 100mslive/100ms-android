@@ -74,6 +74,22 @@ class VideoGridFragment : Fragment() {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        wasLocalVideoTrackVideoOn = (localMeeting?.video?.isMute?:true) == false
+        updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, localMeeting)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (wasLocalVideoTrackVideoOn == true && isMinimized.not()) {
+            updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, localMeeting)
+        }
+    }
+
+    private var wasLocalVideoTrackVideoOn : Boolean? =null
+
+
     private fun initVideoGrid() {
         peerGridVideoAdapter = VideoGridAdapter(this@VideoGridFragment)
         screenShareAdapter = VideoGridAdapter(this@VideoGridFragment, isScreenShare = true)
