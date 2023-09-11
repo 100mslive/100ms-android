@@ -19,7 +19,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:elevation="@dimen/eight_dp"
         android:id="@+id/degradedView"
-        android:visibility="gone"
+        android:visibility="visible"
         android:alpha="0"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
