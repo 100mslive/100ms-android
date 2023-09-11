@@ -260,7 +260,7 @@ class VideoGridFragment : Fragment() {
              }
          }
 
-        if (isVideoOff || binding.insetPill.visibility == View.INVISIBLE || binding.insetPill.visibility == View.GONE) return
+        if (isVideoOff) return
         Log.d(TAG, "updateVideoViewLayout:2 video on ${isVideoOff.not()} ${meetingTrack?.video?.isMute}")
 
         if (meetingTrack?.video?.isMute == false && meetingTrack.video != null) {
