@@ -50,6 +50,7 @@
             android:background="@drawable/gray_line_vertical_divider" />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/change_name_dec"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,6 +63,7 @@
             android:id="@+id/newName"
             android:singleLine="true"
             android:maxLines="1"
+            android:fontFamily="@font/inter_regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
