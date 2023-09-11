@@ -130,7 +130,10 @@ abstract class VideoGridBaseFragment : Fragment() {
 
           val params = child.layoutParams as GridLayout.LayoutParams
 
-          val size = if(index == 4 && spread5thVideo && isScreenshare().not()) {
+          val size =
+            if(gridRowCount == 1 && gridColumnCount == 2)
+              1
+            else if(index == 4 && spread5thVideo && isScreenshare().not()) {
             // The 5th video spans two spaces.
             //  if there are only 5 videos
             2
