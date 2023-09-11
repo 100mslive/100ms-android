@@ -103,7 +103,6 @@ class VideoGridFragment : Fragment() {
         binding.iconOption.setOnClickListener {
             LocalTileBottomSheet(onMinimizeClicked = {
                 contextSafe { context, activity ->
-                    isMinimized = true
                     toggleInsetUI(isMinimised = true)
                 }
             }, onNameChange = {
@@ -119,7 +118,6 @@ class VideoGridFragment : Fragment() {
 
         binding.maximizedIcon.setOnClickListener {
             toggleInsetUI(isMinimised = false)
-//            binding.insetPill.resetUI(binding.insetPill.x, binding.insetPill.y, false)
         }
         binding.insetPill.makeInset {
             binding.iconOption.visibility = if (isMinimized) View.GONE else View.VISIBLE
@@ -202,7 +200,7 @@ class VideoGridFragment : Fragment() {
                         binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, R.dimen.two_dp)
                     binding.minimizedIconVideoOff.isEnabled = false
 
-                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
+                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState && lastVideoMuteState!= null)
                     updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, it)
                     lastVideoMuteState = true
                     binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
@@ -213,7 +211,7 @@ class VideoGridFragment : Fragment() {
                         binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on, R.dimen.two_dp)
                     binding.minimizedIconVideoOff.isEnabled = true
 
-                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
+                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState && lastVideoMuteState!= null)
                     updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, it)
                     lastVideoMuteState = false
                 }
