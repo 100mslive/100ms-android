@@ -77,6 +77,7 @@ class VideoGridFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        if (localMeeting?.video == null) return
         wasLocalVideoTrackVideoOn = (localMeeting?.video?.isMute?:true) == false
         updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, localMeeting)
         meetingViewModel.setLocalVideoEnabled(false)

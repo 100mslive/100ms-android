@@ -194,7 +194,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       item.video?.let { track ->
         if (isScreenshare()) view.setScalingType( RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         view.addTrack(track)
-        view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
+       // view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         if (item.video?.isDegraded == true ) binding.hmsVideoView.hide() else binding.hmsVideoView.show()
         binding.hmsVideoView.setOnLongClickListener {
           (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
