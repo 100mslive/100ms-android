@@ -85,7 +85,6 @@ class VideoGridFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if ()
         if (wasLocalVideoTrackVideoOn == true) {
             meetingViewModel.setLocalVideoEnabled(true)
             if (isMinimized.not())
