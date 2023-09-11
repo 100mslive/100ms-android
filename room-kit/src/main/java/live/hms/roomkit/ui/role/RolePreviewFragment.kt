@@ -109,6 +109,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
                             contextSafe { context, activity ->
                                 activity.runOnUiThread {
                                     binding.previewView.removeTrack()
+                                    meetingViewModel.lowerLocalPeerHand()
                                     findNavController().navigate(
                                         RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
                                             false
