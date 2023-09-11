@@ -41,7 +41,15 @@ fun View.setOnSingleClickListener(l: View.OnClickListener) {
 fun View.setOnSingleClickListener(l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l))
 }
+fun View.show() {
+    if (this.visibility != View.VISIBLE)
+        this.visibility = View.VISIBLE
+}
 
+fun View.hide() {
+    if (this.visibility != View.INVISIBLE)
+        this.visibility = View.INVISIBLE
+}
 // Keep the listener at last such that we can use kotlin lambda
 fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {
   setOnClickListener(OnSingleClickListener(l, waitDelay))
