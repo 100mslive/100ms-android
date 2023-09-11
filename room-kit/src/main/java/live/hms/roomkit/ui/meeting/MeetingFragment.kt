@@ -1241,6 +1241,10 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
+            View.VISIBLE
+        else
+            View.GONE
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                 ChatParticipantCombinedFragment().show(
