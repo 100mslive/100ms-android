@@ -1530,11 +1530,14 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
 internal fun ListItemChatBinding.applyTheme() {
 
     name.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
     message.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+    time.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 }
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {
