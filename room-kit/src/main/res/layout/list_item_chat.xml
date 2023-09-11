@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="@dimen/spacing_d1">
+    android:padding="@dimen/spacing_d1">
 
     <View
         android:id="@+id/blue_bar"
@@ -34,7 +34,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        tools:text="2:13pm"
+        tools:text="2:13 pm"
+        android:textAllCaps="true"
         android:textSize="12sp"
         android:singleLine="true"
         android:maxLines="1"
