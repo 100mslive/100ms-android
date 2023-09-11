@@ -66,10 +66,10 @@ fun View.startBounceAnimationUpwards(offset: Int = 0, animationDuration: Long = 
 }
 
 fun View.initAnimState(alphaOnly: Boolean = false, littleLessTranslate : Boolean = false,  isUpwardsAnimation: Boolean = true) {
-    val height = 72.0f * this.resources.displayMetrics.density * if (isUpwardsAnimation) 1 else -1
+    val height = 72.0f  * (if (isUpwardsAnimation) 1 else -1)
     if (alphaOnly.not())
         this.apply {
-            translationY =  if (littleLessTranslate)  height/2 else height
+            translationY =  if (littleLessTranslate)  (height/2).toFloat() else height
             scaleX = 0.8f
             alpha = 0.0f
         }
