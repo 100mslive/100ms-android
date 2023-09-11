@@ -5,17 +5,22 @@
     <item
         android:id="@+id/bring_on_stage"
         android:icon="@drawable/participant_bring_on_stage"
-        android:title="Bring on Stage"
+        android:title="@string/bring_on_stage"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/toggle_audio"
         android:icon="@drawable/ic_mic_toggle_off"
-        android:title="Audio toggle"
+        android:title="@string/menu_item_mute_audio"
         />
     <item
         android:id="@+id/toggle_video"
         android:icon="@drawable/ic_videocam_off_24"
-        android:title="Toggle Video"
+        android:title="@string/menu_item_mute_video"
+        />
+    <item
+        android:title="Remove Participant"
+        android:icon="@drawable/ic_baseline_remove_circle_24"
+        android:id="@+id/remove_participant"
         />
 </menu>

@@ -1,7 +1,9 @@
 package live.hms.roomkit.ui.meeting
 
+import android.annotation.SuppressLint
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,6 +54,7 @@ class SessionOptionBottomSheet(
         return binding.root
     }
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         applyTheme()
@@ -118,7 +121,9 @@ class SessionOptionBottomSheet(
 
 
         val group: Group = Section().apply {
+            if (meetingViewModel.isParticpantListEnabled())
             add(peerListOption)
+            if (meetingViewModel.isBRBEnabled())
             add(brbOption)
             if (meetingViewModel.isAllowedToShareScreen())
             add(screenShareOption)
@@ -128,9 +133,7 @@ class SessionOptionBottomSheet(
         }
         gridOptionAdapter.update(listOf(group))
 
-        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
-            recordingOption.showProgress(it)
-        }
+
 
         meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
             val isRecording = meetingViewModel.isRecordingState()
@@ -148,10 +151,16 @@ class SessionOptionBottomSheet(
             raiseHandOption.setSelectedButton(it)
         }
 
-        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
-            peerListOption.setParticpantCountUpdate(it)
+        if (meetingViewModel.isParticpantListEnabled())
+        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
+            peerListOption.setParticpantCountUpdate(meetingViewModel.peers.size)
         }
 
+
+        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
+            Log.d("SessionOptionBottoSheet", "isRecordingInProgess: $it")
+            recordingOption.showProgress(it)
+        }
 
     }
 

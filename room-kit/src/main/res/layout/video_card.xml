@@ -16,6 +16,46 @@
         android:textColor="@android:color/white"
         android:textSize="40sp" />
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:elevation="@dimen/eight_dp"
+        android:id="@+id/degradedView"
+        android:visibility="gone"
+        android:alpha="0"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/degradeddec"
+            android:id="@+id/degradedHeader"
+            android:textSize="13sp"
+            android:lineHeight="20sp"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Poor connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/degradedHeader"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/degradeddec"
+            android:textSize="12sp"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            android:fontFamily="@font/inter_regular"
+            android:text="The video will resume automatically when the connection improves"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <LinearLayout
         android:id="@+id/surface_view_holder"
         android:layout_width="match_parent"
@@ -91,15 +131,6 @@
                 android:src="@drawable/ic_mobile_screen_share_24"
                />
 
-            <ImageView
-                android:id="@+id/ic_degraded"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_gravity="center"
-                android:alpha="0"
-                android:visibility="gone"
-                android:layout_marginLeft="8dp"
-                android:src="@drawable/ic_degraded" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -123,7 +154,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         app:iconSize="24dp"
-        android:src="@drawable/ic_hand_raise"
+        android:src="@drawable/video_tile_hand"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="8dp"
@@ -137,7 +168,7 @@
         android:layout_margin="5dp"
         android:alpha="0"
         app:iconSize="32dp"
-        android:src="@drawable/ic_mic_mute"
+        android:src="@drawable/video_tile_mute"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="8dp"
@@ -176,9 +207,8 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginEnd="16dp"
-        app:iconSize="24dp"
         android:alpha="0"
-        android:src="@drawable/ic_brb"
+        android:src="@drawable/video_tile_brb"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="8dp"

@@ -24,6 +24,7 @@ import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
+import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.dp
 import live.hms.video.signal.init.HMSRoomLayout
@@ -280,6 +281,31 @@ internal fun FragmentMeetingBinding.applyTheme() {
         R.drawable.gray_round_stroked_drawable
     )
 
+    streamYetToStart.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    streamYetToStart.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.ic_circle_solid
+    )
+    hlsYetToStartHeader.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    hlsYetToStartDec.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 
     meetingFragmentProgress?.setBackgroundColor(
         getColorOrDefault(
@@ -582,6 +608,29 @@ internal fun VideoCardBinding.applyTheme() {
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+
+    degradedHeader.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    degradeddec.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+
+    degradedView.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().background_default
         )
     )
 
@@ -1130,7 +1179,7 @@ fun FragmentGridVideoBinding.applyTheme() {
 
     rootLayout.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
             HMSPrebuiltTheme.getDefaults().surface_default
         )
     )
@@ -1315,12 +1364,11 @@ internal fun ParticipantHeaderItemBinding.applyTheme() {
                 HMSPrebuiltTheme.getDefaults().onsurface_med_emp
             )
         )
-
-
     }
-
-
-
+    headerbottom.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    ))
 }
 // ParticipantItem binding
 internal fun ListItemPeerListBinding.applyTheme() {
@@ -1492,6 +1540,10 @@ internal fun ListItemChatBinding.applyTheme() {
 internal fun HlsFragmentLayoutBinding.applyTheme() {
     chatView.background = getChatBackgroundDrawable()
     editTextMessage.background = getChatBackgroundDrawable()
+
+    progressBar.progressTintList = ColorStateList.valueOf(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 }
 
 internal fun FragmentParticipantsBinding.applyTheme() {
@@ -1522,5 +1574,136 @@ internal fun FragmentParticipantsBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         ))
         background = getChatBackgroundDrawable()
+    }
+}
+
+private fun backgroundShape(inset : Boolean = false): ShapeDrawable {
+    val eightDp = 8.dp().toFloat()
+    val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)
+    return if(inset) {ShapeDrawable(
+        RoundRectShape(
+            lines, RectF(1f,1f,1f,1f),
+            lines
+        ))} else {
+        ShapeDrawable(
+            RoundRectShape(
+                lines, null,
+                null
+            )   )
+    }
+}
+fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
+    // border bright
+    toggleAudio.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+    toggleVideo.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+    with(menuBackingLayout){
+        dividerDrawable = ResourcesCompat.getDrawable(resources, R.drawable.menu_item_participants_divider, null)
+        ?.apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.borderBright,
+                    HMSPrebuiltTheme.getDefaults().border_bright)
+            )
+        }
+        background = LayerDrawable(
+            arrayOf(backgroundShape()
+            .apply {
+                paint.color = getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                    HMSPrebuiltTheme.getDefaults().surface_default)
+            },
+                backgroundShape(true)
+                    .apply {
+                        paint.color = getColorOrDefault(
+                            HMSPrebuiltTheme.getColours()?.borderBright,
+                            HMSPrebuiltTheme.getDefaults().border_bright)
+                    }
+            )
+        )
+    }
+    val textColors = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    )
+    onStage.setTextColor(textColors)
+    raiseHand.setTextColor(textColors)
+    removeParticipant.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    ))
+
+    onStage.drawableStart = ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.participant_bring_on_stage, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+    }
+    if(options.audioIsOn != null) {
+        val audioIcon = if(options.audioIsOn) {
+            R.drawable.participants_menu_audio_muted
+        } else {
+            R.drawable.participants_menu_audio_unmuted
+        }
+        toggleAudio.drawableStart = ResourcesCompat.getDrawable(
+            this.root.resources,
+            audioIcon, null
+        )?.apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+        }
+    }
+    if(options.videoIsOn != null) {
+        val videoIcon = if(options.videoIsOn) {
+            R.drawable.participants_menu_video_muteed
+        } else {
+            R.drawable.ic_videocam_24
+        }
+        toggleVideo.drawableStart = ResourcesCompat.getDrawable(
+            this.root.resources,
+            videoIcon, null
+        )?.apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+        }
+    }
+    raiseHand.drawableStart = ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.lower_hand_modern, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+    }
+
+    removeParticipant.drawableStart = ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.remove_participant_item, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+                HMSPrebuiltTheme.getDefaults().error_default
+            )
+        )
     }
 }

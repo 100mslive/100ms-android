@@ -118,8 +118,8 @@ abstract class VideoGridBaseFragment : Fragment() {
     var rowIdx = 0
 
     layout.apply {
-
-      Log.d("VGBF","  (screenshar : ${isScreenshare()}) grid row count ${gridRowCount} else column count ${gridColumnCount}")
+      if (isScreenshare().not())
+      Log.d("VGBF","fatal updating grid layout dimension ${gridRowCount} else column count ${gridColumnCount}")
       fun normalLayout() {
         // The 5th video, if there are only 5, gets spread.
         val spread5thVideo = childCount == 5
@@ -128,7 +128,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
           val params = child.layoutParams as GridLayout.LayoutParams
 
-          val size = if(index == 4 && spread5thVideo) {
+          val size = if(index == 4 && spread5thVideo && isScreenshare().not()) {
             // The 5th video spans two spaces.
             //  if there are only 5 videos
             2
@@ -139,7 +139,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
 
           params.rowSpec = GridLayout.spec(rowIdx, 1, 1f)
-          params.columnSpec = GridLayout.spec(colIdx, 1, 1f)
+          params.columnSpec = GridLayout.spec(colIdx, size, 1f)
 
           if (colIdx + 1 == getNormalLayoutColumnCount()) {
             rowIdx += 1
@@ -278,7 +278,9 @@ abstract class VideoGridBaseFragment : Fragment() {
       iconAudioOff.visibility  = View.VISIBLE
       else
         iconAudioOff.visibility = View.GONE*/
-      icDegraded.alpha = visibilityOpacity(item.video?.isDegraded == true)
+      degradedView.alpha = visibilityOpacity(item.video?.isDegraded == true)
+      degradedView.visibility = if (item.video?.isDegraded == true) View.VISIBLE else View.INVISIBLE
+      Log.d(TAG,"bindVideo for :: ${item.peer.name} isDegraded :: ${item.video?.isDegraded} visibility :: ${item.video} ")
 
       /** [View.setVisibility] */
       val surfaceViewVisibility = if (item.video == null
@@ -288,7 +290,6 @@ abstract class VideoGridBaseFragment : Fragment() {
       } else {
         View.VISIBLE
       }
-
       if (hmsVideoView.visibility != surfaceViewVisibility) {
         hmsVideoView.visibility = surfaceViewVisibility
       }

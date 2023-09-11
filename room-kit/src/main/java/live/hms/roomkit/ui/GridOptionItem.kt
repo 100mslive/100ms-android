@@ -31,6 +31,7 @@ class GridOptionItem(
         viewBinding.applyTheme()
 
 
+
         viewBinding.subtitle.text = title
 
 
@@ -45,6 +46,14 @@ class GridOptionItem(
         viewBinding.root.setOnClickListener {
             if (showProgress.not())
             onClick()
+        }
+
+        if (showProgress) {
+            viewBinding.progressBar.visibility = View.VISIBLE
+            viewBinding.nonpregressGroup.visibility = View.INVISIBLE
+        } else {
+            viewBinding.progressBar.visibility = View.GONE
+            viewBinding.nonpregressGroup.visibility = View.VISIBLE
         }
 
         setSelectedView(isSelected, viewBinding)

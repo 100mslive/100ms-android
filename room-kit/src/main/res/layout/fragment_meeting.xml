@@ -22,6 +22,64 @@
             android:layout_gravity="center" />
     </FrameLayout>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/stream_yet_to_start_container"
+        android:visibility="gone"
+        android:elevation="@dimen/sizeteen_dp"
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:background="@drawable/ic_circle_solid"
+            android:src="@drawable/frame_1423ic_hls"
+            android:id="@+id/stream_yet_to_start"
+            android:layout_width="80dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/hls_yet_to_start_header"
+            android:layout_marginBottom="24dp"
+            android:layout_height="80dp"/>
+        <TextView
+            app:layout_constraintTop_toBottomOf="@id/stream_yet_to_start"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/hls_yet_to_start_dec"
+            android:id="@+id/hls_yet_to_start_header"
+            android:textSize="24sp"
+            android:layout_marginBottom="@dimen/eight_dp"
+            android:lineHeight="20sp"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Stream yet to start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/hls_yet_to_start_header"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/hls_yet_to_start_dec"
+            android:textSize="15sp"
+
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            android:fontFamily="@font/inter_regular"
+            android:text="Sit back and relax"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     <include
         android:id="@+id/progress_bar"
         layout="@layout/progress_bar" />
@@ -48,7 +106,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:paddingBottom="16dp"
+        android:paddingBottom="8dp"
         android:paddingTop="8dp"
         android:orientation="horizontal"
         android:gravity="center_vertical">
@@ -58,6 +116,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:elevation="4dp"
+            android:layout_marginEnd="@dimen/eight_dp"
             android:layout_marginStart="16dp"
             android:scaleType="fitXY"
             android:src="@drawable/genericlogo"/>
@@ -66,9 +125,7 @@
             android:id="@+id/recording_signal_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:visibility="visible"
             tools:visibility="visible">
 
@@ -109,7 +166,6 @@
                 android:layout_height="20dp"
                 android:visibility="gone"
                 tools:visibility="visible"
-                android:layout_marginLeft="@dimen/eight_dp"
                 android:src="@drawable/ic_record_button_24"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -329,7 +385,6 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_marginEnd="10dp"
                 android:contentDescription="@string/open_chat"
                 app:srcCompat="@drawable/ic_chat_message" />
 
@@ -347,16 +402,6 @@
 
         </RelativeLayout>
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/button_share_screen"
-            android:layout_width="40dp"
-            android:padding="0.5dp"
-            app:contentPadding="@dimen/eight_dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="10dp"
-            android:visibility="gone"
-            android:contentDescription="@string/toggle_video"
-             />
 
         <Space
             android:id="@+id/space_6"

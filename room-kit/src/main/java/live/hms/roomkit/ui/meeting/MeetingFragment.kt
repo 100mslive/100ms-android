@@ -331,7 +331,7 @@ class MeetingFragment : Fragment() {
         } else {
 //            binding.buttonGoLive?.visibility = View.GONE
         }
-        if (recordingState == RecordingState.STREAMING_AND_RECORDING || recordingState == RecordingState.STREAMING || recordingState == RecordingState.RECORDING) {
+        if (recordingState == RecordingState.STREAMING_AND_RECORDING ) {
             binding.meetingFragmentProgress?.visibility = View.GONE
 //            binding.buttonGoLive?.setImageDrawable(
 //                ContextCompat.getDrawable(
@@ -358,7 +358,20 @@ class MeetingFragment : Fragment() {
             binding.recordingSignal.visibility = View.VISIBLE
             binding.tvViewersCount?.visibility = View.GONE
             binding.tvViewersCountCard.visibility = View.GONE
-        } else {
+        } else if (recordingState == RecordingState.STREAMING) {
+            binding.liveTitleCard?.visibility = View.VISIBLE
+            binding.tvViewersCountCard?.visibility = View.VISIBLE
+            binding.recordingSignal.visibility = View.GONE
+
+            if (meetingViewModel.isRTMPRunning()) {
+                binding.liveTitle?.text = "Live with RTMP"
+            } else {
+                binding.liveTitle?.text = "Live"
+            }
+            binding.tvViewersCount?.visibility = View.VISIBLE
+            binding.tvViewersCountCard.visibility = View.VISIBLE
+        }
+        else {
             binding.recordingSignal.visibility = View.GONE
             binding.liveTitleCard?.visibility = View.GONE
             binding.tvViewersCount?.visibility = View.GONE
@@ -479,10 +492,15 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
-        meetingViewModel.peerCount.observe(viewLifecycleOwner) { peerCount ->
-            if(peerCount != null)
-                binding.tvViewersCount?.text = peerCount.toString()
+        meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
+                binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
         }
+
+        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
+            binding.tvViewersCount?.text =meetingViewModel.peers.size.toString()
+
+        }
+
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
@@ -515,6 +533,7 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
             updateMeetingViewMode(it)
+            Log.d(TAG, "Meeting view mode changed to $it")
             requireActivity().invalidateOptionsMenu()
         }
 
@@ -853,6 +872,13 @@ class MeetingFragment : Fragment() {
     }
 
     private fun configureWebrtcView() {
+
+
+        binding.topMenu?.visibility = View.VISIBLE
+        binding.bottomControls.visibility  = View.VISIBLE
+        showControlBars(false)
+        cancelCallback()
+
         val fragmentContainerParam = RelativeLayout.LayoutParams(
             RelativeLayout.LayoutParams.MATCH_PARENT,
             RelativeLayout.LayoutParams.MATCH_PARENT
@@ -862,10 +888,6 @@ class MeetingFragment : Fragment() {
         fragmentContainerParam.addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
         binding.fragmentContainer.layoutParams = fragmentContainerParam
 
-        binding.topMenu?.visibility = View.VISIBLE
-        binding.bottomControls.visibility  = View.VISIBLE
-        showControlBars(false)
-        cancelCallback()
 
 
         binding.topMenu?.setBackgroundColor(
@@ -891,7 +913,7 @@ class MeetingFragment : Fragment() {
     private fun configureHLSView() {
         updateBindings()
 
-        //hideSystemBars()
+        hideSystemBars()
 
         delayedHide(3000)
     }
@@ -1138,24 +1160,8 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if (meetingViewModel.isPrebuiltDebugMode()) {
-            binding.buttonShareScreen?.setIconDisabled(R.drawable.ic_share_screen)
-        }
 
-        binding.buttonShareScreen?.apply {
-            setOnSingleClickListener(200L) {
-                Log.v(TAG, "buttonShareScreen.onClick()")
-                if (meetingViewModel.isPrebuiltDebugMode().not()) {
-                    findNavController().navigate(
-                        MeetingFragmentDirections.actionMeetingFragmentToChatBottomSheetFragment(
-                            "Dummy Customer Id"
-                        )
-                    )
-                } else {
-                    startOrStopScreenShare()
-                }
-            }
-        }
+
 
         binding.buttonSettingsMenu?.apply {
 
@@ -1430,17 +1436,9 @@ class MeetingFragment : Fragment() {
     }
 
     fun inflateExitFlow() {
-        if (meetingViewModel.isAllowedToEndMeeting()) {
-            if (meetingViewModel.isHlsRunning()) {
-                if (meetingViewModel.isAllowedToHlsStream()) {
-                    MultipleLeaveOptionBottomSheet().show(childFragmentManager, "LeaveBottomSheet")
-                } else {
-                    LeaveCallBottomSheet().show(parentFragmentManager, null)
-                }
-            } else {
-                MultipleLeaveOptionBottomSheet()
-                    .show(childFragmentManager, "LeaveBottomSheet")
-            }
+        if (meetingViewModel.isAllowedToEndMeeting() || (meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning())) {
+            MultipleLeaveOptionBottomSheet()
+                .show(childFragmentManager, "LeaveBottomSheet")
         } else {
             LeaveCallBottomSheet().show(parentFragmentManager, null)
         }

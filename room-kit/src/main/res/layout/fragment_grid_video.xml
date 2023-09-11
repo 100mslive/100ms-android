@@ -16,6 +16,7 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/inset_pill"
+            android:visibility="gone"
             app:cardCornerRadius="@dimen/sizeteen_dp"
             android:layout_gravity="bottom|right"
             android:layout_width="wrap_content"
@@ -116,15 +117,6 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
 
-                <live.hms.videoview.HMSVideoView
-                    android:id="@+id/local_hms_video_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:visibility="visible" />
 
                 <live.hms.roomkit.ui.meeting.audiomode.AudioLevelView
                     android:visibility="visible"
@@ -146,7 +138,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:elevation="8dp"
-                    android:src="@drawable/ic_mic_mute"
+                    android:src="@drawable/video_tile_mute"
                     android:visibility="invisible"
                     app:iconSize="32dp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -159,7 +151,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:elevation="8dp"
-                    android:src="@drawable/ic_brb"
+                    android:src="@drawable/video_tile_brb"
                     android:visibility="invisible"
                     app:iconSize="32dp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -207,7 +199,8 @@
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager_remote_screen_share"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/tab_layout_dots_remote_screen_share"
@@ -219,11 +212,11 @@
             android:layout_height="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_gravity="bottom|center"
             app:tabMode="fixed"
             android:layout_marginVertical="@dimen/four_dp"
             android:elevation="@dimen/sizeteen_dp"
-            app:layout_constraintTop_toBottomOf="@id/view_pager_remote_screen_share"
             app:tabBackground="@drawable/dot_selector_4"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp" />

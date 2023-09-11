@@ -45,17 +45,23 @@ class EndCallBottomSheet : BottomSheetDialogFragment() {
         binding.applyTheme()
 
 
-        binding.endSessionTitle.text = "End Session"
-        binding.endSessionDescription.text =
-            if (meetingViewModel.isHlsRunning()) "The session will end for everyone and all the activities, including the stream will stop. You can’t undo this action." else "The session will end for everyone and all the activities will stop. You can’t undo this action."
-        binding.endSessionButton.text = "End Session"
+        val canEndRoom = meetingViewModel.isAllowedToEndMeeting()
+
+        binding.endSessionTitle.text =  if (canEndRoom) "End Session" else "End Stream"
+        binding.endSessionDescription.text = if (canEndRoom) "The session will end for everyone in the room immediately." else "The stream will end for everyone after they’ve watched it."
+        binding.endSessionButton.text = if (canEndRoom) "End Session" else "End Stream"
 
         binding.endSessionButton.setOnSingleClickListener(200L) {
 
-            if (meetingViewModel.isHlsRunning() && meetingViewModel.isAllowedToHlsStream()) {
+            if (canEndRoom) {
                 meetingViewModel.stopHls()
+                meetingViewModel.endRoom(false)
+            } else {
+                meetingViewModel.stopHls()
+                meetingViewModel.leaveMeeting()
             }
-            meetingViewModel.endRoom(false)
+
+
         }
 
 

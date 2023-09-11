@@ -49,10 +49,16 @@ class MultipleLeaveOptionBottomSheet() : BottomSheetDialogFragment() {
         binding.leaveDescription.text =
             "Others will continue after you leave. You can join the session again."
 
+        val canEndStream = meetingViewModel.isAllowedToHlsStream()
+        val canEndRoom = meetingViewModel.isAllowedToEndMeeting()
+
+        if (canEndRoom.not() && canEndStream.not())
+            dismissAllowingStateLoss()
+
         binding.endSessionTitle.text =
-            if (meetingViewModel.isHlsRunning()) "End Session" else "End for All"
+            if (canEndRoom) "End Session" else "End Stream"
         binding.endSessionDescription.text =
-            if (meetingViewModel.isHlsRunning()) "The session and stream will end for everyone. You can’t undo this action." else "The session will end for everyone. You can’t undo this action."
+            if (canEndRoom) "The session will end for everyone in the room immediately." else "The stream will end for everyone after they’ve watched it."
 
 
         binding.leaveLayout.setOnSingleClickListener(200L) {

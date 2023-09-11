@@ -25,9 +25,11 @@ class ParticipantHeaderItem(private val roleName: String, private val numPeers: 
             expanded(roleName, expandableGroup.isExpanded)
             updateExpandChevron(expandableGroup.isExpanded, viewBinding)
         }
+        updateExpandChevron(expandableGroup.isExpanded, viewBinding)
     }
 
     private fun updateExpandChevron(expanded: Boolean, viewBinding: ParticipantHeaderItemBinding) {
+        viewBinding.headerbottom.visibility = if(expanded) View.VISIBLE else View.GONE
         val chevron = if (expanded) R.drawable.chevron_up
         else R.drawable.chevron_down
 

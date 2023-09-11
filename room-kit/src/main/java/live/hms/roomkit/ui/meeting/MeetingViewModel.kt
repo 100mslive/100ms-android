@@ -46,17 +46,13 @@ import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
-import live.hms.video.sdk.models.enums.AudioMixingMode
-import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import live.hms.video.sdk.models.enums.HMSRoomUpdate
-import live.hms.video.sdk.models.enums.HMSTrackUpdate
+import live.hms.video.sdk.models.enums.*
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
-import live.hms.video.utils.HMSCoroutineScope
 import live.hms.video.utils.HMSLogger
 import java.util.*
 import kotlin.properties.Delegates
@@ -360,8 +356,11 @@ class MeetingViewModel(
         override fun addSpeakerSource() {
             addSource(speakers) { speakers : Array<HMSSpeaker> ->
 
-                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> =
+                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> = if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
                     speakers.filter { it.peer?.isLocal == false }.toTypedArray()
+                } else {
+                    speakers
+                }
 
                 val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
                 setValue(result.first)
@@ -390,9 +389,9 @@ class MeetingViewModel(
 
                val excludeLocalTrackIfRemotePeerIsPreset =
                    //Don't inset when local peer and local screen share track is found
-                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2)
+                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
                        meetTracks
-                 else if(meetTracks.size > 1)
+                 else if(meetTracks.size > 1 &&  hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
                        meetTracks.filter { !it.isLocal }.toList()
                     else
                         meetTracks
@@ -832,6 +831,12 @@ class MeetingViewModel(
                             getRecordingState(hmsRoom)
                         )
                         showRecordInfo(hmsRoom)
+
+                        if (hmsRoom.browserRecordingState?.initialising == true)
+                            isRecordingInProgess.postValue(true)
+                        else  (hmsRoom.browserRecordingState?.running == true)
+                        isRecordingInProgess.postValue(false)
+
                     }
 
                     HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> {
@@ -920,6 +925,8 @@ class MeetingViewModel(
 
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
+                if(message.type != HMSMessageType.CHAT)
+                    return
                 broadcastsReceived.postValue(
                     ChatMessage(
                         message.sender?.name.orEmpty(),
@@ -1121,6 +1128,10 @@ class MeetingViewModel(
         return  hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.offStageRoles?.contains(handRaisedPeerRole?.name)?:false
     }
 
+    fun hasInsetEnabled(currentRole : HMSRole?) : Boolean = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.videoTileLayout?.grid?.enableLocalTileInset?:false
+
+    fun isBRBEnabled() = hmsRoomLayout?.data?.findLast { it?.role ==  hmsSDK.getLocalPeer()?.hmsRole?.name }?.screens?.conferencing?.default?.elements?.brb != null
+    fun isParticpantListEnabled() = hmsRoomLayout?.data?.findLast { it?.role ==  hmsSDK.getLocalPeer()?.hmsRole?.name }?.screens?.conferencing?.default?.elements?.participantList != null
     private fun getOnStageRole(currentRole : HMSRole?) = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole
 
     private fun switchToHlsView(streamUrl: String) =
@@ -1132,6 +1143,7 @@ class MeetingViewModel(
         }
     }
 
+    val showHlsStreamYetToStartError = MutableLiveData<Boolean>(false)
     private fun switchToHlsViewIfRequired(role: HMSRole?, streamUrl: String?) {
         var started = false
         val isHlsPeer = isHlsPeer(role)
@@ -1140,15 +1152,21 @@ class MeetingViewModel(
             switchToHlsView(streamUrl)
         }
 
+        if (isHlsPeer && streamUrl == null) {
+            showHlsStreamYetToStartError.postValue(true)
+        } else {
+            showHlsStreamYetToStartError.postValue(false)
+        }
+
         // Only send errors for those who are hls peers
         if (!started && isHlsPeer) {
             val reasons = mutableListOf<String>()
             if (streamUrl == null) {
                 reasons.add("Stream url was null")
             }
-            HMSCoroutineScope.launch {
-                _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
-            }
+//            HMSCoroutineScope.launch {
+//                _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
+//            }
         }
     }
 
@@ -1541,7 +1559,6 @@ class MeetingViewModel(
                 }
 
                 override fun onSuccess() {
-                    isRecordingInProgess.postValue(false)
                     Log.d(TAG, "RTMP recording Success")
                 }
 
