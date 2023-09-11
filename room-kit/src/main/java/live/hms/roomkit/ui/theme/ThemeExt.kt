@@ -1509,6 +1509,10 @@ private fun getChatBackgroundDrawable(): ShapeDrawable {
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
     // Emptyview
+    messageEmptyImage.drawable.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default))
+
     emptyTitle.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
