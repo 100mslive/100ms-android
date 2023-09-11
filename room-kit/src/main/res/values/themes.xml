@@ -143,6 +143,8 @@
     </style>
     <style name="RoundedTabsTextStyle" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
+        <item name="fontFamily">@font/inter_semibold</item>
+        <item name="android:textSize">14dp</item>
     </style>
 
     <style name="RoundedTabDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">

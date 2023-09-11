@@ -15,6 +15,7 @@ import java.util.*
 
 
 class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+  private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
   companion object {
     private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
       override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
@@ -32,10 +33,16 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
         binding.applyTheme()
     }
 
-    fun bind(message: ChatMessage) {
-      binding.name.text = "${message.senderName}${getRecipientText(message)}"
-      binding.message.text = message.message
-      binding.blueBar.visibility = if (message.isSentByMe) View.VISIBLE else View.GONE
+
+    fun bind(sentMessage: ChatMessage) {
+      with(binding) {
+        name.text = "${sentMessage.senderName}${getRecipientText(sentMessage)}"
+        message.text = sentMessage.message
+        blueBar.visibility = if (sentMessage.isSentByMe) View.VISIBLE else View.GONE
+        if(sentMessage.time != null) {
+          time.text = formatter.format(Date(sentMessage.time))
+        }
+      }
     }
 
     private fun getRecipientText(message: ChatMessage): String =

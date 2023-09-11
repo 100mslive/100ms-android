@@ -1266,6 +1266,8 @@ class MeetingFragment : Fragment() {
                 }
             }
         }
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen())
+            binding.buttonOpenChat.callOnClick()
 
         binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
 
