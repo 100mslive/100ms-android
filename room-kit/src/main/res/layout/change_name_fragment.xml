@@ -50,6 +50,7 @@
             android:background="@drawable/gray_line_vertical_divider" />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/change_name_dec"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
