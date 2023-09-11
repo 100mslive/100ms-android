@@ -8,7 +8,8 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     private var hmsRoomLayout : HMSRoomLayout? = null
     private val roleMap : MutableMap<String, HMSRoomLayout.HMSRoomLayoutData> = mutableMapOf()
     private val localPeer by lazy { hmssdk.getLocalPeer()!! }
-
+    fun chatInitialStateOpen() : Boolean = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+        ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
     fun isChatOverlay() = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
         ?.default?.elements?.chat?.overlayView == true
     fun onStageExp(role : String) =
