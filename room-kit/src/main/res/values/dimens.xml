@@ -11,7 +11,7 @@
     <dimen name="one_dp">1dp</dimen>
     <dimen name="two_dp">2dp</dimen>
     <dimen name="twohundred_dp">160dp</dimen>
-    <dimen name="popup_width">450dp</dimen>
+    <dimen name="popup_width">300dp</dimen>
     <dimen name="onefify_dp">200dp</dimen>
     <dimen name="four_dp">4dp</dimen>
     <dimen name="twelve_dp">12dp</dimen>
