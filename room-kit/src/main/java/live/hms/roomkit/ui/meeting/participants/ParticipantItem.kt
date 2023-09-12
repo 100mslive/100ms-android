@@ -200,10 +200,13 @@ class ParticipantItem(
             viewBinding.muteUnmuteIcon.gone()
             viewBinding.audioLevelView.show()
             viewBinding.audioLevelView.requestLayout()
-            activeSpeakers.removeObservers(viewBinding.root.context as LifecycleOwner)
-            activeSpeakers.observe(viewBinding.root.context as LifecycleOwner) { (t, speakers) ->
-                val level = speakers.find { it.hmsTrack?.trackId == audioTrack.trackId }?.level ?: 0
-                viewBinding.audioLevelView.update(level)
+//            activeSpeakers.removeObservers(viewBinding.root.context as LifecycleOwner)
+            kotlin.runCatching {
+                activeSpeakers.observe(viewBinding.root.context as LifecycleOwner) { (t, speakers) ->
+                    Log.d("HMSANIM", "${audioTrack.trackId} speakers ${speakers}")
+                    val level = speakers.find { it.hmsTrack?.trackId == audioTrack.trackId }?.level ?: 0
+                    viewBinding.audioLevelView.update(level)
+                }
             }
         }
 
