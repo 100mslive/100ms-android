@@ -20,8 +20,8 @@ import live.hms.roomkit.ui.meeting.participants.ParticipantsTabFragment
 import live.hms.roomkit.ui.theme.applyTheme
 
 
-class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-
+class ChatParticipantAdapter(fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
+    val partFragment = ParticipantsTabFragment(fragment::dismiss)
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
@@ -30,7 +30,7 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
         return if (position == 0)
             CombinedChatFragmentTab()
         else
-            ParticipantsTabFragment()
+            partFragment
     }
 }
 const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"

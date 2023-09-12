@@ -1593,6 +1593,11 @@ private fun TextInputLayout.applyTheme() {
             ),
             PorterDuff.Mode.SRC_IN
         ) }
+    boxStrokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+    boxStrokeWidth = 1.dp()
 }
 private fun TextInputEditText.applyTheme() {
     setHintTextColor(ColorStateList.valueOf(getColorOrDefault(
