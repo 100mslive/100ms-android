@@ -100,13 +100,17 @@ class HlsFragment : Fragment() {
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
-        val chatVisibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
+        val chatVisibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(true))
             View.VISIBLE
         else
             View.GONE
         binding.chatMessages.visibility = chatVisibility
         binding.chatView.visibility = chatVisibility
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null, meetingViewModel.prebuiltInfoContainer::isChatEnabled)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
+            meetingViewModel.prebuiltInfoContainer.isChatEnabled(
+                true
+            )
+        }
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {

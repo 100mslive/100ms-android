@@ -452,7 +452,11 @@ class MeetingFragment : Fragment() {
                 binding.editTextMessage.setText("")
             }
         }
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null, meetingViewModel.prebuiltInfoContainer::isChatEnabled)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
+            meetingViewModel.prebuiltInfoContainer.isChatEnabled(
+                false
+            )
+        }
     }
 
     override fun onCreateView(
@@ -544,7 +548,7 @@ class MeetingFragment : Fragment() {
         }
 
         chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
-            if(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
+            if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(false)) {
                 if (count > 0) {
                     binding.unreadMessageCount.apply {
                         visibility = View.VISIBLE
@@ -1181,7 +1185,7 @@ class MeetingFragment : Fragment() {
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
                             if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
-                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
+                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled(false)) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
@@ -1254,7 +1258,7 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
+        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(false))
             View.VISIBLE
         else
             View.GONE
