@@ -12,7 +12,9 @@ import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.CustomMenuLayoutBinding
 import live.hms.roomkit.databinding.ListItemPeerListBinding
+import live.hms.roomkit.gone
 import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.roomkit.show
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
@@ -182,14 +184,18 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
     }
 
     private fun updateSpeaking(isMute: Boolean?, viewBinding: ListItemPeerListBinding) {
-        val drawable = if (isMute == true || isMute == null) {
+        if (isMute == true || isMute == null) {
             // Mute
-            R.drawable.ic_audio_toggle_off
+            viewBinding.muteUnmuteIcon.show()
+            viewBinding.audioLevelView.gone()
+            viewBinding.muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(viewBinding.root.resources, R.drawable.ic_audio_toggle_off, null))
         }
         else {
-            R.drawable.speaking_icon
+            viewBinding.muteUnmuteIcon.gone()
+            viewBinding.audioLevelView.show()
+            viewBinding.audioLevelView.requestLayout()
         }
-        viewBinding.muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(viewBinding.root.resources, drawable, null))
+
     }
 
     private fun getMenuOptions(forPeer: HMSPeer) : EnabledMenuOptions {

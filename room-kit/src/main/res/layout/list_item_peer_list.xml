@@ -64,6 +64,15 @@
             android:layout_marginLeft="8dp"
             />
 
+        <live.hms.roomkit.ui.meeting.audiomode.AudioLevelView
+            android:id="@+id/audio_level_view"
+            android:layout_width="@dimen/participant_item_icon"
+            android:layout_height="@dimen/participant_item_icon"
+            android:padding="@dimen/participant_item_icon_padding"
+            android:layout_marginLeft="8dp"/>
+
+
+
 
         <ImageButton
             android:id="@+id/peerSettings"
