@@ -16,7 +16,6 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/inset_pill"
-            android:visibility="gone"
             app:cardCornerRadius="@dimen/sizeteen_dp"
             android:layout_gravity="bottom|right"
             android:layout_width="wrap_content"

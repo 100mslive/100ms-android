@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,12 +15,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
+import live.hms.roomkit.databinding.LayoutParticipantsMergeBinding
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -32,10 +33,11 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
-class ParticipantsFragment : Fragment() {
+
+class ParticipantsTabFragment : Fragment() {
 
     private val TAG = "ParticipantsFragment"
-    private var binding by viewLifecycle<FragmentParticipantsBinding>()
+    private var binding by viewLifecycle<LayoutParticipantsMergeBinding>()
     private var alertDialog: AlertDialog? = null
     val adapter = GroupieAdapter()
     private lateinit var handRaisedKey :String
@@ -55,9 +57,8 @@ class ParticipantsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentParticipantsBinding.inflate(inflater, container, false)
+        binding = LayoutParticipantsMergeBinding.inflate(inflater, container, false)
         handRaisedKey = requireContext().resources.getString(R.string.hand_raised_group)
-        initViewModels()
         return binding.root
     }
 
@@ -69,7 +70,7 @@ class ParticipantsFragment : Fragment() {
 
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = peerList.groupBy {
-            if(it.isHandRaised() && it.hmsRole.name.lowercase() != "broadcaster" && it.hmsRole.name.lowercase() != "host")
+            if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true && it.hmsRole.name.lowercase() != "broadcaster" && it.hmsRole.name.lowercase() != "host")
                 handRaisedKey
             else
                 it.hmsRole.name
@@ -133,12 +134,13 @@ class ParticipantsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.applyTheme()
+//        binding.applyTheme()
+        initViewModels()
         initOnBackPress()
         initViews()
     }
     private fun updateParticipantCount(count : Int) {
-        binding.participantsNum.text = resources.getString(R.string.participants_heading, count)
+//        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
     }
 
     private fun initViews() {
@@ -182,11 +184,11 @@ class ParticipantsFragment : Fragment() {
             meetingViewModel.peers
         else
             meetingViewModel.peers.filter {
-            text.isNullOrEmpty() || it.name.contains(
-                text.toString(),
-                true
-            )
-        }
+                text.isNullOrEmpty() || it.name.contains(
+                    text.toString(),
+                    true
+                )
+            }
     }
 
     private fun onSheetClicked(peer: HMSPeer) {

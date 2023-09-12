@@ -33,6 +33,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
+import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -106,6 +107,12 @@ class HlsFragment : Fragment() {
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
+        val chatVisibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
+            View.VISIBLE
+        else
+            View.GONE
+        binding.chatMessages.visibility = chatVisibility
+        binding.chatView.visibility = chatVisibility
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel)
     }
 

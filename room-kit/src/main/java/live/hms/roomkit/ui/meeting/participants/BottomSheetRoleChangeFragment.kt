@@ -91,7 +91,7 @@ class BottomSheetRoleChangeFragment : BottomSheetDialogFragment(),
 
 
         with(binding) {
-            cancel.setOnClickListener { findNavController().popBackStack() }
+            cancel.setOnClickListener { dismissAllowingStateLoss() }
 
             promptChangeRole.setOnClickListener {
                 initPopup()

@@ -1,38 +1,23 @@
 package live.hms.roomkit.ui.meeting.chat.combined
 
 import android.app.Dialog
-import android.content.Context
-import android.content.DialogInterface
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.Shape
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.ui.text.android.TextLayout
-import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
+import live.hms.roomkit.ui.meeting.participants.ParticipantsTabFragment
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.util.viewLifecycle
 
 
 class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
@@ -45,7 +30,7 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
         return if (position == 0)
             CombinedChatFragmentTab()
         else
-            ParticipantsFragment()
+            ParticipantsTabFragment()
     }
 }
 const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"

@@ -396,7 +396,7 @@ class MeetingViewModel(
                     else
                         meetTracks
 
-                val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset)
+                val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset.filter { it.isScreen.not() })
                 setValue(result)
             }
 

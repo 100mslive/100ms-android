@@ -77,7 +77,7 @@ class VideoGridFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        if (localMeeting?.video == null) return
+        if (localMeeting == null) return
         wasLocalVideoTrackVideoOn = (localMeeting?.video?.isMute?:true) == false
         updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, localMeeting)
         meetingViewModel.setLocalVideoEnabled(false)
@@ -86,6 +86,7 @@ class VideoGridFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        if (localMeeting == null) return
         if (wasLocalVideoTrackVideoOn == true) {
             meetingViewModel.setLocalVideoEnabled(true)
             if (isMinimized.not())
@@ -196,7 +197,7 @@ class VideoGridFragment : Fragment() {
 
 
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
-            localMeeting = it.filter { it.isLocal }.firstOrNull()
+            localMeeting = it.filter { it.isLocal && it.isScreen.not() }.firstOrNull()
 
             //show or hide inset
             if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2)) {
@@ -256,7 +257,7 @@ class VideoGridFragment : Fragment() {
         meetingTrack: MeetingTrack?
     ) {
 
-        Log.d(TAG, "updateVideoViewLayout: video on ${isVideoOff.not()} ${meetingTrack?.video?.isMute}")
+        Log.d(TAG, "updateVideoViewLayout: video on ${isVideoOff.not()} ${meetingTrack?.video?.isMute} visiboilyi ${binding.insetPill.visibility}")
 
          insetPillMaximised.forEachIndexed { index, view ->
              if (view is HMSVideoView) {
@@ -265,7 +266,8 @@ class VideoGridFragment : Fragment() {
              }
          }
 
-        if (isVideoOff || binding.insetPill.visibility == View.INVISIBLE || binding.insetPill.visibility == View.GONE) return
+        if (isVideoOff) return
+        Log.d(TAG, "updateVideoViewLayout:2 video on ${isVideoOff.not()} ${meetingTrack?.video?.isMute}")
 
         if (meetingTrack?.video?.isMute == false && meetingTrack.video != null) {
             val hmsVideoView = HMSVideoView(requireContext()).apply {
@@ -311,8 +313,9 @@ class VideoGridFragment : Fragment() {
                 Pair(newRowCount, newColumnCount)
 
             val itemsPerPage = newRowCount * newColumnCount
+            val hasLocalTile = tracks.find { it.isLocal }
             // Without this, the extra inset adds one more tile than they should
-            val tempItems = (tracks.size + itemsPerPage - 1) - 1 // always subtract local peer inset
+            val tempItems = (tracks.size + itemsPerPage - 1) - 1 * (if (hasLocalTile != null) 1 else 0)
             val expectedItems = tempItems / itemsPerPage
             screenShareAdapter.totalPages = screenShareTrackList.size
             peerGridVideoAdapter.totalPages = if (expectedItems == 0)

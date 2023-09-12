@@ -112,6 +112,9 @@ class PreviewFragment : Fragment() {
             return true
         } else {
             binding.buttonJoinMeeting.text = "Join Now"
+            binding.buttonJoinMeeting.setDrawables(
+                start = null            )
+
             startHlsStream = false
             return false
         }
