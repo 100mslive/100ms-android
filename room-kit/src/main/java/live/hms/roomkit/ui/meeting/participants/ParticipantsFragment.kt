@@ -164,7 +164,7 @@ class ParticipantsFragment : Fragment() {
             addItemDecoration(divider)
         }
         binding.closeButton.setOnSingleClickListener {
-            findNavController().popBackStack()
+            closeButton()
         }
         // Search disables conventional updates.
         binding.textInputSearch.apply {
@@ -175,6 +175,13 @@ class ParticipantsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun closeButton() {
+        parentFragmentManager
+            .beginTransaction()
+            .remove(this)
+            .commitAllowingStateLoss()
     }
 
     private fun getSearchFilteredPeersIfNeeded() : List<HMSPeer> {
@@ -244,7 +251,7 @@ class ParticipantsFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().popBackStack()
+                    closeButton()
                 }
             })
     }

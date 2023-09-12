@@ -1473,8 +1473,6 @@ internal fun LayoutChatParticipantCombinedBinding.applyTheme(hideParticipantTab 
 
         chatTab.background = getTabStateList()
         participantTab.background = getTabStateList()
-    } else {
-
     }
 
 }

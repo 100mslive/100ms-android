@@ -1185,7 +1185,6 @@ class MeetingFragment : Fragment() {
                                 childFragmentManager
                                     .beginTransaction()
                                     .add(R.id.fragment_container, ParticipantsFragment())
-                                    .addToBackStack(null)
                                     .commit()
                             } else {
                                 val args = Bundle()
