@@ -120,6 +120,7 @@
                 <live.hms.roomkit.ui.meeting.audiomode.AudioLevelView
                     android:visibility="visible"
                     android:alpha="0"
+                    android:elevation="@dimen/eight_dp"
                     android:id="@+id/icon_audio_level"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
