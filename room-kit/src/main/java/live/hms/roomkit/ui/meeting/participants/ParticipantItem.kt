@@ -69,7 +69,7 @@ class ParticipantItem(
             val popBinding = CustomMenuLayoutBinding.bind(view)
 
             popBinding.applyTheme(getMenuOptions(hmsPeer))
-            val mypopupWindow = PopupWindow(view, view.context.resources.getDimension(R.dimen.popup_width).toInt(), view.context.resources.getDimension(R.dimen.twohundred_dp).toInt(), true)
+            val mypopupWindow = PopupWindow(view, view.context.resources.getDimension(R.dimen.popup_width).toInt(), view.context.resources.getDimension(R.dimen.popup_height).toInt(), true)
             mypopupWindow.showAsDropDown(it)
             mypopupWindow.contentView.setOnClickListener {
                 mypopupWindow.dismiss()
