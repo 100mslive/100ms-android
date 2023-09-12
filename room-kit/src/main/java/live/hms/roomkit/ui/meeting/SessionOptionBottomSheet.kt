@@ -124,7 +124,6 @@ class SessionOptionBottomSheet(
 
         val changeName = GridOptionItem(
             "Change Name", R.drawable.change_name, {
-                dismiss()
                 ChangeNameDialogFragment().show(
                     childFragmentManager,
                     ChangeNameDialogFragment.TAG
