@@ -1176,7 +1176,8 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
-                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
+                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
+                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
