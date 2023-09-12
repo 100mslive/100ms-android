@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.theme
 
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.*
 import android.graphics.drawable.*
 import android.graphics.drawable.shapes.RectShape
@@ -12,6 +13,7 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -19,6 +21,8 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableLeft
@@ -1404,9 +1408,9 @@ internal fun ListItemPeerListBinding.applyTheme() {
     )
 }
 
-internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
+private fun closeButtonTheme(closeCombinedTabButton: AppCompatImageButton, res : Resources) {
     closeCombinedTabButton.setBackgroundDrawable(ResourcesCompat.getDrawable(
-        this.root.resources,
+        res,
         R.drawable.ic_close_16, null
     )?.apply {
         setTint(
@@ -1417,6 +1421,9 @@ internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
         )
     }
     )
+}
+internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
+    closeButtonTheme(closeCombinedTabButton, this.root.resources)
     backingLinearLayout.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
         .apply {
             val color = getColorOrDefault(
@@ -1564,37 +1571,51 @@ internal fun HlsFragmentLayoutBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 }
 
+private fun TextInputLayout.applyTheme() {
+    // text color
+    // hint color
+    // background color
+    defaultHintTextColor = ColorStateList.valueOf(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+    ))
+    startIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_search_24, null)
+        ?.apply { colorFilter = PorterDuffColorFilter(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+            ),
+            PorterDuff.Mode.SRC_IN
+        ) }
+}
+private fun TextInputEditText.applyTheme() {
+    setHintTextColor(ColorStateList.valueOf(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+    )))
+    setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+    background = getChatBackgroundDrawable()
+}
 internal fun FragmentParticipantsBinding.applyTheme() {
-    with(containerSearch) {
-        // text color
-        // hint color
-        // background color
-        defaultHintTextColor = ColorStateList.valueOf(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-        ))
-        startIconDrawable = ResourcesCompat.getDrawable(resources, R.drawable.ic_search_24, null)
-            ?.apply { colorFilter = PorterDuffColorFilter(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-                    HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-                ),
-                PorterDuff.Mode.SRC_IN
-            ) }
-    }
-    with(textInputSearch) {
-        setHintTextColor(ColorStateList.valueOf(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-        )))
-        setTextColor(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        ))
-        background = getChatBackgroundDrawable()
-    }
+    containerSearch.applyTheme()
+    textInputSearch.applyTheme()
+    closeButtonTheme(closeButton, this.root.resources)
+    // surfacedim
+    root.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDim,
+        HMSPrebuiltTheme.getDefaults().surface_dim))
+    participantsNum.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 }
 
+internal fun LayoutParticipantsMergeBinding.applyTheme() {
+    containerSearch.applyTheme()
+    textInputSearch.applyTheme()
+}
 private fun backgroundShape(inset : Boolean = false): ShapeDrawable {
     val eightDp = 8.dp().toFloat()
     val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)

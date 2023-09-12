@@ -31,6 +31,7 @@ import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
+import live.hms.roomkit.ui.meeting.participants.ParticipantsTabFragment
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 
@@ -45,7 +46,7 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
         return if (position == 0)
             CombinedChatFragmentTab()
         else
-            ParticipantsFragment()
+            ParticipantsTabFragment()
     }
 }
 const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"

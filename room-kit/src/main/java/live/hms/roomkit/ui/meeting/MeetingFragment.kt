@@ -257,9 +257,13 @@ class MeetingFragment : Fragment() {
             }
 
             R.id.action_participants -> {
-                findNavController().navigate(
+                val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
-                )
+                } else {
+                    MeetingFragmentDirections.actionMeetingFragmentToParticipantsTabFragment()
+
+                }
+                findNavController().navigate(directions)
             }
 
             R.id.action_share_screen -> {
