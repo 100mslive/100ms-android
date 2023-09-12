@@ -84,7 +84,10 @@ class SessionOptionBottomSheet(
         val screenShareOption = GridOptionItem(
             resources.getString(R.string.start_screen_share),
             R.drawable.ic_share_screen,
-            onScreenShareClicked,
+            {
+                onScreenShareClicked.invoke()
+                dismiss()
+            },
             isSelected = meetingViewModel.isScreenShared()
         )
 
@@ -119,6 +122,17 @@ class SessionOptionBottomSheet(
             }, isSelected = false,
         )
 
+        val changeName = GridOptionItem(
+            "Change Name", R.drawable.change_name, {
+                ChangeNameDialogFragment().show(
+                    childFragmentManager,
+                    ChangeNameDialogFragment.TAG
+                )
+                dismiss()
+            }, isSelected = false
+        )
+
+
 
         val group: Group = Section().apply {
             if (meetingViewModel.isParticpantListEnabled())
@@ -130,6 +144,7 @@ class SessionOptionBottomSheet(
             add(raiseHandOption)
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
+            add(changeName)
         }
         gridOptionAdapter.update(listOf(group))
 

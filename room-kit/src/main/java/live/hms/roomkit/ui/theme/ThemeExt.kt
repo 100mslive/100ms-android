@@ -1385,7 +1385,7 @@ internal fun ListItemPeerListBinding.applyTheme() {
     HMSPrebuiltTheme.getDefaults().secondary_default,
     R.drawable.circle_secondary_32
     )
-    
+
     badNetworkIndicator.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_dim,
