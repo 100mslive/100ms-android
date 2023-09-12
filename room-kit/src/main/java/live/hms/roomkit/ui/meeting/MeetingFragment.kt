@@ -1177,6 +1177,9 @@ class MeetingFragment : Fragment() {
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
                             if( meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
+                                if(isOverlayChatVisible()){
+                                    toggleChatVisibility()
+                                }
                                 childFragmentManager
                                     .beginTransaction()
                                     .add(R.id.fragment_container, ParticipantsFragment())
@@ -1256,28 +1259,13 @@ class MeetingFragment : Fragment() {
                     ChatParticipantCombinedFragment.TAG
                 )
             } else {
-                with(binding.chatView!!) {
-                    visibility = if (visibility == View.GONE) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
-                }
-                binding.chatMessages.visibility = binding.chatView.visibility
-                // Scroll to the latest message if it's visible
-                if (binding.chatMessages.visibility == View.VISIBLE) {
-                    val position = chatAdapter.itemCount - 1
-                    if (position >= 0) {
-                        binding.chatMessages!!.smoothScrollToPosition(position)
-                        chatViewModel.unreadMessagesCount.postValue(0)
-                    }
-                }
+                toggleChatVisibility()
             }
         }
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen())
             binding.buttonOpenChat.callOnClick()
 
-        binding.buttonRaiseHand?.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
+        binding.buttonRaiseHand.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
 
@@ -1310,6 +1298,28 @@ class MeetingFragment : Fragment() {
                 Glide.with(this)
                     .load(meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url)
                     .into(it)
+            }
+        }
+    }
+
+    private fun isOverlayChatVisible() : Boolean {
+        return binding.chatView.visibility == View.VISIBLE
+    }
+    private fun toggleChatVisibility() {
+        with(binding.chatView) {
+            visibility = if (visibility == View.GONE) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        }
+        binding.chatMessages.visibility = binding.chatView.visibility
+        // Scroll to the latest message if it's visible
+        if (binding.chatMessages.visibility == View.VISIBLE) {
+            val position = chatAdapter.itemCount - 1
+            if (position >= 0) {
+                binding.chatMessages.smoothScrollToPosition(position)
+                chatViewModel.unreadMessagesCount.postValue(0)
             }
         }
     }
