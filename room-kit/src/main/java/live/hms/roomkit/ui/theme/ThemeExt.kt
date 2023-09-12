@@ -1380,6 +1380,12 @@ internal fun ParticipantHeaderItemBinding.applyTheme() {
 }
 // ParticipantItem binding
 internal fun ListItemPeerListBinding.applyTheme() {
+    audioLevelView.setBackgroundAndColor(
+            HMSPrebuiltTheme.getColours()?.secondaryDim,
+    HMSPrebuiltTheme.getDefaults().secondary_default,
+    R.drawable.circle_secondary_32
+    )
+    
     badNetworkIndicator.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDim,
         HMSPrebuiltTheme.getDefaults().secondary_dim,

@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import live.hms.roomkit.util.dp
 
 class AudioLevelView(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
@@ -92,7 +93,7 @@ class AudioLevelView(context: Context, attrs: AttributeSet) : FrameLayout(contex
 
         return ValueAnimator.ofFloat(currentHeight, finalHeight).apply {
             duration = 200
-            interpolator = DecelerateInterpolator()
+            interpolator = FastOutLinearInInterpolator()
         }
     }
 

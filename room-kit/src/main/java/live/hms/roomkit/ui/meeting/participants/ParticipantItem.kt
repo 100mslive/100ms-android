@@ -1,43 +1,51 @@
 package live.hms.roomkit.ui.meeting.participants
 import android.content.Context
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.PopupWindow
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.CustomMenuLayoutBinding
 import live.hms.roomkit.databinding.ListItemPeerListBinding
+import live.hms.roomkit.gone
 import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.roomkit.show
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
+import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
+import live.hms.video.media.tracks.HMSAudioTrack
 import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
+import live.hms.video.sdk.models.HMSSpeaker
 import org.webrtc.ContextUtils.getApplicationContext
 
-class ParticipantItem(private val hmsPeer: HMSPeer,
-                      private val viewerPeer : HMSLocalPeer,
-                      private val toggleTrack: (hmsPeer: HMSRemotePeer, type: HMSTrackType) -> Unit,
-                      private val changeRole: (remotePeerId: String, roleToChangeTo : String, force : Boolean) -> Unit,
-                      private val isAllowedToChangeRole : Boolean,
-                      private val isAllowedToMutePeers : Boolean,
-                      private val isAllowedToRemovePeers : Boolean,
-                      private val prebuiltInfoContainer : PrebuiltInfoContainer,
-                      private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
-                      private val requestPeerLeave : (hmsPeer: HMSRemotePeer, reason: String) -> Unit
-                      ) : BindableItem<ListItemPeerListBinding>(){
+class ParticipantItem(
+    private val hmsPeer: HMSPeer,
+    private val viewerPeer: HMSLocalPeer,
+    private val toggleTrack: (hmsPeer: HMSRemotePeer, type: HMSTrackType) -> Unit,
+    private val changeRole: (remotePeerId: String, roleToChangeTo: String, force: Boolean) -> Unit,
+    private val isAllowedToChangeRole: Boolean,
+    private val isAllowedToMutePeers: Boolean,
+    private val isAllowedToRemovePeers: Boolean,
+    private val prebuiltInfoContainer: PrebuiltInfoContainer,
+    private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
+    private val requestPeerLeave: (hmsPeer: HMSRemotePeer, reason: String) -> Unit,
+    private val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>>
+) : BindableItem<ListItemPeerListBinding>(){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
         val name = if(hmsPeer.isLocal){
@@ -48,7 +56,7 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
         viewBinding.name.text = name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer.metadata, viewBinding)
-        updateSpeaking(hmsPeer.audioTrack?.isMute, viewBinding)
+        updateSpeaking(hmsPeer.audioTrack, viewBinding)
         // Don't show the settings if they aren't allowed to change anything at all.
         viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
             View.GONE
@@ -181,15 +189,24 @@ class ParticipantItem(private val hmsPeer: HMSPeer,
         }
     }
 
-    private fun updateSpeaking(isMute: Boolean?, viewBinding: ListItemPeerListBinding) {
-        val drawable = if (isMute == true || isMute == null) {
+    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding) {
+        if (audioTrack?.isMute == true || audioTrack?.isMute == null) {
             // Mute
-            R.drawable.ic_audio_toggle_off
+            viewBinding.muteUnmuteIcon.show()
+            viewBinding.audioLevelView.gone()
+            viewBinding.muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(viewBinding.root.resources, R.drawable.ic_audio_toggle_off, null))
         }
         else {
-            R.drawable.speaking_icon
+            viewBinding.muteUnmuteIcon.gone()
+            viewBinding.audioLevelView.show()
+            viewBinding.audioLevelView.requestLayout()
+            activeSpeakers.removeObservers(viewBinding.root.context as LifecycleOwner)
+            activeSpeakers.observe(viewBinding.root.context as LifecycleOwner) { (t, speakers) ->
+                val level = speakers.find { it.hmsTrack?.trackId == audioTrack.trackId }?.level ?: 0
+                viewBinding.audioLevelView.update(level)
+            }
         }
-        viewBinding.muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(viewBinding.root.resources, drawable, null))
+
     }
 
     private fun getMenuOptions(forPeer: HMSPeer) : EnabledMenuOptions {
