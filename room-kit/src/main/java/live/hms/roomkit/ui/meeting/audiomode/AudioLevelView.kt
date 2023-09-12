@@ -43,10 +43,10 @@ class AudioLevelView(context: Context, attrs: AttributeSet) : FrameLayout(contex
     }
 
     private fun mapAudioLevelToScale(level: Int) = when {
-        level >= 90 -> 1.0f
-        level > 80 -> 0.85f
-        level >= 70 -> 0.75f
-        level in 50..69 -> 0.65f
+        level >= 90 -> 0.75f
+        level > 80 -> 0.70f
+        level >= 70 -> 0.65f
+        level in 50..69 -> 0.60f
         level in 40..49 -> 0.55f
         level in 30..39 -> 0.45f
         level in 10..29 -> 0.35f
@@ -91,7 +91,7 @@ class AudioLevelView(context: Context, attrs: AttributeSet) : FrameLayout(contex
         val currentHeight = current?.animatedValue as? Float ?: 0f
 
         return ValueAnimator.ofFloat(currentHeight, finalHeight).apply {
-            duration = 200
+            duration = 150
             interpolator = DecelerateInterpolator()
         }
     }
