@@ -6,6 +6,7 @@ import android.graphics.*
 import android.graphics.drawable.*
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -1428,7 +1429,7 @@ private fun closeButtonTheme(closeCombinedTabButton: AppCompatImageButton, res :
     }
     )
 }
-internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
+internal fun LayoutChatParticipantCombinedBinding.applyTheme(hideParticipantTab : Boolean) {
     closeButtonTheme(closeCombinedTabButton, this.root.resources)
     backingLinearLayout.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
         .apply {
@@ -1451,22 +1452,30 @@ internal fun LayoutChatParticipantCombinedBinding.applyTheme() {
                 HMSPrebuiltTheme.getDefaults().onsurface_low_emp)
         )
     )
-    tabLayout.background = getShape()
-        //ResourcesCompat.getDrawable(this.root.resources,R.drawable.tab_layout_bg, null)!!
-        .apply {
-            val color = getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.surfaceDefault,
-                HMSPrebuiltTheme.getDefaults().surface_default)
-            colorFilter =
-                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
-        }
+    if(!hideParticipantTab) {
+        tabLayout.background = getShape()
+            //ResourcesCompat.getDrawable(this.root.resources,R.drawable.tab_layout_bg, null)!!
+            .apply {
+                val color = getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                    HMSPrebuiltTheme.getDefaults().surface_default
+                )
+                colorFilter =
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                        color,
+                        BlendModeCompat.SRC
+                    )
+            }
 
-    val tabGroup = (tabLayout.getChildAt(0) as ViewGroup)
-    val chatTab = tabGroup.getChildAt(0)
-    val participantTab = tabGroup.getChildAt(1)
+        val tabGroup = (tabLayout.getChildAt(0) as ViewGroup)
+        val chatTab = tabGroup.getChildAt(0)
+        val participantTab = tabGroup.getChildAt(1)
 
-    chatTab.background = getTabStateList()
-    participantTab.background = getTabStateList()
+        chatTab.background = getTabStateList()
+        participantTab.background = getTabStateList()
+    } else {
+
+    }
 
 }
 

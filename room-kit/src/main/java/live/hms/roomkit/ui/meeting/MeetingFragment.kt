@@ -57,6 +57,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
+import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_CHAT_ALONE
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
@@ -1188,7 +1189,9 @@ class MeetingFragment : Fragment() {
                                     .commit()
                             } else {
                                 val args = Bundle()
-                                    .apply { putBoolean(OPEN_TO_PARTICIPANTS, true) }
+                                    .apply {
+                                        putBoolean(OPEN_TO_PARTICIPANTS, true)
+                                    }
 
                                 ChatParticipantCombinedFragment()
                                     .apply { arguments = args }
@@ -1255,7 +1258,11 @@ class MeetingFragment : Fragment() {
             View.GONE
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
-                ChatParticipantCombinedFragment().show(
+                ChatParticipantCombinedFragment().apply {
+                    arguments = Bundle().apply { putBoolean(OPEN_TO_CHAT_ALONE,
+                        !meetingViewModel.isParticpantListEnabled()
+                    ) }
+                }.show(
                     childFragmentManager,
                     ChatParticipantCombinedFragment.TAG
                 )

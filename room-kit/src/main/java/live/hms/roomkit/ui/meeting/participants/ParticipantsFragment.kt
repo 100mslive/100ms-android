@@ -20,6 +20,7 @@ import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -162,7 +163,9 @@ class ParticipantsFragment : Fragment() {
             }
             addItemDecoration(divider)
         }
-
+        binding.closeButton.setOnSingleClickListener {
+            findNavController().popBackStack()
+        }
         // Search disables conventional updates.
         binding.textInputSearch.apply {
             addTextChangedListener { text ->
