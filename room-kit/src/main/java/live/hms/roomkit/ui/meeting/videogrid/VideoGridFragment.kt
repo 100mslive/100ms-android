@@ -309,7 +309,7 @@ class VideoGridFragment : Fragment() {
             val itemsPerPage = newRowCount * newColumnCount
             val hasLocalTile = tracks.find { it.isLocal }
             // Without this, the extra inset adds one more tile than they should
-            val tempItems = (tracks.size + itemsPerPage - 1) - (if (hasLocalTile != null) 1 else 0)
+            val tempItems = (tracks.size + itemsPerPage - 1) - 1 * (if (hasLocalTile != null) 1 else 0)
             val expectedItems = tempItems / itemsPerPage
             screenShareAdapter.totalPages = screenShareTrackList.size
             peerGridVideoAdapter.totalPages = if (expectedItems == 0)
