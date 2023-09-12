@@ -85,8 +85,8 @@ class SessionOptionBottomSheet(
             resources.getString(R.string.start_screen_share),
             R.drawable.ic_share_screen,
             {
-                onScreenShareClicked.invoke()
                 dismiss()
+                onScreenShareClicked.invoke()
             },
             isSelected = meetingViewModel.isScreenShared()
         )
@@ -124,11 +124,11 @@ class SessionOptionBottomSheet(
 
         val changeName = GridOptionItem(
             "Change Name", R.drawable.change_name, {
+                dismiss()
                 ChangeNameDialogFragment().show(
                     childFragmentManager,
                     ChangeNameDialogFragment.TAG
                 )
-                dismiss()
             }, isSelected = false
         )
 
