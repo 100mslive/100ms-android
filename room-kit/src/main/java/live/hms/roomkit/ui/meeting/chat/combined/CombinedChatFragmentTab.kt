@@ -43,7 +43,7 @@ class CombinedChatFragmentTab : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator, meetingViewModel.prebuiltInfoContainer::isChatEnabled)
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }

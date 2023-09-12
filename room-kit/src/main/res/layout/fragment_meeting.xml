@@ -392,6 +392,7 @@
 
             <TextView
                 android:id="@+id/unread_message_count"
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/button_open_chat"

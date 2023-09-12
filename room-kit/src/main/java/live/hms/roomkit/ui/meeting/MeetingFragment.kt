@@ -258,6 +258,7 @@ class MeetingFragment : Fragment() {
             }
 
             R.id.action_participants -> {
+                // Possibly unused
                 val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
                 } else {
@@ -451,7 +452,7 @@ class MeetingFragment : Fragment() {
                 binding.editTextMessage.setText("")
             }
         }
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages!!, chatViewModel)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null, meetingViewModel.prebuiltInfoContainer::isChatEnabled)
     }
 
     override fun onCreateView(
@@ -543,13 +544,15 @@ class MeetingFragment : Fragment() {
         }
 
         chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
-            if (count > 0) {
-                binding.unreadMessageCount.apply {
-                    visibility = View.VISIBLE
-                    text = count.toString()
+            if(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
+                if (count > 0) {
+                    binding.unreadMessageCount.apply {
+                        visibility = View.VISIBLE
+                        text = count.toString()
+                    }
+                } else {
+                    binding.unreadMessageCount.visibility = View.GONE
                 }
-            } else {
-                binding.unreadMessageCount.visibility = View.GONE
             }
         }
 
