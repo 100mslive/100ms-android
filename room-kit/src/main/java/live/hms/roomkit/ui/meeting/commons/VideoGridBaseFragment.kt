@@ -276,6 +276,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
       binding.iconMaximised.alpha = visibilityOpacity(isScreenshare())
       binding.iconMaximised.setOnClickListener {
+        if (isScreenshare())
         meetingViewModel.triggerScreenShareBottomSheet(item.video)
       }
 
