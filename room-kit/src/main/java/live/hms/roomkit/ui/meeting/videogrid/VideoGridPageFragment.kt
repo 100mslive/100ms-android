@@ -75,7 +75,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       //don't update if row and column are same
       if (shouldUpdate.not()) return
       setVideoGridRowsAndColumns(rowCount, columnCount)
-    meetingViewModel.updateGridLayoutDimensions.value = true
+    renderCurrentPage(emptyList())
     meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
   }
 
@@ -101,17 +101,22 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       }
     }
 
-    if (isScreenShare.not()){
-      meetingViewModel.updateGridLayoutDimensions.observe(viewLifecycleOwner) { shouldUpdate ->
-        Log.d(TAG, "fatal updateGridLayoutDimensions: $shouldUpdate ${pageIndex}")
-        if (shouldUpdate) {
-          renderCurrentPage(emptyList())
-        }
-      }
-    }
+//    if (isScreenShare.not()){
+//      meetingViewModel.updateGridLayoutDimensions.observe(viewLifecycleOwner) { shouldUpdate ->
+//
+//        if (shouldUpdate) {
+//          if (isScreenshare().not())
+//          Log.d("XXX", " \uD83D\uDC80 page ${pageIndex}")
+//
+//        }
+//      }
+//    }
 
     if (isScreenShare.not()) {
       meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { videoGridTrack ->
+        val currentPageVideo =  getCurrentPageVideos(videoGridTrack)
+        if (isScreenshare().not())
+          Log.d("XXX", " \uD83C\uDF83 page ${pageIndex} size :${currentPageVideo.size} videos : ${currentPageVideo.map { it?.video?.trackId }}")
         renderCurrentPage(videoGridTrack)
       }
     } else {
