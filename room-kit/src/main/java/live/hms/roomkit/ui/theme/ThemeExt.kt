@@ -1583,6 +1583,8 @@ private fun TextInputLayout.applyTheme() {
     // text color
     // hint color
     // background color
+
+    background = getChatBackgroundDrawable()
     defaultHintTextColor = ColorStateList.valueOf(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
         HMSPrebuiltTheme.getDefaults().onsurface_low_emp
@@ -1595,11 +1597,12 @@ private fun TextInputLayout.applyTheme() {
             ),
             PorterDuff.Mode.SRC_IN
         ) }
-    boxStrokeColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright
-    )
-    boxStrokeWidth = 1.dp()
+//    boxStrokeColor = getColorOrDefault(
+//        HMSPrebuiltTheme.getColours()?.borderBright,
+//        HMSPrebuiltTheme.getDefaults().border_bright
+//    )
+    boxStrokeWidth = 0
+    boxStrokeWidthFocused = 0
 }
 private fun TextInputEditText.applyTheme() {
     setHintTextColor(ColorStateList.valueOf(getColorOrDefault(
