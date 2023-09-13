@@ -768,6 +768,7 @@ class MeetingViewModel(
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
+                            updateThemeBasedOnCurrentRole(hmsPeer.hmsRole)
                             val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
                             val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
                             if (isHlsPeer) {
@@ -776,7 +777,7 @@ class MeetingViewModel(
                                 exitHlsViewIfRequired(false)
                             }
                         }
-                        updateThemeBasedOnCurrentRole(hmsPeer.hmsRole)
+
                         participantPeerUpdate.postValue(Unit)
                     }
 
