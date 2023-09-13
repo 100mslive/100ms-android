@@ -735,14 +735,12 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
-            binding.space2?.visibility = if (allowed) View.VISIBLE else View.GONE
             //to show or hide mic icon [eg in HLS mode mic is not required]
             updatePipMicState(allowed, true)
         }
 
         meetingViewModel.isLocalVideoPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleVideo.visibility = if (allowed) View.VISIBLE else View.GONE
-            binding.space3?.visibility = if (allowed) View.VISIBLE else View.GONE
             binding.buttonSwitchCamera?.visibility = if (allowed) View.VISIBLE else View.GONE
         }
 
@@ -931,7 +929,6 @@ class MeetingFragment : Fragment() {
                 HMSPrebuiltTheme.getDefaults().background_default
             )
         )
-        binding.space4?.visibility = View.GONE
         binding.buttonRaiseHand?.visibility = View.GONE
 
         WindowCompat.setDecorFitsSystemWindows(activity!!.window, true)
@@ -969,7 +966,6 @@ class MeetingFragment : Fragment() {
         )
         , Color.TRANSPARENT, GradientDrawable.Orientation.BOTTOM_TOP)
 
-        binding.space4?.visibility = View.VISIBLE
         binding.buttonRaiseHand?.visibility = View.VISIBLE
 
         binding.fragmentContainer.setOnSingleClickListener(500L) {
@@ -1275,10 +1271,13 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls()))
+        val chatVisiBility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls()))
             View.VISIBLE
         else
             View.GONE
+
+        binding.buttonOpenChat.visibility = chatVisiBility
+        binding.messageMenu.visibility = chatVisiBility
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls())) {
                 ChatParticipantCombinedFragment().apply {
