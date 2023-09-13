@@ -118,7 +118,6 @@
             android:elevation="4dp"
             android:layout_marginEnd="@dimen/eight_dp"
             android:layout_marginStart="16dp"
-            android:scaleType="fitXY"
             android:src="@drawable/genericlogo"/>
 
         <LinearLayout
