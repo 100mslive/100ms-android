@@ -842,11 +842,11 @@ class MeetingFragment : Fragment() {
 
 
     private fun updateProgressBarUI(heading: String, description: String = "") {
-        binding.progressBar.heading.text = heading
-        binding.progressBar.description.apply {
-            visibility = if (description.isEmpty()) View.GONE else View.VISIBLE
-            text = description
-        }
+//        binding.progressBar.heading.text = heading
+//        binding.progressBar.description.apply {
+//            visibility = if (description.isEmpty()) View.GONE else View.VISIBLE
+//            text = description
+//        }
     }
 
     private val handler by lazy { Handler(Looper.myLooper()!!) }
@@ -1171,8 +1171,8 @@ class MeetingFragment : Fragment() {
     }
 
     private fun showProgressBar() {
-        binding.fragmentContainer.visibility = View.GONE
-        binding.bottomControls.visibility = View.GONE
+        binding.fragmentContainer.visibility = View.VISIBLE
+        binding.bottomControls.visibility = View.VISIBLE
 
         binding.progressBar.root.visibility = View.VISIBLE
     }
