@@ -779,6 +779,7 @@ class MeetingViewModel(
                                 exitHlsViewIfRequired(false)
                             }
                         }
+                        updateThemeBasedOnCurrentRole(hmsPeer.hmsRole)
                         participantPeerUpdate.postValue(Unit)
                     }
 
