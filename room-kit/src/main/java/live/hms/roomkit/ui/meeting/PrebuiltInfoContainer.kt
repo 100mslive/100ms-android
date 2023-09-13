@@ -1,8 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
-import android.util.Log
 import live.hms.video.sdk.HMSSDK
-import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.signal.init.HMSRoomLayout
 
 class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
@@ -19,11 +17,15 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.default?.elements?.chat != null
         }
     }
-    fun chatInitialStateOpen(isHls : Boolean) : Boolean = if(isHls) {
-        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
-    } else {
-        roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-            ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
+    fun chatInitialStateOpen(isHls: Boolean): Boolean {
+        val isChatInitialOpen = if (isHls) {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
+        }
+        // Initial open is only valid for overlay chat
+        return isChatOverlay(isHls) && isChatInitialOpen
     }
     fun isChatOverlay(isHls : Boolean) = if(isHls) {
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.overlayView == true
