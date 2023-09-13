@@ -542,11 +542,10 @@ internal fun ChangeNameFragmentBinding.applyTheme() {
             setColorFilter(color, PorterDuff.Mode.ADD);
         }
 
-    newName.setBackgroundColor(
-        getColorOrDefault(
+    newName.setBackgroundAndColor(
             HMSPrebuiltTheme.getColours()?.surfaceDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default
-        )
+            HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
     )
 
     newName.setTextColor(
