@@ -1723,9 +1723,9 @@ class MeetingViewModel(
     }
 
     fun isBRBOn(): Boolean {
-        val localPeer = hmsSDK.getLocalPeer()!!
+        val localPeer = hmsSDK.getLocalPeer()?: return false
         val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
-        return currentMetadata!!.isBRBOn
+        return currentMetadata?.isBRBOn?:false
     }
 
     fun toggleBRB() {
