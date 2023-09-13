@@ -457,6 +457,11 @@ class MeetingFragment : Fragment() {
                 isHls()
             )
         }
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
+            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
+        }
     }
 
     override fun onCreateView(
@@ -1293,8 +1298,9 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls()))
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
             binding.buttonOpenChat.callOnClick()
+        }
 
         binding.buttonRaiseHand.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
 
@@ -1352,6 +1358,12 @@ class MeetingFragment : Fragment() {
                 binding.chatMessages.smoothScrollToPosition(position)
                 chatViewModel.unreadMessagesCount.postValue(0)
             }
+        }
+
+        if(binding.chatView.visibility == View.VISIBLE) {
+            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
         }
     }
 
