@@ -1088,7 +1088,7 @@ class MeetingFragment : Fragment() {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ALIGN_BOTTOM)
                     addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
-                    updateMargins(bottom = bottomMenuHeight.toInt() + 16)
+                    updateMargins(bottom = bottomMenuHeight.toInt() + resources.getDimension(R.dimen.eight_dp).toInt())
                 }
             } else {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
