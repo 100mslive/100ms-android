@@ -3,51 +3,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container_card_progress_bar"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    android:layout_margin="12dp"
-    app:cardCornerRadius="8dp"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+
+  >
 
     <LinearLayout
+        android:id="@+id/container_card_progress_bar_card"
+        android:layout_gravity="bottom"
+        android:elevation="@dimen/sizeteen_dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="0dp"
-        android:orientation="vertical">
+        android:layout_marginBottom="88dp"
+        android:layout_marginHorizontal="@dimen/sizeteen_dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/sizeteen_dp"
+        android:paddingVertical="@dimen/eight_dp">
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:id="@+id/container_progress"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+             />
+
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/heading"
-            android:fontFamily="@font/clan_pro_medium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_margin="12dp"
-            android:gravity="center"
-            android:text="@string/progress_bar_heading"
-            android:textSize="16sp" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"
-            android:text="@string/progress_bar_description"
+            android:layout_marginLeft="@dimen/eight_dp"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Your lost your network connection.
+Trying to reconnect."
             android:textSize="14sp" />
 
-        <ProgressBar
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

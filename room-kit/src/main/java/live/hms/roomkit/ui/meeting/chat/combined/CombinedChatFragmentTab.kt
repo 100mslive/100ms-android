@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.MeetingViewMode
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
@@ -46,7 +47,7 @@ class CombinedChatFragmentTab : Fragment() {
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator) {
             meetingViewModel.prebuiltInfoContainer.isChatEnabled(
                 // Is never launched from hls
-                false
+                isHls()
             )
         }
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
@@ -54,4 +55,7 @@ class CombinedChatFragmentTab : Fragment() {
         }
     }
 
+    private fun isHls() : Boolean{
+        return meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER
+    }
 }

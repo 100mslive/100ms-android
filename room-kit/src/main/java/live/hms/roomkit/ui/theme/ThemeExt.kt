@@ -330,10 +330,29 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
+    progressBar.containerProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
     progressBar.containerCardProgressBar.setBackgroundColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default
     )
+
+    progressBar.containerCardProgressBar.setBackgroundColor(getColorOrDefault(
+        "#40000000",
+        HMSPrebuiltTheme.getDefaults().surface_default
+    ))
+
+    progressBar.containerCardProgressBarCard.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.blue_round_solid_drawable
+    )
+    //progressBar.containerCardProgressBar.alpha = 0.3f
 
     progressBar.heading.setTextColor(
         getColorOrDefault(
@@ -342,12 +361,12 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
-    progressBar.description.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
-            HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
-        )
-    )
+//    progressBar.description.setTextColor(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+//            HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
+//        )
+//    )
 
 //    progressBar.progressBarX.progressTintList = ColorStateList.valueOf(
 //        getColorOrDefault(
@@ -1572,12 +1591,7 @@ internal fun ListItemChatBinding.applyTheme() {
 }
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {
-    chatView.background = getChatBackgroundDrawable()
-    editTextMessage.background = getChatBackgroundDrawable()
-    iconSend.drawable.setTint(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-    ))
+
 
     progressBar.progressTintList = ColorStateList.valueOf(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
@@ -1588,6 +1602,8 @@ private fun TextInputLayout.applyTheme() {
     // text color
     // hint color
     // background color
+
+    background = getChatBackgroundDrawable()
     defaultHintTextColor = ColorStateList.valueOf(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
         HMSPrebuiltTheme.getDefaults().onsurface_low_emp
@@ -1600,11 +1616,12 @@ private fun TextInputLayout.applyTheme() {
             ),
             PorterDuff.Mode.SRC_IN
         ) }
-    boxStrokeColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright
-    )
-    boxStrokeWidth = 1.dp()
+//    boxStrokeColor = getColorOrDefault(
+//        HMSPrebuiltTheme.getColours()?.borderBright,
+//        HMSPrebuiltTheme.getDefaults().border_bright
+//    )
+    boxStrokeWidth = 0
+    boxStrokeWidthFocused = 0
 }
 private fun TextInputEditText.applyTheme() {
     setHintTextColor(ColorStateList.valueOf(getColorOrDefault(

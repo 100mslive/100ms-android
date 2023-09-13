@@ -19,10 +19,19 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.default?.elements?.chat != null
         }
     }
-    fun chatInitialStateOpen() : Boolean = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-        ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
-    fun isChatOverlay() = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-        ?.default?.elements?.chat?.overlayView == true
+    fun chatInitialStateOpen(isHls : Boolean) : Boolean = if(isHls) {
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
+    } else {
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+            ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
+    }
+    fun isChatOverlay(isHls : Boolean) = if(isHls) {
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.overlayView == true
+    } else {
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+            ?.default?.elements?.chat?.overlayView == true
+    }
+
     fun onStageExp(role : String) =
         roleMap[role]?.screens?.conferencing?.default?.elements?.onStageExp
 
