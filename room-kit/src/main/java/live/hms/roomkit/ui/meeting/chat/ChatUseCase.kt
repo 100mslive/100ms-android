@@ -6,8 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearSmoothScroller
 
 import androidx.recyclerview.widget.RecyclerView
-
-
+import kotlin.reflect.KFunction0
 
 
 /**
@@ -23,29 +22,34 @@ class ChatUseCase {
         recyclerview: SingleSideFadeRecyclerview,
         chatViewModel: ChatViewModel,
         emptyIndicator: View? = null,
+        isChatEnabled: () -> Boolean
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
         recyclerview.adapter = chatAdapter
         toggleEmptyIndicator(emptyIndicator, messages.value)
         messages.observe(viewlifecycleOwner) {
+            if (isChatEnabled()) {
+
             toggleEmptyIndicator(emptyIndicator, it)
             chatAdapter.submitList(it)
             val position = it.size - 1
-            if(position >= 0) {
+            if (position >= 0) {
                 // Without this sometimes the view won't update.
                 chatAdapter.notifyItemInserted(position)
                 // Scroll to the new message
-                val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(recyclerview.context) {
-                    override fun getVerticalSnapPreference(): Int {
-                        return SNAP_TO_START
+                val smoothScroller: RecyclerView.SmoothScroller =
+                    object : LinearSmoothScroller(recyclerview.context) {
+                        override fun getVerticalSnapPreference(): Int {
+                            return SNAP_TO_START
+                        }
                     }
-                }
                 smoothScroller.targetPosition = position
                 recyclerview.layoutManager!!.startSmoothScroll(smoothScroller)
-                if(recyclerview.visibility == View.VISIBLE)
+                if (recyclerview.visibility == View.VISIBLE)
                     chatViewModel.unreadMessagesCount.postValue(0)
             }
+        }
         }
     }
 

@@ -258,7 +258,8 @@ class MeetingFragment : Fragment() {
             }
 
             R.id.action_participants -> {
-                val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
+                // Possibly unused
+                val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls())) {
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
                 } else {
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsTabFragment()
@@ -451,7 +452,11 @@ class MeetingFragment : Fragment() {
                 binding.editTextMessage.setText("")
             }
         }
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages!!, chatViewModel)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
+            meetingViewModel.prebuiltInfoContainer.isChatEnabled(
+                isHls()
+            )
+        }
     }
 
     override fun onCreateView(
@@ -543,13 +548,15 @@ class MeetingFragment : Fragment() {
         }
 
         chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
-            if (count > 0) {
-                binding.unreadMessageCount.apply {
-                    visibility = View.VISIBLE
-                    text = count.toString()
+            if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
+                if (count > 0) {
+                    binding.unreadMessageCount.apply {
+                        visibility = View.VISIBLE
+                        text = count.toString()
+                    }
+                } else {
+                    binding.unreadMessageCount.visibility = View.GONE
                 }
-            } else {
-                binding.unreadMessageCount.visibility = View.GONE
             }
         }
 
@@ -846,6 +853,10 @@ class MeetingFragment : Fragment() {
     private val hideRunnable = Runnable { hideControlBars() }
 
     private fun updateMeetingViewMode(mode: MeetingViewMode) {
+
+        val modeEnteredOrExitedHls = !this::currentFragment.isInitialized || (currentFragment is HlsFragment && mode !is MeetingViewMode.HLS_VIEWER
+                || currentFragment !is HlsFragment && mode is MeetingViewMode.HLS_VIEWER)
+
         currentFragment = when (mode) {
             MeetingViewMode.GRID -> VideoGridFragment()
             MeetingViewMode.PINNED -> PinnedVideoFragment()
@@ -863,6 +874,19 @@ class MeetingFragment : Fragment() {
             .replace(R.id.fragment_container, currentFragment)
             .addToBackStack(null)
             .commit()
+
+        if(modeEnteredOrExitedHls) {
+            val overlayIsVisible = isOverlayChatVisible()
+            if (meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
+                val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls())
+                if (overlayIsVisible && !isChatOverlay)
+                    toggleChatVisibility()
+                else if (!overlayIsVisible && isChatOverlay)
+                    toggleChatVisibility()
+            } else if (overlayIsVisible) {
+                toggleChatVisibility()
+            }
+        }
 
         setupConfiguration(mode)
     }
@@ -1177,8 +1201,8 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
-                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
-                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
+                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls()) ||
+                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
@@ -1251,12 +1275,12 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
+        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls()))
             View.VISIBLE
         else
             View.GONE
         binding.buttonOpenChat.setOnSingleClickListener {
-            if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
+            if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls())) {
                 ChatParticipantCombinedFragment().apply {
                     arguments = Bundle().apply { putBoolean(OPEN_TO_CHAT_ALONE,
                         !meetingViewModel.isParticpantListEnabled()
@@ -1269,7 +1293,8 @@ class MeetingFragment : Fragment() {
                 toggleChatVisibility()
             }
         }
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen())
+
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls()))
             binding.buttonOpenChat.callOnClick()
 
         binding.buttonRaiseHand.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
@@ -1471,4 +1496,7 @@ class MeetingFragment : Fragment() {
         }
     }
 
+    private fun isHls() : Boolean{
+        return meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER
+    }
 }
