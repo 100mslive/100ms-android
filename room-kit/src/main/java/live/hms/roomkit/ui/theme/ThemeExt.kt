@@ -330,10 +330,29 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
+    progressBar.containerProgress.progressTintList = ColorStateList.valueOf(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
+        )
+    )
+
     progressBar.containerCardProgressBar.setBackgroundColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default
     )
+
+    progressBar.containerCardProgressBar.setBackgroundColor(getColorOrDefault(
+        "#40000000",
+        HMSPrebuiltTheme.getDefaults().surface_default
+    ))
+
+    progressBar.containerCardProgressBarCard.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.blue_round_solid_drawable
+    )
+    //progressBar.containerCardProgressBar.alpha = 0.3f
 
     progressBar.heading.setTextColor(
         getColorOrDefault(
@@ -342,12 +361,12 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
-    progressBar.description.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
-            HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
-        )
-    )
+//    progressBar.description.setTextColor(
+//        getColorOrDefault(
+//            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+//            HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
+//        )
+//    )
 
 //    progressBar.progressBarX.progressTintList = ColorStateList.valueOf(
 //        getColorOrDefault(
