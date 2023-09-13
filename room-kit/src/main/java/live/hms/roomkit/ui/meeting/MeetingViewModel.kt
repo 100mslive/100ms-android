@@ -55,6 +55,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
 
@@ -921,6 +922,13 @@ class MeetingViewModel(
                     HMSTrackUpdate.TRACK_RESTORED -> _liveDataTracks.postValue(_tracks)
                 }
                 participantPeerUpdate.postValue(Unit)
+            }
+
+            override fun peerListUpdated(
+                addedPeers: ArrayList<HMSPeer>?,
+                removedPeers: ArrayList<HMSPeer>?
+            ) {
+                Log.d(TAG, "peerListUpdated - added peers = $addedPeers, removed peers = $removedPeers")
             }
 
             override fun onMessageReceived(message: HMSMessage) {
