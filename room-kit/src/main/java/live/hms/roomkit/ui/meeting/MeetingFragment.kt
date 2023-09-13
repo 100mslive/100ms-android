@@ -1030,7 +1030,7 @@ class MeetingFragment : Fragment() {
                 override fun onAnimationStart(animation: Animator?) {
                     binding.topMenu.visibility = View.VISIBLE
                     showSystemBars()
-                    moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat() + 8.dp())
+                    moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
@@ -1083,7 +1083,7 @@ class MeetingFragment : Fragment() {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ALIGN_BOTTOM)
                     addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
-                    updateMargins(bottom = bottomMenuHeight.toInt() + 16)
+                    updateMargins(bottom = bottomMenuHeight.toInt() + resources.getDimension(R.dimen.eight_dp).toInt())
                 }
             } else {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
