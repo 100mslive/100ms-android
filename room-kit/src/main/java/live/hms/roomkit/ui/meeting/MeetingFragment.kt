@@ -457,6 +457,11 @@ class MeetingFragment : Fragment() {
                 isHls()
             )
         }
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
+            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
+        }
     }
 
     override fun onCreateView(
@@ -502,6 +507,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
+
         meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
                 binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
         }
@@ -775,6 +781,9 @@ class MeetingFragment : Fragment() {
             chatViewModel.peersUpdate()
         }
 
+        meetingViewModel.roleChange.observe(viewLifecycleOwner) {
+            updateChatButtonWhenRoleChanges()
+        }
     }
 
 
@@ -885,10 +894,21 @@ class MeetingFragment : Fragment() {
                 toggleChatVisibility()
             }
         }
-
         setupConfiguration(mode)
     }
 
+    fun updateChatButtonWhenRoleChanges() {
+        if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
+            binding.messageMenu.visibility = View.VISIBLE
+        } else {
+            binding.messageMenu.visibility = View.GONE
+        }
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
+            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
+        }
+    }
     var controlBarsVisible = true
     private fun setupConfiguration(mode: MeetingViewMode) {
         if (mode is MeetingViewMode.HLS_VIEWER) {
@@ -1078,12 +1098,15 @@ class MeetingFragment : Fragment() {
     }
 
     private fun moveChat(up: Boolean, bottomMenuHeight: Float) {
+        if(binding.chatView.visibility != View.VISIBLE)
+            return
+
         with(binding.chatView!!){
             if(up) {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ALIGN_BOTTOM)
                     addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
-                    updateMargins(bottom = bottomMenuHeight.toInt() + 16)
+                    updateMargins(bottom = bottomMenuHeight.toInt() + resources.getDimension(R.dimen.eight_dp).toInt())
                 }
             } else {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
@@ -1293,8 +1316,9 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls()))
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
             binding.buttonOpenChat.callOnClick()
+        }
 
         binding.buttonRaiseHand.setOnSingleClickListener(350L) { meetingViewModel.toggleRaiseHand() }
 
@@ -1352,6 +1376,13 @@ class MeetingFragment : Fragment() {
                 binding.chatMessages.smoothScrollToPosition(position)
                 chatViewModel.unreadMessagesCount.postValue(0)
             }
+        }
+
+        if(binding.chatView.visibility == View.VISIBLE) {
+
+            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
         }
     }
 

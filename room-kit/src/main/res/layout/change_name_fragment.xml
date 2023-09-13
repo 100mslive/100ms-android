@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingVertical="16dp">
+        android:paddingTop="@dimen/sizeteen_dp">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -34,7 +34,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="right"
-                android:layout_marginEnd="16dp"
+
                 android:elevation="3dp"
                 android:src="@drawable/ic_close_16"
                 app:layout_constraintStart_toStartOf="parent"
@@ -63,11 +63,11 @@
             android:id="@+id/newName"
             android:singleLine="true"
             android:maxLines="1"
+            android:textSize="12sp"
             android:fontFamily="@font/inter_regular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
             android:background="@drawable/gray_round_drawable"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp" />

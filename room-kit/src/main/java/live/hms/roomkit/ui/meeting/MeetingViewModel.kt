@@ -76,6 +76,7 @@ class MeetingViewModel(
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
+    val roleChange = MutableLiveData<HMSPeer>()
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
@@ -464,6 +465,8 @@ class MeetingViewModel(
 
             override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
                 previewPeerData.postValue(Pair(type, peer))
+                if(peer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED)
+                    roleChange.postValue(peer)
             }
 
             override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
@@ -769,6 +772,7 @@ class MeetingViewModel(
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
+                            updateThemeBasedOnCurrentRole(hmsPeer.hmsRole)
                             val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
                             val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
                             if (isHlsPeer) {
@@ -777,6 +781,7 @@ class MeetingViewModel(
                                 exitHlsViewIfRequired(false)
                             }
                         }
+
                         participantPeerUpdate.postValue(Unit)
                     }
 
