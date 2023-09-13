@@ -155,20 +155,18 @@ class VideoGridFragment : Fragment() {
             if (isLocal) {
                 when (peerTypePair.second) {
                     HMSPeerUpdate.METADATA_CHANGED -> {
-                        val isHandRaised =
-                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isHandRaised == true
                         val isBRB =
                             CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isBRBOn == true
 
-                        if (isBRB || isHandRaised) {
+                        if (isBRB) {
                             binding.iconBrb.visibility = View.VISIBLE
-                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.video_tile_brb else R.drawable.video_tile_hand)
+                            binding.iconBrb.setImageResource(R.drawable.video_tile_brb)
                         } else {
                             binding.iconBrb.visibility = View.GONE
                         }
                     }
                     HMSPeerUpdate.HAND_RAISED_CHANGED -> {
-                        if (peerTypePair.first.isHandRaised()) {
+                        if (peerTypePair.first.isHandRaised) {
                             binding.iconBrb.visibility = View.VISIBLE
                             binding.iconBrb.setImageResource(R.drawable.raise_hand_modern)
                         }

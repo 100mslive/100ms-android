@@ -68,7 +68,7 @@ class ParticipantsFragment : Fragment() {
 
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = peerList.groupBy {
-            if(it.isHandRaised())
+            if(it.isHandRaised)
                 handRaisedKey
             else
                 it.hmsRole.name

@@ -219,7 +219,7 @@ class ParticipantItem(
             ) == true
         val isOnStageButNotBroadcasterRole = prebuiltInfoContainer.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
 
-        val isHandRaised = forPeer.isHandRaised()
+        val isHandRaised = forPeer.isHandRaised
                 // You have to be in the offstage roles to be categorized as hand raised
                 && isOffStageRole
 
@@ -259,7 +259,7 @@ class ParticipantItem(
 //    }
 
     private fun updateHandRaise(hmsPeer: HMSPeer, viewBinding: ListItemPeerListBinding) {
-        val isHandRaised = hmsPeer.isHandRaised()
+        val isHandRaised = hmsPeer.isHandRaised
         viewBinding.handraise.visibility = if(isHandRaised)
             View.VISIBLE
         else

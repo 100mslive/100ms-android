@@ -65,7 +65,7 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
 
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = peerList.groupBy {
-            if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true)
+            if(it.isHandRaised)
                 handRaisedKey
             else
                 it.hmsRole.name

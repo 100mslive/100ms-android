@@ -1000,7 +1000,7 @@ class MeetingViewModel(
             && hmsSDK.getLocalPeer()?.hmsRole?.name == "broadcaster"
             && getOnStageRole(hmsSDK.getLocalPeer()?.hmsRole).isNullOrEmpty().not()
         ) {
-            if (handRaisedPeer.isHandRaised()) {
+            if (handRaisedPeer.isHandRaised) {
                 hmsNotificationEvent.postValue(
                     HMSNotification(
                         title = "${handRaisedPeer.name} raised hand",
@@ -1067,7 +1067,7 @@ class MeetingViewModel(
     }
 
     private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
-        val isSelfHandRaised = hmsPeer.isHandRaised()
+        val isSelfHandRaised = hmsPeer.isHandRaised
         _isHandRaised.postValue(isSelfHandRaised)
         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.METADATA_CHANGED))
     }
@@ -1704,7 +1704,7 @@ class MeetingViewModel(
     fun toggleRaiseHand() {
         val localPeer = hmsSDK.getLocalPeer()
         localPeer?.let {
-            if (it.isHandRaised()) {
+            if (it.isHandRaised) {
                 lowerLocalPeerHand()
             } else {
                 raiseLocalPeerHand()

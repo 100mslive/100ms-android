@@ -368,7 +368,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
 
           renderedViewPair.binding.videoCard.raisedHand.alpha =
-            visibilityOpacity(newVideo.peer.isHandRaised())
+            visibilityOpacity(newVideo.peer.isHandRaised)
 
           renderedViewPair.binding.videoCard.isBrb.alpha =
             visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isBRBOn == true)
@@ -402,7 +402,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
 
           videoBinding.videoCard.raisedHand.alpha =
-            visibilityOpacity(newVideo.peer.isHandRaised())
+            visibilityOpacity(newVideo.peer.isHandRaised)
 
           videoBinding.videoCard.isBrb.alpha =
             visibilityOpacity(CustomPeerMetadata.fromJson(newVideo.peer.metadata)?.isBRBOn == true)
@@ -434,13 +434,13 @@ abstract class VideoGridBaseFragment : Fragment() {
     if (renderedViewPair != null) {
       when (peerTypePair.second) {
         HMSPeerUpdate.METADATA_CHANGED -> {
-          val isHandRaised = renderedViewPair.meetingTrack.peer.isHandRaised()
+          val isHandRaised = renderedViewPair.meetingTrack.peer.isHandRaised
           val isBRB = CustomPeerMetadata.fromJson(renderedViewPair.meetingTrack.peer.metadata)?.isBRBOn == true
           renderedViewPair.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
           renderedViewPair.binding.videoCard.isBrb.alpha = visibilityOpacity(isBRB)
         }
         HMSPeerUpdate.HAND_RAISED_CHANGED -> {
-          renderedViewPair.binding.videoCard.raisedHand.alpha = visibilityOpacity(renderedViewPair.meetingTrack.peer.isHandRaised())
+          renderedViewPair.binding.videoCard.raisedHand.alpha = visibilityOpacity(renderedViewPair.meetingTrack.peer.isHandRaised)
         }
         HMSPeerUpdate.NAME_CHANGED -> {
           with(renderedViewPair.binding.videoCard) {
