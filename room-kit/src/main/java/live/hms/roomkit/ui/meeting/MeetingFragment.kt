@@ -507,6 +507,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
+
         meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
                 binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
         }
@@ -780,6 +781,9 @@ class MeetingFragment : Fragment() {
             chatViewModel.peersUpdate()
         }
 
+        meetingViewModel.roleChange.observe(viewLifecycleOwner) {
+            updateChatButtonWhenRoleChanges()
+        }
     }
 
 
@@ -890,10 +894,21 @@ class MeetingFragment : Fragment() {
                 toggleChatVisibility()
             }
         }
-
         setupConfiguration(mode)
     }
 
+    fun updateChatButtonWhenRoleChanges() {
+        if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
+            binding.messageMenu.visibility = View.VISIBLE
+        } else {
+            binding.messageMenu.visibility = View.GONE
+        }
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
+            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+        } else {
+            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
+        }
+    }
     var controlBarsVisible = true
     private fun setupConfiguration(mode: MeetingViewMode) {
         if (mode is MeetingViewMode.HLS_VIEWER) {
@@ -1083,6 +1098,9 @@ class MeetingFragment : Fragment() {
     }
 
     private fun moveChat(up: Boolean, bottomMenuHeight: Float) {
+        if(binding.chatView.visibility != View.VISIBLE)
+            return
+
         with(binding.chatView!!){
             if(up) {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
@@ -1361,6 +1379,7 @@ class MeetingFragment : Fragment() {
         }
 
         if(binding.chatView.visibility == View.VISIBLE) {
+
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {
             binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
