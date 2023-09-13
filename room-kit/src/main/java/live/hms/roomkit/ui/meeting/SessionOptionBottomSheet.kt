@@ -167,7 +167,7 @@ class SessionOptionBottomSheet(
 
         if (meetingViewModel.isParticpantListEnabled())
         meetingViewModel.peerCount.observe(viewLifecycleOwner) {
-            peerListOption.setParticpantCountUpdate(meetingViewModel.peers.size)
+            peerListOption.setParticpantCountUpdate(it)
         }
 
 
