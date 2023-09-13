@@ -1436,7 +1436,7 @@ internal fun ListItemPeerListBinding.applyTheme() {
 private fun closeButtonTheme(closeCombinedTabButton: AppCompatImageButton, res : Resources) {
     closeCombinedTabButton.setBackgroundDrawable(ResourcesCompat.getDrawable(
         res,
-        R.drawable.ic_close_16, null
+        R.drawable.ic_cross, null
     )?.apply {
         setTint(
             getColorOrDefault(
