@@ -57,6 +57,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
+import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_CHAT_ALONE
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
@@ -257,6 +258,7 @@ class MeetingFragment : Fragment() {
             }
 
             R.id.action_participants -> {
+                // Possibly unused
                 val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
                 } else {
@@ -450,7 +452,11 @@ class MeetingFragment : Fragment() {
                 binding.editTextMessage.setText("")
             }
         }
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages!!, chatViewModel)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
+            meetingViewModel.prebuiltInfoContainer.isChatEnabled(
+                false
+            )
+        }
     }
 
     override fun onCreateView(
@@ -542,13 +548,15 @@ class MeetingFragment : Fragment() {
         }
 
         chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
-            if (count > 0) {
-                binding.unreadMessageCount.apply {
-                    visibility = View.VISIBLE
-                    text = count.toString()
+            if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(false)) {
+                if (count > 0) {
+                    binding.unreadMessageCount.apply {
+                        visibility = View.VISIBLE
+                        text = count.toString()
+                    }
+                } else {
+                    binding.unreadMessageCount.visibility = View.GONE
                 }
-            } else {
-                binding.unreadMessageCount.visibility = View.GONE
             }
         }
 
@@ -1176,18 +1184,20 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
-                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
+                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
+                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled(false)) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
                                 childFragmentManager
                                     .beginTransaction()
                                     .add(R.id.fragment_container, ParticipantsFragment())
-                                    .addToBackStack(null)
                                     .commit()
                             } else {
                                 val args = Bundle()
-                                    .apply { putBoolean(OPEN_TO_PARTICIPANTS, true) }
+                                    .apply {
+                                        putBoolean(OPEN_TO_PARTICIPANTS, true)
+                                    }
 
                                 ChatParticipantCombinedFragment()
                                     .apply { arguments = args }
@@ -1248,13 +1258,17 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
+        binding.buttonOpenChat.visibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(false))
             View.VISIBLE
         else
             View.GONE
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
-                ChatParticipantCombinedFragment().show(
+                ChatParticipantCombinedFragment().apply {
+                    arguments = Bundle().apply { putBoolean(OPEN_TO_CHAT_ALONE,
+                        !meetingViewModel.isParticpantListEnabled()
+                    ) }
+                }.show(
                     childFragmentManager,
                     ChatParticipantCombinedFragment.TAG
                 )

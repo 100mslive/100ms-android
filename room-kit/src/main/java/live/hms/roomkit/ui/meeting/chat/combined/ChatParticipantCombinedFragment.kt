@@ -20,8 +20,18 @@ import live.hms.roomkit.ui.meeting.participants.ParticipantsTabFragment
 import live.hms.roomkit.ui.theme.applyTheme
 
 
-class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class ChatOnlyAdapter(fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
 
+    override fun getItemCount(): Int = 1
+
+    override fun createFragment(position: Int): Fragment {
+        // Return a NEW fragment instance in createFragment(int).
+
+        return CombinedChatFragmentTab()
+    }
+}
+class ChatParticipantAdapter(fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
+    val partFragment = ParticipantsTabFragment(fragment::dismiss)
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
@@ -30,14 +40,15 @@ class ChatParticipantAdapter(fragment: Fragment) : FragmentStateAdapter(fragment
         return if (position == 0)
             CombinedChatFragmentTab()
         else
-            ParticipantsTabFragment()
+            partFragment
     }
 }
 const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"
+const val OPEN_TO_CHAT_ALONE: String= "CHAT_TAB_ONLY"
 class ChatParticipantCombinedFragment : BottomSheetDialogFragment() {
     private lateinit var binding : LayoutChatParticipantCombinedBinding//by viewLifecycle<LayoutChatParticipantCombinedBinding>()
-    lateinit var pagerAdapter : ChatParticipantAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
-    val meetingViewModel by activityViewModels<MeetingViewModel>()
+    lateinit var pagerAdapter : FragmentStateAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
+//    val meetingViewModel by activityViewModels<MeetingViewModel>()
 //    private val args: ChatParticipantCombinedFragmentArgs by navArgs()
 companion object {
     val TAG: String = "CombinedChatFragmentTag"
@@ -48,16 +59,17 @@ companion object {
         setStyle(STYLE_NORMAL, R.style.RoundedTabDialogTheme);
     }
 
-    private fun getShowParticipants() : Boolean =
+    private fun hideParticipantTab() : Boolean =
+        arguments?.getBoolean(OPEN_TO_CHAT_ALONE, false) == true
+    private fun jumpToParticipantsTab() : Boolean =
         arguments?.getBoolean(OPEN_TO_PARTICIPANTS, false) == true
 
     private fun addObservers() {
-        Log.d("asdadasf","Updating ")
         initOnBackPress()
-        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
-
-            binding.tabLayout.getTabAt(1)?.setText("$it")
-        }
+//        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
+//
+//            binding.tabLayout.getTabAt(1)?.setText("$it")
+//        }
     }
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val bottomSheet = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
@@ -66,7 +78,11 @@ companion object {
         binding = LayoutChatParticipantCombinedBinding.bind(view)
         bottomSheet.setContentView(view)
 
-        pagerAdapter = ChatParticipantAdapter(this)
+        pagerAdapter = if(hideParticipantTab())
+            ChatOnlyAdapter(this)
+        else
+            ChatParticipantAdapter(this)
+
         binding.pager.adapter = pagerAdapter
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             tab.text = if(position == 0 ) "Chat" else "Participants"
@@ -78,7 +94,7 @@ companion object {
             dismissAllowingStateLoss()
         }
 
-        if(getShowParticipants())
+        if(jumpToParticipantsTab() && !hideParticipantTab())
             binding.pager.post {
                 binding.pager.setCurrentItem(1, true)
             }
@@ -88,7 +104,7 @@ companion object {
                 state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
-        binding.applyTheme()
+        binding.applyTheme(hideParticipantTab())
         return bottomSheet
     }
 

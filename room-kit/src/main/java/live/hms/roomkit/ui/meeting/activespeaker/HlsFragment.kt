@@ -10,30 +10,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
-import androidx.media3.common.Player.Listener
 import androidx.media3.common.VideoSize
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-import androidx.media3.ui.AspectRatioFrameLayout.ResizeMode
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
 import live.hms.hls_player.HmsHlsPlayer
-import live.hms.roomkit.R
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
 import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.meeting.ChatViewModelFactory
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
-import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -107,13 +100,17 @@ class HlsFragment : Fragment() {
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
-        val chatVisibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
+        val chatVisibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(true))
             View.VISIBLE
         else
             View.GONE
         binding.chatMessages.visibility = chatVisibility
         binding.chatView.visibility = chatVisibility
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel)
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
+            meetingViewModel.prebuiltInfoContainer.isChatEnabled(
+                true
+            )
+        }
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {

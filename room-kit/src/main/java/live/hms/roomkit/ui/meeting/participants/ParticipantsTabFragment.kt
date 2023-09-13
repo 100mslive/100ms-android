@@ -11,30 +11,25 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.databinding.LayoutParticipantsMergeBinding
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 
-class ParticipantsTabFragment : Fragment() {
+class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
 
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<LayoutParticipantsMergeBinding>()
@@ -111,7 +106,8 @@ class ParticipantsTabFragment : Fragment() {
         ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size, ::expandedGroups))
             .apply {
                 addAll(groupedPeers[key]?.map {
-                    ParticipantItem(it,
+                    ParticipantItem(
+                        it,
                         localPeer,
                         meetingViewModel::togglePeerMute,
                         ::changePeerRole,
@@ -120,7 +116,8 @@ class ParticipantsTabFragment : Fragment() {
                         canRemovePeers,
                         meetingViewModel.prebuiltInfoContainer,
                         meetingViewModel.participantPreviousRoleChangeUseCase,
-                        meetingViewModel::requestPeerLeave
+                        meetingViewModel::requestPeerLeave,
+                        meetingViewModel.activeSpeakers
                     )
                 }!!)
                 // If the group was expanded, open it again.
@@ -190,17 +187,6 @@ class ParticipantsTabFragment : Fragment() {
                 )
             }
     }
-
-    private fun onSheetClicked(peer: HMSPeer) {
-        val action =
-            ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(
-                peer.peerID,
-                meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray(),
-                peer.name
-            )
-        findNavController().navigate(action)
-    }
-
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         binding.recyclerView.adapter = adapter
@@ -222,7 +208,7 @@ class ParticipantsTabFragment : Fragment() {
 
                 val builder = AlertDialog.Builder(requireContext())
                     .setMessage(message)
-                    .setTitle(live.hms.roomkit.R.string.non_fatal_error_dialog_title)
+                    .setTitle(R.string.non_fatal_error_dialog_title)
                     .setCancelable(true)
 
                 builder.setPositiveButton(live.hms.roomkit.R.string.ok) { dialog, _ ->
@@ -244,7 +230,7 @@ class ParticipantsTabFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().popBackStack()
+                    dismissFragment()
                 }
             })
     }

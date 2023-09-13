@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,12 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -119,7 +118,8 @@ class ParticipantsFragment : Fragment() {
                         canRemovePeers,
                         meetingViewModel.prebuiltInfoContainer,
                         meetingViewModel.participantPreviousRoleChangeUseCase,
-                        meetingViewModel::requestPeerLeave
+                        meetingViewModel::requestPeerLeave,
+                        meetingViewModel.activeSpeakers
                     )
                 }!!)
                 // If the group was expanded, open it again.
@@ -163,7 +163,9 @@ class ParticipantsFragment : Fragment() {
             }
             addItemDecoration(divider)
         }
-
+        binding.closeButton.setOnSingleClickListener {
+            closeButton()
+        }
         // Search disables conventional updates.
         binding.textInputSearch.apply {
             addTextChangedListener { text ->
@@ -173,6 +175,13 @@ class ParticipantsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun closeButton() {
+        parentFragmentManager
+            .beginTransaction()
+            .remove(this)
+            .commitAllowingStateLoss()
     }
 
     private fun getSearchFilteredPeersIfNeeded() : List<HMSPeer> {
@@ -242,7 +251,7 @@ class ParticipantsFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    findNavController().popBackStack()
+                    closeButton()
                 }
             })
     }

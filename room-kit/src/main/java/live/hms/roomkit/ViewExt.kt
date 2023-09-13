@@ -41,6 +41,11 @@ fun View.setOnSingleClickListener(l: View.OnClickListener) {
 fun View.setOnSingleClickListener(l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l))
 }
+
+fun View.gone() {
+    if (this.visibility != View.GONE)
+        this.visibility = View.GONE
+}
 fun View.show() {
     if (this.visibility != View.VISIBLE)
         this.visibility = View.VISIBLE

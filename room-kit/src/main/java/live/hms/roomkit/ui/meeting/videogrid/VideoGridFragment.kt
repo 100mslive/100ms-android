@@ -200,9 +200,13 @@ class VideoGridFragment : Fragment() {
             localMeeting = it.filter { it.isLocal && it.isScreen.not() }.firstOrNull()
 
             //show or hide inset
-            if ( (it.size == 1 && localMeeting != null) || (it.size == 2 && it.filter { it.isLocal }.size == 2)) {
+            if (meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole).not())
                 binding.insetPill.visibility = View.GONE
-            } else if (it.size > 1 && localMeeting != null && meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole)) {
+            else if ( (it.size == 1 && localMeeting != null)
+                || (it.size == 2 && it.filter { it.isLocal }.size == 2)
+            ) {
+                binding.insetPill.visibility = View.GONE
+            } else if (it.size > 1 && localMeeting != null) {
                 binding.insetPill.visibility = View.VISIBLE
             } else if (localMeeting == null) {
                 binding.insetPill.visibility = View.GONE
