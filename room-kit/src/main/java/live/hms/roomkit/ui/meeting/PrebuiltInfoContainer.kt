@@ -26,10 +26,10 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
     }
     fun isChatOverlay(isHls : Boolean) = if(isHls) {
-        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.overlayView != true
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.overlayView == true
     } else {
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-            ?.default?.elements?.chat?.overlayView != true
+            ?.default?.elements?.chat?.overlayView == true
     }
 
     fun onStageExp(role : String) =
