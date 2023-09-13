@@ -268,7 +268,6 @@
 
         <EditText
             android:id="@+id/edit_text_message"
-            style="@style/TextInputLayout"
             android:layout_width="wrap_content"
             android:layout_toStartOf="@id/icon_send"
             android:layout_alignParentStart="true"

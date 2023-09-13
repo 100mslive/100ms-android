@@ -1572,12 +1572,7 @@ internal fun ListItemChatBinding.applyTheme() {
 }
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {
-    chatView.background = getChatBackgroundDrawable()
-    editTextMessage.background = getChatBackgroundDrawable()
-    iconSend.drawable.setTint(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-    ))
+
 
     progressBar.progressTintList = ColorStateList.valueOf(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,

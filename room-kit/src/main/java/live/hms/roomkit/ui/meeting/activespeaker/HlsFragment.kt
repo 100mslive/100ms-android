@@ -42,8 +42,6 @@ import kotlin.math.absoluteValue
  */
 private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
-    private val chatViewModel: ChatViewModel by activityViewModels()
-    private val chatAdapter = ChatAdapter()
 
     private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
@@ -91,29 +89,7 @@ class HlsFragment : Fragment() {
             }
         }
 
-        binding.iconSend.setOnSingleClickListener {
-            val messageStr = binding.editTextMessage.text.toString().trim()
-            if (messageStr.isNotEmpty()) {
-                chatViewModel.sendMessage(messageStr)
-                binding.editTextMessage.setText("")
-            }
-        }
-
         setPlayerStatsListener(true)
-        meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
-            chatViewModel.receivedMessage(it)
-        }
-        val chatVisibility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(true))
-            View.VISIBLE
-        else
-            View.GONE
-        binding.chatMessages.visibility = chatVisibility
-        binding.chatView.visibility = chatVisibility
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
-            meetingViewModel.prebuiltInfoContainer.isChatEnabled(
-                true
-            )
-        }
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {
