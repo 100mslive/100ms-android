@@ -157,7 +157,7 @@ class SessionOptionBottomSheet(
 
         meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
             screenShareOption.setSelectedButton(it)
-            peerListOption.setParticpantCountUpdate(meetingViewModel.peers.size)
+            peerListOption.setParticpantCountUpdate(meetingViewModel.peerCount.value)
             screenShareOption.setText(if (it) resources.getString(R.string.stop_share_screen) else resources.getString(R.string.start_screen_share))
         }
 
@@ -166,7 +166,7 @@ class SessionOptionBottomSheet(
         }
 
         if (meetingViewModel.isParticpantListEnabled())
-        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
+        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
             peerListOption.setParticpantCountUpdate(meetingViewModel.peers.size)
         }
 

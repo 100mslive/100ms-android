@@ -506,8 +506,8 @@ class MeetingFragment : Fragment() {
                 binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
         }
 
-        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
-            binding.tvViewersCount?.text =meetingViewModel.peers.size.toString()
+        meetingViewModel.peerCount.observe(viewLifecycleOwner) {
+            binding.tvViewersCount?.text =it.toString()
 
         }
 
