@@ -159,12 +159,6 @@ class MeetingViewModel(
                 override fun onTokenSuccess(token: String) {
 
                     val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
-                    if (layoutEndpointBase.isNullOrEmpty()) {
-                        //todo remove this if it's a prod room then don't call the layout API
-                        setHmsConfig(hmsPrebuiltOptions, token, initURL)
-                        setTheme(HMSPrebuiltTheme.getDefaultHmsColorPalette())
-                        onHMSActionResultListener.onSuccess()
-                    } else {
                         hmsSDK.getRoomLayout(
                             token,
                             LayoutRequestOptions(layoutEndpointBase),
@@ -184,7 +178,6 @@ class MeetingViewModel(
                                 }
 
                             })
-                    }
                 }
 
             })
