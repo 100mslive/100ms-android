@@ -1052,7 +1052,9 @@ class MeetingFragment : Fragment() {
                 override fun onAnimationStart(animation: Animator?) {
                     binding.topMenu.visibility = View.VISIBLE
                     showSystemBars()
-                    moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
+                    // This prvents the bar from moving twice as high as it should
+                    if(shouldHideAfterDelay)
+                        moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
