@@ -786,9 +786,10 @@ class MeetingViewModel(
                         participantPeerUpdate.postValue(Unit)
                     }
 
-                    HMSPeerUpdate.METADATA_CHANGED,
+                    HMSPeerUpdate.METADATA_CHANGED ,
                     HMSPeerUpdate.HAND_RAISED_CHANGED -> {
-                        triggerBringOnStageNotificationIfHandRaised(hmsPeer)
+                        if (type == HMSPeerUpdate.HAND_RAISED_CHANGED)
+                            triggerBringOnStageNotificationIfHandRaised(hmsPeer)
                         if (hmsPeer.isLocal) {
                             updateSelfHandRaised(hmsPeer as HMSLocalPeer)
                         } else {
