@@ -961,7 +961,6 @@ class MeetingFragment : Fragment() {
     private fun configureHLSView() {
         updateBindings()
 
-        hideSystemBars()
 
         delayedHide(3000)
     }
@@ -998,41 +997,6 @@ class MeetingFragment : Fragment() {
         }
     }
 
-    private fun hideSystemBars() {
-            activity?.let {
-                val windowInsetsController = WindowCompat.getInsetsController(it.window, it.window.decorView)
-                windowInsetsController?.systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
-                // Step 1
-                WindowCompat.setDecorFitsSystemWindows(it.window, false)
-                // step 2
-                windowInsetsController?.isAppearanceLightNavigationBars = true
-
-                // step 3
-                view?.let { it1 ->
-                    ViewCompat.setOnApplyWindowInsetsListener(it1) { view, windowInsets ->
-                        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-                        // Apply the insets as a margin to the view. Here the system is setting
-                        // only the bottom, left, and right dimensions, but apply whichever insets are
-                        // appropriate to your layout. You can also update the view padding
-                        // if that's more appropriate.
-                        val params = it1.layoutParams as ViewGroup.MarginLayoutParams
-                        params.leftMargin = insets.left
-                        params.bottomMargin = insets.bottom
-                        params.rightMargin = insets.right
-                        it1.layoutParams = params
-
-                        // Return CONSUMED if you don't want want the window insets to keep being
-                        // passed down to descendant views.
-                        WindowInsetsCompat.CONSUMED
-                    }
-                }
-
-                // step  4
-                windowInsetsController?.hide(WindowInsetsCompat.Type.navigationBars())
-            }
-    }
 
     private fun showSystemBars() {
 
@@ -1138,7 +1102,6 @@ class MeetingFragment : Fragment() {
                 override fun onAnimationEnd(animation: Animator?) {
                     topMenu.visibility = View.GONE
                     controlBarsVisible = false
-                    hideSystemBars()
                 }
 
                 override fun onAnimationCancel(animation: Animator?) {
