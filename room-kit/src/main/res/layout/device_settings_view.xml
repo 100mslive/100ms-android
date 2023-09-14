@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
-    android:background="@color/primary_bg">
+    android:padding="20dp">
 
     <ImageView
         android:id="@+id/close_btn"
@@ -25,7 +24,6 @@
         android:fontFamily="@font/inter_semibold"
         android:text="Device Stats"
         android:textAllCaps="false"
-        android:textColor="@color/muted_text"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/close_btn"
         app:layout_constraintEnd_toEndOf="parent"

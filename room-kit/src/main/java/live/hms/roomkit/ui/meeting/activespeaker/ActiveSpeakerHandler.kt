@@ -3,10 +3,9 @@ package live.hms.roomkit.ui.meeting.activespeaker
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.utils.HMSLogger
-
-class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
+class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val numActiveSpeakerVideos : Int = 4, private val getTracks: () -> List<MeetingTrack>) {
     private val TAG = ActiveSpeakerHandler::class.java.simpleName
-    private val speakerCache = ActiveSpeakerCache<SpeakerItem>(4)
+    private val speakerCache = ActiveSpeakerCache<SpeakerItem>(numActiveSpeakerVideos, appendUnsorted)
 
     fun trackUpdateTrigger(tracks: List<MeetingTrack>): List<MeetingTrack> {
         synchronized(tracks) {
@@ -46,15 +45,22 @@ class ActiveSpeakerHandler(private val getTracks: () -> List<MeetingTrack>) {
     private fun update(): List<MeetingTrack> {
         // Update all the videos which aren't screenshares
 
-        val order = speakerCache.getAllItems()
-        val videos = order.mapNotNull { orderedItem ->
-            getTracks().find { givenTrack ->
-                givenTrack.peer.peerID == orderedItem.peerId && givenTrack.isScreen.not()
+        synchronized(getTracks()){
+            val order = speakerCache.getAllItems()
+            return  order.mapNotNull { orderedItem ->
+                getTracks().find { givenTrack ->
+                    givenTrack.peer.peerID == orderedItem.peerId && givenTrack.isScreen.not()
+                }
             }
         }
-        return videos
+
+
         // Always bind videos after this function is called
         // updateVideos(binding.container, videos)
+    }
+
+    fun updateMaxActiveSpeaker(maxActiveSpeaker: Int) {
+        speakerCache.updateMaxActiveSpeaker(maxActiveSpeaker)
     }
 
     data class SpeakerItem(

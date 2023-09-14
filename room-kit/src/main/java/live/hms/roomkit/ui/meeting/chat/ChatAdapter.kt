@@ -4,43 +4,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemChatBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ChatAdapter(
-  private val messages: ArrayList<ChatMessage>,
-  private val onPin : (String?) -> Unit
-) : RecyclerView.Adapter<ChatAdapter.ChatMessageViewHolder>() {
+class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+  private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
+  companion object {
+    private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
+      override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
+        oldItem == newItem
 
-  private val dateFormatter = SimpleDateFormat("EEE, d MMM HH:mm", Locale.getDefault())
+
+      override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean =
+        oldItem == newItem
+    }
+  }
 
   inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
     RecyclerView.ViewHolder(binding.root) {
-
     init {
-      binding.messageOptionsImageButton.setOnClickListener {
-        val popup = PopupMenu(it.context, it)
-        popup.menuInflater
-          .inflate(R.menu.menu_chat, popup.menu)
-        popup.show()
-        popup.setOnMenuItemClickListener {
-          onPin(with(messages[bindingAdapterPosition]) {
-            "$senderName: $message"
-          })
-          true
-        }
-      }
+        binding.applyTheme()
     }
 
-    fun bind(message: ChatMessage) {
-      binding.name.text = "${message.senderName}${getRecipientText(message)}"
-      binding.message.text = message.message
-      binding.blueBar.visibility = if (message.isSentByMe) View.VISIBLE else View.GONE
-      binding.time.text = dateFormatter.format(message.time)
+
+    fun bind(sentMessage: ChatMessage) {
+      with(binding) {
+        name.text = "${sentMessage.senderName}${getRecipientText(sentMessage)}"
+        message.text = sentMessage.message
+        blueBar.visibility = if (sentMessage.isSentByMe) View.VISIBLE else View.GONE
+        if(sentMessage.time != null) {
+          time.text = formatter.format(Date(sentMessage.time))
+        }
+      }
     }
 
     private fun getRecipientText(message: ChatMessage): String =
@@ -61,8 +63,15 @@ class ChatAdapter(
   }
 
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
-    holder.bind(messages[position])
+    holder.bind(getItem(position))
   }
 
-  override fun getItemCount() = messages.size
+  override fun onBindViewHolder(
+    holder: ChatMessageViewHolder,
+    position: Int,
+    payloads: MutableList<Any>
+  ) {
+    super.onBindViewHolder(holder, position, payloads)
+    // Skip doing anything maybe it just relayouts
+  }
 }

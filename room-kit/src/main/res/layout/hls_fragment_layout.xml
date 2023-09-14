@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Player view -->
     <androidx.media3.ui.PlayerView
         android:id="@+id/hls_view"
+        app:use_controller="false"
+        app:resize_mode="zoom"
+        android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Stats for nerds -->
     <LinearLayout
         android:layout_below="@id/extra_properties"
         android:id="@+id/stats_view_parent"
@@ -18,7 +31,7 @@
         android:background="#80000000"
         android:orientation="vertical"
         android:padding="10dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/stats_view"
@@ -43,8 +56,8 @@
                 android:layout_marginStart="2dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center" />
-
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="horizontal"
@@ -67,10 +80,9 @@
 
         </LinearLayout>
 
-
-
     </LinearLayout>
 
+    <!-- Goto live and track selector -->
     <LinearLayout
         android:id="@+id/extra_properties"
         android:layout_width="match_parent"
@@ -79,8 +91,8 @@
         android:layout_marginHorizontal="16dp"
         android:paddingHorizontal="8dp"
         android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        >
+        android:visibility="gone"
+        android:orientation="horizontal">
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_track_selection"
             android:layout_width="24dp"
@@ -89,11 +101,11 @@
             android:src="@drawable/settings_icon"
             android:text="Settings"
             android:textAllCaps="false" />
-<Space
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    />
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_seek_live"
             android:layout_width="wrap_content"
@@ -104,15 +116,15 @@
             android:textAllCaps="false" />
     </LinearLayout>
 
+    <!-- To show timed metadata -->
     <TextView
         android:layout_alignParentBottom="true"
         android:id="@+id/hlsCues"
+        android:visibility="gone"
         android:textSize="12pt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:text="Hls Text"
-        android:textColor="@color/white"
         />
-
 
 </RelativeLayout>

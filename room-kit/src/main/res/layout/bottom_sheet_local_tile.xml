@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp"
+    android:id="@+id/rootLayout"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
+
+
+
+            <TextView
+                android:paddingTop="24dp"
+                android:paddingLeft="16dp"
+                android:id="@+id/audio_ot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawablePadding="8dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="You"
+                android:textSize="16sp" />
+
+            <TextView
+                android:paddingBottom="16dp"
+                android:paddingTop="8dp"
+                android:paddingLeft="16dp"
+                android:id="@+id/role_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawablePadding="8dp"
+                android:fontFamily="@font/inter_regular"
+                android:lineHeight="16dp"
+                android:textSize="13sp" />
+
+
+
+
+        <View
+            android:id="@+id/border5"
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/gray_line_vertical_divider" />
+
+        <TextView
+            android:id="@+id/earpiece_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/icon_maximised"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Minimise Your Tile"
+            android:visibility="visible" />
+
+        <View
+            android:id="@+id/border6"
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            android:layout_marginHorizontal="16dp"
+            android:background="@drawable/gray_line_vertical_divider" />
+
+        <TextView
+            android:id="@+id/change_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/change_name"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="20dp"
+            android:text="Change Name"
+            android:visibility="visible" />
+
+
+    </LinearLayout>
+
+</FrameLayout>

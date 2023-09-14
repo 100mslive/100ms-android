@@ -4,4 +4,24 @@
     <dimen name="video_list_size">120dp</dimen>
     <dimen name="audio_item_size">120dp</dimen>
     <dimen name="bottom_meeting_control_size">64dp</dimen>
+    <dimen name="inset_pill_width">104dp</dimen>
+    <dimen name="inset_pill_height">186dp</dimen>
+    <dimen name="sizeteen_dp">16dp</dimen>
+    <dimen name="eight_dp">8dp</dimen>
+    <dimen name="one_dp">1dp</dimen>
+    <dimen name="two_dp">2dp</dimen>
+    <dimen name="popup_height">170dp</dimen>
+    <dimen name="twohundred_dp">160dp</dimen>
+    <dimen name="popup_width">225dp</dimen>
+    <dimen name="onefify_dp">200dp</dimen>
+    <dimen name="four_dp">4dp</dimen>
+    <dimen name="twelve_dp">12dp</dimen>
+    <dimen name="thirty_two_dp">32dp</dimen>
+    <dimen name="tall_bottom_sheet">90%</dimen>
+    <dimen name="curve">12dp</dimen>
+    <dimen name="spacing_d1">8dp</dimen>
+    <dimen name="spacing_d2">16dp</dimen>
+    <dimen name="spacing_d4">32dp</dimen>
+    <dimen name="participant_item_icon">24dp</dimen>
+    <dimen name="participant_item_icon_padding">4dp</dimen>
 </resources>

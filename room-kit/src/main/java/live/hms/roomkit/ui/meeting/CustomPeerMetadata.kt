@@ -2,11 +2,17 @@ package live.hms.roomkit.ui.meeting
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.google.gson.annotations.SerializedName
 
 data class CustomPeerMetadata(
+    @SerializedName("isHandRaised")
     val isHandRaised: Boolean,
+    @SerializedName("isBRBOn")
     val isBRBOn: Boolean,
-    val name: String
+    @SerializedName("name")
+    val name: String? = null,
+    @SerializedName("prevRole")
+    val prevRole : String? = null
 ) {
 
     fun toJson(): String {

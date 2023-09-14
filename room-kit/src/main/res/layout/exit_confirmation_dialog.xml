@@ -3,8 +3,7 @@
     android:id="@+id/parent_view"
     style="?attr/bottomSheetStyle"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/primary_bg">
+    android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -23,7 +22,6 @@
             android:gravity="center|start"
             android:paddingVertical="6dp"
             android:text="Leave Studio"
-            android:textColor="@color/white"
             android:textSize="20sp" />
 
         <TextView
@@ -65,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/primary_red_round_drawable"
+                android:background="@drawable/primary_round_drawable"
                 android:fontFamily="@font/inter_semibold"
                 android:text="Leave"
                 android:textAllCaps="false" />

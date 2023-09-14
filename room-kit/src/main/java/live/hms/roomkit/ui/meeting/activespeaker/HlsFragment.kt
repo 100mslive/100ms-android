@@ -1,24 +1,35 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import android.widget.RelativeLayout
+import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.launch
-import live.hms.roomkit.R
+import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
+import live.hms.roomkit.R
+import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.chat.ChatAdapter
+import live.hms.roomkit.ui.meeting.chat.ChatUseCase
+import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.util.contextSafe
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -45,6 +56,7 @@ class HlsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         binding = HlsFragmentLayoutBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -52,7 +64,7 @@ class HlsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.applyTheme()
         binding.btnSeekLive.setOnClickListener {
             player.seekToLivePosition()
         }
@@ -99,14 +111,47 @@ class HlsFragment : Fragment() {
     fun resumePlay() {
 
         binding.hlsView.player = player.getNativePlayer()
+        player.getNativePlayer().addListener(object : Player.Listener {
+            @SuppressLint("UnsafeOptInUsageError")
+            override fun onSurfaceSizeChanged(width: Int, height: Int) {
+                super.onSurfaceSizeChanged(width, height)
 
+            }
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
+                super.onVideoSizeChanged(videoSize)
+                viewLifecycleOwner.lifecycleScope.launch {
+
+                    if (videoSize.height !=0 && videoSize.width !=0) {
+                        val width = videoSize.width
+                        val height = videoSize.height
+
+                        //landscape play
+                        if (width > height) {
+                            binding.hlsView.resizeMode = RESIZE_MODE_FIT
+                        } else {
+                            binding.hlsView.resizeMode = RESIZE_MODE_ZOOM
+                        }
+                        binding.progressBar.visibility = View.GONE
+                        binding.hlsView.visibility = View.VISIBLE
+                    }
+                }
+
+            }
+        })
+        
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
             override fun onPlaybackFailure(error : HmsHlsException) {
                 Log.d("HMSHLSPLAYER","From App, error: $error")
             }
 
+            @SuppressLint("UnsafeOptInUsageError")
             override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
+                contextSafe { context, activity ->
+                    activity.runOnUiThread {
+
+                    }
+                }
                 Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
 
@@ -149,7 +194,7 @@ class HlsFragment : Fragment() {
 
                 @SuppressLint("SetTextI18n")
                 override fun onEventUpdate(playerStats: PlayerStatsModel) {
-                    updateLiveButtonVisibility(playerStats)
+//                    updateLiveButtonVisibility(playerStats)
                     if(isStatsDisplayActive) {
                         updateStatsView(playerStats)
                     }

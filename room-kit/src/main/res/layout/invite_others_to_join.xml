@@ -9,7 +9,6 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/primary_bg"
         android:orientation="vertical"
         android:padding="24dp">
 
@@ -41,7 +40,6 @@
             android:layout_marginTop="20dp"
             android:fontFamily="@font/inter_semibold"
             android:text="@string/invite_others_str"
-            android:textColor="@color/white"
             android:textSize="20sp" />
 
         <TextView
@@ -50,7 +48,6 @@
             android:layout_marginTop="8dp"
             android:fontFamily="@font/inter_semibold"
             android:text="@string/add_other_broadcasters_str"
-            android:textColor="@color/muted_text"
             android:textSize="14sp" />
 
     </LinearLayout>

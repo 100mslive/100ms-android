@@ -5,7 +5,6 @@
     style="?attr/bottomSheetStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/primary_bg"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -30,16 +29,14 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:fontFamily="@font/inter_semibold"
-            android:text="Change role"
-            android:textColor="@color/white" />
+            android:text="Change role" />
 
         <Button
             android:id="@+id/muteUnmuteVideo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_semibold"
-            android:text="Ask to unmute video"
-            android:textColor="@color/white" />
+            android:text="Ask to unmute video" />
 
         <Button
             android:id="@+id/muteUnmuteAudio"
@@ -47,15 +44,14 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_semibold"
             android:text="Ask to unmute audio"
-            android:textColor="@color/white" />
+            />
 
         <Button
             android:id="@+id/removePeer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
-            android:text="Remove Peer"
-            android:textColor="@color/white" />
+            android:text="Remove Peer" />
 
         <Space
             android:layout_width="0dp"
@@ -68,7 +64,7 @@
             android:background="@android:color/transparent"
             android:fontFamily="@font/inter_semibold"
             android:text="Cancel"
-            android:textColor="@color/white" />
+             />
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

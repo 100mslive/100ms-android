@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/root"
     android:layout_height="match_parent">
 
     <com.google.android.material.textview.MaterialTextView
@@ -10,11 +11,50 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@drawable/circle_secondary_80"
         android:gravity="center"
         android:text="@string/john_doe_initials"
         android:textColor="@android:color/white"
         android:textSize="40sp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:elevation="@dimen/eight_dp"
+        android:id="@+id/degradedView"
+        android:visibility="visible"
+        android:alpha="0"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/degradeddec"
+            android:id="@+id/degradedHeader"
+            android:textSize="13sp"
+            android:lineHeight="20sp"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:fontFamily="@font/inter_semibold"
+            android:text="Poor connection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/degradedHeader"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/degradeddec"
+            android:textSize="12sp"
+            android:layout_marginHorizontal="16dp"
+            android:gravity="center"
+            android:fontFamily="@font/inter_regular"
+            android:text="The video will resume automatically when the connection improves"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/surface_view_holder"
@@ -38,77 +78,59 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="-8dp"
-        android:layout_marginBottom="-8dp"
-        android:backgroundTint="@color/black_faded_40"
-        app:cardCornerRadius="5dp"
-        app:cardElevation="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="8dp"
         app:strokeWidth="0dp">
 
         <LinearLayout
+            android:id="@+id/linear_layout_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="12dp"
-            android:backgroundTint="@color/black_faded_40"
+            android:layout_marginBottom="4dp"
             android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/network_quality"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="8dp"
-                android:src="@drawable/ic_baseline_wifi_5"
-                android:visibility="gone" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/name"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:ellipsize="end"
-                android:gravity="center"
+                android:layout_marginEnd="4dp"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:text="@string/john_doe"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textSize="14sp"
+                android:fontFamily="@font/inter_regular"
+                android:lineHeight="20sp"
+                />
 
             <ImageView
-                android:id="@+id/icon_audio_off"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:visibility="gone"
+                android:id="@+id/network_quality"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:layout_marginLeft="8dp"
-                android:contentDescription="@string/audio_status"
-                android:src="@drawable/ic_mic_off_24"
-                app:tint="@color/white_faded_70" />
+                android:src="@drawable/ic_baseline_wifi_5"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/icon_screen_share"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
-                android:visibility="gone"
                 android:layout_gravity="center"
                 android:layout_marginLeft="4dp"
+                android:alpha="0"
+                android:visibility="gone"
                 android:contentDescription="@string/screen_share"
                 android:src="@drawable/ic_mobile_screen_share_24"
-                app:tint="@color/white_faded_70" />
+               />
 
-            <ImageView
-                android:id="@+id/ic_degraded"
-                android:layout_width="14dp"
-                android:visibility="gone"
-                android:layout_height="14dp"
-                android:layout_gravity="center"
-                android:layout_marginLeft="8dp"
-                android:src="@drawable/ic_degraded"
-                app:tint="@color/white_faded_70" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -126,49 +148,71 @@
     </ScrollView>
 
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/audio_level"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/container_name"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
-        android:background="@drawable/circle_secondary_24"
-        android:gravity="center"
-        android:text="@string/_hyphen"
-        android:visibility="gone"
-        android:textColor="@android:color/white"
-        android:textSize="10sp"
-        android:textStyle="bold" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/raised_hand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        app:iconSize="24dp"
+        android:src="@drawable/video_tile_hand"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="20dp"
-        android:padding="16dp"
-        android:text="✋"
-        android:textSize="36sp" />
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/icon_audio_off"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="5dp"
+        android:alpha="0"
+        app:iconSize="32dp"
+        android:src="@drawable/video_tile_mute"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/icon_maximised"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="5dp"
+        app:iconSize="32dp"
+        android:elevation="@dimen/sizeteen_dp"
+        android:src="@drawable/icon_maximised"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        />
+
+    <live.hms.roomkit.ui.meeting.audiomode.AudioLevelView
+        android:alpha="0"
+        android:id="@+id/audio_level"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        />
+
+
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/is_brb"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginEnd="16dp"
         android:alpha="0"
-        android:layout_marginBottom="35dp"
-        android:src="@drawable/ic_brb"
-        android:textSize="36sp" />
+        android:src="@drawable/video_tile_brb"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp" />
 
 
 </RelativeLayout>

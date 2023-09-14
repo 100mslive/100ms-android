@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    app:cardBackgroundColor="@color/primary_bg"
     app:cardCornerRadius="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,7 +30,6 @@
             android:fontFamily="@font/inter_semibold"
             android:text="START STREAMING"
             android:textAllCaps="true"
-            android:textColor="@color/muted_text"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="@+id/close_btn"
             app:layout_constraintStart_toEndOf="@+id/close_btn"
@@ -45,7 +43,6 @@
             android:layout_marginTop="5dp"
             android:fontFamily="@font/inter_semibold"
             android:text="HLS"
-            android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="@+id/tv_start_streaming_title"
             app:layout_constraintTop_toBottomOf="@id/tv_start_streaming_title" />
@@ -84,7 +81,6 @@
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/inter_semibold"
                     android:text="HLS Streaming"
-                    android:textColor="@color/white"
                     android:textSize="20sp" />
 
 
@@ -112,16 +108,14 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_record_button_24"
-                    android:tint="@color/white" />
+                    android:src="@drawable/ic_record_button_24" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginStart="20dp"
-                    android:text="Record the stream"
-                    android:textColor="@color/white" />
+                    android:text="Record the stream" />
 
                 <Space
                     android:layout_width="wrap_content"

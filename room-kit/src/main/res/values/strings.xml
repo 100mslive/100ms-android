@@ -6,6 +6,7 @@
     <string name="meeting_fragment">Meeting Fragment</string>
     <string name="chat_fragment">Chat Fragment</string>
     <string name="participants_fragment">Participants Fragment</string>
+    <string name="role_preview_fragment">Role Preview Fragment</string>
 
 
     <string name="environment">Environment</string>
@@ -45,10 +46,13 @@
     <string name="open_chat">Open Chat</string>
     <string name="share_screen">Share Screen</string>
     <string name="stop_share_screen">Stop Share Screen</string>
-    <string name="record_meeting">Record Meeting</string>
+    <string name="record_meeting">Start recording</string>
+    <string name="start_record_meeting">Start recording</string>
+    <string name="start_screen_share">Start Screen Share</string>
+    <string name="stop_record_meeting">Record Meeting</string>
     <string name="show_participants">Show Participants</string>
     <string name="settings_fragment">Settings Fragment</string>
-    <string name="default_name">Default Name</string>
+    <string name="default_name">Enter Name...</string>
     <string name="default_video_source">Default Video Source</string>
     <string name="degradation_preference_str">Degradation Preference</string>
     <string name="default_microphone_source">Default Microphone Source</string>
@@ -67,7 +71,7 @@
     <string name="video_codec">Video Codec</string>
     <string name="log_level_100ms_sdk">Log Level 100ms Sdk</string>
     <string name="log_level_webrtc">Log Level WebRTC</string>
-    <string name="search_participants">Find what you’re looking for</string>
+    <string name="search_participants">Search for participants</string>
     <string name="video_bitrate">Video Bitrate</string>
     <string name="role">Role</string>
     <string name="change_role_request">Change Role Request</string>
@@ -120,6 +124,7 @@
     <string name="grid_view">Grid View</string>
     <string name="active_speaker_view">Active Speaker View</string>
     <string name="screen_share">Screen Share</string>
+    <string name="brb">Be Right Back</string>
     <string name="audio_status">Audio Status</string>
     <string name="video_status">Video Status</string>
     <string name="audio_level">Audio Level</string>
@@ -159,9 +164,16 @@
     <string name="mute_local_audio_on_phone_ring">Mute local audio on phone ring</string>
     <string name="disable_auto_simulcast">Disable Auto Simulcast</string>
     <string name="is_prebuilt_debug_enabled">Prebuilt (NonDebug/Debug)</string>
-    <string name="raise_hand">✋ Raise Hand</string>
+    <string name="go_live_in_prebuilt_debug_enabled">Use Mock API</string>
+    <string name="raise_hand">Raise Hand</string>
+    <string name="raise_hands">Raise Hand</string>
+    <string name="peer_list">Participant(s)</string>
+    <string name="change_name">Change Name</string>
     <string name="pip_mode">PIP mode</string>
     <string name="lower_hand">Lower Hand</string>
+    <string name="start_recording">Recording</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="stop_screenshare">Stop ScreenShare</string>
     <string name="name_change_dialog">Type in the new name</string>
     <string name="submit">Submit</string>
     <string name="hls_start">HLS Start</string>
@@ -174,8 +186,8 @@
     <string name="unknown">unknown</string>
     <string name="file_playing">File Playing</string>
 
-    <string name="camera_and_mic_permissions"><![CDATA[Camera & Mic permissions]]></string>
-    <string name="permissions_description">Just a few things before you join</string>
+    <string name="camera_and_mic_permissions">Enable permissions</string>
+    <string name="permissions_description">Sharing your camera and microphone permissions helps us give you the optimal experience</string>
     <string name="get_name_str">Let’s get started with your name</string>
     <string name="go_live_in_five_str">Go live in five!</string>
     <string name="get_started_str">Get Started</string>
@@ -201,7 +213,31 @@
     <string name="rtmp_streaming_switch">RTMP streaming</string>
     <string name="go_live_str">Go Live</string>
     <string name="end_stream_str">End Stream</string>
-    <string name="live_str">Live</string>
+    <string name="live_str">LIVE</string>
     <string name="device_stats_str">Device Info</string>
-    <item name="IS_INT" type="id"/>
+    <item name="IS_INT" type="id" />
+    <string name="single_choice_text">Select one of the radio buttons to mark the correct answer.</string>
+    <string name="multi_choice_text">Check the boxes to mark the correct answers.</string>
+    <string name="leave_description">Others will continue after you leave. You can join the session again</string>
+    <string name="leave_title">Leave Room</string>
+    <string name="end_session_title">End Stream</string>
+    <string name="end_stream_description">The stream will end for everyone. You can\'t undo this action</string>
+    <string name="end_stream_title">End Stream</string>
+    <string name="end_stream_description_full">This stream will end for everyone and all the activities will stop. You can\'t undo this action</string>
+    <string name="end_session">End Session</string>
+    <string name="toggle_handraise">Toggle Handraise</string>
+    <string name="participant_header_item">%1$s (%2$d)</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="hand_raised_group">Hand Raised</string>
+    <string name="send_messages_to_everyone">Send a message…</string>
+    <string name="audio_only_subheading">Setup your audio before joining</string>
+    <string name="video_only_subheading">Setup your video before joining</string>
+    <string name="audio_video_subheading">Setup your audio and video before joining</string>
+    <string name="audio_video_subheading_no">Setup before joining</string>
+    <string name="participants_heading">Participants (%1$d)</string>
+    <string name="menu_item_mute_audio">Mute Audio</string>
+    <string name="menu_item_mute_video">Mute Video</string>
+    <string name="bring_on_stage">Bring on Stage</string>
 </resources>

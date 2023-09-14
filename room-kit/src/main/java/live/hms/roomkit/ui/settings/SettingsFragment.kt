@@ -15,11 +15,9 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.BuildConfig
 import live.hms.roomkit.databinding.FragmentSettingsBinding
-import live.hms.roomkit.ui.meeting.MeetingViewMode
 import live.hms.roomkit.util.ENV_PROD
 import live.hms.roomkit.util.ENV_QA
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.video.sdk.models.DegradationPreference
 import live.hms.video.utils.HMSLogger
 import java.util.*
@@ -63,7 +61,7 @@ class SettingsFragment : Fragment() {
       "Rear Facing Camera" to REAR_FACING_CAMERA,
     )
 
-    private val MEETING_MODES = MeetingViewMode::class.nestedClasses.mapNotNull { it.simpleName }.toTypedArray()
+    private val MEETING_MODES = arrayListOf<String>("ACTIVE_SPEAKER").toTypedArray()
 
     private val LOG_LEVELS_100MS = HMSLogger.LogLevel.values().map { it.toString() }.toTypedArray()
 
@@ -498,6 +496,12 @@ class SettingsFragment : Fragment() {
         settings.inPreBuiltDebugMode,
         isPrebuiltDebugEnabled
       ) { commitHelper.setPrebuiltDebugMode(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.useMockAPi,
+        goLiveInPrebuiltDebugEnabled
+      ) { commitHelper.setGOLiveInPrebuilt(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

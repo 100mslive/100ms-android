@@ -1,33 +1,53 @@
 package live.hms.roomkit.ui.meeting
 
-import android.app.AlertDialog
-import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import androidx.fragment.app.DialogFragment
+import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.ChangeNameFragmentBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.NameUtils.isValidUserName
+import live.hms.roomkit.util.viewLifecycle
 
 
-class ChangeNameDialogFragment : DialogFragment() {
+class ChangeNameDialogFragment : BottomSheetDialogFragment() {
 
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-
+    private var binding by viewLifecycle<ChangeNameFragmentBinding>()
     companion object {
         const val TAG = "ChangeNameDialogFragment"
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val dialoglayout: View =
-            layoutInflater.inflate(R.layout.change_name_fragment, null)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme);
 
-        val newName = dialoglayout.findViewById<EditText>(R.id.newName)
-        val submitButton = dialoglayout.findViewById<Button>(R.id.submit_name_change_button)
-        val cancelButton = dialoglayout.findViewById<Button>(R.id.cancel_btn)
+
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        binding = ChangeNameFragmentBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.applyTheme()
+        val newName = binding.newName
+        val submitButton = binding.changeName
+        val cancelButton = binding.closeBtn
+        newName.setText(meetingViewModel.hmsSDK.getLocalPeer()?.name.orEmpty())
+        newName.requestFocus()
+        val imm = activity!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
         submitButton.setOnClickListener {
             if (isValidUserName(newName)) {
@@ -37,12 +57,12 @@ class ChangeNameDialogFragment : DialogFragment() {
             }
         }
 
+
+
         cancelButton.setOnClickListener {
-            dismiss()
+            dismissAllowingStateLoss()
         }
 
-        return AlertDialog.Builder(requireContext())
-            .setView(dialoglayout)
-            .create()
     }
+
 }

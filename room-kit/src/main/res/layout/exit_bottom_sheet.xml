@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/end_session_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/leave_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/leave_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_leave" />
+
+                <TextView
+                    android:id="@+id/leave_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:lineHeight="24sp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:textSize="20sp"
+                    android:text="@string/leave_title" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/leave_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="40dp"
+                android:layout_marginTop="4dp"
+                android:gravity="start"
+                android:lineHeight="20sp"
+                android:textSize="14dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/leave_description" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/end_session_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/icon_end_session"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_end_session" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/end_session_title"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:lineHeight="24sp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:textSize="20sp"
+                    android:text="@string/end_session_title" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/end_session_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="40dp"
+                android:layout_marginTop="4dp"
+                android:gravity="start"
+                android:lineHeight="20sp"
+                android:textSize="14dp"
+                android:fontFamily="@font/inter_semibold"
+                android:text="@string/end_stream_description" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

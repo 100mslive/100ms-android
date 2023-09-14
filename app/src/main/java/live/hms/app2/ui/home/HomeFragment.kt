@@ -129,36 +129,32 @@ class HomeFragment : Fragment() {
 
     private fun joinRoom() {
         settings.lastUsedMeetingUrl = settings.lastUsedMeetingUrl.replace("/preview/", "/meeting/")
-        getRoomCodeFromURl(settings.lastUsedMeetingUrl)
+        val code = getRoomCodeFromURl(settings.lastUsedMeetingUrl)
+        launchPrebuilt(code!!)
     }
 
-    private fun getRoomCodeFromURl(url: String) {
-        when {
+    private fun getRoomCodeFromURl(url: String): String? {
+        return when {
             REGEX_MEETING_URL_CODE.matches(url) -> {
                 val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
-                val code = groups[2]
-                launchPrebuilt(code)
-
-
+                groups[2]
             }
             REGEX_STREAMING_MEETING_URL_ROOM_CODE.matches(url) -> {
                 val groups =
                     REGEX_STREAMING_MEETING_URL_ROOM_CODE.findAll(url).toList()[0].groupValues
-                val code = groups[2]
-                launchPrebuilt(code)
+                groups[2]
 
             }
             REGEX_PREVIEW_URL_CODE.matches(url) -> {
                 val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
-                val code = groups[2]
-                launchPrebuilt(code)
-
+                groups[2]
             }
+            else -> null
         }
     }
 
     private fun launchPrebuilt(code: String) {
-        contextSafe { context, activity ->
+        contextSafe { _, activity ->
 
             HMSRoomKit.launchPrebuilt(
                 code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = "random-user-id", debugInfo = settings.inPreBuiltDebugMode,
@@ -166,6 +162,7 @@ class HomeFragment : Fragment() {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")
                             put("init", "https://qa-init.100ms.live/init")
+                            put("layout", if (settings.useMockAPi) "https://demo8271564.mockable.io" else "https://api-nonprod.100ms.live")
                         }
                     })
             )

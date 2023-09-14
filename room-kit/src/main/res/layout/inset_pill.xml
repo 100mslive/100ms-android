@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<live.hms.roomkit.ui.inset.InsetPill xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/inset_pill_width"
+    android:layout_height="@dimen/inset_pill_height"
+    android:background="@android:color/holo_red_dark">
+
+    <live.hms.videoview.HMSVideoView
+        android:id="@+id/hms_video_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</live.hms.roomkit.ui.inset.InsetPill>

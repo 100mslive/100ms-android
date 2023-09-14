@@ -1,32 +1,11 @@
-<!--?xml version="1.0" encoding="UTF-8"?-->
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="blue_0">#0b0f15</color>
-    <color name="blue_1">#14171C</color>
-    <color name="blue_2">#161b22</color>
-    <color name="blue_3">#1b2028</color>
-    <color name="blue_4">#2b3139</color>
-    <color name="name_initials_background">#3f4453</color>
-    <color name="primary_blue">#2672ED</color>
-
-    <color name="text_color">#c0c1c3</color>
-    <color name="text_color_faded_70">#b3c0c1c3</color>
-
-    <color name="black_faded_40">#66000000</color>
-    <color name="black">#000</color>
-
-    <color name="red">#CC525F</color>
-    <color name="white">#ffffff</color>
-    <color name="white_faded_30">#4dffffff</color>
-    <color name="white_faded_70">#b3ffffff</color>
-    <color name="color_gray_highlight">#4B373735</color>
-    <color name="recording">#e04848</color>
-    <color name="recording_transition">#FFFFFF</color>
-    <color name="streaming">#2832c2</color>
-    <color name="streaming_recording">#FFC107</color>
-    <color name="muted_text">#CCE0ECFF</color>
-    <color name="primary_bg">#14171C</color>
-    <color name="btn_disabled">#242A33</color>
-    <color name="gray_color">#1D2229</color>
-    <color name="dark_red">#201617</color>
-    <color name="gray_light">#2D3440</color>
+    <color name="poll_state_live">#CB525E</color>
+    <color name="poll_state_draft">#475366</color>
+    <color name="poll_state_ended">#475366</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
 </resources>

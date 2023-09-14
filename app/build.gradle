@@ -13,14 +13,13 @@ android {
     defaultConfig {
         applicationId "live.hms.app2"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode project.findProperty('100MS_APP_VERSION_CODE') as int
         versionName project.findProperty('100MS_APP_VERSION_NAME')
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "boolean", "INTERNAL", project.findProperty('INTERNAL') ? INTERNAL : "false"
-        buildConfigField "String", "TOKEN_ENDPOINT", TOKEN_ENDPOINT
         buildConfigField "String", "BUG_REPORT_EMAIL_TO", project.findProperty('BUG_REPORT_EMAIL_TO') ? BUG_REPORT_EMAIL_TO : "\"\""
         buildConfigField "String", "BUG_REPORT_EMAIL_CC", project.findProperty('BUG_REPORT_EMAIL_CC') ? BUG_REPORT_EMAIL_CC : "\"\""
         buildConfigField "String", "RTMP_INJEST_URL", project.findProperty('RTMP_INJEST_URL') ? RTMP_INJEST_URL : "\"\""
@@ -61,7 +60,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
     //100ms.live prebuilt lib
-    implementation "live.100ms:room-kit:0.0.4"
+    implementation "live.100ms:room-kit:1.0.0"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
@@ -80,7 +79,6 @@ dependencies {
 
     // Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
     // Get Permissions easily
     implementation 'pub.devrel:easypermissions:1.1.3'
@@ -98,8 +96,8 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     testImplementation 'org.hamcrest:hamcrest:2.2'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 

@@ -1,47 +1,61 @@
 package live.hms.roomkit.ui.meeting
 
-import android.R
 import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.util.Log
-import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
 import com.google.gson.Gson
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
+import live.hms.roomkit.ui.notification.HMSNotification
+import live.hms.roomkit.ui.notification.HMSNotificationType
+import live.hms.roomkit.ui.polls.PollCreationInfo
+import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.util.*
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
+import live.hms.video.interactivity.HmsInteractivityCenter
+import live.hms.video.interactivity.HmsPollUpdateListener
+import live.hms.video.events.AgentType
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
+import live.hms.video.polls.HMSPollBuilder
+import live.hms.video.polls.HMSPollQuestionBuilder
+import live.hms.video.polls.HMSPollResponseBuilder
+import live.hms.video.polls.models.HMSPollUpdateType
+import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.HmsPollCategory
+import live.hms.video.polls.models.HmsPollState
+import live.hms.video.polls.models.answer.PollAnswerResponse
+import live.hms.video.polls.models.question.HMSPollQuestion
+import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
-import live.hms.video.sdk.models.enums.AudioMixingMode
-import live.hms.video.sdk.models.enums.HMSPeerUpdate
-import live.hms.video.sdk.models.enums.HMSRoomUpdate
-import live.hms.video.sdk.models.enums.HMSTrackUpdate
+import live.hms.video.sdk.models.enums.*
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
-import live.hms.video.signal.init.HMSTokenListener
-import live.hms.video.signal.init.TokenRequest
-import live.hms.video.signal.init.TokenRequestOptions
-import live.hms.video.utils.HMSCoroutineScope
+import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import java.util.*
+import kotlin.properties.Delegates
 
 
 class MeetingViewModel(
@@ -51,12 +65,17 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
+    private var hmsRoomLayout : HMSRoomLayout? = null
+    val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
+
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
-    private var isPrebuiltDebug = false
+    private var isPrebuiltDebug by Delegates.notNull<Boolean>()
+    val roleChange = MutableLiveData<HMSPeer>()
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
@@ -78,11 +97,42 @@ class MeetingViewModel(
 
     val hmsSDK = HMSSDK
         .Builder(application)
+        .haltPreviewJoinForPermissionsRequest(true)
+        .setFrameworkInfo(FrameworkInfo(framework = AgentType.ANDROID_NATIVE, isPrebuilt = true))
         .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
         .setLogSettings(hmsLogSettings)
         .build()
 
-     fun initSdk(roomCode: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+    val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
+        .apply {
+            this.pollUpdateListener = object : HmsPollUpdateListener {
+                override fun onPollUpdate(
+                    hmsPoll: HmsPoll,
+                    hmsPollUpdateType: HMSPollUpdateType
+                ) {
+                    if(hmsPollUpdateType == HMSPollUpdateType.started) {
+                        viewModelScope.launch {
+                            if(isPrebuiltDebug)
+                                _events.emit(Event.PollStarted(hmsPoll))
+                        }
+                    }
+                    else if (hmsPollUpdateType == HMSPollUpdateType.resultsupdated) {
+                        viewModelScope.launch {
+                            if(isPrebuiltDebug)
+                                _events.emit(Event.PollVotesUpdated(hmsPoll))
+                        }
+                    }
+                }
+
+            }
+        }
+    fun getHmsRoomLayout() = hmsRoomLayout
+
+    fun initSdk(
+        roomCode: String,
+        hmsPrebuiltOptions: HMSPrebuiltOptions?,
+        onHMSActionResultListener: HMSActionResultListener
+    ) {
         if (hasValidToken) {
             onHMSActionResultListener.onSuccess()
             return
@@ -94,10 +144,10 @@ class MeetingViewModel(
         else
             "https://prod-init.100ms.live/init"
 
-         isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo?:false
+        isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo ?: false
 
         hmsSDK.getAuthTokenByRoomCode(
-            TokenRequest(roomCode, hmsPrebuiltOptions?.userId?:UUID.randomUUID().toString()),
+            TokenRequest(roomCode, hmsPrebuiltOptions?.userId ?: UUID.randomUUID().toString()),
             TokenRequestOptions(tokenURL),
             object : HMSTokenListener {
                 override fun onError(error: HMSException) {
@@ -107,30 +157,62 @@ class MeetingViewModel(
 
                 override fun onTokenSuccess(token: String) {
 
-                   hmsConfig = HMSConfig(
-                        userName = hmsPrebuiltOptions?.userName.orEmpty(),
-                        token,
-                        Gson().toJson(
-                            CustomPeerMetadata(
-                                isHandRaised = false,
-                                name = hmsPrebuiltOptions?.userName.orEmpty(),
-                                isBRBOn = false
-                            )
-                        )
-                            .toString(),
-                        captureNetworkQualityInPreview = true,
-                        initEndpoint = initURL,
-                    )
+                    val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
+                        hmsSDK.getRoomLayout(
+                            token,
+                            LayoutRequestOptions(layoutEndpointBase),
+                            object :
+                                HMSLayoutListener {
+                                override fun onError(error: HMSException) {
+                                    Log.e(TAG, "onError: ", error)
+                                    onHMSActionResultListener.onError(error)
+                                }
 
-                    hasValidToken = true
+                                override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
+                                    hmsRoomLayout = layoutConfig
+                                    prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
+                                    setHmsConfig(hmsPrebuiltOptions, token, initURL)
+                                    kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
+                                    onHMSActionResultListener.onSuccess()
+                                }
 
-                    onHMSActionResultListener.onSuccess()
-
+                            })
                 }
 
             })
 
 
+    }
+
+    private fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
+        HMSPrebuiltTheme.setTheme(theme)
+    }
+
+    fun updateNameInPreview(nameStr: String) {
+            hmsConfig = hmsConfig?.copy(userName = nameStr)
+    }
+
+    private fun setHmsConfig(
+        hmsPrebuiltOptions: HMSPrebuiltOptions?,
+        token: String,
+        initURL: String
+    ) {
+        hmsConfig = HMSConfig(
+            userName = hmsPrebuiltOptions?.userName.orEmpty(),
+            token,
+            Gson().toJson(
+                CustomPeerMetadata(
+                    isHandRaised = false,
+                    name = hmsPrebuiltOptions?.userName.orEmpty(),
+                    isBRBOn = false
+                )
+            )
+                .toString(),
+            captureNetworkQualityInPreview = true,
+            initEndpoint = initURL,
+        )
+
+        hasValidToken = true
     }
 
     private var hmsConfig: HMSConfig? = null
@@ -173,7 +255,6 @@ class MeetingViewModel(
     private val savedStats: MutableMap<String, Any> = mutableMapOf()
 
 
-
     private val failures = ArrayList<HMSException>()
 
     val meetingViewMode = MutableLiveData(settings.meetingMode)
@@ -192,6 +273,11 @@ class MeetingViewModel(
     val previewUpdateLiveData: LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
     val hlsToggleUpdateLiveData: LiveData<Boolean> = hlsToggleUpdateData
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
+    val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
+    val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
+    val hmsRemoveNotificationEvent = MutableLiveData<HMSNotificationType>()
+    val updateGridLayoutDimensions = SingleLiveEvent<Boolean>()
+    val hmsScreenShareBottomSheetEvent = SingleLiveEvent<String>()
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {
@@ -202,11 +288,7 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
-    // Title at the top of the meeting
-    val title = MutableLiveData<Int>()
-    fun setTitle(@StringRes resId: Int) {
-        this.title.postValue(resId)
-    }
+    fun isGoLiveInPreBuiltEnabled() = settings.useMockAPi
 
     var showAudioMuted = MutableLiveData(false)
         private set
@@ -246,8 +328,9 @@ class MeetingViewModel(
     private var hmsRoom: HMSRoom? = null
 
     // Live data for enabling/disabling mute buttons
-    val isLocalAudioPublishingAllowed = MutableLiveData(false)
-    val isLocalVideoPublishingAllowed = MutableLiveData(false)
+    val isLocalAudioPresent = MutableLiveData(false)
+    val isLocalVideoPresent = MutableLiveData(false)
+    val isRecordingInProgess = MutableLiveData(false)
 
     // Live data containing all the current tracks in a meeting
     private val _liveDataTracks = MutableLiveData(_tracks)
@@ -256,13 +339,80 @@ class MeetingViewModel(
     // Live data containing the current Speaker in the meeting
     val speakers = MutableLiveData<Array<HMSSpeaker>>()
 
-    private val activeSpeakerHandler = ActiveSpeakerHandler { _tracks }
+    private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
+
+    val updateRowAndColumnSpanForVideoPeerGrid = MutableLiveData<Pair<Int,Int>>()
+
+    val speakerUpdateLiveData = object : ActiveSpeakerLiveData() {
+        private val speakerH = ActiveSpeakerHandler(true,settings.videoGridRows* settings.videoGridColumns
+        ) { _tracks }
+
+        override fun addSpeakerSource() {
+            addSource(speakers) { speakers : Array<HMSSpeaker> ->
+
+                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> = if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
+                    speakers.filter { it.peer?.isLocal == false }.toTypedArray()
+                } else {
+                    speakers
+                }
+
+                val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
+                setValue(result.first)
+            }
+        }
+
+        override fun removeSpeakerSource() {
+            removeSource(speakers)
+        }
+
+        //TODO can't be null
+        fun refreshSpeaker() {
+           // speakers.postValue(speakers.value)
+        }
+
+        override fun updateMaxActiveSpeaker(rowCount: Int, columnCount: Int) {
+            speakerH.updateMaxActiveSpeaker(rowCount*columnCount)
+            refreshSpeaker()
+        }
+        init {
+            addSpeakerSource()
+
+            // Add all tracks as they come in.
+            addSource(tracks) { meetTracks: List<MeetingTrack> ->
+                //if remote peer and local peer is present inset mode
+
+               val excludeLocalTrackIfRemotePeerIsPreset =
+                   //Don't inset when local peer and local screen share track is found
+                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
+                       meetTracks
+                 else if(meetTracks.size > 1 &&  hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
+                       meetTracks.filter { !it.isLocal }.toList()
+                    else
+                        meetTracks
+
+                val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset.filter { it.isScreen.not() })
+                setValue(result)
+            }
+
+        }
+
+
+
+    }
+
     val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
         speakers.map(activeSpeakerHandler::speakerUpdate)
     val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
+    // We need all the active speakers, but the very first time it should be filled.
+    //  with all the tracks.
+    //  subsequent updates that matter are:
+    //  track updates (which can add or remove tracks at the end)
+    //  Active speaker updates which modify the current ones.
+
     // Live data which changes on any change of peer
     val peerLiveData = MutableLiveData<HMSPeer>()
+    val participantPeerUpdate = MutableLiveData<Unit>()
     private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
     val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
@@ -283,21 +433,26 @@ class MeetingViewModel(
     val trackStatus: LiveData<Pair<String, Boolean>> = _trackStatus
 
 
-
-
-
     val peers: List<HMSPeer>
         get() = hmsSDK.getPeers()
+//    val permissionCompletable = CompletableDeferred<Boolean>()
 
     fun startPreview() {
         if (hmsConfig == null) {
             HMSLogger.e(TAG, "HMSConfig is null. Cannot start preview.")
             return
         }
+
         // call Preview api
         hmsSDK.preview(hmsConfig!!, object : HMSPreviewListener {
             override fun onError(error: HMSException) {
                 previewErrorData.postValue(error)
+            }
+
+            override fun onPermissionsRequested(permissions : List<String>) {
+                viewModelScope.launch {
+                    _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                }
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
@@ -313,13 +468,13 @@ class MeetingViewModel(
                 // This will keep the isRecording value updated correctly in preview. It will not be called after join.
                 _isRecording.postValue(getRecordingState(hmsRoom))
                 if (type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
-                    Log.d("PeerCountUpdated", "New peer count is : ${hmsRoom.peerCount}")
+                    peerCount.postValue(hmsRoom.peerCount)
                 }
             }
 
         })
     }
-
+    val peerCount = MutableLiveData(0)
     fun setLocalVideoEnabled(enabled: Boolean) {
 
         hmsSDK.getLocalPeer()?.videoTrack?.apply {
@@ -367,6 +522,7 @@ class MeetingViewModel(
     }
 
     fun toggleLocalAudio() {
+        //hmsNotificationEvent.postValue(HMSNotification(title = "Test ${System.currentTimeMillis()} ", icon = R.drawable.person_icon, isDismissible = true))
         // If mute then enable audio, if not mute, disable it
         hmsSDK.getLocalPeer()?.audioTrack?.let { setLocalAudioEnabled(it.isMute) }
     }
@@ -507,6 +663,12 @@ class MeetingViewModel(
                 }
             }
 
+            override fun onPermissionsRequested(permissions: List<String>) {
+                viewModelScope.launch {
+                    _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                }
+            }
+
             override fun onSessionStoreAvailable(sessionStore: HmsSessionStore) {
                 super.onSessionStoreAvailable(sessionStore)
                 sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
@@ -552,10 +714,13 @@ class MeetingViewModel(
                         override fun onSuccess() {}
                     }
                 )
+                updatePolls()
+                participantPeerUpdate.postValue(Unit)
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
                 Log.d(TAG, "join:onPeerUpdate type=$type, peer=$hmsPeer")
+
                 when (type) {
                     HMSPeerUpdate.PEER_LEFT -> {
                         synchronized(_tracks) {
@@ -568,10 +733,12 @@ class MeetingViewModel(
                             _liveDataTracks.postValue(_tracks)
                             peerLiveData.postValue(hmsPeer)
                         }
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.PEER_JOINED -> {
                         peerLiveData.postValue(hmsPeer)
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
@@ -593,9 +760,12 @@ class MeetingViewModel(
                             "RoleChangeUpdate",
                             "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
                         )
+                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED)
+                            roleChange.postValue(hmsPeer)
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
+                            updateThemeBasedOnCurrentRole(hmsPeer.hmsRole)
                             val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
                             val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
                             if (isHlsPeer) {
@@ -604,27 +774,33 @@ class MeetingViewModel(
                                 exitHlsViewIfRequired(false)
                             }
                         }
+
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.METADATA_CHANGED -> {
+                        triggerBringOnStageNotificationIfHandRaised(hmsPeer)
                         if (hmsPeer.isLocal) {
                             updateSelfHandRaised(hmsPeer as HMSLocalPeer)
                         } else {
                             _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
                         }
+                        participantPeerUpdate.postValue(Unit)
                     }
+
                     HMSPeerUpdate.NAME_CHANGED -> {
                         if (hmsPeer.isLocal) {
                             updateNameChange(hmsPeer as HMSLocalPeer)
                         } else {
                             _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
                         }
+                        participantPeerUpdate.postValue(Unit)
                     }
 
                     HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
                         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, type))
+                        participantPeerUpdate.postValue(Unit)
                     }
-
                     else -> Unit
                 }
             }
@@ -633,24 +809,34 @@ class MeetingViewModel(
                 Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
 
                 when (type) {
+                    HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> peerCount.postValue(hmsRoom.peerCount)
                     HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
                         )
                         showServerInfo(hmsRoom)
                     }
+
                     HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
                         )
                         showRtmpInfo(hmsRoom)
                     }
+
                     HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
                         )
                         showRecordInfo(hmsRoom)
+
+                        if (hmsRoom.browserRecordingState?.initialising == true)
+                            isRecordingInProgess.postValue(true)
+                        else  (hmsRoom.browserRecordingState?.running == true)
+                        isRecordingInProgess.postValue(false)
+
                     }
+
                     HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
@@ -658,12 +844,14 @@ class MeetingViewModel(
                         switchToHlsViewIfRequired()
                         showHlsInfo(hmsRoom)
                     }
+
                     HMSRoomUpdate.HLS_RECORDING_STATE_UPDATED -> {
                         _isRecording.postValue(
                             getRecordingState(hmsRoom)
                         )
                         showHlsRecordingInfo(hmsRoom)
                     }
+
                     else -> {
                     }
                 }
@@ -676,30 +864,34 @@ class MeetingViewModel(
                         if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                             when (track.type) {
                                 HMSTrackType.AUDIO -> {
-                                    isLocalAudioPublishingAllowed.postValue(true)
+                                    isLocalAudioPresent.postValue(true)
                                     isLocalAudioEnabled.postValue(!track.isMute)
                                 }
+
                                 HMSTrackType.VIDEO -> {
-                                    isLocalVideoPublishingAllowed.postValue(true)
+                                    isLocalVideoPresent.postValue(true)
                                     isLocalVideoEnabled.postValue(!track.isMute)
                                 }
                             }
                         }
                         addTrack(track, peer)
                     }
+
                     HMSTrackUpdate.TRACK_REMOVED -> {
                         if (peer is HMSLocalPeer && track.source == HMSTrackSource.REGULAR) {
                             when (track.type) {
                                 HMSTrackType.AUDIO -> {
-                                    isLocalAudioPublishingAllowed.postValue(false)
+                                    isLocalAudioPresent.postValue(false)
                                 }
+
                                 HMSTrackType.VIDEO -> {
-                                    isLocalVideoPublishingAllowed.postValue(false)
+                                    isLocalVideoPresent.postValue(false)
                                 }
                             }
                         }
                         removeTrack(track, peer)
                     }
+
                     HMSTrackUpdate.TRACK_MUTED -> {
                         _liveDataTracks.postValue(_tracks)
                         if (peer.isLocal) {
@@ -710,6 +902,7 @@ class MeetingViewModel(
                             }
                         }
                     }
+
                     HMSTrackUpdate.TRACK_UNMUTED -> {
                         _liveDataTracks.postValue(_tracks)
                         if (peer.isLocal) {
@@ -720,14 +913,18 @@ class MeetingViewModel(
                             }
                         }
                     }
+
                     HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED -> _liveDataTracks.postValue(_tracks)
                     HMSTrackUpdate.TRACK_DEGRADED -> _liveDataTracks.postValue(_tracks)
                     HMSTrackUpdate.TRACK_RESTORED -> _liveDataTracks.postValue(_tracks)
                 }
+                participantPeerUpdate.postValue(Unit)
             }
 
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
+                if(message.type != HMSMessageType.CHAT)
+                    return
                 broadcastsReceived.postValue(
                     ChatMessage(
                         message.sender?.name.orEmpty(),
@@ -782,6 +979,70 @@ class MeetingViewModel(
         })
     }
 
+    private fun triggerBringOnStageNotificationIfHandRaised(handRaisedPeer: HMSPeer) {
+        //triggerd user has on stage role permission
+        if(hasBringOnStageRolePermission(currentRole = hmsSDK.getLocalPeer()?.hmsRole, handRaisedPeerRole = handRaisedPeer.hmsRole)
+            && hmsSDK.getLocalPeer()?.hmsRole?.name == "broadcaster"
+            && getOnStageRole(hmsSDK.getLocalPeer()?.hmsRole).isNullOrEmpty().not()
+        ) {
+            if (CustomPeerMetadata.fromJson(handRaisedPeer.metadata)?.isHandRaised == true) {
+                hmsNotificationEvent.postValue(
+                    HMSNotification(
+                        title = "${handRaisedPeer.name} raised hand",
+                        isDismissible = false,
+                        icon = R.drawable.hand_raised,
+                        actionButtonText = "Bring on stage",
+                        type = HMSNotificationType.BringOnStage(handRaisedPeer, getOnStageRole(hmsSDK.getLocalPeer()?.hmsRole).orEmpty())
+                    )
+                )
+            }
+        }
+
+    }
+
+    private fun updatePolls() {
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                viewModelScope.launch {
+                    result.sortedByDescending { it.startedAt }.firstOrNull()?.also { firstPoll ->
+                        if(isPrebuiltDebug)
+                            _events.emit(Event.PollStarted(firstPoll))
+                    }
+                }
+            }
+
+            override fun onError(error: HMSException) {
+                Log.d(TAG,"Polls error $error")
+            }
+
+        })
+    }
+
+    fun getCurrentRoleChangeRequest() = pendingRoleChange
+
+    fun getTrackForRolePendingChangeRequest(rolePreviewListener: RolePreviewListener) {
+        val request = getCurrentRoleChangeRequest()
+        request?.suggestedRole?.let { role ->
+            hmsSDK.preview(role, object : RolePreviewListener {
+                override fun onError(error: HMSException) {
+                    rolePreviewListener.onError(error)
+                }
+
+                override fun onTracks(localTracks: Array<HMSTrack>) {
+                    rolePreviewListener.onTracks(localTracks)
+                }
+
+                override fun onPermissionsRequested(permissions : List<String>) {
+                    viewModelScope.launch {
+                        _events.emit(Event.RequestPermission(permissions.toTypedArray()))
+                    }
+                }
+
+
+            })
+        }
+    }
+
     private fun getMeetingTrack(trackId: String?): MeetingTrack? {
         return if (trackId == null)
             null
@@ -829,31 +1090,60 @@ class MeetingViewModel(
         state.postValue(MeetingState.Ongoing())
     }
 
-    fun changeRoleAccept(hmsRoleChangeRequest: HMSRoleChangeRequest) {
-        hmsSDK.acceptChangeRole(hmsRoleChangeRequest, object : HMSActionResultListener {
-            override fun onSuccess() {
-                Log.i(TAG, "Successfully accepted change role request for $hmsRoleChangeRequest")
-            }
+    fun changeRoleAccept(onSuccess:() -> Unit = {}, onFailure:() -> Unit = {}) {
+        pendingRoleChange?.let {
+            hmsSDK.acceptChangeRole(it, object : HMSActionResultListener {
+                override fun onSuccess() {
+              //      toggleRaiseHand(false)
+                    setStatetoOngoing()
+                    updateThemeBasedOnCurrentRole(it.suggestedRole)
+                    onSuccess.invoke()
+                }
 
-            override fun onError(error: HMSException) {
-                Log.e(TAG, "Error while accepting change role request :: ${error.description}")
-                state.postValue(MeetingState.NonFatalFailure(error))
-            }
-        })
-    }
+                override fun onError(error: HMSException) {
+                    onFailure.invoke()
+                    setStatetoOngoing()
+                    Log.e(TAG, "Error while accepting change role request :: ${error.description}")
+                    state.postValue(MeetingState.NonFatalFailure(error))
+                }
+            })
 
-    private fun isHlsPeer(role: HMSRole?): Boolean =
-        role?.name?.startsWith("hls-") == true
-
-    private fun switchToHlsView(streamUrl: String) =
-        meetingViewMode.postValue(MeetingViewMode.HLS(streamUrl))
-
-    private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
-        if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS) {
-            meetingViewMode.postValue(MeetingViewMode.ACTIVE_SPEAKER)
         }
     }
 
+    private fun updateThemeBasedOnCurrentRole(suggestedRole: HMSRole) {
+        hmsRoomLayout?.data?.findLast { it?.role == suggestedRole.name }?.themes?.getOrNull(0)?.palette?.let {
+            setTheme(it)
+        }
+    }
+
+    private fun isHlsPeer(localRole: HMSRole?) : Boolean{
+          return  hmsRoomLayout?.data?.findLast { it?.role ==  localRole?.name }?.screens?.conferencing?.hlsLiveStreaming != null
+    }
+
+    //Checks if hand raised peer is eligble for viewer on stage
+    private fun hasBringOnStageRolePermission(currentRole : HMSRole?, handRaisedPeerRole: HMSRole?) : Boolean{
+        return  hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.offStageRoles?.contains(handRaisedPeerRole?.name)?:false
+    }
+
+    fun hasInsetEnabled(currentRole : HMSRole?) : Boolean = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.videoTileLayout?.grid?.enableLocalTileInset?:false
+
+    fun isBRBEnabled() = hmsRoomLayout?.data?.findLast { it?.role ==  hmsSDK.getLocalPeer()?.hmsRole?.name }?.screens?.conferencing?.default?.elements?.brb != null
+    fun isParticpantListEnabled() : Boolean = with(hmsRoomLayout?.data?.findLast { it?.role ==  hmsSDK.getLocalPeer()?.hmsRole?.name }?.screens?.conferencing) {
+        this?.default?.elements?.participantList != null || this?.hlsLiveStreaming?.elements?.participantList != null
+    }
+    private fun getOnStageRole(currentRole : HMSRole?) = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole
+
+    private fun switchToHlsView(streamUrl: String) =
+        meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
+
+    private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
+        if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS_VIEWER) {
+            meetingViewMode.postValue(MeetingViewMode.GRID)
+        }
+    }
+
+    val showHlsStreamYetToStartError = MutableLiveData<Boolean>(false)
     private fun switchToHlsViewIfRequired(role: HMSRole?, streamUrl: String?) {
         var started = false
         val isHlsPeer = isHlsPeer(role)
@@ -862,15 +1152,21 @@ class MeetingViewModel(
             switchToHlsView(streamUrl)
         }
 
+        if (isHlsPeer && streamUrl == null) {
+            showHlsStreamYetToStartError.postValue(true)
+        } else {
+            showHlsStreamYetToStartError.postValue(false)
+        }
+
         // Only send errors for those who are hls peers
         if (!started && isHlsPeer) {
             val reasons = mutableListOf<String>()
             if (streamUrl == null) {
                 reasons.add("Stream url was null")
             }
-            HMSCoroutineScope.launch {
-                _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
-            }
+//            HMSCoroutineScope.launch {
+//                _events.emit(Event.HlsNotStarted("Can't switch to hls view. ${reasons.joinToString(",")}"))
+//            }
         }
     }
 
@@ -909,6 +1205,8 @@ class MeetingViewModel(
             })
         }
     }
+
+    fun getAudioOutputRouteType() = hmsSDK.getAudioOutputRouteType()
 
     fun leaveMeeting(details: HMSRemovedFromRoom? = null) {
         hasValidToken = false
@@ -996,6 +1294,7 @@ class MeetingViewModel(
                                 it.audio?.trackId == track.trackId
                     }
                 }
+
                 HMSTrackType.VIDEO -> {
                     _tracks.find {
                         it.peer.peerID == peer.peerID &&
@@ -1010,6 +1309,7 @@ class MeetingViewModel(
                 HMSTrackType.AUDIO -> {
                     meetingTrack?.audio = null
                 }
+
                 HMSTrackType.VIDEO -> {
                     meetingTrack?.video = null
                 }
@@ -1036,6 +1336,10 @@ class MeetingViewModel(
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
     }
 
+    fun isAllowedToCreatePolls() : Boolean {
+        return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
+    }
+
     fun isAllowedToEndMeeting(): Boolean {
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true
     }
@@ -1060,6 +1364,8 @@ class MeetingViewModel(
 
     fun isAllowedToHlsStream(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.permission?.hlsStreaming == true
+
+    fun isAllowedToEndRoom() :Boolean = hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true
 
     fun isAllowedToShareScreen(): Boolean =
         hmsSDK.getLocalPeer()?.hmsRole?.publishParams?.allowed?.contains("screen") == true
@@ -1188,9 +1494,11 @@ class MeetingViewModel(
                 HMSTrackType.AUDIO -> {
                     it.audioTrack?.isMute
                 }
+
                 HMSTrackType.VIDEO -> {
                     it.videoTrack?.isMute
                 }
+
                 else -> {
                     val audioMute = it.audioTrack?.isMute
                     val videoMute = it.videoTrack?.isMute
@@ -1198,9 +1506,11 @@ class MeetingViewModel(
                         audioMute == null -> {
                             videoMute
                         }
+
                         videoMute == null -> {
                             audioMute
                         }
+
                         else -> {
                             videoMute || audioMute
                         }
@@ -1217,11 +1527,12 @@ class MeetingViewModel(
 
     fun recordMeeting(
         isRecording: Boolean,
-        rtmpInjectUrls: List<String>,
-        inputWidthHeight: HMSRtmpVideoResolution?
+        rtmpInjectUrls: List<String> = emptyList(),
+        inputWidthHeight: HMSRtmpVideoResolution? = null,
+        runnable: Runnable? = null
     ) {
         // It's streaming if there are rtmp urls present.
-
+        isRecordingInProgess.postValue(true)
         Log.v(TAG, "Starting recording. url: $rtmpInjectUrls")
         hmsSDK.startRtmpOrRecording(
             HMSRecordingConfig(
@@ -1231,9 +1542,20 @@ class MeetingViewModel(
                 inputWidthHeight
             ), object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
+                    isRecordingInProgess.postValue(false)
                     Log.d(TAG, "RTMP recording error: $error")
                     // restore the current state
-                    viewModelScope.launch { _events.emit(Event.RTMPError(error)) }
+                    runnable?.run()
+                    hmsNotificationEvent.postValue(
+                        HMSNotification(
+                            isError = true,
+                            title = "Recording failed to start",
+                            isDismissible = false,
+                            icon = R.drawable.record_off,
+                            actionButtonText = "Retry",
+                            type = HMSNotificationType.RecordingFailedToStart
+                        )
+                    )
                 }
 
                 override fun onSuccess() {
@@ -1269,9 +1591,9 @@ class MeetingViewModel(
         // With custom notification
         val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
             .setContentText("Screenshare running for roomId: ${hmsRoom?.roomId}")
-            .setSmallIcon(R.drawable.arrow_up_float)
+            .setSmallIcon(android.R.drawable.arrow_up_float)
             .addAction(
-                R.drawable.ic_menu_close_clear_cancel,
+                android.R.drawable.ic_menu_close_clear_cancel,
                 "Stop Screenshare",
                 HMSScreenCaptureService.getStopScreenSharePendingIntent(getApplication())
             )
@@ -1282,8 +1604,15 @@ class MeetingViewModel(
 
     fun isScreenShared() = hmsSDK.isScreenShared()
 
-    fun stopScreenshare(actionListener: HMSActionResultListener) {
-        hmsSDK.stopScreenshare(actionListener)
+    fun stopScreenshare() {
+        hmsSDK.stopScreenshare(object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+            }
+
+            override fun onSuccess() {
+                isScreenShare.postValue(false)
+            }
+        })
     }
 
     fun startAudioshare(
@@ -1297,9 +1626,9 @@ class MeetingViewModel(
         // With custom notification
         val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
             .setContentText("Sharing Audio of device to roomId: ${hmsRoom?.roomId}")
-            .setSmallIcon(R.drawable.arrow_up_float)
+            .setSmallIcon(android.R.drawable.arrow_up_float)
             .addAction(
-                R.drawable.ic_menu_close_clear_cancel,
+                android.R.drawable.ic_menu_close_clear_cancel,
                 "Stop sharing device audio",
                 HMSScreenCaptureService.getStopScreenSharePendingIntent(getApplication())
             )
@@ -1320,7 +1649,6 @@ class MeetingViewModel(
     fun stopAudioshare(actionListener: HMSActionResultListener) {
         hmsSDK.stopAudioshare(actionListener)
     }
-
 
 
     fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
@@ -1349,17 +1677,25 @@ class MeetingViewModel(
         data class HlsRecordingEvent(override val message: String) : MessageEvent(message)
         data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
         data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
+        data class PollStarted(val hmsPoll: HmsPoll) : Event()
+        data class PollVotesUpdated(val hmsPoll: HmsPoll) : Event()
+        data class RequestPermission(val permissions : Array<String>) : Event()
     }
 
     private val _isHandRaised = MutableLiveData<Boolean>(false)
     val isHandRaised: LiveData<Boolean> = _isHandRaised
 
 
-    fun toggleRaiseHand() {
+    fun toggleRaiseHand(forceLowerHandRaise : Boolean?=null) {
         val localPeer = hmsSDK.getLocalPeer()!!
-        val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
-        val isHandRaised = currentMetadata!!.isHandRaised
-        val newMetadataJson = currentMetadata.copy(isHandRaised = !isHandRaised).toJson()
+        val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata) ?: return
+
+        val isHandRaised  = if (forceLowerHandRaise == null) {
+            currentMetadata.isHandRaised.not()
+        } else {
+            forceLowerHandRaise.not()
+        }
+        val newMetadataJson = currentMetadata.copy(isHandRaised = isHandRaised).toJson()
 
         hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
@@ -1388,9 +1724,9 @@ class MeetingViewModel(
     }
 
     fun isBRBOn(): Boolean {
-        val localPeer = hmsSDK.getLocalPeer()!!
+        val localPeer = hmsSDK.getLocalPeer()?: return false
         val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
-        return currentMetadata!!.isBRBOn
+        return currentMetadata?.isBRBOn?:false
     }
 
     fun toggleBRB() {
@@ -1435,7 +1771,7 @@ class MeetingViewModel(
     fun startHls(hlsUrl: String?, recordingConfig: HMSHlsRecordingConfig) {
         val meetingVariants = if (hlsUrl.isNullOrBlank()) {
             null
-        } else listOf(HMSHLSMeetingURLVariant(hlsUrl))
+        } else null
 
         val config = HMSHLSConfig(
             meetingVariants,
@@ -1527,7 +1863,248 @@ class MeetingViewModel(
     fun isPrebuiltDebugMode(): Boolean {
         return isPrebuiltDebug
     }
+    fun permissionGranted() = hmsSDK.setPermissionsAccepted()
 
+    fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
+        // To start a poll
 
+        Log.d("Polls","$currentList")
+        val hmsPollBuilder = HMSPollBuilder.Builder()
+            .withTitle(pollCreationInfo.pollTitle)
+            .withCategory(if (pollCreationInfo.isPoll) HmsPollCategory.POLL else HmsPollCategory.QUIZ)
+            .withAnonymous(pollCreationInfo.hideVote)
+            .withRolesThatCanVote(hmsSDK.getRoles().filter { it.name == "host" })
+            .withRolesThatCanViewResponses(hmsSDK.getRoles().filter { it.name == "host" })
+
+        currentList.forEach { questionUi ->
+            Log.d("Polls","Processing $questionUi")
+
+            when(questionUi) {
+                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
+                is QuestionUi.MultiChoiceQuestion -> {
+                    val multiChoice = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.multiChoice)
+                        .withTitle(questionUi.withTitle)
+                    questionUi.options.forEachIndexed { index : Int, option : String ->
+                        multiChoice.addQuizOption(option, questionUi.correctOptionIndex?.contains(index) == true)
+                    }
+                    hmsPollBuilder
+                        .addQuestion(multiChoice.build())
+                }
+                QuestionUi.QuestionCreator -> { /*Nothing to do here*/}
+                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
+                is QuestionUi.SingleChoiceQuestion -> {
+                    val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.singleChoice)
+                        .withTitle(questionUi.withTitle)
+                    questionUi.options.forEachIndexed { index : Int, option : String ->
+                        singleChoiceQuestionBuilder.addQuizOption(option, questionUi.correctOptionIndex == index)
+                    }
+                    hmsPollBuilder
+                        .addQuestion(singleChoiceQuestionBuilder.build())
+                }
+            }
+        }
+
+        localHmsInteractivityCenter.quickStartPoll(hmsPollBuilder.build(), object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d("Polls","Error $error")
+            }
+
+            override fun onSuccess() {
+                Log.d("Polls","Success")
+            }
+
+        })
+    }
+
+    fun saveInfoText(question: HMSPollQuestion, answer : String, hmsPoll: HmsPoll) : Boolean {
+
+        val valid = if(question.type == HMSPollQuestionType.shortAnswer &&
+            answer.length > (question.answerShortMinLength ?: 0)
+        ) {
+            true
+        }
+        else question.type == HMSPollQuestionType.longAnswer &&
+            (answer.length > (question.answerLongMinLength ?: 0) )
+
+        if(valid) {
+            val response = HMSPollResponseBuilder(hmsPoll, null)
+                .addResponse(question, answer)
+            localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
+                override fun onSuccess(result: PollAnswerResponse) {
+                    Log.d("PollAnswer","Success $result")
+                }
+
+                override fun onError(error: HMSException) {
+                    Log.d("PollAnswer","Error $error")
+                }
+
+            })
+        }
+        return valid
+    }
+    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll) : Boolean {
+        if(option == null) {
+            return false
+        }
+        val answer = question.options?.get(option)
+        if(answer != null) {
+            val response = HMSPollResponseBuilder(hmsPoll, null)
+                .addResponse(question, answer)
+            localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
+                override fun onSuccess(result: PollAnswerResponse) {
+                    Log.d("PollAnswer","Success")
+                }
+
+                override fun onError(error: HMSException) {
+                    Log.d("PollAnswer","Error $error")
+                }
+
+            })
+        }
+        return true
+    }
+    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll) : Boolean {
+        val valid = options != null
+        val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
+            options?.contains(index) == true
+        }
+        if(valid && answer != null) {
+            val response = HMSPollResponseBuilder(hmsPoll, null)
+                .addResponse(question, answer)
+            localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
+                override fun onSuccess(result: PollAnswerResponse) {
+                    Log.d("PollAnswer","Success $result")
+                }
+
+                override fun onError(error: HMSException) {
+                    Log.d("PollAnswer","Error $error")
+                }
+
+            })
+        }
+
+        return valid
+    }
+
+    suspend fun getPollForPollId(pollId: String): HmsPoll? {
+        val pollWithQuestions = CompletableDeferred<HmsPoll?>()
+        localHmsInteractivityCenter.polls.find { it.pollId == pollId }!!
+            .also { existingPoll ->
+                if (existingPoll.questions == null || (existingPoll?.questions?.isEmpty() == true)) {
+                    localHmsInteractivityCenter.fetchPollQuestions(
+                        existingPoll,
+                        object : HmsTypedActionResultListener<List<HMSPollQuestion>> {
+                            override fun onSuccess(result: List<HMSPollQuestion>) {
+                                val newPoll =
+                                    localHmsInteractivityCenter.polls.find { newPolls -> newPolls.pollId == pollId }
+                                pollWithQuestions.complete(newPoll)
+                            }
+
+                            override fun onError(error: HMSException) {
+                                pollWithQuestions.completeExceptionally(error)
+                            }
+
+                        })
+                } else {
+                    pollWithQuestions.complete(existingPoll)
+                }
+            }
+        return try {
+            pollWithQuestions.await()
+        } catch (error: HMSException) {
+            null
+        }
+    }
+    fun hasPoll() : HmsPoll? = localHmsInteractivityCenter.polls.firstOrNull()
+
+    suspend fun getAllPolls() : List<HmsPoll>? {
+        val getStartedPolls = CompletableDeferred<List<HmsPoll>>()
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                getStartedPolls.complete(result)
+            }
+
+            override fun onError(error: HMSException) {
+                getStartedPolls.completeExceptionally(error)
+            }
+
+        })
+        val getCreatedPolls = CompletableDeferred<List<HmsPoll>>()
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.CREATED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                getCreatedPolls.complete(result)
+            }
+
+            override fun onError(error: HMSException) {
+                getCreatedPolls.completeExceptionally(error)
+            }
+
+        })
+        val getEndedPolls = CompletableDeferred<List<HmsPoll>>()
+        localHmsInteractivityCenter.fetchPollList(HmsPollState.STOPPED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+            override fun onSuccess(result: List<HmsPoll>) {
+                getEndedPolls.complete(result)
+            }
+
+            override fun onError(error: HMSException) {
+                getEndedPolls.completeExceptionally(error)
+            }
+
+        })
+
+        return try {
+            getStartedPolls.await()
+                .plus(getCreatedPolls.await())
+                .plus(getEndedPolls.await())
+        } catch (error : HMSException) {
+
+            null
+        }
+    }
+
+    fun isRecordingState(): Boolean {
+        return isRecording.value == RecordingState.RECORDING || isRecording.value == RecordingState.STREAMING_AND_RECORDING
+    }
+
+    fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
+        changeRole(handRaisePeer.peerID, onStageRole, false)
+    }
+
+    fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {
+        hmsNotificationEvent.postValue(
+            HMSNotification(
+                title = "Error ${message}",
+                isError = true,
+                isDismissible = isDismissible,
+                icon = R.drawable.ic_alert_triangle,
+                type = type,
+                actionButtonText = actionButtonText
+            )
+        )
+    }
+
+    fun triggerScreenShareBottomSheet(video: HMSVideoTrack?) {
+        video?.trackId?.let {
+            hmsScreenShareBottomSheetEvent.postValue(it)
+        }
+    }
+
+    fun triggerScreenShareNotification(showScreenshare: Boolean) {
+        if (showScreenshare) {
+            hmsNotificationEvent.postValue(
+                HMSNotification(
+                    title = "You are sharing your screen",
+                    isError = true,
+                    isDismissible = false,
+                    icon = R.drawable.share_screen_on,
+                    type = HMSNotificationType.ScreenShare,
+                    actionButtonText = "Stop"
+                )
+            )
+        } else {
+            hmsRemoveNotificationEvent.postValue(HMSNotificationType.ScreenShare)
+        }
+
+    }
 }
 

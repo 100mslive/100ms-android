@@ -61,7 +61,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
@@ -76,7 +76,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
@@ -91,7 +91,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true).appendMessageIdForTest())
+        addMessage(ChatMessage(hmsMessage, true))
       }
 
     })
@@ -108,14 +108,18 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   private fun addMessage(message: ChatMessage) {
     // Check if the last sender was also the same person
-    _messages.add(message)
-    messages.postValue(_messages)
+    if(_messages.find { it.messageId == message.messageId } == null) {
+      if(!message.isSentByMe) {
+        unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
+      }
+      _messages.add(message)
+      messages.postValue(_messages)
+    }
   }
 
   fun receivedMessage(message: ChatMessage) {
     Log.v(TAG, "receivedMessage: $message")
-    unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
-    addMessage(message.appendMessageIdForTest())
+    addMessage(message)
   }
 
   fun peersUpdate() {
@@ -141,11 +145,4 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
   init {
     peersUpdate() // Load up local peers into the chat members.
   }
-}
-
-fun ChatMessage.appendMessageIdForTest(): ChatMessage {
-  return if(BuildConfig.DEBUG)
-    this.copy(message = "${this.messageId?.takeLast(8)}: ${this.message}" )
-  else
-    this
 }

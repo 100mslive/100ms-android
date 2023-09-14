@@ -77,7 +77,7 @@
                     android:layout_marginLeft="8dp"
                     android:contentDescription="@string/screen_share"
                     android:src="@drawable/ic_mic_off_24"
-                    app:tint="@color/white_faded_70" />
+                     />
 
                 <ImageView
                     android:id="@+id/icon_screen_share"
@@ -87,7 +87,7 @@
                     android:layout_marginLeft="4dp"
                     android:contentDescription="@string/screen_share"
                     android:src="@drawable/ic_mobile_screen_share_24"
-                    app:tint="@color/white_faded_70" />
+                     />
 
             </LinearLayout>
 

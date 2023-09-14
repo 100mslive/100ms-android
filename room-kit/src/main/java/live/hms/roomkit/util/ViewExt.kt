@@ -4,16 +4,23 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityManager
+import android.view.animation.LinearInterpolator
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
 import live.hms.roomkit.R
 import live.hms.roomkit.helpers.OnSingleClickListener
+import live.hms.roomkit.ui.notification.CardStackLayoutManager
+import live.hms.roomkit.ui.notification.CardStackListener
+import live.hms.roomkit.ui.notification.Direction
+import live.hms.roomkit.ui.notification.StackFrom
+import live.hms.roomkit.ui.notification.SwipeableMethod
 import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 import live.hms.video.media.tracks.HMSLocalVideoTrack
@@ -25,12 +32,16 @@ import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.roundToInt
 
 
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
   setOnClickListener(OnSingleClickListener(l))
 }
 
+private fun getDip(): Float = Resources.getSystem().displayMetrics.density
+fun Float.dp() = this * getDip()
+fun Int.dp() = (this * getDip()).roundToInt()
 fun View.setOnSingleClickListener(l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l))
 }
@@ -208,6 +219,9 @@ fun SurfaceViewRenderer.isInit() : Boolean {
     return (getTag(R.id.IS_INT) as? Boolean) == true
 }
 
+fun HMSVideoTrack?.switchCamera() {
+    (this as? HMSLocalVideoTrack)?.switchCamera()
+}
 
 fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture : (Uri)-> Unit, onLongPress: () -> Unit) {
 
@@ -276,5 +290,28 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
         didConsume
     }
 
+
+
+
+}
+
+
+fun CardStackLayoutManager?.init(context: Context, listener: CardStackListener) : CardStackLayoutManager {
+    var layoutManager = this
+    if (layoutManager == null)
+        layoutManager = CardStackLayoutManager(context, listener).apply {
+            setStackFrom(StackFrom.Bottom)
+            setVisibleCount(3)
+            setTranslationInterval(8.0f)
+            setScaleInterval(0.95f)
+            setSwipeThreshold(0.3f)
+            setMaxDegree(0f)
+            setDirections(Direction.HORIZONTAL)
+            setCanScrollHorizontal(true)
+            setCanScrollVertical(false)
+            setSwipeableMethod(SwipeableMethod.AutomaticAndManual)
+            setOverlayInterpolator(LinearInterpolator())
+        }
+    return layoutManager
 
 }
