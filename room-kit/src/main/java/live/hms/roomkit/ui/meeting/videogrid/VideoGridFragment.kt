@@ -315,7 +315,11 @@ class VideoGridFragment : Fragment() {
 
             val remoteScreenShareTilesCount = screenShareTrackList.size
             val localScreenShareTileCount = tracks.filter { it.isLocal && it.isScreen}.size
-            val onthePeerGridTileCount = tracks.size - remoteScreenShareTilesCount - localScreenShareTileCount
+            val hasLocalTile = tracks.filter { it.isLocal && it.isScreen.not()}.size == 1
+            val bothLocalTile = (tracks.size == 2 && tracks.filter { it.isLocal }.size == 2)
+            val hasRemotePeers = tracks.filter { it.isLocal.not() }.isNotEmpty()
+            val hasInsetTileVisible = meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole) && hasLocalTile && bothLocalTile.not() && hasRemotePeers
+            val onthePeerGridTileCount = tracks.size - remoteScreenShareTilesCount - localScreenShareTileCount + (1 * if(hasInsetTileVisible) -1 else 0)
             // Without this, the extra inset adds one more tile than they should
             val expectedPages = Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
             screenShareAdapter.totalPages = remoteScreenShareTilesCount
