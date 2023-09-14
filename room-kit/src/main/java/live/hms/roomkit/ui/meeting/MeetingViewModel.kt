@@ -465,8 +465,6 @@ class MeetingViewModel(
 
             override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
                 previewPeerData.postValue(Pair(type, peer))
-                if(peer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED)
-                    roleChange.postValue(peer)
             }
 
             override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
@@ -730,6 +728,7 @@ class MeetingViewModel(
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
                 Log.d(TAG, "join:onPeerUpdate type=$type, peer=$hmsPeer")
+
                 when (type) {
                     HMSPeerUpdate.PEER_LEFT -> {
                         synchronized(_tracks) {
@@ -769,6 +768,8 @@ class MeetingViewModel(
                             "RoleChangeUpdate",
                             "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
                         )
+                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED)
+                            roleChange.postValue(hmsPeer)
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists

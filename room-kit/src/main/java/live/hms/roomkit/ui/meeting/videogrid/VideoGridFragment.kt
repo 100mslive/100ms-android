@@ -315,14 +315,15 @@ class VideoGridFragment : Fragment() {
                 Pair(newRowCount, newColumnCount)
 
             val itemsPerPage = newRowCount * newColumnCount
-            val hasLocalTile = tracks.find { it.isLocal }
+
+
+            val remoteScreenShareTilesCount = screenShareTrackList.size
+            val localScreenShareTileCount = tracks.filter { it.isLocal && it.isScreen}.size
+            val onthePeerGridTileCount = tracks.size - remoteScreenShareTilesCount - localScreenShareTileCount
             // Without this, the extra inset adds one more tile than they should
-            val tempItems = (tracks.size + itemsPerPage - 1) - 1 * (if (hasLocalTile != null) 1 else 0)
-            val expectedItems = tempItems / itemsPerPage
-            screenShareAdapter.totalPages = screenShareTrackList.size
-            peerGridVideoAdapter.totalPages = if (expectedItems == 0)
-                1
-            else expectedItems
+            val expectedPages = Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
+            screenShareAdapter.totalPages = remoteScreenShareTilesCount
+            peerGridVideoAdapter.totalPages = expectedPages
 
             binding.tabLayoutDots.visibility =
                 if (peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE

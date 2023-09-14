@@ -259,7 +259,7 @@ class MeetingFragment : Fragment() {
 
             R.id.action_participants -> {
                 // Possibly unused
-                val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls())) {
+                val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
                 } else {
                     MeetingFragmentDirections.actionMeetingFragmentToParticipantsTabFragment()
@@ -453,11 +453,9 @@ class MeetingFragment : Fragment() {
             }
         }
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
-            meetingViewModel.prebuiltInfoContainer.isChatEnabled(
-                isHls()
-            )
+            meetingViewModel.prebuiltInfoContainer.isChatEnabled()
         }
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {
             binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
@@ -554,7 +552,7 @@ class MeetingFragment : Fragment() {
         }
 
         chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
-            if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
+            if(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
                 if (count > 0) {
                     binding.unreadMessageCount.apply {
                         visibility = View.VISIBLE
@@ -863,6 +861,7 @@ class MeetingFragment : Fragment() {
 
         val modeEnteredOrExitedHls = !this::currentFragment.isInitialized || (currentFragment is HlsFragment && mode !is MeetingViewMode.HLS_VIEWER
                 || currentFragment !is HlsFragment && mode is MeetingViewMode.HLS_VIEWER)
+        val triggerFirstUpdate = !this::currentFragment.isInitialized
 
         currentFragment = when (mode) {
             MeetingViewMode.GRID -> VideoGridFragment()
@@ -884,8 +883,8 @@ class MeetingFragment : Fragment() {
 
         if(modeEnteredOrExitedHls) {
             val overlayIsVisible = isOverlayChatVisible()
-            if (meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
-                val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls())
+            if (meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
+                val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
                 if (overlayIsVisible && !isChatOverlay)
                     toggleChatVisibility()
                 else if (!overlayIsVisible && isChatOverlay)
@@ -894,16 +893,19 @@ class MeetingFragment : Fragment() {
                 toggleChatVisibility()
             }
         }
+        if(triggerFirstUpdate){
+            updateChatButtonWhenRoleChanges()
+        }
         setupConfiguration(mode)
     }
 
-    fun updateChatButtonWhenRoleChanges() {
-        if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
+    private fun updateChatButtonWhenRoleChanges() {
+        if(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
             binding.messageMenu.visibility = View.VISIBLE
         } else {
             binding.messageMenu.visibility = View.GONE
         }
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {
             binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
@@ -1050,7 +1052,9 @@ class MeetingFragment : Fragment() {
                 override fun onAnimationStart(animation: Animator?) {
                     binding.topMenu.visibility = View.VISIBLE
                     showSystemBars()
-                    moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
+                    // This prevents the bar from moving twice as high as it should
+                    if(shouldHideAfterDelay)
+                        moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
@@ -1220,8 +1224,9 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
-                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls()) ||
-                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls())) {
+                            if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
+                                    !meetingViewModel.prebuiltInfoContainer.isChatEnabled()
+                            ) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
@@ -1294,7 +1299,7 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        val chatVisiBility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled(isHls()))
+        val chatVisiBility = if(meetingViewModel.prebuiltInfoContainer.isChatEnabled())
             View.VISIBLE
         else
             View.GONE
@@ -1302,7 +1307,7 @@ class MeetingFragment : Fragment() {
         binding.buttonOpenChat.visibility = chatVisiBility
         binding.messageMenu.visibility = chatVisiBility
         binding.buttonOpenChat.setOnSingleClickListener {
-            if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay(isHls())) {
+            if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                 ChatParticipantCombinedFragment().apply {
                     arguments = Bundle().apply { putBoolean(OPEN_TO_CHAT_ALONE,
                         !meetingViewModel.isParticpantListEnabled()
@@ -1316,7 +1321,7 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen(isHls())) {
+        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.callOnClick()
         }
 
@@ -1524,9 +1529,5 @@ class MeetingFragment : Fragment() {
         } else {
             LeaveCallBottomSheet().show(parentFragmentManager, null)
         }
-    }
-
-    private fun isHls() : Boolean{
-        return meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER
     }
 }

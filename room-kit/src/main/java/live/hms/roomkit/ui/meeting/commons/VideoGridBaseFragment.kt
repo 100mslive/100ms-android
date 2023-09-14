@@ -380,20 +380,6 @@ abstract class VideoGridBaseFragment : Fragment() {
           var statsInterpreter: StatsInterpreter? = null
           if (!isVideoGrid) {
             statsInterpreter = StatsInterpreter(settings.showStats)
-            meetingViewModel.statsToggleLiveData.observe(this) {
-              if (it) {
-                videoBinding.videoCard.statsView.visibility = View.VISIBLE
-                statsInterpreter.initiateStats(
-                  viewLifecycleOwner,
-                  meetingViewModel.getStats(),
-                  newVideo.video,
-                  newVideo.audio,
-                  newVideo.peer.isLocal
-                ) { videoBinding.videoCard.statsView.text = it }
-              } else {
-                videoBinding.videoCard.statsView.visibility = View.GONE
-              }
-            }
           }
 
           // Bind surfaceView when view is visible to user
