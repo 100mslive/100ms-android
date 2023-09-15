@@ -13,14 +13,14 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // Jetpack Navigation
-        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3'
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.7.2'
         classpath "io.github.gradle-nexus:publish-plugin:1.1.0"
 
         // Firebase Google-Services
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.gms:google-services:4.4.0'
 
         // Firebase Crashlytics
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
     }
 }
 
