@@ -1013,7 +1013,7 @@ class MeetingFragment : Fragment() {
         controlBarsVisible = true
         binding.topMenu.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     binding.topMenu.visibility = View.VISIBLE
                     showSystemBars()
                     // This prevents the bar from moving twice as high as it should
@@ -1021,7 +1021,7 @@ class MeetingFragment : Fragment() {
                         moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                     if (shouldHideAfterDelay) {
@@ -1030,12 +1030,12 @@ class MeetingFragment : Fragment() {
                     }
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     binding.topMenu?.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 
@@ -1044,21 +1044,21 @@ class MeetingFragment : Fragment() {
         val screenHeight = activity!!.window.decorView.height
         binding.bottomControls.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     binding.bottomControls.visibility = View.VISIBLE
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
-                    binding.bottomControls.visibility = View.VISIBLE
-                    controlBarsVisible = true
-                }
-
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.bottomControls.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
+                    binding.bottomControls.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                }
+
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 
@@ -1094,22 +1094,22 @@ class MeetingFragment : Fragment() {
         topMenu?.animate()
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     topMenu.visibility = View.VISIBLE
                     moveChat(up = false, topMenu!!.height.toFloat())
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     topMenu.visibility = View.GONE
                     controlBarsVisible = false
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 
@@ -1118,21 +1118,21 @@ class MeetingFragment : Fragment() {
         bottomMenu.animate()
             ?.translationY((bottomMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     bottomMenu.visibility = View.VISIBLE
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     bottomMenu.visibility = View.GONE
                     controlBarsVisible = false
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     bottomMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 
