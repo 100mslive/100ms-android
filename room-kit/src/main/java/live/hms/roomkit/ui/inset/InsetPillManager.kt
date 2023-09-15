@@ -47,42 +47,42 @@ class InsetPillManager : View.OnClickListener, GestureDetector.OnDoubleTapListen
         //
     }
 
-    override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
         return true
     }
 
-    override fun onDoubleTap(e: MotionEvent?): Boolean {
+    override fun onDoubleTap(e: MotionEvent): Boolean {
         return false
     }
 
-    override fun onDoubleTapEvent(e: MotionEvent?): Boolean {
+    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
         return false
     }
 
-    override fun onDown(e: MotionEvent?): Boolean {
+    override fun onDown(e: MotionEvent): Boolean {
         return false
     }
 
-    override fun onShowPress(e: MotionEvent?) {
+    override fun onShowPress(e: MotionEvent) {
 
     }
 
-    override fun onSingleTapUp(e: MotionEvent?): Boolean {
+    override fun onSingleTapUp(e: MotionEvent): Boolean {
         return false
     }
 
     override fun onScroll(
-        e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float
+        e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float
     ): Boolean {
         return false
     }
 
-    override fun onLongPress(e: MotionEvent?) {
+    override fun onLongPress(e: MotionEvent) {
 
     }
 
     override fun onFling(
-        e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float
+        e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float
     ): Boolean {
         return false
     }

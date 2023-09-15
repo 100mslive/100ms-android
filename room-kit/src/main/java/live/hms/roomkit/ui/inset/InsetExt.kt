@@ -70,9 +70,7 @@ internal fun View.makeInset(
 //                draggableListener?.onLongPress(this@setupDraggable)
             }
 
-
-
-            override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 onDoubleTap.invoke()
                 return super.onSingleTapConfirmed(e)
             }
