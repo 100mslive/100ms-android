@@ -189,113 +189,6 @@ class MeetingFragment : Fragment() {
         setupRecordingTimeView()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_share_link -> {
-                val sendIntent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "text/plain"
-                }
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                startActivity(shareIntent)
-            }
-
-            R.id.sessionMetadataAlpha -> {
-                findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoomMetadataAlphaFragment())
-            }
-
-            R.id.action_record_meeting, R.id.hls_start -> {
-
-//                findNavController().navigate(
-//                    MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment(
-//                        roomDetails.url
-//                    )
-//                )
-            }
-
-            R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
-
-            R.id.action_email_logs -> {
-                requireContext().startActivity(
-                    EmailUtils.getNonFatalLogIntent(requireContext())
-                )
-            }
-            R.id.action_stats -> {
-                val deviceStatsBottomSheet = DeviceStatsBottomSheet()
-                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
-            }
-
-            R.id.action_grid_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
-            }
-
-            R.id.action_pinned_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
-            }
-
-            R.id.active_speaker_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.ACTIVE_SPEAKER)
-            }
-
-            R.id.audio_only_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.AUDIO_ONLY)
-            }
-
-            R.id.hls_view -> {
-                meetingViewModel.switchToHlsViewIfRequired()
-            }
-
-            R.id.action_settings -> {
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
-                )
-            }
-
-            R.id.action_bulk_role_change -> {
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment()
-                )
-            }
-
-            R.id.action_participants -> {
-                // Possibly unused
-                val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
-                    MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
-                } else {
-                    MeetingFragmentDirections.actionMeetingFragmentToParticipantsTabFragment()
-
-                }
-                findNavController().navigate(directions)
-            }
-
-            R.id.action_share_screen -> {
-                val mediaProjectionManager: MediaProjectionManager? =
-                    requireContext().getSystemService(
-                        Context.MEDIA_PROJECTION_SERVICE
-                    ) as MediaProjectionManager
-                resultLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
-
-            }
-
-            R.id.action_stop_share_screen -> {
-            }
-
-            R.id.pip_mode -> {
-                launchPipMode()
-            }
-
-            R.id.raise_hand -> {
-                meetingViewModel.toggleRaiseHand()
-            }
-
-
-            R.id.change_name -> meetingViewModel.requestNameChange()
-
-            R.id.hls_stop -> meetingViewModel.stopHls()
-        }
-        return false
-    }
-
     private fun updateActionVolumeMenuIcon(
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
@@ -427,10 +320,6 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
-        setHasOptionsMenu(true)
-        meetingViewModel.showAudioMuted.observe(
-            viewLifecycleOwner,
-            Observer { activity?.invalidateOptionsMenu() })
         meetingViewModel.isRecording.observe(
             viewLifecycleOwner,
             Observer {
