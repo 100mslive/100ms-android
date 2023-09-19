@@ -8,6 +8,9 @@ import live.hms.roomkit.databinding.LayoutViewMoreButtonBinding
 class ViewMoreItem(val role : String) : BindableItem<LayoutViewMoreButtonBinding>() {
     override fun bind(viewBinding: LayoutViewMoreButtonBinding, position: Int) {
         // TODO attach onclick listener
+        viewBinding.viewMore.setOnClickListener {
+
+        }
     }
 
     override fun getLayout(): Int = R.layout.layout_view_more_button
