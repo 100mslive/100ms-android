@@ -187,25 +187,15 @@ class ParticipantsFragment : Fragment() {
     private fun getSearchFilteredPeersIfNeeded() : List<HMSPeer> {
         val text = filterText
 
-        return if(!isSearching())
+        return if (!isSearching())
             meetingViewModel.peers
         else
             meetingViewModel.peers.filter {
-            text.isNullOrEmpty() || it.name.contains(
-                text.toString(),
-                true
-            )
-        }
-    }
-
-    private fun onSheetClicked(peer: HMSPeer) {
-        val action =
-            ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(
-                peer.peerID,
-                meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray(),
-                peer.name
-            )
-        findNavController().navigate(action)
+                text.isNullOrEmpty() || it.name.contains(
+                    text.toString(),
+                    true
+                )
+            }
     }
 
     @SuppressLint("SetTextI18n")

@@ -136,6 +136,7 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
         initOnBackPress()
         initViews()
     }
+
     private fun updateParticipantCount(count : Int) {
 //        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
     }
@@ -177,7 +178,7 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
     private fun getSearchFilteredPeersIfNeeded() : List<HMSPeer> {
         val text = filterText
 
-        return if(!isSearching())
+        return if (!isSearching())
             meetingViewModel.peers
         else
             meetingViewModel.peers.filter {
