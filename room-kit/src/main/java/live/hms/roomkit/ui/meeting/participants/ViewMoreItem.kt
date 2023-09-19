@@ -5,11 +5,11 @@ import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutViewMoreButtonBinding
 
-class ViewMoreItem(val role : String) : BindableItem<LayoutViewMoreButtonBinding>() {
+class ViewMoreItem(val role : String, private val onClick:(role: String) -> Unit) : BindableItem<LayoutViewMoreButtonBinding>() {
     override fun bind(viewBinding: LayoutViewMoreButtonBinding, position: Int) {
         // TODO attach onclick listener
         viewBinding.viewMore.setOnClickListener {
-
+            onClick(role)
         }
     }
 

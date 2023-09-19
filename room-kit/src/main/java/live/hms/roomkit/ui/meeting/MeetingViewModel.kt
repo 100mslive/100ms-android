@@ -2130,5 +2130,14 @@ class MeetingViewModel(
         }
 
     }
+
+    fun getPeerlistIterator(roleName: String): PeerListIterator {
+        val options = PeerListIteratorOptions(byRoleName = roleName, limit = 1)
+        return hmsSDK.getPeerListIterator(options)
+    }
+
+    fun getFullPeerlistIterator(): PeerListIterator {
+        return hmsSDK.getPeerListIterator()
+    }
 }
 

@@ -39,7 +39,10 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
             requireActivity().application
         )
     }
-    private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel) { meetingViewModel.peers } }
+    private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, {
+        meetingViewModel.peers
+    }, {})
+    }
 
 
     override fun onCreateView(

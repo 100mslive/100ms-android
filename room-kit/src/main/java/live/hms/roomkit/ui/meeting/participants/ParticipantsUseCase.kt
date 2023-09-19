@@ -20,7 +20,8 @@ import live.hms.video.sdk.models.HMSPeer
 
 const val handRaisedKey = "Hand Raised"
 class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
-                          val getPeers : () -> List<HMSPeer>, ) {
+                          val getPeers : () -> List<HMSPeer>,
+                            val onClick: (role: String) -> Unit) {
     val adapter = GroupieAdapter()
     private val expandedGroups = mutableMapOf<String,Boolean>()
     private var filterText : String? = null
@@ -84,7 +85,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
 
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = peerList.groupBy {
-            if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true)
+            if(it.isHandRaised)
                 handRaisedKey
             else
                 it.hmsRole.name
@@ -109,11 +110,19 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                     // Offstage roles
                     if( meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)?.contains(key) == true) {
                         // Add the
-                        it.add(ViewMoreItem(key))
+                        it.add(ViewMoreItem(key) { role -> onClick(role) })
                     }
                 }
 
         })
+
+        // Add off-stage groups if this is a large room
+        if (meetingViewModel.hmsSDK.getRoom()?.isLargeRoom == true) {
+            for ( offStageRole in meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)!!) {
+                // Check if already added
+
+            }
+        }
 
         adapter.update(groups)
     }
