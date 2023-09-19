@@ -80,6 +80,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         //  ideally this should be replaced with just updating the
         //  peers but still with the search query.
         val peerList = getSearchFilteredPeersIfNeeded(peers)
+        val localPeerRoleName = meetingViewModel.hmsSDK.getLocalPeer()!!.hmsRole.name
 
         // Group people by roles.
         val groupedPeers : Map<String, List<HMSPeer>> = peerList.groupBy {
@@ -103,6 +104,15 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
 
         groups.addAll(groupedPeers.keys.filterNot { it == handRaisedKey }.map { key ->
             keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer)
+                .also {
+                    // Add view more here
+                    // Offstage roles
+                    if( meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)?.contains(key) == true) {
+                        // Add the
+                        it.add(ViewMoreItem(key))
+                    }
+                }
+
         })
 
         adapter.update(groups)
