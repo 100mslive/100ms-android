@@ -180,7 +180,9 @@ class VideoGridFragment : Fragment() {
                     HMSPeerUpdate.PEER_LEFT,
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
                     HMSPeerUpdate.NO_DOMINANT_SPEAKER,
-                    HMSPeerUpdate.ROLE_CHANGED -> {
+                    HMSPeerUpdate.ROLE_CHANGED,
+                        // This is handled in metadata update
+                    HMSPeerUpdate.HAND_RAISED_CHANGED -> {
                     }
                 }
             }

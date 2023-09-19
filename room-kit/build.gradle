@@ -14,11 +14,11 @@ def getVersionName = { ->
 
 android {
     namespace 'live.hms.roomkit'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdk 33
         versionCode 1
         versionName getVersionName()
 
