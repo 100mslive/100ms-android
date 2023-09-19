@@ -419,7 +419,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       renderedViews.find { it.meetingTrack.peer.peerID == peerTypePair.first.peerID }
     if (renderedViewPair != null) {
       when (peerTypePair.second) {
-        HMSPeerUpdate.METADATA_CHANGED -> {
+        HMSPeerUpdate.METADATA_CHANGED, -> {
           val isHandRaised = CustomPeerMetadata.fromJson(renderedViewPair.meetingTrack.peer.metadata)?.isHandRaised == true
           val isBRB = CustomPeerMetadata.fromJson(renderedViewPair.meetingTrack.peer.metadata)?.isBRBOn == true
           renderedViewPair.binding.videoCard.raisedHand.alpha = visibilityOpacity(isHandRaised)
@@ -443,8 +443,10 @@ abstract class VideoGridBaseFragment : Fragment() {
         HMSPeerUpdate.PEER_LEFT,
         HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
         HMSPeerUpdate.NO_DOMINANT_SPEAKER,
-        HMSPeerUpdate.ROLE_CHANGED -> {}
-      }
+        HMSPeerUpdate.ROLE_CHANGED,
+          // This is handled in metadata update
+        HMSPeerUpdate.HAND_RAISED_CHANGED-> {}
+        }
     }
   }
 
