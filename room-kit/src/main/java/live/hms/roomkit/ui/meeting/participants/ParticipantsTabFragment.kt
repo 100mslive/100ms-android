@@ -7,27 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.xwray.groupie.ExpandableGroup
-import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutParticipantsMergeBinding
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.video.sdk.models.HMSLocalPeer
-import live.hms.video.sdk.models.HMSPeer
 
 class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
 

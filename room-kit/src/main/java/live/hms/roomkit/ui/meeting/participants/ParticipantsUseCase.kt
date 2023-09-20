@@ -11,7 +11,6 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
@@ -76,7 +75,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         }
     }
     // This is only suspending so it can run in the background
-    suspend fun updateParticipantsAdapter(peers: List<HMSPeer>) {
+    suspend fun updateParticipantsAdapter(peers: List<HMSPeer>, hasNext: Boolean = true) {
         // Don't throw away results when it's searching
         //  ideally this should be replaced with just updating the
         //  peers but still with the search query.
@@ -108,21 +107,13 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                 .also {
                     // Add view more here
                     // Offstage roles
-                    if( meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)?.contains(key) == true) {
-                        // Add the
-                        it.add(ViewMoreItem(key) { role -> onClick(role) })
+                    if(meetingViewModel.isLargeRoom() && meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)?.contains(key) == true) {
+                        if (hasNext) {
+                            it.add(ViewMoreItem(key) { role -> onClick(role) })
+                        }
                     }
                 }
-
         })
-
-        // Add off-stage groups if this is a large room
-        if (meetingViewModel.hmsSDK.getRoom()?.isLargeRoom == true) {
-            for ( offStageRole in meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)!!) {
-                // Check if already added
-
-            }
-        }
 
         adapter.update(groups)
     }

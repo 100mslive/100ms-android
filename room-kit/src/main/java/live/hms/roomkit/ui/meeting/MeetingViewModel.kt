@@ -78,6 +78,8 @@ class MeetingViewModel(
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
 
+    fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
+
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
             HMSAudioTrackSettings.Builder()

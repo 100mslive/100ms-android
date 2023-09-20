@@ -53,7 +53,8 @@ class ParticipantsFragment : Fragment() {
     private var isPaginatedPeerlistInitialized = false
 
     private fun getNextPage(role: String) {
-        iteratorMap[role]?.next(object : PeerListResultListener{
+        val iterator = iteratorMap[role]
+        iterator?.next(object : PeerListResultListener{
             override fun onError(error: HMSException) {
                 meetingViewModel.triggerErrorNotification(message = error.message)
             }
@@ -77,7 +78,10 @@ class ParticipantsFragment : Fragment() {
                 deferred.await()
             }
             // Return  the combined list of real time and non real time peers
-            meetingViewModel.peers.plus(paginatedPeerList)
+            val realtimePeers = meetingViewModel.peers
+            val filteredPaginatedPeers = paginatedPeerList.filter { !realtimePeers.contains(it) }
+
+            meetingViewModel.peers.plus(filteredPaginatedPeers)
         } else {
             // Return only Real time peers
             meetingViewModel.peers
@@ -119,7 +123,7 @@ class ParticipantsFragment : Fragment() {
             .commitAllowingStateLoss()
     }
 
-    private suspend fun initPaginatedPeerlist(initPaginationDeffered: CompletableDeferred<Boolean>) {
+    private suspend fun initPaginatedPeerlist(initPaginationDeferred: CompletableDeferred<Boolean>) {
         isPaginatedPeerlistInitialized =  true
         lifecycleScope.launch {
             // Now fetch the first set of peers for all off-stage roles
@@ -145,7 +149,7 @@ class ParticipantsFragment : Fragment() {
                     }
                 }
             }
-            initPaginationDeffered.complete(true)
+            initPaginationDeferred.complete(true)
         }
     }
 
