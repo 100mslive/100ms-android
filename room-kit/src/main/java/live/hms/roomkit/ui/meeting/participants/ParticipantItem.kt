@@ -190,7 +190,11 @@ class ParticipantItem(
     }
 
     private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding) {
-        if (audioTrack?.isMute == true || audioTrack?.isMute == null) {
+        if (audioTrack == null) {
+            viewBinding.muteUnmuteIcon.gone()
+            viewBinding.audioLevelView.gone()
+        }
+        else if (audioTrack?.isMute == true || audioTrack?.isMute == null) {
             // Mute
             viewBinding.muteUnmuteIcon.show()
             viewBinding.audioLevelView.gone()
