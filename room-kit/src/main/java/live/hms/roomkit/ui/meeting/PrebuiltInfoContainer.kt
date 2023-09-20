@@ -35,6 +35,9 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     fun onStageExp(role : String) =
         roleMap[role]?.screens?.conferencing?.default?.elements?.onStageExp
 
+    fun offStageRoles(role : String) =
+        roleMap[role]?.screens?.conferencing?.default?.elements?.onStageExp?.offStageRoles
+
     fun setParticipantLabelInfo(hmsRoomLayout: HMSRoomLayout?){
         this.hmsRoomLayout = hmsRoomLayout
         hmsRoomLayout?.data
