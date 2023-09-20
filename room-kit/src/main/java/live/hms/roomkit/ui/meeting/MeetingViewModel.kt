@@ -2134,7 +2134,7 @@ class MeetingViewModel(
     }
 
     fun getPeerlistIterator(roleName: String): PeerListIterator {
-        val options = PeerListIteratorOptions(byRoleName = roleName, limit = 1)
+        val options = PeerListIteratorOptions(byRoleName = roleName)
         return hmsSDK.getPeerListIterator(options)
     }
 
