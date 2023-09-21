@@ -131,7 +131,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         canRemovePeers: Boolean,
         localPeer : HMSLocalPeer
     ) : ExpandableGroup =
-        ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size, ::expandedGroups))
+        ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size, ::expandedGroups), isExpanded(key))
             .apply {
                 addAll(groupedPeers[key]?.map {
                     ParticipantItem(it,
@@ -147,10 +147,9 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                         meetingViewModel.activeSpeakers
                     )
                 }!!)
-                // If the group was expanded, open it again.
-                if(expandedGroups[key] == true || expandedGroups[key] == null){
-                    onToggleExpanded()
-                }
             }
+
+    private fun isExpanded(key: String): Boolean =
+        expandedGroups[key] == true || expandedGroups[key] == null
 
 }
