@@ -13,7 +13,7 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 
 class ParticipantHeaderItem(private val roleName: String, private val numPeers: Int? = 0, val expanded : (String, Boolean) -> Unit) :
-    BindableItem<ParticipantHeaderItemBinding>(), ExpandableItem {
+    BindableItem<ParticipantHeaderItemBinding>(roleName.hashCode().toLong()), ExpandableItem {
     private lateinit var expandableGroup: ExpandableGroup
 // heading is onsurface medium
     // background is border default

@@ -45,7 +45,7 @@ class ParticipantItem(
     private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
     private val requestPeerLeave: (hmsPeer: HMSRemotePeer, reason: String) -> Unit,
     private val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>>
-) : BindableItem<ListItemPeerListBinding>(){
+) : BindableItem<ListItemPeerListBinding>(hmsPeer.peerID.hashCode().toLong()){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
         val name = if(hmsPeer.isLocal){
