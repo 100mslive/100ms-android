@@ -23,7 +23,7 @@
             android:label="@string/meeting"
             android:screenOrientation="portrait"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Theme.App2.NoActionBar"
+            android:theme="@style/Theme.Roomkit.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <provider
