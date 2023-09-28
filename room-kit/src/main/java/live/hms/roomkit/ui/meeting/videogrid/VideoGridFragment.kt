@@ -30,6 +30,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.util.NameUtils
+import live.hms.roomkit.util.applyConstraint
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.roomkit.util.visibilityOpacity
@@ -276,6 +277,7 @@ class VideoGridFragment : Fragment() {
         if (meetingTrack?.video?.isMute == false && meetingTrack.video != null) {
             val hmsVideoView = HMSVideoView(requireContext()).apply {
                 setZOrderMediaOverlay(true)
+                id = View.generateViewId()
                 addTrack(meetingTrack?.video!!)
                 initAnimState(alphaOnly = true)
             }
@@ -286,6 +288,8 @@ class VideoGridFragment : Fragment() {
 
     }
 
+    //Important to prevent redraws like crazy. This was causing flickering issue
+    var lastGuideLinePercentage = 0f
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
@@ -293,17 +297,45 @@ class VideoGridFragment : Fragment() {
             val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
             var newRowCount = 0
             var newColumnCount = 0
+            var newGuideLinePercentage = 0f
             //is screen share track is present then reduce the grid and column span else restore
             if (screenShareTrackList.isEmpty()) {
                 binding.screenShareContainer.visibility = View.GONE
                 newRowCount = 3
                 newColumnCount = 2
-                binding.divider.setGuidelinePercent(0f)
+                newGuideLinePercentage = 0f
+
             } else {
                 binding.screenShareContainer.visibility = View.VISIBLE
                 newRowCount = 1
                 newColumnCount = 2
-                binding.divider.setGuidelinePercent(0.75f)
+                newGuideLinePercentage = 0.75f
+            }
+
+            //smart updates cause updating evenrything at once would call layout()
+            if (lastGuideLinePercentage != newGuideLinePercentage) {
+                if (newGuideLinePercentage == 0.0f) {
+                    //un docked state
+                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        height = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+
+                    binding.rootLayout.applyConstraint {
+                        binding.viewPagerVideoGrid.clearTop()
+                    }
+
+                } else {
+                    //docked state
+                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+                    }
+                    binding.rootLayout.applyConstraint {
+                        binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
+                    }
+                }
+
+                binding.divider.setGuidelinePercent(newGuideLinePercentage)
+                lastGuideLinePercentage = newGuideLinePercentage
             }
 
             if (screenShareTrackList.size <=1){
