@@ -30,6 +30,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.util.NameUtils
+import live.hms.roomkit.util.applyConstraint
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.roomkit.util.visibilityOpacity
@@ -311,6 +312,25 @@ class VideoGridFragment : Fragment() {
             }
 
             if (lastGuideLinePercentage != newGuideLinePercentage) {
+                if (newGuideLinePercentage == 0.0f) {
+
+                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        height = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+
+                    binding.rootLayout.applyConstraint {
+                        binding.viewPagerVideoGrid.clearTop()
+                    }
+
+                } else {
+                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        height = 0
+                    }
+                    binding.rootLayout.applyConstraint {
+                        binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
+                    }
+                }
+
                 binding.divider.setGuidelinePercent(newGuideLinePercentage)
                 lastGuideLinePercentage = newGuideLinePercentage
             }
