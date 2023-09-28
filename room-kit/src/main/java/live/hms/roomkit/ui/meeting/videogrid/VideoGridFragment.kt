@@ -277,6 +277,7 @@ class VideoGridFragment : Fragment() {
         if (meetingTrack?.video?.isMute == false && meetingTrack.video != null) {
             val hmsVideoView = HMSVideoView(requireContext()).apply {
                 setZOrderMediaOverlay(true)
+                id = View.generateViewId()
                 addTrack(meetingTrack?.video!!)
                 initAnimState(alphaOnly = true)
             }
