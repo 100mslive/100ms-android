@@ -286,6 +286,8 @@ class VideoGridFragment : Fragment() {
 
     }
 
+    //Important to prevent redraws like crazy. This was causing flickering issue
+    var lastGuideLinePercentage = 0f
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
@@ -293,17 +295,24 @@ class VideoGridFragment : Fragment() {
             val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
             var newRowCount = 0
             var newColumnCount = 0
+            var newGuideLinePercentage = 0f
             //is screen share track is present then reduce the grid and column span else restore
             if (screenShareTrackList.isEmpty()) {
                 binding.screenShareContainer.visibility = View.GONE
                 newRowCount = 3
                 newColumnCount = 2
-                binding.divider.setGuidelinePercent(0f)
+                newGuideLinePercentage = 0f
+
             } else {
                 binding.screenShareContainer.visibility = View.VISIBLE
                 newRowCount = 1
                 newColumnCount = 2
-                binding.divider.setGuidelinePercent(0.75f)
+                newGuideLinePercentage = 0.75f
+            }
+
+            if (lastGuideLinePercentage != newGuideLinePercentage) {
+                binding.divider.setGuidelinePercent(newGuideLinePercentage)
+                lastGuideLinePercentage = newGuideLinePercentage
             }
 
             if (screenShareTrackList.size <=1){
