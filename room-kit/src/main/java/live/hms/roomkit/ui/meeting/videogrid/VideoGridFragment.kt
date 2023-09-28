@@ -311,9 +311,10 @@ class VideoGridFragment : Fragment() {
                 newGuideLinePercentage = 0.75f
             }
 
+            //smart updates cause updating evenrything at once would call layout()
             if (lastGuideLinePercentage != newGuideLinePercentage) {
                 if (newGuideLinePercentage == 0.0f) {
-
+                    //un docked state
                     binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
                         height = ViewGroup.LayoutParams.MATCH_PARENT
                     }
@@ -323,8 +324,9 @@ class VideoGridFragment : Fragment() {
                     }
 
                 } else {
+                    //docked state
                     binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        height = 0
+                        height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
                     }
                     binding.rootLayout.applyConstraint {
                         binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
