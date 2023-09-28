@@ -83,7 +83,7 @@ class MeetingViewModel(
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
             HMSAudioTrackSettings.Builder()
-                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
+//                .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
                 .initialState(getAudioTrackState())
                 .setPhoneCallMuteState(if (settings.muteLocalAudioOnPhoneRing) PhoneCallState.ENABLE_MUTE_ON_PHONE_CALL_RING else PhoneCallState.DISABLE_MUTE_ON_VOIP_PHONE_CALL_RING)
                 .build()
