@@ -108,7 +108,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
             val isNonRealTimeHeader = meetingViewModel.isLargeRoom() && meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)?.contains(key) == true
             // For large rooms and off-stage roles, show peer count from the response of iterator
             val peerCount = if (isNonRealTimeHeader) {
-                iteratorMap?.get(key)?.total
+                iteratorMap?.get(key)?.totalCount
             } else {
                 groupedPeers[key]?.size
             }
