@@ -16,6 +16,7 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.PeerListIterator
 
 const val handRaisedKey = "Hand Raised"
 class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
@@ -75,7 +76,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         }
     }
     // This is only suspending so it can run in the background
-    suspend fun updateParticipantsAdapter(peers: List<HMSPeer>, hasNext: Boolean = true) {
+    suspend fun updateParticipantsAdapter(peers: List<HMSPeer>, iteratorMap: Map<String, PeerListIterator>? = null) {
         // Don't throw away results when it's searching
         //  ideally this should be replaced with just updating the
         //  peers but still with the search query.
@@ -99,15 +100,24 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         val groups = mutableListOf<ExpandableGroup>()
         // Keep hand raised on top.
         if(groupedPeers[handRaisedKey] != null) {
-            groups.add(keyToGroup(handRaisedKey, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer))
+            // Send peercount as null as we want to show the count from real time list
+            groups.add(keyToGroup(handRaisedKey, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer, null))
         }
 
         groups.addAll(groupedPeers.keys.filterNot { it == handRaisedKey }.map { key ->
-            keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer)
+            val isNonRealTimeHeader = meetingViewModel.isLargeRoom() && meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)?.contains(key) == true
+            // For large rooms and off-stage roles, show peer count from the response of iterator
+            val peerCount = if (isNonRealTimeHeader) {
+                iteratorMap?.get(key)?.totalCount
+            } else {
+                groupedPeers[key]?.size
+            }
+            keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer, peerCount)
                 .also {
-                    // Add view more here
+                    // Add view more here for non realtime roles
                     // Offstage roles
-                    if(meetingViewModel.isLargeRoom() && meetingViewModel.prebuiltInfoContainer.offStageRoles(localPeerRoleName)?.contains(key) == true) {
+                    if(isNonRealTimeHeader) {
+                        val hasNext = iteratorMap?.get(key)?.hasNext() ?: false
                         if (hasNext) {
                             it.add(ViewMoreItem(key) { role -> onClick(role) })
                         }
@@ -129,25 +139,34 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         canChangeRole: Boolean,
         canMutePeers: Boolean,
         canRemovePeers: Boolean,
-        localPeer : HMSLocalPeer
-    ) : ExpandableGroup =
-        ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size, ::expandedGroups), isExpanded(key))
-            .apply {
-                addAll(groupedPeers[key]?.map {
-                    ParticipantItem(it,
-                        localPeer,
-                        meetingViewModel::togglePeerMute,
-                        meetingViewModel::changeRole,
-                        canChangeRole,
-                        canMutePeers,
-                        canRemovePeers,
-                        meetingViewModel.prebuiltInfoContainer,
-                        meetingViewModel.participantPreviousRoleChangeUseCase,
-                        meetingViewModel::requestPeerLeave,
-                        meetingViewModel.activeSpeakers
-                    )
-                }!!)
-            }
+        localPeer : HMSLocalPeer,
+        totalPeerCount: Int?
+    ) : ExpandableGroup {
+        // Show the number of peers in the current role if this is a large room
+        // Else show the count as the size of the peer list for regular rooms
+        val numPeers = totalPeerCount ?: groupedPeers[key]?.size
+        return ExpandableGroup(
+                ParticipantHeaderItem(key, numPeers, ::expandedGroups),
+                isExpanded(key)
+            )
+                .apply {
+                    addAll(groupedPeers[key]?.map {
+                        ParticipantItem(
+                            it,
+                            localPeer,
+                            meetingViewModel::togglePeerMute,
+                            meetingViewModel::changeRole,
+                            canChangeRole,
+                            canMutePeers,
+                            canRemovePeers,
+                            meetingViewModel.prebuiltInfoContainer,
+                            meetingViewModel.participantPreviousRoleChangeUseCase,
+                            meetingViewModel::requestPeerLeave,
+                            meetingViewModel.activeSpeakers
+                        )
+                    }!!)
+                }
+    }
 
     private fun isExpanded(key: String): Boolean =
         expandedGroups[key] == true || expandedGroups[key] == null

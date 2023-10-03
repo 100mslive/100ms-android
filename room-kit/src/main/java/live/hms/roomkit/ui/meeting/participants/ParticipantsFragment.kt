@@ -63,7 +63,7 @@ class ParticipantsFragment : Fragment() {
                 // add the next page of peers into final list
                 paginatedPeerList.addAll(result)
                lifecycleScope.launch {
-                   participantsUseCase.updateParticipantsAdapter(getPeerList())
+                   participantsUseCase.updateParticipantsAdapter(getPeerList(), iteratorMap)
                }
             }
 
@@ -124,7 +124,6 @@ class ParticipantsFragment : Fragment() {
     }
 
     private suspend fun initPaginatedPeerlist(initPaginationDeferred: CompletableDeferred<Boolean>) {
-        isPaginatedPeerlistInitialized =  true
         lifecycleScope.launch {
             // Now fetch the first set of peers for all off-stage roles
             val offStageRoleNames = meetingViewModel.prebuiltInfoContainer.offStageRoles(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.name!!)
@@ -141,6 +140,7 @@ class ParticipantsFragment : Fragment() {
                             }
 
                             override fun onSuccess(result: ArrayList<HMSPeer>) {
+                                isPaginatedPeerlistInitialized =  true
                                 paginatedPeerList.addAll(result)
                                 deferred.complete(true)
                             }
@@ -161,7 +161,7 @@ class ParticipantsFragment : Fragment() {
 //        initPaginatedPeerlist()
         meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
-                participantsUseCase.updateParticipantsAdapter(getPeerList())
+                participantsUseCase.updateParticipantsAdapter(getPeerList(), iteratorMap = iteratorMap)
             }
         }
         meetingViewModel.peerCount.observe(viewLifecycleOwner,::updateParticipantCount)
