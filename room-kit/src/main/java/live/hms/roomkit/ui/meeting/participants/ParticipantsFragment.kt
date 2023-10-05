@@ -11,7 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.setOnSingleClickListener
@@ -73,9 +75,7 @@ class ParticipantsFragment : Fragment() {
     private suspend fun getPeerList(): List<HMSPeer> {
         return if (isLargeRoom) {
             if (!isPaginatedPeerlistInitialized) {
-                val deferred = CompletableDeferred<Boolean>()
-                initPaginatedPeerlist(deferred)
-                deferred.await()
+                paginatedPeerList.addAll(initPaginatedPeerListAndIterators())
             }
             // Return  the combined list of real time and non real time peers
             val realtimePeers = meetingViewModel.peers
@@ -123,34 +123,29 @@ class ParticipantsFragment : Fragment() {
             .commitAllowingStateLoss()
     }
 
-    private suspend fun initPaginatedPeerlist(initPaginationDeferred: CompletableDeferred<Boolean>) {
-        lifecycleScope.launch {
-            // Now fetch the first set of peers for all off-stage roles
-            val offStageRoleNames = meetingViewModel.prebuiltInfoContainer.offStageRoles(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.name!!)
-            offStageRoleNames?.let {
-                for (role in it) {
-                    if (role != null) {
-                        val iterator = meetingViewModel.getPeerlistIterator(role)
-                        iteratorMap[role] = iterator
-                        val deferred = CompletableDeferred<Boolean>()
-                        // Get the first page
-                        iterator.next(object : PeerListResultListener{
-                            override fun onError(error: HMSException) {
-                                deferred.complete(false)
-                            }
-
-                            override fun onSuccess(result: ArrayList<HMSPeer>) {
-                                isPaginatedPeerlistInitialized =  true
-                                paginatedPeerList.addAll(result)
-                                deferred.complete(true)
-                            }
-                        })
-                        deferred.await()
-                    }
+    private suspend fun initPaginatedPeerListAndIterators(): List<HMSPeer> {
+        // Now fetch the first set of peers for all off-stage roles
+        val offStageRoleNames =
+            meetingViewModel.prebuiltInfoContainer.offStageRoles(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.name!!)
+        val deferredList = offStageRoleNames?.filterNotNull()?.map { role ->
+            val iterator = meetingViewModel.getPeerlistIterator(role)
+            iteratorMap[role] = iterator
+            val roleIteratorDeferred = CompletableDeferred<ArrayList<HMSPeer>>()
+            // Get the first page
+            iterator.next(object : PeerListResultListener {
+                override fun onError(error: HMSException) {
+                    roleIteratorDeferred.completeExceptionally(error)
                 }
-            }
-            initPaginationDeferred.complete(true)
+
+                override fun onSuccess(result: ArrayList<HMSPeer>) {
+                    isPaginatedPeerlistInitialized = true
+                    roleIteratorDeferred.complete(result)
+                }
+            })
+            roleIteratorDeferred
         }
+        // This can throw an exception
+        return supervisorScope { deferredList?.awaitAll()?.flatten() ?: emptyList() }
     }
 
     @SuppressLint("SetTextI18n")
