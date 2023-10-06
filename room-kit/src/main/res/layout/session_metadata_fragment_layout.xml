@@ -73,7 +73,6 @@
                 android:id="@+id/submit_name_change_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/primary_blue_round_drawable"
                 android:fontFamily="@font/inter_semibold"
                 android:paddingHorizontal="30dp"
                 android:text="Change" />
@@ -139,7 +138,6 @@
                 android:id="@+id/submit_observer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/primary_blue_round_drawable"
                 android:fontFamily="@font/inter_semibold"
                 android:paddingHorizontal="30dp"
                 android:text="Observe" />

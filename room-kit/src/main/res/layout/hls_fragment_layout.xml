@@ -110,7 +110,6 @@
             android:id="@+id/btn_seek_live"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/primary_blue_round_drawable"
             android:fontFamily="@font/inter_semibold"
             android:text="Live"
             android:textAllCaps="false" />

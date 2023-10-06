@@ -47,7 +47,6 @@
     <TextView
         android:paddingHorizontal="@dimen/four_dp"
         android:paddingVertical="@dimen/two_dp"
-        android:background="@drawable/blue_round_solid_drawable"
         android:id="@+id/participant_count_text"
         android:layout_width="wrap_content"
         android:fontFamily="@font/inter_regular"
