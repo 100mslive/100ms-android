@@ -8,6 +8,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ItemGridOptionBinding
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.getShape
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
 
 class GridOptionItem(
@@ -60,16 +62,25 @@ class GridOptionItem(
     }
 
     private fun setSelectedView(isSelected: Boolean, v: ItemGridOptionBinding) {
-        if (isSelected.not()) v.rootLayout.setBackgroundAndColor(
-            HMSPrebuiltTheme.getColours()?.backgroundDefault,
-            HMSPrebuiltTheme.getDefaults().background_default,
-            R.drawable.blue_round_solid_drawable
-        ) else {
-            v.rootLayout.setBackgroundAndColor(
-                HMSPrebuiltTheme.getColours()?.surfaceBrighter,
-                HMSPrebuiltTheme.getDefaults().surface_bright,
-                R.drawable.blue_round_solid_drawable
-            )
+        v.rootLayout.background = if (isSelected.not()) {
+             getShape().apply {
+                setTint(
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+                        HMSPrebuiltTheme.getDefaults().background_default
+                    )
+                )
+            }
+        }
+         else {
+            getShape().apply {
+                setTint(
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.surfaceBrighter,
+                        HMSPrebuiltTheme.getDefaults().surface_bright,
+                    )
+                )
+            }
         }
     }
 

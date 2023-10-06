@@ -57,7 +57,6 @@
             android:layout_height="36dp"
             android:layout_marginLeft="@dimen/sizeteen_dp"
             android:layout_marginEnd="@dimen/eight_dp"
-            android:background="@drawable/blue_round_solid_drawable"
             android:fontFamily="@font/inter_semibold"
             android:gravity="center"
             android:maxLines="1"
