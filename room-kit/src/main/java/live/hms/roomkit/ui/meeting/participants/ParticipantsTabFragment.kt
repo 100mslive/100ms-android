@@ -30,7 +30,7 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
     }
     private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, {
         meetingViewModel.peers
-    }, {})
+    }, {}, lifecycleScope)
     }
 
 

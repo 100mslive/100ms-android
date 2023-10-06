@@ -17,16 +17,47 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.PeerListIterator
+import live.hms.video.sdk.models.role.HMSRole
+
 
 const val handRaisedKey = "Hand Raised"
 class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                           val getPeers : () -> List<HMSPeer>,
-                            val onClick: (role: String) -> Unit) {
+                            val onClick: (role: String) -> Unit,
+    val lifecycleCoroutineScope : LifecycleCoroutineScope
+    ) {
+    // When
     val adapter = GroupieAdapter()
     private val expandedGroups = mutableMapOf<String,Boolean>()
     private var filterText : String? = null
+    private var filterGroup : String? = null
+    suspend fun roleFiltering(filterByGroupType : String?)
+    {
+//        when(filterByGroupType) {
+//            is GroupType.HandRaised -> handRaisedKey
+//            is GroupType.Role -> filterByGroupType.hmsRole.name
+//            null -> null
+//        }
+        filterGroup = filterByGroupType
+        // Trigger a refresh.
+        updateParticipantsAdapter(getPeers())
+    }
     private fun isSearching() = !filterText.isNullOrEmpty()
 
+    private fun getGroupFilteredPeersIfNeeded(peers: List<HMSPeer>) : List<HMSPeer> {
+        val filterGroup = filterGroup
+        return if(filterGroup.isNullOrEmpty()) {
+            peers
+        } else {
+            peers.filter {
+                val filterGroupName = if(it.isHandRaised)
+                handRaisedKey
+            else
+                it.hmsRole.name
+                filterGroupName == filterGroup
+            }
+        }
+    }
     // Used to use meetingViewModel.peers
     private fun getSearchFilteredPeersIfNeeded(peers : List<HMSPeer>) : List<HMSPeer> {
         val text = filterText
@@ -80,7 +111,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         // Don't throw away results when it's searching
         //  ideally this should be replaced with just updating the
         //  peers but still with the search query.
-        val peerList = getSearchFilteredPeersIfNeeded(peers)
+        val peerList = getSearchFilteredPeersIfNeeded(getGroupFilteredPeersIfNeeded(peers))
         val localPeerRoleName = meetingViewModel.hmsSDK.getLocalPeer()!!.hmsRole.name
 
         // Group people by roles.
@@ -119,7 +150,10 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                     if(isNonRealTimeHeader) {
                         val hasNext = iteratorMap?.get(key)?.hasNext() ?: false
                         if (hasNext) {
-                            it.add(ViewMoreItem(key) { role -> onClick(role) })
+                            it.add(ViewMoreItem(key) { role : String ->
+                                lifecycleCoroutineScope.launch { roleFiltering(role) }
+//                                onClick(role)
+                            })
                         }
                     }
                 }

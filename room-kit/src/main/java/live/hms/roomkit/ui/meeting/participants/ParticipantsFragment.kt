@@ -48,7 +48,7 @@ class ParticipantsFragment : Fragment() {
         }
     }, { role ->
         getNextPage(role)
-    })
+    }, lifecycleScope)
     }
 
 
