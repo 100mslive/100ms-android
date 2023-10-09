@@ -17,14 +17,13 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.PeerListIterator
-import live.hms.video.sdk.models.role.HMSRole
 
 
 const val handRaisedKey = "Hand Raised"
 class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                           val getPeers : () -> List<HMSPeer>,
-                            val onClick: (role: String) -> Unit,
-    val lifecycleCoroutineScope : LifecycleCoroutineScope
+                          val getNextPage: (role: String) -> Unit,
+                          val lifecycleCoroutineScope : LifecycleCoroutineScope
     ) {
     // When
     val adapter = GroupieAdapter()
@@ -146,13 +145,21 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
             keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer, peerCount)
                 .also {
                     // Add view more here for non realtime roles
-                    // Offstage roles
-                    if(isNonRealTimeHeader) {
+                    // Show the button to all the peers of this role
+                    if(isNonRealTimeHeader && filterGroup.isNullOrEmpty()) {
                         val hasNext = iteratorMap?.get(key)?.hasNext() ?: false
                         if (hasNext) {
-                            it.add(ViewMoreItem(key) { role : String ->
+                            it.add(ViewMoreItem(key, "View All") { role : String ->
                                 lifecycleCoroutineScope.launch { roleFiltering(role) }
 //                                onClick(role)
+                            })
+                        }
+                    } else if(isNonRealTimeHeader){
+                        // Show the button to load more of the peers in this group
+                        val hasNext = iteratorMap?.get(key)?.hasNext() ?: false
+                        if (hasNext) {
+                            it.add(ViewMoreItem(key, "View More") { role : String ->
+                                getNextPage(role)
                             })
                         }
                     }

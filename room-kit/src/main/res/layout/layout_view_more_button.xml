@@ -21,7 +21,7 @@
             android:maxLines="1"
             android:layout_margin="8dp"
             android:drawableEnd="@drawable/ic_load_more"
-            android:text="View All"
+            android:hint="View All"
             android:textColor="#FF0000"
             android:textSize="13sp"/>
 
