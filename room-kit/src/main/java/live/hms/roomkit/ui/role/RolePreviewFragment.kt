@@ -109,6 +109,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
                             contextSafe { context, activity ->
                                 activity.runOnUiThread {
                                     binding.previewView.removeTrack()
+                                    meetingViewModel.lowerLocalPeerHand()
                                     findNavController().navigate(
                                         RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
                                             false
@@ -126,7 +127,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
 
         binding.declineButton.setOnClickListener {
             meetingViewModel.setStatetoOngoing()
-            meetingViewModel.toggleRaiseHand(forceLowerHandRaise = true)
+            meetingViewModel.lowerLocalPeerHand()
             binding.previewView.removeTrack()
             findNavController().navigate(
                 RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(

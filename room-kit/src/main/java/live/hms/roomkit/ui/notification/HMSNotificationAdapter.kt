@@ -49,7 +49,7 @@ class HMSNotificationAdapter(
             actionButton.setBackgroundAndColor(
                 if (notifications.isError) HMSPrebuiltTheme.getColours()?.alertErrorDefault else HMSPrebuiltTheme.getColours()?.secondaryDefault,
                 HMSPrebuiltTheme.getDefaults().secondary_default,
-                R.drawable.blue_round_solid_drawable
+                null
             )
 
             actionButton.setOnClickListener {

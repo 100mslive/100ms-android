@@ -55,6 +55,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
 
@@ -76,6 +77,8 @@ class MeetingViewModel(
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
+
+    fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
         .audio(
@@ -778,8 +781,10 @@ class MeetingViewModel(
                         participantPeerUpdate.postValue(Unit)
                     }
 
-                    HMSPeerUpdate.METADATA_CHANGED -> {
-                        triggerBringOnStageNotificationIfHandRaised(hmsPeer)
+                    HMSPeerUpdate.METADATA_CHANGED ,
+                    HMSPeerUpdate.HAND_RAISED_CHANGED -> {
+                        if (type == HMSPeerUpdate.HAND_RAISED_CHANGED)
+                            triggerBringOnStageNotificationIfHandRaised(hmsPeer)
                         if (hmsPeer.isLocal) {
                             updateSelfHandRaised(hmsPeer as HMSLocalPeer)
                         } else {
@@ -921,6 +926,13 @@ class MeetingViewModel(
                 participantPeerUpdate.postValue(Unit)
             }
 
+            override fun peerListUpdated(
+                addedPeers: ArrayList<HMSPeer>?,
+                removedPeers: ArrayList<HMSPeer>?
+            ) {
+                Log.d(TAG, "peerListUpdated - added peers = $addedPeers, removed peers = $removedPeers")
+            }
+
             override fun onMessageReceived(message: HMSMessage) {
                 Log.v(TAG, "onMessageReceived: $message")
                 if(message.type != HMSMessageType.CHAT)
@@ -985,7 +997,7 @@ class MeetingViewModel(
             && hmsSDK.getLocalPeer()?.hmsRole?.name == "broadcaster"
             && getOnStageRole(hmsSDK.getLocalPeer()?.hmsRole).isNullOrEmpty().not()
         ) {
-            if (CustomPeerMetadata.fromJson(handRaisedPeer.metadata)?.isHandRaised == true) {
+            if (handRaisedPeer.isHandRaised) {
                 hmsNotificationEvent.postValue(
                     HMSNotification(
                         title = "${handRaisedPeer.name} raised hand",
@@ -1052,7 +1064,7 @@ class MeetingViewModel(
     }
 
     private fun updateSelfHandRaised(hmsPeer: HMSLocalPeer) {
-        val isSelfHandRaised = CustomPeerMetadata.fromJson(hmsPeer.metadata)?.isHandRaised == true
+        val isSelfHandRaised = hmsPeer.isHandRaised
         _isHandRaised.postValue(isSelfHandRaised)
         _peerMetadataNameUpdate.postValue(Pair(hmsPeer, HMSPeerUpdate.METADATA_CHANGED))
     }
@@ -1686,27 +1698,41 @@ class MeetingViewModel(
     val isHandRaised: LiveData<Boolean> = _isHandRaised
 
 
-    fun toggleRaiseHand(forceLowerHandRaise : Boolean?=null) {
-        val localPeer = hmsSDK.getLocalPeer()!!
-        val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata) ?: return
-
-        val isHandRaised  = if (forceLowerHandRaise == null) {
-            currentMetadata.isHandRaised.not()
-        } else {
-            forceLowerHandRaise.not()
+    fun toggleRaiseHand() {
+        val localPeer = hmsSDK.getLocalPeer()
+        localPeer?.let {
+            if (it.isHandRaised) {
+                lowerLocalPeerHand()
+            } else {
+                raiseLocalPeerHand()
+            }
+        }?: kotlin.run {
+            Log.e(TAG, "Local Peer not present")
         }
-        val newMetadataJson = currentMetadata.copy(isHandRaised = isHandRaised).toJson()
+    }
 
-        hmsSDK.changeMetadata(newMetadataJson, object : HMSActionResultListener {
+    private fun raiseLocalPeerHand() {
+        hmsSDK.raiseLocalPeerHand(object : HMSActionResultListener{
             override fun onError(error: HMSException) {
-                Log.d(TAG, "There was an error $error")
+                Log.e(TAG, "Error while raising hand $error")
             }
 
             override fun onSuccess() {
-                Log.d(TAG, "Metadata update succeeded")
+                Log.d(TAG, "Successfully raised hand")
             }
         })
+    }
 
+    fun lowerLocalPeerHand() {
+        hmsSDK.lowerLocalPeerHand(object : HMSActionResultListener{
+            override fun onError(error: HMSException) {
+                Log.e(TAG, "Error while lowering hand $error")
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Successfully lowered hand")
+            }
+        })
     }
 
     fun sendHlsMetadata(metaDataModel: HMSHLSTimedMetadata) {
@@ -2105,6 +2131,15 @@ class MeetingViewModel(
             hmsRemoveNotificationEvent.postValue(HMSNotificationType.ScreenShare)
         }
 
+    }
+
+    fun getPeerlistIterator(roleName: String): PeerListIterator {
+        val options = PeerListIteratorOptions(byRoleName = roleName)
+        return hmsSDK.getPeerListIterator(options)
+    }
+
+    fun getFullPeerlistIterator(): PeerListIterator {
+        return hmsSDK.getPeerListIterator()
     }
 }
 

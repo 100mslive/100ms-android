@@ -72,7 +72,7 @@ internal fun View.makeInset(
 
 
 
-            override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                 onDoubleTap.invoke()
                 return super.onSingleTapConfirmed(e)
             }

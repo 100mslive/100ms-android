@@ -7,130 +7,96 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.xwray.groupie.ExpandableGroup
-import com.xwray.groupie.GroupieAdapter
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.video.sdk.models.HMSLocalPeer
+import live.hms.video.error.HMSException
+import live.hms.video.sdk.listeners.PeerListResultListener
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.PeerListIterator
+
 class ParticipantsFragment : Fragment() {
 
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<FragmentParticipantsBinding>()
     private var alertDialog: AlertDialog? = null
-    val adapter = GroupieAdapter()
-    private lateinit var handRaisedKey :String
-    private var filterText : String? = null
-    private fun isSearching() = !filterText.isNullOrEmpty()
-    private val expandedGroups = mutableMapOf<String,Boolean>()
-
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
             requireActivity().application
         )
     }
+    private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, {
+        if (isLargeRoom) {
+            paginatedPeerList
+        } else {
+            meetingViewModel.peers
+        }
+    }, { role ->
+        getNextPage(role)
+    })
+    }
 
 
+    private val iteratorMap = hashMapOf<String, PeerListIterator>()
+    private val paginatedPeerList = arrayListOf<HMSPeer>()
+    private var isLargeRoom = false
+    private var isPaginatedPeerlistInitialized = false
+
+    private fun getNextPage(role: String) {
+        val iterator = iteratorMap[role]
+        iterator?.next(object : PeerListResultListener{
+            override fun onError(error: HMSException) {
+                meetingViewModel.triggerErrorNotification(message = error.message)
+            }
+
+            override fun onSuccess(result: ArrayList<HMSPeer>) {
+                // add the next page of peers into final list
+                paginatedPeerList.addAll(result)
+               lifecycleScope.launch {
+                   participantsUseCase.updateParticipantsAdapter(getPeerList(), iteratorMap)
+               }
+            }
+
+        })
+    }
+
+    private suspend fun getPeerList(): List<HMSPeer> {
+        return if (isLargeRoom) {
+            if (!isPaginatedPeerlistInitialized) {
+                val deferred = CompletableDeferred<Boolean>()
+                initPaginatedPeerlist(deferred)
+                deferred.await()
+            }
+            // Return  the combined list of real time and non real time peers
+            val realtimePeers = meetingViewModel.peers
+            val filteredPaginatedPeers = paginatedPeerList.filter { !realtimePeers.contains(it) }
+
+            meetingViewModel.peers.plus(filteredPaginatedPeers)
+        } else {
+            // Return only Real time peers
+            meetingViewModel.peers
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentParticipantsBinding.inflate(inflater, container, false)
-        handRaisedKey = requireContext().resources.getString(R.string.hand_raised_group)
+        isLargeRoom = meetingViewModel.hmsSDK.getRoom()?.isLargeRoom == true
         initViewModels()
         return binding.root
     }
-
-    // This is only suspending so it can run in the background
-    private suspend fun updateParticipantsAdapter(peerList: List<HMSPeer>) {
-        // Don't throw away results when it's searching
-        //  ideally this should be replaced with just updating the
-        //  peers but still with the search query.
-
-        // Group people by roles.
-        val groupedPeers : Map<String, List<HMSPeer>> = peerList.groupBy {
-            if(CustomPeerMetadata.fromJson(it.metadata)?.isHandRaised == true)
-                handRaisedKey
-            else
-                it.hmsRole.name
-        }
-
-
-        val canChangeRole = meetingViewModel.isAllowedToChangeRole()
-        val canMutePeers = meetingViewModel.isAllowedToMutePeers()
-        val canRemovePeers = meetingViewModel.isAllowedToRemovePeers()
-        val localPeer = meetingViewModel.hmsSDK.getLocalPeer()!!
-
-        val groups = mutableListOf<ExpandableGroup>()
-        // Keep hand raised on top.
-        if(groupedPeers[handRaisedKey] != null) {
-            groups.add(keyToGroup(handRaisedKey, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer))
-        }
-
-        groups.addAll(groupedPeers.keys.filterNot { it == handRaisedKey }.map { key ->
-            keyToGroup(key, groupedPeers, canChangeRole, canMutePeers, canRemovePeers, localPeer)
-        })
-
-        adapter.update(groups)
-    }
-
-
-    private fun expandedGroups( rolename : String, expanded : Boolean) {
-        expandedGroups[rolename] = expanded
-    }
-
-    private fun keyToGroup(
-        key: String,
-        groupedPeers: Map<String, List<HMSPeer>>,
-        canChangeRole: Boolean,
-        canMutePeers: Boolean,
-        canRemovePeers: Boolean,
-        localPeer : HMSLocalPeer
-    ) : ExpandableGroup =
-        ExpandableGroup(ParticipantHeaderItem(key, groupedPeers[key]?.size, ::expandedGroups))
-            .apply {
-                addAll(groupedPeers[key]?.map {
-                    ParticipantItem(it,
-                        localPeer,
-                        meetingViewModel::togglePeerMute,
-                        ::changePeerRole,
-                        canChangeRole,
-                        canMutePeers,
-                        canRemovePeers,
-                        meetingViewModel.prebuiltInfoContainer,
-                        meetingViewModel.participantPreviousRoleChangeUseCase,
-                        meetingViewModel::requestPeerLeave,
-                        meetingViewModel.activeSpeakers
-                    )
-                }!!)
-                // If the group was expanded, open it again.
-                if(expandedGroups[key] == true || expandedGroups[key] == null){
-                    onToggleExpanded()
-                }
-            }
-
-    private fun changePeerRole(remotePeerId : String, toRole : String, force : Boolean) =
-        meetingViewModel.changeRole(remotePeerId, toRole, force)
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
@@ -142,39 +108,12 @@ class ParticipantsFragment : Fragment() {
     }
 
     private fun initViews() {
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            itemAnimator = null
-            addItemDecoration(
-                // Border bright
-                HeaderItemDecoration(
-                    getColorOrDefault(
-                        HMSPrebuiltTheme.getColours()?.borderBright,
-                        HMSPrebuiltTheme.getDefaults().border_bright
-                    ),
-                    0,
-                    16f,
-                    24f,
-                    R.layout.participant_header_item
-                )
-            )
-            val divider = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL).apply {
-                setDrawable(resources.getDrawable(R.drawable.participants_divider)!!)
-            }
-            addItemDecoration(divider)
-        }
+        participantsUseCase.initRecyclerView(binding.recyclerView)
         binding.closeButton.setOnSingleClickListener {
             closeButton()
         }
         // Search disables conventional updates.
-        binding.textInputSearch.apply {
-            addTextChangedListener { text ->
-                lifecycleScope.launch {
-                    filterText = text.toString()
-                    updateParticipantsAdapter(getSearchFilteredPeersIfNeeded())
-                }
-            }
-        }
+        participantsUseCase.initSearchView(binding.textInputSearch, lifecycleScope)
     }
 
     private fun closeButton() {
@@ -184,37 +123,45 @@ class ParticipantsFragment : Fragment() {
             .commitAllowingStateLoss()
     }
 
-    private fun getSearchFilteredPeersIfNeeded() : List<HMSPeer> {
-        val text = filterText
+    private suspend fun initPaginatedPeerlist(initPaginationDeferred: CompletableDeferred<Boolean>) {
+        lifecycleScope.launch {
+            // Now fetch the first set of peers for all off-stage roles
+            val offStageRoleNames = meetingViewModel.prebuiltInfoContainer.offStageRoles(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.name!!)
+            offStageRoleNames?.let {
+                for (role in it) {
+                    if (role != null) {
+                        val iterator = meetingViewModel.getPeerlistIterator(role)
+                        iteratorMap[role] = iterator
+                        val deferred = CompletableDeferred<Boolean>()
+                        // Get the first page
+                        iterator.next(object : PeerListResultListener{
+                            override fun onError(error: HMSException) {
+                                deferred.complete(false)
+                            }
 
-        return if(!isSearching())
-            meetingViewModel.peers
-        else
-            meetingViewModel.peers.filter {
-            text.isNullOrEmpty() || it.name.contains(
-                text.toString(),
-                true
-            )
+                            override fun onSuccess(result: ArrayList<HMSPeer>) {
+                                isPaginatedPeerlistInitialized =  true
+                                paginatedPeerList.addAll(result)
+                                deferred.complete(true)
+                            }
+                        })
+                        deferred.await()
+                    }
+                }
+            }
+            initPaginationDeferred.complete(true)
         }
-    }
-
-    private fun onSheetClicked(peer: HMSPeer) {
-        val action =
-            ParticipantsFragmentDirections.actionParticipantsFragmentToBottomSheetRoleChange(
-                peer.peerID,
-                meetingViewModel.getAvailableRoles().map { it.name }.toTypedArray(),
-                peer.name
-            )
-        findNavController().navigate(action)
     }
 
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
-        binding.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = participantsUseCase.adapter
         // Initial updating of views
+        // Using HMSCoroutine scope here since we want the next call to get queued
+//        initPaginatedPeerlist()
         meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
             lifecycleScope.launch {
-                updateParticipantsAdapter(getSearchFilteredPeersIfNeeded())
+                participantsUseCase.updateParticipantsAdapter(getPeerList(), iteratorMap = iteratorMap)
             }
         }
         meetingViewModel.peerCount.observe(viewLifecycleOwner,::updateParticipantCount)
@@ -244,6 +191,13 @@ class ParticipantsFragment : Fragment() {
 
 
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        paginatedPeerList.clear()
+        isPaginatedPeerlistInitialized = false
+        iteratorMap.clear()
     }
 
     private fun initOnBackPress() {

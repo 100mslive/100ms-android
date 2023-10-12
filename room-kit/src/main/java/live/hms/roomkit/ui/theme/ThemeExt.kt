@@ -99,11 +99,14 @@ internal fun androidx.appcompat.widget.AppCompatImageView.setIconTintColor(
 internal fun View.setBackgroundAndColor(
     backgroundColorStr: String?,
     defaultBackgroundColor: String,
-    @DrawableRes backGroundDrawableRes: Int
+    @DrawableRes backGroundDrawableRes: Int?
 ) {
     this.backgroundTintList =
         ColorStateList.valueOf(getColorOrDefault(backgroundColorStr, defaultBackgroundColor))
-    val normalDrawable: Drawable = ResourcesCompat.getDrawable(this.context.resources, backGroundDrawableRes, null)!!
+    val normalDrawable: Drawable = if(backGroundDrawableRes != null)
+        ResourcesCompat.getDrawable(this.context.resources, backGroundDrawableRes, null)!!
+    else
+        getShape()
     val wrapDrawable: Drawable = DrawableCompat.wrap(normalDrawable)
     DrawableCompat.setTint(
         wrapDrawable, getColorOrDefault(backgroundColorStr, defaultBackgroundColor)
@@ -236,7 +239,7 @@ internal fun TextView.buttonEnabled() {
     this.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     this.drawableStart?.setTint(
@@ -246,6 +249,8 @@ internal fun TextView.buttonEnabled() {
         )
     )
 }
+
+private fun getBackgroundForColor(color : Int) = getShape().apply { setTint(color) }
 
 internal fun TextView.buttonDisabled() {
     this.isEnabled = false
@@ -261,7 +266,7 @@ internal fun TextView.buttonDisabled() {
     this.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.primaryDisabled,
         HMSPrebuiltTheme.getDefaults().primary_disabled,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     this.drawableStart?.setTint(
@@ -350,7 +355,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
     progressBar.containerCardProgressBarCard.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
     //progressBar.containerCardProgressBar.alpha = 0.3f
 
@@ -565,7 +570,7 @@ internal fun ChangeNameFragmentBinding.applyTheme() {
     changeName.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     changeName.setTextColor(
@@ -619,7 +624,7 @@ internal fun BottomSheetStopRecordingBinding.applyTheme() {
     changeName.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().primary_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     changeName.setTextColor(
@@ -781,7 +786,7 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
     buttonJoinMeeting.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     previewCard.setBackgroundAndColor(
@@ -823,7 +828,7 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
     declineButton.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.backgroundDefault,
         HMSPrebuiltTheme.getDefaults().background_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
 
@@ -883,13 +888,13 @@ internal fun FragmentPreviewBinding.applyTheme() {
     buttonJoinMeeting.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().primary_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     joinLoader.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.primaryDisabled,
         HMSPrebuiltTheme.getDefaults().primary_disabled,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     joinLoaderProgress.indeterminateDrawable.colorFilter = PorterDuffColorFilter(
@@ -1246,7 +1251,7 @@ fun FragmentGridVideoBinding.applyTheme() {
     iconOption.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     iconOption.drawable.setTint(
@@ -1324,7 +1329,7 @@ fun ItemGridOptionBinding.applyTheme() {
     participantCountText.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceBrighter,
         HMSPrebuiltTheme.getDefaults().surface_bright,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     participantCountText.setTextColor(
@@ -1342,7 +1347,7 @@ fun NotificationCardBinding.applyTheme() {
 
         HMSPrebuiltTheme.getColours()?.surfaceDim,
         HMSPrebuiltTheme.getDefaults().surface_dim,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     ribbon.setBackgroundColor(
@@ -1363,7 +1368,7 @@ fun NotificationCardBinding.applyTheme() {
     actionButton.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,
-        R.drawable.blue_round_solid_drawable
+        null
     )
 
     actionButton.setTextColor(
@@ -1431,6 +1436,21 @@ internal fun ListItemPeerListBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
         HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
     )
+}
+
+internal fun LayoutViewMoreButtonBinding.applyTheme() {
+    viewMore.setBackgroundColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+    )
+    viewMoreText.drawableStart?.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+        HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
+    ))
+    viewMoreText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
+        HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
+    ))
 }
 
 private fun closeButtonTheme(closeCombinedTabButton: AppCompatImageButton, res : Resources) {

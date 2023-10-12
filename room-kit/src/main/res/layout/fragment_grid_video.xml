@@ -7,6 +7,7 @@
     android:layout_height="match_parent">
 
     <FrameLayout
+        android:id="@+id/tempid"
         android:elevation="24dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,7 +23,7 @@
             android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-
+            android:id="@+id/tempid2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
@@ -228,8 +229,7 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager_video_grid"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="@id/divider"
+        android:layout_height="match_parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/tab_layout_dots"
@@ -244,7 +244,6 @@
         android:background="#FF0000"
         android:layout_marginVertical="@dimen/four_dp"
         android:elevation="@dimen/sizeteen_dp"
-        app:layout_constraintTop_toBottomOf="@id/view_pager_video_grid"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -45,7 +45,7 @@ class ParticipantItem(
     private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
     private val requestPeerLeave: (hmsPeer: HMSRemotePeer, reason: String) -> Unit,
     private val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>>
-) : BindableItem<ListItemPeerListBinding>(){
+) : BindableItem<ListItemPeerListBinding>(hmsPeer.peerID.hashCode().toLong()){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
         val name = if(hmsPeer.isLocal){
@@ -55,7 +55,7 @@ class ParticipantItem(
         }
         viewBinding.name.text = name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
-        updateHandRaise(hmsPeer.metadata, viewBinding)
+        updateHandRaise(hmsPeer, viewBinding)
         updateSpeaking(hmsPeer.audioTrack, viewBinding)
         // Don't show the settings if they aren't allowed to change anything at all.
         viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
@@ -190,7 +190,11 @@ class ParticipantItem(
     }
 
     private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding) {
-        if (audioTrack?.isMute == true || audioTrack?.isMute == null) {
+        if (audioTrack == null) {
+            viewBinding.muteUnmuteIcon.gone()
+            viewBinding.audioLevelView.gone()
+        }
+        else if (audioTrack?.isMute == true || audioTrack?.isMute == null) {
             // Mute
             viewBinding.muteUnmuteIcon.show()
             viewBinding.audioLevelView.gone()
@@ -219,7 +223,7 @@ class ParticipantItem(
             ) == true
         val isOnStageButNotBroadcasterRole = prebuiltInfoContainer.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
 
-        val isHandRaised = CustomPeerMetadata.fromJson(forPeer.metadata)?.isHandRaised == true
+        val isHandRaised = forPeer.isHandRaised
                 // You have to be in the offstage roles to be categorized as hand raised
                 && isOffStageRole
 
@@ -258,8 +262,8 @@ class ParticipantItem(
 //        }
 //    }
 
-    private fun updateHandRaise(metadata: String, viewBinding: ListItemPeerListBinding) {
-        val isHandRaised = CustomPeerMetadata.fromJson(metadata)?.isHandRaised == true
+    private fun updateHandRaise(hmsPeer: HMSPeer, viewBinding: ListItemPeerListBinding) {
+        val isHandRaised = hmsPeer.isHandRaised
         viewBinding.handraise.visibility = if(isHandRaised)
             View.VISIBLE
         else

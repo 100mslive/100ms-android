@@ -189,113 +189,6 @@ class MeetingFragment : Fragment() {
         setupRecordingTimeView()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_share_link -> {
-                val sendIntent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "text/plain"
-                }
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                startActivity(shareIntent)
-            }
-
-            R.id.sessionMetadataAlpha -> {
-                findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoomMetadataAlphaFragment())
-            }
-
-            R.id.action_record_meeting, R.id.hls_start -> {
-
-//                findNavController().navigate(
-//                    MeetingFragmentDirections.actionMeetingFragmentToRtmpRecordFragment(
-//                        roomDetails.url
-//                    )
-//                )
-            }
-
-            R.id.action_stop_streaming_and_recording -> meetingViewModel.stopRecording()
-
-            R.id.action_email_logs -> {
-                requireContext().startActivity(
-                    EmailUtils.getNonFatalLogIntent(requireContext())
-                )
-            }
-            R.id.action_stats -> {
-                val deviceStatsBottomSheet = DeviceStatsBottomSheet()
-                deviceStatsBottomSheet.show(requireActivity().supportFragmentManager,"deviceStatsBottomSheet")
-            }
-
-            R.id.action_grid_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
-            }
-
-            R.id.action_pinned_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
-            }
-
-            R.id.active_speaker_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.ACTIVE_SPEAKER)
-            }
-
-            R.id.audio_only_view -> {
-                meetingViewModel.setMeetingViewMode(MeetingViewMode.AUDIO_ONLY)
-            }
-
-            R.id.hls_view -> {
-                meetingViewModel.switchToHlsViewIfRequired()
-            }
-
-            R.id.action_settings -> {
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToSettingsFragment(SettingsMode.MEETING)
-                )
-            }
-
-            R.id.action_bulk_role_change -> {
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment()
-                )
-            }
-
-            R.id.action_participants -> {
-                // Possibly unused
-                val directions = if(meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
-                    MeetingFragmentDirections.actionMeetingFragmentToParticipantsFragment()
-                } else {
-                    MeetingFragmentDirections.actionMeetingFragmentToParticipantsTabFragment()
-
-                }
-                findNavController().navigate(directions)
-            }
-
-            R.id.action_share_screen -> {
-                val mediaProjectionManager: MediaProjectionManager? =
-                    requireContext().getSystemService(
-                        Context.MEDIA_PROJECTION_SERVICE
-                    ) as MediaProjectionManager
-                resultLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
-
-            }
-
-            R.id.action_stop_share_screen -> {
-            }
-
-            R.id.pip_mode -> {
-                launchPipMode()
-            }
-
-            R.id.raise_hand -> {
-                meetingViewModel.toggleRaiseHand()
-            }
-
-
-            R.id.change_name -> meetingViewModel.requestNameChange()
-
-            R.id.hls_stop -> meetingViewModel.stopHls()
-        }
-        return false
-    }
-
     private fun updateActionVolumeMenuIcon(
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
@@ -427,10 +320,6 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
-        setHasOptionsMenu(true)
-        meetingViewModel.showAudioMuted.observe(
-            viewLifecycleOwner,
-            Observer { activity?.invalidateOptionsMenu() })
         meetingViewModel.isRecording.observe(
             viewLifecycleOwner,
             Observer {
@@ -1013,7 +902,7 @@ class MeetingFragment : Fragment() {
         controlBarsVisible = true
         binding.topMenu.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     binding.topMenu.visibility = View.VISIBLE
                     showSystemBars()
                     // This prevents the bar from moving twice as high as it should
@@ -1021,7 +910,7 @@ class MeetingFragment : Fragment() {
                         moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                     if (shouldHideAfterDelay) {
@@ -1030,12 +919,12 @@ class MeetingFragment : Fragment() {
                     }
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     binding.topMenu?.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 
@@ -1044,21 +933,21 @@ class MeetingFragment : Fragment() {
         val screenHeight = activity!!.window.decorView.height
         binding.bottomControls.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     binding.bottomControls.visibility = View.VISIBLE
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
-                    binding.bottomControls.visibility = View.VISIBLE
-                    controlBarsVisible = true
-                }
-
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     binding.bottomControls.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
+                    binding.bottomControls.visibility = View.VISIBLE
+                    controlBarsVisible = true
+                }
+
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 
@@ -1094,22 +983,22 @@ class MeetingFragment : Fragment() {
         topMenu?.animate()
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     topMenu.visibility = View.VISIBLE
                     moveChat(up = false, topMenu!!.height.toFloat())
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     topMenu.visibility = View.GONE
                     controlBarsVisible = false
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 
@@ -1118,21 +1007,21 @@ class MeetingFragment : Fragment() {
         bottomMenu.animate()
             ?.translationY((bottomMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) {
+                override fun onAnimationStart(animation: Animator) {
                     bottomMenu.visibility = View.VISIBLE
                 }
 
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     bottomMenu.visibility = View.GONE
                     controlBarsVisible = false
                 }
 
-                override fun onAnimationCancel(animation: Animator?) {
+                override fun onAnimationCancel(animation: Animator) {
                     bottomMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
-                override fun onAnimationRepeat(animation: Animator?) {
+                override fun onAnimationRepeat(animation: Animator) {
 
                 }
 

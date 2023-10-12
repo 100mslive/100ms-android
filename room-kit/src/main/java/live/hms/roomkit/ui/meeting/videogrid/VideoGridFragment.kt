@@ -30,6 +30,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.util.NameUtils
+import live.hms.roomkit.util.applyConstraint
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.roomkit.util.visibilityOpacity
@@ -155,16 +156,20 @@ class VideoGridFragment : Fragment() {
             if (isLocal) {
                 when (peerTypePair.second) {
                     HMSPeerUpdate.METADATA_CHANGED -> {
-                        val isHandRaised =
-                            CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isHandRaised == true
                         val isBRB =
                             CustomPeerMetadata.fromJson(peerTypePair.first.metadata)?.isBRBOn == true
 
-                        if (isBRB || isHandRaised) {
+                        if (isBRB) {
                             binding.iconBrb.visibility = View.VISIBLE
-                            binding.iconBrb.setImageResource(if (isBRB) R.drawable.video_tile_brb else R.drawable.video_tile_hand)
+                            binding.iconBrb.setImageResource(R.drawable.video_tile_brb)
                         } else {
                             binding.iconBrb.visibility = View.GONE
+                        }
+                    }
+                    HMSPeerUpdate.HAND_RAISED_CHANGED -> {
+                        if (peerTypePair.first.isHandRaised) {
+                            binding.iconBrb.visibility = View.VISIBLE
+                            binding.iconBrb.setImageResource(R.drawable.raise_hand_modern)
                         }
                     }
                     HMSPeerUpdate.NAME_CHANGED -> {
@@ -176,7 +181,9 @@ class VideoGridFragment : Fragment() {
                     HMSPeerUpdate.PEER_LEFT,
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER,
                     HMSPeerUpdate.NO_DOMINANT_SPEAKER,
-                    HMSPeerUpdate.ROLE_CHANGED -> {
+                    HMSPeerUpdate.ROLE_CHANGED,
+                        // This is handled in metadata update
+                    HMSPeerUpdate.HAND_RAISED_CHANGED -> {
                     }
                 }
             }
@@ -270,6 +277,7 @@ class VideoGridFragment : Fragment() {
         if (meetingTrack?.video?.isMute == false && meetingTrack.video != null) {
             val hmsVideoView = HMSVideoView(requireContext()).apply {
                 setZOrderMediaOverlay(true)
+                id = View.generateViewId()
                 addTrack(meetingTrack?.video!!)
                 initAnimState(alphaOnly = true)
             }
@@ -280,6 +288,8 @@ class VideoGridFragment : Fragment() {
 
     }
 
+    //Important to prevent redraws like crazy. This was causing flickering issue
+    var lastGuideLinePercentage = 0f
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
@@ -287,17 +297,45 @@ class VideoGridFragment : Fragment() {
             val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
             var newRowCount = 0
             var newColumnCount = 0
+            var newGuideLinePercentage = 0f
             //is screen share track is present then reduce the grid and column span else restore
             if (screenShareTrackList.isEmpty()) {
                 binding.screenShareContainer.visibility = View.GONE
                 newRowCount = 3
                 newColumnCount = 2
-                binding.divider.setGuidelinePercent(0f)
+                newGuideLinePercentage = 0f
+
             } else {
                 binding.screenShareContainer.visibility = View.VISIBLE
                 newRowCount = 1
                 newColumnCount = 2
-                binding.divider.setGuidelinePercent(0.75f)
+                newGuideLinePercentage = 0.75f
+            }
+
+            //smart updates cause updating evenrything at once would call layout()
+            if (lastGuideLinePercentage != newGuideLinePercentage) {
+                if (newGuideLinePercentage == 0.0f) {
+                    //un docked state
+                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        height = ViewGroup.LayoutParams.MATCH_PARENT
+                    }
+
+                    binding.rootLayout.applyConstraint {
+                        binding.viewPagerVideoGrid.clearTop()
+                    }
+
+                } else {
+                    //docked state
+                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                        height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+                    }
+                    binding.rootLayout.applyConstraint {
+                        binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
+                    }
+                }
+
+                binding.divider.setGuidelinePercent(newGuideLinePercentage)
+                lastGuideLinePercentage = newGuideLinePercentage
             }
 
             if (screenShareTrackList.size <=1){

@@ -1,11 +1,8 @@
 package live.hms.app2.ui.home
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -16,22 +13,33 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
-import live.hms.app2.BuildConfig
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentHomeBinding
+import live.hms.app2.util.REGEX_MEETING_URL_CODE
+import live.hms.app2.util.REGEX_PREVIEW_URL_CODE
+import live.hms.app2.util.REGEX_STREAMING_MEETING_URL_ROOM_CODE
+import live.hms.app2.util.getInitEndpointEnvironment
+import live.hms.app2.util.isValidMeetingUrl
+import live.hms.app2.util.viewLifecycle
+import live.hms.roomkit.ui.HMSPrebuiltOptions
+import live.hms.roomkit.ui.HMSRoomKit
+import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
+import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
+import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
+import live.hms.roomkit.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
+import live.hms.roomkit.ui.settings.SettingsFragment
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.EmailUtils
-import live.hms.app2.util.*
 import live.hms.roomkit.util.NameUtils.isValidUserName
-import live.hms.roomkit.ui.HMSPrebuiltOptions
-import live.hms.roomkit.ui.HMSRoomKit
-import live.hms.roomkit.ui.meeting.*
 import live.hms.roomkit.util.contextSafe
 
+const val SETTINGS_FRAGMENT_TAG = "settings"
 class HomeFragment : Fragment() {
 
     companion object {
@@ -69,29 +77,21 @@ class HomeFragment : Fragment() {
             requireActivity().intent.removeExtra(LEAVE_INFROMATION_WAS_END_ROOM)
             createForceLeaveDialog(person, reason, roomWasEnded)
         }
-        initOnBackPress()
     }
-
-    private fun initOnBackPress() {
-        requireActivity().apply {
-            onBackPressedDispatcher.addCallback(
-                this@HomeFragment.viewLifecycleOwner,
-                object : OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        Log.v(HomeFragment.TAG, "initOnBackPress -> handleOnBackPressed")
-                        finish()
-                    }
-                })
-        }
-    }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToSettingsFragment(SettingsMode.HOME)
-                )
+                val args = Bundle().apply {
+                    putSerializable("mode", SettingsMode.HOME)
+                }
+                parentFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.nav_host_fragment, SettingsFragment().apply { arguments = args },
+                        SETTINGS_FRAGMENT_TAG)
+                    .addToBackStack(null)
+                    .commit()
+
             }
             R.id.action_email_logs -> {
                 requireContext().startActivity(
@@ -181,11 +181,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun initEditTextViews() {
-        binding.editTextName.doOnTextChanged { text, start, before, count ->
+        binding.editTextName.doOnTextChanged { _, _, _, _ ->
             validate()
         }
 
-        binding.edtMeetingUrl.doOnTextChanged { text, start, before, count ->
+        binding.edtMeetingUrl.doOnTextChanged { text, _, _, _ ->
             if (text.isNullOrEmpty()) {
                 binding.tvMeetingUrlInputLayout.hint =
                     requireContext().resources.getString(R.string.paste_the_link_here_str)
@@ -217,7 +217,7 @@ class HomeFragment : Fragment() {
 
                 data?.let {
                     data.getStringExtra(QrCodeActivity.QR_INTENT_RESULT)?.let {
-                        if (it.isNullOrEmpty().not()) {
+                        if (it.isEmpty().not()) {
                             binding.edtMeetingUrl.setText(it)
                             validate()
                         }
