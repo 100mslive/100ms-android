@@ -2,3 +2,8 @@ include ':lib'
 include ':app'
 rootProject.name = "Android 100ms"
 include ':room-kit'
+
+include ':example-shared'
+include ':library-databinding'
+include ':library-viewbinding'
+include ':library'
