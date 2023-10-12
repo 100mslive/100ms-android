@@ -105,6 +105,7 @@ class ParticipantsFragment : Fragment() {
         binding.participantsBack.setOnClickListener {
             lifecycleScope.launch {
                 participantsUseCase.roleFiltering(null)
+                binding.participantsBack.visibility = View.GONE
             }
         }
         // Search disables conventional updates.
