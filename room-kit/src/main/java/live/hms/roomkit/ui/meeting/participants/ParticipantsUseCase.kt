@@ -48,6 +48,13 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
     } else {
         emptyList()
     }}
+    init {
+        // Initial page load.
+        scope.launch {
+            paginatedPeers.refreshNonRealtimePeersIfNeeded()
+            updateParticipantsAdapter(getAllPeers())
+        }
+    }
 
     val participantPeerUpdate = meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
         scope.launch {

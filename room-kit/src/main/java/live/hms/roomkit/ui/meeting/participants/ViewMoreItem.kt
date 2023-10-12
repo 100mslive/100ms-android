@@ -11,7 +11,7 @@ class ViewMoreItem(val role : String, val buttonText : String, private val onCli
         with(viewBinding) {
             applyTheme()
             viewMoreText.text = buttonText
-            viewMore.setOnClickListener {
+            root.setOnClickListener {
                 onClick(role)
             }
         }

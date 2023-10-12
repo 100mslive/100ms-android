@@ -1439,10 +1439,6 @@ internal fun ListItemPeerListBinding.applyTheme() {
 }
 
 internal fun LayoutViewMoreButtonBinding.applyTheme() {
-    viewMore.setBackgroundColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
-        HMSPrebuiltTheme.getDefaults().secondary_default,
-    )
     viewMoreText.drawableStart?.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
         HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
