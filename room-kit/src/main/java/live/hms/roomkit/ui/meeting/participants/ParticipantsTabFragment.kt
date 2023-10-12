@@ -28,9 +28,9 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
             requireActivity().application
         )
     }
-    private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, {
-        meetingViewModel.peers
-    }, {}, lifecycleScope)
+    private val participantsUseCase by lazy {
+        ParticipantsUseCase(meetingViewModel, lifecycleScope, viewLifecycleOwner)
+        { /*binding.participantsBack.visibility = View.VISIBLE*/ }
     }
 
 

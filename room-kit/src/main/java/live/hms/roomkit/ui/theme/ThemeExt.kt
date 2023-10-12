@@ -1656,6 +1656,18 @@ private fun TextInputEditText.applyTheme() {
 internal fun FragmentParticipantsBinding.applyTheme() {
     containerSearch.applyTheme()
     textInputSearch.applyTheme()
+    participantsBack.setBackgroundDrawable(ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.left_arrow, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+            )
+        )
+    }
+    )
     closeButtonTheme(closeButton, this.root.resources)
     // surfacedim
     root.setBackgroundColor(getColorOrDefault(
