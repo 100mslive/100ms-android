@@ -774,6 +774,7 @@ class MeetingViewModel(
                             if (isHlsPeer) {
                                 switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
                             } else {
+                                showHlsStreamYetToStartError.postValue(false)
                                 exitHlsViewIfRequired(false)
                             }
                         }
