@@ -1347,7 +1347,7 @@ fun NotificationCardBinding.applyTheme() {
 
         HMSPrebuiltTheme.getColours()?.surfaceDim,
         HMSPrebuiltTheme.getDefaults().surface_dim,
-        null
+        R.drawable.blue_round_drawable
     )
 
     ribbon.setBackgroundColor(
