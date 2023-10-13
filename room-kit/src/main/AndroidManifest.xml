@@ -26,15 +26,6 @@
             android:theme="@style/Theme.Roomkit.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="live.hms.app2.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
     </application>
 
 </manifest>
