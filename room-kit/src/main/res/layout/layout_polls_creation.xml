@@ -12,8 +12,8 @@
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/backButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/back_icon"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
@@ -23,7 +23,7 @@
             style="@style/HmsHeadings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="@dimen/twelve_dp"
             android:text="Poll/Quiz"
             app:layout_constraintBottom_toBottomOf="@id/backButton"
             app:layout_constraintLeft_toRightOf="@id/backButton"
@@ -85,7 +85,6 @@
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/hideVoteCount"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/poll_distancing"
             android:text="Hide Vote Count"
@@ -119,7 +118,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="24dp"
-            android:background="@drawable/primary_blue_round_drawable"
             android:text="Start Poll"
             app:layout_constraintTop_toBottomOf="@id/timer" />
 

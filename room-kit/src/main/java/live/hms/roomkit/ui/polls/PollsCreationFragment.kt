@@ -16,6 +16,7 @@ import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
 import live.hms.roomkit.ui.polls.previous.PreviousPollsInfo
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 
@@ -41,13 +42,18 @@ class PollsCreationFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(binding) {
+            applyTheme()
             backButton.setOnSingleClickListener { findNavController().popBackStack() }
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
-            pollButton.setOnSingleClickListener { highlightPollOrQuiz(true)
-                pollsViewModel.highlightPollOrQuiz(true)}
+            pollButton.setOnSingleClickListener {
+                highlightPollOrQuiz(true)
+                pollsViewModel.highlightPollOrQuiz(true)
+            }
             pollButton.callOnClick()
-            quizButton.setOnSingleClickListener { highlightPollOrQuiz(false)
-                pollsViewModel.highlightPollOrQuiz(false)}
+            quizButton.setOnSingleClickListener {
+                highlightPollOrQuiz(false)
+                pollsViewModel.highlightPollOrQuiz(false)
+            }
             anonymous.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.isAnon(isChecked) }
             timer.setOnCheckedChangeListener{_,isChecked -> pollsViewModel.setTimer(isChecked)}
             startPollButton.setOnSingleClickListener { startPoll() }

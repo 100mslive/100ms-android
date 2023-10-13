@@ -6,15 +6,16 @@ import android.graphics.*
 import android.graphics.drawable.*
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -1536,7 +1537,7 @@ fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
                     HMSPrebuiltTheme.getDefaults().surface_default)
             )
         }
-    val d2= getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.k, null)!!
+    val d2= getShape()
     .apply {
         setTint(
             getColorOrDefault(
@@ -1670,19 +1671,32 @@ internal fun LayoutParticipantsMergeBinding.applyTheme() {
     containerSearch.applyTheme()
     textInputSearch.applyTheme()
 }
-private fun backgroundShape(inset : Boolean = false): ShapeDrawable {
-    val eightDp = 8.dp().toFloat()
-    val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)
-    return if(inset) {ShapeDrawable(
-        RoundRectShape(
-            lines, RectF(1f,1f,1f,1f),
-            lines
-        ))} else {
+private fun backgroundShape(inset: Boolean = false, innerRadii : Float = 8.dp().toFloat()): ShapeDrawable {
+    val lines = floatArrayOf(
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii
+    )
+    return if (inset) {
+        ShapeDrawable(
+            RoundRectShape(
+                lines, RectF(1f, 1f, 1f, 1f),
+                lines
+            )
+        )
+    } else {
         ShapeDrawable(
             RoundRectShape(
                 lines, null,
                 null
-            )   )
+            )
+        )
     }
 }
 fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
@@ -1799,4 +1813,199 @@ fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
             )
         )
     }
+}
+
+private fun trackTintList() : ColorStateList {
+    val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
+        intArrayOf(-android.R.attr.state_checked))
+
+    return ColorStateList(
+        checkedUncheckedState,
+        intArrayOf(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.primaryDefault,
+                HMSPrebuiltTheme.getDefaults().primary_default),
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+        )
+    )
+}
+
+private fun setSwitchThemes(switchCompat: SwitchCompat) {
+    with(switchCompat) {
+        thumbTintList = thumbTintList()
+        trackTintList = trackTintList()
+    }
+}
+private fun thumbTintList()  : ColorStateList {
+    val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
+        intArrayOf(-android.R.attr.state_checked))
+
+    return ColorStateList(
+        checkedUncheckedState,
+        intArrayOf(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp),
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                HMSPrebuiltTheme.getDefaults().secondary_default)
+        )
+    )
+}
+// Polls
+fun LayoutPollsCreationBinding.applyTheme() {
+    backButton.backgroundTintList =
+        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    pollButton.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
+    pollButton.drawableLeft?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    quizButton.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
+    quizButton.drawableLeft?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    // TODO button borders
+    pollNameEditText.hintTextColor = ColorStateList(
+        arrayOf( intArrayOf(android.R.attr.state_selected, -android.R.attr.state_selected)),
+        intArrayOf( getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
+    )
+
+    pollTitleEditText.background = getChatBackgroundDrawable()
+    pollTitleEditText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+    pollTitleEditText.setHintTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
+
+    val buttonDisabledBackgroundColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDisabled,
+        HMSPrebuiltTheme.getDefaults().primary_disabled)
+    val buttonDisabledTextColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+        HMSPrebuiltTheme.getDefaults().onprimary_low_emp)
+
+
+    val buttonEnabledBackgroundColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default)
+
+    val buttonEnabledTextColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp)
+
+
+    val states = arrayOf(intArrayOf(android.R.attr.state_enabled),
+        intArrayOf(-android.R.attr.state_enabled))
+    val backgroundColors = intArrayOf(buttonEnabledBackgroundColor, buttonDisabledBackgroundColor)
+    val textColors = intArrayOf(buttonEnabledTextColor, buttonDisabledTextColor)
+
+    startPollButton.backgroundTintList = ColorStateList(
+        states,
+        backgroundColors
+    )
+    startPollButton.setTextColor(ColorStateList(
+        states,
+        textColors
+    ))
+
+    previousPollsHeading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    setSwitchThemes(hideVoteCount)
+    setSwitchThemes(anonymous)
+    setSwitchThemes(timer)
+    quizButton.withBackgroundAndBorder(false)
+    pollButton.withBackgroundAndBorder(true)
+}
+
+fun Button.withBackgroundAndBorder(isPoll : Boolean, isSelected : Boolean = true) {
+    drawableLeft = LayerDrawable(
+        arrayOf(ResourcesCompat.getDrawable(this.resources, if(isPoll) R.drawable.poll_icon else R.drawable.quiz_icon, null),
+            backgroundShape(true, 4.dp().toFloat())
+            .apply {
+                paint.color = if(isSelected)
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.primaryDefault,
+                        HMSPrebuiltTheme.getDefaults().primary_default)
+                else
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.borderBright,
+                        HMSPrebuiltTheme.getDefaults().border_bright)
+            } )
+    )
+    background = LayerDrawable(
+        arrayOf(backgroundShape()
+            .apply {
+                paint.color = getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                    HMSPrebuiltTheme.getDefaults().surface_default)
+            },
+            backgroundShape(true)
+                .apply {
+                    paint.color = getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.borderBright,
+                        HMSPrebuiltTheme.getDefaults().border_bright)
+                }
+        )
+    )
+//    val unselectedDrawable = getShape()
+//        //ResourcesCompat.getDrawable(this.root.resources,R.drawable.k, null)!!
+//        .apply {
+//            setTint(
+//                getColorOrDefault(
+//                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
+//                    HMSPrebuiltTheme.getDefaults().surface_default)
+//            )
+//        }
+//    val d2= getShape()
+//        .apply {
+//            setTint(
+//                getColorOrDefault(
+//                    HMSPrebuiltTheme.getColours()?.surfaceBright,
+//                    HMSPrebuiltTheme.getDefaults().surface_bright)
+//            )
+//        }
+//    val selectedInner = InsetDrawable(d2,8)
+//    val selectedDrawable = LayerDrawable(listOf(unselectedDrawable, selectedInner).toTypedArray())
+//
+//    backgroundShape()
 }
