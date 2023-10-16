@@ -1439,10 +1439,6 @@ internal fun ListItemPeerListBinding.applyTheme() {
 }
 
 internal fun LayoutViewMoreButtonBinding.applyTheme() {
-    viewMore.setBackgroundColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
-        HMSPrebuiltTheme.getDefaults().secondary_default,
-    )
     viewMoreText.drawableStart?.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
         HMSPrebuiltTheme.getDefaults().onsecondary_high_emp
@@ -1656,6 +1652,18 @@ private fun TextInputEditText.applyTheme() {
 internal fun FragmentParticipantsBinding.applyTheme() {
     containerSearch.applyTheme()
     textInputSearch.applyTheme()
+    participantsBack.setBackgroundDrawable(ResourcesCompat.getDrawable(
+        this.root.resources,
+        R.drawable.left_arrow, null
+    )?.apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+            )
+        )
+    }
+    )
     closeButtonTheme(closeButton, this.root.resources)
     // surfacedim
     root.setBackgroundColor(getColorOrDefault(
