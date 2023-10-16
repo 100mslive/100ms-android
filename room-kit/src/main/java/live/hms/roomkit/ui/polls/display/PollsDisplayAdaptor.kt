@@ -2,11 +2,13 @@ package live.hms.roomkit.ui.polls.display
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.DrawableCompat.applyTheme
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
@@ -71,9 +73,13 @@ class PollsDisplayAdaptor(
     ): PollDisplayQuestionHolder<ViewBinding> {
         val view = when(viewType) {
             HMSPollQuestionType.multiChoice.ordinal,
-            HMSPollQuestionType.singleChoice.ordinal-> LayoutPollsDisplayChoicesQuesionBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply { applyTheme() }
+            HMSPollQuestionType.singleChoice.ordinal-> LayoutPollsDisplayChoicesQuesionBinding.inflate(LayoutInflater.from(parent.context), parent, false).also {
+                it.applyTheme()
+            }
             HMSPollQuestionType.shortAnswer.ordinal,
-            HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false).also {
+                it.applyTheme()
+            }
             else -> null
         }
         val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)

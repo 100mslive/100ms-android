@@ -15,6 +15,7 @@
         android:layout_marginTop="@dimen/spacing_d3"
         android:layout_marginLeft="@dimen/spacing_d3"
         android:layout_height="wrap_content"
+        android:background="@null"
         android:src="@drawable/left_arrow"/>
 
     <TextView
