@@ -12,14 +12,17 @@
 
         <androidx.appcompat.widget.AppCompatImageButton
             android:id="@+id/backButton"
+            android:layout_marginTop="@dimen/spacing_d3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/back_icon"
+            android:layout_marginLeft="@dimen/spacing_d3"
+            android:src="@drawable/left_arrow"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/heading"
+
             style="@style/HmsHeadings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
