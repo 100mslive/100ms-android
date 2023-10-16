@@ -673,13 +673,23 @@ class MeetingFragment : Fragment() {
         }
     }
 
-
+    private val showedPolls = hashSetOf<String>()
     private fun showPollStart(pollId: String) {
-        startPollSnackBar?.dismiss()
-        startPollSnackBar = Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE).setAction("Open") {
-            findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(pollId))}
+        if (!showedPolls.contains(pollId)) {
+            showedPolls.add(pollId)
+            startPollSnackBar?.dismiss()
+            startPollSnackBar = Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Open") {
+                    findNavController().navigate(
+                        MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(
+                            pollId
+                        )
+                    )
+                }
 
-        startPollSnackBar?.show()
+            startPollSnackBar?.show()
+
+        }
     }
 
     private val pipReceiver by lazy {
