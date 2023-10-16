@@ -1888,7 +1888,7 @@ class MeetingViewModel(
     }
 
     fun isPrebuiltDebugMode(): Boolean {
-        return isPrebuiltDebug
+        return isPrebuiltDebug.not()
     }
     fun permissionGranted() = hmsSDK.setPermissionsAccepted()
 

@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_d3"
-            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
             android:text="Select the type you want to continue with"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/heading" />
@@ -43,9 +43,8 @@
             android:id="@+id/poll_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_d3"
-            android:layout_marginTop="@dimen/spacing_d1"
-            android:layout_marginEnd="@dimen/spacing_d3"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d1"
             android:drawableLeft="@drawable/poll_icon"
             android:text="Poll"
             app:layout_constraintEnd_toStartOf="@+id/quiz_button"
@@ -69,7 +68,7 @@
             android:id="@+id/pollNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
             android:layout_marginHorizontal="@dimen/spacing_d3"
             android:hint="Name this poll"
             app:layout_constraintLeft_toLeftOf="@id/poll_button"
@@ -85,38 +84,38 @@
             android:id="@+id/hideVoteCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
             android:text="Hide Vote Count"
             app:layout_constraintLeft_toLeftOf="@id/pollNameEditText"
             app:layout_constraintTop_toBottomOf="@id/pollNameEditText"
-            app:switchPadding="@dimen/polls_switch_padding" />
+             />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/anonymous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
             android:text="Make results anonymous"
             app:layout_constraintLeft_toLeftOf="@id/pollNameEditText"
             app:layout_constraintTop_toBottomOf="@id/hideVoteCount"
-            app:switchPadding="@dimen/polls_switch_padding" />
+            />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
             android:text="Timer"
             app:layout_constraintLeft_toLeftOf="@id/pollNameEditText"
             app:layout_constraintTop_toBottomOf="@id/anonymous"
-            app:switchPadding="@dimen/polls_switch_padding" />
+            />
 
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/startPollButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/spacing_d3"
+            android:layout_margin="@dimen/fixed_spacing_d3"
             android:text="Start Poll"
             app:layout_constraintTop_toBottomOf="@id/timer" />
 
@@ -124,7 +123,7 @@
             android:id="@+id/previousPollsHeading"
             app:layout_constraintLeft_toLeftOf="@id/timer"
             app:layout_constraintTop_toBottomOf="@id/startPollButton"
-            android:layout_marginVertical="@dimen/spacing_d3"
+            android:layout_marginVertical="@dimen/fixed_spacing_d3"
             style="@style/HmsHeadings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
