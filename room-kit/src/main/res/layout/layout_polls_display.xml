@@ -22,12 +22,22 @@
         android:id="@+id/heading"
         style="@style/HmsHeadings"
         android:layout_marginTop="@dimen/spacing_d3"
-        android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/twelve_dp"
         android:text="Poll/Quiz" />
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:layout_marginLeft="@dimen/spacing_d3"
+        android:layout_marginVertical="@dimen/spacing_d2"
+        android:id="@+id/pollStarterUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_semibold"
+        android:textSize="16sp"
+        android:hint="Tyler started a poll"
+        />
 
 
     <androidx.recyclerview.widget.RecyclerView

@@ -2032,6 +2032,12 @@ fun LayoutPollsDisplayBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+    pollStarterUsername.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
 }
 
 fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {

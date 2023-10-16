@@ -240,4 +240,5 @@
     <string name="menu_item_mute_audio">Mute Audio</string>
     <string name="menu_item_mute_video">Mute Video</string>
     <string name="bring_on_stage">Bring on Stage</string>
+    <string name="poll_started_by">%1$s started a poll</string>
 </resources>

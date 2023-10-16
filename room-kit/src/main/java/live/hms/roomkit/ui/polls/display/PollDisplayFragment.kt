@@ -14,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.setOnSingleClickListener
@@ -69,6 +70,7 @@ class PollDisplayFragment : Fragment() {
 
                     findNavController().popBackStack()
                 }
+                pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name)
                 questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
