@@ -69,7 +69,13 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     private fun optionsBinder(question: QuestionContainer) {
         with(binding as LayoutPollsDisplayChoicesQuesionBinding) {
             manageVisibility(question, this)
-            questionNumbering.text = "Question ${question.question.questionID} of ${poll?.questions?.size}"
+            val questionType = when(question.question.type) {
+                HMSPollQuestionType.singleChoice -> "SINGLE CHOICE"
+                HMSPollQuestionType.multiChoice -> "MULTIPLE CHOICE"
+                HMSPollQuestionType.shortAnswer -> "SHORT ANSWER"
+                HMSPollQuestionType.longAnswer -> "LONG ANSWER"
+            }
+            questionNumbering.text = binding.root.resources.getString(R.string.polls_question_numbering_text, question.question.questionID, poll.questions?.size ?:0, questionType)
             questionText.text = question.question.text
             options.layoutManager = LinearLayoutManager(binding.root.context)
             // selected options could be read from the UI directly.

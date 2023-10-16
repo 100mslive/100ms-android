@@ -241,4 +241,5 @@
     <string name="menu_item_mute_video">Mute Video</string>
     <string name="bring_on_stage">Bring on Stage</string>
     <string name="poll_started_by">%1$s started a poll</string>
+    <string name="polls_question_numbering_text">"Question %1$d of %2$d : %3$s"</string>
 </resources>

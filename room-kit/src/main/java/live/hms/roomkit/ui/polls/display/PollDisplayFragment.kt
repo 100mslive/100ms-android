@@ -64,7 +64,6 @@ class PollDisplayFragment : Fragment() {
 
             poll = returnedPoll
 
-
             with(binding) {
                 backButton.setOnSingleClickListener {
 
