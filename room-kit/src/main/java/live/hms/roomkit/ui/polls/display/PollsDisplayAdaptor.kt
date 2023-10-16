@@ -71,7 +71,7 @@ class PollsDisplayAdaptor(
     ): PollDisplayQuestionHolder<ViewBinding> {
         val view = when(viewType) {
             HMSPollQuestionType.multiChoice.ordinal,
-            HMSPollQuestionType.singleChoice.ordinal-> LayoutPollsDisplayChoicesQuesionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            HMSPollQuestionType.singleChoice.ordinal-> LayoutPollsDisplayChoicesQuesionBinding.inflate(LayoutInflater.from(parent.context), parent, false).apply { applyTheme() }
             HMSPollQuestionType.shortAnswer.ordinal,
             HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null

@@ -4,6 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import live.hms.roomkit.databinding.LayoutPollsDisplayOptionsItemBinding
+import live.hms.roomkit.ui.theme.applyTheme
 
 class DisplayAnswerOptionsViewHolder(
     val binding: LayoutPollsDisplayOptionsItemBinding,
@@ -17,6 +18,7 @@ class DisplayAnswerOptionsViewHolder(
     }
 
     init {
+        binding.applyTheme()
         if(bindingAdapterPosition != RecyclerView.NO_POSITION) {
             binding.text.setText(getItem(bindingAdapterPosition).text)
         }

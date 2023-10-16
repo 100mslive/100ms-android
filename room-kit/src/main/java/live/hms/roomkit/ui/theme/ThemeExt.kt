@@ -1921,6 +1921,22 @@ fun LayoutPollsCreationBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
         HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
 
+
+    previousPollsHeading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+    startPollButton.pollButtons()
+    setSwitchThemes(hideVoteCount)
+    setSwitchThemes(anonymous)
+    setSwitchThemes(timer)
+    quizButton.withBackgroundAndBorder(false)
+    pollButton.withBackgroundAndBorder(true)
+}
+
+fun Button.pollButtons() {
+
     val buttonDisabledBackgroundColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDisabled,
         HMSPrebuiltTheme.getDefaults().primary_disabled)
@@ -1937,32 +1953,21 @@ fun LayoutPollsCreationBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
         HMSPrebuiltTheme.getDefaults().onprimary_high_emp)
 
-
     val states = arrayOf(intArrayOf(android.R.attr.state_enabled),
         intArrayOf(-android.R.attr.state_enabled))
     val backgroundColors = intArrayOf(buttonEnabledBackgroundColor, buttonDisabledBackgroundColor)
     val textColors = intArrayOf(buttonEnabledTextColor, buttonDisabledTextColor)
 
-    startPollButton.backgroundTintList = ColorStateList(
+    backgroundTintList = ColorStateList(
         states,
         backgroundColors
     )
-    startPollButton.setTextColor(ColorStateList(
+
+    setTextColor(ColorStateList(
         states,
         textColors
     ))
 
-    previousPollsHeading.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
-    )
-
-    setSwitchThemes(hideVoteCount)
-    setSwitchThemes(anonymous)
-    setSwitchThemes(timer)
-    quizButton.withBackgroundAndBorder(false)
-    pollButton.withBackgroundAndBorder(true)
 }
 
 fun Button.withBackgroundAndBorder(isPoll : Boolean, isSelected : Boolean = true) {
@@ -2016,4 +2021,45 @@ fun Button.withBackgroundAndBorder(isPoll : Boolean, isSelected : Boolean = true
 //    val selectedDrawable = LayerDrawable(listOf(unselectedDrawable, selectedInner).toTypedArray())
 //
 //    backgroundShape()
+}
+
+fun LayoutPollsDisplayBinding.applyTheme() {
+    backButton.backgroundTintList =
+        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
+
+fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {
+    questionNumbering.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    questionText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    votebutton.pollButtons()
+}
+
+fun LayoutQuizDisplayShortAnswerBinding.applyTheme() {
+
+}
+
+fun LayoutPollsDisplayOptionsItemBinding.applyTheme() {
+    text.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 }
