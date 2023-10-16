@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.polls.models.HmsPoll
@@ -37,7 +38,7 @@ class PollDisplayFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = LayoutPollsDisplayBinding.inflate(inflater, container, false)
+        binding = LayoutPollsDisplayBinding.inflate(inflater, container, false).also { it.applyTheme() }
         return binding.root
     }
 
@@ -73,7 +74,7 @@ class PollDisplayFragment : Fragment() {
                 questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
-
+                heading.text = getString(R.string.poll_title_heading, poll.title)
                 // The views have to be rendered before the update Poll Votes can be called.
                 //  the delay allows for this.
                 delay(300)

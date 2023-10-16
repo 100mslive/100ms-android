@@ -2038,6 +2038,14 @@ fun LayoutPollsDisplayBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
+    pollsLive.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+    ))
+    pollsLive.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    ))
 }
 
 fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {
