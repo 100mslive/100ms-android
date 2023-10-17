@@ -25,9 +25,9 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private val adapter = AnswerOptionsAdapter(canRoleViewVotes) {
+    private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
         if(binding is LayoutPollsDisplayChoicesQuesionBinding){
-            binding.votebutton.isEnabled = true
+            binding.votebutton.isEnabled = answersSelected
         }
     }
     var votingProgressAdapter : VotingProgressAdapter? = null

@@ -12,7 +12,7 @@ class DisplayAnswerOptionsViewHolder(
     private val canRoleViewVotes: Boolean,
     getItem: (Int) -> Option,
     setItemSelected: (selected: Int, noOthers: Boolean) -> Unit,
-    val questionAnswered: () -> Unit,
+    val answerSelectionUpdated: () -> Unit,
     ) : ViewHolder(binding.root){
 
     init {
@@ -24,7 +24,7 @@ class DisplayAnswerOptionsViewHolder(
         binding.radioButton.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked) {
                 setItemSelected(bindingAdapterPosition, true)
-                questionAnswered()
+                answerSelectionUpdated()
             }
         }
 
@@ -32,7 +32,7 @@ class DisplayAnswerOptionsViewHolder(
             getItem(bindingAdapterPosition).apply {
                 this.isChecked = isChecked
             }
-            questionAnswered()
+            answerSelectionUpdated()
         }
     }
 

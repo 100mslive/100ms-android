@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.polls.display
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -23,7 +22,7 @@ var hiddenAndAnswered : Boolean = false)
  * answer selected, which takes the question and such
  */
 class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean,
-    private val questionAnswered : () -> Unit) : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
+    private val answerSelectionUpdated : (answersSelected : Boolean) -> Unit) : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
 
     // all items have in fact changed.
     @SuppressLint("NotifyDataSetChanged")
@@ -48,7 +47,10 @@ class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DisplayAnswerOptionsViewHolder {
         val binding = LayoutPollsDisplayOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DisplayAnswerOptionsViewHolder(binding,canRoleViewVotes, ::getItem, ::setItemSelected, questionAnswered)
+        return DisplayAnswerOptionsViewHolder(binding,canRoleViewVotes, ::getItem, ::setItemSelected, {
+            val hasExistingAnswer = getSelectedOptions().isNotEmpty()
+            answerSelectionUpdated(hasExistingAnswer)
+        })
     }
 
     override fun onBindViewHolder(holder: DisplayAnswerOptionsViewHolder, position: Int) {
