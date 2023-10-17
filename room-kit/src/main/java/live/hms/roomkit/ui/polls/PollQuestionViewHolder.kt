@@ -13,6 +13,8 @@ import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.saveButtonDisabled
+import live.hms.roomkit.ui.theme.saveButtonEnabled
 import live.hms.roomkit.util.setOnSingleClickListener
 
 private var count : Long = 0
@@ -91,16 +93,17 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
             addAnOptionTextView.setOnSingleClickListener {
                 val showCheckBox = questionTypeSpinner.selectedItemPosition == 1
                 optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
-                saveButton.isEnabled = true
+                saveButton.saveButtonEnabled()
             }
             deleteOptionTrashButton.setOnSingleClickListener {
                 // Delete the last option when delete is clicked.
                 optionsAdapter.submitList(optionsAdapter.currentList.dropLast(1))
-                saveButton.isEnabled = optionsAdapter.currentList.size > 1
+                if (optionsAdapter.currentList.size > 1) saveButton.saveButtonEnabled() else saveButton.saveButtonDisabled()
+
             }
-            saveButton.isEnabled = false
+            saveButton.saveButtonDisabled()
             saveButton.setOnClickListener {
-                saveButton.isEnabled = false
+                saveButton.saveButtonDisabled()
                 val title = askAQuestionEditText.text.toString()
                 val newQuestionUi = when(questionTypeSpinner.selectedItemPosition){
                     // single, multi, short, long

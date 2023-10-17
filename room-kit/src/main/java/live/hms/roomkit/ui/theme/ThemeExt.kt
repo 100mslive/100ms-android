@@ -2146,5 +2146,52 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
     )
 
 
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    saveButton.saveButtonEnabled()
+
+}
+
+internal fun TextView.saveButtonEnabled() {
+    this.isEnabled = true
+
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        null
+    )
+
+}
+
+
+internal fun TextView.saveButtonDisabled() {
+    this.isEnabled = false
+
+
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
+        HMSPrebuiltTheme.getDefaults().primary_disabled,
+        null
+    )
+
 
 }
