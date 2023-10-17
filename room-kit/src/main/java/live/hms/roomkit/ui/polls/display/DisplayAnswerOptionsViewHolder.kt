@@ -5,17 +5,15 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import live.hms.roomkit.databinding.LayoutPollsDisplayOptionsItemBinding
 import live.hms.roomkit.ui.theme.applyTheme
+import kotlin.reflect.KProperty0
 
 class DisplayAnswerOptionsViewHolder(
     val binding: LayoutPollsDisplayOptionsItemBinding,
-    private val canRoleViewVotes : Boolean,
+    private val canRoleViewVotes: Boolean,
     getItem: (Int) -> Option,
-    setItemSelected: (selected : Int, noOthers: Boolean) -> Unit,
+    setItemSelected: (selected: Int, noOthers: Boolean) -> Unit,
+    val questionAnswered: () -> Unit,
     ) : ViewHolder(binding.root){
-
-    fun q() {
-        binding.radioButton.isChecked = false
-    }
 
     init {
         binding.applyTheme()
@@ -24,14 +22,17 @@ class DisplayAnswerOptionsViewHolder(
         }
         // Both set the same property, only one will be used.
         binding.radioButton.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked)
+            if(isChecked) {
                 setItemSelected(bindingAdapterPosition, true)
+                questionAnswered()
+            }
         }
 
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             getItem(bindingAdapterPosition).apply {
                 this.isChecked = isChecked
             }
+            questionAnswered()
         }
     }
 

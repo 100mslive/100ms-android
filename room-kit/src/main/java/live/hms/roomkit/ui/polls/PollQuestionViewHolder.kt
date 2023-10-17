@@ -155,8 +155,9 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding){
             questionTitle.text = questionUi.withTitle
             val adapter = ArrayAdapter<String>(binding.root.context, android.R.layout.simple_list_item_1)
-            options.layoutManager = LinearLayoutManager(binding.root.context)
+//            options.layoutManager = LinearLayoutManager(binding.root.context)
             adapter.addAll(questionUi.options)
+            options.adapter = adapter
         }
     }
 
@@ -164,8 +165,9 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding){
             questionTitle.text = questionUi.withTitle
             val adapter = ArrayAdapter<String>(binding.root.context, android.R.layout.simple_list_item_1)
-            options.layoutManager = LinearLayoutManager(binding.root.context)
+//            options.layoutManager = LinearLayoutManager(binding.root.context)
             adapter.addAll(questionUi.options)
+            options.adapter = adapter
         }
     }
 
