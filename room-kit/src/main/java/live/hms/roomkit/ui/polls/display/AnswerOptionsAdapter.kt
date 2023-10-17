@@ -22,7 +22,8 @@ var hiddenAndAnswered : Boolean = false)
  * Functions needed are:
  * answer selected, which takes the question and such
  */
-class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean) : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
+class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean,
+    private val onItemSelected : () -> Unit) : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
 
     // all items have in fact changed.
     @SuppressLint("NotifyDataSetChanged")
@@ -66,6 +67,7 @@ class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean) : ListAdapter
                 item.isChecked = false
             }
         }
+        onItemSelected()
         notifyDataSetChanged()
     }
 

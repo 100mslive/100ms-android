@@ -21,10 +21,15 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val poll : HmsPoll,
     val saveInfoText: (text : String, position : Int) -> Boolean,
     val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
-    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean
+    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean,
+    val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private val adapter = AnswerOptionsAdapter(canRoleViewVotes)
+    private val adapter = AnswerOptionsAdapter(canRoleViewVotes) {
+        if(binding is LayoutPollsDisplayChoicesQuesionBinding){
+            binding.votebutton.isEnabled = true
+        }
+    }
     var votingProgressAdapter : VotingProgressAdapter? = null
 
     // There are two different layouts.
@@ -64,6 +69,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             votebutton.visibility = View.VISIBLE
             votingProgressBars.visibility = View.GONE
         }
+//        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
     }
 
     private fun optionsBinder(question: QuestionContainer) {
@@ -81,6 +87,10 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             // selected options could be read from the UI directly.
             options.adapter = adapter
             adapter.submitList(question.question.options?.map { Option(it.text?:"", question.question.type == HMSPollQuestionType.multiChoice) })
+            skipButton.setOnSingleClickListener {
+                // TODO skip
+
+            }
             votebutton.setOnSingleClickListener {
                 val voted : Boolean = if(question.question.type == HMSPollQuestionType.singleChoice){
                     saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll)

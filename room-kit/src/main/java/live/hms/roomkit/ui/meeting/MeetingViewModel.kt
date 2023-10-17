@@ -1990,6 +1990,11 @@ class MeetingViewModel(
         }
         return true
     }
+    fun saveSkipped(question: HMSPollQuestion, hmsPoll: HmsPoll) {
+//        val response = HMSPollResponseBuilder(hmsPoll, null)
+//
+//        localHmsInteractivityCenter.add()
+    }
     fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll) : Boolean {
         val valid = options != null
         val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->

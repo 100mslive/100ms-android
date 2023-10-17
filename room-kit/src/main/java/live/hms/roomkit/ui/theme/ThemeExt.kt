@@ -2063,6 +2063,7 @@ fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {
         )
     )
     votebutton.pollButtons()
+
 }
 fun LayoutQuizDisplayShortAnswerBinding.applyTheme() {
 
