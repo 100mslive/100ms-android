@@ -23,7 +23,7 @@ var hiddenAndAnswered : Boolean = false)
  * answer selected, which takes the question and such
  */
 class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean,
-    private val onItemSelected : () -> Unit) : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
+    private val questionAnswered : () -> Unit) : ListAdapter<Option, DisplayAnswerOptionsViewHolder>(DIFFUTIL_CALLBACK) {
 
     // all items have in fact changed.
     @SuppressLint("NotifyDataSetChanged")
@@ -48,7 +48,7 @@ class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DisplayAnswerOptionsViewHolder {
         val binding = LayoutPollsDisplayOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return DisplayAnswerOptionsViewHolder(binding,canRoleViewVotes, ::getItem, ::setItemSelected)
+        return DisplayAnswerOptionsViewHolder(binding,canRoleViewVotes, ::getItem, ::setItemSelected, questionAnswered)
     }
 
     override fun onBindViewHolder(holder: DisplayAnswerOptionsViewHolder, position: Int) {
@@ -67,7 +67,6 @@ class AnswerOptionsAdapter(private val canRoleViewVotes : Boolean,
                 item.isChecked = false
             }
         }
-        onItemSelected()
         notifyDataSetChanged()
     }
 
