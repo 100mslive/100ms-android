@@ -2077,3 +2077,74 @@ fun LayoutPollsDisplayOptionsItemBinding.applyTheme() {
         )
     )
 }
+
+
+fun LayoutPollQuestionCreationItemBinding.applyTheme() {
+
+    root.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        null
+    )
+
+    questionTypeTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    questionTypeSpinner.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_bright,
+        R.drawable.gray_round_drawable
+    )
+
+
+    askAQuestionEditText.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
+    )
+
+    askAQuestionEditText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    askAQuestionEditText.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    optionsHeading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    addAnOptionTextView.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    addAnOptionTextView.drawableStart?.setTint(
+    getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+    )
+    )
+
+
+
+}

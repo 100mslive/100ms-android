@@ -12,6 +12,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.setOnSingleClickListener
 
 private var count : Long = 0
@@ -51,6 +52,7 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
 
     private fun bind(questionUi: QuestionUi.QuestionCreator) {
         with(binding as LayoutPollQuestionCreationItemBinding) {
+            binding.applyTheme()
             val requiredToAnswer = !notRequiredToAnswer.isChecked
 
             val optionsAdapter = OptionsListAdapter()
