@@ -39,31 +39,7 @@
             android:layout_marginTop="@dimen/spacing_d2"
             android:nestedScrollingEnabled="false" />
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_margin="@dimen/spacing_d2"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        <Button
-            android:id="@+id/skipButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:enabled="false"
-            android:visibility="gone"
-            android:text="Skip"
-            />
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                />
-        <Button
-            android:id="@+id/votebutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:enabled="false"
-            android:text="@string/polls_vote_button" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/votingProgressBars"
@@ -72,5 +48,30 @@
             android:layout_marginTop="@dimen/spacing_d2"
             android:nestedScrollingEnabled="false" />
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_margin="@dimen/spacing_d2"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/skipButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:visibility="gone"
+                android:text="Skip"
+                />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                />
+            <Button
+                android:id="@+id/votebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="@string/polls_vote_button" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

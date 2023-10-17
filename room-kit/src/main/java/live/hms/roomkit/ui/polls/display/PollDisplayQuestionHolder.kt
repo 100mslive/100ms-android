@@ -46,7 +46,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
         if(question.voted) {
-            votebutton.visibility = View.GONE
+            votebutton.isEnabled = false
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
             if(poll.anonymous && !canRoleViewVotes){
                 (options.adapter as AnswerOptionsAdapter).disableOptions()
@@ -66,7 +66,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 
         } else {
             options.visibility = View.VISIBLE
-            votebutton.visibility = View.VISIBLE
+            votebutton.isEnabled = adapter.getSelectedOptions().isNotEmpty()
             votingProgressBars.visibility = View.GONE
         }
 //        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
