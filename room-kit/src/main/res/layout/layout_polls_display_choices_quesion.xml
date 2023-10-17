@@ -39,8 +39,6 @@
             android:layout_marginTop="@dimen/spacing_d2"
             android:nestedScrollingEnabled="false" />
 
-
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/votingProgressBars"
             android:layout_width="match_parent"
