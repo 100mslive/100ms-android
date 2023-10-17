@@ -3,53 +3,62 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/root"
     android:windowSoftInputMode="adjustPan"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="@dimen/spacing_d2"
+        >
 
         <TextView
             android:id="@+id/questionTypeTitle"
             android:layout_width="wrap_content"
-            android:layout_height="16dp"
+            android:layout_height="20dp"
             android:layout_marginBottom="8dp"
             android:text="Question Type"
+            android:textSize="14sp"
+            android:lineHeight="20sp"
+            android:fontFamily="@font/inter_regular"
             app:layout_constraintBottom_toTopOf="@+id/questionTypeSpinner"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
 
         <Spinner
-            android:padding="12dp"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="@dimen/spacing_d2"
             android:id="@+id/questionTypeSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="8dp"
+            android:theme="@style/HmsPollCardText"
+            android:background="@drawable/gray_round_drawable"
             android:entries="@array/question_type_options"
-            app:layout_constraintBottom_toTopOf="@+id/askAquestionLayout"
+            app:layout_constraintBottom_toTopOf="@+id/askAQuestionEditText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/questionTypeTitle" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/askAquestionLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+        <EditText
             app:layout_constraintBottom_toTopOf="@+id/optionsHeading"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/questionTypeSpinner">
+            app:layout_constraintTop_toBottomOf="@+id/questionTypeSpinner"
+            android:id="@+id/askAQuestionEditText"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:layout_marginBottom="@dimen/spacing_d2"
+            android:textSize="12sp"
+            android:fontFamily="@font/inter_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gray_round_drawable"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/askAQuestionEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ask A Question"
-                tools:visibility="gone" />
-        </com.google.android.material.textfield.TextInputLayout>
+
 
         <TextView
             android:id="@+id/optionsHeading"
@@ -58,8 +67,11 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:text="Options"
+            android:fontFamily="@font/inter_regular"
+            android:textSize="14sp"
+            android:lineHeight="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/askAquestionLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/askAQuestionEditText" />
 
         <FrameLayout
             android:id="@+id/optionsListRadioGroupVG"
@@ -93,11 +105,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"
-            android:drawablePadding="23dp"
-            android:gravity="center"
-            android:padding="5dp"
+            android:drawablePadding="8dp"
+            android:drawableStart="@drawable/add_ic"
+            android:padding="@dimen/eight_dp"
             android:text="Add an option"
-
+            android:gravity="center_vertical"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:lineHeight="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/optionsListRadioGroupVG" />
