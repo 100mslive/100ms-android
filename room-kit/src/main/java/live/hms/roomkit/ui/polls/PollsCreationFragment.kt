@@ -16,6 +16,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
 import live.hms.roomkit.ui.polls.previous.PreviousPollsInfo
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.isSelectedStroke
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 
@@ -81,8 +82,11 @@ class PollsCreationFragment : Fragment(){
     private fun highlightPollOrQuiz(isPoll : Boolean) {
         // Whichever button is selected, disable it.
         // Hopefully the UI for the opposite one will be grayed.
-        binding.quizButton.isEnabled = isPoll
-        binding.pollButton.isEnabled = !isPoll
+        binding.quizButton.isSelectedStroke(!isPoll)
+        binding.quizIcon.isSelectedStroke(!isPoll)
+
+        binding.pollButton.isSelectedStroke(isPoll)
+        binding.pollIcon.isSelectedStroke(isPoll)
     }
 
     private fun initOnBackPress() {
