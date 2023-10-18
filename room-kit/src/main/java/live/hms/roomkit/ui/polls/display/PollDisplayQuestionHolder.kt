@@ -22,6 +22,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val saveInfoText: (text : String, position : Int) -> Boolean,
     val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
     val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean,
+    // This isn't implemented yet
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
