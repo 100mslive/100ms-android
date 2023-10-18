@@ -49,7 +49,7 @@
             android:id="@+id/askAQuestionEditText"
             android:singleLine="true"
             android:maxLines="1"
-            android:layout_marginBottom="@dimen/spacing_d2"
+
             android:textSize="12sp"
             android:fontFamily="@font/inter_regular"
             android:layout_width="match_parent"
@@ -59,17 +59,17 @@
             android:paddingVertical="12dp" />
 
 
-
         <TextView
             android:id="@+id/optionsHeading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="Options"
+            android:layout_marginBottom="@dimen/eight_dp"
             android:fontFamily="@font/inter_regular"
-            android:textSize="14sp"
             android:lineHeight="20sp"
+            android:text="Options"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@id/optionsListRadioGroupVG"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/askAQuestionEditText" />
 
@@ -77,9 +77,10 @@
             android:id="@+id/optionsListRadioGroupVG"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginBottom="@dimen/spacing_d2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/addAnOptionTextView"
             app:layout_constraintTop_toBottomOf="@id/optionsHeading">
 
             <RadioGroup
@@ -103,7 +104,6 @@
             android:id="@+id/addAnOptionTextView"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginTop="24dp"
             android:layout_marginBottom="8dp"
             android:drawablePadding="8dp"
             android:drawableStart="@drawable/add_ic"
@@ -113,23 +113,23 @@
             android:textSize="14sp"
             android:fontFamily="@font/inter_regular"
             android:lineHeight="20sp"
+            app:layout_constraintBottom_toTopOf="@id/notRequiredToAnswer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/optionsListRadioGroupVG" />
 
         <androidx.appcompat.widget.SwitchCompat
-            tools:visibility="visible"
             android:id="@+id/notRequiredToAnswer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:text="Not required to answer"
             app:layout_constraintBottom_toTopOf="@+id/saveButton"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/addAnOptionTextView"
-            app:switchPadding="16dp" />
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/deleteOptionTrashButton"
