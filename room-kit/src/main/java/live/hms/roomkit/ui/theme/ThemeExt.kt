@@ -21,6 +21,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.textfield.TextInputEditText
@@ -1863,8 +1864,8 @@ private fun thumbTintList()  : ColorStateList {
 }
 // Polls
 fun LayoutPollsCreationBinding.applyTheme() {
-    backButton.backgroundTintList =
-        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+
     heading.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
@@ -1879,29 +1880,44 @@ fun LayoutPollsCreationBinding.applyTheme() {
         )
     )
 
-    pollButton.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    ))
+    pollIcon.setCardBackgroundColor(
+        getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
 
-    pollButton.drawableLeft?.setTint(
+    quizIcon.setCardBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+
+    pollIcDrawable.drawable.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 
-    quizButton.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-    ))
-
-    quizButton.drawableLeft?.setTint(
+    quizIcDrawable.drawable.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+
+
+    pollText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
+    quizText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
 
     // TODO button borders
     pollNameEditText.hintTextColor = ColorStateList(
@@ -1931,8 +1947,10 @@ fun LayoutPollsCreationBinding.applyTheme() {
     setSwitchThemes(hideVoteCount)
     setSwitchThemes(anonymous)
     setSwitchThemes(timer)
-    quizButton.withBackgroundAndBorder(false)
-    pollButton.withBackgroundAndBorder(true)
+    quizButton.isSelectedStroke(false)
+    quizIcon.isSelectedStroke(false)
+    pollButton.isSelectedStroke(true)
+    pollIcon.isSelectedStroke(true)
 }
 
 fun Button.pollButtons() {
@@ -1970,58 +1988,18 @@ fun Button.pollButtons() {
 
 }
 
-fun Button.withBackgroundAndBorder(isPoll : Boolean, isSelected : Boolean = true) {
-    drawableLeft = LayerDrawable(
-        arrayOf(ResourcesCompat.getDrawable(this.resources, if(isPoll) R.drawable.poll_icon else R.drawable.quiz_icon, null),
-            backgroundShape(true, 4.dp().toFloat())
-            .apply {
-                paint.color = if(isSelected)
-                    getColorOrDefault(
-                        HMSPrebuiltTheme.getColours()?.primaryDefault,
-                        HMSPrebuiltTheme.getDefaults().primary_default)
-                else
-                    getColorOrDefault(
-                        HMSPrebuiltTheme.getColours()?.borderBright,
-                        HMSPrebuiltTheme.getDefaults().border_bright)
-            } )
-    )
-    background = LayerDrawable(
-        arrayOf(backgroundShape()
-            .apply {
-                paint.color = getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
-                    HMSPrebuiltTheme.getDefaults().surface_default)
-            },
-            backgroundShape(true)
-                .apply {
-                    paint.color = getColorOrDefault(
-                        HMSPrebuiltTheme.getColours()?.borderBright,
-                        HMSPrebuiltTheme.getDefaults().border_bright)
-                }
-        )
-    )
-//    val unselectedDrawable = getShape()
-//        //ResourcesCompat.getDrawable(this.root.resources,R.drawable.k, null)!!
-//        .apply {
-//            setTint(
-//                getColorOrDefault(
-//                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
-//                    HMSPrebuiltTheme.getDefaults().surface_default)
-//            )
-//        }
-//    val d2= getShape()
-//        .apply {
-//            setTint(
-//                getColorOrDefault(
-//                    HMSPrebuiltTheme.getColours()?.surfaceBright,
-//                    HMSPrebuiltTheme.getDefaults().surface_bright)
-//            )
-//        }
-//    val selectedInner = InsetDrawable(d2,8)
-//    val selectedDrawable = LayerDrawable(listOf(unselectedDrawable, selectedInner).toTypedArray())
-//
-//    backgroundShape()
+fun MaterialCardView.isSelectedStroke(isSelected : Boolean) {
+    if (isSelected.not())
+        this.strokeColor = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().primary_default)
+    else
+        this.strokeColor = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default)
+
 }
+
 
 fun LayoutPollsDisplayBinding.applyTheme() {
     backButton.backgroundTintList =
