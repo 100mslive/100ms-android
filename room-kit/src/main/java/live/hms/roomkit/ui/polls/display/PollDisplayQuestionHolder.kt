@@ -10,6 +10,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.question.HMSPollQuestion
@@ -48,6 +50,13 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
         if(question.voted) {
             votebutton.isEnabled = false
+            votebutton.background = null
+            votebutton.setTextColor(
+                getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+            )
+            )
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
             if(poll.anonymous && !canRoleViewVotes){
                 (options.adapter as AnswerOptionsAdapter).disableOptions()
