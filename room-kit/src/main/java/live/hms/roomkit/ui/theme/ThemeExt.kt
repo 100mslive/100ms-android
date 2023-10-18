@@ -2084,7 +2084,7 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
     root.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default,
-        null
+        R.drawable.gray_round_drawable
     )
 
     questionTypeTitle.setTextColor(
