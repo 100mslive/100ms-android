@@ -1919,19 +1919,26 @@ fun LayoutPollsCreationBinding.applyTheme() {
     ))
 
 
-    // TODO button borders
-    pollNameEditText.hintTextColor = ColorStateList(
+    pollTitleEditText.setHintTextColor(ColorStateList(
         arrayOf( intArrayOf(android.R.attr.state_selected, -android.R.attr.state_selected)),
         intArrayOf( getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceLow,
             HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
+    ))
+
+
+
+    pollTitleEditText.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
     )
 
-    pollTitleEditText.background = getChatBackgroundDrawable()
     pollTitleEditText.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
     )
     pollTitleEditText.setHintTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
