@@ -57,6 +57,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 HMSPrebuiltTheme.getDefaults().onsurface_low_emp
             )
             )
+            votebutton.text = "Voted"
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
             if(poll.anonymous && !canRoleViewVotes){
                 (options.adapter as AnswerOptionsAdapter).disableOptions()
