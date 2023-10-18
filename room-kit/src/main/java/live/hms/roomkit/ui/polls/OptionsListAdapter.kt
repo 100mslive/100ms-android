@@ -1,8 +1,11 @@
 package live.hms.roomkit.ui.polls
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
@@ -11,9 +14,11 @@ import java.util.*
 
 data class Option(var text : String,
                   val showCheckbox : Boolean,
-                  var isChecked : Boolean = false, val id : String = UUID.randomUUID().toString())
+                  var isChecked : Boolean = false,
+                  val id : String = UUID.randomUUID().toString())
 
 class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBACK) {
+    lateinit var refreshSubmitButton :() -> Unit
 
     companion object {
         val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<Option>() {
@@ -36,6 +41,28 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
         holder.bind(getItem(position))
         // Put the cursor in the edittext as it's created.
         holder.binding.text.requestFocus()
+        holder.binding.text.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                getItem(holder.bindingAdapterPosition).text = text.toString()
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+                refreshSubmitButton?.invoke()
+            }
+
+        })
+    }
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<Option>,
+        currentList: MutableList<Option>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        refreshSubmitButton()
     }
 
     private fun selectOnlyCurrentOption(position: Int) {

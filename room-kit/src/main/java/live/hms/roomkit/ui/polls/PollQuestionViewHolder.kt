@@ -5,6 +5,8 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -57,7 +59,9 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
             binding.applyTheme()
             val requiredToAnswer = !notRequiredToAnswer.isChecked
 
-            val optionsAdapter = OptionsListAdapter()
+            val optionsAdapter = OptionsListAdapter().also {
+                it.refreshSubmitButton = { validateSaveButtonEnabledState(it, binding.saveButton) }
+            }
             optionsListView.adapter = optionsAdapter
             optionsListView.layoutManager = LinearLayoutManager(binding.root.context)
             questionTypeSpinner.onItemSelectedListener = object : OnItemSelectedListener {
@@ -68,7 +72,8 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     id: Long
                 ) {
                     // Reset options whenever a question type is selected
-                    optionsAdapter.submitList(emptyList())
+                    addNewOption(optionsAdapter, isMultiOptionQuestionCreation(questionTypeSpinner))
+                    addNewOption(optionsAdapter, isMultiOptionQuestionCreation(questionTypeSpinner))
                     // If short/long answer hide the options else show them
                     val multiOptionVisibility = if(position > 1) View.GONE else View.VISIBLE
                     addAnOptionTextView.visibility = multiOptionVisibility
@@ -91,15 +96,12 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
 
             }
             addAnOptionTextView.setOnSingleClickListener {
-                val showCheckBox = questionTypeSpinner.selectedItemPosition == 1
-                optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
-                saveButton.saveButtonEnabled()
+                val showCheckBox = isMultiOptionQuestionCreation(questionTypeSpinner)
+                addNewOption(optionsAdapter, showCheckBox)
             }
             deleteOptionTrashButton.setOnSingleClickListener {
                 // Delete the last option when delete is clicked.
                 optionsAdapter.submitList(optionsAdapter.currentList.dropLast(1))
-                if (optionsAdapter.currentList.size > 1) saveButton.saveButtonEnabled() else saveButton.saveButtonDisabled()
-
             }
             saveButton.saveButtonDisabled()
             saveButton.setOnClickListener {
@@ -149,6 +151,23 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                 saveInfo(newQuestionUi!!)
             }
         }
+    }
+
+    private fun isMultiOptionQuestionCreation(questionTypeSpinner: Spinner): Boolean {
+        return questionTypeSpinner.selectedItemPosition == 1
+    }
+
+    private fun addNewOption(optionsAdapter: OptionsListAdapter, showCheckBox: Boolean) {
+        optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
+    }
+
+    private fun validateSaveButtonEnabledState(optionsAdapter: OptionsListAdapter, saveButton : TextView) {
+        // Validation criteria
+        // No empty answers.
+        // At least one answer.
+        if (optionsAdapter.currentList.filter { it.text.isBlank() }.isEmpty() &&
+            optionsAdapter.currentList.size > 0) saveButton.saveButtonEnabled() else saveButton.saveButtonDisabled()
+
     }
 
     private fun bind(questionUi: QuestionUi.MultiChoiceQuestion) {
