@@ -12,6 +12,7 @@ import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.voteButtons
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.question.HMSPollQuestion
@@ -79,6 +80,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             options.visibility = View.VISIBLE
             votebutton.isEnabled = adapter.getSelectedOptions().isNotEmpty()
             votingProgressBars.visibility = View.GONE
+            votebutton.text = "Vote"
+            votebutton.voteButtons()
         }
 //        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
     }
