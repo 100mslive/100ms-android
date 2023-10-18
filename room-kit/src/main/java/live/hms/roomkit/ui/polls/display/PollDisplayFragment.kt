@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -45,7 +46,7 @@ class PollDisplayFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        initOnBackPress()
         lifecycleScope.launch {
             val returnedPoll = meetingViewModel.getPollForPollId(args.pollId)
             if(returnedPoll == null) {
@@ -92,4 +93,14 @@ class PollDisplayFragment : Fragment() {
 
         }
     }
+    private fun initOnBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    binding.backButton.performClick()
+                }
+            })
+    }
+
 }

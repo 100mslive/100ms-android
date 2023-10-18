@@ -1953,6 +1953,41 @@ fun LayoutPollsCreationBinding.applyTheme() {
     pollIcon.isSelectedStroke(true)
 }
 
+fun Button.voteButtons() {
+
+    val buttonDisabledBackgroundColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDisabled,
+        HMSPrebuiltTheme.getDefaults().primary_disabled)
+    val buttonDisabledTextColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+        HMSPrebuiltTheme.getDefaults().onprimary_low_emp)
+
+
+    val buttonEnabledBackgroundColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default)
+
+    val buttonEnabledTextColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp)
+
+    val states = arrayOf(intArrayOf(android.R.attr.state_enabled),
+        intArrayOf(-android.R.attr.state_enabled))
+    val backgroundColors = intArrayOf(buttonEnabledBackgroundColor, buttonDisabledBackgroundColor)
+    val textColors = intArrayOf(buttonEnabledTextColor, buttonDisabledTextColor)
+
+    backgroundTintList = ColorStateList(
+        states,
+        backgroundColors
+    )
+
+    setTextColor(ColorStateList(
+        states,
+        textColors
+    ))
+
+}
+
 fun Button.pollButtons() {
 
     val buttonDisabledBackgroundColor = getColorOrDefault(
@@ -2040,7 +2075,7 @@ fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
-    votebutton.pollButtons()
+    votebutton.voteButtons()
 
 }
 fun LayoutQuizDisplayShortAnswerBinding.applyTheme() {

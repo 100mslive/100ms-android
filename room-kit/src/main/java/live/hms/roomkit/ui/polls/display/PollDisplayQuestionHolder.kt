@@ -10,6 +10,9 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.voteButtons
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.question.HMSPollQuestion
@@ -22,6 +25,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val saveInfoText: (text : String, position : Int) -> Boolean,
     val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
     val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean,
+    // This isn't implemented yet
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -47,6 +51,14 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
         if(question.voted) {
             votebutton.isEnabled = false
+            votebutton.background = null
+            votebutton.setTextColor(
+                getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+            )
+            )
+            votebutton.text = "Voted"
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
             if(poll.anonymous && !canRoleViewVotes){
                 (options.adapter as AnswerOptionsAdapter).disableOptions()
@@ -68,6 +80,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             options.visibility = View.VISIBLE
             votebutton.isEnabled = adapter.getSelectedOptions().isNotEmpty()
             votingProgressBars.visibility = View.GONE
+            votebutton.text = "Vote"
+            votebutton.voteButtons()
         }
 //        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
     }
