@@ -98,7 +98,7 @@ class PollDisplayFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    binding.backButton.performClick()
+                    binding.backButton.callOnClick()
                 }
             })
     }
