@@ -32,4 +32,6 @@ class PollsViewModel : ViewModel() {
     }
 
     fun getPollsCreationInfo() = pollCreationInfo
+
+    fun isPoll() = pollCreationInfo.isPoll
 }
