@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.polls.display.voting
 
 import android.os.Build
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
@@ -14,7 +15,9 @@ class ProgressDisplayViewHolder(
 
     fun bind(item: ProgressBarInfo) {
         with(binding) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if(item.totalVoteCount == 0) {
+                questionProgressBar.visibility = View.GONE
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 questionProgressBar.setProgress(item.percentage, true)
             }
             answer.text = item.optionText

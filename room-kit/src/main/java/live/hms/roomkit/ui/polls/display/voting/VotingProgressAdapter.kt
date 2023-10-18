@@ -13,7 +13,8 @@ data class ProgressBarInfo(
     val index : Int,
     val percentage : Int,
     val optionText : String,
-    val numberOfVotes : Long
+    val numberOfVotes : Long,
+    val totalVoteCount : Int
 )
 class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarInfo, ProgressDisplayViewHolder>(
     DIFFUTIL_CALLBACK
@@ -39,7 +40,8 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
                     optionText = it.text ?: "",
                     numberOfVotes = votesForThisOption,
                     percentage = percentage,
-                    index = index
+                    index = index,
+                    totalVoteCount = pollStatsQuestion.total
                 )
         }
         submitList(items)
