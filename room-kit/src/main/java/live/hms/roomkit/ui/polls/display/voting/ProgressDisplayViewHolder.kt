@@ -1,7 +1,9 @@
 package live.hms.roomkit.ui.polls.display.voting
 
+import android.os.Build
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayResultProgressBarsItemBinding
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.PollStatsQuestions
@@ -12,9 +14,12 @@ class ProgressDisplayViewHolder(
 
     fun bind(item: ProgressBarInfo) {
         with(binding) {
-            questionProgressBar.setProgress(item.percentage, true)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                questionProgressBar.setProgress(item.percentage, true)
+            }
             answer.text = item.optionText
-            totalVotes.text = "${item.numberOfVotes} votes"
+            val numVotes = item.numberOfVotes.toInt()
+            totalVotes.text = binding.root.resources.getQuantityString(R.plurals.poll_votes, numVotes, numVotes)
         }
     }
 

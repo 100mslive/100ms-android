@@ -11,9 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.databinding.LayoutPollsCreationBinding
-import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
 import live.hms.roomkit.ui.polls.previous.PreviousPollsInfo
@@ -50,12 +48,12 @@ class PollsCreationFragment : Fragment(){
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
             pollButton.setOnSingleClickListener {
                 highlightPollOrQuiz(true)
-                pollsViewModel.highlightPollOrQuiz(true)
+                pollsViewModel.setPollOrQuiz(true)
             }
             pollButton.callOnClick()
             quizButton.setOnSingleClickListener {
                 highlightPollOrQuiz(false)
-                pollsViewModel.highlightPollOrQuiz(false)
+                pollsViewModel.setPollOrQuiz(false)
             }
             anonymous.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.isAnon(isChecked) }
             timer.setOnCheckedChangeListener{_,isChecked -> pollsViewModel.setTimer(isChecked)}
