@@ -115,14 +115,12 @@ class MeetingViewModel(
                 ) {
                     if(hmsPollUpdateType == HMSPollUpdateType.started) {
                         viewModelScope.launch {
-                            if(isPrebuiltDebug)
-                                _events.emit(Event.PollStarted(hmsPoll))
+                            _events.emit(Event.PollStarted(hmsPoll))
                         }
                     }
                     else if (hmsPollUpdateType == HMSPollUpdateType.resultsupdated) {
                         viewModelScope.launch {
-                            if(isPrebuiltDebug)
-                                _events.emit(Event.PollVotesUpdated(hmsPoll))
+                            _events.emit(Event.PollVotesUpdated(hmsPoll))
                         }
                     }
                 }
