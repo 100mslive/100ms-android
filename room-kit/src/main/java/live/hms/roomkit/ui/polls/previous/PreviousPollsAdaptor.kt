@@ -1,12 +1,11 @@
 package live.hms.roomkit.ui.polls.previous
 
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import live.hms.roomkit.R
 import live.hms.roomkit.databinding.PreviousPollsListBinding
+import live.hms.roomkit.ui.theme.pollsStatusLiveDraftEnded
 import live.hms.video.polls.models.HmsPollState
 
 data class PreviousPollsInfo(
@@ -23,19 +22,9 @@ class PreviewPollsViewBinding(
     fun bind(info: PreviousPollsInfo) {
         with(binding) {
             name.text = info.name
-            status.text = when(info.state) {
-                HmsPollState.STARTED -> "LIVE"
-                HmsPollState.CREATED -> "DRAFT"
-                HmsPollState.STOPPED -> "ENDED"
-            }
             viewButton.isEnabled = info.state == HmsPollState.STARTED
-            val colorRes = when(info.state) {
-                HmsPollState.STARTED -> R.drawable.polls_status_background_live
-                HmsPollState.CREATED -> R.drawable.polls_status_background_draft
-                HmsPollState.STOPPED -> R.drawable.polls_status_background_ended
-            }
             viewButton.setOnClickListener { view(bindingAdapterPosition) }
-            status.setBackgroundResource(colorRes)
+            status.pollsStatusLiveDraftEnded(info.state)
         }
     }
 }

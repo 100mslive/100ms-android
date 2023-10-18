@@ -113,13 +113,14 @@ class MeetingViewModel(
                     hmsPoll: HmsPoll,
                     hmsPollUpdateType: HMSPollUpdateType
                 ) {
-                    if(hmsPollUpdateType == HMSPollUpdateType.started) {
-                        viewModelScope.launch {
+                    when(hmsPollUpdateType) {
+                        HMSPollUpdateType.started -> viewModelScope.launch {
                             _events.emit(Event.PollStarted(hmsPoll))
                         }
-                    }
-                    else if (hmsPollUpdateType == HMSPollUpdateType.resultsupdated) {
-                        viewModelScope.launch {
+                        HMSPollUpdateType.stopped -> viewModelScope.launch {
+                            _events.emit(Event.PollEnded(hmsPoll))
+                        }
+                        HMSPollUpdateType.resultsupdated -> viewModelScope.launch {
                             _events.emit(Event.PollVotesUpdated(hmsPoll))
                         }
                     }
@@ -1689,6 +1690,7 @@ class MeetingViewModel(
         data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
         data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
         data class PollStarted(val hmsPoll: HmsPoll) : Event()
+        data class PollEnded(val hmsPoll : HmsPoll) : Event()
         data class PollVotesUpdated(val hmsPoll: HmsPoll) : Event()
         data class RequestPermission(val permissions : Array<String>) : Event()
     }

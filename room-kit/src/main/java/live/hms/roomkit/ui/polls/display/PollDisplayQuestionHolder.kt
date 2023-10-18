@@ -49,16 +49,21 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     }
 
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
-        if(question.voted) {
-            votebutton.isEnabled = false
-            votebutton.background = null
-            votebutton.setTextColor(
-                getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-                HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-            )
-            )
-            votebutton.text = "Voted"
+        if(question.voted || poll.stoppedAt != null) {
+            if(!question.voted) {
+                votebutton.visibility = View.GONE
+            } else {
+                votebutton.isEnabled = false
+                votebutton.background = null
+                votebutton.setTextColor(
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+                    )
+                )
+                votebutton.text = "Voted"
+            }
+
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
             if(poll.anonymous && !canRoleViewVotes){
                 (options.adapter as AnswerOptionsAdapter).disableOptions()
@@ -77,6 +82,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             // But nothing will update them. They will always be zero.
 
         } else {
+            votebutton.visibility = View.VISIBLE
             options.visibility = View.VISIBLE
             votebutton.isEnabled = adapter.getSelectedOptions().isNotEmpty()
             votingProgressBars.visibility = View.GONE

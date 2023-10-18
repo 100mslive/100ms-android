@@ -34,6 +34,7 @@ import live.hms.roomkit.setGradient
 import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.dp
+import live.hms.video.polls.models.HmsPollState
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -2214,4 +2215,18 @@ internal fun TextView.saveButtonDisabled() {
     )
 
 
+}
+
+fun TextView.pollsStatusLiveDraftEnded(state: HmsPollState) {
+    text = when(state) {
+        HmsPollState.STARTED -> "LIVE"
+        HmsPollState.CREATED -> "DRAFT"
+        HmsPollState.STOPPED -> "ENDED"
+    }
+    val colorRes = when(state) {
+        HmsPollState.STARTED -> R.drawable.polls_status_background_live
+        HmsPollState.CREATED -> R.drawable.polls_status_background_draft
+        HmsPollState.STOPPED -> R.drawable.polls_status_background_ended
+    }
+    setBackgroundResource(colorRes)
 }

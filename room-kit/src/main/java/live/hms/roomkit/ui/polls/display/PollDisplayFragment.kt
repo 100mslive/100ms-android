@@ -19,9 +19,11 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.pollsStatusLiveDraftEnded
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.HmsPollState
 
 /**
  * This is shown via a toast that pops up when we receive an HmsPoll event.
@@ -85,8 +87,16 @@ class PollDisplayFragment : Fragment() {
             lifecycleScope.launch {
                 meetingViewModel.events.onEach {
                     if (it is MeetingViewModel.Event.PollVotesUpdated) {
-                        // Update the polls? How?
                         pollsDisplayAdaptor.updatePollVotes(it.hmsPoll)
+                    }
+                    if( it is MeetingViewModel.Event.PollEnded) {
+                        if(pollsDisplayAdaptor.getPoll.pollId == it.hmsPoll.pollId) {
+                            binding.pollsLive.pollsStatusLiveDraftEnded(HmsPollState.STOPPED)
+                            pollsDisplayAdaptor.notifyDataSetChanged()
+                            // Doesn't show up without the delay
+                            delay(300)
+                            pollsDisplayAdaptor.updatePollVotes(it.hmsPoll)
+                        }
                     }
                 }.collect()
             }

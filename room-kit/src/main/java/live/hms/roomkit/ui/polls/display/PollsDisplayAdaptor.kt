@@ -24,9 +24,10 @@ import live.hms.video.sdk.models.HMSPeer
 
 // Also we need not only the question but whether it was answered and some details like the number of votes.
 data class QuestionContainer(
+    val poll : HmsPoll,
     val question: HMSPollQuestion,
     var textAnswers : String? = null,
-    var voted : Boolean = false
+    var voted : Boolean = false,
 )
 class PollsDisplayAdaptor(
     val localPeer : HMSPeer,
@@ -45,7 +46,7 @@ class PollsDisplayAdaptor(
     val updater : MutableList<PollDisplayQuestionHolder<ViewBinding>> = mutableListOf()
 
     fun displayPoll(hmsPoll: HmsPoll) {
-        val questions = hmsPoll.questions?.map { QuestionContainer(it, voted = it.voted) }
+        val questions = hmsPoll.questions?.map { QuestionContainer(hmsPoll, it, voted = it.voted) }
         if(questions != null) {
             submitList(questions)
         }
@@ -113,7 +114,7 @@ class PollsDisplayAdaptor(
         updater.forEach { action ->
             val questions = hmsPoll.questions
             if(questions != null) {
-                action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll)
+                action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll) ?: (1 / 0)
             }
         }
     }
