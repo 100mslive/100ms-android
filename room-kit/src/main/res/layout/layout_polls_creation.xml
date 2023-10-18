@@ -194,6 +194,7 @@
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/timer"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/fixed_spacing_d3"
