@@ -15,6 +15,7 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.voteButtons
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 
@@ -49,7 +50,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     }
 
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
-        if(question.voted || poll.stoppedAt != null) {
+        if(question.voted || poll.state == HmsPollState.STOPPED) {
             if(!question.voted) {
                 votebutton.visibility = View.GONE
             } else {
