@@ -42,6 +42,10 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         when(question.question.type) {
             HMSPollQuestionType.singleChoice, HMSPollQuestionType.multiChoice -> {
                 votingProgressAdapter = VotingProgressAdapter(question.question.questionID)
+                    .apply {
+                        updateProgressBar(poll.questions ?: emptyList(), poll, canRoleViewVotes)
+                    }
+
                 optionsBinder(question)
             }
             HMSPollQuestionType.shortAnswer,
