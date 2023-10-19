@@ -2121,6 +2121,12 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
         R.drawable.gray_round_drawable
     )
 
+    spinnerArrow.drawable.setTint(
+        getColorOrDefault(  HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().surface_default,)
+    )
+
+
 
     askAQuestionEditText.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceBright,

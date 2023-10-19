@@ -7,6 +7,11 @@
     android:windowSoftInputMode="adjustPan"
     android:layout_height="match_parent">
 
+    <ScrollView
+        android:scrollIndicators="none"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,6 +32,17 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
+        <ImageView
+            android:id="@+id/spinner_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:elevation="@dimen/eight_dp"
+            android:src="@drawable/chevron_down"
+            app:layout_constraintBottom_toBottomOf="@+id/questionTypeSpinner"
+            app:layout_constraintEnd_toEndOf="@+id/questionTypeSpinner"
+            app:layout_constraintTop_toTopOf="@+id/questionTypeSpinner" />
+
         <Spinner
             android:paddingVertical="12dp"
             android:paddingHorizontal="@dimen/spacing_d2"
@@ -34,7 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:theme="@style/HmsPollCardText"
+            android:textSize="12sp"
+            android:fontFamily="@font/inter_regular"
             android:background="@drawable/gray_round_drawable"
             android:entries="@array/question_type_options"
             app:layout_constraintBottom_toTopOf="@+id/askAQuestionEditText"
@@ -158,11 +175,13 @@
             android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/border"
             android:layout_width="wrap_content"
-            android:layout_height="40dp"
+            android:layout_height="32dp"
             android:text="Save"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
 </com.google.android.material.card.MaterialCardView>
