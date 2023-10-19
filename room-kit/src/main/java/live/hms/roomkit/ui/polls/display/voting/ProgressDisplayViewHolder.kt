@@ -32,11 +32,15 @@ class ProgressDisplayViewHolder(
         applyTheme()
         optionText.text = item.optionText
         val numVotes = item.numberOfVotes.toInt()
-        val isAnswerCorrect = if(item.questionType == HMSPollQuestionType.singleChoice) {
-            item.pollQuestionAnswer?.option == item.index + 1
-        } else if(item.questionType == HMSPollQuestionType.multiChoice) {
-            item.pollQuestionAnswer?.options?.contains(item.index + 1) == true
-        } else false
+        val isAnswerCorrect = when (item.questionType) {
+            HMSPollQuestionType.singleChoice -> {
+                item.pollQuestionAnswer?.option == item.index + 1
+            }
+            HMSPollQuestionType.multiChoice -> {
+                item.pollQuestionAnswer?.options?.contains(item.index + 1) == true
+            }
+            else -> false
+        }
         if(isAnswerCorrect)
             optionText.drawableStart = ResourcesCompat.getDrawable(root.resources, R.drawable.circle_tick, null)
         peopleAnswering.text = binding.root.resources.getQuantityString(R.plurals.poll_quiz_results, numVotes, numVotes)
