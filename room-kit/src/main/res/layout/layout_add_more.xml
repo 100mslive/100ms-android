@@ -4,10 +4,14 @@
     android:layout_height="match_parent">
     <TextView
         android:id="@+id/addMoreOptions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/inter_regular"
-        android:textSize="14sp"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:drawablePadding="8dp"
+        android:drawableStart="@drawable/add_ic"
+        android:padding="@dimen/eight_dp"
         android:text="Add an option"
-        />
+        android:gravity="center_vertical"
+        android:textSize="14sp"
+        android:fontFamily="@font/inter_regular"
+        android:lineHeight="20sp"/>
 </LinearLayout>
