@@ -92,10 +92,14 @@ class ProgressDisplayViewHolder(
             val numVotes = item.numberOfVotes.toInt()
             totalVotes.text =
                 binding.root.resources.getQuantityString(R.plurals.poll_votes, numVotes, numVotes)
-            if (item.hideVoteCount)
+            if (item.hideVoteCount) {
+                questionProgressBar.visibility = View.GONE
                 totalVotes.visibility = View.GONE
-            else
+            }
+            else {
+                questionProgressBar.visibility = View.VISIBLE
                 totalVotes.visibility = View.VISIBLE
+            }
         }
     }
 
