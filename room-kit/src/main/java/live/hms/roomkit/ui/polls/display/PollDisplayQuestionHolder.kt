@@ -15,6 +15,7 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.voteButtons
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
@@ -66,7 +67,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                         HMSPrebuiltTheme.getDefaults().onsurface_low_emp
                     )
                 )
-                votebutton.text = "Voted"
+                votebutton.text = if(poll.category == HmsPollCategory.QUIZ) binding.root.resources.getString(R.string.polls_quiz_answer_button_complete) else binding.root.resources.getString(R.string.polls_answer_button_complete)
             }
 
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
@@ -91,7 +92,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             options.visibility = View.VISIBLE
             votebutton.isEnabled = adapter.getSelectedOptions().isNotEmpty()
             votingProgressBars.visibility = View.GONE
-            votebutton.text = "Vote"
+            votebutton.text = if(poll.category == HmsPollCategory.QUIZ) binding.root.resources.getString(R.string.polls_quiz_answer_button) else binding.root.resources.getString(R.string.polls_answer_button)
             votebutton.voteButtons()
         }
 //        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
@@ -124,7 +125,6 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 } else {
                     saveInfoText("What?", bindingAdapterPosition)
                 }
-                Log.d("Poll", "Changed voted to $voted")
                 question.voted = voted
                 manageVisibility(question, this)
             }
