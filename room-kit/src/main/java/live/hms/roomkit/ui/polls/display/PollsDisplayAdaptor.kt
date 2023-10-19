@@ -114,7 +114,7 @@ class PollsDisplayAdaptor(
         updater.forEach { action ->
             val questions = hmsPoll.questions
             if(questions != null) {
-                action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll) ?: (1 / 0)
+                action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll, canViewResponses(getPoll, localPeer))
             }
         }
     }

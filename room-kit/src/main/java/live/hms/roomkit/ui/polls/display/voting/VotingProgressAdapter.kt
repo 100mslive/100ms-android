@@ -22,7 +22,8 @@ data class ProgressBarInfo(
     val totalVoteCount: Int,
     val pollQuestionAnswer: HMSPollQuestionAnswer?,
     val questionType: HMSPollQuestionType?,
-    val pollState : HmsPollState
+    val pollState : HmsPollState,
+    val hideVoteCount : Boolean
 )
 class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarInfo, ProgressDisplayViewHolder>(
     DIFFUTIL_CALLBACK
@@ -30,7 +31,7 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
     /**
      * Call this when the votes change, to change the progressbar.
      */
-    fun updateProgressBar(pollStatsQuestions: List<HMSPollQuestion>, hmsPoll: HmsPoll) {
+    fun updateProgressBar(pollStatsQuestions: List<HMSPollQuestion>, hmsPoll: HmsPoll, canViewResponses : Boolean) {
         val pollStatsQuestion = pollStatsQuestions.find { it.questionID == questionIndex }
         if(pollStatsQuestion == null)
             return
@@ -54,7 +55,8 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
                     totalVoteCount = pollStatsQuestion.total,
                     pollQuestionAnswer = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.correctAnswer,
                     questionType = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.type,
-                    pollState = hmsPoll.state
+                    pollState = hmsPoll.state,
+                    hideVoteCount = !canViewResponses
                 )
         }
         submitList(items)

@@ -71,6 +71,10 @@ class ProgressDisplayViewHolder(
                 numVotes
             )
         }
+        if (item.hideVoteCount)
+            peopleAnswering.visibility = View.GONE
+        else
+            peopleAnswering.visibility = View.VISIBLE
     }
 
     private fun pollsBinding(
