@@ -9,7 +9,7 @@ import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 
-class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
+class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
     // Will be called when a single question is added to the adapter
@@ -49,7 +49,7 @@ class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolde
             3,4 -> LayoutPollQuizItemShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it)) })
+        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it)) }, isPoll)
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {

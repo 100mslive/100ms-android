@@ -39,7 +39,8 @@ sealed class QuestionUi(open val index : Long, open val viewType : Int, open val
 }
 
 class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
-                                              val saveInfo : (questionUi: QuestionUi) -> Unit
+                                              val saveInfo : (questionUi: QuestionUi) -> Unit,
+    val isPoll : () -> Boolean
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -163,13 +164,32 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
         optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
     }
 
-    private fun validateSaveButtonEnabledState(optionsAdapter: OptionsListAdapter, saveButton : TextView) {
+    private fun validateSaveButtonEnabledState(
+        optionsAdapter: OptionsListAdapter,
+        saveButton: TextView
+    ) {
         // Validation criteria
         // No empty answers.
         // At least one answer.
-        if (optionsAdapter.currentList.filter { it.text.isBlank() }.isEmpty() &&
-            optionsAdapter.currentList.size > 0) saveButton.saveButtonEnabled() else saveButton.saveButtonDisabled()
+        val isPoll = isPoll()
+//        val isMultiOptionCreation = isMultiOptionQuestionCreation(questionTypeSpinner)
+        val allOptionsFilledInWithNoBlanks =  (optionsAdapter.currentList.none { it.text.isBlank() } &&
+            optionsAdapter.currentList.size > 0)
 
+        val enableButton = if(isPoll) {
+            allOptionsFilledInWithNoBlanks
+        } else {
+            // it's a quiz
+            // we have to check if every single choice and multi choice has
+            //  at least one answer selected
+            allOptionsFilledInWithNoBlanks &&
+                    optionsAdapter.currentList.any { it.isChecked }
+        }
+
+        if(enableButton)
+            saveButton.saveButtonEnabled()
+        else
+            saveButton.saveButtonDisabled()
     }
 
     private fun bind(questionUi: QuestionUi.MultiChoiceQuestion) {

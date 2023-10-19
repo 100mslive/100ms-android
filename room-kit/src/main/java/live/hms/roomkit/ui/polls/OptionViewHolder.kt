@@ -10,7 +10,8 @@ import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
 
 class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
                        getItem: (position : Int) -> Option,
-                       selectOnlyCurrentPosition : (Int) -> Unit ) : ViewHolder(binding.root) {
+                       selectOnlyCurrentPosition : (Int) -> Unit,
+                       refreshSubmitButton : () -> Unit) : ViewHolder(binding.root) {
     init {
         if(bindingAdapterPosition != NO_POSITION) {
             binding.text.setText(getItem(bindingAdapterPosition).text)
@@ -23,9 +24,11 @@ class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
             getItem(bindingAdapterPosition).isChecked = isChecked
             // Radio buttons reset all others when selected
             selectOnlyCurrentPosition(bindingAdapterPosition)
+            refreshSubmitButton()
         }
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             getItem(bindingAdapterPosition).isChecked = isChecked
+            refreshSubmitButton()
         }
     }
     fun bind(option : Option) {

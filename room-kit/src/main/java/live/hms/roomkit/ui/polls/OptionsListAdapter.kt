@@ -35,7 +35,7 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionViewHolder {
         val binding = LayoutPollQuizOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return OptionViewHolder(binding,::getItem, ::selectOnlyCurrentOption)
+        return OptionViewHolder(binding,::getItem, ::selectOnlyCurrentOption, refreshSubmitButton)
     }
 
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
@@ -54,7 +54,7 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                refreshSubmitButton?.invoke()
+                refreshSubmitButton()
             }
 
         })
