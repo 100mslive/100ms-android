@@ -23,7 +23,9 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.shape.CornerFamily
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.R
@@ -1842,11 +1844,18 @@ private fun trackTintList() : ColorStateList {
     )
 }
 
-private fun setSwitchThemes(switchCompat: SwitchCompat) {
+private fun setSwitchThemes(switchCompat: SwitchMaterial) {
     with(switchCompat) {
         thumbTintList = thumbTintList()
         trackTintList = trackTintList()
     }
+
+    switchCompat.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
 }
 private fun thumbTintList()  : ColorStateList {
     val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
@@ -1951,14 +1960,31 @@ fun LayoutPollsCreationBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
     )
-    startPollButton.pollButtons()
+
+    settingStr.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    border.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+
+    startPollButton.buttonEnabled()
     setSwitchThemes(hideVoteCount)
     setSwitchThemes(anonymous)
-    setSwitchThemes(timer)
+    //setSwitchThemes(timer)
     quizButton.isSelectedStroke(false)
     quizIcon.isSelectedStroke(false)
     pollButton.isSelectedStroke(true)
     pollIcon.isSelectedStroke(true)
+
+
 }
 
 fun Button.voteButtons() {
@@ -1996,40 +2022,6 @@ fun Button.voteButtons() {
 
 }
 
-fun Button.pollButtons() {
-
-    val buttonDisabledBackgroundColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.primaryDisabled,
-        HMSPrebuiltTheme.getDefaults().primary_disabled)
-    val buttonDisabledTextColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onPrimaryLow,
-        HMSPrebuiltTheme.getDefaults().onprimary_low_emp)
-
-
-    val buttonEnabledBackgroundColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.primaryDefault,
-        HMSPrebuiltTheme.getDefaults().primary_default)
-
-    val buttonEnabledTextColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-        HMSPrebuiltTheme.getDefaults().onprimary_high_emp)
-
-    val states = arrayOf(intArrayOf(android.R.attr.state_enabled),
-        intArrayOf(-android.R.attr.state_enabled))
-    val backgroundColors = intArrayOf(buttonEnabledBackgroundColor, buttonDisabledBackgroundColor)
-    val textColors = intArrayOf(buttonEnabledTextColor, buttonDisabledTextColor)
-
-    backgroundTintList = ColorStateList(
-        states,
-        backgroundColors
-    )
-
-    setTextColor(ColorStateList(
-        states,
-        textColors
-    ))
-
-}
 
 fun MaterialCardView.isSelectedStroke(isSelected : Boolean) {
     if (isSelected.not())
