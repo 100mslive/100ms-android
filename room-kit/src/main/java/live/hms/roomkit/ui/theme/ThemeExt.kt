@@ -1872,7 +1872,19 @@ private fun thumbTintList()  : ColorStateList {
         )
     )
 }
+
 // Polls
+
+fun LayoutPollQuestionCreationBinding.applyTheme() {
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+}
 fun LayoutPollsCreationBinding.applyTheme() {
     backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 
