@@ -72,6 +72,8 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     id: Long
                 ) {
                     // Reset options whenever a question type is selected
+                    optionsAdapter.submitList(emptyList())
+                    // Add two empty options
                     addNewOption(optionsAdapter, isMultiOptionQuestionCreation(questionTypeSpinner))
                     addNewOption(optionsAdapter, isMultiOptionQuestionCreation(questionTypeSpinner))
                     // If short/long answer hide the options else show them
