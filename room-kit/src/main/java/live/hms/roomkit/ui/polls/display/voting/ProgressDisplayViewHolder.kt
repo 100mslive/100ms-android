@@ -13,6 +13,7 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.polls.models.HmsPollCategory
+import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.question.HMSPollQuestionType
 
 class ProgressDisplayViewHolder(
@@ -56,11 +57,20 @@ class ProgressDisplayViewHolder(
                     )
                 }
 
-        peopleAnswering.text = binding.root.resources.getQuantityString(
-            R.plurals.poll_quiz_results,
-            numVotes,
-            numVotes
-        )
+        peopleAnswering.text = if(item.pollState == HmsPollState.STOPPED) {
+            binding.root.resources.getQuantityString(
+                R.plurals.poll_quiz_results_for_ended_polls,
+                numVotes,
+                numVotes,
+                item.percentage)
+        }
+            else {
+                binding.root.resources.getQuantityString(
+                R.plurals.poll_quiz_results,
+                numVotes,
+                numVotes
+            )
+        }
     }
 
     private fun pollsBinding(

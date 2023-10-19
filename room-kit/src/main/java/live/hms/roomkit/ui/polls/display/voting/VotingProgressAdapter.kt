@@ -8,6 +8,7 @@ import live.hms.roomkit.databinding.LayoutPollsDisplayResultProgressBarsItemBind
 import live.hms.roomkit.databinding.LayoutPollsDisplayResultQuizAnswerItemsBinding
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
+import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.HMSPollQuestionAnswer
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
@@ -20,7 +21,8 @@ data class ProgressBarInfo(
     val numberOfVotes: Long,
     val totalVoteCount: Int,
     val pollQuestionAnswer: HMSPollQuestionAnswer?,
-    val questionType: HMSPollQuestionType?
+    val questionType: HMSPollQuestionType?,
+    val pollState : HmsPollState
 )
 class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarInfo, ProgressDisplayViewHolder>(
     DIFFUTIL_CALLBACK
@@ -51,7 +53,8 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
                     index = index,
                     totalVoteCount = pollStatsQuestion.total,
                     pollQuestionAnswer = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.correctAnswer,
-                    questionType = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.type
+                    questionType = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.type,
+                    pollState = hmsPoll.state
                 )
         }
         submitList(items)

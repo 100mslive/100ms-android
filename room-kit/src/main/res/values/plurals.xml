@@ -21,4 +21,16 @@
             %1$d peers
         </item>
     </plurals>
+    <plurals
+        name="poll_quiz_results_for_ended_polls">
+        <item
+            quantity="zero"
+            >None (0%%)</item>
+        <item
+            quantity="one"
+            >%1$d peer (%2$d%%)</item>
+        <item quantity="other">
+            %1$d peers (%2$d%%)
+        </item>
+    </plurals>
 </resources>
