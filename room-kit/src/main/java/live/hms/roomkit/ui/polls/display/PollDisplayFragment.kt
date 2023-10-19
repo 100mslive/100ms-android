@@ -79,6 +79,7 @@ class PollDisplayFragment : Fragment() {
                 questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
+                pollsLive.pollsStatusLiveDraftEnded(poll.state)
                 heading.text = getString(R.string.poll_title_heading, poll.title, startedType)
                 // The views have to be rendered before the update Poll Votes can be called.
                 //  the delay allows for this.
