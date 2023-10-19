@@ -2109,6 +2109,8 @@ fun LayoutPollsDisplayOptionsItemBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+    radioButton.buttonTintList = trackTintList()
+    checkbox.buttonTintList = trackTintList()
 }
 
 
