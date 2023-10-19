@@ -23,6 +23,7 @@ import live.hms.roomkit.ui.theme.pollsStatusLiveDraftEnded
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 
 /**
@@ -73,11 +74,12 @@ class PollDisplayFragment : Fragment() {
 
                     findNavController().popBackStack()
                 }
-                pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name)
+                val startedType = if(poll.category == HmsPollCategory.QUIZ) "Quiz" else "Poll"
+                pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name, startedType)
                 questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
-                heading.text = getString(R.string.poll_title_heading, poll.title)
+                heading.text = getString(R.string.poll_title_heading, poll.title, startedType)
                 // The views have to be rendered before the update Poll Votes can be called.
                 //  the delay allows for this.
                 delay(300)

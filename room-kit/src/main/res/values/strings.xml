@@ -240,8 +240,8 @@
     <string name="menu_item_mute_audio">Mute Audio</string>
     <string name="menu_item_mute_video">Mute Video</string>
     <string name="bring_on_stage">Bring on Stage</string>
-    <string name="poll_started_by">%1$s started a poll</string>
+    <string name="poll_started_by">%1$s started a %2$s</string>
     <string name="polls_question_numbering_text">"QUESTION %1$d OF %2$d : %3$s"</string>
     <string name="polls_vote_button">Vote</string>
-    <string name="poll_title_heading">%1$s Poll</string>
+    <string name="poll_title_heading">%1$s %2$s</string>
 </resources>
