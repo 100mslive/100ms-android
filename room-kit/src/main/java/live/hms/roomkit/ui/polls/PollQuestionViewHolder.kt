@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.LayoutAddMoreBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
@@ -36,11 +37,14 @@ sealed class QuestionUi(open val index : Long, open val viewType : Int, open val
                           override val requiredToAnswer: Boolean) : QuestionUi(index, 3, requiredToAnswer)
     data class ShortAnswer(val text : String, override val index: Long,
                            override val requiredToAnswer: Boolean) : QuestionUi(index, 4, requiredToAnswer)
+    object AddAnotherItemView : QuestionUi(-1, 5, false)
+    object LaunchButton
 }
 
 class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                                               val saveInfo : (questionUi: QuestionUi) -> Unit,
-    val isPoll : () -> Boolean
+    val isPoll : () -> Boolean,
+                                              val reAddQuestionCreator: () -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -51,15 +55,22 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
             is QuestionUi.MultiChoiceQuestion -> bind(questionUi)
             is QuestionUi.ShortAnswer -> bind(questionUi)
             is QuestionUi.SingleChoiceQuestion -> bind(questionUi)
+            is QuestionUi.AddAnotherItemView -> bind(questionUi)
         }
     }
 
-
+    private fun bind(addMoreBinding: QuestionUi.AddAnotherItemView) {
+        with(binding as LayoutAddMoreBinding) {
+            applyTheme()
+        }
+        binding.addMoreOptions.setOnSingleClickListener {
+            reAddQuestionCreator()
+        }
+    }
     private fun bind(questionUi: QuestionUi.QuestionCreator) {
         with(binding as LayoutPollQuestionCreationItemBinding) {
             binding.applyTheme()
             val requiredToAnswer = !notRequiredToAnswer.isChecked
-
             val optionsAdapter = OptionsListAdapter().also {
                 it.refreshSubmitButton = { validateSaveButtonEnabledState(it, binding.saveButton) }
             }
@@ -72,11 +83,14 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     position: Int,
                     id: Long
                 ) {
+
                     // Reset options whenever a question type is selected
-                    optionsAdapter.submitList(emptyList())
                     // Add two empty options
-                    addNewOption(optionsAdapter, isMultiOptionQuestionCreation(questionTypeSpinner))
-                    addNewOption(optionsAdapter, isMultiOptionQuestionCreation(questionTypeSpinner))
+                    optionsAdapter.submitList(listOf(
+                        Option("", isMultiOptionQuestionCreation(questionTypeSpinner)),
+                        Option("", isMultiOptionQuestionCreation(questionTypeSpinner))
+                    ))
+
                     // If short/long answer hide the options else show them
                     val multiOptionVisibility = if(position > 1) View.GONE else View.VISIBLE
                     addAnOptionTextView.visibility = multiOptionVisibility
@@ -89,6 +103,7 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     } else {
                         ""
                     }
+
                     // Only the UI might need to be toggled
                     Log.d(TAG,"Toggle UI")
                 }
@@ -148,9 +163,7 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     else -> null
                 }
                 // Reset the UI
-
-//                optionsAdapter.submitList(emptyList())
-//                askAQuestionEditText.setText("")
+                askAQuestionEditText.setText("")
                 // Save the info
                 saveInfo(newQuestionUi!!)
             }

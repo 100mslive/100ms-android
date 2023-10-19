@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
@@ -31,6 +32,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
+import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
@@ -2319,4 +2321,20 @@ fun LinearProgressIndicator.applyProgressbarTheme() {
         HMSPrebuiltTheme.getDefaults().surface_bright
     ))
 
+}
+
+fun LayoutAddMoreBinding.applyTheme() {
+    addMoreOptions.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    addMoreOptions.drawableStart = AppCompatResources.getDrawable(
+        root.context, R.drawable.add_circle_with_plus
+    )?.apply { setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+    }
 }
