@@ -21,9 +21,9 @@ class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
         }
         // Both set the same property, only one will be used.
         binding.radioButton.setOnCheckedChangeListener { _, isChecked ->
-            getItem(bindingAdapterPosition).isChecked = isChecked
             // Radio buttons reset all others when selected
-            selectOnlyCurrentPosition(bindingAdapterPosition)
+            if(isChecked)
+                selectOnlyCurrentPosition(bindingAdapterPosition)
             refreshSubmitButton()
         }
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->

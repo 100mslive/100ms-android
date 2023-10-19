@@ -148,8 +148,9 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     else -> null
                 }
                 // Reset the UI
-                optionsAdapter.submitList(emptyList())
-                askAQuestionEditText.setText("")
+
+//                optionsAdapter.submitList(emptyList())
+//                askAQuestionEditText.setText("")
                 // Save the info
                 saveInfo(newQuestionUi!!)
             }

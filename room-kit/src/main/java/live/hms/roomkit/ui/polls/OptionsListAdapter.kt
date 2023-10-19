@@ -2,7 +2,6 @@ package live.hms.roomkit.ui.polls
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
@@ -70,8 +69,9 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     private fun selectOnlyCurrentOption(position: Int) {
         for ( i in 0 until currentList.size) {
-            Log.d("OptionsListAdapter", "Considering ${getItem(i)}, going to be ${i == position}")
             getItem(i).isChecked = i == position
+            if(i != position)
+                notifyItemChanged(i)
         }
     }
 }

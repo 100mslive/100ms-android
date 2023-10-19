@@ -49,7 +49,7 @@ class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<Questi
             3,4 -> LayoutPollQuizItemShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it)) }, isPoll)
+        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it).minus(QuestionUi.QuestionCreator)) }, isPoll)
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {
