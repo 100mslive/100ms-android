@@ -24,6 +24,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
@@ -2302,4 +2303,18 @@ fun LayoutPollsDisplayResultProgressBarsItemBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
         HMSPrebuiltTheme.getDefaults().onsurface_med_emp
     ))
+    questionProgressBar.applyProgressbarTheme()
+}
+
+fun LinearProgressIndicator.applyProgressbarTheme() {
+    trackColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default
+    )
+
+    setIndicatorColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_bright
+    ))
+
 }

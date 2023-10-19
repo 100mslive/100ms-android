@@ -72,11 +72,11 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 options.visibility = View.GONE
                 votingProgressBars.visibility = View.VISIBLE
                 votingProgressBars.adapter = votingProgressAdapter
-                val divider =
-                    DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
-                        setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
-                    }
-                votingProgressBars.addItemDecoration(divider)
+//                val divider =
+//                    DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
+//                        setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
+//                    }
+//                votingProgressBars.addItemDecoration(divider)
 
                 votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
             }
