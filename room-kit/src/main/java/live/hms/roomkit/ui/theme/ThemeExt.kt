@@ -2165,6 +2165,7 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
     )
     )
 
+    setSwitchThemes(notRequiredToAnswer)
 
     deleteOptionTrashButton.drawable.setTint(
         getColorOrDefault(
@@ -2174,6 +2175,14 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
     )
 
     saveButton.saveButtonEnabled()
+
+
+    border.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
 
 }
 

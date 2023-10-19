@@ -104,7 +104,6 @@
             android:id="@+id/addAnOptionTextView"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_marginBottom="8dp"
             android:drawablePadding="8dp"
             android:drawableStart="@drawable/add_ic"
             android:padding="@dimen/eight_dp"
@@ -118,18 +117,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/optionsListRadioGroupVG" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/notRequiredToAnswer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
             android:text="Not required to answer"
-            app:layout_constraintBottom_toTopOf="@+id/saveButton"
+            app:layout_constraintBottom_toTopOf="@+id/border"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/addAnOptionTextView"
             tools:visibility="visible" />
+
+        <View
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            app:layout_constraintBottom_toTopOf="@id/saveButton"
+            app:layout_constraintTop_toBottomOf="@id/notRequiredToAnswer"
+            android:layout_marginVertical="@dimen/spacing_d1"
+            android:background="@drawable/gray_line_vertical_divider" />
+
 
         <ImageView
             android:id="@+id/deleteOptionTrashButton"
@@ -149,9 +156,9 @@
             android:textColor="#EFF0FA"
             android:textSize="14sp"
             android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/border"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_marginBottom="8dp"
             android:text="Save"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
