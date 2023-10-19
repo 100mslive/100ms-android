@@ -8,6 +8,7 @@
         android:id="@+id/optionText"
         android:layout_width="wrap_content"
         android:textSize="14sp"
+        android:drawablePadding="@dimen/spacing_d1"
         android:fontFamily="@font/inter_regular"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/spacing_d2"
