@@ -2216,6 +2216,33 @@ internal fun TextView.saveButtonDisabled() {
 
 }
 
+fun LayoutPollQuizOptionsItemBinding.setTheme() {
+
+    text.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
+    )
+
+    text.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    text.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    radioButton.buttonTintList = trackTintList()
+    checkbox.buttonTintList = trackTintList()
+
+}
+
 fun TextView.pollsStatusLiveDraftEnded(state: HmsPollState) {
     text = when(state) {
         HmsPollState.STARTED -> "LIVE"

@@ -49,7 +49,7 @@
             android:id="@+id/askAQuestionEditText"
             android:singleLine="true"
             android:maxLines="1"
-
+            android:hint="e.g. Who will win the match?"
             android:textSize="12sp"
             android:fontFamily="@font/inter_regular"
             android:layout_width="match_parent"
@@ -150,7 +150,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_marginBottom="8dp"
             android:text="Save"
             app:layout_constraintBottom_toBottomOf="parent"
