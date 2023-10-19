@@ -1883,6 +1883,13 @@ fun LayoutPollsCreationBinding.applyTheme() {
         )
     )
 
+    previousPollsHeading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
     subtitle.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
