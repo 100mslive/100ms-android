@@ -2230,3 +2230,23 @@ fun TextView.pollsStatusLiveDraftEnded(state: HmsPollState) {
     }
     setBackgroundResource(colorRes)
 }
+fun LayoutPollsDisplayResultQuizAnswerItemsBinding.applyTheme() {
+    optionText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+    peopleAnswering.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+}
+fun LayoutPollsDisplayResultProgressBarsItemBinding.applyTheme() {
+    answer.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+    totalVotes.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+}

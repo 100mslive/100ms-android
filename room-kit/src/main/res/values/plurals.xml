@@ -9,4 +9,16 @@
             %1$d votes
         </item>
 </plurals>
+    <plurals
+        name="poll_quiz_results">
+        <item
+            quantity="zero"
+            >None</item>
+        <item
+            quantity="one"
+            >%1$d peer</item>
+        <item quantity="other">
+            %1$d peers
+        </item>
+    </plurals>
 </resources>
