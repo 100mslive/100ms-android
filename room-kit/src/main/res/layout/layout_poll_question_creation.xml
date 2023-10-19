@@ -7,20 +7,24 @@
     xmlns:tools="http://schemas.android.com/tools">
 
 
-    <androidx.appcompat.widget.AppCompatImageButton
+    <ImageView
+        android:layout_marginTop="@dimen/spacing_d3"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="@dimen/spacing_d3"
+        android:src="@drawable/left_arrow"
         android:id="@+id/backButton"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/back_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/heading"
-        style="@style/HmsHeadings"
+        android:textSize="20sp"
+        android:layout_marginStart="12dp"
+        android:lineHeight="24sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:fontFamily="@font/inter_bold"
         android:text="Poll/Quiz"
         app:layout_constraintBottom_toBottomOf="@id/backButton"
         app:layout_constraintLeft_toRightOf="@id/backButton"

@@ -23,7 +23,9 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.shape.CornerFamily
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.R
@@ -1842,11 +1844,18 @@ private fun trackTintList() : ColorStateList {
     )
 }
 
-private fun setSwitchThemes(switchCompat: SwitchCompat) {
+private fun setSwitchThemes(switchCompat: SwitchMaterial) {
     with(switchCompat) {
         thumbTintList = thumbTintList()
         trackTintList = trackTintList()
     }
+
+    switchCompat.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
 }
 private fun thumbTintList()  : ColorStateList {
     val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
@@ -1863,11 +1872,30 @@ private fun thumbTintList()  : ColorStateList {
         )
     )
 }
+
 // Polls
+
+fun LayoutPollQuestionCreationBinding.applyTheme() {
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+}
 fun LayoutPollsCreationBinding.applyTheme() {
     backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 
     heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    previousPollsHeading.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
@@ -1951,14 +1979,31 @@ fun LayoutPollsCreationBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
     )
-    startPollButton.pollButtons()
+
+    settingStr.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    border.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+
+    startPollButton.buttonEnabled()
     setSwitchThemes(hideVoteCount)
     setSwitchThemes(anonymous)
-    setSwitchThemes(timer)
+    //setSwitchThemes(timer)
     quizButton.isSelectedStroke(false)
     quizIcon.isSelectedStroke(false)
     pollButton.isSelectedStroke(true)
     pollIcon.isSelectedStroke(true)
+
+
 }
 
 fun Button.voteButtons() {
@@ -1996,40 +2041,6 @@ fun Button.voteButtons() {
 
 }
 
-fun Button.pollButtons() {
-
-    val buttonDisabledBackgroundColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.primaryDisabled,
-        HMSPrebuiltTheme.getDefaults().primary_disabled)
-    val buttonDisabledTextColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onPrimaryLow,
-        HMSPrebuiltTheme.getDefaults().onprimary_low_emp)
-
-
-    val buttonEnabledBackgroundColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.primaryDefault,
-        HMSPrebuiltTheme.getDefaults().primary_default)
-
-    val buttonEnabledTextColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
-        HMSPrebuiltTheme.getDefaults().onprimary_high_emp)
-
-    val states = arrayOf(intArrayOf(android.R.attr.state_enabled),
-        intArrayOf(-android.R.attr.state_enabled))
-    val backgroundColors = intArrayOf(buttonEnabledBackgroundColor, buttonDisabledBackgroundColor)
-    val textColors = intArrayOf(buttonEnabledTextColor, buttonDisabledTextColor)
-
-    backgroundTintList = ColorStateList(
-        states,
-        backgroundColors
-    )
-
-    setTextColor(ColorStateList(
-        states,
-        textColors
-    ))
-
-}
 
 fun MaterialCardView.isSelectedStroke(isSelected : Boolean) {
     if (isSelected.not())
@@ -2122,6 +2133,12 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
         R.drawable.gray_round_drawable
     )
 
+    spinnerArrow.drawable.setTint(
+        getColorOrDefault(  HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().surface_default,)
+    )
+
+
 
     askAQuestionEditText.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.surfaceBright,
@@ -2166,6 +2183,7 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
     )
     )
 
+    setSwitchThemes(notRequiredToAnswer)
 
     deleteOptionTrashButton.drawable.setTint(
         getColorOrDefault(
@@ -2175,6 +2193,14 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
     )
 
     saveButton.saveButtonEnabled()
+
+
+    border.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
 
 }
 
@@ -2214,6 +2240,33 @@ internal fun TextView.saveButtonDisabled() {
         null
     )
 
+
+}
+
+fun LayoutPollQuizOptionsItemBinding.setTheme() {
+
+    text.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
+    )
+
+    text.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    text.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    radioButton.buttonTintList = trackTintList()
+    checkbox.buttonTintList = trackTintList()
 
 }
 

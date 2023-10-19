@@ -15,6 +15,9 @@
         android:layout_height="wrap_content"
         />
     <EditText
+        android:hint="e.g. Who will win the match?"
+        android:textSize="12sp"
+        android:fontFamily="@font/inter_regular"
         android:id="@+id/text"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
+import live.hms.roomkit.ui.theme.setTheme
 import java.util.*
 
 data class Option(var text : String,
@@ -39,8 +40,10 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
         holder.bind(getItem(position))
+        holder.binding.setTheme()
         // Put the cursor in the edittext as it's created.
         holder.binding.text.requestFocus()
+        holder.binding.text.hint = "Option ${position+1}"
         holder.binding.text.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 

@@ -413,6 +413,7 @@
                 android:textColor="#EFF0FA"
                 android:textSize="14sp"
                 android:textStyle="bold"
+                android:fontFamily="@font/inter_bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
