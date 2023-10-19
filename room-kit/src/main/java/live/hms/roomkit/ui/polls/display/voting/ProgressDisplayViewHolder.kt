@@ -10,7 +10,9 @@ import live.hms.roomkit.databinding.LayoutPollsDisplayResultProgressBarsItemBind
 import live.hms.roomkit.databinding.LayoutPollsDisplayResultQuizAnswerItemsBinding
 import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.PollStatsQuestions
@@ -42,7 +44,14 @@ class ProgressDisplayViewHolder(
             else -> false
         }
         if(isAnswerCorrect)
-            optionText.drawableStart = ResourcesCompat.getDrawable(root.resources, R.drawable.circle_tick, null)
+            optionText.drawableStart = ResourcesCompat.getDrawable(root.resources, R.drawable.circle_tick, null)?.apply { setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
+            }
+
         peopleAnswering.text = binding.root.resources.getQuantityString(R.plurals.poll_quiz_results, numVotes, numVotes)
     }
     private fun pollsBinding(binding: LayoutPollsDisplayResultProgressBarsItemBinding, item : ProgressBarInfo) {
