@@ -1029,9 +1029,8 @@ class MeetingViewModel(
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
                 viewModelScope.launch {
-                    result.sortedByDescending { it.startedAt }.firstOrNull()?.also { firstPoll ->
-                        if(isPrebuiltDebug)
-                            _events.emit(Event.PollStarted(firstPoll))
+                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
+                        _events.emit(Event.PollStarted(firstPoll))
                     }
                 }
             }
