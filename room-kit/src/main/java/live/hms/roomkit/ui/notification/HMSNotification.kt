@@ -22,4 +22,5 @@ sealed class HMSNotificationType {
     object Default : HMSNotificationType()
     object RecordingFailedToStart : HMSNotificationType()
     data class BringOnStage(val handRaisePeer: HMSPeer,val  onStageRole: String) : HMSNotificationType()
+    data class OpenPollOrQuiz(val pollId: String) : HMSNotificationType()
 }

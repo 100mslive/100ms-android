@@ -1012,6 +1012,19 @@ class MeetingViewModel(
 
     }
 
+     fun triggerPollsNotification(poll: HmsPoll) {
+        hmsNotificationEvent.postValue(
+            HMSNotification(
+                title = "${poll.createdBy?.name.orEmpty()} started a new ${if (poll.category == HmsPollCategory.POLL) "poll" else "quiz"}",
+                isDismissible = true,
+                icon = R.drawable.poll_vote,
+                actionButtonText = if (poll.category == HmsPollCategory.POLL) "Vote" else "Join",
+                type = HMSNotificationType.OpenPollOrQuiz(pollId = poll.pollId)
+            )
+        )
+
+    }
+
     private fun updatePolls() {
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
@@ -2101,6 +2114,11 @@ class MeetingViewModel(
 
     fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
         changeRole(handRaisePeer.peerID, onStageRole, false)
+    }
+
+    val openPollOrQuizzTrgger by lazy { SingleLiveEvent<String>() }
+    fun openPollsOrQuizTrigger(pollID: String) {
+        openPollOrQuizzTrgger.value = pollID
     }
 
     fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {

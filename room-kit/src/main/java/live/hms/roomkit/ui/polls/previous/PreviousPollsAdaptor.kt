@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.databinding.PreviousPollsListBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.pollsStatusLiveDraftEnded
 import live.hms.video.polls.models.HmsPollState
 
@@ -21,7 +22,7 @@ class PreviewPollsViewBinding(
 
     fun bind(info: PreviousPollsInfo) {
         with(binding) {
-            name.text = info.name
+            name.text = if (info.name.length > 1) {info.name.replaceFirstChar { if (it.isLetter()) it.uppercaseChar()  else it }} else info.name
             viewButton.isEnabled = (info.state == HmsPollState.STARTED || info.state == HmsPollState.STOPPED)
             viewButton.setOnClickListener { view(bindingAdapterPosition) }
             status.pollsStatusLiveDraftEnded(info.state)
@@ -54,6 +55,7 @@ class PreviousPollsAdaptor(private val view: (PreviousPollsInfo) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: PreviewPollsViewBinding, position: Int) {
+        holder.binding.applyTheme()
         holder.bind(getItem(position))
     }
 }
