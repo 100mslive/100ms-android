@@ -2074,17 +2074,16 @@ class MeetingViewModel(
             }
 
         })
-        val getCreatedPolls = CompletableDeferred<List<HmsPoll>>()
-        localHmsInteractivityCenter.fetchPollList(HmsPollState.CREATED, object : HmsTypedActionResultListener<List<HmsPoll>>{
-            override fun onSuccess(result: List<HmsPoll>) {
-                getCreatedPolls.complete(result)
-            }
-
-            override fun onError(error: HMSException) {
-                getCreatedPolls.completeExceptionally(error)
-            }
-
-        })
+//        val getCreatedPolls = CompletableDeferred<List<HmsPoll>>()
+//        localHmsInteractivityCenter.fetchPollList(HmsPollState.CREATED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+//            override fun onSuccess(result: List<HmsPoll>) {
+//                getCreatedPolls.complete(result)
+//            }
+//
+//            override fun onError(error: HMSException) {
+//                getCreatedPolls.completeExceptionally(error)
+//            }
+//        })
         val getEndedPolls = CompletableDeferred<List<HmsPoll>>()
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STOPPED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
