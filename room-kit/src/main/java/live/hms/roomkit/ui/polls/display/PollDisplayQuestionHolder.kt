@@ -138,10 +138,16 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             options.layoutManager = LinearLayoutManager(binding.root.context)
             // selected options could be read from the UI directly.
             options.adapter = adapter
-            adapter.submitList(question.question.options?.mapIndexed { index, it ->
-                Option(it.text ?: "",
+            adapter.submitList(question.question.options?.map { option ->
+                Option(option.text ?: "",
                     question.question.type == HMSPollQuestionType.multiChoice,
-                    isChecked = question.question.myResponses.find { it.questionId - 1 == index } != null,
+                    isChecked = question.question.myResponses.find {
+                        if(question.question.type == HMSPollQuestionType.multiChoice) {
+                            it.selectedOptions?.contains(option.index) == true
+                        } else {
+                            it.selectedOption == option.index
+                        }
+                    } != null,
                     hiddenAndAnswered = question.voted
                 )
             })
