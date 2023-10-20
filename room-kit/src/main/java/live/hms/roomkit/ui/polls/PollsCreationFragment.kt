@@ -29,7 +29,9 @@ class PollsCreationFragment : Fragment(){
     private var binding by viewLifecycle<LayoutPollsCreationBinding>()
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel : MeetingViewModel by activityViewModels()
-
+    val previousPollsAdaptor by lazy {PreviousPollsAdaptor{previousPollsInfo ->
+        findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollDisplayFragment(previousPollsInfo.pollId))
+    }}
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,6 +44,11 @@ class PollsCreationFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
+        meetingViewModel.openPollNewTrigger.observe(viewLifecycleOwner) { it ->
+            if(!it.isNullOrEmpty())
+                binding.backButton.callOnClick()
+        }
+
         binding.creationFlowUi.visibility = if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
         with(binding) {
             applyTheme()
@@ -59,9 +66,7 @@ class PollsCreationFragment : Fragment(){
             anonymous.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.isAnon(isChecked) }
             timer.setOnCheckedChangeListener{_,isChecked -> pollsViewModel.setTimer(isChecked)}
             startPollButton.setOnSingleClickListener { startPoll() }
-            val previousPollsAdaptor = PreviousPollsAdaptor{previousPollsInfo ->
-                findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollDisplayFragment(previousPollsInfo.pollId))
-            }
+
             previousPolls.adapter = previousPollsAdaptor
             previousPolls.layoutManager = LinearLayoutManager(context)
 
@@ -83,7 +88,7 @@ class PollsCreationFragment : Fragment(){
 
     private fun refreshPreviousPollsList() {
         val polls = meetingViewModel.hmsInteractivityCenterPolls().map { PreviousPollsInfo(it.title, it.state, it.pollId) }
-        (binding.previousPolls.adapter as PreviousPollsAdaptor?)?.submitList(polls)
+        previousPollsAdaptor.submitList(polls)
     }
 
     private fun startPoll() {

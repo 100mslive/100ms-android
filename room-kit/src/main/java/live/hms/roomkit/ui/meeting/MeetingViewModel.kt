@@ -106,6 +106,8 @@ class MeetingViewModel(
         .setLogSettings(hmsLogSettings)
         .build()
 
+    private val showedPolls by lazy { HashSet<String>() }
+
     val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
         .apply {
             this.pollUpdateListener = object : HmsPollUpdateListener {
@@ -116,6 +118,10 @@ class MeetingViewModel(
                     when(hmsPollUpdateType) {
                         HMSPollUpdateType.started -> viewModelScope.launch {
                             _events.emit(Event.PollStarted(hmsPoll))
+                            if (!showedPolls.contains(hmsPoll.pollId)) {
+                                showedPolls.add(hmsPoll.pollId)
+                                triggerPollsNotification(hmsPoll)
+                            }
                         }
                         HMSPollUpdateType.stopped -> viewModelScope.launch {
                             _events.emit(Event.PollEnded(hmsPoll))
@@ -2123,6 +2129,7 @@ class MeetingViewModel(
         changeRole(handRaisePeer.peerID, onStageRole, false)
     }
 
+    val openPollNewTrigger = MutableLiveData<String>()
     val openPollOrQuizzTrgger by lazy { MutableLiveData<String>() }
     fun openPollsOrQuizTrigger(pollID: String) {
         openPollOrQuizzTrgger.value = pollID

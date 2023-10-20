@@ -50,6 +50,10 @@ class PollDisplayFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initOnBackPress()
+        meetingViewModel.openPollNewTrigger.observe(viewLifecycleOwner) { it ->
+            if(!it.isNullOrEmpty())
+                findNavController().popBackStack()
+        }
         lifecycleScope.launch {
             val returnedPoll = meetingViewModel.getPollForPollId(args.pollId)
             if(returnedPoll == null) {

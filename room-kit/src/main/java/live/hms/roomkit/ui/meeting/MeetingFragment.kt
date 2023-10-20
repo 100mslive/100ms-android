@@ -129,10 +129,6 @@ class MeetingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val poll = meetingViewModel.hasPoll()
-        if(poll != null) {
-            showPollStart(poll)
-        }
         isCountdownManuallyCancelled = false
         setupRecordingTimeView()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
@@ -319,6 +315,17 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
+        meetingViewModel.openPollNewTrigger.observe(viewLifecycleOwner) { it ->
+            if(!it.isNullOrEmpty() ) {
+                meetingViewModel.openPollNewTrigger.setValue("")
+                meetingViewModel.openPollOrQuizzTrgger.setValue("")
+                findNavController().navigate(
+                    MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(
+                        it
+                    )
+                )
+            }
+        }
         meetingViewModel.isRecording.observe(
             viewLifecycleOwner,
             Observer {
@@ -525,9 +532,6 @@ class MeetingFragment : Fragment() {
                     is MeetingViewModel.Event.HlsEvent, is MeetingViewModel.Event.HlsRecordingEvent -> {
                         Log.d("RecordingState", "HlsEvent: ${event}")
                     }
-                    is MeetingViewModel.Event.PollStarted -> {
-                        showPollStart(event.hmsPoll)
-                    }
 
                     else -> null
                 }
@@ -671,26 +675,15 @@ class MeetingFragment : Fragment() {
             updateChatButtonWhenRoleChanges()
         }
 
-        meetingViewModel.openPollOrQuizzTrgger.observe(viewLifecycleOwner) { pollID ->
-            if (pollID.isEmpty().not()) {
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(
-                        pollID
-                    )
-                )
-                meetingViewModel.openPollOrQuizzTrgger.value = ""
-            }
-        }
     }
 
-    private val showedPolls by lazy { HashSet<String>() }
-    private fun showPollStart(poll: HmsPoll) {
-        val pollId = poll.pollId
-        if (!showedPolls.contains(pollId)) {
-            showedPolls.add(pollId)
-            meetingViewModel.triggerPollsNotification(poll)
-        }
-    }
+//    private fun showPollStart(poll: HmsPoll) {
+//        val pollId = poll.pollId
+//        if (!showedPolls.contains(pollId)) {
+//            showedPolls.add(pollId)
+//            meetingViewModel.triggerPollsNotification(poll)
+//        }
+//    }
 
     private val pipReceiver by lazy {
         PipBroadcastReceiver(

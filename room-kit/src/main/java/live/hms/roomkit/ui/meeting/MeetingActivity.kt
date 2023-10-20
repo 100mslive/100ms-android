@@ -138,6 +138,12 @@ class MeetingActivity : AppCompatActivity() {
             tryRemovingNotification(it)
         }
 
+        meetingViewModel.openPollOrQuizzTrgger.observe(this) { pollID ->
+            if (pollID.isEmpty().not()) {
+                meetingViewModel.openPollNewTrigger.postValue(pollID)
+                meetingViewModel.openPollOrQuizzTrgger.value = ""
+            }
+        }
     }
 
     private fun triggerNotification(hmsNotification: HMSNotification) {
