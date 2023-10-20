@@ -15,6 +15,8 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.voteButtons
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.HmsPollCategory
+import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 
@@ -41,6 +43,10 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         when(question.question.type) {
             HMSPollQuestionType.singleChoice, HMSPollQuestionType.multiChoice -> {
                 votingProgressAdapter = VotingProgressAdapter(question.question.questionID)
+                    .apply {
+                        updateProgressBar(poll.questions ?: emptyList(), poll, canRoleViewVotes)
+                    }
+
                 optionsBinder(question)
             }
             HMSPollQuestionType.shortAnswer,
@@ -49,7 +55,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     }
 
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
-        if(question.voted || poll.stoppedAt != null) {
+        if(question.voted || poll.state == HmsPollState.STOPPED) {
             if(!question.voted) {
                 votebutton.visibility = View.GONE
             } else {
@@ -61,7 +67,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                         HMSPrebuiltTheme.getDefaults().onsurface_low_emp
                     )
                 )
-                votebutton.text = "Voted"
+                votebutton.text = if(poll.category == HmsPollCategory.QUIZ) binding.root.resources.getString(R.string.polls_quiz_answer_button_complete) else binding.root.resources.getString(R.string.polls_answer_button_complete)
             }
 
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
@@ -71,11 +77,11 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 options.visibility = View.GONE
                 votingProgressBars.visibility = View.VISIBLE
                 votingProgressBars.adapter = votingProgressAdapter
-                val divider =
-                    DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
-                        setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
-                    }
-                votingProgressBars.addItemDecoration(divider)
+//                val divider =
+//                    DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
+//                        setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
+//                    }
+//                votingProgressBars.addItemDecoration(divider)
 
                 votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
             }
@@ -86,7 +92,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             options.visibility = View.VISIBLE
             votebutton.isEnabled = adapter.getSelectedOptions().isNotEmpty()
             votingProgressBars.visibility = View.GONE
-            votebutton.text = "Vote"
+            votebutton.text = if(poll.category == HmsPollCategory.QUIZ) binding.root.resources.getString(R.string.polls_quiz_answer_button) else binding.root.resources.getString(R.string.polls_answer_button)
             votebutton.voteButtons()
         }
 //        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
@@ -119,7 +125,6 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 } else {
                     saveInfoText("What?", bindingAdapterPosition)
                 }
-                Log.d("Poll", "Changed voted to $voted")
                 question.voted = voted
                 manageVisibility(question, this)
             }

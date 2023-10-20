@@ -69,7 +69,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:text="@string/polls_vote_button" />
+                tools:text="Vote/Answer" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

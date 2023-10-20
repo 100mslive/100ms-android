@@ -9,9 +9,10 @@
         android:layout_width="wrap_content"
         android:textSize="14sp"
         android:drawablePadding="@dimen/spacing_d1"
+        android:lineHeight="20px"
         android:fontFamily="@font/inter_regular"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_d1"
+        android:layout_marginTop="@dimen/spacing_d2"
         android:layout_marginHorizontal="@dimen/spacing_d2"
         tools:text="Black Bear" />
 
@@ -20,9 +21,10 @@
         android:layout_width="wrap_content"
         android:textSize="14sp"
         android:fontFamily="@font/inter_regular"
+        android:lineHeight="20px"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_marginTop="@dimen/spacing_d1"
+        android:layout_marginTop="@dimen/spacing_d2"
         android:layout_marginHorizontal="@dimen/spacing_d2"
         tools:text="1 peer" />
 

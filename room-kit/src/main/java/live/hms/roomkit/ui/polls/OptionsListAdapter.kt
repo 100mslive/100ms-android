@@ -2,7 +2,6 @@ package live.hms.roomkit.ui.polls
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
@@ -14,7 +13,7 @@ import live.hms.roomkit.ui.theme.setTheme
 import java.util.*
 
 data class Option(var text : String,
-                  val showCheckbox : Boolean,
+                  val showCheckbox : Boolean?,
                   var isChecked : Boolean = false,
                   val id : String = UUID.randomUUID().toString())
 
@@ -35,7 +34,7 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionViewHolder {
         val binding = LayoutPollQuizOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return OptionViewHolder(binding,::getItem, ::selectOnlyCurrentOption)
+        return OptionViewHolder(binding,::getItem, ::selectOnlyCurrentOption, refreshSubmitButton)
     }
 
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
@@ -54,7 +53,7 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                refreshSubmitButton?.invoke()
+                refreshSubmitButton()
             }
 
         })
@@ -70,8 +69,9 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     private fun selectOnlyCurrentOption(position: Int) {
         for ( i in 0 until currentList.size) {
-            Log.d("OptionsListAdapter", "Considering ${getItem(i)}, going to be ${i == position}")
             getItem(i).isChecked = i == position
+            if(i != position)
+                notifyItemChanged(i)
         }
     }
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/addMoreOptions"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:drawablePadding="8dp"
+        android:drawableStart="@drawable/add_ic"
+        android:padding="@dimen/eight_dp"
+        android:text="Add an option"
+        android:gravity="center_vertical"
+        android:textSize="14sp"
+        android:fontFamily="@font/inter_regular"
+        android:lineHeight="20sp"/>
+</LinearLayout>

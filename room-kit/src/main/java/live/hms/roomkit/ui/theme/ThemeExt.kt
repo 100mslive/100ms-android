@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
@@ -24,12 +25,14 @@ import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
+import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
@@ -2108,6 +2111,8 @@ fun LayoutPollsDisplayOptionsItemBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+    radioButton.buttonTintList = trackTintList()
+    checkbox.buttonTintList = trackTintList()
 }
 
 
@@ -2302,4 +2307,34 @@ fun LayoutPollsDisplayResultProgressBarsItemBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
         HMSPrebuiltTheme.getDefaults().onsurface_med_emp
     ))
+    questionProgressBar.applyProgressbarTheme()
+}
+
+fun LinearProgressIndicator.applyProgressbarTheme() {
+    trackColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default
+    )
+
+    setIndicatorColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_bright
+    ))
+
+}
+
+fun LayoutAddMoreBinding.applyTheme() {
+    addMoreOptions.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    addMoreOptions.drawableStart = AppCompatResources.getDrawable(
+        root.context, R.drawable.add_circle_with_plus
+    )?.apply { setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+    }
 }
