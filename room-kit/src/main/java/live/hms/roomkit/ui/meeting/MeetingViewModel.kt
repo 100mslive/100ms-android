@@ -2108,8 +2108,6 @@ class MeetingViewModel(
             } catch (ex : HMSException) {
                 emptyList()
             })
-//            getCreatedPolls.await()
-            polls
         } catch (error : HMSException) {
             Log.d("AreTherePolls","$error")
             null
