@@ -149,6 +149,7 @@ class SessionOptionBottomSheet(
                 add(GridOptionItem(
                         "Polls and Quizzes", R.drawable.poll_vote, {
                         showPolls.invoke()
+                        dismissAllowingStateLoss()
                         }, isSelected = false
                     )
                 )

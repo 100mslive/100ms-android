@@ -12,6 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:id="@+id/creationFlowUi"
+            app:constraint_referenced_ids="subtitle,poll_button,quiz_button,quiz_name_str,pollTitleEditText,setting_str,hideVoteCount,anonymous,startPollButton"
+            android:layout_height="wrap_content"/>
+
         <ImageView
             android:id="@+id/backButton"
             android:layout_marginTop="@dimen/spacing_d3"
