@@ -111,13 +111,17 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         val question = questionContainer.question
         val isAnswerCorrect = when (question.type) {
             HMSPollQuestionType.singleChoice -> {
-                val myAnswer = question.myResponses.firstOrNull()?.questionId
+                val myAnswer = question.myResponses.find { it.questionId == question.questionID }?.selectedOption
                 question.correctAnswer?.option == myAnswer
             }
 
             HMSPollQuestionType.multiChoice -> {
-                val myAnswer = question.myResponses.map{ it.questionId }
-                question.correctAnswer?.options?.containsAll(myAnswer) == true
+                val myAnswer = question.myResponses.find { it.questionId == question.questionID }?.selectedOptions
+                val correctOptions = question.correctAnswer?.options
+                return if(myAnswer == null || correctOptions == null)
+                    false
+                else
+                    myAnswer.containsAll(correctOptions) && myAnswer.size == correctOptions.size
             }
             else -> false
         }
@@ -138,10 +142,16 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             options.layoutManager = LinearLayoutManager(binding.root.context)
             // selected options could be read from the UI directly.
             options.adapter = adapter
-            adapter.submitList(question.question.options?.mapIndexed { index, it ->
-                Option(it.text ?: "",
+            adapter.submitList(question.question.options?.map { option ->
+                Option(option.text ?: "",
                     question.question.type == HMSPollQuestionType.multiChoice,
-                    isChecked = question.question.myResponses.find { it.questionId - 1 == index } != null,
+                    isChecked = question.question.myResponses.find {
+                        if(question.question.type == HMSPollQuestionType.multiChoice) {
+                            it.selectedOptions?.contains(option.index) == true
+                        } else {
+                            it.selectedOption == option.index
+                        }
+                    } != null,
                     hiddenAndAnswered = question.voted
                 )
             })
