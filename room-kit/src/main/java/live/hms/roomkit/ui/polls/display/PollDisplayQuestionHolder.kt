@@ -111,13 +111,17 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         val question = questionContainer.question
         val isAnswerCorrect = when (question.type) {
             HMSPollQuestionType.singleChoice -> {
-                val myAnswer = question.myResponses.firstOrNull()?.questionId
+                val myAnswer = question.myResponses.find { it.questionId == question.questionID }?.selectedOption
                 question.correctAnswer?.option == myAnswer
             }
 
             HMSPollQuestionType.multiChoice -> {
-                val myAnswer = question.myResponses.map{ it.questionId }
-                question.correctAnswer?.options?.containsAll(myAnswer) == true
+                val myAnswer = question.myResponses.find { it.questionId == question.questionID }?.selectedOptions
+                val correctOptions = question.correctAnswer?.options
+                return if(myAnswer == null || correctOptions == null)
+                    false
+                else
+                    myAnswer.containsAll(correctOptions)
             }
             else -> false
         }

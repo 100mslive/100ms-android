@@ -37,11 +37,11 @@ class ProgressDisplayViewHolder(
         val numVotes = item.numberOfVotes.toInt()
         val isAnswerCorrect = when (item.questionType) {
             HMSPollQuestionType.singleChoice -> {
-                item.pollQuestionAnswer?.option == item.index + 1
+                item.pollQuestionAnswer?.option == item.index
             }
 
             HMSPollQuestionType.multiChoice -> {
-                item.pollQuestionAnswer?.options?.contains(item.index + 1) == true
+                item.pollQuestionAnswer?.options?.contains(item.index) == true
             }
 
             else -> false

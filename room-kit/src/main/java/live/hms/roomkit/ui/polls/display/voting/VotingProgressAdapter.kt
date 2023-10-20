@@ -51,7 +51,7 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
                     optionText = it.text ?: "",
                     numberOfVotes = votesForThisOption,
                     percentage = percentage,
-                    index = index,
+                    index = it.index,
                     totalVoteCount = pollStatsQuestion.total,
                     pollQuestionAnswer = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.correctAnswer,
                     questionType = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.type,
