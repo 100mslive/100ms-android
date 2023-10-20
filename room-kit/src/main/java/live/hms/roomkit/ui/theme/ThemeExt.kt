@@ -1961,7 +1961,7 @@ fun LayoutPollsCreationBinding.applyTheme() {
 
 
     pollTitleEditText.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default,
         R.drawable.gray_round_drawable
     )
@@ -2133,7 +2133,7 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
 
 
     questionTypeSpinner.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_bright,
         R.drawable.gray_round_drawable
     )
@@ -2146,7 +2146,7 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
 
 
     askAQuestionEditText.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default,
         R.drawable.gray_round_drawable
     )
@@ -2251,7 +2251,7 @@ internal fun TextView.saveButtonDisabled() {
 fun LayoutPollQuizOptionsItemBinding.setTheme() {
 
     text.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default,
         R.drawable.gray_round_drawable
     )
@@ -2341,9 +2341,29 @@ fun LayoutAddMoreBinding.applyTheme() {
 
 fun PreviousPollsListBinding.applyTheme() {
     root.setBackgroundAndColor(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getColours()?.surfaceBright,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
     )
+
+    viewButton.buttonEnabled()
+
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    status.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    )
+
+    status.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+
 
 
 }
