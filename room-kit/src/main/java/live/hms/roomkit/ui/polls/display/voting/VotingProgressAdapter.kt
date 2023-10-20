@@ -44,7 +44,7 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
                 val votesForThisOption = pollStatsQuestion.options?.get(index)?.voteCount ?: -1
 
                 val percentage : Int = if (pollStatsQuestion.total == 0) {
-                    100
+                    0
                 } else {
                     (votesForThisOption * 100 / pollStatsQuestion.total).toInt()
                 }
