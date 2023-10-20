@@ -13,7 +13,7 @@ import live.hms.roomkit.ui.theme.setTheme
 import java.util.*
 
 data class Option(var text : String,
-                  val showCheckbox : Boolean,
+                  val showCheckbox : Boolean?,
                   var isChecked : Boolean = false,
                   val id : String = UUID.randomUUID().toString())
 

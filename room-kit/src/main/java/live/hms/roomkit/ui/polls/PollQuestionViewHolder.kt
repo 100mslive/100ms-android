@@ -7,6 +7,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -76,6 +77,12 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
             }
             optionsListView.adapter = optionsAdapter
             optionsListView.layoutManager = LinearLayoutManager(binding.root.context)
+            val divider =
+                DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
+                    setDrawable(binding.root.context.getDrawable(R.drawable.polls_creation_divider)!!)
+                }
+            if(isPoll())
+                optionsListView.addItemDecoration(divider)
             questionTypeSpinner.onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
@@ -86,9 +93,10 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
 
                     // Reset options whenever a question type is selected
                     // Add two empty options
+                    val isPoll = isPoll()
                     optionsAdapter.submitList(listOf(
-                        Option("", isMultiOptionQuestionCreation(questionTypeSpinner)),
-                        Option("", isMultiOptionQuestionCreation(questionTypeSpinner))
+                        Option("", if(isPoll) null else isMultiOptionQuestionCreation(questionTypeSpinner)),
+                        Option("", if(isPoll) null else isMultiOptionQuestionCreation(questionTypeSpinner))
                     ))
 
                     // If short/long answer hide the options else show them
