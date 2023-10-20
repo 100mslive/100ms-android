@@ -277,14 +277,14 @@
             android:id="@+id/previousPolls"
             android:layout_width="match_parent"
             android:layout_marginHorizontal="@dimen/spacing_d3"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:nestedScrollingEnabled="false"
             android:paddingBottom="@dimen/spacing_d3"
             android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/previousPollsHeading"
-            tools:itemCount="2"
+            tools:itemCount="5"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/layout_previous_poll_card" />
     </androidx.constraintlayout.widget.ConstraintLayout>
