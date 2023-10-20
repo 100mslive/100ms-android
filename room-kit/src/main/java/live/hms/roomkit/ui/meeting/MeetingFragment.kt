@@ -672,11 +672,14 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.openPollOrQuizzTrgger.observe(viewLifecycleOwner) { pollID ->
-            findNavController().navigate(
-                MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(
-                    pollID
+            if (pollID.isEmpty().not()) {
+                findNavController().navigate(
+                    MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(
+                        pollID
+                    )
                 )
-            )
+                meetingViewModel.openPollOrQuizzTrgger.value = ""
+            }
         }
     }
 
