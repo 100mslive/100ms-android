@@ -79,7 +79,7 @@ class PollDisplayFragment : Fragment() {
                     findNavController().popBackStack()
                 }
                 val startedType = if(poll.category == HmsPollCategory.QUIZ) "Quiz" else "Poll"
-                pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name, startedType)
+                pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name?: "Participant", startedType)
                 questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
