@@ -2099,11 +2099,20 @@ class MeetingViewModel(
         })
 
         return try {
-            getStartedPolls.await()
-                .plus(getCreatedPolls.await())
-                .plus(getEndedPolls.await())
+            val polls = try {
+                getStartedPolls.await()
+            } catch (ex : HMSException) {
+                emptyList()
+            }
+            polls.plus(try {
+                getEndedPolls.await()
+            } catch (ex : HMSException) {
+                emptyList()
+            })
+//            getCreatedPolls.await()
+            polls
         } catch (error : HMSException) {
-
+            Log.d("AreTherePolls","$error")
             null
         }
     }
