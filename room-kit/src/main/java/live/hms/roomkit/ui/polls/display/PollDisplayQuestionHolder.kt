@@ -77,18 +77,22 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 
             // If results are to be hidden, then don't do the rest of the change that swaps layouts
             if(poll.anonymous && !canRoleViewVotes){
-                (options.adapter as AnswerOptionsAdapter).disableOptions()
+                (options.adapter as AnswerOptionsAdapter?)?.disableOptions()
             } else {
-                options.visibility = View.GONE
-                votingProgressBars.visibility = View.VISIBLE
-                votingProgressBars.adapter = votingProgressAdapter
+                if( poll.category == HmsPollCategory.POLL || ( poll.category == HmsPollCategory.QUIZ && poll.state == HmsPollState.STOPPED)) {
+                    options.visibility = View.GONE
+                    votingProgressBars.visibility = View.VISIBLE
+                    votingProgressBars.adapter = votingProgressAdapter
 //                val divider =
 //                    DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
 //                        setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
 //                    }
 //                votingProgressBars.addItemDecoration(divider)
 
-                votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
+                    votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
+                } else {
+                    (options.adapter as AnswerOptionsAdapter?)?.disableOptions()
+                }
             }
             // But nothing will update them. They will always be zero.
 
@@ -134,7 +138,13 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             options.layoutManager = LinearLayoutManager(binding.root.context)
             // selected options could be read from the UI directly.
             options.adapter = adapter
-            adapter.submitList(question.question.options?.map { Option(it.text?:"", question.question.type == HMSPollQuestionType.multiChoice) })
+            adapter.submitList(question.question.options?.mapIndexed { index, it ->
+                Option(it.text ?: "",
+                    question.question.type == HMSPollQuestionType.multiChoice,
+                    isChecked = question.question.myResponses.find { it.questionId - 1 == index } != null,
+                    hiddenAndAnswered = question.voted
+                )
+            })
             skipButton.setOnSingleClickListener {
                 // TODO skip
 
