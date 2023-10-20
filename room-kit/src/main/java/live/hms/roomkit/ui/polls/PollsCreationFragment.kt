@@ -65,8 +65,9 @@ class PollsCreationFragment : Fragment(){
             previousPolls.adapter = previousPollsAdaptor
             previousPolls.layoutManager = LinearLayoutManager(context)
             lifecycleScope.launch {
-                val polls = meetingViewModel.getAllPolls()?.map { PreviousPollsInfo(it.title, it.state, it.pollId) }
-                previousPollsAdaptor.submitList(polls ?: emptyList())
+                meetingViewModel.getAllPolls()
+                val polls = meetingViewModel.hmsInteractivityCenterPolls().map { PreviousPollsInfo(it.title, it.state, it.pollId) }
+                previousPollsAdaptor.submitList(polls)
             }
 
         }

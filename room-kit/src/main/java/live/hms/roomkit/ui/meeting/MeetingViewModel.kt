@@ -2062,6 +2062,8 @@ class MeetingViewModel(
     }
     fun hasPoll() : HmsPoll? = localHmsInteractivityCenter.polls.firstOrNull()
 
+    fun hmsInteractivityCenterPolls() = localHmsInteractivityCenter.polls
+
     suspend fun getAllPolls() : List<HmsPoll>? {
         val getStartedPolls = CompletableDeferred<List<HmsPoll>>()
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
