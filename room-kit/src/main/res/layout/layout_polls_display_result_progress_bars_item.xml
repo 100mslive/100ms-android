@@ -9,7 +9,7 @@
         android:id="@+id/answer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="@dimen/spacing_d2"
         android:gravity="top"
         android:lineSpacingExtra="3sp"
         android:textAppearance="@style/poll_display_answer_item"
