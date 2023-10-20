@@ -12,6 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:id="@+id/creationFlowUi"
+            app:constraint_referenced_ids="subtitle,poll_button,quiz_button,quiz_name_str,pollTitleEditText,setting_str,hideVoteCount,anonymous,startPollButton"
+            android:layout_height="wrap_content"/>
+
         <ImageView
             android:id="@+id/backButton"
             android:layout_marginTop="@dimen/spacing_d3"
@@ -271,14 +277,14 @@
             android:id="@+id/previousPolls"
             android:layout_width="match_parent"
             android:layout_marginHorizontal="@dimen/spacing_d3"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:nestedScrollingEnabled="false"
             android:paddingBottom="@dimen/spacing_d3"
             android:clipToPadding="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/previousPollsHeading"
-            tools:itemCount="2"
+            tools:itemCount="5"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/layout_previous_poll_card" />
     </androidx.constraintlayout.widget.ConstraintLayout>
