@@ -2338,3 +2338,19 @@ fun LayoutAddMoreBinding.applyTheme() {
     )
     }
 }
+
+fun MaterialCardView.highlightCorrectAnswer(isCorrect : Boolean) {
+    strokeColor = if(isCorrect) {
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertSuccess,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    } else {
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    }
+    strokeWidth = 1.dp()
+}
+

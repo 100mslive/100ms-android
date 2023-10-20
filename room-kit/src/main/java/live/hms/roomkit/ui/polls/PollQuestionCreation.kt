@@ -28,7 +28,7 @@ class PollQuestionCreation : Fragment() {
 
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val adapter = PollQuestionCreatorAdapter{pollsViewModel.isPoll()}
+    private val adapter = PollQuestionCreatorAdapter { pollsViewModel.isPoll() }
 
     private var binding by viewLifecycle<LayoutPollQuestionCreationBinding>()
 

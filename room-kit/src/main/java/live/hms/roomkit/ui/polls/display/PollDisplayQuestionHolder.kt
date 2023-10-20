@@ -1,8 +1,6 @@
 package live.hms.roomkit.ui.polls.display
 
-import android.util.Log
 import android.view.View
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -12,6 +10,7 @@ import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.highlightCorrectAnswer
 import live.hms.roomkit.ui.theme.voteButtons
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.video.polls.models.HmsPoll
@@ -55,6 +54,12 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     }
 
     private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
+        // This is now also different if it's polls or quiz.
+        // For polls we see answers immediately and they are updated.
+        // For quizzes, we do not see the answers.
+        if(poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
+            root.highlightCorrectAnswer(isQuestionCorrectlyAnswered(question))
+        }
         if(question.voted || poll.state == HmsPollState.STOPPED) {
             if(!question.voted) {
                 votebutton.visibility = View.GONE
@@ -96,6 +101,23 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             votebutton.voteButtons()
         }
 //        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
+    }
+
+    private fun isQuestionCorrectlyAnswered(questionContainer: QuestionContainer): Boolean {
+        val question = questionContainer.question
+        val isAnswerCorrect = when (question.type) {
+            HMSPollQuestionType.singleChoice -> {
+                val myAnswer = question.myResponses.firstOrNull()?.questionId
+                question.correctAnswer?.option == myAnswer
+            }
+
+            HMSPollQuestionType.multiChoice -> {
+                val myAnswer = question.myResponses.map{ it.questionId }
+                question.correctAnswer?.options?.containsAll(myAnswer) == true
+            }
+            else -> false
+        }
+        return isAnswerCorrect
     }
 
     private fun optionsBinder(question: QuestionContainer) {
