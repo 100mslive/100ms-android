@@ -247,4 +247,5 @@
     <string name="polls_quiz_answer_button">Answer</string>
 po    <string name="polls_quiz_answer_button_complete">Answered</string>
     <string name="poll_title_heading">%1$s %2$s</string>
+    <string name="quiz_your_answer">Your Answer</string>
 </resources>

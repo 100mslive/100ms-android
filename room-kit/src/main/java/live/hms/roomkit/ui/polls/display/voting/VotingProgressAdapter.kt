@@ -10,6 +10,7 @@ import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.HMSPollQuestionAnswer
+import live.hms.video.polls.models.answer.HmsPollAnswer
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 
@@ -23,7 +24,8 @@ data class ProgressBarInfo(
     val pollQuestionAnswer: HMSPollQuestionAnswer?,
     val questionType: HMSPollQuestionType?,
     val pollState : HmsPollState,
-    val hideVoteCount : Boolean
+    val hideVoteCount : Boolean,
+    val myAnswer : HmsPollAnswer?
 )
 class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarInfo, ProgressDisplayViewHolder>(
     DIFFUTIL_CALLBACK
@@ -46,6 +48,7 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
                 } else {
                     (votesForThisOption * 100 / pollStatsQuestion.total).toInt()
                 }
+
                 ProgressBarInfo(
                     category =  hmsPoll.category,
                     optionText = it.text ?: "",
@@ -56,7 +59,8 @@ class VotingProgressAdapter(val questionIndex : Int) : ListAdapter<ProgressBarIn
                     pollQuestionAnswer = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.correctAnswer,
                     questionType = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.type,
                     pollState = hmsPoll.state,
-                    hideVoteCount = !canViewResponses
+                    hideVoteCount = !canViewResponses,
+                    myAnswer = hmsPoll.questions?.get(pollStatsQuestion.questionID - 1)?.myResponses?.firstOrNull()
                 )
         }
         submitList(items)

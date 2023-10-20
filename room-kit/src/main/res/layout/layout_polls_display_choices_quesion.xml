@@ -11,13 +11,14 @@
         android:orientation="vertical">
 
         <TextView
-
+            android:gravity="center_vertical"
+            android:drawablePadding="@dimen/spacing_d1"
             android:id="@+id/questionNumbering"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_d2"
             android:layout_marginLeft="@dimen/spacing_d2"
-            android:gravity="top"
+            android:lineHeight="16dp"
             android:lineSpacingExtra="3sp"
             android:textAppearance="@style/poll_display_question_numbering"
             tools:text="Question X of Y" />

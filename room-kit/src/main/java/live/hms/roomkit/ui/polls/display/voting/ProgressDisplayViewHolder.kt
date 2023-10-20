@@ -58,11 +58,25 @@ class ProgressDisplayViewHolder(
                 }
 
         peopleAnswering.text = if(item.pollState == HmsPollState.STOPPED) {
-            binding.root.resources.getQuantityString(
-                R.plurals.poll_quiz_results_for_ended_polls,
-                numVotes,
-                numVotes,
-                item.percentage)
+            val myAnswer = when (item.questionType) {
+                HMSPollQuestionType.singleChoice -> {
+                    item.myAnswer?.selectedOption == item.index
+                }
+
+                HMSPollQuestionType.multiChoice -> {
+                    item.myAnswer?.selectedOptions?.contains(item.index) == true
+                }
+                else -> false
+            }
+            if( myAnswer )
+                binding.root.resources.getString(R.string.quiz_your_answer)
+            else
+                ""
+//            binding.root.resources.getQuantityString(
+//                R.plurals.poll_quiz_results_for_ended_polls,
+//                numVotes,
+//                numVotes,
+//                item.percentage)
         }
             else {
                 binding.root.resources.getQuantityString(
@@ -71,7 +85,7 @@ class ProgressDisplayViewHolder(
                 numVotes
             )
         }
-        if (item.hideVoteCount)
+        if (item.hideVoteCount && item.pollState != HmsPollState.STOPPED)
             peopleAnswering.visibility = View.GONE
         else
             peopleAnswering.visibility = View.VISIBLE

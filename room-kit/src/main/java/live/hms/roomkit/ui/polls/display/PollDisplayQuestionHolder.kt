@@ -1,12 +1,14 @@
 package live.hms.roomkit.ui.polls.display
 
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
+import live.hms.roomkit.drawableStart
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
@@ -80,6 +82,26 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 (options.adapter as AnswerOptionsAdapter?)?.disableOptions()
             } else {
                 if( poll.category == HmsPollCategory.POLL || ( poll.category == HmsPollCategory.QUIZ && poll.state == HmsPollState.STOPPED)) {
+                    val correctlyAnswered = isQuestionCorrectlyAnswered(question)
+                    val correctnessIndicator = if (correctlyAnswered) R.drawable.correct_answer_quiz_icon
+                    else R.drawable.wrong_answer_quiz_icon
+
+                    val indicatorColor = if (correctlyAnswered) {
+                        getColorOrDefault(
+                            HMSPrebuiltTheme.getColours()?.alertSuccess,
+                            HMSPrebuiltTheme.getDefaults().error_default
+                        )
+                    } else {
+                        getColorOrDefault(
+                            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+                            HMSPrebuiltTheme.getDefaults().error_default
+                        )
+                    }
+
+                    questionNumbering.drawableStart = AppCompatResources.getDrawable(
+                        binding.root.context, correctnessIndicator
+                    )?.apply { setTint(indicatorColor) }
+                    questionNumbering.setTextColor(indicatorColor)
                     options.visibility = View.GONE
                     votingProgressBars.visibility = View.VISIBLE
                     votingProgressBars.adapter = votingProgressAdapter
