@@ -2338,3 +2338,12 @@ fun LayoutAddMoreBinding.applyTheme() {
     )
     }
 }
+
+fun PreviousPollsListBinding.applyTheme() {
+    root.setBackgroundAndColor(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    )
+
+
+}

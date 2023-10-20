@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.polls.PollsCreationFragment"
     android:layout_width="match_parent"
+    android:scrollbars="none"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -252,24 +253,33 @@
             android:textSize="20sp"
             android:layout_marginStart="12dp"
             android:lineHeight="24sp"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/inter_bold"
             app:layout_constraintLeft_toLeftOf="@id/timer"
             app:layout_constraintTop_toBottomOf="@id/startPollButton"
-            android:layout_marginVertical="@dimen/fixed_spacing_d3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/previousPolls"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_marginBottom="@dimen/spacing_d1"
             android:text="Previous Polls/Quizzes"
             />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/previousPolls"
-            tools:listitem="@layout/layout_previous_poll_card"
-            tools:itemCount="2"
-            android:nestedScrollingEnabled="false"
-            app:layout_constraintLeft_toLeftOf="@id/previousPollsHeading"
-            app:layout_constraintTop_toBottomOf="@id/previousPollsHeading"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
             android:layout_height="wrap_content"
-            />
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="@dimen/spacing_d3"
+            android:clipToPadding="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/previousPollsHeading"
+            tools:itemCount="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:listitem="@layout/layout_previous_poll_card" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

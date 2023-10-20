@@ -2,9 +2,10 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/root"
     android:layout_height="wrap_content"
     android:layout_marginTop="16dp"
-    android:layout_marginRight="16dp">
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -43,7 +44,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"/>
 
-        <Button
+        <TextView
             android:id="@+id/viewButton"
             android:layout_alignParentEnd="true"
             android:layout_below="@id/name"
@@ -54,7 +55,6 @@
             android:layout_gravity="right"
             android:backgroundTint="#2672ED"
             android:layout_margin="16dp"
-            android:background="@drawable/polls_blue_button_shape"
             android:text="View" />
 
     </RelativeLayout>

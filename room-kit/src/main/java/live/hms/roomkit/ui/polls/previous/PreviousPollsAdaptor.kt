@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.databinding.PreviousPollsListBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.pollsStatusLiveDraftEnded
 import live.hms.video.polls.models.HmsPollState
 
@@ -54,6 +55,7 @@ class PreviousPollsAdaptor(private val view: (PreviousPollsInfo) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: PreviewPollsViewBinding, position: Int) {
+        holder.binding.applyTheme()
         holder.bind(getItem(position))
     }
 }
