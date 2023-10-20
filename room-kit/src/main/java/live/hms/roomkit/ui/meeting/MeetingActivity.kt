@@ -247,6 +247,11 @@ class MeetingActivity : AppCompatActivity() {
                 handleNotificationDismissClick()
             }
 
+            is HMSNotificationType.OpenPollOrQuiz -> {
+                meetingViewModel.openPollsOrQuizTrigger(type.pollId)
+                handleNotificationDismissClick()
+            }
+
             else -> {}
         }
     }
