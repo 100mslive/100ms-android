@@ -2325,12 +2325,12 @@ fun LayoutPollsDisplayResultProgressBarsItemBinding.applyTheme() {
 
 fun LinearProgressIndicator.applyProgressbarTheme() {
     trackColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
         HMSPrebuiltTheme.getDefaults().primary_default
     )
 
     setIndicatorColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().surface_bright
     ))
 
