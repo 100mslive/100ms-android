@@ -2340,12 +2340,23 @@ fun LayoutAddMoreBinding.applyTheme() {
 }
 
 fun PreviousPollsListBinding.applyTheme() {
-    root.setBackgroundAndColor(
+    root.setBackgroundColor(
             HMSPrebuiltTheme.getColours()?.surfaceBright,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
     )
 
-    viewButton.buttonEnabled()
+    viewButton.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp,
+        R.drawable.gray_round_drawable
+    )
+
+    viewButton.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
 
     name.setTextColor(
         getColorOrDefault(

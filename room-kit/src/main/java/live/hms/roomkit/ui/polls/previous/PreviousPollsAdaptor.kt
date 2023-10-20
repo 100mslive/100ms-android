@@ -22,7 +22,7 @@ class PreviewPollsViewBinding(
 
     fun bind(info: PreviousPollsInfo) {
         with(binding) {
-            name.text = info.name
+            name.text = if (info.name.length > 1) {info.name.replaceFirstChar { if (it.isLetter()) it.uppercaseChar()  else it }} else info.name
             viewButton.isEnabled = (info.state == HmsPollState.STARTED || info.state == HmsPollState.STOPPED)
             viewButton.setOnClickListener { view(bindingAdapterPosition) }
             status.pollsStatusLiveDraftEnded(info.state)
