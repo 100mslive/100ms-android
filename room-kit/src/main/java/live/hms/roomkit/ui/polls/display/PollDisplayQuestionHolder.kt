@@ -1,12 +1,15 @@
 package live.hms.roomkit.ui.polls.display
 
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
+import live.hms.roomkit.drawableStart
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
@@ -80,16 +83,46 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 (options.adapter as AnswerOptionsAdapter?)?.disableOptions()
             } else {
                 if( poll.category == HmsPollCategory.POLL || ( poll.category == HmsPollCategory.QUIZ && poll.state == HmsPollState.STOPPED)) {
+                    if(poll.category == HmsPollCategory.QUIZ) {
+                        val correctlyAnswered = isQuestionCorrectlyAnswered(question)
+                        val correctnessIndicator =
+                            if (correctlyAnswered) R.drawable.correct_answer_quiz_icon
+                            else R.drawable.wrong_answer_quiz_icon
+
+                        val indicatorColor = if (correctlyAnswered) {
+                            getColorOrDefault(
+                                HMSPrebuiltTheme.getColours()?.alertSuccess,
+                                HMSPrebuiltTheme.getDefaults().error_default
+                            )
+                        } else {
+                            getColorOrDefault(
+                                HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+                                HMSPrebuiltTheme.getDefaults().error_default
+                            )
+                        }
+
+                        questionNumbering.drawableStart = AppCompatResources.getDrawable(
+                            binding.root.context, correctnessIndicator
+                        )?.apply { setTint(indicatorColor) }
+                        questionNumbering.setTextColor(indicatorColor)
+                    }
                     options.visibility = View.GONE
                     votingProgressBars.visibility = View.VISIBLE
                     votingProgressBars.adapter = votingProgressAdapter
-//                val divider =
-//                    DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
-//                        setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
-//                    }
-//                votingProgressBars.addItemDecoration(divider)
+                    if(poll.category == HmsPollCategory.POLL) {
+                        val divider =
+                            DividerItemDecoration(
+                                binding.root.context,
+                                RecyclerView.VERTICAL
+                            ).apply {
+                                setDrawable(binding.root.context.getDrawable(R.drawable.polls_display_progress_items_divider)!!)
+                            }
+                        votingProgressBars.addItemDecoration(divider)
+                    }
 
                     votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
+                    // Hide vote button for stopped quizzes
+                    votebutton.visibility = View.GONE
                 } else {
                     (options.adapter as AnswerOptionsAdapter?)?.disableOptions()
                 }
