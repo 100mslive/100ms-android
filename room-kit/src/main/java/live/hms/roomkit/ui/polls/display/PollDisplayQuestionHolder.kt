@@ -121,7 +121,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 return if(myAnswer == null || correctOptions == null)
                     false
                 else
-                    myAnswer.containsAll(correctOptions)
+                    myAnswer.containsAll(correctOptions) && myAnswer.size == correctOptions.size
             }
             else -> false
         }
