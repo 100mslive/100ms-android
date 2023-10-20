@@ -1888,7 +1888,7 @@ class MeetingViewModel(
     }
 
     fun isPrebuiltDebugMode(): Boolean {
-        return isPrebuiltDebug.not()
+        return isPrebuiltDebug
     }
     fun permissionGranted() = hmsSDK.setPermissionsAccepted()
 
@@ -2146,6 +2146,10 @@ class MeetingViewModel(
 
     fun getFullPeerlistIterator(): PeerListIterator {
         return hmsSDK.getPeerListIterator()
+    }
+
+    fun showPollOnUi(): Boolean {
+        return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollRead == true || hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
     }
 }
 

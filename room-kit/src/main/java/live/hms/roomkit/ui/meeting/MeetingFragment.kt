@@ -1112,6 +1112,7 @@ class MeetingFragment : Fragment() {
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
                         onNameChange = {  },
+                        showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
                         onRecordingClicked = {
                             if (meetingViewModel.isRecordingState().not()) {
                                 meetingViewModel.recordMeeting(true, runnable = it)
