@@ -1891,6 +1891,11 @@ fun LayoutPollQuestionCreationBinding.applyTheme() {
 fun LayoutPollsCreationBinding.applyTheme() {
     backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 
+    root.setBackgroundColor(        getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    )
+    )
     heading.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
@@ -2133,7 +2138,7 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
 
 
     questionTypeSpinner.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
         HMSPrebuiltTheme.getDefaults().surface_bright,
         R.drawable.gray_round_drawable
     )
@@ -2146,7 +2151,7 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
 
 
     askAQuestionEditText.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
         HMSPrebuiltTheme.getDefaults().surface_default,
         R.drawable.gray_round_drawable
     )
@@ -2251,7 +2256,7 @@ internal fun TextView.saveButtonDisabled() {
 fun LayoutPollQuizOptionsItemBinding.setTheme() {
 
     text.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
         HMSPrebuiltTheme.getDefaults().surface_default,
         R.drawable.gray_round_drawable
     )
