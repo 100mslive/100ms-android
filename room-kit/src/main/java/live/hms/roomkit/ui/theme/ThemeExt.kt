@@ -1886,6 +1886,14 @@ fun LayoutPollQuestionCreationBinding.applyTheme() {
         )
     )
 
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+
+    )
+
     backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 }
 fun LayoutPollsCreationBinding.applyTheme() {
@@ -2398,4 +2406,3 @@ fun MaterialCardView.highlightCorrectAnswer(isCorrect : Boolean) {
     }
     strokeWidth = 1.dp()
 }
-
