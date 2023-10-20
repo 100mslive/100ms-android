@@ -112,6 +112,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 //                votingProgressBars.addItemDecoration(divider)
 
                     votingProgressBars.layoutManager = LinearLayoutManager(binding.root.context)
+                    // Hide vote button for stopped quizzes
+                    votebutton.visibility = View.GONE
                 } else {
                     (options.adapter as AnswerOptionsAdapter?)?.disableOptions()
                 }
