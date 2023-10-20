@@ -2124,7 +2124,7 @@ class MeetingViewModel(
         changeRole(handRaisePeer.peerID, onStageRole, false)
     }
 
-    val openPollOrQuizzTrgger by lazy { SingleLiveEvent<String>() }
+    val openPollOrQuizzTrgger by lazy { MutableLiveData<String>() }
     fun openPollsOrQuizTrigger(pollID: String) {
         openPollOrQuizzTrgger.value = pollID
     }
