@@ -315,17 +315,6 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
-        meetingViewModel.openPollNewTrigger.observe(viewLifecycleOwner) { it ->
-            if(!it.isNullOrEmpty() ) {
-                meetingViewModel.openPollNewTrigger.setValue("")
-                meetingViewModel.openPollOrQuizzTrgger.setValue("")
-                findNavController().navigate(
-                    MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(
-                        it
-                    )
-                )
-            }
-        }
         meetingViewModel.isRecording.observe(
             viewLifecycleOwner,
             Observer {

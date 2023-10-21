@@ -2129,7 +2129,6 @@ class MeetingViewModel(
         changeRole(handRaisePeer.peerID, onStageRole, false)
     }
 
-    val openPollNewTrigger = MutableLiveData<String>()
     val openPollOrQuizzTrgger by lazy { MutableLiveData<String>() }
     fun openPollsOrQuizTrigger(pollID: String) {
         openPollOrQuizzTrgger.value = pollID

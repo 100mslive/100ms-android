@@ -44,11 +44,6 @@ class PollsCreationFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
-        meetingViewModel.openPollNewTrigger.observe(viewLifecycleOwner) { it ->
-            if(!it.isNullOrEmpty())
-                findNavController().popBackStack()
-        }
-
         binding.creationFlowUi.visibility = if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
         with(binding) {
             applyTheme()

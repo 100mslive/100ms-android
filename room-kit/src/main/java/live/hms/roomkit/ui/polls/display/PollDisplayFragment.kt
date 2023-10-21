@@ -31,7 +31,6 @@ import live.hms.video.polls.models.HmsPollState
  *
  */
 class PollDisplayFragment : Fragment() {
-    private val args: PollDisplayFragmentArgs by navArgs()
     private var binding by viewLifecycle<LayoutPollsDisplayBinding>()
     lateinit var pollsDisplayAdaptor: PollsDisplayAdaptor
     private val meetingViewModel: MeetingViewModel by activityViewModels()
@@ -50,12 +49,9 @@ class PollDisplayFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initOnBackPress()
-        meetingViewModel.openPollNewTrigger.observe(viewLifecycleOwner) { it ->
-            if(!it.isNullOrEmpty())
-                findNavController().popBackStack()
-        }
         lifecycleScope.launch {
-            val returnedPoll = meetingViewModel.getPollForPollId(args.pollId)
+            val pollId = arguments?.getString("pollId")
+            val returnedPoll = if(pollId == null) null else meetingViewModel.getPollForPollId(pollId)
             if(returnedPoll == null) {
                 // Close the fragment and exit
                 findNavController().popBackStack()

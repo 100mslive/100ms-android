@@ -8,9 +8,11 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
@@ -140,8 +142,11 @@ class MeetingActivity : AppCompatActivity() {
 
         meetingViewModel.openPollOrQuizzTrgger.observe(this) { pollID ->
             if (pollID.isEmpty().not()) {
-                meetingViewModel.openPollNewTrigger.postValue(pollID)
                 meetingViewModel.openPollOrQuizzTrgger.value = ""
+                // From here, add the PollDisplayFragment with its pollId.
+//                supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                findNavController(R.id.nav_host_fragment)
+                    .navigate(R.id.action_global_pollDisplayFragment, bundleOf("pollId" to pollID))
             }
         }
     }
