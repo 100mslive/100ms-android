@@ -143,8 +143,6 @@ class MeetingActivity : AppCompatActivity() {
         meetingViewModel.openPollOrQuizzTrgger.observe(this) { pollID ->
             if (pollID.isEmpty().not()) {
                 meetingViewModel.openPollOrQuizzTrgger.value = ""
-                // From here, add the PollDisplayFragment with its pollId.
-//                supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                 findNavController(R.id.nav_host_fragment)
                     .navigate(R.id.action_global_pollDisplayFragment, bundleOf("pollId" to pollID))
             }
