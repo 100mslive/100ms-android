@@ -8,9 +8,11 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
@@ -138,6 +140,13 @@ class MeetingActivity : AppCompatActivity() {
             tryRemovingNotification(it)
         }
 
+        meetingViewModel.openPollOrQuizzTrgger.observe(this) { pollID ->
+            if (pollID.isEmpty().not()) {
+                meetingViewModel.openPollOrQuizzTrgger.value = ""
+                findNavController(R.id.nav_host_fragment)
+                    .navigate(R.id.action_global_pollDisplayFragment, bundleOf("pollId" to pollID))
+            }
+        }
     }
 
     private fun triggerNotification(hmsNotification: HMSNotification) {
@@ -244,6 +253,11 @@ class MeetingActivity : AppCompatActivity() {
 
             is HMSNotificationType.ScreenShare -> {
                 meetingViewModel.stopScreenshare()
+                handleNotificationDismissClick()
+            }
+
+            is HMSNotificationType.OpenPollOrQuiz -> {
+                meetingViewModel.openPollsOrQuizTrigger(type.pollId)
                 handleNotificationDismissClick()
             }
 

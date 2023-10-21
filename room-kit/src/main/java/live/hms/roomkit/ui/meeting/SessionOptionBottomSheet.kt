@@ -28,6 +28,7 @@ class SessionOptionBottomSheet(
     private val onBRBClicked: () -> Unit,
     private val onRaiseHandClicked: () -> Unit,
     private val onNameChange: () -> Unit,
+    private val showPolls: () -> Unit,
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
@@ -144,6 +145,15 @@ class SessionOptionBottomSheet(
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
             add(changeName)
+            if (meetingViewModel.showPollOnUi()) {
+                add(GridOptionItem(
+                        "Polls and Quizzes", R.drawable.poll_vote, {
+                        showPolls.invoke()
+                        dismissAllowingStateLoss()
+                        }, isSelected = false
+                    )
+                )
+            }
         }
         gridOptionAdapter.update(listOf(group))
 

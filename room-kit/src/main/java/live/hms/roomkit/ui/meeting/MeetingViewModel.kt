@@ -106,6 +106,8 @@ class MeetingViewModel(
         .setLogSettings(hmsLogSettings)
         .build()
 
+    private var lastPollStartedTime : Long = 0
+
     val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
         .apply {
             this.pollUpdateListener = object : HmsPollUpdateListener {
@@ -113,16 +115,20 @@ class MeetingViewModel(
                     hmsPoll: HmsPoll,
                     hmsPollUpdateType: HMSPollUpdateType
                 ) {
-                    if(hmsPollUpdateType == HMSPollUpdateType.started) {
-                        viewModelScope.launch {
-                            if(isPrebuiltDebug)
-                                _events.emit(Event.PollStarted(hmsPoll))
+                    when(hmsPollUpdateType) {
+                        HMSPollUpdateType.started -> viewModelScope.launch {
+                            _events.emit(Event.PollStarted(hmsPoll))
+                            // Only show latest polls
+                            if (lastPollStartedTime < hmsPoll.startedAt) {
+                                lastPollStartedTime = hmsPoll.startedAt
+                                triggerPollsNotification(hmsPoll)
+                            }
                         }
-                    }
-                    else if (hmsPollUpdateType == HMSPollUpdateType.resultsupdated) {
-                        viewModelScope.launch {
-                            if(isPrebuiltDebug)
-                                _events.emit(Event.PollVotesUpdated(hmsPoll))
+                        HMSPollUpdateType.stopped -> viewModelScope.launch {
+                            _events.emit(Event.PollEnded(hmsPoll))
+                        }
+                        HMSPollUpdateType.resultsupdated -> viewModelScope.launch {
+                            _events.emit(Event.PollVotesUpdated(hmsPoll))
                         }
                     }
                 }
@@ -1013,19 +1019,32 @@ class MeetingViewModel(
 
     }
 
+     fun triggerPollsNotification(poll: HmsPoll) {
+        hmsNotificationEvent.postValue(
+            HMSNotification(
+                title = "${poll.createdBy?.name.orEmpty()} started a new ${if (poll.category == HmsPollCategory.POLL) "poll" else "quiz"}",
+                isDismissible = true,
+                icon = R.drawable.poll_vote,
+                actionButtonText = if (poll.category == HmsPollCategory.POLL) "Vote" else "Join",
+                type = HMSNotificationType.OpenPollOrQuiz(pollId = poll.pollId)
+            )
+        )
+
+    }
+
     private fun updatePolls() {
+        // Just running this is enough since it will trigger the poll started notifications
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
-                viewModelScope.launch {
-                    result.sortedByDescending { it.startedAt }.firstOrNull()?.also { firstPoll ->
-                        if(isPrebuiltDebug)
-                            _events.emit(Event.PollStarted(firstPoll))
-                    }
-                }
+//                viewModelScope.launch {
+//                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
+//                        _events.emit(Event.PollStarted(firstPoll))
+//                    }
+//                }
             }
 
             override fun onError(error: HMSException) {
-                Log.d(TAG,"Polls error $error")
+//                Log.d(TAG,"Polls error $error")
             }
 
         })
@@ -1691,6 +1710,7 @@ class MeetingViewModel(
         data class CameraSwitchEvent(override val message: String) : MessageEvent(message)
         data class SessionMetadataEvent(override val message: String) : MessageEvent(message)
         data class PollStarted(val hmsPoll: HmsPoll) : Event()
+        data class PollEnded(val hmsPoll : HmsPoll) : Event()
         data class PollVotesUpdated(val hmsPoll: HmsPoll) : Event()
         data class RequestPermission(val permissions : Array<String>) : Event()
     }
@@ -1917,7 +1937,8 @@ class MeetingViewModel(
                     hmsPollBuilder
                         .addQuestion(multiChoice.build())
                 }
-                QuestionUi.QuestionCreator -> { /*Nothing to do here*/}
+                QuestionUi.QuestionCreator,
+                QuestionUi.AddAnotherItemView -> { /*Nothing to do here*/}
                 is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
                 is QuestionUi.SingleChoiceQuestion -> {
                     val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.singleChoice)
@@ -1990,6 +2011,11 @@ class MeetingViewModel(
         }
         return true
     }
+    fun saveSkipped(question: HMSPollQuestion, hmsPoll: HmsPoll) {
+//        val response = HMSPollResponseBuilder(hmsPoll, null)
+//
+//        localHmsInteractivityCenter.add()
+    }
     fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll) : Boolean {
         val valid = options != null
         val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
@@ -2044,6 +2070,8 @@ class MeetingViewModel(
     }
     fun hasPoll() : HmsPoll? = localHmsInteractivityCenter.polls.firstOrNull()
 
+    fun hmsInteractivityCenterPolls() = localHmsInteractivityCenter.polls
+
     suspend fun getAllPolls() : List<HmsPoll>? {
         val getStartedPolls = CompletableDeferred<List<HmsPoll>>()
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
@@ -2056,17 +2084,16 @@ class MeetingViewModel(
             }
 
         })
-        val getCreatedPolls = CompletableDeferred<List<HmsPoll>>()
-        localHmsInteractivityCenter.fetchPollList(HmsPollState.CREATED, object : HmsTypedActionResultListener<List<HmsPoll>>{
-            override fun onSuccess(result: List<HmsPoll>) {
-                getCreatedPolls.complete(result)
-            }
-
-            override fun onError(error: HMSException) {
-                getCreatedPolls.completeExceptionally(error)
-            }
-
-        })
+//        val getCreatedPolls = CompletableDeferred<List<HmsPoll>>()
+//        localHmsInteractivityCenter.fetchPollList(HmsPollState.CREATED, object : HmsTypedActionResultListener<List<HmsPoll>>{
+//            override fun onSuccess(result: List<HmsPoll>) {
+//                getCreatedPolls.complete(result)
+//            }
+//
+//            override fun onError(error: HMSException) {
+//                getCreatedPolls.completeExceptionally(error)
+//            }
+//        })
         val getEndedPolls = CompletableDeferred<List<HmsPoll>>()
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STOPPED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
@@ -2080,11 +2107,18 @@ class MeetingViewModel(
         })
 
         return try {
-            getStartedPolls.await()
-                .plus(getCreatedPolls.await())
-                .plus(getEndedPolls.await())
+            val polls = try {
+                getStartedPolls.await()
+            } catch (ex : HMSException) {
+                emptyList()
+            }
+            polls.plus(try {
+                getEndedPolls.await()
+            } catch (ex : HMSException) {
+                emptyList()
+            })
         } catch (error : HMSException) {
-
+            Log.d("AreTherePolls","$error")
             null
         }
     }
@@ -2095,6 +2129,11 @@ class MeetingViewModel(
 
     fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
         changeRole(handRaisePeer.peerID, onStageRole, false)
+    }
+
+    val openPollOrQuizzTrgger by lazy { MutableLiveData<String>() }
+    fun openPollsOrQuizTrigger(pollID: String) {
+        openPollOrQuizzTrgger.value = pollID
     }
 
     fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {
@@ -2141,6 +2180,10 @@ class MeetingViewModel(
 
     fun getFullPeerlistIterator(): PeerListIterator {
         return hmsSDK.getPeerListIterator()
+    }
+
+    fun showPollOnUi(): Boolean {
+        return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollRead == true || hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
     }
 }
 

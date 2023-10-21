@@ -5,13 +5,20 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.TextView
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.LayoutAddMoreBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.saveButtonDisabled
+import live.hms.roomkit.ui.theme.saveButtonEnabled
 import live.hms.roomkit.util.setOnSingleClickListener
 
 private var count : Long = 0
@@ -31,10 +38,14 @@ sealed class QuestionUi(open val index : Long, open val viewType : Int, open val
                           override val requiredToAnswer: Boolean) : QuestionUi(index, 3, requiredToAnswer)
     data class ShortAnswer(val text : String, override val index: Long,
                            override val requiredToAnswer: Boolean) : QuestionUi(index, 4, requiredToAnswer)
+    object AddAnotherItemView : QuestionUi(-1, 5, false)
+    object LaunchButton
 }
 
 class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
-                                              val saveInfo : (questionUi: QuestionUi) -> Unit
+                                              val saveInfo : (questionUi: QuestionUi) -> Unit,
+    val isPoll : () -> Boolean,
+                                              val reAddQuestionCreator: () -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -45,17 +56,33 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
             is QuestionUi.MultiChoiceQuestion -> bind(questionUi)
             is QuestionUi.ShortAnswer -> bind(questionUi)
             is QuestionUi.SingleChoiceQuestion -> bind(questionUi)
+            is QuestionUi.AddAnotherItemView -> bind(questionUi)
         }
     }
 
-
+    private fun bind(addMoreBinding: QuestionUi.AddAnotherItemView) {
+        with(binding as LayoutAddMoreBinding) {
+            applyTheme()
+        }
+        binding.addMoreOptions.setOnSingleClickListener {
+            reAddQuestionCreator()
+        }
+    }
     private fun bind(questionUi: QuestionUi.QuestionCreator) {
         with(binding as LayoutPollQuestionCreationItemBinding) {
+            binding.applyTheme()
             val requiredToAnswer = !notRequiredToAnswer.isChecked
-
-            val optionsAdapter = OptionsListAdapter()
+            val optionsAdapter = OptionsListAdapter().also {
+                it.refreshSubmitButton = { validateSaveButtonEnabledState(it, binding.saveButton) }
+            }
             optionsListView.adapter = optionsAdapter
             optionsListView.layoutManager = LinearLayoutManager(binding.root.context)
+            val divider =
+                DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
+                    setDrawable(binding.root.context.getDrawable(R.drawable.polls_creation_divider)!!)
+                }
+            if(isPoll())
+                optionsListView.addItemDecoration(divider)
             questionTypeSpinner.onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
@@ -63,8 +90,15 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     position: Int,
                     id: Long
                 ) {
+
                     // Reset options whenever a question type is selected
-                    optionsAdapter.submitList(emptyList())
+                    // Add two empty options
+                    val isPoll = isPoll()
+                    optionsAdapter.submitList(listOf(
+                        Option("", if(isPoll) null else isMultiOptionQuestionCreation(questionTypeSpinner)),
+                        Option("", if(isPoll) null else isMultiOptionQuestionCreation(questionTypeSpinner))
+                    ))
+
                     // If short/long answer hide the options else show them
                     val multiOptionVisibility = if(position > 1) View.GONE else View.VISIBLE
                     addAnOptionTextView.visibility = multiOptionVisibility
@@ -77,6 +111,7 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     } else {
                         ""
                     }
+
                     // Only the UI might need to be toggled
                     Log.d(TAG,"Toggle UI")
                 }
@@ -87,18 +122,16 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
 
             }
             addAnOptionTextView.setOnSingleClickListener {
-                val showCheckBox = questionTypeSpinner.selectedItemPosition == 1
-                optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
-                saveButton.isEnabled = true
+                val showCheckBox = isMultiOptionQuestionCreation(questionTypeSpinner)
+                addNewOption(optionsAdapter, showCheckBox)
             }
             deleteOptionTrashButton.setOnSingleClickListener {
                 // Delete the last option when delete is clicked.
                 optionsAdapter.submitList(optionsAdapter.currentList.dropLast(1))
-                saveButton.isEnabled = optionsAdapter.currentList.size > 1
             }
-            saveButton.isEnabled = false
+            saveButton.saveButtonDisabled()
             saveButton.setOnClickListener {
-                saveButton.isEnabled = false
+                saveButton.saveButtonDisabled()
                 val title = askAQuestionEditText.text.toString()
                 val newQuestionUi = when(questionTypeSpinner.selectedItemPosition){
                     // single, multi, short, long
@@ -138,7 +171,6 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
                     else -> null
                 }
                 // Reset the UI
-                optionsAdapter.submitList(emptyList())
                 askAQuestionEditText.setText("")
                 // Save the info
                 saveInfo(newQuestionUi!!)
@@ -146,12 +178,49 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
         }
     }
 
+    private fun isMultiOptionQuestionCreation(questionTypeSpinner: Spinner): Boolean {
+        return questionTypeSpinner.selectedItemPosition == 1
+    }
+
+    private fun addNewOption(optionsAdapter: OptionsListAdapter, showCheckBox: Boolean) {
+        optionsAdapter.submitList(optionsAdapter.currentList.plus(Option("", showCheckBox)))
+    }
+
+    private fun validateSaveButtonEnabledState(
+        optionsAdapter: OptionsListAdapter,
+        saveButton: TextView
+    ) {
+        // Validation criteria
+        // No empty answers.
+        // At least one answer.
+        val isPoll = isPoll()
+//        val isMultiOptionCreation = isMultiOptionQuestionCreation(questionTypeSpinner)
+        val allOptionsFilledInWithNoBlanks =  (optionsAdapter.currentList.none { it.text.isBlank() } &&
+            optionsAdapter.currentList.size > 0)
+
+        val enableButton = if(isPoll) {
+            allOptionsFilledInWithNoBlanks
+        } else {
+            // it's a quiz
+            // we have to check if every single choice and multi choice has
+            //  at least one answer selected
+            allOptionsFilledInWithNoBlanks &&
+                    optionsAdapter.currentList.any { it.isChecked }
+        }
+
+        if(enableButton)
+            saveButton.saveButtonEnabled()
+        else
+            saveButton.saveButtonDisabled()
+    }
+
     private fun bind(questionUi: QuestionUi.MultiChoiceQuestion) {
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding){
             questionTitle.text = questionUi.withTitle
             val adapter = ArrayAdapter<String>(binding.root.context, android.R.layout.simple_list_item_1)
-            options.layoutManager = LinearLayoutManager(binding.root.context)
+//            options.layoutManager = LinearLayoutManager(binding.root.context)
             adapter.addAll(questionUi.options)
+            options.adapter = adapter
         }
     }
 
@@ -159,8 +228,9 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding){
             questionTitle.text = questionUi.withTitle
             val adapter = ArrayAdapter<String>(binding.root.context, android.R.layout.simple_list_item_1)
-            options.layoutManager = LinearLayoutManager(binding.root.context)
+//            options.layoutManager = LinearLayoutManager(binding.root.context)
             adapter.addAll(questionUi.options)
+            options.adapter = adapter
         }
     }
 

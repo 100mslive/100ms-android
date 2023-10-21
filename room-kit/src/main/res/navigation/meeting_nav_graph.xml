@@ -205,6 +205,6 @@
     <fragment
         android:id="@+id/participantsTabFragment"
         android:name="live.hms.roomkit.ui.meeting.participants.ParticipantsTabFragment"
-        android:label="ParticipantsTabFragment" />
+        android:label="ParticipantsTabFragment" /><action android:id="@+id/action_global_pollDisplayFragment" app:destination="@id/pollDisplayFragment"/>
 
 </navigation>

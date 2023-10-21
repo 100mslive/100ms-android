@@ -9,7 +9,7 @@
         android:id="@+id/answer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="@dimen/spacing_d2"
         android:gravity="top"
         android:lineSpacingExtra="3sp"
         android:textAppearance="@style/poll_display_answer_item"
@@ -21,7 +21,7 @@
         android:id="@+id/totalVotes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="@dimen/spacing_d2"
         android:gravity="top"
         android:lineSpacingExtra="3sp"
         android:textAppearance="@style/poll_display_answer_item"
@@ -29,14 +29,12 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="23" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/questionProgressBar"
-        style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginTop="@dimen/spacing_d1"
+        android:layout_marginHorizontal="@dimen/spacing_d2"
         android:layout_weight="1"
         android:maxHeight="8dp"
         android:progressBackgroundTint="#2C333F"

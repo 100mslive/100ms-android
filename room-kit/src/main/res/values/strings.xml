@@ -240,4 +240,12 @@
     <string name="menu_item_mute_audio">Mute Audio</string>
     <string name="menu_item_mute_video">Mute Video</string>
     <string name="bring_on_stage">Bring on Stage</string>
+    <string name="poll_started_by">%1$s started a %2$s</string>
+    <string name="polls_question_numbering_text">"QUESTION %1$d OF %2$d : %3$s"</string>
+    <string name="polls_answer_button">Vote</string>
+    <string name="polls_answer_button_complete">Voted</string>
+    <string name="polls_quiz_answer_button">Answer</string>
+po    <string name="polls_quiz_answer_button_complete">Answered</string>
+    <string name="poll_title_heading">%1$s %2$s</string>
+    <string name="quiz_your_answer">Your Answer</string>
 </resources>

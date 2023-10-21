@@ -27,9 +27,11 @@ class PollsViewModel : ViewModel() {
         pollCreationInfo = pollCreationInfo.copy(hideVote = isHidden)
     }
 
-    fun highlightPollOrQuiz(isPoll : Boolean) {
+    fun setPollOrQuiz(isPoll : Boolean) {
         pollCreationInfo = pollCreationInfo.copy(isPoll = isPoll)
     }
 
     fun getPollsCreationInfo() = pollCreationInfo
+
+    fun isPoll() = pollCreationInfo.isPoll
 }

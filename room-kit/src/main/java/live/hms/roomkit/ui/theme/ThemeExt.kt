@@ -6,32 +6,40 @@ import android.graphics.*
 import android.graphics.drawable.*
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.shape.CornerFamily
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
+import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.dp
+import live.hms.video.polls.models.HmsPollState
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
 
@@ -1532,7 +1540,7 @@ fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
                     HMSPrebuiltTheme.getDefaults().surface_default)
             )
         }
-    val d2= getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.k, null)!!
+    val d2= getShape()
     .apply {
         setTint(
             getColorOrDefault(
@@ -1678,19 +1686,32 @@ internal fun LayoutParticipantsMergeBinding.applyTheme() {
     containerSearch.applyTheme()
     textInputSearch.applyTheme()
 }
-private fun backgroundShape(inset : Boolean = false): ShapeDrawable {
-    val eightDp = 8.dp().toFloat()
-    val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)
-    return if(inset) {ShapeDrawable(
-        RoundRectShape(
-            lines, RectF(1f,1f,1f,1f),
-            lines
-        ))} else {
+private fun backgroundShape(inset: Boolean = false, innerRadii : Float = 8.dp().toFloat()): ShapeDrawable {
+    val lines = floatArrayOf(
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii,
+        innerRadii
+    )
+    return if (inset) {
+        ShapeDrawable(
+            RoundRectShape(
+                lines, RectF(1f, 1f, 1f, 1f),
+                lines
+            )
+        )
+    } else {
         ShapeDrawable(
             RoundRectShape(
                 lines, null,
                 null
-            )   )
+            )
+        )
     }
 }
 fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
@@ -1807,4 +1828,581 @@ fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
             )
         )
     }
+}
+
+private fun trackTintList() : ColorStateList {
+    val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
+        intArrayOf(-android.R.attr.state_checked))
+
+    return ColorStateList(
+        checkedUncheckedState,
+        intArrayOf(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.primaryDefault,
+                HMSPrebuiltTheme.getDefaults().primary_default),
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+        )
+    )
+}
+
+private fun setSwitchThemes(switchCompat: SwitchMaterial) {
+    with(switchCompat) {
+        thumbTintList = thumbTintList()
+        trackTintList = trackTintList()
+    }
+
+    switchCompat.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+}
+private fun thumbTintList()  : ColorStateList {
+    val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
+        intArrayOf(-android.R.attr.state_checked))
+
+    return ColorStateList(
+        checkedUncheckedState,
+        intArrayOf(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp),
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.secondaryDefault,
+                HMSPrebuiltTheme.getDefaults().secondary_default)
+        )
+    )
+}
+
+// Polls
+
+fun LayoutPollQuestionCreationBinding.applyTheme() {
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+
+    )
+
+    backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+}
+fun LayoutPollsCreationBinding.applyTheme() {
+    backButton.drawable.setTint(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+
+    root.setBackgroundColor(        getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    )
+    )
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    previousPollsHeading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    pollIcon.setCardBackgroundColor(
+        getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    quizIcon.setCardBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+
+    pollIcDrawable.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    quizIcDrawable.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    pollText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
+    quizText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
+
+    pollTitleEditText.setHintTextColor(ColorStateList(
+        arrayOf( intArrayOf(android.R.attr.state_selected, -android.R.attr.state_selected)),
+        intArrayOf( getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
+    ))
+
+
+
+    pollTitleEditText.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
+    )
+
+    pollTitleEditText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    pollTitleEditText.setHintTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
+
+
+    previousPollsHeading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    settingStr.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+
+    border.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+
+    startPollButton.buttonEnabled()
+    setSwitchThemes(hideVoteCount)
+    setSwitchThemes(anonymous)
+    //setSwitchThemes(timer)
+    quizButton.isSelectedStroke(false)
+    quizIcon.isSelectedStroke(false)
+    pollButton.isSelectedStroke(true)
+    pollIcon.isSelectedStroke(true)
+
+
+}
+
+fun Button.voteButtons() {
+
+    val buttonDisabledBackgroundColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDisabled,
+        HMSPrebuiltTheme.getDefaults().primary_disabled)
+    val buttonDisabledTextColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryLow,
+        HMSPrebuiltTheme.getDefaults().onprimary_low_emp)
+
+
+    val buttonEnabledBackgroundColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default)
+
+    val buttonEnabledTextColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp)
+
+    val states = arrayOf(intArrayOf(android.R.attr.state_enabled),
+        intArrayOf(-android.R.attr.state_enabled))
+    val backgroundColors = intArrayOf(buttonEnabledBackgroundColor, buttonDisabledBackgroundColor)
+    val textColors = intArrayOf(buttonEnabledTextColor, buttonDisabledTextColor)
+
+    backgroundTintList = ColorStateList(
+        states,
+        backgroundColors
+    )
+
+    setTextColor(ColorStateList(
+        states,
+        textColors
+    ))
+
+}
+
+
+fun MaterialCardView.isSelectedStroke(isSelected : Boolean) {
+    if (isSelected.not())
+        this.strokeColor = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().primary_default)
+    else
+        this.strokeColor = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default)
+
+}
+
+
+fun LayoutPollsDisplayBinding.applyTheme() {
+    backButton.backgroundTintList =
+        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    pollStarterUsername.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+    pollsLive.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+    ))
+    pollsLive.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    ))
+}
+
+fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {
+    questionNumbering.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    questionText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    votebutton.voteButtons()
+
+}
+fun LayoutQuizDisplayShortAnswerBinding.applyTheme() {
+
+}
+
+fun LayoutPollsDisplayOptionsItemBinding.applyTheme() {
+    text.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    radioButton.buttonTintList = trackTintList()
+    checkbox.buttonTintList = trackTintList()
+}
+
+
+fun LayoutPollQuestionCreationItemBinding.applyTheme() {
+
+    root.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
+    )
+
+    questionTypeTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    questionTypeSpinner.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_bright,
+        R.drawable.gray_round_drawable
+    )
+
+    spinnerArrow.drawable.setTint(
+        getColorOrDefault(  HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().surface_default,)
+    )
+
+
+
+    askAQuestionEditText.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
+    )
+
+    askAQuestionEditText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    askAQuestionEditText.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    optionsHeading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    addAnOptionTextView.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    addAnOptionTextView.drawableStart?.setTint(
+    getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+    )
+    )
+
+    setSwitchThemes(notRequiredToAnswer)
+
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    saveButton.saveButtonEnabled()
+
+
+    border.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+}
+
+internal fun TextView.saveButtonEnabled() {
+    this.isEnabled = true
+
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        null
+    )
+
+}
+
+
+internal fun TextView.saveButtonDisabled() {
+    this.isEnabled = false
+
+
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryLow,
+            HMSPrebuiltTheme.getDefaults().onprimary_low_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
+        HMSPrebuiltTheme.getDefaults().primary_disabled,
+        null
+    )
+
+
+}
+
+fun LayoutPollQuizOptionsItemBinding.setTheme() {
+
+    text.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().surface_default,
+        R.drawable.gray_round_drawable
+    )
+
+    text.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    text.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    radioButton.buttonTintList = trackTintList()
+    checkbox.buttonTintList = trackTintList()
+
+}
+
+fun TextView.pollsStatusLiveDraftEnded(state: HmsPollState) {
+    text = when(state) {
+        HmsPollState.STARTED -> "LIVE"
+        HmsPollState.CREATED -> "DRAFT"
+        HmsPollState.STOPPED -> "ENDED"
+    }
+    val colorRes = when(state) {
+        HmsPollState.STARTED -> R.drawable.polls_status_background_live
+        HmsPollState.CREATED -> R.drawable.polls_status_background_draft
+        HmsPollState.STOPPED -> R.drawable.polls_status_background_ended
+    }
+    setBackgroundResource(colorRes)
+}
+fun LayoutPollsDisplayResultQuizAnswerItemsBinding.applyTheme() {
+    optionText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+    peopleAnswering.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+}
+fun LayoutPollsDisplayResultProgressBarsItemBinding.applyTheme() {
+    answer.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+    totalVotes.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    questionProgressBar.applyProgressbarTheme()
+}
+
+fun LinearProgressIndicator.applyProgressbarTheme() {
+    trackColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceBright,
+        HMSPrebuiltTheme.getDefaults().primary_default
+    )
+
+    setIndicatorColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().surface_bright
+    ))
+
+}
+
+fun LayoutAddMoreBinding.applyTheme() {
+    addMoreOptions.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    addMoreOptions.drawableStart = AppCompatResources.getDrawable(
+        root.context, R.drawable.add_circle_with_plus
+    )?.apply { setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+    }
+}
+
+fun PreviousPollsListBinding.applyTheme() {
+    root.setBackgroundColor(
+            HMSPrebuiltTheme.getColours()?.surfaceBright,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    )
+
+    viewButton.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp,
+        R.drawable.gray_round_drawable
+    )
+
+    viewButton.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+
+    status.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    )
+
+    status.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+
+
+
+}
+
+fun MaterialCardView.highlightCorrectAnswer(isCorrect : Boolean) {
+    strokeColor = if(isCorrect) {
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertSuccess,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    } else {
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    }
+    strokeWidth = 1.dp()
 }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -27,7 +28,7 @@ class PollQuestionCreation : Fragment() {
 
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val adapter = PollQuestionCreatorAdapter()
+    private val adapter = PollQuestionCreatorAdapter { pollsViewModel.isPoll() }
 
     private var binding by viewLifecycle<LayoutPollQuestionCreationBinding>()
 
@@ -53,6 +54,7 @@ class PollQuestionCreation : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initOnBackPress()
         with(binding) {
             backButton.setOnSingleClickListener { findNavController().popBackStack() }
             createdQuestionList.adapter = adapter
@@ -79,5 +81,15 @@ class PollQuestionCreation : Fragment() {
             // Will be enabled later.
             launchPollQuiz.isEnabled = false
         }
+    }
+
+    private fun initOnBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    binding.backButton.callOnClick()
+                }
+            })
     }
 }

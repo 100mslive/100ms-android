@@ -65,7 +65,6 @@ import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.HMSNotificationType
-import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.util.*
@@ -73,6 +72,7 @@ import live.hms.video.audio.HMSAudioManager
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
+import live.hms.video.polls.models.HmsPoll
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSHlsRecordingConfig
 import live.hms.video.sdk.models.HMSRemovedFromRoom
@@ -89,7 +89,6 @@ class MeetingFragment : Fragment() {
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
     }
 
-    private var startPollSnackBar : Snackbar? = null
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
 
@@ -130,10 +129,6 @@ class MeetingFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val poll = meetingViewModel.hasPoll()
-        if(poll != null) {
-            showPollStart(poll.pollId)
-        }
         isCountdownManuallyCancelled = false
         setupRecordingTimeView()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
@@ -526,9 +521,6 @@ class MeetingFragment : Fragment() {
                     is MeetingViewModel.Event.HlsEvent, is MeetingViewModel.Event.HlsRecordingEvent -> {
                         Log.d("RecordingState", "HlsEvent: ${event}")
                     }
-                    is MeetingViewModel.Event.PollStarted -> {
-                        showPollStart(event.hmsPoll.pollId)
-                    }
 
                     else -> null
                 }
@@ -671,16 +663,16 @@ class MeetingFragment : Fragment() {
         meetingViewModel.roleChange.observe(viewLifecycleOwner) {
             updateChatButtonWhenRoleChanges()
         }
+
     }
 
-
-    private fun showPollStart(pollId: String) {
-        startPollSnackBar?.dismiss()
-        startPollSnackBar = Snackbar.make(binding.root, "View Poll", Snackbar.LENGTH_INDEFINITE).setAction("Open") {
-            findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollDisplayFragment(pollId))}
-
-        startPollSnackBar?.show()
-    }
+//    private fun showPollStart(poll: HmsPoll) {
+//        val pollId = poll.pollId
+//        if (!showedPolls.contains(pollId)) {
+//            showedPolls.add(pollId)
+//            meetingViewModel.triggerPollsNotification(poll)
+//        }
+//    }
 
     private val pipReceiver by lazy {
         PipBroadcastReceiver(
@@ -1102,6 +1094,7 @@ class MeetingFragment : Fragment() {
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
                         onNameChange = {  },
+                        showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
                         onRecordingClicked = {
                             if (meetingViewModel.isRecordingState().not()) {
                                 meetingViewModel.recordMeeting(true, runnable = it)
@@ -1129,7 +1122,6 @@ class MeetingFragment : Fragment() {
                         findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToRoleChangeFragment())
                     },
                         {
-                            startPollSnackBar?.dismiss()
                             findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
                         })
                     settingsBottomSheet.show(

@@ -4,27 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.polls.PollsCreationFragment"
     android:layout_width="match_parent"
+    android:scrollbars="none"
+    android:id="@+id/root"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.AppCompatImageButton
+        <androidx.constraintlayout.widget.Group
+            android:layout_width="wrap_content"
+            android:id="@+id/creationFlowUi"
+            app:constraint_referenced_ids="subtitle,poll_button,quiz_button,quiz_name_str,pollTitleEditText,setting_str,hideVoteCount,anonymous,startPollButton"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
             android:id="@+id/backButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/back_icon"
+            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="@dimen/spacing_d3"
+            android:src="@drawable/left_arrow"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/heading"
-            style="@style/HmsHeadings"
+            android:textSize="20sp"
+            android:layout_marginStart="12dp"
+            android:lineHeight="24sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:text="Poll/Quiz"
+            android:fontFamily="@font/inter_bold"
             app:layout_constraintBottom_toBottomOf="@id/backButton"
             app:layout_constraintLeft_toRightOf="@id/backButton"
             app:layout_constraintTop_toTopOf="@id/backButton" />
@@ -33,116 +45,247 @@
             android:id="@+id/subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
+            android:textSize="12sp"
+            android:layout_marginBottom="@dimen/eight_dp"
+            android:fontFamily="@font/inter_regular"
             android:text="Select the type you want to continue with"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/heading" />
 
-        <Button
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/poll_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="15dp"
-            android:drawableLeft="@drawable/poll_icon"
-            android:text="Poll"
+            app:strokeWidth="1dp"
+            android:layout_marginTop="@dimen/eight_dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="@dimen/eight_dp"
+            android:elevation="@dimen/eight_dp"
+            android:layout_marginLeft="@dimen/spacing_d3"
+            android:layout_marginRight="@dimen/eight_dp"
             app:layout_constraintEnd_toStartOf="@+id/quiz_button"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/subtitle" />
-
-        <Button
-            android:id="@+id/quiz_button"
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:drawableLeft="@drawable/quiz_icon"
-            android:text="Quiz"
+            android:layout_height="64dp">
+
+            <com.google.android.material.card.MaterialCardView
+                app:strokeWidth="1dp"
+                android:id="@+id/poll_icon"
+                app:cardCornerRadius="@dimen/eight_dp"
+                android:layout_margin="@dimen/eight_dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+                <ImageView
+                    android:padding="8dp"
+                    android:id="@+id/poll_ic_drawable"
+                    android:src="@drawable/poll_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/poll_text"
+                android:fontFamily="@font/inter_bold"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="64dp"
+                android:textSize="16sp"
+                android:lineHeight="24sp"
+                android:text="Poll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/quiz_button"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:strokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/poll_button"
-            app:layout_constraintTop_toTopOf="@id/poll_button" />
+            app:layout_constraintTop_toTopOf="@id/poll_button"
+            app:cardCornerRadius="@dimen/eight_dp"
+            android:elevation="@dimen/eight_dp"
+            android:layout_marginLeft="@dimen/eight_dp"
+            android:layout_marginRight="@dimen/spacing_d3"
+            android:layout_width="0dp"
+            android:layout_height="64dp">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/pollNameEditText"
+            <com.google.android.material.card.MaterialCardView
+                app:strokeWidth="1dp"
+                android:id="@+id/quiz_icon"
+                app:cardCornerRadius="@dimen/eight_dp"
+                android:layout_margin="@dimen/eight_dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+                <ImageView
+                    android:padding="8dp"
+                    android:id="@+id/quiz_ic_drawable"
+                    android:src="@drawable/quiz_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/quiz_text"
+                android:fontFamily="@font/inter_bold"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="64dp"
+                android:textSize="16sp"
+                android:lineHeight="24sp"
+                android:text="Quiz"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <TextView
+            app:layout_constraintTop_toBottomOf="@id/quiz_button"
+            android:id="@+id/quiz_name_str"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
+            android:textSize="12sp"
+            android:layout_marginBottom="@dimen/eight_dp"
+            android:fontFamily="@font/inter_regular"
+            android:text="Enter Name"
+            app:layout_constraintLeft_toLeftOf="parent"
+             />
+
+
+        <EditText
+            android:singleLine="true"
+            android:maxLines="1"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:background="@drawable/gray_round_drawable"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:id="@+id/pollTitleEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="@dimen/poll_distancing"
-            android:layout_marginEnd="24dp"
+            android:layout_marginTop="@dimen/eight_dp"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
             android:hint="Name this poll"
             app:layout_constraintLeft_toLeftOf="@id/poll_button"
-            app:layout_constraintTop_toBottomOf="@id/quiz_button">
+            app:layout_constraintTop_toBottomOf="@id/quiz_name_str"
+            />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/pollTitleEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <View
+            app:layout_constraintTop_toBottomOf="@id/pollTitleEditText"
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="0.5px"
+            android:layout_marginVertical="@dimen/spacing_d3"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:background="@drawable/gray_line_vertical_divider" />
 
-        <androidx.appcompat.widget.SwitchCompat
+
+        <TextView
+            android:id="@+id/setting_str"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
+            android:textSize="12sp"
+            android:lineHeight="20sp"
+            android:layout_marginBottom="@dimen/eight_dp"
+            android:fontFamily="@font/inter_regular"
+            android:text="Settings"
+            app:layout_constraintTop_toBottomOf="@id/border"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/hideVoteCount"
-            android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/poll_distancing"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:fontFamily="@font/inter_regular"
+            android:textSize="13sp"
             android:text="Hide Vote Count"
-            app:layout_constraintLeft_toLeftOf="@id/pollNameEditText"
-            app:layout_constraintTop_toBottomOf="@id/pollNameEditText"
-            app:switchPadding="@dimen/polls_switch_padding" />
+            app:layout_constraintLeft_toLeftOf="@id/pollTitleEditText"
+            app:layout_constraintTop_toBottomOf="@id/setting_str"
+             />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/anonymous"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/poll_distancing"
+            android:layout_width="match_parent"
+            android:padding="0dp"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:fontFamily="@font/inter_regular"
+            android:textSize="13sp"
             android:text="Make results anonymous"
-            app:layout_constraintLeft_toLeftOf="@id/pollNameEditText"
+            app:layout_constraintLeft_toLeftOf="@id/pollTitleEditText"
             app:layout_constraintTop_toBottomOf="@id/hideVoteCount"
-            app:switchPadding="@dimen/polls_switch_padding" />
+            />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/timer"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/poll_distancing"
+            android:layout_marginTop="@dimen/fixed_spacing_d3"
             android:text="Timer"
-            app:layout_constraintLeft_toLeftOf="@id/pollNameEditText"
+            app:layout_constraintLeft_toLeftOf="@id/pollTitleEditText"
             app:layout_constraintTop_toBottomOf="@id/anonymous"
-            app:switchPadding="@dimen/polls_switch_padding" />
+            />
 
 
-        <androidx.appcompat.widget.AppCompatButton
+        <TextView
             android:id="@+id/startPollButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="24dp"
-            android:background="@drawable/primary_blue_round_drawable"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginVertical="@dimen/spacing_d1"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/inter_bold"
             android:text="Start Poll"
             app:layout_constraintTop_toBottomOf="@id/timer" />
 
         <TextView
             android:id="@+id/previousPollsHeading"
+            android:textSize="20sp"
+            android:layout_marginStart="12dp"
+            android:lineHeight="24sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_bold"
             app:layout_constraintLeft_toLeftOf="@id/timer"
             app:layout_constraintTop_toBottomOf="@id/startPollButton"
-            android:layout_marginTop="36dp"
-            style="@style/HmsHeadings"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/previousPolls"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/spacing_d3"
+            android:layout_marginBottom="@dimen/spacing_d1"
             android:text="Previous Polls/Quizzes"
             />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/previousPolls"
-            android:layout_marginTop="12dp"
-            tools:listitem="@layout/layout_previous_poll_card"
-            tools:itemCount="2"
-            app:layout_constraintLeft_toLeftOf="@id/previousPollsHeading"
-            app:layout_constraintTop_toBottomOf="@id/previousPollsHeading"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="@dimen/spacing_d3"
             android:layout_height="wrap_content"
-            />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/previousPollsHeading"
+            tools:itemCount="5"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:listitem="@layout/layout_previous_poll_card" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
