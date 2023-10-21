@@ -2,9 +2,11 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    app:cardCornerRadius="@dimen/spacing_d1"
     android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:layout_marginRight="16dp">
+    android:layout_marginTop="16dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,17 +15,19 @@
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="16dp"
-            android:fontFamily="@font/inter_regular"
-            android:textSize="16dp"
-            android:lineHeight="24px"
-            android:gravity="top|start"
-            android:lineSpacingExtra="3sp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="@dimen/spacing_d2"
+            android:layout_marginTop="16dp"
+            android:maxLines="1"
+            android:layout_toStartOf="@+id/status"
+            android:fontFamily="@font/inter_semibold"
+            android:gravity="top|start"
+            android:lineHeight="24sp"
+            android:textSize="16sp"
             tools:text="Poll Title" />
 
         <TextView
@@ -32,7 +36,7 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:fontFamily="@font/inter_regular"
-            android:textSize="10dp"
+            android:textSize="10sp"
             android:lineHeight="16px"
             android:gravity="top|end"
             android:paddingHorizontal="8dp"
@@ -43,18 +47,20 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"/>
 
-        <Button
+        <TextView
             android:id="@+id/viewButton"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/name"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:paddingHorizontal="@dimen/spacing_d2"
+            android:paddingVertical="@dimen/spacing_d1"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_gravity="right"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="#2672ED"
-            android:layout_margin="16dp"
-            android:background="@drawable/polls_blue_button_shape"
             android:text="View" />
 
     </RelativeLayout>

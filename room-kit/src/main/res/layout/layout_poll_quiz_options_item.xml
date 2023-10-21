@@ -9,14 +9,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <CheckBox
-        android:padding="8dp"
         android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         />
     <EditText
+        android:hint="e.g. Who will win the match?"
+        android:textSize="12sp"
+        android:fontFamily="@font/inter_regular"
         android:id="@+id/text"
-        android:paddingHorizontal="16dp"
+        android:paddingHorizontal="@dimen/spacing_d2"
         android:paddingVertical="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

@@ -5,11 +5,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewbinding.ViewBinding
+import live.hms.roomkit.databinding.LayoutAddMoreBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 
-class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
+class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
     // Will be called when a single question is added to the adapter
@@ -47,9 +48,13 @@ class PollQuestionCreatorAdapter : ListAdapter<QuestionUi, PollQuestionViewHolde
                 LayoutPollQuizOptionsItemMultiChoiceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             }
             3,4 -> LayoutPollQuizItemShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            5 -> LayoutAddMoreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it)) })
+        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it).minus(QuestionUi.QuestionCreator).plus(QuestionUi.AddAnotherItemView)) }, isPoll)
+        {
+            submitList(listOf(QuestionUi.QuestionCreator).plus(currentList).minus(QuestionUi.AddAnotherItemView))
+        }
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {

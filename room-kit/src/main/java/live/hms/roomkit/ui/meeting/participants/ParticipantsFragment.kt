@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.meeting.participants
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.setOnSingleClickListener
@@ -35,58 +40,43 @@ class ParticipantsFragment : Fragment() {
             requireActivity().application
         )
     }
-    private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, {
-        if (isLargeRoom) {
-            paginatedPeerList
-        } else {
-            meetingViewModel.peers
-        }
-    }, { role ->
-        getNextPage(role)
-    })
+    private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, lifecycleScope,
+        viewLifecycleOwner
+    ) { binding.participantsBack.visibility = View.VISIBLE }
     }
 
 
-    private val iteratorMap = hashMapOf<String, PeerListIterator>()
+
     private val paginatedPeerList = arrayListOf<HMSPeer>()
     private var isLargeRoom = false
-    private var isPaginatedPeerlistInitialized = false
+    private var iteratorsInitated = false
 
-    private fun getNextPage(role: String) {
-        val iterator = iteratorMap[role]
-        iterator?.next(object : PeerListResultListener{
-            override fun onError(error: HMSException) {
-                meetingViewModel.triggerErrorNotification(message = error.message)
-            }
 
-            override fun onSuccess(result: ArrayList<HMSPeer>) {
-                // add the next page of peers into final list
-                paginatedPeerList.addAll(result)
-               lifecycleScope.launch {
-                   participantsUseCase.updateParticipantsAdapter(getPeerList(), iteratorMap)
-               }
-            }
-
-        })
-    }
-
-    private suspend fun getPeerList(): List<HMSPeer> {
-        return if (isLargeRoom) {
-            if (!isPaginatedPeerlistInitialized) {
-                val deferred = CompletableDeferred<Boolean>()
-                initPaginatedPeerlist(deferred)
-                deferred.await()
-            }
-            // Return  the combined list of real time and non real time peers
-            val realtimePeers = meetingViewModel.peers
-            val filteredPaginatedPeers = paginatedPeerList.filter { !realtimePeers.contains(it) }
-
-            meetingViewModel.peers.plus(filteredPaginatedPeers)
-        } else {
-            // Return only Real time peers
-            meetingViewModel.peers
-        }
-    }
+//    private suspend fun getPeerList(resetIterators : Boolean = false): List<HMSPeer> {
+//        return if (isLargeRoom) {
+//            if (!iteratorsInitated || resetIterators) {
+//                // Init before we begin
+//                iteratorsInitated = true
+//                try {
+//                    if(resetIterators) {
+//                        paginatedPeerList.clear()
+//                    }
+//                    paginatedPeerList.addAll(initPaginatedPeerListAndIterators())
+//                } catch (exception : HMSException) {
+//                    iteratorsInitated = false
+//                    Log.e("PaginatedPeerListError","$exception")
+//                }
+//            }
+//            // Return  the combined list of real time and non real time peers
+//            val realtimePeers = meetingViewModel.peers
+//            val filteredPaginatedPeers = paginatedPeerList.filter { !realtimePeers.contains(it) }
+//
+//            meetingViewModel.peers.plus(filteredPaginatedPeers)
+//        } else {
+//            // Return only Real time peers
+//            meetingViewModel.peers
+//        }
+//    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -112,6 +102,12 @@ class ParticipantsFragment : Fragment() {
         binding.closeButton.setOnSingleClickListener {
             closeButton()
         }
+        binding.participantsBack.setOnClickListener {
+            lifecycleScope.launch {
+                participantsUseCase.roleFiltering(null)
+                binding.participantsBack.visibility = View.GONE
+            }
+        }
         // Search disables conventional updates.
         participantsUseCase.initSearchView(binding.textInputSearch, lifecycleScope)
     }
@@ -123,35 +119,6 @@ class ParticipantsFragment : Fragment() {
             .commitAllowingStateLoss()
     }
 
-    private suspend fun initPaginatedPeerlist(initPaginationDeferred: CompletableDeferred<Boolean>) {
-        lifecycleScope.launch {
-            // Now fetch the first set of peers for all off-stage roles
-            val offStageRoleNames = meetingViewModel.prebuiltInfoContainer.offStageRoles(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.name!!)
-            offStageRoleNames?.let {
-                for (role in it) {
-                    if (role != null) {
-                        val iterator = meetingViewModel.getPeerlistIterator(role)
-                        iteratorMap[role] = iterator
-                        val deferred = CompletableDeferred<Boolean>()
-                        // Get the first page
-                        iterator.next(object : PeerListResultListener{
-                            override fun onError(error: HMSException) {
-                                deferred.complete(false)
-                            }
-
-                            override fun onSuccess(result: ArrayList<HMSPeer>) {
-                                isPaginatedPeerlistInitialized =  true
-                                paginatedPeerList.addAll(result)
-                                deferred.complete(true)
-                            }
-                        })
-                        deferred.await()
-                    }
-                }
-            }
-            initPaginationDeferred.complete(true)
-        }
-    }
 
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
@@ -159,11 +126,12 @@ class ParticipantsFragment : Fragment() {
         // Initial updating of views
         // Using HMSCoroutine scope here since we want the next call to get queued
 //        initPaginatedPeerlist()
-        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
-            lifecycleScope.launch {
-                participantsUseCase.updateParticipantsAdapter(getPeerList(), iteratorMap = iteratorMap)
-            }
-        }
+//            meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
+//            lifecycleScope.launch {
+//                periodicallyUpdatePeerListForLargeRoom() // WARING: This clears the peerlist
+//                participantsUseCase.updateParticipantsAdapter(getPeerList(), true)
+//            }
+//        }
         meetingViewModel.peerCount.observe(viewLifecycleOwner,::updateParticipantCount)
 
         meetingViewModel.state.observe(viewLifecycleOwner) { state ->
@@ -188,16 +156,12 @@ class ParticipantsFragment : Fragment() {
 
                 alertDialog = builder.create().apply { show() }
             }
-
-
         }
     }
 
     override fun onDestroy() {
+        participantsUseCase.clear()
         super.onDestroy()
-        paginatedPeerList.clear()
-        isPaginatedPeerlistInitialized = false
-        iteratorMap.clear()
     }
 
     private fun initOnBackPress() {

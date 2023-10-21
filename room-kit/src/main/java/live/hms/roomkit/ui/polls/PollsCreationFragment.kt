@@ -4,18 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.databinding.LayoutPollsCreationBinding
-import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
 import live.hms.roomkit.ui.polls.previous.PreviousPollsInfo
+import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.isSelectedStroke
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.viewLifecycle
 
@@ -28,7 +29,9 @@ class PollsCreationFragment : Fragment(){
     private var binding by viewLifecycle<LayoutPollsCreationBinding>()
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel : MeetingViewModel by activityViewModels()
-
+    val previousPollsAdaptor by lazy {PreviousPollsAdaptor{previousPollsInfo ->
+        findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollDisplayFragment(previousPollsInfo.pollId))
+    }}
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,28 +43,49 @@ class PollsCreationFragment : Fragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initOnBackPress()
+        binding.creationFlowUi.visibility = View.GONE//if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
         with(binding) {
+            applyTheme()
             backButton.setOnSingleClickListener { findNavController().popBackStack() }
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
-            pollButton.setOnSingleClickListener { highlightPollOrQuiz(true)
-                pollsViewModel.highlightPollOrQuiz(true)}
+            pollButton.setOnSingleClickListener {
+                highlightPollOrQuiz(true)
+                pollsViewModel.setPollOrQuiz(true)
+            }
             pollButton.callOnClick()
-            quizButton.setOnSingleClickListener { highlightPollOrQuiz(false)
-                pollsViewModel.highlightPollOrQuiz(false)}
+            quizButton.setOnSingleClickListener {
+                highlightPollOrQuiz(false)
+                pollsViewModel.setPollOrQuiz(false)
+            }
             anonymous.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.isAnon(isChecked) }
             timer.setOnCheckedChangeListener{_,isChecked -> pollsViewModel.setTimer(isChecked)}
             startPollButton.setOnSingleClickListener { startPoll() }
-            val previousPollsAdaptor = PreviousPollsAdaptor{previousPollsInfo ->
-                findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollDisplayFragment(previousPollsInfo.pollId))
-            }
+
             previousPolls.adapter = previousPollsAdaptor
             previousPolls.layoutManager = LinearLayoutManager(context)
+
             lifecycleScope.launch {
-                val polls = meetingViewModel.getAllPolls()?.map { PreviousPollsInfo(it.title, it.state, it.pollId) }
-                previousPollsAdaptor.submitList(polls ?: emptyList())
+                meetingViewModel.getAllPolls()
+                refreshPreviousPollsList()
+            }
+
+            lifecycleScope.launch {
+                meetingViewModel.events.collect { event ->
+                    if(event is MeetingViewModel.Event.PollStarted || event is MeetingViewModel.Event.PollEnded) {
+                        refreshPreviousPollsList()
+                    }
+                }
             }
 
         }
+    }
+
+    private fun refreshPreviousPollsList() {
+        val polls = meetingViewModel.hmsInteractivityCenterPolls()
+            .sortedWith(compareBy({it.state},{-it.startedAt}))
+            .map { PreviousPollsInfo(it.title, it.state, it.pollId) }
+        previousPollsAdaptor.submitList(polls)
     }
 
     private fun startPoll() {
@@ -75,7 +99,21 @@ class PollsCreationFragment : Fragment(){
     private fun highlightPollOrQuiz(isPoll : Boolean) {
         // Whichever button is selected, disable it.
         // Hopefully the UI for the opposite one will be grayed.
-        binding.quizButton.isEnabled = isPoll
-        binding.pollButton.isEnabled = !isPoll
+        binding.quizButton.isSelectedStroke(!isPoll)
+        binding.quizIcon.isSelectedStroke(!isPoll)
+
+        binding.pollButton.isSelectedStroke(isPoll)
+        binding.pollIcon.isSelectedStroke(isPoll)
     }
+
+    private fun initOnBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    binding.backButton.callOnClick()
+                }
+            })
+    }
+
 }

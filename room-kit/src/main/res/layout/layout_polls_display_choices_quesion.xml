@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp">
+    android:layout_margin="@dimen/spacing_d2">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,12 +11,14 @@
         android:orientation="vertical">
 
         <TextView
+            android:gravity="center_vertical"
+            android:drawablePadding="@dimen/spacing_d1"
             android:id="@+id/questionNumbering"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="16dp"
-            android:gravity="top"
+            android:layout_marginTop="@dimen/spacing_d2"
+            android:layout_marginLeft="@dimen/spacing_d2"
+            android:lineHeight="16dp"
             android:lineSpacingExtra="3sp"
             android:textAppearance="@style/poll_display_question_numbering"
             tools:text="Question X of Y" />
@@ -26,35 +28,49 @@
             android:textAppearance="@style/poll_display_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp" />
+            android:layout_marginLeft="@dimen/spacing_d2"
+            android:layout_marginTop="@dimen/spacing_d2" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/options"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="@dimen/spacing_d2"
             android:layout_gravity="right"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_d2"
             android:nestedScrollingEnabled="false" />
-
-        <Button
-            android:id="@+id/votebutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="right"
-            android:backgroundTint="#2672ED"
-            android:layout_margin="16dp"
-            android:background="@drawable/polls_blue_button_shape"
-            android:text="Vote" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/votingProgressBars"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_d2"
             android:nestedScrollingEnabled="false" />
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_margin="@dimen/spacing_d2"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/skipButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:visibility="gone"
+                android:text="Skip"
+                />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                />
+            <Button
+                android:id="@+id/votebutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                tools:text="Vote/Answer" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

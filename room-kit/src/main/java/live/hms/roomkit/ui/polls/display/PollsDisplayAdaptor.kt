@@ -2,11 +2,13 @@ package live.hms.roomkit.ui.polls.display
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.graphics.drawable.DrawableCompat.applyTheme
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
@@ -22,16 +24,18 @@ import live.hms.video.sdk.models.HMSPeer
 
 // Also we need not only the question but whether it was answered and some details like the number of votes.
 data class QuestionContainer(
+    val poll : HmsPoll,
     val question: HMSPollQuestion,
     var textAnswers : String? = null,
-    var voted : Boolean = false
+    var voted : Boolean = false,
 )
 class PollsDisplayAdaptor(
     val localPeer : HMSPeer,
     val getPoll : HmsPoll,
     val saveInfoText : (question: HMSPollQuestion, answer : String, hmsPoll : HmsPoll) -> Boolean,
     val saveInfoSingleChoice : (question : HMSPollQuestion, Int?, hmsPoll : HmsPoll) -> Boolean,
-    val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll) -> Boolean
+    val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll) -> Boolean,
+    val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit
 ) : ListAdapter<QuestionContainer, PollDisplayQuestionHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
@@ -42,7 +46,7 @@ class PollsDisplayAdaptor(
     val updater : MutableList<PollDisplayQuestionHolder<ViewBinding>> = mutableListOf()
 
     fun displayPoll(hmsPoll: HmsPoll) {
-        val questions = hmsPoll.questions?.map { QuestionContainer(it, voted = it.voted) }
+        val questions = hmsPoll.questions?.map { QuestionContainer(hmsPoll, it, voted = it.voted) }
         if(questions != null) {
             submitList(questions)
         }
@@ -71,12 +75,16 @@ class PollsDisplayAdaptor(
     ): PollDisplayQuestionHolder<ViewBinding> {
         val view = when(viewType) {
             HMSPollQuestionType.multiChoice.ordinal,
-            HMSPollQuestionType.singleChoice.ordinal-> LayoutPollsDisplayChoicesQuesionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            HMSPollQuestionType.singleChoice.ordinal-> LayoutPollsDisplayChoicesQuesionBinding.inflate(LayoutInflater.from(parent.context), parent, false).also {
+                it.applyTheme()
+            }
             HMSPollQuestionType.shortAnswer.ordinal,
-            HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            HMSPollQuestionType.longAnswer.ordinal-> LayoutQuizDisplayShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false).also {
+                it.applyTheme()
+            }
             else -> null
         }
-        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice)
+        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
             updater.add(questionHolder)
         }
@@ -106,7 +114,7 @@ class PollsDisplayAdaptor(
         updater.forEach { action ->
             val questions = hmsPoll.questions
             if(questions != null) {
-                action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll)
+                action.votingProgressAdapter?.updateProgressBar(questions, hmsPoll, canViewResponses(getPoll, localPeer))
             }
         }
     }

@@ -21,10 +21,11 @@
     <dimen name="curve">12dp</dimen>
     <dimen name="spacing_d1">8dp</dimen>
     <dimen name="spacing_d2">16dp</dimen>
+    <dimen name="spacing_d3">24dp</dimen>
+    <dimen name="fixed_spacing_d1">@dimen/spacing_d1</dimen>
+    <dimen name="fixed_spacing_d3">@dimen/spacing_d3</dimen>
     <dimen name="spacing_d4">32dp</dimen>
     <dimen name="participant_item_icon">24dp</dimen>
     <dimen name="participant_item_icon_padding">4dp</dimen>
-
-    <dimen name="poll_distancing">14dp</dimen>
     <dimen name="polls_switch_padding">8dp</dimen>
 </resources>

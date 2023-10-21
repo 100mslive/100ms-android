@@ -10,7 +10,8 @@ import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
 
 class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
                        getItem: (position : Int) -> Option,
-                       selectOnlyCurrentPosition : (Int) -> Unit ) : ViewHolder(binding.root) {
+                       selectOnlyCurrentPosition : (Int) -> Unit,
+                       refreshSubmitButton : () -> Unit) : ViewHolder(binding.root) {
     init {
         if(bindingAdapterPosition != NO_POSITION) {
             binding.text.setText(getItem(bindingAdapterPosition).text)
@@ -20,19 +21,33 @@ class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
         }
         // Both set the same property, only one will be used.
         binding.radioButton.setOnCheckedChangeListener { _, isChecked ->
-            getItem(bindingAdapterPosition).isChecked = isChecked
             // Radio buttons reset all others when selected
-            selectOnlyCurrentPosition(bindingAdapterPosition)
+            if(isChecked)
+                selectOnlyCurrentPosition(bindingAdapterPosition)
+            refreshSubmitButton()
         }
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             getItem(bindingAdapterPosition).isChecked = isChecked
+            refreshSubmitButton()
         }
     }
     fun bind(option : Option) {
         binding.radioButton.isChecked = option.isChecked
         binding.checkbox.isChecked = option.isChecked
-        binding.checkbox.visibility = if(option.showCheckbox) View.VISIBLE else View.GONE
-        binding.radioButton.visibility = if(option.showCheckbox) View.GONE else View.VISIBLE
+        when(option.showCheckbox) {
+            true -> {
+                binding.checkbox.visibility = View.VISIBLE
+                binding.radioButton.visibility = View.GONE
+            }
+            false -> {
+                binding.radioButton.visibility = View.VISIBLE
+                binding.checkbox.visibility = View.GONE
+            }
+            null -> {
+                binding.checkbox.visibility = View.GONE
+                binding.radioButton.visibility = View.GONE
+            }
+        }
         binding.text.setText(option.text)
     }
 }
