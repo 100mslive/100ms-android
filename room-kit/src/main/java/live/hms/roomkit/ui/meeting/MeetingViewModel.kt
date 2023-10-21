@@ -106,7 +106,7 @@ class MeetingViewModel(
         .setLogSettings(hmsLogSettings)
         .build()
 
-    private val showedPolls by lazy { HashSet<String>() }
+    private var lastPollStartedTime : Long = 0
 
     val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
         .apply {
@@ -118,8 +118,9 @@ class MeetingViewModel(
                     when(hmsPollUpdateType) {
                         HMSPollUpdateType.started -> viewModelScope.launch {
                             _events.emit(Event.PollStarted(hmsPoll))
-                            if (!showedPolls.contains(hmsPoll.pollId)) {
-                                showedPolls.add(hmsPoll.pollId)
+                            // Only show latest polls
+                            if (lastPollStartedTime < hmsPoll.startedAt) {
+                                lastPollStartedTime = hmsPoll.startedAt
                                 triggerPollsNotification(hmsPoll)
                             }
                         }
@@ -1032,17 +1033,18 @@ class MeetingViewModel(
     }
 
     private fun updatePolls() {
+        // Just running this is enough since it will trigger the poll started notifications
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
-                viewModelScope.launch {
-                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
-                        _events.emit(Event.PollStarted(firstPoll))
-                    }
-                }
+//                viewModelScope.launch {
+//                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
+//                        _events.emit(Event.PollStarted(firstPoll))
+//                    }
+//                }
             }
 
             override fun onError(error: HMSException) {
-                Log.d(TAG,"Polls error $error")
+//                Log.d(TAG,"Polls error $error")
             }
 
         })
