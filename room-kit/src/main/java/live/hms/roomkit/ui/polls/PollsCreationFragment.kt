@@ -82,7 +82,9 @@ class PollsCreationFragment : Fragment(){
     }
 
     private fun refreshPreviousPollsList() {
-        val polls = meetingViewModel.hmsInteractivityCenterPolls().map { PreviousPollsInfo(it.title, it.state, it.pollId) }
+        val polls = meetingViewModel.hmsInteractivityCenterPolls()
+            .sortedWith(compareBy({it.state},{-it.startedAt}))
+            .map { PreviousPollsInfo(it.title, it.state, it.pollId) }
         previousPollsAdaptor.submitList(polls)
     }
 
