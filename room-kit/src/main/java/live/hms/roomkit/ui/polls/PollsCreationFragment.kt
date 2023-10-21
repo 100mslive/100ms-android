@@ -72,7 +72,7 @@ class PollsCreationFragment : Fragment(){
 
             lifecycleScope.launch {
                 meetingViewModel.events.collect { event ->
-                    if(event is MeetingViewModel.Event.PollStarted) {
+                    if(event is MeetingViewModel.Event.PollStarted || event is MeetingViewModel.Event.PollEnded) {
                         refreshPreviousPollsList()
                     }
                 }
