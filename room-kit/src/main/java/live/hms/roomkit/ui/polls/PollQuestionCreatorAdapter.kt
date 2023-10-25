@@ -17,7 +17,7 @@ class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<Questi
     var isReady : ((ready : Boolean) -> Unit)? = null
     init {
         // Adaptor begins with the question creation ui.
-        submitList(listOf(QuestionUi.QuestionCreator))
+        submitList(listOf(QuestionUi.QuestionCreator()))
     }
 
     companion object {
@@ -51,9 +51,9 @@ class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<Questi
             5 -> LayoutAddMoreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it).minus(QuestionUi.QuestionCreator).plus(QuestionUi.AddAnotherItemView)) }, isPoll)
+        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it).minus(QuestionUi.QuestionCreator()).plus(QuestionUi.AddAnotherItemView)) }, isPoll)
         {
-            submitList(listOf(QuestionUi.QuestionCreator).plus(currentList).minus(QuestionUi.AddAnotherItemView))
+            submitList(listOf(QuestionUi.QuestionCreator()).plus(currentList).minus(QuestionUi.AddAnotherItemView))
         }
     }
 

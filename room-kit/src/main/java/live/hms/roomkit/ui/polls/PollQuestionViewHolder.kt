@@ -24,7 +24,7 @@ import live.hms.roomkit.util.setOnSingleClickListener
 private var count : Long = 0
 sealed class QuestionUi(open val index : Long, open val viewType : Int, open val requiredToAnswer : Boolean){
     // Makes the creator UI show up first.
-    object QuestionCreator : QuestionUi(0, 0, false)
+    data class QuestionCreator(var questionUi: QuestionUi? = null) : QuestionUi(0, 0, false)
 
     // Actual questions that might be asked.
     data class MultiChoiceQuestion(val withTitle: String, val options: List<String>, val correctOptionIndex: List<Int>?, override val index : Long,
@@ -51,7 +51,7 @@ class PollQuestionViewHolder<T : ViewBinding>(val binding: T,
 
     fun bind(questionUi: QuestionUi) {
         when(questionUi) {
-            is QuestionUi.QuestionCreator -> bind(QuestionUi.QuestionCreator)
+            is QuestionUi.QuestionCreator -> bind(QuestionUi.QuestionCreator())
             is QuestionUi.LongAnswer -> bind(questionUi)
             is QuestionUi.MultiChoiceQuestion -> bind(questionUi)
             is QuestionUi.ShortAnswer -> bind(questionUi)
