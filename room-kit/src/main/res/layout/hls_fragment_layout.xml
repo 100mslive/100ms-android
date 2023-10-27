@@ -83,15 +83,15 @@
     </LinearLayout>
 
     <!-- Goto live and track selector -->
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/extra_properties"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|end"
+        android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
         android:paddingHorizontal="8dp"
         android:layout_marginTop="16dp"
-        android:visibility="gone"
         android:orientation="horizontal">
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/btn_track_selection"
@@ -106,14 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             />
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_seek_live"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_semibold"
-            android:text="Live"
-            android:textAllCaps="false" />
-    </LinearLayout>
+    </FrameLayout>
 
     <!-- To show timed metadata -->
     <TextView

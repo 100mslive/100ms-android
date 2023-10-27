@@ -1830,7 +1830,7 @@ fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
     }
 }
 
-private fun trackTintList() : ColorStateList {
+ fun trackTintList() : ColorStateList {
     val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
         intArrayOf(-android.R.attr.state_checked))
 

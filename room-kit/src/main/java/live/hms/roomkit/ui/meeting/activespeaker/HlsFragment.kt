@@ -65,9 +65,6 @@ class HlsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        binding.btnSeekLive.setOnClickListener {
-            player.seekToLivePosition()
-        }
 
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
             player.mute(muted)
@@ -217,10 +214,6 @@ class HlsFragment : Fragment() {
         // It's live if the distance from the live edge is less than 10 seconds.
         val isLive = playerStats.distanceFromLive/1000 < SECONDS_FROM_LIVE
         // Show the button to go to live if it's not live.
-        binding.btnSeekLive.visibility =  if(!isLive)
-                View.VISIBLE
-            else
-                View.GONE
     }
 
     override fun onStop() {
