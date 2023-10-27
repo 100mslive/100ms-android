@@ -30,7 +30,7 @@
                 android:layout_gravity="center_vertical"
                 android:drawablePadding="8dp"
                 android:fontFamily="@font/inter_semibold"
-                android:text="Audio Output"
+                android:text="Video Resolution"
                 android:textSize="16sp" />
 
             <ImageView
