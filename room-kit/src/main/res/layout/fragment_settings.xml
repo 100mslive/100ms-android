@@ -364,7 +364,7 @@
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/show_dominant_speaker" />
+            android:text="Enable Internal Audio Manager" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_silence_audio_level_threshold"
