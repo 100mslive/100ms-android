@@ -51,7 +51,7 @@ sealed class QuestionUi(
         override var requiredToAnswer: Boolean = false
     ) : ChoiceQuestions(index, 2, requiredToAnswer) {
         override fun isValid(isPoll : Boolean): Boolean {
-            return super.isValid(isPoll) && (isPoll || correctOptionIndex != null)
+            return super.isValid(isPoll) && (isPoll || selections.isNotEmpty())
         }
     }
 
