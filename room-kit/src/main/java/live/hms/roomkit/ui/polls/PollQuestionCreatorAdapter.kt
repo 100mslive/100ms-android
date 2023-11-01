@@ -122,8 +122,16 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                 // Only the question types
                 item.viewType in 1..4
             }.isNotEmpty()
-        currentList.find { it.viewType == 6 }?.let {
-            (it as QuestionUi.LaunchButton).enabled = shouldEnableLaunchPollButton
+
+        currentList.find { it.viewType == 6 }?.let { launchButton ->
+            val shouldNotify = (launchButton as QuestionUi.LaunchButton).
+                enabled != shouldEnableLaunchPollButton
+
+            if(shouldNotify) {
+                submitList(currentList.filterNot { it.viewType == 6 }
+                    .plus(launchButton.copy(enabled = shouldEnableLaunchPollButton)))
+            }
+
         }
 
     }
