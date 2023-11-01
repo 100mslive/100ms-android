@@ -49,7 +49,7 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
         holder.bind(getItem(position))
         holder.binding.setTheme()
         // Put the cursor in the edittext as it's created.
-        holder.binding.text.requestFocus()
+//        holder.binding.text.requestFocus() // TODO maybe required but it's not quite right anyway
         holder.binding.text.hint = "Option ${position+1}"
         holder.binding.text.addTextChangedListener(
             object : TextWatcher {
