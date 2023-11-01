@@ -10,10 +10,6 @@ import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 
-internal sealed interface QuestionCreatorChangePayload {
-    data class Options(val newOptions: List<Option>?) : QuestionCreatorChangePayload
-
-}
 class PollQuestionCreatorAdapter(private val isPoll : Boolean) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
@@ -119,4 +115,9 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean) : ListAdapter<Que
             currentList.filterNot { item -> item is QuestionUi.QuestionCreator }.isNotEmpty()
         isReady?.invoke(questionAdded)
     }
+}
+
+internal sealed interface QuestionCreatorChangePayload {
+    data class Options(val newOptions: List<Option>?) : QuestionCreatorChangePayload
+
 }
