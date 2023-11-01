@@ -33,7 +33,8 @@ class PollQuestionViewHolder<T : ViewBinding>(
     val isPoll: Boolean,
     val reAddQuestionCreator: () -> Unit,
     val getItem: (position: Int) -> QuestionUi.QuestionCreator,
-    val launchPoll : () -> Unit
+    val launchPoll : () -> Unit,
+    val refresh : (position : Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -153,27 +154,22 @@ class PollQuestionViewHolder<T : ViewBinding>(
             val divider = DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
                 setDrawable(binding.root.context.getDrawable(R.drawable.polls_creation_divider)!!)
             }
+            var skipSelection = true
             if (isPoll) optionsListView.addItemDecoration(divider)
+            setCurrentSelection(questionTypeSpinner, questionUi)
+            skipSelection = false
             questionTypeSpinner.onItemSelectedListener = object : OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?, view: View?, position: Int, id: Long
                 ) {
+                    if(skipSelection)
+                        return
                     // Reset options whenever a question type is selected
                     // Add two empty options
 
                     val isMultiChoice = isMultiOptionQuestionCreation(questionTypeSpinner)
-                    val startingOptions = listOf("", "")
-//                        listOf(
-//                        Option("", if(isPoll) null else isMultiChoice),
-//                        Option("", if(isPoll) null else isMultiChoice)
-//                    )
-
-                    // Three different option types.
-                    // 1. Poll/Quiz
-                    // 2. Single choice question
-                    // 3. Multi choice
-//                    if(option.isChecked)
-//                        selectedIndices.add(index)
+                    val refresh = questionUi.currentQuestion is QuestionUi.MultiChoiceQuestion && !isMultiChoice ||
+                            questionUi.currentQuestion is QuestionUi.SingleChoiceQuestion && isMultiChoice
 
                     getItem(bindingAdapterPosition).apply {
                         currentQuestion = if (isMultiChoice) {
@@ -197,7 +193,8 @@ class PollQuestionViewHolder<T : ViewBinding>(
                     }
 
                     // Only the UI might need to be toggled
-                    Log.d(TAG, "Toggle UI")
+                    if(refresh)
+                        refresh(bindingAdapterPosition)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -233,6 +230,12 @@ class PollQuestionViewHolder<T : ViewBinding>(
 
     private fun isMultiOptionQuestionCreation(questionTypeSpinner: Spinner): Boolean {
         return questionTypeSpinner.selectedItemPosition == 1
+    }
+
+    private fun setCurrentSelection(questionTypeSpinner: Spinner, questionUi: QuestionUi.QuestionCreator) {
+        val isMulti = questionUi.currentQuestion is QuestionUi.MultiChoiceQuestion
+        val selection = if(isMulti) 1 else 0
+        questionTypeSpinner.setSelection(selection, false)
     }
 
     private fun validateSaveButtonEnabledState(

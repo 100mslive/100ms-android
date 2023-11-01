@@ -86,6 +86,9 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
             getItem(position) as QuestionUi.QuestionCreator
         },
         launchPoll)
+        {
+            position -> notifyItemChanged(position)
+        }
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {
