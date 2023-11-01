@@ -260,10 +260,12 @@ class PollQuestionViewHolder<T : ViewBinding>(
 
             saveButton.saveButtonDisabled()
             saveButton.setOnClickListener {
-                // Every edit text has to be disabled at this point.
-                // The one for the title.
-                // TODO The ones for options
-
+                // Every edit text has to have its focus cleared at this point otherwise
+                // it will crash with a java.lang.IllegalArgumentException: parameter must be a descendant of this view
+                //                                                                                                    	at android.view.ViewGroup.offsetRectBetweenParentAndChild(ViewGroup.java:6295).
+                //  The one for the title.
+                askAQuestionEditText.requestFocus() // To clear it from all others like options
+                askAQuestionEditText.clearFocus()   // To clear it from even this
                 // Save the info
                 saveInfo(getItem(bindingAdapterPosition).currentQuestion)
             }
