@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -66,7 +67,7 @@ class PollQuestionCreation : Fragment() {
             createdQuestionList.adapter = adapter
             createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
             val divider = DividerItemDecoration(requireContext(), VERTICAL).apply {
-                setDrawable(binding.root.context.getDrawable(R.drawable.questions_divider)!!)
+                setDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.questions_divider)!!)
             }
             createdQuestionList.addItemDecoration(divider)
 
