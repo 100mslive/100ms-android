@@ -45,7 +45,7 @@
             android:gravity="center"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
-            android:text="Launch Quiz"
+            android:text="Add Questions"
             android:textColor="#EFF0FA"
             android:textSize="14sp"
             android:textStyle="bold"
