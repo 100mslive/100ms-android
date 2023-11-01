@@ -4,11 +4,9 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
-import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 import live.hms.roomkit.ui.theme.setTheme
 import java.util.*
 
