@@ -7,10 +7,14 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -26,9 +30,10 @@ import live.hms.roomkit.util.viewLifecycle
  */
 class PollQuestionCreation : Fragment() {
 
+    val args: PollQuestionCreationArgs by navArgs()
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val adapter = PollQuestionCreatorAdapter { pollsViewModel.isPoll() }
+    private val adapter by lazy { PollQuestionCreatorAdapter(args.isPoll) }
 
     private var binding by viewLifecycle<LayoutPollQuestionCreationBinding>()
 

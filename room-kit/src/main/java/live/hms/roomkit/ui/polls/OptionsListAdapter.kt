@@ -19,6 +19,10 @@ data class Option(var text : String,
 
 class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBACK) {
     lateinit var refreshSubmitButton :() -> Unit
+    lateinit var onOptionTextChanged : (optionIndex : Int, text : String) -> Unit
+    lateinit var onSingleOptionSelected : (optionIndex : Int) -> Unit
+    lateinit var onMultipleOptionSelected : (optionIndex : Int, selected : Boolean) -> Unit
+
 
     companion object {
         val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<Option>() {
@@ -34,7 +38,11 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OptionViewHolder {
         val binding = LayoutPollQuizOptionsItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return OptionViewHolder(binding,::getItem, ::selectOnlyCurrentOption, refreshSubmitButton)
+        return OptionViewHolder(binding,
+            ::getItem,
+            ::selectRadioOption,
+            ::selectCheckboxOption,
+            )
     }
 
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
@@ -43,13 +51,17 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
         // Put the cursor in the edittext as it's created.
         holder.binding.text.requestFocus()
         holder.binding.text.hint = "Option ${position+1}"
-        holder.binding.text.addTextChangedListener(object : TextWatcher {
+        holder.binding.text.addTextChangedListener(
+            object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
 
             override fun onTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                getItem(holder.bindingAdapterPosition).text = text.toString()
+                val text = text.toString()
+                onOptionTextChanged(holder.bindingAdapterPosition, text)
+                // Maybe this is not required? Might be too big to refresh.
+                getItem(holder.bindingAdapterPosition).text = text
             }
 
             override fun afterTextChanged(p0: Editable?) {
@@ -67,11 +79,19 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
         refreshSubmitButton()
     }
 
-    private fun selectOnlyCurrentOption(position: Int) {
-        for ( i in 0 until currentList.size) {
+    private fun selectRadioOption(position: Int){
+        onSingleOptionSelected(position)
+        // TODO this might not be necessary
+        for (i in 0 until currentList.size) {
             getItem(i).isChecked = i == position
-            if(i != position)
+            if (i != position)
                 notifyItemChanged(i)
         }
+        refreshSubmitButton()
+    }
+    private fun selectCheckboxOption(position: Int, selected: Boolean) {
+        onMultipleOptionSelected(position, selected)
+        getItem(position).isChecked = selected
+        refreshSubmitButton()
     }
 }

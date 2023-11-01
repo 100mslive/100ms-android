@@ -44,7 +44,7 @@ class PollsCreationFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
-        binding.creationFlowUi.visibility = View.GONE//if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
+        binding.creationFlowUi.visibility = if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
         with(binding) {
             applyTheme()
             backButton.setOnSingleClickListener { findNavController().popBackStack() }
@@ -93,7 +93,7 @@ class PollsCreationFragment : Fragment(){
         // Move to the next fragment but the data is only carried forward isn't it?
         //  It's not quite used yet.
         // Perhaps it really should be a common VM for all these fragments.
-        findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollQuestionCreation())
+        findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollQuestionCreation(pollsViewModel.isPoll()))
     }
 
     private fun highlightPollOrQuiz(isPoll : Boolean) {

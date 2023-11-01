@@ -10,17 +10,22 @@ import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 
-class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
+internal sealed interface QuestionCreatorChangePayload {
+    data class Options(val newOptions: List<Option>?) : QuestionCreatorChangePayload
+
+}
+class PollQuestionCreatorAdapter(private val isPoll : Boolean) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
     // Will be called when a single question is added to the adapter
     var isReady : ((ready : Boolean) -> Unit)? = null
     init {
         // Adaptor begins with the question creation ui.
-        submitList(listOf(QuestionUi.QuestionCreator()))
+        submitList(listOf(QuestionUi.QuestionCreator(isPoll = isPoll)))
     }
 
     companion object {
+        val questionToOptions = QuestionToOptions()
         val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<QuestionUi>() {
             override fun areItemsTheSame(
                 oldItem: QuestionUi,
@@ -31,6 +36,19 @@ class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<Questi
                 oldItem: QuestionUi,
                 newItem: QuestionUi
             ) = oldItem == newItem
+
+            override fun getChangePayload(oldItem: QuestionUi, newItem: QuestionUi): Any? =
+                when{
+                    // We're only dealing with QuestionCreator changes
+                    oldItem.viewType == 0 && newItem.viewType == 0 &&
+                            // Options Update
+                            (oldItem as QuestionUi.QuestionCreator).currentQuestion.options !=
+                            (newItem as QuestionUi.QuestionCreator).currentQuestion.options
+                    -> {
+                        QuestionCreatorChangePayload.Options(questionToOptions.questionToOptions(newItem.currentQuestion, newItem.isPoll))
+                    }
+                    else -> super.getChangePayload(oldItem, newItem)
+                }
         }
     }
 
@@ -51,14 +69,42 @@ class PollQuestionCreatorAdapter(val isPoll: () -> Boolean) : ListAdapter<Questi
             5 -> LayoutAddMoreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        return PollQuestionViewHolder(view!!, { submitList(currentList.plus(it).minus(QuestionUi.QuestionCreator()).plus(QuestionUi.AddAnotherItemView)) }, isPoll)
+        return PollQuestionViewHolder(view!!, {
+            val list = currentList
+                .filter { item -> item.viewType != 0 }
+                .plus(it)
+                .plus(QuestionUi.AddAnotherItemView)
+            submitList(list)
+            }, isPoll,
         {
-            submitList(listOf(QuestionUi.QuestionCreator()).plus(currentList).minus(QuestionUi.AddAnotherItemView))
+            submitList(
+                listOf(QuestionUi.QuestionCreator())
+                    .plus(currentList)
+                    .minus(QuestionUi.AddAnotherItemView)
+            )
+        }) {position ->
+            getItem(position) as QuestionUi.QuestionCreator
         }
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    override fun onBindViewHolder(
+        holder: PollQuestionViewHolder<ViewBinding>,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        super.onBindViewHolder(holder, position, payloads)
+        // Specific payloads, we'll need this to refresh the options adapter.
+        // refresh only the options adapter when needed.
+        payloads.forEach { payload ->
+            if(payload is QuestionCreatorChangePayload.Options) {
+                // Maybe better to convert to options right here.
+                holder.payloadUpdate(payload)
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int =

@@ -1938,7 +1938,7 @@ class MeetingViewModel(
                     hmsPollBuilder
                         .addQuestion(multiChoice.build())
                 }
-                QuestionUi.QuestionCreator,
+                is QuestionUi.QuestionCreator,
                 QuestionUi.AddAnotherItemView -> { /*Nothing to do here*/}
                 is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
                 is QuestionUi.SingleChoiceQuestion -> {
