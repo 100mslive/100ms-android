@@ -33,7 +33,7 @@ class PollQuestionCreation : Fragment() {
     val args: PollQuestionCreationArgs by navArgs()
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val adapter by lazy { PollQuestionCreatorAdapter(args.isPoll) }
+    private val adapter by lazy { PollQuestionCreatorAdapter(args.isPoll, ::launchPoll) }
 
     private var binding by viewLifecycle<LayoutPollQuestionCreationBinding>()
 
@@ -61,6 +61,7 @@ class PollQuestionCreation : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
         with(binding) {
+            heading.text = "${pollsViewModel.getPollsCreationInfo().pollTitle} ${if(pollsViewModel.isPoll()) "Poll" else "Quiz"}"
             backButton.setOnSingleClickListener { findNavController().popBackStack() }
             createdQuestionList.adapter = adapter
             createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
@@ -69,22 +70,6 @@ class PollQuestionCreation : Fragment() {
             }
             createdQuestionList.addItemDecoration(divider)
 
-            adapter.isReady = { isReady ->
-                launchPollQuiz.isEnabled = isReady
-            }
-
-
-            launchPollQuiz.setOnSingleClickListener {
-                // Clear the UI
-                // start the data
-                meetingViewModel.startPoll(
-                    adapter.currentList,
-                    pollsViewModel.getPollsCreationInfo()
-                )
-                backButton.callOnClick()
-            }
-            // Will be enabled later.
-            launchPollQuiz.isEnabled = false
         }
     }
 
@@ -96,5 +81,15 @@ class PollQuestionCreation : Fragment() {
                     binding.backButton.callOnClick()
                 }
             })
+    }
+
+    private fun launchPoll() {
+        // Launch the poll
+        meetingViewModel.startPoll(
+            adapter.currentList,
+            pollsViewModel.getPollsCreationInfo()
+        )
+        // Go back
+        findNavController().popBackStack()
     }
 }

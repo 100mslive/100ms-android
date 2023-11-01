@@ -1938,8 +1938,6 @@ class MeetingViewModel(
                     hmsPollBuilder
                         .addQuestion(multiChoice.build())
                 }
-                is QuestionUi.QuestionCreator,
-                QuestionUi.AddAnotherItemView -> { /*Nothing to do here*/}
                 is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
                 is QuestionUi.SingleChoiceQuestion -> {
                     val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.singleChoice)
@@ -1950,6 +1948,9 @@ class MeetingViewModel(
                     hmsPollBuilder
                         .addQuestion(singleChoiceQuestionBuilder.build())
                 }
+                is QuestionUi.QuestionCreator,
+                is QuestionUi.LaunchButton,
+                QuestionUi.AddAnotherItemView, -> { /*Nothing to do here*/}
             }
         }
 

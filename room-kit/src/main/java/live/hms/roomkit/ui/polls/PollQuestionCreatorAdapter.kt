@@ -6,18 +6,21 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.databinding.LayoutAddMoreBinding
+import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 
-class PollQuestionCreatorAdapter(private val isPoll : Boolean) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
+class PollQuestionCreatorAdapter(private val isPoll : Boolean,
+                                 private val launchPoll : () -> Unit) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
-    // Will be called when a single question is added to the adapter
-    var isReady : ((ready : Boolean) -> Unit)? = null
     init {
         // Adaptor begins with the question creation ui.
-        submitList(listOf(QuestionUi.QuestionCreator(isPoll = isPoll)))
+        submitList(listOf(
+            QuestionUi.QuestionCreator(isPoll = isPoll),
+            QuestionUi.LaunchButton(isPoll, false)
+        ))
     }
 
     companion object {
@@ -63,6 +66,7 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean) : ListAdapter<Que
             }
             3,4 -> LayoutPollQuizItemShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             5 -> LayoutAddMoreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            6 -> LayoutLaunchPollButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
         return PollQuestionViewHolder(view!!, {
@@ -78,9 +82,10 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean) : ListAdapter<Que
                     .plus(currentList)
                     .minus(QuestionUi.AddAnotherItemView)
             )
-        }) {position ->
+        }, {position ->
             getItem(position) as QuestionUi.QuestionCreator
-        }
+        },
+        launchPoll)
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {
@@ -111,9 +116,20 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean) : ListAdapter<Que
         currentList: MutableList<QuestionUi>
     ) {
         super.onCurrentListChanged(previousList, currentList)
-        val questionAdded =
-            currentList.filterNot { item -> item is QuestionUi.QuestionCreator }.isNotEmpty()
-        isReady?.invoke(questionAdded)
+        // Any questions that exist are defacto valid otherwise they couldn't have been added
+        val shouldEnableLaunchPollButton =
+            currentList.filter { item ->
+                // Only the question types
+                item.viewType in 1..4
+            }.isNotEmpty()
+        currentList.find { it.viewType == 6 }?.let {
+            (it as QuestionUi.LaunchButton).enabled = shouldEnableLaunchPollButton
+        }
+
+    }
+
+    override fun getItemId(position: Int): Long {
+        return getItem(position).getItemId()
     }
 }
 

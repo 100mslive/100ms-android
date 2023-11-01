@@ -3,6 +3,7 @@ package live.hms.roomkit.ui.polls
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutAddMoreBinding
+import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
@@ -30,7 +32,8 @@ class PollQuestionViewHolder<T : ViewBinding>(
     val saveInfo: (questionUi: QuestionUi) -> Unit,
     val isPoll: Boolean,
     val reAddQuestionCreator: () -> Unit,
-    val getItem: (position: Int) -> QuestionUi.QuestionCreator
+    val getItem: (position: Int) -> QuestionUi.QuestionCreator,
+    val launchPoll : () -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -42,6 +45,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
             is QuestionUi.ShortAnswer -> bind(questionUi)
             is QuestionUi.SingleChoiceQuestion -> bind(questionUi)
             is QuestionUi.AddAnotherItemView -> bind(questionUi)
+            is QuestionUi.LaunchButton -> bind(questionUi)
             is QuestionUi.ChoiceQuestions -> TODO()
         }
     }
@@ -52,6 +56,24 @@ class PollQuestionViewHolder<T : ViewBinding>(
             return
         with(binding as LayoutPollQuestionCreationItemBinding) {
             (optionsListView.adapter as OptionsListAdapter).submitList(options.newOptions)
+        }
+    }
+
+    private fun bind(button : QuestionUi.LaunchButton) {
+        with((binding as LayoutLaunchPollButtonBinding).launchPollQuiz) {
+            text = if(button.isPoll)
+                "Launch Poll"
+            else
+                "Launch Quiz"
+
+            if (button.enabled)
+                saveButtonEnabled()
+            else
+                saveButtonDisabled()
+
+            setOnSingleClickListener {
+                launchPoll()
+            }
         }
     }
 

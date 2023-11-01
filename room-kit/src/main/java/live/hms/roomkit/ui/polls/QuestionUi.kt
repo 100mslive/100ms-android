@@ -4,11 +4,14 @@ sealed class QuestionUi(
     open var index: Long,
     open val viewType: Int
 ) {
+    abstract fun getItemId() : Long
     // Makes the creator UI show up first.
     data class QuestionCreator(var currentQuestion: ChoiceQuestions = SingleChoiceQuestion(),
                                var isPoll : Boolean = true,
                                var requiredToAnswer: Boolean = false,
-    ) : QuestionUi(0, 0)
+    ) : QuestionUi(0, 0) {
+        override fun getItemId(): Long = viewType.toLong()
+    }
 
     sealed class ChoiceQuestions(
         override var index: Long,
@@ -23,6 +26,8 @@ sealed class QuestionUi(
                     options.isNotEmpty() &&
                     options.none { it.isEmpty()}
         }
+
+        override fun getItemId(): Long = 1000 + index
     }
 
     // Actual questions that might be asked.
@@ -52,12 +57,20 @@ sealed class QuestionUi(
 
     data class LongAnswer(
         val text: String, override var index: Long,
-    ) : QuestionUi(index, 3)
+    ) : QuestionUi(index, 3){
+        override fun getItemId(): Long = TODO()
+    }
 
     data class ShortAnswer(
         val text: String, override var index: Long,
-    ) : QuestionUi(index, 4)
+    ) : QuestionUi(index, 4) {
+        override fun getItemId(): Long = TODO()
+    }
 
-    object AddAnotherItemView : QuestionUi(-1, 5)
-    object LaunchButton : QuestionUi(-2, 6)
+    object AddAnotherItemView : QuestionUi(-1, 5){
+        override fun getItemId(): Long = viewType.toLong()
+    }
+    data class LaunchButton(val isPoll : Boolean, var enabled : Boolean) : QuestionUi(-2, 6){
+        override fun getItemId(): Long = viewType.toLong()
+    }
 }
