@@ -206,6 +206,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 val question =
                     getItem(bindingAdapterPosition).currentQuestion as QuestionUi.ChoiceQuestions
                 question.options = question.options.plus("")
+                refresh(bindingAdapterPosition)
                 // The same item could refresh just fine, only other items need specific invocationx
             }
             deleteOptionTrashButton.setOnSingleClickListener {
