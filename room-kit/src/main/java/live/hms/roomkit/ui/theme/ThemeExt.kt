@@ -2203,13 +2203,6 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
 
     setSwitchThemes(notRequiredToAnswer)
 
-    deleteOptionTrashButton.drawable.setTint(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-
     saveButton.saveButtonEnabled()
 
 
@@ -2285,7 +2278,12 @@ fun LayoutPollQuizOptionsItemBinding.setTheme() {
 
     radioButton.buttonTintList = trackTintList()
     checkbox.buttonTintList = trackTintList()
-
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 }
 
 fun TextView.pollsStatusLiveDraftEnded(state: HmsPollState) {

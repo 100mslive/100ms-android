@@ -147,6 +147,12 @@ class PollQuestionViewHolder<T : ViewBinding>(
                         question.selections.minus(position).sorted()
                     validateSaveButtonEnabledState(getItem(bindingAdapterPosition), binding.saveButton)
                 }
+                it.deleteOption = { position ->
+                    val question =
+                        getItem(position).currentQuestion
+                    question.options = question.options.minus(question.options[position])
+                    refresh(bindingAdapterPosition)
+                }
             }
             optionsAdapter.submitList(QuestionToOptions().questionToOptions(questionUi.currentQuestion, questionUi.isPoll))
             optionsListView.adapter = optionsAdapter
@@ -208,11 +214,6 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 question.options = question.options.plus("")
                 refresh(bindingAdapterPosition)
                 // The same item could refresh just fine, only other items need specific invocationx
-            }
-            deleteOptionTrashButton.setOnSingleClickListener {
-                val question =
-                    getItem(bindingAdapterPosition).currentQuestion as QuestionUi.ChoiceQuestions
-                question.options = question.options.dropLast(1)
             }
 
             saveButton.saveButtonDisabled()

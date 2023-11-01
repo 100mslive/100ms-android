@@ -20,6 +20,7 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
     lateinit var onOptionTextChanged : (optionIndex : Int, text : String) -> Unit
     lateinit var onSingleOptionSelected : (optionIndex : Int) -> Unit
     lateinit var onMultipleOptionSelected : (optionIndex : Int, selected : Boolean) -> Unit
+    lateinit var deleteOption : (optionIndex : Int) -> Unit
 
 
     companion object {
@@ -40,6 +41,7 @@ class OptionsListAdapter : ListAdapter<Option, OptionViewHolder>(DIFFUTIL_CALLBA
             ::getItem,
             ::selectRadioOption,
             ::selectCheckboxOption,
+            deleteOption
             )
     }
 

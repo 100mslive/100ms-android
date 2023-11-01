@@ -7,16 +7,23 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemBinding
+import live.hms.roomkit.setOnSingleClickListener
 
 class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
                        getItem: (position : Int) -> Option,
                        selectRadioOption : (Int) -> Unit,
                        selectCheckboxOption : (Int, Boolean) -> Unit,
+                       deleteThisOption : (position : Int) -> Unit,
                        ) : ViewHolder(binding.root) {
    var skipCheckChange = false
     init {
         if(bindingAdapterPosition != NO_POSITION) {
             binding.text.setText(getItem(bindingAdapterPosition).text)
+        }
+        binding.deleteOptionTrashButton.setOnSingleClickListener {
+            // Avoid edittext crash
+            binding.root.requestFocus()
+            deleteThisOption(bindingAdapterPosition)
         }
         binding.text.doOnTextChanged { text, _, _, _ ->
             getItem(bindingAdapterPosition).text = text.toString()
