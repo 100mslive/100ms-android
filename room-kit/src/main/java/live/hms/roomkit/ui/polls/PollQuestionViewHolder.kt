@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.xwray.groupie.GroupieAdapter
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutAddMoreBinding
 import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
@@ -225,7 +226,9 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 askAQuestionEditText.requestFocus() // To clear it from all others like options
                 askAQuestionEditText.clearFocus()   // To clear it from even this
                 // Save the info
-                saveInfo(getItem(bindingAdapterPosition).currentQuestion)
+                saveInfo(getItem(bindingAdapterPosition).currentQuestion.apply{
+                    index = ++count
+                })
             }
         }
     }
@@ -252,13 +255,15 @@ class PollQuestionViewHolder<T : ViewBinding>(
     }
 
     private fun bind(questionUi: QuestionUi.MultiChoiceQuestion) {
-
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
+            applyTheme()
             questionTitle.text = questionUi.withTitle
-            val adapter =
-                ArrayAdapter<String>(binding.root.context, android.R.layout.simple_list_item_1)
-//            options.layoutManager = LinearLayoutManager(binding.root.context)
-            adapter.addAll(questionUi.options)
+            questionNumbering.text = "QUESTION ${questionUi.index} of something"
+            val adapter = GroupieAdapter()
+            adapter.addAll(questionUi.options.map {
+                MultiChoiceQuestionOptionItem(questionUi, it)
+            })
+            options.layoutManager = LinearLayoutManager(binding.root.context)
             options.adapter = adapter
         }
     }
@@ -266,10 +271,12 @@ class PollQuestionViewHolder<T : ViewBinding>(
     private fun bind(questionUi: QuestionUi.SingleChoiceQuestion) {
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
             questionTitle.text = questionUi.withTitle
-            val adapter =
-                ArrayAdapter<String>(binding.root.context, android.R.layout.simple_list_item_1)
-//            options.layoutManager = LinearLayoutManager(binding.root.context)
-            adapter.addAll(questionUi.options)
+            questionNumbering.text = "QUESTION ${questionUi.index} of something"
+            val adapter = GroupieAdapter()
+            adapter.addAll(questionUi.options.map {
+                MultiChoiceQuestionOptionItem(questionUi, it)
+            })
+            options.layoutManager = LinearLayoutManager(binding.root.context)
             options.adapter = adapter
         }
     }

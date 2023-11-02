@@ -2,18 +2,35 @@
 <androidx.appcompat.widget.LinearLayoutCompat
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/questionNumbering"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Question 1 of 2"
+        android:fontFamily="@font/inter_medium"
+        android:textSize="10sp"
+        android:lineHeight="16dp"
+        />
+
+    <TextView
         android:id="@+id/questionTitle"
+        android:fontFamily="@font/inter_regular"
+        android:textSize="16sp"
+        android:lineHeight="24dp"
         android:layout_width="match_parent"
+        android:layout_marginVertical="@dimen/spacing_d2"
         android:layout_height="wrap_content" />
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
+        android:nestedScrollingEnabled="false"
         android:id="@+id/options"
         android:layout_width="match_parent"
+        android:minHeight="60dp"
         android:layout_height="wrap_content" />
 
 </androidx.appcompat.widget.LinearLayoutCompat>

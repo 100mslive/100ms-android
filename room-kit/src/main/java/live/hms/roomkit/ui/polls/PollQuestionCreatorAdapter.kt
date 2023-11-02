@@ -69,18 +69,19 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
             6 -> LayoutLaunchPollButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        return PollQuestionViewHolder(view!!, {
+        return PollQuestionViewHolder(view!!,
+            saveInfo = {questionUi ->
             val list = currentList
                 .filter { item -> item.viewType != 0 }
-                .plus(it)
+                .plus(questionUi)
                 .plus(QuestionUi.AddAnotherItemView)
-            submitList(list)
+            submitList(list.sortQuestions())
             }, isPoll,
         {
             submitList(
                 listOf(QuestionUi.QuestionCreator())
                     .plus(currentList)
-                    .minus(QuestionUi.AddAnotherItemView)
+                    .minus(QuestionUi.AddAnotherItemView).sortQuestions()
             )
         }, {position ->
             getItem(position) as QuestionUi.QuestionCreator
@@ -132,7 +133,7 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
 
             if(shouldNotify) {
                 submitList(currentList.filterNot { it.viewType == 6 }
-                    .plus(launchButton.copy(enabled = shouldEnableLaunchPollButton)))
+                    .plus(launchButton.copy(enabled = shouldEnableLaunchPollButton)).sortQuestions())
             }
 
         }
@@ -148,3 +149,5 @@ internal sealed interface QuestionCreatorChangePayload {
     data class Options(val newOptions: List<Option>?) : QuestionCreatorChangePayload
 
 }
+
+fun List<QuestionUi>.sortQuestions() : List<QuestionUi>{ return sortedBy { it.getItemId() } }
