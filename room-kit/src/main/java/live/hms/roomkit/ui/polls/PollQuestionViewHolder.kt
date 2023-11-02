@@ -30,7 +30,7 @@ import live.hms.roomkit.util.setOnSingleClickListener
 
 class PollQuestionViewHolder<T : ViewBinding>(
     val binding: T,
-    val saveInfo: (questionUi: QuestionUi) -> Unit,
+    val saveInfo: (questionUi: QuestionUi, questionInEditIndex : Long?) -> Unit,
     val isPoll: Boolean,
     val reAddQuestionCreator: () -> Unit,
     val getItem: (position: Int) -> QuestionUi.QuestionCreator,
@@ -232,7 +232,8 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 askAQuestionEditText.requestFocus() // To clear it from all others like options
                 askAQuestionEditText.clearFocus()   // To clear it from even this
                 // Save the info
-                saveInfo(getItem(bindingAdapterPosition).currentQuestion)
+                val questionCreatorInfo = getItem(bindingAdapterPosition)
+                saveInfo(questionCreatorInfo.currentQuestion, questionCreatorInfo.questionInEditIndex)
             }
         }
     }

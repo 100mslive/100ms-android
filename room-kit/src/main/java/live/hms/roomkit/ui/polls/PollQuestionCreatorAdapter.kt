@@ -71,10 +71,11 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
             else -> null
         }
         return PollQuestionViewHolder(view!!,
-            saveInfo = {questionUi ->
+            saveInfo = {questionUi, questionInEditIndex ->
             val list = currentList
                 .filter { item -> item.viewType != 0 }
-                .plus(questionUi.apply { index = ++count })
+                // Either restore the question in edit index or add a new one
+                .plus(questionUi.apply { index = questionInEditIndex ?: ++count })
                 .plus(QuestionUi.AddAnotherItemView)
             submitList(list.sortQuestions())
             }, isPoll,
@@ -95,11 +96,12 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                 position ->
                 val questionToEdit = getItem(position)
                 val newQuestionCreator = when (questionToEdit.viewType) {
-                    2 -> QuestionUi.QuestionCreator(currentQuestion = questionToEdit as QuestionUi.SingleChoiceQuestion)
-                    1 -> QuestionUi.QuestionCreator(currentQuestion = questionToEdit as QuestionUi.MultiChoiceQuestion)
+                    1 -> QuestionUi.QuestionCreator(currentQuestion = questionToEdit as QuestionUi.MultiChoiceQuestion, questionInEditIndex = questionToEdit.index)
+                    2 -> QuestionUi.QuestionCreator(currentQuestion = questionToEdit as QuestionUi.SingleChoiceQuestion, questionInEditIndex = questionToEdit.index)
                     else -> null
                 }
                 // Delete the item and add a new question creator.
+                // The index number is maintained via the question creator knowing it and sending it back.
                 if(newQuestionCreator != null) {
                     // Remove the AddAnotherItem because the question creator is being added
                     submitList(currentList.minus(setOf(questionToEdit, QuestionUi.AddAnotherItemView))

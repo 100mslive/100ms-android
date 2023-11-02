@@ -9,6 +9,7 @@ sealed class QuestionUi(
     data class QuestionCreator(var currentQuestion: ChoiceQuestions = SingleChoiceQuestion(),
                                var isPoll : Boolean = true,
                                var requiredToAnswer: Boolean = false,
+        val questionInEditIndex : Long? = null
     ) : QuestionUi(0, 0) {
         override fun getItemId(): Long = viewType.toLong() // It's always first and there's only one
     }
