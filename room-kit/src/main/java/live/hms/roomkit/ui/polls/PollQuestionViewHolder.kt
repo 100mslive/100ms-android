@@ -22,6 +22,7 @@ import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
 import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.saveButtonDisabled
 import live.hms.roomkit.ui.theme.saveButtonEnabled
@@ -34,7 +35,9 @@ class PollQuestionViewHolder<T : ViewBinding>(
     val reAddQuestionCreator: () -> Unit,
     val getItem: (position: Int) -> QuestionUi.QuestionCreator,
     val launchPoll : () -> Unit,
-    val refresh : (position : Int) -> Unit
+    val refresh : (position : Int) -> Unit,
+    val editQuestion : (position : Int) -> Unit,
+    val deleteQuestion : (position : Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -258,6 +261,12 @@ class PollQuestionViewHolder<T : ViewBinding>(
     private fun bind(questionUi: QuestionUi.ChoiceQuestions) {
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
             applyTheme()
+            editQuestionButton.setOnClickListener {
+                editQuestion(bindingAdapterPosition)
+            }
+            deleteOptionTrashButton.setOnClickListener {
+                deleteQuestion(bindingAdapterPosition)
+            }
             questionTitle.text = questionUi.withTitle
             questionNumbering.text = "QUESTION ${questionUi.index} of something: ${if(questionUi is QuestionUi.SingleChoiceQuestion) "SINGLE CHOICE" else "MULTIPLE CHOICE"}"
             val adapter = GroupieAdapter()

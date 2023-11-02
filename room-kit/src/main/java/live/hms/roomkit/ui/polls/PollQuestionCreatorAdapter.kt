@@ -87,10 +87,29 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
         }, {position ->
             getItem(position) as QuestionUi.QuestionCreator
         },
-        launchPoll)
+        launchPoll,
         {
             position -> notifyItemChanged(position)
-        }
+        },
+            editQuestion = {
+                position ->
+                val questionToEdit = getItem(position)
+                val newQuestionCreator = when (questionToEdit.viewType) {
+                    2 -> QuestionUi.QuestionCreator(currentQuestion = questionToEdit as QuestionUi.SingleChoiceQuestion)
+                    1 -> QuestionUi.QuestionCreator(currentQuestion = questionToEdit as QuestionUi.MultiChoiceQuestion)
+                    else -> null
+                }
+                // Delete the item and add a new question creator.
+                if(newQuestionCreator != null) {
+                    // Remove the AddAnotherItem because the question creator is being added
+                    submitList(currentList.minus(setOf(questionToEdit, QuestionUi.AddAnotherItemView))
+                        .plus(newQuestionCreator)
+                        .sortQuestions())
+                }
+            },
+            deleteQuestion = {
+                position -> submitList(currentList.minus(getItem(position)))
+            })
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {
