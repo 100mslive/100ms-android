@@ -26,8 +26,6 @@ import live.hms.roomkit.ui.theme.saveButtonDisabled
 import live.hms.roomkit.ui.theme.saveButtonEnabled
 import live.hms.roomkit.util.setOnSingleClickListener
 
-private var count: Long = 0
-
 class PollQuestionViewHolder<T : ViewBinding>(
     val binding: T,
     val saveInfo: (questionUi: QuestionUi) -> Unit,
@@ -226,9 +224,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 askAQuestionEditText.requestFocus() // To clear it from all others like options
                 askAQuestionEditText.clearFocus()   // To clear it from even this
                 // Save the info
-                saveInfo(getItem(bindingAdapterPosition).currentQuestion.apply{
-                    index = ++count
-                })
+                saveInfo(getItem(bindingAdapterPosition).currentQuestion)
             }
         }
     }

@@ -15,6 +15,7 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                                  private val launchPoll : () -> Unit) : ListAdapter<QuestionUi, PollQuestionViewHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {
+    var count = 0L
     init {
         // Adaptor begins with the question creation ui.
         submitList(listOf(
@@ -73,7 +74,7 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
             saveInfo = {questionUi ->
             val list = currentList
                 .filter { item -> item.viewType != 0 }
-                .plus(questionUi)
+                .plus(questionUi.apply { index = ++count })
                 .plus(QuestionUi.AddAnotherItemView)
             submitList(list.sortQuestions())
             }, isPoll,
