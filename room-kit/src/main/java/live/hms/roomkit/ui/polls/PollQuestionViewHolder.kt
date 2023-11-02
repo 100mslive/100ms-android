@@ -266,6 +266,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
 
     private fun bind(questionUi: QuestionUi.SingleChoiceQuestion) {
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
+            applyTheme()
             questionTitle.text = questionUi.withTitle
             questionNumbering.text = "QUESTION ${questionUi.index} of something"
             val adapter = GroupieAdapter()

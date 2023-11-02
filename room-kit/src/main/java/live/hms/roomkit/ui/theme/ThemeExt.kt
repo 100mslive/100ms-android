@@ -2256,6 +2256,13 @@ internal fun TextView.saveButtonDisabled() {
 
 
 fun LayoutPollQuizOptionsItemMultiChoiceBinding.applyTheme() {
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    editQuestionButton.saveButtonEnabled()
     questionNumbering.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceLow,
