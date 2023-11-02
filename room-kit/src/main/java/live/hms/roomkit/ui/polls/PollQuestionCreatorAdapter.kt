@@ -108,7 +108,18 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                 }
             },
             deleteQuestion = {
-                position -> submitList(currentList.minus(getItem(position)))
+                position ->
+                val itemToDelete = getItem(position)
+                // also every item after this should have its question number decremented.
+                val newList = currentList.minus(itemToDelete).map { if((it.viewType == 1 || it.viewType == 2) && it.index > itemToDelete.index) {
+                    it.index--
+                    it
+                } else
+                    it
+                }
+                // also the overall count is reduced.
+                count--
+                submitList(newList)
             })
     }
 
