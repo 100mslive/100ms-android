@@ -65,7 +65,7 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                 //Multichoice question (remember to set the single choice text as well)
                 LayoutPollQuizOptionsItemMultiChoiceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             }
-            3,4 -> LayoutPollQuizItemShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+//            3,4 -> LayoutPollQuizItemShortAnswerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             5 -> LayoutAddMoreBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             6 -> LayoutLaunchPollButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null

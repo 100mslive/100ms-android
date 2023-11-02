@@ -55,17 +55,17 @@ sealed class QuestionUi(
         }
     }
 
-    data class LongAnswer(
-        val text: String, override var index: Long,
-    ) : QuestionUi(index, 3){
-        override fun getItemId(): Long = TODO()
-    }
-
-    data class ShortAnswer(
-        val text: String, override var index: Long,
-    ) : QuestionUi(index, 4) {
-        override fun getItemId(): Long = TODO()
-    }
+//    data class LongAnswer(
+//        val text: String, override var index: Long,
+//    ) : QuestionUi(index, 3){
+//        override fun getItemId(): Long = TODO()
+//    }
+//
+//    data class ShortAnswer(
+//        val text: String, override var index: Long,
+//    ) : QuestionUi(index, 4) {
+//        override fun getItemId(): Long = TODO()
+//    }
 
     object AddAnotherItemView : QuestionUi(-1, 5){
         override fun getItemId(): Long = viewType.toLong() + 2000

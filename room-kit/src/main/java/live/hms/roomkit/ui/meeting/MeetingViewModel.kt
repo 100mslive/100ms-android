@@ -1928,7 +1928,7 @@ class MeetingViewModel(
             Log.d("Polls","Processing $questionUi")
 
             when(questionUi) {
-                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
+//                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
                 is QuestionUi.MultiChoiceQuestion -> {
                     val multiChoice = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.multiChoice)
                         .withTitle(questionUi.withTitle)
@@ -1938,7 +1938,7 @@ class MeetingViewModel(
                     hmsPollBuilder
                         .addQuestion(multiChoice.build())
                 }
-                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
+//                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
                 is QuestionUi.SingleChoiceQuestion -> {
                     val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.singleChoice)
                         .withTitle(questionUi.withTitle)

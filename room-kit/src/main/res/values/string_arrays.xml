@@ -7,7 +7,5 @@
     <string-array name="question_type_options">
         <item>Single Choice</item>
         <item>Multi Choice</item>
-        <item>Short Answer</item>
-        <item>Long Answer</item>
     </string-array>
 </resources>

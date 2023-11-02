@@ -41,8 +41,8 @@ class PollQuestionViewHolder<T : ViewBinding>(
     fun bind(questionUi: QuestionUi) {
         when (questionUi) {
             is QuestionUi.QuestionCreator -> bind(questionUi)
-            is QuestionUi.LongAnswer -> bind(questionUi)
-            is QuestionUi.ShortAnswer -> bind(questionUi)
+//            is QuestionUi.LongAnswer -> bind(questionUi)
+//            is QuestionUi.ShortAnswer -> bind(questionUi)
             is QuestionUi.AddAnotherItemView -> bind(questionUi)
             is QuestionUi.LaunchButton -> bind(questionUi)
             is QuestionUi.ChoiceQuestions -> bind(questionUi)
@@ -283,18 +283,18 @@ class PollQuestionViewHolder<T : ViewBinding>(
 //        }
 //    }
 
-    private fun bind(questionUi: QuestionUi.ShortAnswer) {
-        with(binding as LayoutPollQuizItemShortAnswerBinding) {
-            questionNumberHeading.text = "QUESTION ${questionUi.index} : Short Answer"
-            questionHeading.text = questionUi.text
-        }
-    }
-
-    private fun bind(questionUi: QuestionUi.LongAnswer) {
-        with(binding as LayoutPollQuizItemShortAnswerBinding) {
-            questionNumberHeading.text = "QUESTION ${questionUi.index} : Long Answer"
-            questionHeading.text = questionUi.text
-        }
-    }
+//    private fun bind(questionUi: QuestionUi.ShortAnswer) {
+//        with(binding as LayoutPollQuizItemShortAnswerBinding) {
+//            questionNumberHeading.text = "QUESTION ${questionUi.index} : Short Answer"
+//            questionHeading.text = questionUi.text
+//        }
+//    }
+//
+//    private fun bind(questionUi: QuestionUi.LongAnswer) {
+//        with(binding as LayoutPollQuizItemShortAnswerBinding) {
+//            questionNumberHeading.text = "QUESTION ${questionUi.index} : Long Answer"
+//            questionHeading.text = questionUi.text
+//        }
+//    }
 
 }
