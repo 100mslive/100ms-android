@@ -160,6 +160,11 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 setDrawable(binding.root.context.getDrawable(R.drawable.polls_creation_divider)!!)
             }
             var skipSelection = true
+            // Remove all item decorators
+            while (optionsListView.getItemDecorationCount() > 0) {
+                optionsListView.removeItemDecorationAt(0);
+            }
+            // Add it back if it's polls.
             if (isPoll) optionsListView.addItemDecoration(divider)
             setCurrentSelection(questionTypeSpinner, questionUi)
             skipSelection = false
