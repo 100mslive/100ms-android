@@ -9,7 +9,7 @@
         android:drawablePadding="8dp"
         android:drawableStart="@drawable/add_ic"
         android:padding="@dimen/eight_dp"
-        android:text="Add an option"
+        android:text="Add another question"
         android:gravity="center_vertical"
         android:textSize="14sp"
         android:fontFamily="@font/inter_regular"

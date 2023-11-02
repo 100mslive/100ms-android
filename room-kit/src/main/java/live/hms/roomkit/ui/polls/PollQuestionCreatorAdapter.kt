@@ -151,4 +151,6 @@ internal sealed interface QuestionCreatorChangePayload {
 
 }
 
-fun List<QuestionUi>.sortQuestions() : List<QuestionUi>{ return sortedBy { it.getItemId() } }
+fun List<QuestionUi>.sortQuestions() : List<QuestionUi>{
+    return sortedWith(compareBy(QuestionUi::getItemId))
+}

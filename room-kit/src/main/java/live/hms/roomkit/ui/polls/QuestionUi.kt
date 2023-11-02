@@ -10,7 +10,7 @@ sealed class QuestionUi(
                                var isPoll : Boolean = true,
                                var requiredToAnswer: Boolean = false,
     ) : QuestionUi(0, 0) {
-        override fun getItemId(): Long = viewType.toLong()
+        override fun getItemId(): Long = viewType.toLong() // It's always first and there's only one
     }
 
     sealed class ChoiceQuestions(
@@ -68,9 +68,9 @@ sealed class QuestionUi(
     }
 
     object AddAnotherItemView : QuestionUi(-1, 5){
-        override fun getItemId(): Long = viewType.toLong()
+        override fun getItemId(): Long = viewType.toLong() + 2000
     }
     data class LaunchButton(val isPoll : Boolean, var enabled : Boolean) : QuestionUi(-2, 6){
-        override fun getItemId(): Long = viewType.toLong()
+        override fun getItemId(): Long = viewType.toLong() + 2000
     }
 }
