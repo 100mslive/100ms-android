@@ -15,7 +15,7 @@ class OptionViewHolder(val binding : LayoutPollQuizOptionsItemBinding,
                        selectCheckboxOption : (Int, Boolean) -> Unit,
                        deleteThisOption : (position : Int) -> Unit,
                        ) : ViewHolder(binding.root) {
-   var skipCheckChange = false
+   private var skipCheckChange = false
     init {
         if(bindingAdapterPosition != NO_POSITION) {
             binding.text.setText(getItem(bindingAdapterPosition).text)
