@@ -1209,12 +1209,14 @@ fun FragmentGridVideoBinding.applyTheme() {
 
     tabLayoutDotsRemoteScreenShare.setBackgroundColor(Color.TRANSPARENT)
 
-    iconOption.setBackgroundColor(
-        getColorOrDefault(
-            EmailUtils.addAlpha(HMSPrebuiltTheme.getColours()?.surfaceDefault!!, 0.6),
-            HMSPrebuiltTheme.getDefaults().surface_default
+    HMSPrebuiltTheme.getColours()?.surfaceDefault?.let {
+        iconOption.setBackgroundColor(
+            getColorOrDefault(
+                EmailUtils.addAlpha(it, 0.6),
+                HMSPrebuiltTheme.getDefaults().surface_default
+            )
         )
-    )
+    }
 
 
     rootLayout.setBackgroundColor(
