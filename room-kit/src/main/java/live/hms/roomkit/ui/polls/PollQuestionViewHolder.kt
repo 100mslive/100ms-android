@@ -149,7 +149,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 }
                 it.deleteOption = { position ->
                     val question =
-                        getItem(position).currentQuestion
+                        getItem(bindingAdapterPosition).currentQuestion
                     question.options = question.options.minus(question.options[position])
                     refresh(bindingAdapterPosition)
                 }
