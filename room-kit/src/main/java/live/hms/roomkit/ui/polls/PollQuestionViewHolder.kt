@@ -10,6 +10,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,12 +42,11 @@ class PollQuestionViewHolder<T : ViewBinding>(
         when (questionUi) {
             is QuestionUi.QuestionCreator -> bind(questionUi)
             is QuestionUi.LongAnswer -> bind(questionUi)
-            is QuestionUi.MultiChoiceQuestion -> bind(questionUi)
             is QuestionUi.ShortAnswer -> bind(questionUi)
-            is QuestionUi.SingleChoiceQuestion -> bind(questionUi)
             is QuestionUi.AddAnotherItemView -> bind(questionUi)
             is QuestionUi.LaunchButton -> bind(questionUi)
-            is QuestionUi.ChoiceQuestions -> TODO()
+            is QuestionUi.ChoiceQuestions -> bind(questionUi)
+
         }
     }
 
@@ -250,33 +250,38 @@ class PollQuestionViewHolder<T : ViewBinding>(
         else saveButton.saveButtonDisabled()
     }
 
-    private fun bind(questionUi: QuestionUi.MultiChoiceQuestion) {
+    private fun bind(questionUi: QuestionUi.ChoiceQuestions) {
         with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
             applyTheme()
             questionTitle.text = questionUi.withTitle
-            questionNumbering.text = "QUESTION ${questionUi.index} of something"
+            questionNumbering.text = "QUESTION ${questionUi.index} of something: ${if(questionUi is QuestionUi.SingleChoiceQuestion) "SINGLE CHOICE" else "MULTIPLE CHOICE"}"
             val adapter = GroupieAdapter()
             adapter.addAll(questionUi.options.map {
                 MultiChoiceQuestionOptionItem(questionUi, it)
             })
+
+            val divider = DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
+                setDrawable(AppCompatResources.getDrawable(binding.root.context, R.drawable.polls_creation_divider)!!)
+            }
+            options.addItemDecoration(divider)
             options.layoutManager = LinearLayoutManager(binding.root.context)
             options.adapter = adapter
         }
     }
 
-    private fun bind(questionUi: QuestionUi.SingleChoiceQuestion) {
-        with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
-            applyTheme()
-            questionTitle.text = questionUi.withTitle
-            questionNumbering.text = "QUESTION ${questionUi.index} of something"
-            val adapter = GroupieAdapter()
-            adapter.addAll(questionUi.options.map {
-                MultiChoiceQuestionOptionItem(questionUi, it)
-            })
-            options.layoutManager = LinearLayoutManager(binding.root.context)
-            options.adapter = adapter
-        }
-    }
+//    private fun bind(questionUi: QuestionUi.SingleChoiceQuestion) {
+//        with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
+//            applyTheme()
+//            questionTitle.text = questionUi.withTitle
+//            questionNumbering.text = "QUESTION ${questionUi.index} of something"
+//            val adapter = GroupieAdapter()
+//            adapter.addAll(questionUi.options.map {
+//                MultiChoiceQuestionOptionItem(questionUi, it)
+//            })
+//            options.layoutManager = LinearLayoutManager(binding.root.context)
+//            options.adapter = adapter
+//        }
+//    }
 
     private fun bind(questionUi: QuestionUi.ShortAnswer) {
         with(binding as LayoutPollQuizItemShortAnswerBinding) {
