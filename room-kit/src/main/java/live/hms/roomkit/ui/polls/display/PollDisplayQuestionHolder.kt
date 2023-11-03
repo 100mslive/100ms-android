@@ -7,11 +7,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.GoLiveBottomSheetBinding
+import live.hms.roomkit.databinding.LayoutEndPollButtonBinding
+import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.alertButtonEnabled
+import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.highlightCorrectAnswer
 import live.hms.roomkit.ui.theme.voteButtons
@@ -30,7 +35,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
     val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean,
     // This isn't implemented yet
-    val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit
+    val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
+    val endPoll : (HmsPoll) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
@@ -42,21 +48,38 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 
     // There are two different layouts.
     fun bind(question : QuestionContainer) {
-        when(question.question.type) {
-            HMSPollQuestionType.singleChoice, HMSPollQuestionType.multiChoice -> {
-                votingProgressAdapter = VotingProgressAdapter(question.question.questionID)
-                    .apply {
-                        updateProgressBar(poll.questions ?: emptyList(), poll, canRoleViewVotes)
-                    }
+        if(question is QuestionContainer.Question) {
+            when (question.question.type) {
+                HMSPollQuestionType.singleChoice, HMSPollQuestionType.multiChoice -> {
+                    votingProgressAdapter = VotingProgressAdapter(question.question.questionID)
+                        .apply {
+                            updateProgressBar(poll.questions ?: emptyList(), poll, canRoleViewVotes)
+                        }
 
-                optionsBinder(question)
+                    optionsBinder(question)
+                }
+
+                HMSPollQuestionType.shortAnswer,
+                HMSPollQuestionType.longAnswer -> textBinder(question)
             }
-            HMSPollQuestionType.shortAnswer,
-            HMSPollQuestionType.longAnswer -> textBinder(question)
+        }
+        else {
+            with(binding as LayoutEndPollButtonBinding) {
+                launchPollQuiz.text = "End Poll"
+                if(poll.state == HmsPollState.STARTED) {
+                    launchPollQuiz.alertButtonEnabled()
+                    launchPollQuiz.setOnClickListener {
+                        endPoll(poll)
+                    }
+                    binding.root.visibility = View.VISIBLE
+                } else {
+                    binding.root.visibility = View.GONE
+                }
+            }
         }
     }
 
-    private fun manageVisibility(question : QuestionContainer, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
+    private fun manageVisibility(question : QuestionContainer.Question, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
         // This is now also different if it's polls or quiz.
         // For polls we see answers immediately and they are updated.
         // For quizzes, we do not see the answers.
@@ -140,7 +163,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 //        skipButton.visibility = if(question.question.canSkip) View.VISIBLE else View.GONE
     }
 
-    private fun isQuestionCorrectlyAnswered(questionContainer: QuestionContainer): Boolean {
+    private fun isQuestionCorrectlyAnswered(questionContainer: QuestionContainer.Question): Boolean {
         val question = questionContainer.question
         val isAnswerCorrect = when (question.type) {
             HMSPollQuestionType.singleChoice -> {
@@ -161,7 +184,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         return isAnswerCorrect
     }
 
-    private fun optionsBinder(question: QuestionContainer) {
+    private fun optionsBinder(question: QuestionContainer.Question) {
         with(binding as LayoutPollsDisplayChoicesQuesionBinding) {
             manageVisibility(question, this)
             val questionType = when(question.question.type) {
@@ -207,7 +230,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
 
     }
 
-    private fun textBinder(question : QuestionContainer) {
+    private fun textBinder(question : QuestionContainer.Question) {
         with(binding as LayoutQuizDisplayShortAnswerBinding) {
             textView.text = question.question.text
             votebutton.setOnClickListener {
