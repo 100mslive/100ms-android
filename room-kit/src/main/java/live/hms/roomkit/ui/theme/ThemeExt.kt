@@ -2258,6 +2258,11 @@ internal fun TextView.saveButtonDisabled() {
 
 
 fun LayoutPollQuizOptionsItemMultiChoiceBinding.applyTheme() {
+    backingCard.setCardBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default)
+    )
+
     deleteOptionTrashButton.drawable.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
