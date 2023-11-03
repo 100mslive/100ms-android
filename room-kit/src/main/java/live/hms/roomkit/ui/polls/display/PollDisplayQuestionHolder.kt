@@ -36,7 +36,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean,
     // This isn't implemented yet
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
-    val endPoll : (HmsPoll) -> Unit
+    val endPoll : (HmsPoll) -> Unit,
+    val canEndPoll : Boolean,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
@@ -66,7 +67,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         else {
             with(binding as LayoutEndPollButtonBinding) {
                 launchPollQuiz.text = "End Poll"
-                if(poll.state == HmsPollState.STARTED) {
+                if(poll.state == HmsPollState.STARTED &&  canEndPoll) {
                     launchPollQuiz.alertButtonEnabled()
                     launchPollQuiz.setOnClickListener {
                         endPoll(poll)

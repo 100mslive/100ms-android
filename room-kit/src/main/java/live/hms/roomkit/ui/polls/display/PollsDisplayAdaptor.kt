@@ -103,7 +103,7 @@ class PollsDisplayAdaptor(
             EndPollViewType -> LayoutEndPollButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped, endPoll)
+        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
             updater.add(questionHolder)
         }
