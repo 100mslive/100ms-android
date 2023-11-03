@@ -157,6 +157,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
                     question.selections = question.selections.minus(position)
                     // Remove the option
                     question.options = question.options.minus(question.options[position])
+                    validateSaveButtonEnabledState(getItem(bindingAdapterPosition), binding.saveButton)
                     refresh(bindingAdapterPosition)
                 }
             }
