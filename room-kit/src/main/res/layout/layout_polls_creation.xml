@@ -252,7 +252,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:fontFamily="@font/inter_bold"
-            android:text="Start Poll"
+            tools:text="Start Poll"
             app:layout_constraintTop_toBottomOf="@id/timer" />
 
         <TextView

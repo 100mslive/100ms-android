@@ -104,6 +104,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
             notRequiredToAnswer.setOnCheckedChangeListener { _, b ->
                 getItem(bindingAdapterPosition).currentQuestion.requiredToAnswer = b
             }
+            binding.askAQuestionEditText.setText(questionUi.currentQuestion.withTitle)
             binding.askAQuestionEditText.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -152,6 +153,9 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 it.deleteOption = { position ->
                     val question =
                         getItem(bindingAdapterPosition).currentQuestion
+                    // Remove the option from the selections (answers) if it was present
+                    question.selections = question.selections.minus(position)
+                    // Remove the option
                     question.options = question.options.minus(question.options[position])
                     refresh(bindingAdapterPosition)
                 }

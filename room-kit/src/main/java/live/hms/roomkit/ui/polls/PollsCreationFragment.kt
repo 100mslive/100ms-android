@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsCreationBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
@@ -51,11 +52,13 @@ class PollsCreationFragment : Fragment(){
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
             pollButton.setOnSingleClickListener {
                 highlightPollOrQuiz(true)
+                toggleStartButtonText(true)
                 pollsViewModel.setPollOrQuiz(true)
             }
             pollButton.callOnClick()
             quizButton.setOnSingleClickListener {
                 highlightPollOrQuiz(false)
+                toggleStartButtonText(false)
                 pollsViewModel.setPollOrQuiz(false)
             }
             anonymous.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.isAnon(isChecked) }
@@ -96,6 +99,9 @@ class PollsCreationFragment : Fragment(){
         findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollQuestionCreation(pollsViewModel.isPoll()))
     }
 
+    private fun toggleStartButtonText(isPoll: Boolean) {
+        binding.startPollButton.text = if(isPoll) getText(R.string.hms_start_poll) else getText(R.string.hms_start_quiz)
+    }
     private fun highlightPollOrQuiz(isPoll : Boolean) {
         // Whichever button is selected, disable it.
         // Hopefully the UI for the opposite one will be grayed.
