@@ -21,6 +21,7 @@ sealed class QuestionUi(
         open var withTitle: String = "",
         open var options: List<String> = emptyList(),
         open var selections : List<Int> = emptyList(),
+        open var totalQuestions : Long
     ) : QuestionUi(index, viewType){
         open fun isValid(isPoll : Boolean) : Boolean {
             return withTitle.isNotEmpty() &&
@@ -37,8 +38,9 @@ sealed class QuestionUi(
         override var options: List<String> = listOf("",""),
         var correctOptionIndex: List<Int>? = null,
         override var index: Long = -1,
-        override var requiredToAnswer: Boolean = false
-    ) : ChoiceQuestions(index, 1, requiredToAnswer) {
+        override var requiredToAnswer: Boolean = false,
+        override var totalQuestions: Long = 0
+    ) : ChoiceQuestions(index, 1, requiredToAnswer, totalQuestions = totalQuestions) {
         override fun isValid(isPoll : Boolean): Boolean {
             return super.isValid(isPoll) && (isPoll || selections.isNotEmpty())
         }
@@ -49,8 +51,9 @@ sealed class QuestionUi(
         override var options: List<String> = listOf("",""),
         var correctOptionIndex: Int? = null,
         override var index: Long = -1,
-        override var requiredToAnswer: Boolean = false
-    ) : ChoiceQuestions(index, 2, requiredToAnswer) {
+        override var requiredToAnswer: Boolean = false,
+        override var totalQuestions: Long = 0
+    ) : ChoiceQuestions(index, 2, requiredToAnswer, totalQuestions = totalQuestions) {
         override fun isValid(isPoll : Boolean): Boolean {
             return super.isValid(isPoll) && (isPoll || selections.isNotEmpty())
         }

@@ -8,7 +8,6 @@ import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.databinding.LayoutAddMoreBinding
 import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
-import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 
 class PollQuestionCreatorAdapter(private val isPoll : Boolean,
@@ -77,22 +76,34 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                 // Either restore the question in edit index or add a new one
                 .plus(questionUi.apply { index = questionInEditIndex ?: ++count })
                 .plus(QuestionUi.AddAnotherItemView)
+                .map {
+                    if((it.viewType == 1 || it.viewType == 2)) {
+                        when(it) {
+                            is QuestionUi.SingleChoiceQuestion -> it.copy(totalQuestions = count)
+                            is QuestionUi.MultiChoiceQuestion -> it.copy(totalQuestions = count)
+                            else -> it
+                        }
+                    }
+                    else
+                        it
+                }
             submitList(list.sortQuestions())
             },
             isPoll,
-        reAddQuestionCreator = {
-            submitList(
-                listOf(QuestionUi.QuestionCreator(isPoll = isPoll))
-                    .plus(currentList)
-                    .minus(QuestionUi.AddAnotherItemView).sortQuestions()
-            )
-        }, {position ->
-            getItem(position) as QuestionUi.QuestionCreator
-        },
-        launchPoll,
-        {
-            position -> notifyItemChanged(position)
-        },
+            reAddQuestionCreator = {
+                submitList(
+                    listOf(QuestionUi.QuestionCreator(isPoll = isPoll))
+                        .plus(currentList)
+                        .minus(QuestionUi.AddAnotherItemView).sortQuestions()
+                )
+            },
+            getItem = {position ->
+                getItem(position) as QuestionUi.QuestionCreator
+            },
+            launchPoll,
+            refresh = {
+                position -> notifyItemChanged(position)
+            },
             editQuestion = {
                 position ->
                 val questionToEdit = getItem(position)
@@ -113,21 +124,27 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                         .plus(newQuestionCreator)
                         .sortQuestions())
                 }
-            },
-            deleteQuestion = {
-                position ->
-                val itemToDelete = getItem(position)
-                // also every item after this should have its question number decremented.
-                val newList = currentList.minus(itemToDelete).map { if((it.viewType == 1 || it.viewType == 2) && it.index > itemToDelete.index) {
-                    it.index--
-                    it
+            }
+        ) { position ->
+            val itemToDelete = getItem(position)
+            // also every item after this should have its question number decremented.
+            // also the overall count is reduced.
+            count--
+            val newList = currentList.minus(itemToDelete).map {
+                if ((it.viewType == 1 || it.viewType == 2)) {
+                    when (it) {
+                        is QuestionUi.SingleChoiceQuestion -> it.copy(totalQuestions = count,
+                            index = if(it.index > itemToDelete.index) it.index - 1 else it.index)
+                        is QuestionUi.MultiChoiceQuestion -> it.copy(totalQuestions = count,
+                            index = if(it.index > itemToDelete.index) it.index - 1 else it.index
+                        )
+                        else -> it
+                    }
                 } else
                     it
-                }
-                // also the overall count is reduced.
-                count--
-                submitList(newList)
-            })
+            }
+            submitList(newList)
+        }
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {

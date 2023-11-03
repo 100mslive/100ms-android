@@ -2,12 +2,9 @@ package live.hms.roomkit.ui.polls
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
@@ -20,7 +17,6 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutAddMoreBinding
 import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationItemBinding
-import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.theme.applyTheme
@@ -28,18 +24,17 @@ import live.hms.roomkit.ui.theme.buttonDisabled
 import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.ui.theme.saveButtonDisabled
 import live.hms.roomkit.ui.theme.saveButtonEnabled
-import live.hms.roomkit.util.setOnSingleClickListener
 
 class PollQuestionViewHolder<T : ViewBinding>(
     val binding: T,
-    val saveInfo: (questionUi: QuestionUi, questionInEditIndex : Long?) -> Unit,
+    val saveInfo: (questionUi: QuestionUi, questionInEditIndex: Long?) -> Unit,
     val isPoll: Boolean,
     val reAddQuestionCreator: () -> Unit,
     val getItem: (position: Int) -> QuestionUi.QuestionCreator,
-    val launchPoll : () -> Unit,
-    val refresh : (position : Int) -> Unit,
-    val editQuestion : (position : Int) -> Unit,
-    val deleteQuestion : (position : Int) -> Unit
+    val launchPoll: () -> Unit,
+    val refresh: (position: Int) -> Unit,
+    val editQuestion: (position: Int) -> Unit,
+    val deleteQuestion: (position: Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -276,7 +271,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 deleteQuestion(bindingAdapterPosition)
             }
             questionTitle.text = questionUi.withTitle
-            questionNumbering.text = "QUESTION ${questionUi.index} of something: ${if(questionUi is QuestionUi.SingleChoiceQuestion) "SINGLE CHOICE" else "MULTIPLE CHOICE"}"
+            questionNumbering.text = "QUESTION ${questionUi.index} of ${questionUi.totalQuestions}: ${if(questionUi is QuestionUi.SingleChoiceQuestion) "SINGLE CHOICE" else "MULTIPLE CHOICE"}"
             val adapter = GroupieAdapter()
             adapter.addAll(questionUi.options.map {
                 MultiChoiceQuestionOptionItem(questionUi, it)
