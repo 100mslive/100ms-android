@@ -53,11 +53,13 @@ class PollsCreationFragment : Fragment(){
             pollButton.setOnSingleClickListener {
                 highlightPollOrQuiz(true)
                 toggleStartButtonText(true)
+                changePollQuizTitleHint(true)
                 pollsViewModel.setPollOrQuiz(true)
             }
             pollButton.callOnClick()
             quizButton.setOnSingleClickListener {
                 highlightPollOrQuiz(false)
+                changePollQuizTitleHint(false)
                 toggleStartButtonText(false)
                 pollsViewModel.setPollOrQuiz(false)
             }
@@ -101,6 +103,9 @@ class PollsCreationFragment : Fragment(){
 
     private fun toggleStartButtonText(isPoll: Boolean) {
         binding.startPollButton.text = if(isPoll) getText(R.string.hms_start_poll) else getText(R.string.hms_start_quiz)
+    }
+    private fun changePollQuizTitleHint(isPoll : Boolean) {
+        binding.pollTitleEditText.hint = if(isPoll) getText(R.string.hms_name_this_poll) else getText(R.string.hms_name_this_quiz)
     }
     private fun highlightPollOrQuiz(isPoll : Boolean) {
         // Whichever button is selected, disable it.

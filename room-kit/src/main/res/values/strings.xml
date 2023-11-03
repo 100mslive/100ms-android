@@ -250,4 +250,6 @@
     <string name="quiz_your_answer">Your Answer</string>
     <string name="hms_start_poll">Start Poll</string>
     <string name="hms_start_quiz">Start Quiz</string>
+    <string name="hms_name_this_poll">Name this poll</string>
+    <string name="hms_name_this_quiz">Name this quiz</string>
 </resources>
