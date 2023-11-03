@@ -666,14 +666,6 @@ class MeetingFragment : Fragment() {
 
     }
 
-//    private fun showPollStart(poll: HmsPoll) {
-//        val pollId = poll.pollId
-//        if (!showedPolls.contains(pollId)) {
-//            showedPolls.add(pollId)
-//            meetingViewModel.triggerPollsNotification(poll)
-//        }
-//    }
-
     private val pipReceiver by lazy {
         PipBroadcastReceiver(
             toogleLocalAudio = meetingViewModel::toggleLocalAudio,
