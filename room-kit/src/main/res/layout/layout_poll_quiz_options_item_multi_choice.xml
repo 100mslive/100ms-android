@@ -1,19 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="@dimen/spacing_d1"
+    android:id="@+id/backingCard"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/questionTitle"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/spacing_d2">
 
-    <ListView
-        android:id="@+id/options"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/questionNumbering"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_medium"
+            android:lineHeight="16dp"
+            android:textSize="10sp"
+            tools:text="Question 1 of 2" />
 
-</androidx.appcompat.widget.LinearLayoutCompat>
+        <TextView
+            android:id="@+id/questionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/spacing_d2"
+            android:fontFamily="@font/inter_regular"
+            android:lineHeight="24dp"
+            android:textSize="16sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_d2"
+            android:nestedScrollingEnabled="false" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/deleteOptionTrashButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/spacing_d2"
+                android:src="@drawable/delete_trash"
+                tools:tint="@color/black_overlay" />
+
+            <TextView
+                android:id="@+id/editQuestionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:gravity="center"
+                android:lineHeight="24px"
+                android:paddingHorizontal="@dimen/spacing_d2"
+                android:paddingVertical="@dimen/spacing_d1"
+                android:textSize="16sp"
+                android:text="Edit" />
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

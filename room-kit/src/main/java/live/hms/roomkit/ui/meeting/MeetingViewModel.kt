@@ -1928,28 +1928,29 @@ class MeetingViewModel(
             Log.d("Polls","Processing $questionUi")
 
             when(questionUi) {
-                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
+//                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
                 is QuestionUi.MultiChoiceQuestion -> {
                     val multiChoice = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.multiChoice)
                         .withTitle(questionUi.withTitle)
                     questionUi.options.forEachIndexed { index : Int, option : String ->
-                        multiChoice.addQuizOption(option, questionUi.correctOptionIndex?.contains(index) == true)
+                        multiChoice.addQuizOption(option, questionUi.selections.contains(index))
                     }
                     hmsPollBuilder
                         .addQuestion(multiChoice.build())
                 }
-                QuestionUi.QuestionCreator,
-                QuestionUi.AddAnotherItemView -> { /*Nothing to do here*/}
-                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
+//                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
                 is QuestionUi.SingleChoiceQuestion -> {
                     val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.singleChoice)
                         .withTitle(questionUi.withTitle)
                     questionUi.options.forEachIndexed { index : Int, option : String ->
-                        singleChoiceQuestionBuilder.addQuizOption(option, questionUi.correctOptionIndex == index)
+                        singleChoiceQuestionBuilder.addQuizOption(option, isCorrect = questionUi.selections.contains(index))
                     }
                     hmsPollBuilder
                         .addQuestion(singleChoiceQuestionBuilder.build())
                 }
+                is QuestionUi.QuestionCreator,
+                is QuestionUi.LaunchButton,
+                QuestionUi.AddAnotherItemView, -> { /*Nothing to do here*/}
             }
         }
 

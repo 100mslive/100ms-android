@@ -2205,13 +2205,6 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
 
     setSwitchThemes(notRequiredToAnswer)
 
-    deleteOptionTrashButton.drawable.setTint(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-
     saveButton.saveButtonEnabled()
 
 
@@ -2263,6 +2256,34 @@ internal fun TextView.saveButtonDisabled() {
 
 }
 
+
+fun LayoutPollQuizOptionsItemMultiChoiceBinding.applyTheme() {
+    backingCard.setCardBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default)
+    )
+
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    editQuestionButton.saveButtonEnabled()
+    questionNumbering.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+    questionTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
+
 fun LayoutPollQuizOptionsItemBinding.setTheme() {
 
     text.setBackgroundAndColor(
@@ -2287,7 +2308,12 @@ fun LayoutPollQuizOptionsItemBinding.setTheme() {
 
     radioButton.buttonTintList = trackTintList()
     checkbox.buttonTintList = trackTintList()
-
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 }
 
 fun TextView.pollsStatusLiveDraftEnded(state: HmsPollState) {
@@ -2407,4 +2433,13 @@ fun MaterialCardView.highlightCorrectAnswer(isCorrect : Boolean) {
         )
     }
     strokeWidth = 1.dp()
+}
+
+internal fun LayoutMultiChoiceQuestionOptionItemBinding.applyTheme() {
+    optionText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
 }

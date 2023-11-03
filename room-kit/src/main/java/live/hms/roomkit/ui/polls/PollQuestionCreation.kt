@@ -5,12 +5,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollQuestionCreationBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -26,9 +31,10 @@ import live.hms.roomkit.util.viewLifecycle
  */
 class PollQuestionCreation : Fragment() {
 
+    val args: PollQuestionCreationArgs by navArgs()
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val adapter = PollQuestionCreatorAdapter { pollsViewModel.isPoll() }
+    private val adapter by lazy { PollQuestionCreatorAdapter(args.isPoll, ::launchPoll) }
 
     private var binding by viewLifecycle<LayoutPollQuestionCreationBinding>()
 
@@ -56,30 +62,15 @@ class PollQuestionCreation : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
         with(binding) {
+            heading.text = "${pollsViewModel.getPollsCreationInfo().pollTitle} ${if(pollsViewModel.isPoll()) "Poll" else "Quiz"}"
             backButton.setOnSingleClickListener { findNavController().popBackStack() }
             createdQuestionList.adapter = adapter
             createdQuestionList.layoutManager = LinearLayoutManager(requireContext())
             val divider = DividerItemDecoration(requireContext(), VERTICAL).apply {
-                setDrawable(binding.root.context.getDrawable(R.drawable.questions_divider)!!)
+                setDrawable(AppCompatResources.getDrawable(requireContext(), R.drawable.questions_divider)!!)
             }
             createdQuestionList.addItemDecoration(divider)
 
-            adapter.isReady = { isReady ->
-                launchPollQuiz.isEnabled = isReady
-            }
-
-
-            launchPollQuiz.setOnSingleClickListener {
-                // Clear the UI
-                // start the data
-                meetingViewModel.startPoll(
-                    adapter.currentList,
-                    pollsViewModel.getPollsCreationInfo()
-                )
-                backButton.callOnClick()
-            }
-            // Will be enabled later.
-            launchPollQuiz.isEnabled = false
         }
     }
 
@@ -91,5 +82,15 @@ class PollQuestionCreation : Fragment() {
                     binding.backButton.callOnClick()
                 }
             })
+    }
+
+    private fun launchPoll() {
+        // Launch the poll
+        meetingViewModel.startPoll(
+            adapter.currentList,
+            pollsViewModel.getPollsCreationInfo()
+        )
+        // Go back
+        findNavController().popBackStack()
     }
 }

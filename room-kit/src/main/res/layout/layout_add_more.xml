@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
     <TextView
         android:id="@+id/addMoreOptions"
         android:layout_width="match_parent"
@@ -9,7 +9,7 @@
         android:drawablePadding="8dp"
         android:drawableStart="@drawable/add_ic"
         android:padding="@dimen/eight_dp"
-        android:text="Add an option"
+        android:text="Add another question"
         android:gravity="center_vertical"
         android:textSize="14sp"
         android:fontFamily="@font/inter_regular"
