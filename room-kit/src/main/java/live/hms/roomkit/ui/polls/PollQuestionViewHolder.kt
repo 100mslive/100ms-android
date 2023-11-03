@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.xwray.groupie.GroupieAdapter
+import kotlinx.coroutines.selects.select
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutAddMoreBinding
 import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
@@ -34,7 +35,8 @@ class PollQuestionViewHolder<T : ViewBinding>(
     val launchPoll: () -> Unit,
     val refresh: (position: Int) -> Unit,
     val editQuestion: (position: Int) -> Unit,
-    val deleteQuestion: (position: Int) -> Unit
+    val deleteQuestion: (position: Int) -> Unit,
+    val updateSelection : (position : Int, List<Int>, List<String>?) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     private val TAG = "PollQuestionViewHolder"
 
@@ -128,37 +130,35 @@ class PollQuestionViewHolder<T : ViewBinding>(
                     validateSaveButtonEnabledState(getItem(bindingAdapterPosition), binding.saveButton)
                 }
                 it.onSingleOptionSelected = { position ->
-                    val question =
-                        getItem(bindingAdapterPosition).currentQuestion as QuestionUi.SingleChoiceQuestion
-                    // This can't be right.... also we don't have any variable for selected
-                    //  but not answered.
-                    // This is in fact the perfect thing to create a model class for
-                    // Though that model will have to be stored....
-                    question.selections = listOf(position)
-                    validateSaveButtonEnabledState(getItem(bindingAdapterPosition), binding.saveButton)
+                    updateSelection(bindingAdapterPosition, listOf(position), null)
                 }
                 it.onMultipleOptionSelected = { position, selected ->
                     val question =
-                        getItem(bindingAdapterPosition).currentQuestion as QuestionUi.MultiChoiceQuestion
-
-                    question.selections = if(selected)
+                        getItem(bindingAdapterPosition).currentQuestion
+                    // TODO also fix the thing
+                    val selections = if(selected)
                          question.selections.plus(position).sorted()
                     else
                         question.selections.minus(position).sorted()
-                    validateSaveButtonEnabledState(getItem(bindingAdapterPosition), binding.saveButton)
+                    updateSelection(bindingAdapterPosition, selections, null)
                 }
                 it.deleteOption = { position ->
                     val question =
                         getItem(bindingAdapterPosition).currentQuestion
                     // Remove the option from the selections (answers) if it was present
-                    question.selections = question.selections.minus(position)
+                    //  Also change the index of what's selected.
+                    val newSelections = question.selections.minus(position).map { selectedIndex ->
+                        if(selectedIndex > position) selectedIndex - 1 else selectedIndex }
                     // Remove the option
-                    question.options = question.options.minus(question.options[position])
+                    val newOptions = question.options.minus(question.options[position])
                     validateSaveButtonEnabledState(getItem(bindingAdapterPosition), binding.saveButton)
                     refresh(bindingAdapterPosition)
+                    updateSelection(bindingAdapterPosition, newSelections, newOptions)
                 }
             }
-            optionsAdapter.submitList(QuestionToOptions().questionToOptions(questionUi.currentQuestion, questionUi.isPoll))
+            optionsAdapter.submitList(
+                QuestionToOptions().questionToOptions(questionUi.currentQuestion, questionUi.isPoll)
+            )
             optionsListView.adapter = optionsAdapter
             optionsListView.layoutManager = LinearLayoutManager(binding.root.context)
             val divider = DividerItemDecoration(binding.root.context, RecyclerView.VERTICAL).apply {
@@ -225,7 +225,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 // The same item could refresh just fine, only other items need specific invocationx
             }
 
-            saveButton.saveButtonDisabled()
+            validateSaveButtonEnabledState(questionUi, saveButton)
             saveButton.setOnClickListener {
                 // Every edit text has to have its focus cleared at this point otherwise
                 // it will crash with a java.lang.IllegalArgumentException: parameter must be a descendant of this view

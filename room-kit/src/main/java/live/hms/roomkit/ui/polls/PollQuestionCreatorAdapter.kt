@@ -124,8 +124,8 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                         .plus(newQuestionCreator)
                         .sortQuestions())
                 }
-            }
-        ) { position ->
+            },
+            deleteQuestion = { position ->
             val itemToDelete = getItem(position)
             // also every item after this should have its question number decremented.
             // also the overall count is reduced.
@@ -144,7 +144,20 @@ class PollQuestionCreatorAdapter(private val isPoll : Boolean,
                     it
             }
             submitList(newList)
-        }
+        },
+            updateSelection = { position, selections, options ->
+                val selectedItem : QuestionUi? = getItem(position)
+                if(selectedItem != null && selectedItem is QuestionUi.QuestionCreator)
+                {
+                    val newList = currentList.minus(selectedItem)
+                        .plus(selectedItem.copy(currentQuestion = selectedItem.currentQuestion.apply {
+                            this.selections = selections
+                            this.options = options ?: this.options
+                        }))
+                        .sortQuestions()
+                    submitList(newList)
+                }
+            })
     }
 
     override fun onBindViewHolder(holder: PollQuestionViewHolder<ViewBinding>, position: Int) {
