@@ -24,6 +24,8 @@ import live.hms.roomkit.databinding.LayoutPollQuizItemShortAnswerBinding
 import live.hms.roomkit.databinding.LayoutPollQuizOptionsItemMultiChoiceBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.buttonDisabled
+import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.ui.theme.saveButtonDisabled
 import live.hms.roomkit.ui.theme.saveButtonEnabled
 import live.hms.roomkit.util.setOnSingleClickListener
@@ -70,9 +72,9 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 "Launch Quiz"
 
             if (button.enabled)
-                saveButtonEnabled()
+                buttonEnabled()
             else
-                saveButtonDisabled()
+                buttonDisabled()
 
             setOnSingleClickListener {
                 launchPoll()
