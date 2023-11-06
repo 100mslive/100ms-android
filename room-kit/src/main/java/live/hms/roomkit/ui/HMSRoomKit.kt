@@ -11,22 +11,14 @@ import live.hms.roomkit.util.TOKEN
 object HMSRoomKit {
 
 
-    fun launchPrebuilt(roomCode: String, activity: Activity, options: HMSPrebuiltOptions? = null) {
+    fun launchPrebuilt(roomCode: String? = null, token: String?= null, activity: Activity, options: HMSPrebuiltOptions? = null) {
         Intent(activity, MeetingActivity::class.java).apply {
             putExtra(ROOM_CODE, roomCode)
-            putExtra(ROOM_PREBUILT, options)
-            startActivity(activity, this, null)
-        }
-
-    }
-
-
-    fun launchPrebuiltUsingToken(token: String, activity: Activity, options: HMSPrebuiltOptions? = null) {
-        Intent(activity, MeetingActivity::class.java).apply {
             putExtra(TOKEN, token)
             putExtra(ROOM_PREBUILT, options)
             startActivity(activity, this, null)
         }
+
     }
 
 }
