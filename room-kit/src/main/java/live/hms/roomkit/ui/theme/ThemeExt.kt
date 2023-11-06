@@ -233,7 +233,29 @@ internal fun ShapeableImageView.setIconDisabled(
 
 }
 
+internal fun TextView.alertButtonEnabled() {
+    this.isEnabled = true
 
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default,
+        null
+    )
+
+    this.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+}
 internal fun TextView.buttonEnabled() {
     this.isEnabled = true
 

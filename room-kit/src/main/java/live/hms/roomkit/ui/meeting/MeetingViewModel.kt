@@ -1913,6 +1913,16 @@ class MeetingViewModel(
     }
     fun permissionGranted() = hmsSDK.setPermissionsAccepted()
 
+    fun endPoll(hmsPoll: HmsPoll) = localHmsInteractivityCenter.stop(hmsPoll, object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+            Log.e("EndPoll","Error ending poll")
+        }
+
+        override fun onSuccess() {
+            Log.d("EndPoll","Poll ended")
+        }
+
+    })
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll
 
