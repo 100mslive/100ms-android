@@ -140,6 +140,7 @@ class MeetingViewModel(
 
     fun initSdk(
         roomCode: String,
+        token: String,
         hmsPrebuiltOptions: HMSPrebuiltOptions?,
         onHMSActionResultListener: HMSActionResultListener
     ) {
@@ -156,6 +157,10 @@ class MeetingViewModel(
 
         isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo ?: false
 
+        if (token.isNullOrEmpty().not()) {
+            joinRoomUsingToken(token, hmsPrebuiltOptions, onHMSActionResultListener)
+        }
+
         hmsSDK.getAuthTokenByRoomCode(
             TokenRequest(roomCode, hmsPrebuiltOptions?.userId ?: UUID.randomUUID().toString()),
             TokenRequestOptions(tokenURL),
@@ -166,31 +171,37 @@ class MeetingViewModel(
                 }
 
                 override fun onTokenSuccess(token: String) {
-
-                    val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
-                        hmsSDK.getRoomLayout(
-                            token,
-                            LayoutRequestOptions(layoutEndpointBase),
-                            object :
-                                HMSLayoutListener {
-                                override fun onError(error: HMSException) {
-                                    Log.e(TAG, "onError: ", error)
-                                    onHMSActionResultListener.onError(error)
-                                }
-
-                                override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
-                                    hmsRoomLayout = layoutConfig
-                                    prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
-                                    setHmsConfig(hmsPrebuiltOptions, token, initURL)
-                                    kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
-                                    onHMSActionResultListener.onSuccess()
-                                }
-
-                            })
+                    joinRoomUsingToken(token, hmsPrebuiltOptions, onHMSActionResultListener)
                 }
 
             })
 
+
+    }
+
+
+    fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+
+        val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
+        hmsSDK.getRoomLayout(
+            token,
+            LayoutRequestOptions(layoutEndpointBase),
+            object :
+                HMSLayoutListener {
+                override fun onError(error: HMSException) {
+                    Log.e(TAG, "onError: ", error)
+                    onHMSActionResultListener.onError(error)
+                }
+
+                override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
+                    hmsRoomLayout = layoutConfig
+                    prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
+                    setHmsConfig(hmsPrebuiltOptions, token, initURL)
+                    kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
+                    onHMSActionResultListener.onSuccess()
+                }
+
+            })
 
     }
 
