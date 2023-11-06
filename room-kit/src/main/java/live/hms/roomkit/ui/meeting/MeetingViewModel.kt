@@ -150,10 +150,7 @@ class MeetingViewModel(
         }
         //if empty is uses the prod token url else uses the debug token url
         val tokenURL: String = hmsPrebuiltOptions?.endPoints?.get("token") ?: ""
-        val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
-            hmsPrebuiltOptions.endPoints["init"].orEmpty()
-        else
-            "https://prod-init.100ms.live/init"
+
 
         isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo ?: false
 
@@ -181,6 +178,11 @@ class MeetingViewModel(
 
 
     fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+
+        val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
+            hmsPrebuiltOptions.endPoints["init"].orEmpty()
+        else
+            "https://prod-init.100ms.live/init"
 
         val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
         hmsSDK.getRoomLayout(
