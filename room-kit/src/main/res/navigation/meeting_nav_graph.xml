@@ -193,7 +193,11 @@
     <fragment
         android:id="@+id/pollQuestionCreation"
         android:name="live.hms.roomkit.ui.polls.PollQuestionCreation"
-        android:label="PollQuestionCreation" />
+        android:label="PollQuestionCreation" >
+        <argument
+            android:name="isPoll"
+            app:argType="boolean" />
+    </fragment>
     <fragment
         android:id="@+id/pollDisplayFragment"
         android:name="live.hms.roomkit.ui.polls.display.PollDisplayFragment"

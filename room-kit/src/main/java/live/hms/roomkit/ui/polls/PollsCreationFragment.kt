@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsCreationBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
@@ -44,18 +45,22 @@ class PollsCreationFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initOnBackPress()
-        binding.creationFlowUi.visibility = View.GONE//if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
+        binding.creationFlowUi.visibility = if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
         with(binding) {
             applyTheme()
             backButton.setOnSingleClickListener { findNavController().popBackStack() }
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
             pollButton.setOnSingleClickListener {
                 highlightPollOrQuiz(true)
+                toggleStartButtonText(true)
+                changePollQuizTitleHint(true)
                 pollsViewModel.setPollOrQuiz(true)
             }
             pollButton.callOnClick()
             quizButton.setOnSingleClickListener {
                 highlightPollOrQuiz(false)
+                changePollQuizTitleHint(false)
+                toggleStartButtonText(false)
                 pollsViewModel.setPollOrQuiz(false)
             }
             anonymous.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.isAnon(isChecked) }
@@ -93,9 +98,15 @@ class PollsCreationFragment : Fragment(){
         // Move to the next fragment but the data is only carried forward isn't it?
         //  It's not quite used yet.
         // Perhaps it really should be a common VM for all these fragments.
-        findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollQuestionCreation())
+        findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollQuestionCreation(pollsViewModel.isPoll()))
     }
 
+    private fun toggleStartButtonText(isPoll: Boolean) {
+        binding.startPollButton.text = if(isPoll) getText(R.string.hms_start_poll) else getText(R.string.hms_start_quiz)
+    }
+    private fun changePollQuizTitleHint(isPoll : Boolean) {
+        binding.pollTitleEditText.hint = if(isPoll) getText(R.string.hms_name_this_poll) else getText(R.string.hms_name_this_quiz)
+    }
     private fun highlightPollOrQuiz(isPoll : Boolean) {
         // Whichever button is selected, disable it.
         // Hopefully the UI for the opposite one will be grayed.

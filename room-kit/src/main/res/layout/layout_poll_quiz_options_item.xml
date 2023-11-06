@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
     <RadioButton
         android:id="@+id/radioButton"
         android:layout_width="wrap_content"
@@ -14,12 +15,24 @@
         android:layout_height="wrap_content"
         />
     <EditText
+        android:layout_weight="1"
         android:hint="e.g. Who will win the match?"
         android:textSize="12sp"
         android:fontFamily="@font/inter_regular"
         android:id="@+id/text"
         android:paddingHorizontal="@dimen/spacing_d2"
         android:paddingVertical="12dp"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/deleteOptionTrashButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_gravity="center"
+        tools:tint="@color/black_overlay"
+        android:layout_marginLeft="@dimen/spacing_d1"
+        android:src="@drawable/delete_trash"
+         />
 </androidx.appcompat.widget.LinearLayoutCompat>

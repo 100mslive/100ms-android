@@ -64,7 +64,8 @@ class PollDisplayFragment : Fragment() {
                 meetingViewModel::saveInfoText,
                 meetingViewModel::saveInfoSingleChoice,
                 meetingViewModel::saveInfoMultiChoice,
-                meetingViewModel::saveSkipped
+                meetingViewModel::saveSkipped,
+                meetingViewModel::endPoll
             )
 
             poll = returnedPoll

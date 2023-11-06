@@ -82,15 +82,9 @@ class HomeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-                val args = Bundle().apply {
-                    putSerializable("mode", SettingsMode.HOME)
-                }
-                parentFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.nav_host_fragment, SettingsFragment().apply { arguments = args },
-                        SETTINGS_FRAGMENT_TAG)
-                    .addToBackStack(null)
-                    .commit()
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeFragmentToSettingsFragment(SettingsMode.HOME)
+                )
 
             }
             R.id.action_email_logs -> {

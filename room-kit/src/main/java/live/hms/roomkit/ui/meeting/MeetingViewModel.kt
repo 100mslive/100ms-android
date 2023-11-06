@@ -85,6 +85,7 @@ class MeetingViewModel(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
                 .initialState(getAudioTrackState())
+                .setDisableInternalAudioManager(settings.detectDominantSpeaker.not())
                 .setPhoneCallMuteState(if (settings.muteLocalAudioOnPhoneRing) PhoneCallState.ENABLE_MUTE_ON_PHONE_CALL_RING else PhoneCallState.DISABLE_MUTE_ON_VOIP_PHONE_CALL_RING)
                 .build()
         )
@@ -1912,6 +1913,16 @@ class MeetingViewModel(
     }
     fun permissionGranted() = hmsSDK.setPermissionsAccepted()
 
+    fun endPoll(hmsPoll: HmsPoll) = localHmsInteractivityCenter.stop(hmsPoll, object : HMSActionResultListener {
+        override fun onError(error: HMSException) {
+            Log.e("EndPoll","Error ending poll")
+        }
+
+        override fun onSuccess() {
+            Log.d("EndPoll","Poll ended")
+        }
+
+    })
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll
 
@@ -1927,28 +1938,29 @@ class MeetingViewModel(
             Log.d("Polls","Processing $questionUi")
 
             when(questionUi) {
-                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
+//                is QuestionUi.LongAnswer -> hmsPollBuilder.addLongAnswerQuestion(questionUi.text)
                 is QuestionUi.MultiChoiceQuestion -> {
                     val multiChoice = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.multiChoice)
                         .withTitle(questionUi.withTitle)
                     questionUi.options.forEachIndexed { index : Int, option : String ->
-                        multiChoice.addQuizOption(option, questionUi.correctOptionIndex?.contains(index) == true)
+                        multiChoice.addQuizOption(option, questionUi.selections.contains(index))
                     }
                     hmsPollBuilder
                         .addQuestion(multiChoice.build())
                 }
-                QuestionUi.QuestionCreator,
-                QuestionUi.AddAnotherItemView -> { /*Nothing to do here*/}
-                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
+//                is QuestionUi.ShortAnswer -> hmsPollBuilder.addShortAnswerQuestion(questionUi.text)
                 is QuestionUi.SingleChoiceQuestion -> {
                     val singleChoiceQuestionBuilder = HMSPollQuestionBuilder.Builder(HMSPollQuestionType.singleChoice)
                         .withTitle(questionUi.withTitle)
                     questionUi.options.forEachIndexed { index : Int, option : String ->
-                        singleChoiceQuestionBuilder.addQuizOption(option, questionUi.correctOptionIndex == index)
+                        singleChoiceQuestionBuilder.addQuizOption(option, isCorrect = questionUi.selections.contains(index))
                     }
                     hmsPollBuilder
                         .addQuestion(singleChoiceQuestionBuilder.build())
                 }
+                is QuestionUi.QuestionCreator,
+                is QuestionUi.LaunchButton,
+                QuestionUi.AddAnotherItemView, -> { /*Nothing to do here*/}
             }
         }
 
