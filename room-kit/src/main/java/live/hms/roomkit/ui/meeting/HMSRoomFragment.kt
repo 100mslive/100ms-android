@@ -64,7 +64,7 @@ class HMSRoomFragment : Fragment() {
 
         meetingViewModel.initSdk(
             roomCode.orEmpty(),
-            token, hmsPrebuiltOptions, object : HMSActionResultListener {
+            "", hmsPrebuiltOptions, object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
                     contextSafe { context, activity ->
                         activity.runOnUiThread {
