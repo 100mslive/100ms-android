@@ -156,6 +156,7 @@ class MeetingViewModel(
 
         if (token.isNullOrEmpty().not()) {
             joinRoomUsingToken(token, hmsPrebuiltOptions, onHMSActionResultListener)
+            return
         }
 
         hmsSDK.getAuthTokenByRoomCode(
