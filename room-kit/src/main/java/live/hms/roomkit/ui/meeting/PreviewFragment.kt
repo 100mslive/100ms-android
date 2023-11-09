@@ -57,6 +57,7 @@ import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.sdk.models.enums.HMSStreamingState
 import live.hms.video.sdk.models.role.PublishParams
 import live.hms.videoview.VideoViewStateChangeListener
 
@@ -332,10 +333,10 @@ class PreviewFragment : Fragment() {
                 binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
                 binding.iconParticipants.startBounceAnimationUpwards()
             }
-            isHlsRunning = it.second.hlsStreamingState?.running == true
+            isHlsRunning = it.second.hlsStreamingState.state == HMSStreamingState.STARTED
             updateJoinButtonTextIfHlsIsEnabled(it?.second?.localPeer?.hmsRole?.name)
 
-            if (it.second.hlsStreamingState?.running == true) {
+            if (it.second.hlsStreamingState.state == HMSStreamingState.STARTED) {
                 binding.liveHlsGroup.visibility = View.VISIBLE
                 binding.hlsSession.startBounceAnimationUpwards()
             } else {
