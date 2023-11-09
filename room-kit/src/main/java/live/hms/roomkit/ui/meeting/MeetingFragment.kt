@@ -8,6 +8,7 @@ import android.app.RemoteAction
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.Icon
@@ -745,6 +746,16 @@ class MeetingFragment : Fragment() {
                 arguments = bundleOf(
                     "hlsStreamUrl" to mode.url
                 )
+            }
+        }
+
+        //handle orientation change
+        when(mode) {
+            is MeetingViewMode.HLS_VIEWER -> {
+                    contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR }
+            }
+            else -> {
+                contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
             }
         }
 
