@@ -1221,6 +1221,12 @@ class MeetingFragment : Fragment() {
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
+        binding.chatMessages.setOnClickListener {
+            if (controlBarsVisible)
+                hideControlBars()
+            else
+                showControlBars(true)
+        }
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1
