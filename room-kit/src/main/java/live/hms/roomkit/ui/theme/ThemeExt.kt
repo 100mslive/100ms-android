@@ -461,6 +461,13 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )
     )
 
+    recordingPause.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
     recordingSignalProgress.progressTintList = ColorStateList.valueOf(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,

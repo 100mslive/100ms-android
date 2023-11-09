@@ -18,8 +18,8 @@ import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.sdk.models.enums.HMSRecordingState
 
 class SessionOptionBottomSheet(
     private val onScreenShareClicked: () -> Unit,
@@ -159,7 +159,7 @@ class SessionOptionBottomSheet(
 
 
 
-        meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
+        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
             val isRecording = meetingViewModel.isRecordingState()
             recordingOption.setSelectedButton(isRecording)
             recordingOption.setText(if (isRecording) resources.getString(R.string.stop_recording) else resources.getString(R.string.start_record_meeting))
@@ -181,9 +181,9 @@ class SessionOptionBottomSheet(
         }
 
 
-        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
+        meetingViewModel.recordingState.observe(viewLifecycleOwner) {
             Log.d("SessionOptionBottoSheet", "isRecordingInProgess: $it")
-            recordingOption.showProgress(it)
+            recordingOption.showProgress(it == HMSRecordingState.STARTING)
         }
 
     }

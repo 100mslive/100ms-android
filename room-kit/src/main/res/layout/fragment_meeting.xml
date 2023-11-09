@@ -161,6 +161,17 @@
                 android:layout_height="20dp"/>
 
             <ImageView
+                android:id="@+id/recording_pause"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:src="@drawable/ic_recording_pause"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
                 android:id="@+id/recording_signal"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
