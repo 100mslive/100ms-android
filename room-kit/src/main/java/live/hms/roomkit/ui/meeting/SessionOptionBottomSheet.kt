@@ -159,8 +159,11 @@ class SessionOptionBottomSheet(
 
 
 
-        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
-            val isRecording = meetingViewModel.isRecordingState()
+        meetingViewModel.recordingState.observe(viewLifecycleOwner) { state ->
+
+            val isRecording = state in listOf(HMSRecordingState.STARTED, HMSRecordingState.PAUSED,
+                HMSRecordingState.RESUMED)
+
             recordingOption.setSelectedButton(isRecording)
             recordingOption.setText(if (isRecording) resources.getString(R.string.stop_recording) else resources.getString(R.string.start_record_meeting))
         }

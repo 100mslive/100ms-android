@@ -134,7 +134,10 @@ class MeetingActivity : AppCompatActivity() {
     }
 
     private fun initViewModels() {
-        meetingViewModel.isRecording.observe(this) {
+        meetingViewModel.recordingState.observe(this) {
+            invalidateOptionsMenu()
+        }
+        meetingViewModel.streamingState.observe(this) {
             invalidateOptionsMenu()
         }
         meetingViewModel.pinnedTrack.observe(this) {
