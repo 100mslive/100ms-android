@@ -1625,7 +1625,12 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
 }
 
 internal fun ListItemChatBinding.applyTheme() {
-
+    sentBackground.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright)
+    sentBackground.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default))
     name.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
@@ -1635,6 +1640,14 @@ internal fun ListItemChatBinding.applyTheme() {
     time.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
         HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+
+    toGroup.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+
+    sentTo.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 }
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {

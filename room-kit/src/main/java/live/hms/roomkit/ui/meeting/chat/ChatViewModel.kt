@@ -4,6 +4,10 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import live.hms.roomkit.BuildConfig
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSMessageResultListener
@@ -11,6 +15,7 @@ import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.HMSMessage
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRemotePeer
+import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
 import java.util.*
@@ -32,22 +37,41 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   fun sendMessage(messageStr : String) {
 
-    val message = ChatMessage(
-      "You",
-      null, // Let the server alone set the time
-      messageStr,
-      true,
-      Recipient.Everyone
-    )
-
     // Decide where it should go.
     when(val recipient = currentSelectedRecipient) {
-      Recipient.Everyone -> broadcast( message )
+      Recipient.Everyone -> broadcast( ChatMessage(
+        "You",
+        null, // Let the server alone set the time
+        messageStr,
+        true,
+        Recipient.Everyone,
+        null,
+        ChatMessage.sendTo(HMSMessageRecipientType.BROADCAST, null),
+        ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST)
+      ) )
       is Recipient.Peer -> directMessage(
-        message.copy(recipient = Recipient.Peer(recipient.peer)),
+        ChatMessage(
+          "You",
+          null, // Let the server alone set the time
+          messageStr,
+          true,
+          Recipient.Peer(recipient.peer),
+          null,
+          ChatMessage.sendTo(HMSMessageRecipientType.PEER, null),
+          ChatMessage.toGroup(HMSMessageRecipientType.PEER)
+        ),
         recipient.peer)
       is Recipient.Role -> groupMessage(
-        message.copy(recipient = Recipient.Role(recipient.role)),
+        ChatMessage(
+          "You",
+          null, // Let the server alone set the time
+          messageStr,
+          true,
+          Recipient.Role(recipient.role),
+          null,
+          ChatMessage.sendTo(HMSMessageRecipientType.ROLES, listOf(recipient.role)),
+          ChatMessage.toGroup(HMSMessageRecipientType.ROLES)
+        ),
         recipient.role)
     }
   }
@@ -61,8 +85,10 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true))
-      }
+          MainScope().launch {
+            addMessage(ChatMessage(hmsMessage, true))
+          }
+        }
 
     })
   }
@@ -76,7 +102,9 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true))
+        MainScope().launch {
+          addMessage(ChatMessage(hmsMessage, true))
+        }
       }
 
     })
@@ -91,7 +119,9 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
       override fun onSuccess(hmsMessage: HMSMessage) {
         // Request Successfully sent to server
-        addMessage(ChatMessage(hmsMessage, true))
+        MainScope().launch {
+          addMessage(ChatMessage(hmsMessage, true))
+        }
       }
 
     })
@@ -119,7 +149,9 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
   fun receivedMessage(message: ChatMessage) {
     Log.v(TAG, "receivedMessage: $message")
-    addMessage(message)
+    MainScope().launch {
+      addMessage(message)
+    }
   }
 
   fun peersUpdate() {

@@ -947,12 +947,7 @@ class MeetingViewModel(
                     return
                 broadcastsReceived.postValue(
                     ChatMessage(
-                        message.sender?.name.orEmpty(),
-                        message.serverReceiveTime,
-                        message.message,
-                        false,
-                        recipient = Recipient.toRecipient(message.recipient),
-                        message.messageId
+                        message, false
                     )
                 )
             }

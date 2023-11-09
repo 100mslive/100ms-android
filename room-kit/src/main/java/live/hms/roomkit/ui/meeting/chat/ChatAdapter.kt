@@ -42,6 +42,20 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
         if(sentMessage.time != null) {
           time.text = formatter.format(Date(sentMessage.time))
         }
+        sentTo.visibility = if(sentMessage.sentTo == null)
+           View.GONE
+        else
+          View.VISIBLE
+        toGroup.visibility = if(sentMessage.toGroup == null)
+          View.GONE
+        else
+          View.VISIBLE
+        sentBackground.visibility = if(sentMessage.toGroup == null && sentMessage.sentTo == null) {
+          View.GONE
+        } else
+          View.VISIBLE
+        sentTo.text = sentMessage.sentTo
+        toGroup.text = sentMessage.toGroup
       }
     }
 
@@ -64,14 +78,5 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
 
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
     holder.bind(getItem(position))
-  }
-
-  override fun onBindViewHolder(
-    holder: ChatMessageViewHolder,
-    position: Int,
-    payloads: MutableList<Any>
-  ) {
-    super.onBindViewHolder(holder, position, payloads)
-    // Skip doing anything maybe it just relayouts
   }
 }
