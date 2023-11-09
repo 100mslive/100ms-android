@@ -128,7 +128,7 @@ class MeetingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         isCountdownManuallyCancelled = false
-        setupRecordingTimeView()
+        setupStreamingTimeView()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
     }
 
@@ -180,7 +180,7 @@ class MeetingFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         isCountdownManuallyCancelled = false
-        setupRecordingTimeView()
+        setupStreamingTimeView()
     }
 
     private fun updateActionVolumeMenuIcon(
@@ -216,74 +216,7 @@ class MeetingFragment : Fragment() {
         }
     }
 
-    private fun updateStreamingRecordingViews(recordingState: StreamingRecordingState) {
-        when (recordingState) {
-            StreamingRecordingState.STREAMING_AND_RECORDING -> {
-                binding.recordingPause.visibility =
-                    if (meetingViewModel.hmsSDK.getRoom()?.hlsRecordingState?.state == HMSRecordingState.PAUSED) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
-                if (hasStartedHls &&
-                    meetingViewModel.hmsSDK.getRoom()?.hlsStreamingState?.state == HMSStreamingState.STARTING) {
-                        binding.meetingFragmentProgress.visibility = View.GONE
-                } else {
-                        binding.meetingFragmentProgress.visibility = View.GONE
-                }
-
-
-                binding.liveTitleCard.visibility = View.VISIBLE
-                binding.tvViewersCountCard.visibility = View.VISIBLE
-                binding.recordingSignal.visibility = View.VISIBLE
-
-                if (meetingViewModel.isRTMPRunning()) {
-                    binding.liveTitle.text = "Live with RTMP"
-                } else {
-                    binding.liveTitle.text = "Live"
-                }
-                binding.tvViewersCount.visibility = View.VISIBLE
-                binding.tvViewersCountCard.visibility = View.VISIBLE
-                setupRecordingTimeView()
-            }
-            StreamingRecordingState.RECORDING -> {
-                binding.recordingPause.visibility =
-                    if (meetingViewModel.hmsSDK.getRoom()?.hlsRecordingState?.state == HMSRecordingState.PAUSED) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
-                binding.recordingPause.visibility = View.GONE
-                binding.liveTitleCard.visibility = View.GONE
-                binding.recordingSignal.visibility = View.VISIBLE
-                binding.tvViewersCount.visibility = View.GONE
-                binding.tvViewersCountCard.visibility = View.GONE
-            }
-            StreamingRecordingState.STREAMING -> {
-                binding.recordingPause.visibility = View.GONE
-                binding.liveTitleCard.visibility = View.VISIBLE
-                binding.tvViewersCountCard.visibility = View.VISIBLE
-                binding.recordingSignal.visibility = View.GONE
-
-                if (meetingViewModel.isRTMPRunning()) {
-                    binding.liveTitle.text = "Live with RTMP"
-                } else {
-                    binding.liveTitle.text = "Live"
-                }
-                binding.tvViewersCount.visibility = View.VISIBLE
-                binding.tvViewersCountCard.visibility = View.VISIBLE
-            }
-            StreamingRecordingState.NOT_RECORDING_OR_STREAMING -> {
-                binding.recordingPause.visibility = View.GONE
-                binding.recordingSignal.visibility = View.GONE
-                binding.liveTitleCard.visibility = View.GONE
-                binding.tvViewersCount.visibility = View.GONE
-                binding.tvViewersCountCard.visibility = View.GONE
-            }
-        }
-    }
-
-    private fun setupRecordingTimeView() {
+    private fun setupStreamingTimeView() {
         countDownTimer?.cancel()
         countDownTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(l: Long) {
@@ -292,8 +225,8 @@ class MeetingFragment : Fragment() {
                         ?: meetingViewModel.hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
-                        binding.tvRecordingTime?.visibility = View.VISIBLE
-                        binding.tvRecordingTime?.text =
+                        binding.tvStreamingTime.visibility = View.VISIBLE
+                        binding.tvStreamingTime.text =
                             millisecondsToTime(System.currentTimeMillis().minus(startedAt))
                     }
                 }
@@ -325,14 +258,17 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
+        initButtons()
+        initOnBackPress()
 
-        binding.iconSend.setOnSingleClickListener {
-            val messageStr = binding.editTextMessage.text.toString().trim()
-            if (messageStr.isNotEmpty()) {
-                chatViewModel.sendMessage(messageStr)
-                binding.editTextMessage.setText("")
-            }
+        if (meetingViewModel.state.value is MeetingState.Disconnected) {
+            // Handles configuration changes
+            meetingViewModel.startMeeting()
+        } else {
+            //start HLS stream
+            startHLSStreamingIfRequired()
         }
+
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
             meetingViewModel.prebuiltInfoContainer.isChatEnabled()
         }
@@ -349,21 +285,6 @@ class MeetingFragment : Fragment() {
     ): View {
         binding = FragmentMeetingBinding.inflate(inflater, container, false)
 
-        initButtons()
-        initOnBackPress()
-
-        if (meetingViewModel.state.value is MeetingState.Disconnected) {
-            // Handles configuration changes
-            meetingViewModel.startMeeting()
-        } else {
-            //start HLS stream
-           if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
-               binding.meetingFragmentProgress.visibility = View.VISIBLE
-               hasStartedHls = true
-               meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
-           }
-
-        }
         return binding.root
     }
 
@@ -377,14 +298,72 @@ class MeetingFragment : Fragment() {
         requireActivity().finish()
     }
 
+    private fun updateRecordingViews(state: HMSRecordingState) {
+        when (state) {
+            HMSRecordingState.STARTING -> {
+                binding.recordingSignalProgress.visibility = View.VISIBLE
+                binding.recordingSignal.visibility = View.GONE
+                binding.recordingPause.visibility = View.GONE
+            }
+            HMSRecordingState.RESUMED, HMSRecordingState.STARTED -> {
+                binding.recordingSignalProgress.visibility = View.GONE
+                binding.recordingSignal.visibility = View.VISIBLE
+                binding.recordingPause.visibility = View.GONE
+            }
+            HMSRecordingState.PAUSED -> {
+                binding.recordingSignalProgress.visibility = View.GONE
+                binding.recordingSignal.visibility = View.GONE
+                binding.recordingPause.visibility = View.VISIBLE
+            }
+            HMSRecordingState.FAILED, HMSRecordingState.NONE, HMSRecordingState.STOPPED -> {
+                binding.recordingSignalProgress.visibility = View.GONE
+                binding.recordingSignal.visibility = View.GONE
+                binding.recordingPause.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun updateStreamingViews(state: HMSStreamingState) {
+        when (state) {
+            HMSStreamingState.STARTING -> {
+                // Remove the loader on getting STARTING notification for any peer who has hlsStreaming permission
+                if (meetingViewModel.isAllowedToHlsStream()) {
+                    binding.meetingFragmentProgress.visibility = View.GONE
+                }
+            }
+
+            HMSStreamingState.STARTED -> {
+                binding.meetingFragmentProgress.visibility = View.GONE
+                binding.liveTitleCard.visibility = View.VISIBLE
+                if (meetingViewModel.isRTMPRunning()) {
+                    binding.liveTitle.text = "Live with RTMP"
+                } else {
+                    binding.liveTitle.text = "Live"
+                }
+                binding.tvViewersCountCard.visibility = View.VISIBLE
+                binding.tvViewersCount.visibility = View.VISIBLE
+                setupStreamingTimeView()
+            }
+
+            HMSStreamingState.NONE, HMSStreamingState.STOPPED, HMSStreamingState.FAILED -> {
+                if (state != HMSStreamingState.NONE)
+                    binding.meetingFragmentProgress.visibility = View.GONE
+                binding.liveTitleCard.visibility = View.GONE
+                binding.tvViewersCount.visibility = View.GONE
+                binding.tvViewersCountCard.visibility = View.GONE
+            }
+
+        }
+    }
+
     private fun initObservers() {
 
         meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
-                binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
+                binding.streamYetToStartContainer.visibility = if (showError) View.VISIBLE else View.GONE
         }
 
         meetingViewModel.peerCount.observe(viewLifecycleOwner) {
-            binding.tvViewersCount?.text =it.toString()
+            binding.tvViewersCount.text =it.toString()
 
         }
 
@@ -393,36 +372,12 @@ class MeetingFragment : Fragment() {
         }
 
         meetingViewModel.recordingState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                HMSRecordingState.STARTING -> {
-                    binding.recordingSignalProgress.visibility = View.VISIBLE
-                    binding.recordingSignal.visibility = View.GONE
-                    binding.recordingPause.visibility = View.GONE
-                }
-                HMSRecordingState.RESUMED, HMSRecordingState.STARTED -> {
-                    binding.recordingSignalProgress.visibility = View.GONE
-                    binding.recordingSignal.visibility = View.VISIBLE
-                    binding.recordingPause.visibility = View.GONE
-                }
-                HMSRecordingState.PAUSED -> {
-                    binding.recordingSignalProgress.visibility = View.GONE
-                    binding.recordingSignal.visibility = View.GONE
-                    binding.recordingPause.visibility = View.VISIBLE
-                }
-                HMSRecordingState.FAILED, HMSRecordingState.NONE, HMSRecordingState.STOPPED -> {
-                    binding.recordingSignalProgress.visibility = View.GONE
-                    binding.recordingSignal.visibility = View.GONE
-                    binding.recordingPause.visibility = View.GONE
-                }
-            }
+            updateRecordingViews(state)
         }
 
-        meetingViewModel.isRecording.observe(
-            viewLifecycleOwner,
-            Observer {
-                updateStreamingRecordingViews(it)
-            })
-
+        meetingViewModel.streamingState.observe(viewLifecycleOwner) { state ->
+            updateStreamingViews(state)
+        }
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
             if (isHandRaised) {
@@ -432,21 +387,8 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        meetingViewModel.isRecording.observe(viewLifecycleOwner) {
-            val isRecording = meetingViewModel.isRecordingState()
-            binding.recordingSignal.visibility =  if (isRecording) View.VISIBLE else View.GONE
-        }
-
-
         meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
             meetingViewModel.triggerScreenShareNotification(it)
-        }
-
-        meetingViewModel.hlsToggleUpdateLiveData.observe(viewLifecycleOwner) {
-            when(it) {
-                true -> binding.meetingFragmentProgress.visibility = View.VISIBLE
-                false -> binding.meetingFragmentProgress.visibility = View.GONE
-            }
         }
 
         meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
@@ -684,6 +626,14 @@ class MeetingFragment : Fragment() {
             updateChatButtonWhenRoleChanges()
         }
 
+    }
+
+    private fun startHLSStreamingIfRequired() {
+        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
+            binding.meetingFragmentProgress.visibility = View.VISIBLE
+            hasStartedHls = true
+            meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
+        }
     }
 
     private val pipReceiver by lazy {
@@ -1044,9 +994,7 @@ class MeetingFragment : Fragment() {
         if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
-
         binding.progressBar.root.visibility = View.GONE
-        binding.meetingFragmentProgress.visibility = View.GONE
     }
 
     private fun showProgressBar() {
@@ -1068,10 +1016,15 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        binding.iconSend.setOnSingleClickListener {
+            val messageStr = binding.editTextMessage.text.toString().trim()
+            if (messageStr.isNotEmpty()) {
+                chatViewModel.sendMessage(messageStr)
+                binding.editTextMessage.setText("")
+            }
+        }
 
-
-
-        binding.buttonSettingsMenu?.apply {
+        binding.buttonSettingsMenu.apply {
 
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
@@ -1108,7 +1061,11 @@ class MeetingFragment : Fragment() {
                         onNameChange = {  },
                         showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
                         onRecordingClicked = {
-                            if (meetingViewModel.isRecordingState().not()) {
+                            val isBrowserRecordingRunning = meetingViewModel.hmsSDK.getRoom()?.browserRecordingState?.state in listOf(
+                                HMSRecordingState.STARTING, HMSRecordingState.STARTED,
+                                HMSRecordingState.RESUMED, HMSRecordingState.PAUSED
+                            )
+                            if (isBrowserRecordingRunning.not()) {
                                 meetingViewModel.recordMeeting(true, runnable = it)
                             } else {
                                 StopRecordingBottomSheet {
@@ -1120,11 +1077,9 @@ class MeetingFragment : Fragment() {
                                     StopRecordingBottomSheet.TAG
                                 )
                             }
-
-
                         },
                     ).show(
-                        childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+                        childFragmentManager, AudioSwitchBottomSheetTAG
                     )
 
                 } else {
@@ -1187,7 +1142,7 @@ class MeetingFragment : Fragment() {
 
         updatePipEndCall()
 
-        binding.iconOutputDevice?.apply {
+        binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconOutputDevice.onClick()")
 
@@ -1201,7 +1156,7 @@ class MeetingFragment : Fragment() {
 
         updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
 
-        binding.buttonSwitchCamera?.setOnSingleClickListener(200L) {
+        binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             meetingViewModel.flipCamera()
             if (it.isEnabled) meetingViewModel.flipCamera()
         }
@@ -1209,8 +1164,8 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url.isNullOrEmpty()) {
             binding.logoIv?.visibility = View.GONE
         } else {
-            binding.logoIv?.visibility = View.VISIBLE
-            binding.logoIv?.let {
+            binding.logoIv.visibility = View.VISIBLE
+            binding.logoIv.let {
                 Glide.with(this)
                     .load(meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url)
                     .into(it)

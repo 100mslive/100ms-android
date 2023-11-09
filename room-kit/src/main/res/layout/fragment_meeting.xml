@@ -213,7 +213,7 @@
 
 
                 <TextView
-                    android:id="@+id/tv_recording_time"
+                    android:id="@+id/tv_streaming_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
