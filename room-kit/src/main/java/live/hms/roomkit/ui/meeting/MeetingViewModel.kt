@@ -715,13 +715,16 @@ class MeetingViewModel(
                 val hlsUrl = room.hlsStreamingState.variants?.get(0)?.hlsStreamUrl
                 switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
 
-                if (room.hlsStreamingState.state != HMSStreamingState.NONE)
+                val runningStreamingStates = listOf(HMSStreamingState.STARTED, HMSStreamingState.STARTING)
+                val runningRecordingStates = listOf(HMSRecordingState.STARTING, HMSRecordingState.STARTED, HMSRecordingState.PAUSED, HMSRecordingState.RESUMED)
+
+                if (room.hlsStreamingState.state in runningStreamingStates)
                     streamingState.postValue(room.hlsStreamingState.state)
-                if (room.rtmpHMSRtmpStreamingState.state != HMSStreamingState.NONE)
+                if (room.rtmpHMSRtmpStreamingState.state in runningStreamingStates)
                     streamingState.postValue(room.rtmpHMSRtmpStreamingState.state)
-                if (room.browserRecordingState.state != HMSRecordingState.NONE)
+                if (room.browserRecordingState.state in runningRecordingStates)
                     recordingState.postValue(room.browserRecordingState.state)
-                if (room.hlsRecordingState.state != HMSRecordingState.NONE)
+                if (room.hlsRecordingState.state in runningRecordingStates )
                     recordingState.postValue(room.hlsRecordingState.state)
 
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
