@@ -8,6 +8,7 @@ import android.app.RemoteAction
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.Icon
@@ -718,6 +719,16 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        //handle orientation change
+        when(mode) {
+            is MeetingViewMode.HLS_VIEWER -> {
+                    contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR }
+            }
+            else -> {
+                contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+            }
+        }
+
         childFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, currentFragment)
@@ -1185,6 +1196,12 @@ class MeetingFragment : Fragment() {
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
+        binding.chatMessages.setOnClickListener {
+            if (controlBarsVisible)
+                hideControlBars()
+            else
+                showControlBars(true)
+        }
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1
