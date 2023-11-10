@@ -722,7 +722,7 @@ class MeetingViewModel(
                 if (room.browserRecordingState.state != HMSRecordingState.NONE)
                     recordingState.postValue(room.browserRecordingState.state)
                 if (room.hlsRecordingState.state != HMSRecordingState.NONE)
-                    recordingState.postValue(HMSRecordingState.NONE)
+                    recordingState.postValue(room.hlsRecordingState.state)
 
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
                     { message -> _sessionMetadata.postValue(message) },
