@@ -253,7 +253,6 @@ class PreviewFragment : Fragment() {
             binding.descriptionTv.startBounceAnimationUpwards()
         }
 
-
         if (meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url.isNullOrEmpty()) {
             binding.logoIv.visibility = View.INVISIBLE
         } else {
@@ -265,9 +264,6 @@ class PreviewFragment : Fragment() {
             binding.logoIv.startBounceAnimationUpwards()
 
         }
-
-
-
     }
 
     private fun setupKeyboardAnimation() {
@@ -327,32 +323,12 @@ class PreviewFragment : Fragment() {
 
     private fun initButtons() {
 
-        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
-            if (it.second.peerCount != null) {
-                binding.iconParticipants.visibility = View.VISIBLE
-                binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
-                binding.iconParticipants.startBounceAnimationUpwards()
-            }
-            isHlsRunning = it.second.hlsStreamingState.state == HMSStreamingState.STARTED
-            updateJoinButtonTextIfHlsIsEnabled(it?.second?.localPeer?.hmsRole?.name)
-
-            if (it.second.hlsStreamingState.state == HMSStreamingState.STARTED) {
-                binding.liveHlsGroup.visibility = View.VISIBLE
-                binding.hlsSession.startBounceAnimationUpwards()
-            } else {
-                binding.liveHlsGroup.visibility = View.GONE
-            }
-
-
-        }
-
         binding.closeBtn.setOnSingleClickListener(300L) {
             contextSafe { context, activity ->
                 meetingViewModel.leaveMeeting()
                 goToHomePage()
             }
         }
-
 
         binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
@@ -499,13 +475,7 @@ class PreviewFragment : Fragment() {
     }
 
 
-    private fun goToHomePage() {/*Intent(requireContext(), HomeActivity::class.java).apply {
-            crashlyticsLog(
-                TAG,
-                "MeetingActivity.finish() -> going to HomeActivity :: $this"
-            )
-            startActivity(this)
-        }*/
+    private fun goToHomePage() {
         requireActivity().finish()
     }
 
@@ -537,6 +507,25 @@ class PreviewFragment : Fragment() {
                 else -> {
 
                 }
+            }
+        }
+
+        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
+            if (it.second.peerCount != null) {
+                binding.iconParticipants.visibility = View.VISIBLE
+                binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
+                binding.iconParticipants.startBounceAnimationUpwards()
+            }
+            isHlsRunning = it.second.hlsStreamingState.state == HMSStreamingState.STARTED
+            updateJoinButtonTextIfHlsIsEnabled(it?.second?.localPeer?.hmsRole?.name)
+
+            val isLiveWithHLSOrRTMP = it.second.hlsStreamingState.state == HMSStreamingState.STARTED ||
+                    it.second.rtmpHMSRtmpStreamingState.state == HMSStreamingState.STARTED
+            if (isLiveWithHLSOrRTMP) {
+                binding.liveHlsGroup.visibility = View.VISIBLE
+                binding.hlsSession.startBounceAnimationUpwards()
+            } else {
+                binding.liveHlsGroup.visibility = View.GONE
             }
         }
 
@@ -638,7 +627,7 @@ class PreviewFragment : Fragment() {
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
 
-                    updateJoinButtonTextIfHlsIsEnabled(room?.localPeer?.hmsRole?.name)
+                    updateJoinButtonTextIfHlsIsEnabled(room.localPeer?.hmsRole?.name)
                     enableDisableJoinNowButton()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
@@ -664,8 +653,6 @@ class PreviewFragment : Fragment() {
 
     private fun updateUiBasedOnPublishParams(publishParams: PublishParams?) {
         if (publishParams == null) return
-
-
 
         if (publishParams.allowed.contains("audio")) {
             binding.buttonToggleAudio.visibility = View.VISIBLE

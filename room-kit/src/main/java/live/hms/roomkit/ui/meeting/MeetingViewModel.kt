@@ -289,6 +289,7 @@ class MeetingViewModel(
     private val previewUpdateData: MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> =
         MutableLiveData()
     val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(false)
+    val peerCount = MutableLiveData(0)
 
     val previewRoomStateLiveData: LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
     val previewPeerLiveData: LiveData<Pair<HMSPeerUpdate, HMSPeer>> = previewPeerData
@@ -305,7 +306,6 @@ class MeetingViewModel(
         if (mode != meetingViewMode.value) {
             meetingViewMode.postValue(mode)
         }
-
     }
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
@@ -497,7 +497,7 @@ class MeetingViewModel(
 
         })
     }
-    val peerCount = MutableLiveData(0)
+
     fun setLocalVideoEnabled(enabled: Boolean) {
 
         hmsSDK.getLocalPeer()?.videoTrack?.apply {
@@ -714,6 +714,15 @@ class MeetingViewModel(
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = room.hlsStreamingState.variants?.get(0)?.hlsStreamUrl
                 switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
+
+                if (room.hlsStreamingState.state != HMSStreamingState.NONE)
+                    streamingState.postValue(room.hlsStreamingState.state)
+                if (room.rtmpHMSRtmpStreamingState.state != HMSStreamingState.NONE)
+                    streamingState.postValue(room.rtmpHMSRtmpStreamingState.state)
+                if (room.browserRecordingState.state != HMSRecordingState.NONE)
+                    recordingState.postValue(room.browserRecordingState.state)
+                if (room.hlsRecordingState.state != HMSRecordingState.NONE)
+                    recordingState.postValue(HMSRecordingState.NONE)
 
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
                     { message -> _sessionMetadata.postValue(message) },
