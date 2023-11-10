@@ -793,7 +793,7 @@ class MeetingFragment : Fragment() {
 
 
 
-        binding.topMenu?.setBackgroundColor(
+        binding.topMenu.setBackgroundColor(
             getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.backgroundDim,
                 HMSPrebuiltTheme.getDefaults().background_default
@@ -805,7 +805,7 @@ class MeetingFragment : Fragment() {
                 HMSPrebuiltTheme.getDefaults().background_default
             )
         )
-        binding.buttonRaiseHand?.visibility = View.GONE
+        binding.buttonRaiseHand.visibility = View.GONE
 
         WindowCompat.setDecorFitsSystemWindows(activity!!.window, true)
 
@@ -841,7 +841,7 @@ class MeetingFragment : Fragment() {
         )
         , Color.TRANSPARENT, GradientDrawable.Orientation.BOTTOM_TOP)
 
-        binding.buttonRaiseHand?.visibility = View.VISIBLE
+        binding.buttonRaiseHand.visibility = View.VISIBLE
 
         binding.fragmentContainer.setOnSingleClickListener(500L) {
             if (controlBarsVisible)
@@ -885,7 +885,7 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
-                    binding.topMenu?.visibility = View.VISIBLE
+                    binding.topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
