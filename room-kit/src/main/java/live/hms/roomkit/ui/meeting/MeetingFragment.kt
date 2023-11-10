@@ -735,6 +735,14 @@ class MeetingFragment : Fragment() {
             .addToBackStack(null)
             .commit()
 
+        binding.root.setOnClickListener {
+            if (controlBarsVisible && meetingViewModel.prebuiltInfoContainer.isChatOverlay())
+                hideControlBars()
+            else
+                showControlBars(true)
+        }
+
+
         if(modeEnteredOrExitedHls) {
             val overlayIsVisible = isOverlayChatVisible()
             if (meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
@@ -1196,12 +1204,6 @@ class MeetingFragment : Fragment() {
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
-        binding.chatMessages.setOnClickListener {
-            if (controlBarsVisible)
-                hideControlBars()
-            else
-                showControlBars(true)
-        }
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1
