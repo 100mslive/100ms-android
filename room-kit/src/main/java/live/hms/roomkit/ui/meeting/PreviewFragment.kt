@@ -57,6 +57,7 @@ import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.sdk.models.enums.HMSRecordingState
 import live.hms.video.sdk.models.enums.HMSStreamingState
 import live.hms.video.sdk.models.role.PublishParams
 import live.hms.videoview.VideoViewStateChangeListener
@@ -90,7 +91,7 @@ class PreviewFragment : Fragment() {
     private var setTextOnce = false
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
-    private var isHlsRunning = false
+    private var isBeamRunning = false
     private var isFirstRender : Boolean = true
     private var startHlsStream : Boolean = false
 
@@ -100,7 +101,7 @@ class PreviewFragment : Fragment() {
         val hlsJoinButtonFromLayoutConfig = meetingViewModel.getHmsRoomLayout()
             ?.getPreviewLayout(roleName)?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
 
-        if (isHlsRunning.not() && hlsJoinButtonFromLayoutConfig) {
+        if (isBeamRunning.not() && hlsJoinButtonFromLayoutConfig) {
             if (binding.buttonJoinMeeting.drawableStart == null) {
                 binding.buttonJoinMeeting.setDrawables(
                     start = ContextCompat.getDrawable(
@@ -516,7 +517,9 @@ class PreviewFragment : Fragment() {
                 binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
                 binding.iconParticipants.startBounceAnimationUpwards()
             }
-            isHlsRunning = it.second.hlsStreamingState.state == HMSStreamingState.STARTED
+            isBeamRunning = it.second.hlsStreamingState.state == HMSStreamingState.STARTED ||
+                    it.second.rtmpHMSRtmpStreamingState.state == HMSStreamingState.STARTED ||
+                    it.second.browserRecordingState.state == HMSRecordingState.STARTED
             updateJoinButtonTextIfHlsIsEnabled(it?.second?.localPeer?.hmsRole?.name)
 
             val isLiveWithHLSOrRTMP = it.second.hlsStreamingState.state == HMSStreamingState.STARTED ||
