@@ -132,7 +132,7 @@ class SettingsStore(context: Context) {
     set(value) = putBoolean(USE_HARDWARE_AEC, value)
 
   var showStats: Boolean
-    get() = sharedPreferences.getBoolean(SHOW_STATS, true)
+    get() = sharedPreferences.getBoolean(SHOW_STATS, false)
     set(value) = putBoolean(SHOW_STATS, value)
 
   var disableAutoResize: Boolean

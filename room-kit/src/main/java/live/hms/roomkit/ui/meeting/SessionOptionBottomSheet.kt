@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
@@ -59,6 +61,10 @@ class SessionOptionBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         applyTheme()
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()

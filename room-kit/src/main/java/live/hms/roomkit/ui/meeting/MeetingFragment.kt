@@ -84,7 +84,9 @@ val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
 val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 
 class MeetingFragment : Fragment() {
-    private val chatAdapter = ChatAdapter()
+    private val chatAdapter = ChatAdapter({
+        onChatClick()
+    })
     companion object {
         private const val TAG = "MeetingFragment"
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
@@ -146,6 +148,12 @@ class MeetingFragment : Fragment() {
         cancelCallback()
     }
 
+    private fun onChatClick() {
+        if (controlBarsVisible && meetingViewModel.prebuiltInfoContainer.isChatOverlay())
+            hideControlBars()
+        else
+            showControlBars(true)
+    }
     private fun cancelCallback() = handler.removeCallbacks(hideRunnable)
 
     var resultLauncher =
@@ -759,11 +767,24 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        //handle orientation change
+        when(mode) {
+            is MeetingViewMode.HLS_VIEWER -> {
+                    contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR }
+            }
+            else -> {
+                contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+            }
+        }
+
         childFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, currentFragment)
             .addToBackStack(null)
             .commit()
+
+
+
 
         if(modeEnteredOrExitedHls) {
             val overlayIsVisible = isOverlayChatVisible()
@@ -1221,12 +1242,6 @@ class MeetingFragment : Fragment() {
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
-        binding.chatMessages.setOnClickListener {
-            if (controlBarsVisible)
-                hideControlBars()
-            else
-                showControlBars(true)
-        }
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1
