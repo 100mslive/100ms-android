@@ -62,6 +62,21 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
     </FrameLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/spacing_d2"
+        android:layout_marginVertical="@dimen/spacing_d1"
+        >
+
+    <include
+        android:id="@+id/chatControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/layout_chat_send_to_controls"
+        />
+    </FrameLayout>
+
     <RelativeLayout
         android:id="@+id/chatView"
         android:layout_width="match_parent"
