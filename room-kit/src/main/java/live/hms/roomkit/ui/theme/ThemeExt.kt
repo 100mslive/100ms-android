@@ -1594,6 +1594,32 @@ private fun getChatBackgroundDrawable(): ShapeDrawable {
 }
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+    with(chatControls.sendTo.chipBackground) {
+        strokeColor = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright)
+        setBackgroundColor(getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                HMSPrebuiltTheme.getDefaults().surface_default))
+    }
+    chatControls.sendTo.chipText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+
+    with(chatControls.previousSentTo.chipBackground) {
+        strokeColor = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright)
+        setBackgroundColor(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default))
+    }
+    chatControls.previousSentTo.chipText.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+
+
+    chatControls.sendTo.chipText.text = "Everyone"
     // Emptyview
     messageEmptyImage.drawable.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
@@ -1628,6 +1654,7 @@ internal fun ListItemChatBinding.applyTheme() {
     sentBackground.strokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.borderBright,
         HMSPrebuiltTheme.getDefaults().border_bright)
+
     sentBackground.setBackgroundColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().surface_default))

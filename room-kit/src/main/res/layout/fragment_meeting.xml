@@ -278,8 +278,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/send_messages_to_everyone"
             android:gravity="center_vertical"
-            android:paddingHorizontal="8dp"
-            android:layout_marginStart="8dp" />
+            android:paddingHorizontal="@dimen/spacing_d1"
+            android:layout_marginStart="@dimen/spacing_d1" />
 
 
         <ImageView

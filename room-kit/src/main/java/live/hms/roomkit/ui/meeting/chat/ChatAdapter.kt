@@ -36,7 +36,7 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
 
     fun bind(sentMessage: ChatMessage) {
       with(binding) {
-        name.text = "${sentMessage.senderName}${getRecipientText(sentMessage)}"
+        name.text = sentMessage.senderName
         message.text = sentMessage.message
         blueBar.visibility = if (sentMessage.isSentByMe) View.VISIBLE else View.GONE
         if(sentMessage.time != null) {
@@ -58,13 +58,6 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
         toGroup.text = sentMessage.toGroup
       }
     }
-
-    private fun getRecipientText(message: ChatMessage): String =
-      when(message.recipient) {
-        Recipient.Everyone -> ""
-        is Recipient.Peer -> " (to ${message.recipient.peer.name})"
-        is Recipient.Role -> " (to ${message.recipient.role.name})"
-      }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {

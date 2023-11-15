@@ -253,4 +253,5 @@
     <string name="hms_name_this_poll">Name this poll</string>
     <string name="hms_name_this_quiz">Name this quiz</string>
     <string name="view_more">View More</string>
+    <string name="chat_with">Chat With</string>
 </resources>

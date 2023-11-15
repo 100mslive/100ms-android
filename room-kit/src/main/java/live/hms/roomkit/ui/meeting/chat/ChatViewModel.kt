@@ -4,11 +4,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import live.hms.roomkit.BuildConfig
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSMessageResultListener
 import live.hms.video.sdk.HMSSDK
@@ -18,7 +15,6 @@ import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
-import java.util.*
 import kotlin.collections.ArrayList
 
 data class SelectedRecipient(val recipients: List<Recipient>,
@@ -44,7 +40,6 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         null, // Let the server alone set the time
         messageStr,
         true,
-        Recipient.Everyone,
         null,
         ChatMessage.sendTo(HMSMessageRecipientType.BROADCAST, null),
         ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST)
@@ -55,7 +50,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
           null, // Let the server alone set the time
           messageStr,
           true,
-          Recipient.Peer(recipient.peer),
+
           null,
           ChatMessage.sendTo(HMSMessageRecipientType.PEER, null),
           ChatMessage.toGroup(HMSMessageRecipientType.PEER)
@@ -67,7 +62,6 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
           null, // Let the server alone set the time
           messageStr,
           true,
-          Recipient.Role(recipient.role),
           null,
           ChatMessage.sendTo(HMSMessageRecipientType.ROLES, listOf(recipient.role)),
           ChatMessage.toGroup(HMSMessageRecipientType.ROLES)
