@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+class ChatAdapter(val onClick: () -> Unit = {}) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
   private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
   companion object {
     private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
@@ -31,6 +31,9 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
     RecyclerView.ViewHolder(binding.root) {
     init {
         binding.applyTheme()
+        binding.root.setOnClickListener {
+          onClick()
+        }
     }
 
 
