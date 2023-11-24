@@ -46,7 +46,8 @@ class ChatBottomSheetFragment : BottomSheetDialogFragment(), AdapterView.OnItemS
                 if (pinned == null) {
                     hintView.visibility = View.GONE
                 } else {
-                    hintMessageTextview.text = pinned
+                    // TODO Gulzar
+                    hintMessageTextview.text = pinned.toString() // Todo change this
                     hintView.visibility = View.VISIBLE
                 }
             }
