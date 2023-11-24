@@ -41,9 +41,8 @@ class BlockUserUseCase(
             Log.e(TAG,"Tried to block user without session store inited")
             return
         }
-        if (chatMessage.senderPeerId == null)
-        // the user is no longer present
-        else {
+        if (chatMessage.senderPeerId != null) {
+            // the user is no longer present
             // This is a list and will be updated.
             hmsSessionStore.set(BLOCK_PEER_KEY,
                 (currentBlockList.value
@@ -72,7 +71,7 @@ class BlockUserUseCase(
                 }
 
                 override fun onSuccess() {
-                    Log.d(TAG, "Error Added block peer key")
+                    Log.d(TAG, "Added block peer key")
                 }
 
             })
