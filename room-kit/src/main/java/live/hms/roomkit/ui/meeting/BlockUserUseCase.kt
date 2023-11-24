@@ -44,10 +44,11 @@ class BlockUserUseCase(
         if (chatMessage.senderPeerId != null) {
             // the user is no longer present
             // This is a list and will be updated.
-            hmsSessionStore.set(BLOCK_PEER_KEY,
-                (currentBlockList.value
-                    // Add the peer id or create a new list if null
-                    ?.plus(chatMessage.senderPeerId) ?: listOf(chatMessage.senderPeerId)).toJson(),
+            val newValue = currentBlockList.value
+                // Add the peer id or create a new list if null
+                ?.plus(chatMessage.senderPeerId) ?: listOf(chatMessage.senderPeerId)
+            hmsSessionStore.set(newValue,
+                BLOCK_PEER_KEY,
                 object : HMSActionResultListener {
                     override fun onError(error: HMSException) {
                         Log.e(TAG, "Updating block list failed with $error")
