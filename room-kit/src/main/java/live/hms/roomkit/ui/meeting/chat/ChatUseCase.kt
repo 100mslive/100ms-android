@@ -32,7 +32,9 @@ class ChatUseCase {
             if (isChatEnabled()) {
 
             toggleEmptyIndicator(emptyIndicator, it)
-            chatAdapter.submitList(it)
+                val chatList = mutableListOf<ChatMessage>()
+                chatList.addAll(it)
+            chatAdapter.submitList(chatList)
             val position = it.size - 1
             if (position >= 0) {
                 // Without this sometimes the view won't update.
