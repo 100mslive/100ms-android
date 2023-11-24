@@ -15,163 +15,199 @@ import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
-import kotlin.collections.ArrayList
 
-data class SelectedRecipient(val recipients: List<Recipient>,
-                             val index : Int)
+data class SelectedRecipient(
+    val recipients: List<Recipient>, val index: Int
+)
 
 class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
-  companion object {
-    private const val TAG = "ChatViewModel"
-  }
-
-  private val _messages = ArrayList<ChatMessage>()
-  private val _chatMembers = MutableLiveData<SelectedRecipient>()
-  val chatMembers : LiveData<SelectedRecipient> = _chatMembers
-  private var currentSelectedRecipient : Recipient = Recipient.Everyone
-
-  fun sendMessage(messageStr : String) {
-
-    // Decide where it should go.
-    when(val recipient = currentSelectedRecipient) {
-      Recipient.Everyone -> broadcast( ChatMessage(
-        "You",
-        null, // Let the server alone set the time
-        messageStr,
-        true,
-        null,
-        ChatMessage.sendTo(HMSMessageRecipientType.BROADCAST, null),
-        ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST),
-        hmssdk.getLocalPeer()?.peerID
-      ) )
-      is Recipient.Peer -> directMessage(
-        ChatMessage(
-          "You",
-          null, // Let the server alone set the time
-          messageStr,
-          true,
-
-          null,
-          ChatMessage.sendTo(HMSMessageRecipientType.PEER, null),
-          ChatMessage.toGroup(HMSMessageRecipientType.PEER),
-          hmssdk.getLocalPeer()?.peerID
-        ),
-        recipient.peer)
-      is Recipient.Role -> groupMessage(
-        ChatMessage(
-          "You",
-          null, // Let the server alone set the time
-          messageStr,
-          true,
-          null,
-          ChatMessage.sendTo(HMSMessageRecipientType.ROLES, listOf(recipient.role)),
-          ChatMessage.toGroup(HMSMessageRecipientType.ROLES),
-          hmssdk.getLocalPeer()?.peerID!!
-        ),
-        recipient.role)
+    companion object {
+        private const val TAG = "ChatViewModel"
     }
-  }
 
-  private fun directMessage(message : ChatMessage, peer : HMSPeer) {
+    private var _messages = mutableListOf<ChatMessage>()
+    private val _chatMembers = MutableLiveData<SelectedRecipient>()
+    val chatMembers: LiveData<SelectedRecipient> = _chatMembers
+    private var currentSelectedRecipient: Recipient = Recipient.Everyone
 
-    hmssdk.sendDirectMessage(message.message, HMSMessageType.CHAT, peer, object : HMSMessageResultListener {
-      override fun onError(error: HMSException) {
-        Log.e(TAG, error.message)
-      }
+    fun sendMessage(messageStr: String) {
 
-      override fun onSuccess(hmsMessage: HMSMessage) {
-        // Request Successfully sent to server
-          MainScope().launch {
-            addMessage(ChatMessage(hmsMessage, true))
-          }
+        // Decide where it should go.
+        when (val recipient = currentSelectedRecipient) {
+            Recipient.Everyone -> broadcast(
+                ChatMessage(
+                    "You",
+                    null, // Let the server alone set the time
+                    messageStr,
+                    true,
+                    null,
+                    ChatMessage.sendTo(HMSMessageRecipientType.BROADCAST, null),
+                    ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST),
+                    hmssdk.getLocalPeer()?.peerID
+                )
+            )
+
+            is Recipient.Peer -> directMessage(
+                ChatMessage(
+                    "You",
+                    null, // Let the server alone set the time
+                    messageStr,
+                    true,
+
+                    null,
+                    ChatMessage.sendTo(HMSMessageRecipientType.PEER, null),
+                    ChatMessage.toGroup(HMSMessageRecipientType.PEER),
+                    hmssdk.getLocalPeer()?.peerID
+                ), recipient.peer
+            )
+
+            is Recipient.Role -> groupMessage(
+                ChatMessage(
+                    "You",
+                    null, // Let the server alone set the time
+                    messageStr,
+                    true,
+                    null,
+                    ChatMessage.sendTo(HMSMessageRecipientType.ROLES, listOf(recipient.role)),
+                    ChatMessage.toGroup(HMSMessageRecipientType.ROLES),
+                    hmssdk.getLocalPeer()?.peerID!!
+                ), recipient.role
+            )
         }
+    }
 
-    })
-  }
+    private fun directMessage(message: ChatMessage, peer: HMSPeer) {
 
-  private fun groupMessage(message: ChatMessage, role : HMSRole) {
+        hmssdk.sendDirectMessage(message.message,
+            HMSMessageType.CHAT,
+            peer,
+            object : HMSMessageResultListener {
+                override fun onError(error: HMSException) {
+                    Log.e(TAG, error.message)
+                }
 
-    hmssdk.sendGroupMessage(message.message, HMSMessageType.CHAT, listOf(role), object : HMSMessageResultListener {
-      override fun onError(error: HMSException) {
-        Log.e(TAG, error.message)
-      }
+                override fun onSuccess(hmsMessage: HMSMessage) {
+                    // Request Successfully sent to server
+                    MainScope().launch {
+                        addMessage(ChatMessage(hmsMessage, true))
+                    }
+                }
 
-      override fun onSuccess(hmsMessage: HMSMessage) {
-        // Request Successfully sent to server
+            })
+    }
+
+    private fun groupMessage(message: ChatMessage, role: HMSRole) {
+
+        hmssdk.sendGroupMessage(message.message,
+            HMSMessageType.CHAT,
+            listOf(role),
+            object : HMSMessageResultListener {
+                override fun onError(error: HMSException) {
+                    Log.e(TAG, error.message)
+                }
+
+                override fun onSuccess(hmsMessage: HMSMessage) {
+                    // Request Successfully sent to server
+                    MainScope().launch {
+                        addMessage(ChatMessage(hmsMessage, true))
+                    }
+                }
+
+            })
+    }
+
+    private fun broadcast(message: ChatMessage) {
+
+        hmssdk.sendBroadcastMessage(message.message,
+            HMSMessageType.CHAT,
+            object : HMSMessageResultListener {
+                override fun onError(error: HMSException) {
+                    Log.e(TAG, error.message)
+                }
+
+                override fun onSuccess(hmsMessage: HMSMessage) {
+                    // Request Successfully sent to server
+                    MainScope().launch {
+                        addMessage(ChatMessage(hmsMessage, true))
+                    }
+                }
+
+            })
+    }
+
+    // This contains all messages so when we switch between views we don't lose them.
+    //  otherwise the chat would only have messages that were received when it opened.
+    //  and lose all of them when it was closed.
+    val messages = MutableLiveData<List<ChatMessage>>()
+    val unreadMessagesCount = MutableLiveData(0)
+
+    fun clearMessages() {
+        _messages.clear()
+        messages.postValue(_messages)
+        unreadMessagesCount.postValue(0)
+    }
+
+    private fun addMessage(message: ChatMessage) {
+        // Check if the last sender was also the same person
+        if(shouldBlockMessage(message))
+            return
+
+        if (_messages.find { it.messageId == message.messageId } == null) {
+            if (!message.isSentByMe) {
+                unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
+            }
+            _messages.add(message)
+            messages.postValue(_messages)
+        }
+    }
+
+    fun receivedMessage(message: ChatMessage) {
+        Log.v(TAG, "receivedMessage: $message")
         MainScope().launch {
-          addMessage(ChatMessage(hmsMessage, true))
+            addMessage(message)
         }
-      }
+    }
 
-    })
-  }
-
-  private fun broadcast(message: ChatMessage) {
-
-    hmssdk.sendBroadcastMessage(message.message, HMSMessageType.CHAT, object : HMSMessageResultListener {
-      override fun onError(error: HMSException) {
-        Log.e(TAG, error.message)
-      }
-
-      override fun onSuccess(hmsMessage: HMSMessage) {
-        // Request Successfully sent to server
-        MainScope().launch {
-          addMessage(ChatMessage(hmsMessage, true))
+    fun peersUpdate() {
+        val list = convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles())
+        val currentIndex = when (val num = list.indexOf(currentSelectedRecipient)) {
+            -1 -> 0
+            else -> num
         }
-      }
-
-    })
-  }
-
-  val messages = MutableLiveData<ArrayList<ChatMessage>>()
-  val unreadMessagesCount = MutableLiveData(0)
-
-  fun clearMessages() {
-    _messages.clear()
-    messages.postValue(_messages)
-    unreadMessagesCount.postValue(0)
-  }
-
-  private fun addMessage(message: ChatMessage) {
-    // Check if the last sender was also the same person
-    if(_messages.find { it.messageId == message.messageId } == null) {
-      if(!message.isSentByMe) {
-        unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
-      }
-      _messages.add(message)
-      messages.postValue(_messages)
+        _chatMembers.postValue(SelectedRecipient(list, currentIndex))
     }
-  }
 
-  fun receivedMessage(message: ChatMessage) {
-    Log.v(TAG, "receivedMessage: $message")
-    MainScope().launch {
-      addMessage(message)
+    private fun convertPeersToChatMembers(
+        listOfParticipants: List<HMSRemotePeer>, roles: List<HMSRole>
+    ): List<Recipient> {
+        return listOf(Recipient.Everyone).plus(roles.map { Recipient.Role(it) })
+            // Remove local peers (yourself) from the list of people you can message.
+            .plus(listOfParticipants.map { Recipient.Peer(it) })
     }
-  }
 
-  fun peersUpdate() {
-    val list = convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles())
-    val currentIndex = when(val num = list.indexOf(currentSelectedRecipient)) {
-      -1 -> 0
-      else -> num
+    fun recipientSelected(recipient: Recipient) {
+        currentSelectedRecipient = recipient
     }
-    _chatMembers.postValue(SelectedRecipient(list, currentIndex))
-  }
 
-  private fun convertPeersToChatMembers(listOfParticipants : List<HMSRemotePeer>, roles : List<HMSRole>) : List<Recipient> {
-    return listOf(Recipient.Everyone)
-      .plus(roles.map { Recipient.Role(it) })
-      // Remove local peers (yourself) from the list of people you can message.
-      .plus(listOfParticipants.map { Recipient.Peer(it) })
-  }
+    init {
+        peersUpdate() // Load up local peers into the chat members.
+    }
 
-  fun recipientSelected(recipient: Recipient) {
-    currentSelectedRecipient = recipient
-  }
+    private var blockedPeerIds: Set<String> = setOf()
 
-  init {
-    peersUpdate() // Load up local peers into the chat members.
-  }
+    private fun shouldBlockMessage(message: ChatMessage): Boolean =
+        blockedPeerIds.contains(message.senderPeerId)
+
+
+    fun updateBlockList(chatBlockedPeerIdsList: List<String>?) {
+        // What does the adapter have to do?
+        // Basically turn on a filter.
+        // Ok so part of the problem is that we call submit list directly :(
+        if (chatBlockedPeerIdsList == null) return
+        blockedPeerIds = chatBlockedPeerIdsList.toSet()
+        // Refresh the current list
+        _messages = _messages.filter { !blockedPeerIds.contains(it.senderPeerId) }.toMutableList()
+        messages.postValue(_messages)
+    }
 }

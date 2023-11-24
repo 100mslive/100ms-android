@@ -16,7 +16,7 @@ import kotlin.reflect.KFunction0
  */
 class ChatUseCase {
     fun initiate(
-        messages: MutableLiveData<ArrayList<ChatMessage>>,
+        messages: MutableLiveData<List<ChatMessage>>,
         viewlifecycleOwner: LifecycleOwner,
         chatAdapter: ChatAdapter,
         recyclerview: SingleSideFadeRecyclerview,
@@ -32,7 +32,7 @@ class ChatUseCase {
             if (isChatEnabled()) {
 
             toggleEmptyIndicator(emptyIndicator, it)
-            chatAdapter.sendChatMessage(it)
+            chatAdapter.submitList(it)
             val position = it.size - 1
             if (position >= 0) {
                 // Without this sometimes the view won't update.
@@ -55,7 +55,7 @@ class ChatUseCase {
 
     private fun toggleEmptyIndicator(
         emptyIndicator: View?,
-        messages: ArrayList<ChatMessage>?,
+        messages: List<ChatMessage>?,
     ) {
         emptyIndicator?.visibility = if( messages.isNullOrEmpty() ) {
             View.VISIBLE

@@ -77,23 +77,5 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit) : List
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
     holder.bind(getItem(position))
   }
-  private var blockedPeerIds : Set<String>? = setOf<String>()
-  fun sendChatMessage(list: MutableList<ChatMessage>?) {
-    // whenever submitlist is called, filter it.
-    // peers can't be unblocked anyway but if they are, their previous messages
-    //  remain filtered out
-    val blockList = blockedPeerIds
-    val newList = if(blockList == null) list
-    else
-      list?.filter { !blockList.contains(it.senderPeerId) }
-    submitList(newList)
-  }
-  fun updateBlockList(chatBlockedPeerIdsList: List<String>?) {
-    // What does the adapter have to do?
-    // Basically turn on a filter.
-    // Ok so part of the problem is that we call submit list directly :(
-    blockedPeerIds = chatBlockedPeerIdsList?.toSet()
-    // Refresh the current list
-    sendChatMessage(currentList)
-  }
+
 }

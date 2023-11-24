@@ -390,7 +390,7 @@ class MeetingFragment : Fragment() {
 
     private fun initObservers() {
         meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
-            chatAdapter.updateBlockList(chatBlockedPeerIdsList)
+            chatViewModel.updateBlockList(chatBlockedPeerIdsList)
         }
         meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
                 binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
