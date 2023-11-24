@@ -20,7 +20,7 @@ class CombinedChatFragmentTab : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedTabChatBinding>()
     val meetingViewModel : MeetingViewModel by activityViewModels()
     private val chatViewModel : ChatViewModel by activityViewModels()
-    private val chatAdapter = ChatAdapter(meetingViewModel::openMessageOptions)
+    private val chatAdapter by lazy { ChatAdapter(meetingViewModel::openMessageOptions) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
