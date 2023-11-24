@@ -29,7 +29,6 @@ class BlockUserUseCase(
                     gson.fromJson(value.asJsonArray, Array<String>::class.java).toList()
                 }
                 currentBlockList.postValue(newList)
-//                    blockListUpdated(message)
             }
         }
     }

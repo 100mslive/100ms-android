@@ -104,7 +104,7 @@ class MeetingFragment : Fragment() {
             requireActivity().application
         )
     }
-    private val chatAdapter by lazy { ChatAdapter(meetingViewModel::openMessageOptions) {onChatClick()} }
+    private val chatAdapter by lazy { ChatAdapter(meetingViewModel::openMessageOptions, ::onChatClick) }
 
     private val chatViewModel: ChatViewModel by activityViewModels {
         ChatViewModelFactory(meetingViewModel.hmsSDK)

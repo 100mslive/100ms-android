@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemChatBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.theme.applyTheme
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,12 +32,12 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
   inner class ChatMessageViewHolder(val binding: ListItemChatBinding, openMessageOptions : (Int) -> Unit) :
     RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.applyTheme()
-      binding.root.setOnClickListener {
+      binding.applyTheme()
+      binding.root.setOnSingleClickListener {
         // Setting a click listener on the entire root. Watch
         //  out if there are other buttons on this.
-        onClick()
         openMessageOptions(bindingAdapterPosition)
+        onClick()
       }
     }
 
