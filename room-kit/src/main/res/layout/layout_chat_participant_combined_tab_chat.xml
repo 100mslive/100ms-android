@@ -62,20 +62,54 @@
         </androidx.appcompat.widget.LinearLayoutCompat>
     </FrameLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/spacing_d2"
-        android:layout_marginVertical="@dimen/spacing_d1"
-        >
 
-    <include
-        android:id="@+id/chatControls"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/layout_chat_send_to_controls"
-        />
-    </FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_d2"
+            android:layout_marginVertical="@dimen/spacing_d1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_d1"
+                android:text="@string/chat_with" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/sendToBackground"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:strokeWidth="1dp"
+                app:contentPadding="@dimen/four_dp"
+                >
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/sendToChipText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/inter_bold"
+                    android:lineHeight="16px"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="To Group"
+                    android:textSize="12sp"
+                    app:fontFamily="@font/inter_regular"
+                    tools:layout_editor_absoluteY="2dp" />
+            </com.google.android.material.card.MaterialCardView>
+            <View
+                android:layout_width="@dimen/spacing_d1"
+                android:layout_height="match_parent"
+                />
+            <ImageButton
+                android:id="@+id/searchButton"
+                android:background="@null"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_search_24"
+                />
+        </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/chatView"
