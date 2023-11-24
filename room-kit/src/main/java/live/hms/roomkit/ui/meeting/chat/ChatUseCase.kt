@@ -32,7 +32,7 @@ class ChatUseCase {
             if (isChatEnabled()) {
 
             toggleEmptyIndicator(emptyIndicator, it)
-            chatAdapter.submitList(it)
+            chatAdapter.sendChatMessage(it)
             val position = it.size - 1
             if (position >= 0) {
                 // Without this sometimes the view won't update.
