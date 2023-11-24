@@ -20,7 +20,7 @@ class CombinedChatFragmentTab : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedTabChatBinding>()
     val meetingViewModel : MeetingViewModel by activityViewModels()
     private val chatViewModel : ChatViewModel by activityViewModels()
-    private val chatAdapter = ChatAdapter()
+    private val chatAdapter = ChatAdapter(meetingViewModel::openMessageOptions)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +40,7 @@ class CombinedChatFragmentTab : Fragment() {
         }
 
         binding.applyTheme()
+
         return binding.root
     }
 

@@ -5,9 +5,10 @@ import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.sessionstore.HMSKeyChangeListener
+import live.hms.video.utils.GsonUtils
 import java.io.Closeable
 
-private const val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessage"
+private const val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessages"
 class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) : Closeable {
     private val addedListeners = mutableListOf<HMSKeyChangeListener>()
     override fun close() {
@@ -25,11 +26,11 @@ class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) : Clo
         addedListeners.clear()
     }
 
-    fun updatePinnedMessage(data: String?, hmsActionResultListener: HMSActionResultListener) {
+    fun updatePinnedMessage(data: List<String>?, hmsActionResultListener: HMSActionResultListener) {
         hmsSessionStore.set(data, PINNED_MESSAGE_SESSION_KEY, hmsActionResultListener)
     }
 
-    fun setPinnedMessageUpdateListener(pinnedMessageUpdated: (String?) -> Unit, hmsActionResultListener: HMSActionResultListener) {
+    fun setPinnedMessageUpdateListener(pinnedMessageUpdated: (List<String>?) -> Unit, hmsActionResultListener: HMSActionResultListener) {
         // Add the listener for the key that pinned message is sent on
         val listener = object : HMSKeyChangeListener {
             override fun onKeyChanged(key: String, value: JsonElement?) {
@@ -38,7 +39,7 @@ class SessionMetadataUseCase(private val hmsSessionStore: HmsSessionStore) : Clo
                     val message = if (value == null) {
                         null
                     } else {
-                        value.asString
+                        GsonUtils.gson.fromJson(value.asJsonArray, Array<String>::class.java).toList()
                     }
                     pinnedMessageUpdated(message)
                 }

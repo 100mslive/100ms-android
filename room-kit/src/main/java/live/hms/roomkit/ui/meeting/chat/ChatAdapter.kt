@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
   private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
   companion object {
     private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
@@ -27,10 +27,15 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
     }
   }
 
-  inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
+  inner class ChatMessageViewHolder(val binding: ListItemChatBinding, openMessageOptions : (Int) -> Unit) :
     RecyclerView.ViewHolder(binding.root) {
     init {
         binding.applyTheme()
+      binding.root.setOnClickListener {
+        // Setting a click listener on the entire root. Watch
+        //  out if there are other buttons on this.
+        openMessageOptions(bindingAdapterPosition)
+      }
     }
 
 
@@ -66,10 +71,29 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
       parent,
       false
     )
-    return ChatMessageViewHolder(binding)
+    return ChatMessageViewHolder(binding, { position -> openMessageOptions(getItem(position)) })
   }
 
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
     holder.bind(getItem(position))
+  }
+  private var blockedPeerIds : Set<String>? = setOf<String>()
+  override fun submitList(list: MutableList<ChatMessage>?) {
+    // whenever submitlist is called, filter it.
+    // peers can't be unblocked anyway but if they are, their previous messages
+    //  remain filtered out
+    val blockList = blockedPeerIds
+    val newList = if(blockList == null) list
+    else
+      list?.filter { it.senderPeerId !in blockList }
+    super.submitList(newList)
+  }
+  fun updateBlockList(chatBlockedPeerIdsList: List<String>?) {
+    // What does the adapter have to do?
+    // Basically turn on a filter.
+    // Ok so part of the problem is that we call submit list directly :(
+    blockedPeerIds = chatBlockedPeerIdsList?.toSet()
+    // Refresh the current list
+    submitList(currentList)
   }
 }

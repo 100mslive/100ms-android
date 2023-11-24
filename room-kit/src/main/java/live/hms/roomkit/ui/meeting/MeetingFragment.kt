@@ -83,7 +83,6 @@ val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
 val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 
 class MeetingFragment : Fragment() {
-    private val chatAdapter = ChatAdapter()
     companion object {
         private const val TAG = "MeetingFragment"
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
@@ -106,6 +105,7 @@ class MeetingFragment : Fragment() {
             requireActivity().application
         )
     }
+    private val chatAdapter = ChatAdapter(meetingViewModel::openMessageOptions)
 
     private val chatViewModel: ChatViewModel by activityViewModels {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
@@ -389,7 +389,9 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
-
+//        meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
+//            chatAdapter.updateBlockList(chatBlockedPeerIdsList)
+//        }
         meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
                 binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
         }
@@ -616,6 +618,7 @@ class MeetingFragment : Fragment() {
                 }
 
             }
+
         }
 
         meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->

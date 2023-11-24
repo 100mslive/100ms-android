@@ -683,6 +683,7 @@ class MeetingViewModel(
                 super.onSessionStoreAvailable(sessionStore)
                 sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
                 pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
+                blockUserUseCase.setSessionStore(sessionStore)
             }
 
             override fun onJoin(room: HMSRoom) {
@@ -724,6 +725,7 @@ class MeetingViewModel(
                         override fun onSuccess() {}
                     }
                 )
+                blockUserUseCase.addKeyChangeListener()
                 updatePolls()
                 participantPeerUpdate.postValue(Unit)
             }
@@ -1870,7 +1872,10 @@ class MeetingViewModel(
 
     private lateinit var sessionMetadataUseCase: SessionMetadataUseCase
     private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
-    fun setSessionMetadata(data: String?) {
+    private val blockUserUseCase : BlockUserUseCase = BlockUserUseCase()
+    val currentBlockList = blockUserUseCase.currentBlockList
+    fun setSessionMetadata(data: List<String>?) {
+        // TODO Gulzar
         sessionMetadataUseCase.updatePinnedMessage(data, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
@@ -1895,8 +1900,8 @@ class MeetingViewModel(
         })
     }
 
-    private val _sessionMetadata = MutableLiveData<String?>(null)
-    val sessionMetadata: LiveData<String?> = _sessionMetadata
+    private val _sessionMetadata = MutableLiveData<List<String>?>(null)
+    val sessionMetadata: LiveData<List<String>?> = _sessionMetadata
 
     override fun onCleared() {
         super.onCleared()
@@ -2191,6 +2196,12 @@ class MeetingViewModel(
 
     fun showPollOnUi(): Boolean {
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollRead == true || hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
+    }
+
+    fun openMessageOptions(chatMessage: ChatMessage) {
+        // In this case we will assume we're just blocking the person so let's set the
+        //  session store option.
+        sessionMetadataUseCase
     }
 }
 

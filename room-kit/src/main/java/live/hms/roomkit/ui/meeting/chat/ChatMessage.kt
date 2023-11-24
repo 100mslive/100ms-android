@@ -14,6 +14,7 @@ data class ChatMessage constructor(
     var messageId : String? = null,
     val sentTo : String?,
     val toGroup : String?,
+    val senderPeerId : String?,
 ) {
     companion object {
         fun sendTo(message: HMSMessage) : String? = sendTo(message.recipient.recipientType,
@@ -38,7 +39,8 @@ data class ChatMessage constructor(
         sentByMe,
         messageId = message.messageId,
         sentTo = sendTo(message),
-        toGroup = toGroup(message.recipient.recipientType)
+        toGroup = toGroup(message.recipient.recipientType),
+        message.sender?.peerID
     )
 
 }

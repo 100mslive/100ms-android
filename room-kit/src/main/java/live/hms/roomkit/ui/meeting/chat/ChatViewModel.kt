@@ -42,7 +42,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         true,
         null,
         ChatMessage.sendTo(HMSMessageRecipientType.BROADCAST, null),
-        ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST)
+        ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST),
+        hmssdk.getLocalPeer()?.peerID
       ) )
       is Recipient.Peer -> directMessage(
         ChatMessage(
@@ -53,7 +54,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
           null,
           ChatMessage.sendTo(HMSMessageRecipientType.PEER, null),
-          ChatMessage.toGroup(HMSMessageRecipientType.PEER)
+          ChatMessage.toGroup(HMSMessageRecipientType.PEER),
+          hmssdk.getLocalPeer()?.peerID
         ),
         recipient.peer)
       is Recipient.Role -> groupMessage(
@@ -64,7 +66,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
           true,
           null,
           ChatMessage.sendTo(HMSMessageRecipientType.ROLES, listOf(recipient.role)),
-          ChatMessage.toGroup(HMSMessageRecipientType.ROLES)
+          ChatMessage.toGroup(HMSMessageRecipientType.ROLES),
+          hmssdk.getLocalPeer()?.peerID!!
         ),
         recipient.role)
     }
