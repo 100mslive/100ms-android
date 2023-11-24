@@ -84,9 +84,10 @@ val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
 val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 
 class MeetingFragment : Fragment() {
-    private val chatAdapter = ChatAdapter({
+    private val chatAdapter = ChatAdapter {
         onChatClick()
-    })
+    }
+
     companion object {
         private const val TAG = "MeetingFragment"
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
