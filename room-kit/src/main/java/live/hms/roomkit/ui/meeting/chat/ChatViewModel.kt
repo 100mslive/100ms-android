@@ -210,4 +210,9 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         _messages = _messages.filter { !blockedPeerIds.contains(it.senderPeerId) }.toMutableList()
         messages.postValue(_messages)
     }
+
+    fun isUserBlockedFromChat(): Boolean {
+        val peerId = hmssdk.getLocalPeer()?.peerID
+        return peerId != null && blockedPeerIds.contains(peerId)
+    }
 }

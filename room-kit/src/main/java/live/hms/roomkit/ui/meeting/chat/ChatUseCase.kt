@@ -1,6 +1,9 @@
 package live.hms.roomkit.ui.meeting.chat
 
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearSmoothScroller
@@ -22,7 +25,10 @@ class ChatUseCase {
         recyclerview: SingleSideFadeRecyclerview,
         chatViewModel: ChatViewModel,
         emptyIndicator: View? = null,
-        isChatEnabled: () -> Boolean
+        sendButton: ImageView,
+        editText: EditText,
+        bannedText : TextView,
+        isChatEnabled: () -> Boolean,
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
@@ -30,7 +36,12 @@ class ChatUseCase {
         toggleEmptyIndicator(emptyIndicator, messages.value)
         messages.observe(viewlifecycleOwner) {
             if (isChatEnabled()) {
-
+            if(chatViewModel.isUserBlockedFromChat()) {
+                // Then their edit text etc is hidden.
+                sendButton.visibility = View.GONE
+                editText.visibility = View.GONE
+                bannedText.visibility = View.VISIBLE
+            }
             toggleEmptyIndicator(emptyIndicator, it)
             val chatList = mutableListOf<ChatMessage>()
             chatList.addAll(it)

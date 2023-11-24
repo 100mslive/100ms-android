@@ -292,6 +292,18 @@
         android:layout_above="@id/bottom_controls"
         >
 
+        <TextView
+            android:id="@+id/userBlocked"
+            android:layout_width="match_parent"
+            android:padding="@dimen/spacing_d1"
+            android:lineHeight="20sp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="center"
+            android:text="@string/blocked_from_sending_messages"
+            />
         <EditText
             android:id="@+id/edit_text_message"
             android:layout_width="wrap_content"

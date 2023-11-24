@@ -1645,10 +1645,17 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
     // Chat
     chatView.background = getChatBackgroundDrawable()
     editTextMessage.background = getChatBackgroundDrawable()
+
     editTextMessage.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+    userBlocked.background = getChatBackgroundDrawable()
+    userBlocked.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
     )
 
     editTextMessage.setHintTextColor(getColorOrDefault(
@@ -1658,6 +1665,12 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
         HMSPrebuiltTheme.getDefaults().onsurface_low_emp
     ))
+    userBlocked.background = getChatBackgroundDrawable()
+    userBlocked.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    )
 }
 
 internal fun ListItemChatBinding.applyTheme() {

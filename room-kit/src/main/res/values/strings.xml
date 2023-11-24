@@ -254,4 +254,5 @@
     <string name="hms_name_this_quiz">Name this quiz</string>
     <string name="view_more">View More</string>
     <string name="chat_with">Chat With</string>
+    <string name="blocked_from_sending_messages">You\'ve been blocked from sending messages</string>
 </resources>

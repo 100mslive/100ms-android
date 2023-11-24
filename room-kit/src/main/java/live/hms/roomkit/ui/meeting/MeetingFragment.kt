@@ -276,7 +276,8 @@ class MeetingFragment : Fragment() {
             startHLSStreamingIfRequired()
         }
 
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
+        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null,
+            binding.iconSend, binding.editTextMessage, binding.userBlocked) {
             meetingViewModel.prebuiltInfoContainer.isChatEnabled()
         }
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
