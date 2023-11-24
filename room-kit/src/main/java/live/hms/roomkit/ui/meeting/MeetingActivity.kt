@@ -31,6 +31,7 @@ import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.ROOM_CODE
 import live.hms.roomkit.util.ROOM_PREBUILT
+import live.hms.roomkit.util.TOKEN
 import live.hms.roomkit.util.init
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
@@ -77,10 +78,19 @@ class MeetingActivity : AppCompatActivity() {
 
         val hmsPrebuiltOption: HMSPrebuiltOptions? =
             intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
-        val roomCode: String = intent!!.getStringExtra(ROOM_CODE)!!
+
+        val roomCode: String = intent?.getStringExtra(ROOM_CODE)?:""
+        val token: String = intent?.getStringExtra(TOKEN)?:""
+
+        if (roomCode.isEmpty() && token.isEmpty()) {
+            Toast.makeText(this, "Room code or token is required", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+
+
         binding.progressBar.visibility = View.VISIBLE
         //todo show a loader UI
-        meetingViewModel.initSdk(roomCode, hmsPrebuiltOption, object : HMSActionResultListener {
+        meetingViewModel.initSdk(roomCode, token, hmsPrebuiltOption, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 runOnUiThread {
                     Toast.makeText(this@MeetingActivity, error.message, Toast.LENGTH_SHORT).show()
@@ -124,7 +134,10 @@ class MeetingActivity : AppCompatActivity() {
     }
 
     private fun initViewModels() {
-        meetingViewModel.isRecording.observe(this) {
+        meetingViewModel.recordingState.observe(this) {
+            invalidateOptionsMenu()
+        }
+        meetingViewModel.streamingState.observe(this) {
             invalidateOptionsMenu()
         }
         meetingViewModel.pinnedTrack.observe(this) {

@@ -14,7 +14,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
+                  val onClick: () -> Unit = {}) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
   private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
   companion object {
     private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
@@ -34,6 +35,7 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit) : List
       binding.root.setOnClickListener {
         // Setting a click listener on the entire root. Watch
         //  out if there are other buttons on this.
+        onClick()
         openMessageOptions(bindingAdapterPosition)
       }
     }

@@ -433,14 +433,14 @@ internal fun FragmentMeetingBinding.applyTheme() {
 //        )
 //    )
 
-    tvRecordingTime?.setTextColor(
+    tvStreamingTime.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
 
-    tvViewersCount?.setTextColor(
+    tvViewersCount.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
@@ -457,6 +457,13 @@ internal fun FragmentMeetingBinding.applyTheme() {
     recordingSignal.drawable.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    recordingPause.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )

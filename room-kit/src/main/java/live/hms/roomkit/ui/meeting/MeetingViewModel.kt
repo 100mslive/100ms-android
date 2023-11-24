@@ -140,6 +140,7 @@ class MeetingViewModel(
 
     fun initSdk(
         roomCode: String,
+        token: String,
         hmsPrebuiltOptions: HMSPrebuiltOptions?,
         onHMSActionResultListener: HMSActionResultListener
     ) {
@@ -149,12 +150,14 @@ class MeetingViewModel(
         }
         //if empty is uses the prod token url else uses the debug token url
         val tokenURL: String = hmsPrebuiltOptions?.endPoints?.get("token") ?: ""
-        val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
-            hmsPrebuiltOptions.endPoints["init"].orEmpty()
-        else
-            "https://prod-init.100ms.live/init"
+
 
         isPrebuiltDebug = hmsPrebuiltOptions?.debugInfo ?: false
+
+        if (token.isNullOrEmpty().not()) {
+            joinRoomUsingToken(token, hmsPrebuiltOptions, onHMSActionResultListener)
+            return
+        }
 
         hmsSDK.getAuthTokenByRoomCode(
             TokenRequest(roomCode, hmsPrebuiltOptions?.userId ?: UUID.randomUUID().toString()),
@@ -166,31 +169,42 @@ class MeetingViewModel(
                 }
 
                 override fun onTokenSuccess(token: String) {
-
-                    val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
-                        hmsSDK.getRoomLayout(
-                            token,
-                            LayoutRequestOptions(layoutEndpointBase),
-                            object :
-                                HMSLayoutListener {
-                                override fun onError(error: HMSException) {
-                                    Log.e(TAG, "onError: ", error)
-                                    onHMSActionResultListener.onError(error)
-                                }
-
-                                override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
-                                    hmsRoomLayout = layoutConfig
-                                    prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
-                                    setHmsConfig(hmsPrebuiltOptions, token, initURL)
-                                    kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
-                                    onHMSActionResultListener.onSuccess()
-                                }
-
-                            })
+                    joinRoomUsingToken(token, hmsPrebuiltOptions, onHMSActionResultListener)
                 }
 
             })
 
+
+    }
+
+
+    fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+
+        val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
+            hmsPrebuiltOptions.endPoints["init"].orEmpty()
+        else
+            "https://prod-init.100ms.live/init"
+
+        val layoutEndpointBase = hmsPrebuiltOptions?.endPoints?.get("layout")
+        hmsSDK.getRoomLayout(
+            token,
+            LayoutRequestOptions(layoutEndpointBase),
+            object :
+                HMSLayoutListener {
+                override fun onError(error: HMSException) {
+                    Log.e(TAG, "onError: ", error)
+                    onHMSActionResultListener.onError(error)
+                }
+
+                override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
+                    hmsRoomLayout = layoutConfig
+                    prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
+                    setHmsConfig(hmsPrebuiltOptions, token, initURL)
+                    kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
+                    onHMSActionResultListener.onSuccess()
+                }
+
+            })
 
     }
 
@@ -274,14 +288,13 @@ class MeetingViewModel(
     private val previewErrorData: MutableLiveData<HMSException> = MutableLiveData()
     private val previewUpdateData: MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> =
         MutableLiveData()
-    private val hlsToggleUpdateData: MutableLiveData<Boolean> = MutableLiveData()
     val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(false)
+    val peerCount = MutableLiveData(0)
 
     val previewRoomStateLiveData: LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
     val previewPeerLiveData: LiveData<Pair<HMSPeerUpdate, HMSPeer>> = previewPeerData
     val previewErrorLiveData: LiveData<HMSException> = previewErrorData
     val previewUpdateLiveData: LiveData<Pair<HMSRoom, Array<HMSTrack>>> = previewUpdateData
-    val hlsToggleUpdateLiveData: LiveData<Boolean> = hlsToggleUpdateData
     val statsToggleLiveData: LiveData<Boolean> = statsToggleData
     val isScreenShare: MutableLiveData<Boolean>  = MutableLiveData(false)
     val hmsNotificationEvent = SingleLiveEvent<HMSNotification>()
@@ -293,7 +306,6 @@ class MeetingViewModel(
         if (mode != meetingViewMode.value) {
             meetingViewMode.postValue(mode)
         }
-
     }
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
@@ -333,14 +345,16 @@ class MeetingViewModel(
     val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
     val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
-    private val _isRecording = MutableLiveData(RecordingState.NOT_RECORDING_OR_STREAMING)
-    val isRecording: LiveData<RecordingState> = _isRecording
+    private val _isRecording = MutableLiveData(StreamingRecordingState.NOT_RECORDING_OR_STREAMING)
     private var hmsRoom: HMSRoom? = null
 
     // Live data for enabling/disabling mute buttons
     val isLocalAudioPresent = MutableLiveData(false)
     val isLocalVideoPresent = MutableLiveData(false)
-    val isRecordingInProgess = MutableLiveData(false)
+
+    //Live data to show ui for recording and streaming states
+    val recordingState = MutableLiveData(HMSRecordingState.NONE)
+    val streamingState = MutableLiveData(HMSStreamingState.NONE)
 
     // Live data containing all the current tracks in a meeting
     private val _liveDataTracks = MutableLiveData(_tracks)
@@ -475,8 +489,7 @@ class MeetingViewModel(
 
             override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
                 roomState.postValue(Pair(type, hmsRoom))
-                // This will keep the isRecording value updated correctly in preview. It will not be called after join.
-                _isRecording.postValue(getRecordingState(hmsRoom))
+
                 if (type == HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED) {
                     peerCount.postValue(hmsRoom.peerCount)
                 }
@@ -484,7 +497,7 @@ class MeetingViewModel(
 
         })
     }
-    val peerCount = MutableLiveData(0)
+
     fun setLocalVideoEnabled(enabled: Boolean) {
 
         hmsSDK.getLocalPeer()?.videoTrack?.apply {
@@ -700,11 +713,21 @@ class MeetingViewModel(
                 Log.d(TAG, "Room started at: ${room.startedAt}")
 
                 // get the hls URL from the Room, if it exists
-                val hlsUrl = room.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+                val hlsUrl = room.hlsStreamingState.variants?.get(0)?.hlsStreamUrl
                 switchToHlsViewIfRequired(room.localPeer?.hmsRole, hlsUrl)
-                _isRecording.postValue(
-                    getRecordingState(room)
-                )
+
+                val runningStreamingStates = listOf(HMSStreamingState.STARTED, HMSStreamingState.STARTING)
+                val runningRecordingStates = listOf(HMSRecordingState.STARTING, HMSRecordingState.STARTED, HMSRecordingState.PAUSED, HMSRecordingState.RESUMED)
+
+                if (room.hlsStreamingState.state in runningStreamingStates)
+                    streamingState.postValue(room.hlsStreamingState.state)
+                if (room.rtmpHMSRtmpStreamingState.state in runningStreamingStates)
+                    streamingState.postValue(room.rtmpHMSRtmpStreamingState.state)
+                if (room.browserRecordingState.state in runningRecordingStates)
+                    recordingState.postValue(room.browserRecordingState.state)
+                if (room.hlsRecordingState.state in runningRecordingStates )
+                    recordingState.postValue(room.hlsRecordingState.state)
+
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
                     { message -> _sessionMetadata.postValue(message) },
                     object : HMSActionResultListener {
@@ -824,50 +847,40 @@ class MeetingViewModel(
                 Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
 
                 when (type) {
-                    HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> peerCount.postValue(hmsRoom.peerCount)
+                    HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> {
+                        peerCount.postValue(hmsRoom.peerCount)
+                    }
+
                     HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED -> {
-                        _isRecording.postValue(
-                            getRecordingState(hmsRoom)
-                        )
                         showServerInfo(hmsRoom)
                     }
 
                     HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED -> {
-                        _isRecording.postValue(
-                            getRecordingState(hmsRoom)
-                        )
                         showRtmpInfo(hmsRoom)
+                        streamingState.postValue(hmsRoom.rtmpHMSRtmpStreamingState.state)
                     }
 
                     HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED -> {
-                        _isRecording.postValue(
-                            getRecordingState(hmsRoom)
-                        )
                         showRecordInfo(hmsRoom)
-
-                        if (hmsRoom.browserRecordingState?.initialising == true)
-                            isRecordingInProgess.postValue(true)
-                        else  (hmsRoom.browserRecordingState?.running == true)
-                        isRecordingInProgess.postValue(false)
-
+                        recordingState.postValue(hmsRoom.browserRecordingState.state)
                     }
 
                     HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED -> {
-                        _isRecording.postValue(
-                            getRecordingState(hmsRoom)
-                        )
                         switchToHlsViewIfRequired()
                         showHlsInfo(hmsRoom)
+                        streamingState.postValue(hmsRoom.hlsStreamingState.state)
                     }
 
                     HMSRoomUpdate.HLS_RECORDING_STATE_UPDATED -> {
-                        _isRecording.postValue(
-                            getRecordingState(hmsRoom)
-                        )
                         showHlsRecordingInfo(hmsRoom)
+                        recordingState.postValue(hmsRoom.hlsRecordingState.state)
                     }
 
-                    else -> {
+                    HMSRoomUpdate.ROOM_MUTED -> {
+
+                    }
+                    HMSRoomUpdate.ROOM_UNMUTED -> {
+
                     }
                 }
             }
@@ -1092,29 +1105,11 @@ class MeetingViewModel(
     }
 
     fun isServerRecordingEnabled(room: HMSRoom): Boolean {
-        return room.serverRecordingState?.running == true
+        return room.serverRecordingState.state == HMSRecordingState.STARTED
     }
 
-    private fun getRecordingState(room: HMSRoom): RecordingState {
-
-        val recording = room.browserRecordingState?.running == true ||
-                room.hlsRecordingState?.running == true
-        val streaming = room.rtmpHMSRtmpStreamingState?.running == true ||
-                room.hlsStreamingState?.running == true
-
-        return if (recording && streaming) {
-            RecordingState.STREAMING_AND_RECORDING
-        } else if (recording) {
-            RecordingState.RECORDING
-        } else if (streaming) {
-            RecordingState.STREAMING
-        } else {
-            RecordingState.NOT_RECORDING_OR_STREAMING
-        }
-    }
-
-    fun isHlsRunning() = hmsRoom?.hlsStreamingState?.running == true
-    fun isRTMPRunning() = hmsRoom?.rtmpHMSRtmpStreamingState?.running == true
+    fun isHlsRunning() = hmsSDK.getRoom()?.hlsStreamingState?.state == HMSStreamingState.STARTED
+    fun isRTMPRunning() = hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.state == HMSStreamingState.STARTED
 
     fun setStatetoOngoing() {
         state.postValue(MeetingState.Ongoing())
@@ -1562,7 +1557,7 @@ class MeetingViewModel(
         runnable: Runnable? = null
     ) {
         // It's streaming if there are rtmp urls present.
-        isRecordingInProgess.postValue(true)
+        recordingState.postValue(HMSRecordingState.STARTING)
         Log.v(TAG, "Starting recording. url: $rtmpInjectUrls")
         hmsSDK.startRtmpOrRecording(
             HMSRecordingConfig(
@@ -1572,7 +1567,7 @@ class MeetingViewModel(
                 inputWidthHeight
             ), object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
-                    isRecordingInProgess.postValue(false)
+                    recordingState.postValue(HMSRecordingState.FAILED)
                     Log.d(TAG, "RTMP recording error: $error")
                     // restore the current state
                     runnable?.run()
@@ -1827,13 +1822,12 @@ class MeetingViewModel(
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
                     _events.emit(Event.Hls.HlsError(error))
-                    hlsToggleUpdateData.postValue(false)
+                    streamingState.postValue(HMSStreamingState.FAILED)
                 }
             }
 
             override fun onSuccess() {
                 Log.d(TAG, "Hls streaming started successfully")
-                hlsToggleUpdateData.postValue(true)
             }
         })
     }
@@ -2136,10 +2130,6 @@ class MeetingViewModel(
             Log.d("AreTherePolls","$error")
             null
         }
-    }
-
-    fun isRecordingState(): Boolean {
-        return isRecording.value == RecordingState.RECORDING || isRecording.value == RecordingState.STREAMING_AND_RECORDING
     }
 
     fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {

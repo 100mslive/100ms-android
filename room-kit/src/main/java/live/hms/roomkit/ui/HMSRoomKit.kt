@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat.startActivity
 import live.hms.roomkit.ui.meeting.MeetingActivity
 import live.hms.roomkit.util.ROOM_CODE
 import live.hms.roomkit.util.ROOM_PREBUILT
+import live.hms.roomkit.util.TOKEN
 
 object HMSRoomKit {
 
@@ -17,6 +18,15 @@ object HMSRoomKit {
             startActivity(activity, this, null)
         }
 
+    }
+
+
+    fun launchPrebuiltUsingAuthToken(token: String, activity: Activity, options: HMSPrebuiltOptions? = null) {
+        Intent(activity, MeetingActivity::class.java).apply {
+            putExtra(TOKEN, token)
+            putExtra(ROOM_PREBUILT, options)
+            startActivity(activity, this, null)
+        }
     }
 
 }

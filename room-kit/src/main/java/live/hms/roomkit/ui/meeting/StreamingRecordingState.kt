@@ -1,10 +1,8 @@
 package live.hms.roomkit.ui.meeting
 
-enum class RecordingState {
+enum class StreamingRecordingState {
     RECORDING,
     NOT_RECORDING_OR_STREAMING,
-    RECORDING_TRANSITIONING_TO_NOT_RECORDING,
-    NOT_RECORDING_TRANSITION_IN_PROGRESS,
     STREAMING,
     STREAMING_AND_RECORDING
 }
