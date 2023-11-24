@@ -1873,6 +1873,9 @@ class MeetingViewModel(
     private lateinit var sessionMetadataUseCase: SessionMetadataUseCase
     private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
     private val blockUserUseCase : BlockUserUseCase = BlockUserUseCase()
+    fun blockUser(chatMessage: ChatMessage) {
+        blockUserUseCase.blockUser(chatMessage)
+    }
     val currentBlockList = blockUserUseCase.currentBlockList
     fun setSessionMetadata(data: List<String>?) {
         // TODO Gulzar
@@ -2201,7 +2204,7 @@ class MeetingViewModel(
     fun openMessageOptions(chatMessage: ChatMessage) {
         // In this case we will assume we're just blocking the person so let's set the
         //  session store option.
-        sessionMetadataUseCase
+        blockUser(chatMessage)
     }
 }
 
