@@ -21,11 +21,14 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 
 class CombinedChatFragmentTab : Fragment() {
-    val TAG = "CombinedChatFragmentTab"
     private var binding by viewLifecycle<LayoutChatParticipantCombinedTabChatBinding>()
     val meetingViewModel : MeetingViewModel by activityViewModels()
     private val chatViewModel : ChatViewModel by activityViewModels()
-    private val chatAdapter by lazy { ChatAdapter(::openMessageOptions) }
+    private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+    private val chatAdapter by lazy { ChatAdapter({ message ->
+        launchMessageOptionsDialog.launch(meetingViewModel,
+        childFragmentManager, message) })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,15 +69,5 @@ class CombinedChatFragmentTab : Fragment() {
 
         }
 
-    }
-
-    private fun openMessageOptions(chatMessage: ChatMessage,) {
-        // If the user can't block or pin message, hide the entire dialog.
-        if(!(meetingViewModel.isAllowedToBlockFromChat() || meetingViewModel.isAllowedToPinMessages()) )
-            return
-
-        MessageOptionsBottomSheet(chatMessage).apply {
-            arguments = bundleOf(CHAT_MESSAGE_OPTIONS_EXTRA to chatMessage)
-        }.show(childFragmentManager, TAG)
     }
 }

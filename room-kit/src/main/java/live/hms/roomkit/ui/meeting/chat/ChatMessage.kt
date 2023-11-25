@@ -4,8 +4,13 @@ import live.hms.video.sdk.models.HMSMessage
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.role.HMSRole
 import java.util.*
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 const val DEFAULT_SENDER_NAME = "Participant"
+
+
+@Parcelize
 data class ChatMessage constructor(
     val senderName: String,
     val time: Long? = null,
@@ -15,7 +20,7 @@ data class ChatMessage constructor(
     val sentTo : String?,
     val toGroup : String?,
     val senderPeerId : String?,
-) {
+)  : Parcelable {
     companion object {
         fun sendTo(message: HMSMessage) : String? = sendTo(message.recipient.recipientType,
             message.recipient.recipientRoles)

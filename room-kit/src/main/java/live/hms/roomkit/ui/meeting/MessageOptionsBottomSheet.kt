@@ -30,7 +30,10 @@ import live.hms.roomkit.util.ROOM_PREBUILT
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.enums.HMSRecordingState
 const val CHAT_MESSAGE_OPTIONS_EXTRA = "ChatMessageOptionsExtra"
-class MessageOptionsBottomSheet(val chatMessage: ChatMessage): BottomSheetDialogFragment() {
+class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
+                                private val allowedToBlock : Boolean,
+    private val allowedToPin : Boolean
+): BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetMessageOptionsBinding>()
 //    private val chatMessage: ChatMessage? = arguments?.getParcelable(CHAT_MESSAGE_OPTIONS_EXTRA) as ChatMessage?
@@ -68,33 +71,27 @@ class MessageOptionsBottomSheet(val chatMessage: ChatMessage): BottomSheetDialog
             dismissAllowingStateLoss()
         }
 
-        if(meetingViewModel.isAllowedToBlockFromChat()) {
+        if(allowedToBlock) {
             binding.optionBlockFromChat.visibility = View.VISIBLE
         } else {
             binding.optionBlockFromChat.visibility = View.GONE
         }
 
-        if(meetingViewModel.isAllowedToPinMessages()){
+        if(allowedToPin){
             binding.optionPinMessage.visibility = View.VISIBLE
         } else {
             binding.optionPinMessage.visibility = View.GONE
         }
 
-        if(chatMessage == null) {
-            Log.d("MessageOptions","No chat message received, closing")
-            dismissAllowingStateLoss()
-        }
-        else {
-            with(binding) {
-                optionPinMessage.setOnSingleClickListener {
-                    meetingViewModel.pinMessage(chatMessage)
-                    dismiss()
-                }
+        with(binding) {
+            optionPinMessage.setOnSingleClickListener {
+                meetingViewModel.pinMessage(chatMessage)
+                dismiss()
+            }
 
-                optionBlockFromChat.setOnSingleClickListener {
-                    meetingViewModel.blockUser(chatMessage)
-                    dismiss()
-                }
+            optionBlockFromChat.setOnSingleClickListener {
+                meetingViewModel.blockUser(chatMessage)
+                dismiss()
             }
         }
     }
@@ -115,8 +112,4 @@ class MessageOptionsBottomSheet(val chatMessage: ChatMessage): BottomSheetDialog
             )
         )
     }
-
-//    override fun getTheme(): Int {
-//        return R.style.AppBottomSheetDialogTheme
-//    }
 }

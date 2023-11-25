@@ -57,6 +57,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
+import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_CHAT_ALONE
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
@@ -104,7 +105,11 @@ class MeetingFragment : Fragment() {
             requireActivity().application
         )
     }
-    private val chatAdapter by lazy { ChatAdapter(meetingViewModel::openMessageOptions, ::onChatClick) }
+    private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+    private val chatAdapter by lazy { ChatAdapter({ message ->
+        launchMessageOptionsDialog.launch(meetingViewModel,
+            childFragmentManager, message) }, ::onChatClick)
+    }
 
     private val chatViewModel: ChatViewModel by activityViewModels {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
