@@ -32,8 +32,9 @@
                 android:src="@drawable/chevron_pin_message_indicator" />
 
             <androidx.recyclerview.widget.RecyclerView
+
                 android:id="@+id/pinnedMessagesRecyclerView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/spacing_d2"
                 tools:itemCount="1"
