@@ -68,7 +68,11 @@ class CombinedChatFragmentTab : Fragment() {
 
     }
 
-    private fun openMessageOptions(chatMessage: ChatMessage) {
+    private fun openMessageOptions(chatMessage: ChatMessage,) {
+        // If the user can't block or pin message, hide the entire dialog.
+        if(!(meetingViewModel.isAllowedToBlockFromChat() || meetingViewModel.isAllowedToPinMessages()) )
+            return
+
         MessageOptionsBottomSheet(chatMessage).apply {
             arguments = bundleOf(CHAT_MESSAGE_OPTIONS_EXTRA to chatMessage)
         }.show(childFragmentManager, TAG)
