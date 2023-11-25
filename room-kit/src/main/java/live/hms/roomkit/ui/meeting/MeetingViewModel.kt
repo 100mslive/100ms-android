@@ -2191,10 +2191,9 @@ class MeetingViewModel(
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollRead == true || hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
     }
 
-    fun isAllowedToBlockFromChat(): Boolean =
-        true // TODO how?
+    fun isAllowedToBlockFromChat(): Boolean = prebuiltInfoContainer.isAllowedToBlockUserFromChat()
 
-    fun isAllowedToPinMessages(): Boolean = true // TODO how?
+    fun isAllowedToPinMessages(): Boolean = prebuiltInfoContainer.isAllowedToPinMessages()
 
 }
 

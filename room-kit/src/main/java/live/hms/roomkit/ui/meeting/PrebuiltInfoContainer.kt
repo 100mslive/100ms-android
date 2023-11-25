@@ -8,6 +8,18 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     private val roleMap : MutableMap<String, HMSRoomLayout.HMSRoomLayoutData> = mutableMapOf()
     private val localPeer by lazy { hmssdk.getLocalPeer()!! }
 
+    fun isAllowedToBlockUserFromChat() : Boolean =
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.realTimeControls?.canBlockUser == true ||
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat?.realTimeControls?.canBlockUser != true
+
+    fun isAllowedToPinMessages() : Boolean =
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.allowPinningMessages != true ||
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat?.allowPinningMessages != true
+
     fun isChatEnabled(): Boolean =
         // how do we even know if it's in hls? What if they have both?
             roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
