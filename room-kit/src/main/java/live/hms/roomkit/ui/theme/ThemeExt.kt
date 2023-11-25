@@ -2528,3 +2528,12 @@ internal fun LayoutMultiChoiceQuestionOptionItemBinding.applyTheme() {
         )
     )
 }
+
+fun LayoutPinnedMessageBinding.applyTheme() {
+    pinnedMessage.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}

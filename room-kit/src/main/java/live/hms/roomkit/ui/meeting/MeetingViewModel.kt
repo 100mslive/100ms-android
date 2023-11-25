@@ -694,7 +694,7 @@ class MeetingViewModel(
 
             override fun onSessionStoreAvailable(sessionStore: HmsSessionStore) {
                 super.onSessionStoreAvailable(sessionStore)
-                sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
+                sessionMetadataUseCase.setSessionStore(sessionStore)
                 pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
                 blockUserUseCase.setSessionStore(sessionStore)
             }
@@ -728,8 +728,8 @@ class MeetingViewModel(
                 if (room.hlsRecordingState.state in runningRecordingStates )
                     recordingState.postValue(room.hlsRecordingState.state)
 
+                sessionMetadataUseCase.updatePeerName(room.localPeer?.name ?: "Participant")
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
-                    { message -> _sessionMetadata.postValue(message) },
                     object : HMSActionResultListener {
                         override fun onError(error: HMSException) {}
                         override fun onSuccess() {}
@@ -1864,16 +1864,16 @@ class MeetingViewModel(
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
 
-    private lateinit var sessionMetadataUseCase: SessionMetadataUseCase
+    private val sessionMetadataUseCase: SessionMetadataUseCase = SessionMetadataUseCase()
     private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
     private val blockUserUseCase : BlockUserUseCase = BlockUserUseCase()
+
     fun blockUser(chatMessage: ChatMessage) {
         blockUserUseCase.blockUser(chatMessage)
     }
     val currentBlockList = blockUserUseCase.currentBlockList
-    fun setSessionMetadata(data: List<String>?) {
-        // TODO Gulzar
-        sessionMetadataUseCase.updatePinnedMessage(data, object : HMSActionResultListener {
+    fun pinMessage(message : ChatMessage) {
+        sessionMetadataUseCase.addToPinnedMessages(message, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
                     _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
@@ -1897,11 +1897,12 @@ class MeetingViewModel(
         })
     }
 
-    private val _sessionMetadata = MutableLiveData<List<String>?>(null)
-    val sessionMetadata: LiveData<List<String>?> = _sessionMetadata
+    val sessionMetadata: LiveData<Array<SessionMetadataUseCase.PinnedMessage>> = sessionMetadataUseCase.pinnedMessages
 
     override fun onCleared() {
         super.onCleared()
+        sessionMetadataUseCase.close()
+        blockUserUseCase.close()
         leaveMeeting()
     }
 
