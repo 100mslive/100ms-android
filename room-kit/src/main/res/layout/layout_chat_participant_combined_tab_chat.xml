@@ -11,12 +11,34 @@
     app:layout_heightPercent="@dimen/tall_bottom_sheet"
     android:orientation="vertical">
 
-    <FrameLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_margin="@dimen/spacing_d2"
         >
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:id="@+id/pinnedMessagesDisplay"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/chevron_pin_message_indicator" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pinnedMessagesRecyclerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_d2"
+                tools:itemCount="1"
+                tools:listitem="@layout/layout_pinned_message" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
         android:layout_width="match_parent"
@@ -60,7 +82,7 @@
                 android:text="There are no messages here yet. Start a conversation by sending a message."
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
-    </FrameLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
         <LinearLayout
