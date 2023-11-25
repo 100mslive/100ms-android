@@ -20,6 +20,7 @@ import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.getShape
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.enums.HMSRecordingState
 
@@ -200,7 +201,7 @@ class SessionOptionBottomSheet(
     private fun applyTheme() {
 
 
-        binding.rootLayout.background = resources.getDrawable(R.drawable.gray_shape_round_dialog)
+        binding.rootLayout.background = getShape()
             .apply {
                 val color = getColorOrDefault(
                     HMSPrebuiltTheme.getColours()?.backgroundDefault,
@@ -235,10 +236,6 @@ class SessionOptionBottomSheet(
                 HMSPrebuiltTheme.getDefaults().onsurface_high_emp
             )
         )
-    }
-
-    override fun getTheme(): Int {
-        return R.style.AppBottomSheetDialogTheme
     }
 
 }

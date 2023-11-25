@@ -17,7 +17,6 @@ import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
-import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationType
@@ -1897,7 +1896,7 @@ class MeetingViewModel(
         })
     }
 
-    val sessionMetadata: LiveData<Array<SessionMetadataUseCase.PinnedMessage>> = sessionMetadataUseCase.pinnedMessages
+    val pinnedMessages: LiveData<Array<SessionMetadataUseCase.PinnedMessage>> = sessionMetadataUseCase.pinnedMessages
 
     override fun onCleared() {
         super.onCleared()
@@ -2192,10 +2191,10 @@ class MeetingViewModel(
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollRead == true || hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
     }
 
-    fun openMessageOptions(chatMessage: ChatMessage) {
-        // In this case we will assume we're just blocking the person so let's set the
-        //  session store option.
-        blockUser(chatMessage)
-    }
+    fun isAllowedToBlockFromChat(): Boolean =
+        true // TODO how?
+
+    fun isAllowedToPinMessages(): Boolean = true // TODO how?
+
 }
 

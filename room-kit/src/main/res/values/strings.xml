@@ -255,4 +255,5 @@
     <string name="view_more">View More</string>
     <string name="chat_with">Chat With</string>
     <string name="blocked_from_sending_messages">You\'ve been blocked from sending messages</string>
+    <string name="block_from_chat">Block from Chat</string>
 </resources>

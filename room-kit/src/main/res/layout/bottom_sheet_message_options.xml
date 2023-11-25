@@ -6,7 +6,6 @@
     app:cardCornerRadius="@dimen/sizeteen_dp"
     android:paddingBottom="16dp"
     android:id="@id/rootLayout"
-    android:background="@drawable/gray_shape_round_dialog"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent">
@@ -30,8 +29,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:drawablePadding="8dp"
+                android:lineHeight="24sp"
                 android:fontFamily="@font/inter_semibold"
-                android:text="Options"
+                android:text="Message Options"
                 android:textSize="16sp" />
 
             <ImageView
@@ -52,18 +52,77 @@
             android:id="@+id/border5"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="16dp"
+            android:layout_marginVertical="@dimen/spacing_d2"
             android:background="@drawable/gray_line_vertical_divider" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginBottom="@dimen/sizeteen_dp"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_marginVertical="@dimen/sizeteen_dp"
             android:layout_marginHorizontal="20dp"
             android:id="@+id/options_grid"
             android:nestedScrollingEnabled="false"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/spacing_d2"
+            android:layout_marginStart="@dimen/spacing_d2"
+            android:orientation="vertical">
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/optionPinMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/spacing_d2"
+                >
+            <ImageButton
+                android:id="@+id/pinMessageIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/message_option_pin_icon"
+                />
 
+            <TextView
+                android:id="@+id/pinMessageText"
+                android:layout_width="match_parent"
+                android:fontFamily="@font/inter_semibold"
+                android:lineHeight="20sp"
+                android:textSize="14sp"
+                android:translationY="1.53sp"
+                android:lineSpacingExtra="3sp"
+                android:layout_height="match_parent"
+                android:text="Pin"
+                />
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/optionBlockFromChat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/spacing_d2"
+                android:orientation="horizontal"
+                >
+                <ImageView
+                    android:id="@+id/blockFromChatIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/block_from_chat_icon"
+                    />
+
+                <TextView
+                    android:id="@+id/blockFromChatText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:lineHeight="20sp"
+                    android:translationY="1.53sp"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="3sp"
+                    android:text="@string/block_from_chat"
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </LinearLayout>
 
