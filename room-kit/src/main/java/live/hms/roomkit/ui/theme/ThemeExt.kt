@@ -1589,7 +1589,7 @@ fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
     return stateList
 }
 
-private fun getChatBackgroundDrawable(): ShapeDrawable {
+fun getChatBackgroundDrawable(): ShapeDrawable {
     return getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
         .apply {
             val color = getColorOrDefault(
@@ -2536,4 +2536,43 @@ fun LayoutPinnedMessageBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+}
+
+fun BottomSheetMessageOptionsBinding.applyTheme() {
+    root.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                HMSPrebuiltTheme.getDefaults().surface_default)
+            colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+        }
+
+    pinMessageIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    pinMessageText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    blockFromChatIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+    blockFromChatText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
 }
