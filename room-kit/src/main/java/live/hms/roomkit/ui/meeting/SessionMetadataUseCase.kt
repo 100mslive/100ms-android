@@ -37,6 +37,8 @@ class SessionMetadataUseCase : Closeable {
         localPeerName = peerName
     }
     override fun close() {
+        if(!::hmsSessionStore.isInitialized)
+            return
         hmsSessionStore.removeKeyChangeListener(keyListener, object :HMSActionResultListener{
             override fun onError(error: HMSException) {
             }

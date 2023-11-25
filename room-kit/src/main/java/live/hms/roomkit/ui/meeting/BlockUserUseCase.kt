@@ -78,6 +78,8 @@ class BlockUserUseCase(
     }
 
     override fun close() {
+        if(!::hmsSessionStore.isInitialized)
+            return
         // remove the key change listeners for this.
         hmsSessionStore.removeKeyChangeListener(
             keyChangeListener,
