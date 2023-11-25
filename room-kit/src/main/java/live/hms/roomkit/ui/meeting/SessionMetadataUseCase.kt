@@ -82,7 +82,4 @@ class SessionMetadataUseCase : Closeable {
         this.hmsSessionStore = sessionStore
     }
 
-    fun setLocalPeerName(name : String) {
-        this.localPeerName = name
-    }
 }
