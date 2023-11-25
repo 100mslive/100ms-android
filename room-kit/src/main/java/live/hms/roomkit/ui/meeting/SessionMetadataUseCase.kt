@@ -14,6 +14,8 @@ import java.io.Closeable
 
 private const val PINNED_MESSAGE_SESSION_KEY: String = "pinnedMessages"
 class SessionMetadataUseCase : Closeable {
+    private val MAX_PINNED_MESSAGES = 3
+
     private lateinit var hmsSessionStore: HmsSessionStore
     private var localPeerName : String? = null
     private val keyListener = object : HMSKeyChangeListener {
@@ -59,7 +61,7 @@ class SessionMetadataUseCase : Closeable {
         // text, id, pinnedBy
         val newPinnedMessage = PinnedMessage(data.message, data.messageId ?: "", localPeerName ?: "Participant")
         val existingPinnedMessages = pinnedMessages.value ?: arrayOf()
-        val newMessages = if(existingPinnedMessages.size < 3)
+        val newMessages = if(existingPinnedMessages.size < MAX_PINNED_MESSAGES)
             listOf(newPinnedMessage).plus(existingPinnedMessages)
         else
             listOf(newPinnedMessage).plus(existingPinnedMessages.dropLast(1))
