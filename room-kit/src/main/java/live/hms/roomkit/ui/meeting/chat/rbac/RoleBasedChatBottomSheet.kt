@@ -29,8 +29,9 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
 
 class RoleBasedChatBottomSheet(
-    private val getSelectedRecipient : () -> Recipient,
-    private val recipientSelected: (Recipient) -> Unit) : BottomSheetDialogFragment() {
+    private val getSelectedRecipient: () -> Recipient,
+    private val recipientSelected: (Recipient) -> Unit
+) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<LayoutRoleBasedChatBottomSheetSelectorBinding>()
     private val groupieAdapter = GroupieAdapter()
@@ -44,18 +45,16 @@ class RoleBasedChatBottomSheet(
     companion object {
         val TAG = "RoleBasedChatBottomSheet"
         fun launch(fm: FragmentManager, chatViewModel: ChatViewModel) {
-            RoleBasedChatBottomSheet(
-                { chatViewModel.currentlySelectedRecipientRbac.value!! },
+            RoleBasedChatBottomSheet({ chatViewModel.currentlySelectedRecipientRbac.value!! },
                 { selectedRecipient ->
                     chatViewModel.updateSelectedRecipientChatBottomSheet(selectedRecipient)
-                }
-                ).show(fm, TAG)
+                }).show(fm, TAG)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme);
+        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
     }
 
 
@@ -90,9 +89,7 @@ class RoleBasedChatBottomSheet(
                     getColorOrDefault(
                         HMSPrebuiltTheme.getColours()?.borderBright,
                         HMSPrebuiltTheme.getDefaults().border_bright
-                    ),
-                    0,
-                    R.layout.layout_role_based_chat_message_bottom_sheet_item_header
+                    ), 0, R.layout.layout_role_based_chat_message_bottom_sheet_item_header
                 )
             )
         }
@@ -101,7 +98,7 @@ class RoleBasedChatBottomSheet(
         val allowedParticipants = meetingViewModel.availableRecipientsForChat()
         val initialRecipients = initialAddRecipients(allowedParticipants, testing)
         groupieAdapter.update(initialRecipients)
-        if(allowedParticipants.peers || testing) {
+        if (allowedParticipants.peers || testing) {
             // Update all peers everytime the peers change
             meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
                 groupieAdapter.update(
@@ -120,31 +117,47 @@ class RoleBasedChatBottomSheet(
         dismissAllowingStateLoss()
     }
 
-    private fun initialAddRecipients(allowedParticipants: AllowedToMessageParticipants,
-                                     forTestingAllowAll : Boolean): List<Group> {
+    private fun initialAddRecipients(
+        allowedParticipants: AllowedToMessageParticipants, forTestingAllowAll: Boolean
+    ): List<Group> {
         val hmsSDK = meetingViewModel.hmsSDK
         val recipients = mutableListOf<Group>()
         // For testing, remove when not needed
         // Add `everyone` general chat
         val currentSelectedRecipient = getSelectedRecipient()
-        if(allowedParticipants.everyone || forTestingAllowAll) {
-            recipients.add(RecipientItem(Recipient.Everyone, currentSelectedRecipient, ::onRecipientSelected))
+        if (allowedParticipants.everyone || forTestingAllowAll) {
+            recipients.add(
+                RecipientItem(
+                    Recipient.Everyone,
+                    currentSelectedRecipient,
+                    ::onRecipientSelected
+                )
+            )
         }
         // Add roles
-        if(allowedParticipants.roles.isNotEmpty() || forTestingAllowAll) {
+        if (allowedParticipants.roles.isNotEmpty() || forTestingAllowAll) {
             // There aren't many roles so we'll choose n^2 runtime
-            val rolesToAdd = if(forTestingAllowAll) {
-                hmsSDK.getRoles().map { RecipientItem(Recipient.Role(it), currentSelectedRecipient, ::onRecipientSelected) }
+            val rolesToAdd = if (forTestingAllowAll) {
+                hmsSDK.getRoles().map {
+                    RecipientItem(
+                        Recipient.Role(it),
+                        currentSelectedRecipient,
+                        ::onRecipientSelected
+                    )
+                }
             } else {
                 // Create a map of roles to their names
                 val allRoles = hmsSDK.getRoles().associateBy { it.name }
-                allowedParticipants.roles
-                    .mapNotNull { allRoles[it] }
-                    .map { RecipientItem(Recipient.Role(it), currentSelectedRecipient, ::onRecipientSelected) }
+                allowedParticipants.roles.mapNotNull { allRoles[it] }.map {
+                        RecipientItem(
+                            Recipient.Role(it),
+                            currentSelectedRecipient,
+                            ::onRecipientSelected
+                        )
+                    }
             }
             // Separate headers and roles
-            val rolesGroup = ExpandableGroup(RecipientHeader("ROLES"), true)
-                .apply {
+            val rolesGroup = ExpandableGroup(RecipientHeader("ROLES"), true).apply {
                     addAll(rolesToAdd)
                 }
             recipients.add(rolesGroup)
@@ -153,10 +166,19 @@ class RoleBasedChatBottomSheet(
         return recipients
     }
 
-    private fun getUpdatedPeersGroup(hmsSDK : HMSSDK, currentSelectedRecipient: Recipient): ExpandableGroup {
-        return ExpandableGroup(RecipientHeader("PARTICIPANTS"), true)
-            .apply {
-                addAll(hmsSDK.getRemotePeers().map { RecipientItem(Recipient.Peer(it), currentSelectedRecipient, ::onRecipientSelected) })
+    private fun getUpdatedPeersGroup(
+        hmsSDK: HMSSDK,
+        currentSelectedRecipient: Recipient
+    ): ExpandableGroup {
+        return ExpandableGroup(RecipientHeader("PARTICIPANTS"), true).apply {
+                addAll(
+                    hmsSDK.getRemotePeers().map {
+                        RecipientItem(
+                            Recipient.Peer(it),
+                            currentSelectedRecipient,
+                            ::onRecipientSelected
+                        )
+                    })
             }
     }
 
