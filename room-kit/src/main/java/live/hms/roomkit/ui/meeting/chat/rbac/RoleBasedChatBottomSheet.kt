@@ -30,10 +30,12 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
 
-class RoleBasedChatBottomSheet(private val recipientSelected: (Recipient) -> Unit) : BottomSheetDialogFragment() {
+class RoleBasedChatBottomSheet(
+    private val getSelectedRecipient : () -> Recipient,
+    private val recipientSelected: (Recipient) -> Unit) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<LayoutRoleBasedChatBottomSheetSelectorBinding>()
-    val groupieAdapter = GroupieAdapter()
+    private val groupieAdapter = GroupieAdapter()
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -44,7 +46,12 @@ class RoleBasedChatBottomSheet(private val recipientSelected: (Recipient) -> Uni
     companion object {
         val TAG = "RoleBasedChatBottomSheet"
         fun launch(fm: FragmentManager, chatViewModel: ChatViewModel) {
-            RoleBasedChatBottomSheet(chatViewModel::recipientSelected).show(fm, TAG)
+            RoleBasedChatBottomSheet(
+                { chatViewModel.currentlySelectedRecipient.value!! },
+                { selectedRecipient ->
+                    chatViewModel.updateSelectedRecipientChatBottomSheet(selectedRecipient)
+                }
+                ).show(fm, TAG)
         }
     }
 
@@ -87,7 +94,7 @@ class RoleBasedChatBottomSheet(private val recipientSelected: (Recipient) -> Uni
         }
 
         val testing = true
-        val allowedParticipants =meetingViewModel.availableRecipientsForChat()
+        val allowedParticipants = meetingViewModel.availableRecipientsForChat()
         val initialRecipients = initialAddRecipients(allowedParticipants, testing)
         groupieAdapter.update(initialRecipients)
         if(allowedParticipants.peers || testing) {
@@ -96,12 +103,17 @@ class RoleBasedChatBottomSheet(private val recipientSelected: (Recipient) -> Uni
                 groupieAdapter.update(
                     initialRecipients.plus(
                         getUpdatedPeersGroup(
-                            meetingViewModel.hmsSDK
+                            meetingViewModel.hmsSDK, getSelectedRecipient()
                         )
                     )
                 )
             }
         }
+    }
+
+    private fun onRecipientSelected(recipient: Recipient) {
+        recipientSelected(recipient)
+        dismissAllowingStateLoss()
     }
 
     private fun initialAddRecipients(allowedParticipants: AllowedToMessageParticipants,
@@ -110,20 +122,21 @@ class RoleBasedChatBottomSheet(private val recipientSelected: (Recipient) -> Uni
         val recipients = mutableListOf<Group>()
         // For testing, remove when not needed
         // Add `everyone` general chat
+        val currentSelectedRecipient = getSelectedRecipient()
         if(allowedParticipants.everyone || forTestingAllowAll) {
-            recipients.add(RecipientItem(Recipient.Everyone))
+            recipients.add(RecipientItem(Recipient.Everyone, currentSelectedRecipient, ::onRecipientSelected))
         }
         // Add roles
         if(allowedParticipants.roles.isNotEmpty() || forTestingAllowAll) {
             // There aren't many roles so we'll choose n^2 runtime
             val rolesToAdd = if(forTestingAllowAll) {
-                hmsSDK.getRoles().map { RecipientItem(Recipient.Role(it)) }
+                hmsSDK.getRoles().map { RecipientItem(Recipient.Role(it), currentSelectedRecipient, ::onRecipientSelected) }
             } else {
                 // Create a map of roles to their names
                 val allRoles = hmsSDK.getRoles().associateBy { it.name }
                 allowedParticipants.roles
                     .mapNotNull { allRoles[it] }
-                    .map { RecipientItem(Recipient.Role(it)) }
+                    .map { RecipientItem(Recipient.Role(it), currentSelectedRecipient, ::onRecipientSelected) }
             }
             // Separate headers and roles
             val rolesGroup = ExpandableGroup(RecipientHeader("ROLES"), true)
@@ -136,10 +149,10 @@ class RoleBasedChatBottomSheet(private val recipientSelected: (Recipient) -> Uni
         return recipients
     }
 
-    private fun getUpdatedPeersGroup(hmsSDK : HMSSDK): ExpandableGroup {
+    private fun getUpdatedPeersGroup(hmsSDK : HMSSDK, currentSelectedRecipient: Recipient): ExpandableGroup {
         return ExpandableGroup(RecipientHeader("PARTICIPANTS"), true)
             .apply {
-                addAll(hmsSDK.getPeers().map { RecipientItem(Recipient.Peer(it)) })
+                addAll(hmsSDK.getPeers().map { RecipientItem(Recipient.Peer(it), currentSelectedRecipient, ::onRecipientSelected) })
             }
     }
 

@@ -5,15 +5,23 @@ import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding
 import live.hms.roomkit.databinding.ListItemPeerListBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.meeting.chat.SelectedRecipient
 import live.hms.roomkit.ui.theme.applyTheme
 
-class RecipientItem(private val recipient: Recipient)
+class RecipientItem(private val recipient: Recipient,
+                    private val currentSelectedRecipient: Recipient,
+                    private val onItemClicked : (Recipient) -> Unit)
     : BindableItem<LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding>(recipient.hashCode().toLong()) {
     override fun bind(viewBinding: LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding, position: Int) {
         with(viewBinding) {
             applyTheme()
+            root.setOnSingleClickListener {
+                onItemClicked(recipient)
+            }
             name.text = getTextForItem(recipient)
+            tick.visibility = if(currentSelectedRecipient == recipient) View.VISIBLE else View.GONE
         }
     }
 

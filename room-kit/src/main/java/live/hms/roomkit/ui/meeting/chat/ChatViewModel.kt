@@ -25,6 +25,11 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     companion object {
         private const val TAG = "ChatViewModel"
     }
+    private val _currentlySelectedRecipient = MutableLiveData<Recipient>(Recipient.Everyone)
+    fun updateSelectedRecipientChatBottomSheet(recipient: Recipient) {
+        _currentlySelectedRecipient.postValue(recipient)
+    }
+    val currentlySelectedRecipient : LiveData<Recipient> = _currentlySelectedRecipient
 
     private var _messages = mutableListOf<ChatMessage>()
     private val _chatMembers = MutableLiveData<SelectedRecipient>()
