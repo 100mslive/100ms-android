@@ -2619,6 +2619,13 @@ fun BottomSheetMessageOptionsBinding.applyTheme() {
 
 fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
     root.background = dialogBackground(this.root.resources)
+    border5.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
 }
 fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
     name.setTextColor(
