@@ -2547,8 +2547,8 @@ fun LayoutPinnedMessageBinding.applyTheme() {
     )
 }
 
-fun BottomSheetMessageOptionsBinding.applyTheme() {
-    root.background = ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
+private fun dialogBackground(resourcesCompat: Resources): Drawable {
+    return ResourcesCompat.getDrawable(resourcesCompat, R.drawable.gray_shape_round_dialog, null)!!
         .apply {
             val color = getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.surfaceDefault,
@@ -2556,6 +2556,10 @@ fun BottomSheetMessageOptionsBinding.applyTheme() {
             colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
+}
+
+fun BottomSheetMessageOptionsBinding.applyTheme() {
+    root.background = dialogBackground(this.root.resources)
 
     pinMessageIcon.drawable.setTint(
         getColorOrDefault(
@@ -2581,6 +2585,39 @@ fun BottomSheetMessageOptionsBinding.applyTheme() {
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.alertErrorDefault,
             HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
+}
+
+fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
+    root.background = dialogBackground(this.root.resources)
+}
+fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+}
+fun LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding.applyTheme() {
+    image.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    tick.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
 

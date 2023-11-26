@@ -10,15 +10,15 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
     fun isAllowedToBlockUserFromChat() : Boolean =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.realTimeControls?.canBlockUser == true ||
+            ?.elements?.chat?.realTimeControls?.canBlockUser != null ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.realTimeControls?.canBlockUser != true
+                    ?.default?.elements?.chat?.realTimeControls?.canBlockUser != null
 
     fun isAllowedToPinMessages() : Boolean =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.allowPinningMessages != true ||
+            ?.elements?.chat?.allowPinningMessages != null ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.allowPinningMessages != true
+                    ?.default?.elements?.chat?.allowPinningMessages != null
 
     fun isChatEnabled(): Boolean =
         // how do we even know if it's in hls? What if they have both?
@@ -61,4 +61,30 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
             }
     }
+
+    fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants {
+        val everyone = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.publicChatEnabled != null ||
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat?.publicChatEnabled != null
+
+        val peerLevelDms = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.privateChatEnabled != null ||
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat?.privateChatEnabled != null
+
+        val whitelistedRolesConference = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+            ?.default?.elements?.chat?.rolesWhiteList ?: emptyList()
+
+        val whitelistedRolesHls = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.rolesWhiteList ?: emptyList()
+
+        return AllowedToMessageParticipants(everyone, peerLevelDms, whitelistedRolesConference + whitelistedRolesHls)
+    }
 }
+
+data class AllowedToMessageParticipants(
+    val everyone : Boolean,
+    val peers : Boolean,
+    val roles : List<String>
+)
