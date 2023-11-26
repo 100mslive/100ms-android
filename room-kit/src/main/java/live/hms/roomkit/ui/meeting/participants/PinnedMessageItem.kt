@@ -23,7 +23,7 @@ class PinnedMessageItem(private val receivedPinnedMessage: SessionMetadataUseCas
         }
     }
 
-    fun boldTheSenderName(text : String) : SpannableString {
+    private fun boldTheSenderName(text : String) : SpannableString {
         if (!TextUtils.isEmpty(text)) {
             val index = text.indexOf(':')
 
