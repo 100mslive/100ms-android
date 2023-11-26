@@ -1,27 +1,19 @@
 package live.hms.roomkit.ui.meeting.chat.combined
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
-import live.hms.roomkit.drawableEnd
-import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
-import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 
 class CombinedChatFragmentTab : Fragment() {
@@ -62,8 +54,10 @@ class CombinedChatFragmentTab : Fragment() {
         binding.sendToBackground.setOnSingleClickListener {
             RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
         }
-        chatViewModel.currentlySelectedRecipient.observe(viewLifecycleOwner) { recipient ->
-            ChatRbacRecipientHandling().updateChipRecipient(binding.sendToChipText, recipient)
+        chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
+            ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
+            // Change what kind of message is sent omg
+            // Change what messages are seen wtf
         }
         pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView)
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,

@@ -47,7 +47,7 @@ class RoleBasedChatBottomSheet(
         val TAG = "RoleBasedChatBottomSheet"
         fun launch(fm: FragmentManager, chatViewModel: ChatViewModel) {
             RoleBasedChatBottomSheet(
-                { chatViewModel.currentlySelectedRecipient.value!! },
+                { chatViewModel.currentlySelectedRecipientRbac.value!! },
                 { selectedRecipient ->
                     chatViewModel.updateSelectedRecipientChatBottomSheet(selectedRecipient)
                 }
