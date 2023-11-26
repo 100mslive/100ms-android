@@ -152,7 +152,7 @@ class RoleBasedChatBottomSheet(
     private fun getUpdatedPeersGroup(hmsSDK : HMSSDK, currentSelectedRecipient: Recipient): ExpandableGroup {
         return ExpandableGroup(RecipientHeader("PARTICIPANTS"), true)
             .apply {
-                addAll(hmsSDK.getPeers().map { RecipientItem(Recipient.Peer(it), currentSelectedRecipient, ::onRecipientSelected) })
+                addAll(hmsSDK.getRemotePeers().map { RecipientItem(Recipient.Peer(it), currentSelectedRecipient, ::onRecipientSelected) })
             }
     }
 

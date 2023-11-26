@@ -634,10 +634,6 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
-            chatViewModel.peersUpdate()
-        }
-
         meetingViewModel.roleChange.observe(viewLifecycleOwner) {
             updateChatButtonWhenRoleChanges()
         }
