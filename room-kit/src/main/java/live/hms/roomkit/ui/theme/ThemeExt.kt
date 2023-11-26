@@ -312,6 +312,7 @@ internal fun TextView.buttonDisabled() {
 private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
+    configureChatControlsTheme(sendToBackground, sendToChipText)
     chatView.background = getChatBackgroundDrawable()
     iconSend.drawable.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,

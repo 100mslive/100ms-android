@@ -57,9 +57,11 @@ import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
+import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
 import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_CHAT_ALONE
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
+import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
@@ -370,6 +372,12 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
+        binding.sendToBackground.setOnSingleClickListener {
+            RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
+        }
+        chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
+            ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
+        }
         meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
             chatViewModel.updateBlockList(chatBlockedPeerIdsList)
         }
@@ -1210,6 +1218,7 @@ class MeetingFragment : Fragment() {
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
+        binding.chatExtra.visibility = binding.chatView.visibility
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1

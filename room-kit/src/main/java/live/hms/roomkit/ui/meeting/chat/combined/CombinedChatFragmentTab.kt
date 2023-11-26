@@ -56,8 +56,6 @@ class CombinedChatFragmentTab : Fragment() {
         }
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
-            // Change what kind of message is sent omg
-            // Change what messages are seen wtf
         }
         pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView)
         ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,
