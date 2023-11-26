@@ -5,6 +5,7 @@
     android:paddingVertical="@dimen/spacing_d2"
     xmlns:tools="http://schemas.android.com/tools"
     tools:background="@android:color/black"
+    android:paddingHorizontal="@dimen/spacing_d2"
     android:orientation="horizontal">
 
     <ImageView

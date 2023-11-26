@@ -57,13 +57,11 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_marginVertical="@dimen/sizeteen_dp"
-            android:layout_marginHorizontal="20dp"
             android:id="@+id/options_grid"
             android:nestedScrollingEnabled="false"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginEnd="@dimen/spacing_d2"
-            android:layout_marginStart="@dimen/spacing_d2" />
+            />
 
     </LinearLayout>
 
