@@ -5,12 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -24,6 +21,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.meeting.participants.MessageHeaderItemDecoration
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
@@ -87,10 +85,16 @@ class RoleBasedChatBottomSheet(
             adapter = groupieAdapter
             layoutManager = LinearLayoutManager(context)
             itemAnimator = null
-            val divider = DividerItemDecoration(context, RecyclerView.VERTICAL).apply {
-                setDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.bottom_sheet_divider, null)!!)
-            }
-            addItemDecoration(divider)
+            addItemDecoration(
+                MessageHeaderItemDecoration(
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.borderBright,
+                        HMSPrebuiltTheme.getDefaults().border_bright
+                    ),
+                    0,
+                    R.layout.layout_role_based_chat_message_bottom_sheet_item_header
+                )
+            )
         }
 
         val testing = true
