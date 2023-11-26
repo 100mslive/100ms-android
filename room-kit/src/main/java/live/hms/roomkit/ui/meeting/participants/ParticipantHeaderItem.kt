@@ -35,12 +35,13 @@ class ParticipantHeaderItem(private val roleName: String, private val numPeers: 
 
         viewBinding.heading.drawableEnd = AppCompatResources.getDrawable(
             viewBinding.root.context, chevron
-        )?.apply { setTint(
-            getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-        )
+        )?.apply {
+            setTint(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
         }
     }
 

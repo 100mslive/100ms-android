@@ -113,8 +113,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:ellipsize="end"
+                    android:drawablePadding="@dimen/spacing_d0"
                     android:fontFamily="@font/inter_bold"
                     android:lineHeight="16px"
+                    android:drawableEnd="@drawable/tiny_down_chevron"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:text="To Group"
@@ -127,6 +129,7 @@
                 android:layout_height="match_parent"
                 />
             <ImageButton
+                android:visibility="gone"
                 android:id="@+id/searchButton"
                 android:background="@null"
                 android:layout_width="wrap_content"

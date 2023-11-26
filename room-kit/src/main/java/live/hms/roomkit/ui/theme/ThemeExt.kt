@@ -16,7 +16,6 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -24,12 +23,12 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textview.MaterialTextView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableEnd
@@ -1599,7 +1598,35 @@ fun getChatBackgroundDrawable(): ShapeDrawable {
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
 }
-private fun configureChatControlsTheme(chatControls : LayoutChatSendToControlsBinding) =with(chatControls){
+private fun configureChatControlsTheme(
+    sendToBackground: MaterialCardView,
+    sendToChipText: MaterialTextView
+) {
+    sendToBackground.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+    sendToBackground.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
+    sendToChipText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    sendToChipText.drawableEnd?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
+//=with(chatControls){
 //    with(sendTo.chipBackground) {
 //        strokeColor = getColorOrDefault(
 //            HMSPrebuiltTheme.getColours()?.borderBright,
@@ -1612,8 +1639,8 @@ private fun configureChatControlsTheme(chatControls : LayoutChatSendToControlsBi
 //        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
 //        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 
-}
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+    configureChatControlsTheme(sendToBackground, sendToChipText)
 //    configureChatControlsTheme(chatControls)
 //    chatControls.sendTo.chipText.text = "Everyone"
 
