@@ -26,7 +26,10 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         private const val TAG = "ChatViewModel"
     }
     private val _currentlySelectedRecipient = MutableLiveData<Recipient>(Recipient.Everyone)
+
     fun updateSelectedRecipientChatBottomSheet(recipient: Recipient) {
+        // Set a filter for the messages.
+
         _currentlySelectedRecipient.postValue(recipient)
     }
     val currentlySelectedRecipientRbac : LiveData<Recipient> = _currentlySelectedRecipient
@@ -185,6 +188,9 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         blockedPeerIds.contains(message.senderPeerId)
 
 
+    // The blocklist throws away all messages from the blocked
+    //  peer so there's no need to keep running it later.
+    //  This is different from a role/peer filter which has to keep the messages.
     fun updateBlockList(chatBlockedPeerIdsList: List<String>?) {
         // What does the adapter have to do?
         // Basically turn on a filter.
