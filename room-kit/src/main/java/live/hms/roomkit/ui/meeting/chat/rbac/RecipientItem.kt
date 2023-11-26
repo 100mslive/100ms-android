@@ -20,6 +20,7 @@ class RecipientItem(private val recipient: Recipient,
             }
             name.text = getTextForItem(recipient)
             tick.visibility = if(currentSelectedRecipient == recipient) View.VISIBLE else View.GONE
+            image.visibility = if(recipient == Recipient.Everyone) View.VISIBLE else View.GONE
         }
     }
 
