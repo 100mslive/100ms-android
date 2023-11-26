@@ -64,13 +64,13 @@ class SessionMetadataUseCase : Closeable {
         val newPinnedMessage = PinnedMessage(data.message, data.messageId ?: "", localPeerName ?: "Participant")
         val existingPinnedMessages = pinnedMessages.value ?: arrayOf()
         val newMessages = if(existingPinnedMessages.size < MAX_PINNED_MESSAGES)
-            listOf(newPinnedMessage).plus(existingPinnedMessages)
+            existingPinnedMessages.plus(newPinnedMessage).toList()
         else
-            listOf(newPinnedMessage).plus(existingPinnedMessages.dropLast(1))
+            existingPinnedMessages.drop(1).plus(newPinnedMessage)
         updatePinnedMessage(newMessages, hmsActionResultListener)
     }
 
-    private fun updatePinnedMessage(data: List<PinnedMessage>?, hmsActionResultListener: HMSActionResultListener) {
+    private fun updatePinnedMessage(data: List<PinnedMessage>, hmsActionResultListener: HMSActionResultListener) {
         hmsSessionStore.set(data, PINNED_MESSAGE_SESSION_KEY, hmsActionResultListener)
     }
 
