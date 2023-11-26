@@ -201,12 +201,13 @@ class SessionOptionBottomSheet(
     private fun applyTheme() {
 
 
-        binding.rootLayout.background = getShape()
-            .apply {
-                val color = getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.backgroundDefault,
-                    HMSPrebuiltTheme.getDefaults().background_default)
-                setColorFilter(color, PorterDuff.Mode.ADD);
+        binding.rootLayout.background =
+            resources.getDrawable(R.drawable.gray_shape_round_dialog).apply {
+                    val color = getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+                        HMSPrebuiltTheme.getDefaults().background_default
+                    )
+                    setColorFilter(color, PorterDuff.Mode.ADD)
             }
 
 
@@ -236,6 +237,10 @@ class SessionOptionBottomSheet(
                 HMSPrebuiltTheme.getDefaults().onsurface_high_emp
             )
         )
+    }
+
+    override fun getTheme(): Int {
+        return R.style.AppBottomSheetDialogTheme
     }
 
 }
