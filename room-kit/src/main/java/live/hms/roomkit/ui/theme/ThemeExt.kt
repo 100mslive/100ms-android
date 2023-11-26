@@ -2574,16 +2574,14 @@ fun LayoutPinnedMessageBinding.applyTheme() {
     )
 }
 
-private fun dialogBackground(resourcesCompat: Resources): Drawable {
-    return ResourcesCompat.getDrawable(resourcesCompat, R.drawable.gray_shape_round_dialog, null)!!
-        .apply {
-            val color = getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.surfaceDefault,
-                HMSPrebuiltTheme.getDefaults().surface_default)
-            colorFilter =
-                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
-        }
-}
+private fun dialogBackground(resources: Resources): Drawable =
+    ResourcesCompat.getDrawable(resources,R.drawable.gray_shape_round_dialog, null)!!.apply {
+        val color = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+        setColorFilter(color, PorterDuff.Mode.ADD)
+    }
 
 fun BottomSheetMessageOptionsBinding.applyTheme() {
     root.background = dialogBackground(this.root.resources)

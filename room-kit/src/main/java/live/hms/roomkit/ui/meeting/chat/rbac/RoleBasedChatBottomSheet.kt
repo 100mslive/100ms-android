@@ -177,4 +177,8 @@ class RoleBasedChatBottomSheet(
         )
     }
 
+    override fun getTheme(): Int {
+        return R.style.AppBottomSheetDialogTheme
+    }
+
 }
