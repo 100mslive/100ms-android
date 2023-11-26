@@ -38,9 +38,6 @@
             app:destination="@id/RolePreviewFragment" />
 
         <action
-            android:id="@+id/action_MeetingFragment_to_ChatBottomSheetFragment"
-            app:destination="@id/ChatBottomSheetFragment" />
-        <action
             android:id="@+id/action_MeetingFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
         <action
@@ -72,20 +69,6 @@
             android:id="@+id/action_MeetingFragment_to_participantsTabFragment"
             app:destination="@id/participantsTabFragment" />
     </fragment>
-
-    <dialog
-        android:id="@+id/ChatBottomSheetFragment"
-        android:name="live.hms.roomkit.ui.meeting.chat.ChatBottomSheetFragment"
-        android:label="@string/chat_fragment"
-        tools:layout="@layout/dialog_bottom_sheet_chat">
-
-
-        <argument
-            android:name="currentUserCustomerId"
-            app:argType="string"
-            app:nullable="false" />
-
-    </dialog>
 
     <fragment
         android:id="@+id/ParticipantsFragment"

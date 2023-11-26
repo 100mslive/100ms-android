@@ -32,14 +32,11 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     val currentlySelectedRecipientRbac : LiveData<Recipient> = _currentlySelectedRecipient
 
     private var _messages = mutableListOf<ChatMessage>()
-    private val _chatMembers = MutableLiveData<SelectedRecipient>()
-    val chatMembers: LiveData<SelectedRecipient> = _chatMembers
-    private var currentSelectedRecipient: Recipient = Recipient.Everyone
 
     fun sendMessage(messageStr: String) {
 
         // Decide where it should go.
-        when (val recipient = currentSelectedRecipient) {
+        when (val recipient = currentlySelectedRecipientRbac.value!!) {
             Recipient.Everyone -> broadcast(
                 ChatMessage(
                     "You",
@@ -174,29 +171,12 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         }
     }
 
-    fun peersUpdate() {
-        val list = convertPeersToChatMembers(hmssdk.getRemotePeers(), hmssdk.getRoles())
-        val currentIndex = when (val num = list.indexOf(currentSelectedRecipient)) {
-            -1 -> 0
-            else -> num
-        }
-        _chatMembers.postValue(SelectedRecipient(list, currentIndex))
-    }
-
     private fun convertPeersToChatMembers(
         listOfParticipants: List<HMSRemotePeer>, roles: List<HMSRole>
     ): List<Recipient> {
         return listOf(Recipient.Everyone).plus(roles.map { Recipient.Role(it) })
             // Remove local peers (yourself) from the list of people you can message.
             .plus(listOfParticipants.map { Recipient.Peer(it) })
-    }
-
-    fun recipientSelected(recipient: Recipient) {
-        currentSelectedRecipient = recipient
-    }
-
-    init {
-        peersUpdate() // Load up local peers into the chat members.
     }
 
     private var blockedPeerIds: Set<String> = setOf()
