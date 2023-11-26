@@ -12,18 +12,21 @@ import live.hms.roomkit.ui.meeting.chat.Recipient
 class ChatMessageViewFilterHelper {
     private var filterRecipient : Recipient = Recipient.Everyone
 //    private var filterGroup : String? = null
+    fun setFilter(recipient: Recipient) {
+        filterRecipient = recipient
+    }
     private fun isSearching() = filterRecipient == Recipient.Everyone
-    private fun getSearchFilteredPeersIfNeeded(m : List<ChatMessage>) : List<ChatMessage> {
-        val filterTargetRecipient = filterRecipient
+    fun getSearchFilteredPeersIfNeeded(m : List<ChatMessage>) : List<ChatMessage> {
 
-        return when(filterTargetRecipient) {
+        return when(val filterTargetRecipient = filterRecipient) {
             Recipient.Everyone -> m // no change
+            // Always include your own messages
             is Recipient.Peer -> m.filter {
-                it.senderPeerId == filterTargetRecipient.peer.peerID
+                it.senderPeerId == filterTargetRecipient.peer.peerID || it.isSentByMe
             }
+            // Always include your own messages
             is Recipient.Role -> m.filter {
-                true // TODO
-//                it.roleName == filterTargetRecipient.role.name
+                it.senderRoleName == filterTargetRecipient.role.name || it.isSentByMe
             }
         }
 

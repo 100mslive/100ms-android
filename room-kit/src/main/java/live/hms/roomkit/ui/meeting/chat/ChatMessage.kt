@@ -20,6 +20,7 @@ data class ChatMessage constructor(
     val sentTo : String?,
     val toGroup : String?,
     val senderPeerId : String?,
+    val senderRoleName : String?,
 )  : Parcelable {
     companion object {
         fun sendTo(message: HMSMessage) : String? = sendTo(message.recipient.recipientType,
@@ -45,7 +46,8 @@ data class ChatMessage constructor(
         messageId = message.messageId,
         sentTo = sendTo(message),
         toGroup = toGroup(message.recipient.recipientType),
-        message.sender?.peerID
+        message.sender?.peerID,
+        message.sender?.hmsRole?.name
     )
 
 }
