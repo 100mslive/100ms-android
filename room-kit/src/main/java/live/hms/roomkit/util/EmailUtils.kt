@@ -15,14 +15,13 @@ object EmailUtils {
   const val TAG = "EmailUtils"
 
   fun addAlpha(originalColor: String, alpha: Double): String {
-    var originalColor = originalColor
+
     val alphaFixed = (alpha * 255)
     var alphaHex = toHexString(alphaFixed)
     if (alphaHex.length == 1) {
       alphaHex = "0$alphaHex"
     }
-    originalColor = originalColor.replace("#", "#$alphaHex")
-    return originalColor
+    return originalColor.replace("#", "#$alphaHex")
   }
   fun getNonFatalLogIntent(context: Context, throwable: Throwable? = null): Intent {
     val logFile = LogUtils.saveLogsToFile(context, "nonfatal-log")
