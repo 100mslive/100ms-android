@@ -115,25 +115,20 @@ public class LinePagerIndicatorDecoration extends RecyclerView.ItemDecoration {
         mPaint.setColor(colorActive);
 
         // width of item indicator including padding
-        final float itemWidth = mIndicatorItemLength + mIndicatorItemPadding;
+        final float itemHeight = mIndicatorItemLength + mIndicatorItemPadding;
 
         if (progress == 0F) {
             // no swipe, draw a normal indicator
-            float highlightStart = indicatorStartX + itemWidth * highlightPosition;
-            c.drawLine(highlightStart, indicatorPosY, highlightStart + mIndicatorItemLength, indicatorPosY, mPaint);
+            float highlightStart = indicatorPosY + itemHeight * highlightPosition;
+            c.drawLine(indicatorStartX, highlightStart, indicatorStartX , highlightStart + mIndicatorItemLength, mPaint);
         } else {
-            float highlightStart = indicatorStartX + itemWidth * highlightPosition;
+            float highlightStart = indicatorPosY + itemHeight * highlightPosition;
             // calculate partial highlight
             float partialLength = mIndicatorItemLength * progress;
 
             // draw the cut off highlight
-            c.drawLine(highlightStart + partialLength, indicatorPosY, highlightStart + mIndicatorItemLength, indicatorPosY, mPaint);
+            c.drawLine(indicatorStartX, highlightStart + partialLength, indicatorStartX, highlightStart + mIndicatorItemLength, mPaint);
 
-            // draw the highlight overlapping to the next item as well
-            if (highlightPosition < itemCount - 1) {
-                highlightStart += itemWidth;
-                c.drawLine(highlightStart, indicatorPosY, highlightStart + partialLength, indicatorPosY, mPaint);
-            }
         }
     }
 
