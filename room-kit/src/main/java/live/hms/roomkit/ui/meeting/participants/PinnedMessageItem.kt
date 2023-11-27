@@ -14,7 +14,7 @@ import live.hms.roomkit.databinding.LayoutPinnedMessageBinding
 import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.theme.applyTheme
 
-class PinnedMessageItem(private val receivedPinnedMessage: SessionMetadataUseCase.PinnedMessage)
+class PinnedMessageItem(val receivedPinnedMessage: SessionMetadataUseCase.PinnedMessage)
     : BindableItem<LayoutPinnedMessageBinding>(receivedPinnedMessage.hashCode().toLong()) {
     override fun bind(viewBinding: LayoutPinnedMessageBinding, position: Int) {
         with(viewBinding) {

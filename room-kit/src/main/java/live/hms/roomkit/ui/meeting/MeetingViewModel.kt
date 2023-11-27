@@ -1893,6 +1893,18 @@ class MeetingViewModel(
         })
     }
 
+    fun unPinMessage(pinnedMessage: SessionMetadataUseCase.PinnedMessage) {
+        sessionMetadataUseCase.removeFromPinnedMessages(pinnedMessage, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Session metadata removing pinned message ${error.message}"))
+                }
+            }
+
+            override fun onSuccess() {}
+        })
+    }
+
     fun bulkRoleChange(toRole: HMSRole, rolesToChange: List<HMSRole>) {
         hmsSDK.changeRoleOfPeersWithRoles(rolesToChange, toRole, object : HMSActionResultListener {
             override fun onError(error: HMSException) {

@@ -10,6 +10,7 @@ import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
+import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
@@ -64,7 +65,7 @@ class CombinedChatFragmentTab : Fragment() {
         meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
             chatViewModel.updateBlockList(chatBlockedPeerIdsList)
         }
-        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView)
+        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage)
         PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
         ChatUseCase().initiate(chatViewModel.messages,
             meetingViewModel.chatPauseState, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,
@@ -80,6 +81,10 @@ class CombinedChatFragmentTab : Fragment() {
             pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
                 binding.pinnedMessagesDisplay)
         }
+
+    }
+
+    fun unpinMessage(pinnedMessage : SessionMetadataUseCase.PinnedMessage) {
 
     }
 }

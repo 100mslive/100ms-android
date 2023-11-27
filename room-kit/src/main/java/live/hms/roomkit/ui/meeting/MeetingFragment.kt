@@ -282,7 +282,10 @@ class MeetingFragment : Fragment() {
             startHLSStreamingIfRequired()
         }
         binding.chatMessages.isHeightContrained = true
-        PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
+        PauseChatUIUseCase().setChatPauseVisible(
+            binding.chatOptionsCard,
+            meetingViewModel
+        )
         ChatUseCase().initiate(
             chatViewModel.messages,
             meetingViewModel.chatPauseState,

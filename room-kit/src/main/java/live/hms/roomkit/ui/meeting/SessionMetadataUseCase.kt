@@ -59,6 +59,12 @@ class SessionMetadataUseCase : Closeable {
         val pinnedBy : String
     )
 
+    fun removeFromPinnedMessages(chatMessage: PinnedMessage, hmsActionResultListener: HMSActionResultListener) {
+        val currentMessages = pinnedMessages.value?: emptyArray()
+        val result = currentMessages.filter { it != chatMessage }
+        updatePinnedMessage(result, hmsActionResultListener)
+    }
+
     fun addToPinnedMessages(data: ChatMessage, hmsActionResultListener: HMSActionResultListener) {
         // text, id, pinnedBy
         val newPinnedMessage = PinnedMessage("${data.senderName}: ${data.message}", data.messageId ?: "", localPeerName ?: "Participant")

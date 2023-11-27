@@ -4,11 +4,12 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.card.MaterialCardView
 import live.hms.roomkit.setOnSingleClickListener
-import live.hms.video.sdk.models.HMSLocalPeer
 
 class PauseChatUIUseCase {
-    fun setChatPauseVisible(materialCardView: MaterialCardView,
-                            meetingViewModel: MeetingViewModel) {
+    fun setChatPauseVisible(
+        materialCardView: MaterialCardView,
+        meetingViewModel: MeetingViewModel
+    ) {
         materialCardView.visibility = if(meetingViewModel.isAllowedToPauseChat()) View.VISIBLE else View.GONE
         materialCardView.setOnSingleClickListener {
             val newState = meetingViewModel.chatPauseState.value!!
