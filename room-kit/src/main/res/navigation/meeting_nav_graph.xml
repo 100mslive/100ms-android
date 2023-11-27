@@ -178,6 +178,8 @@
         android:name="live.hms.roomkit.ui.polls.PollQuestionCreation"
         android:label="PollQuestionCreation" >
         <argument
+            app:nullable="false"
+            android:defaultValue="false"
             android:name="isPoll"
             app:argType="boolean" />
     </fragment>
