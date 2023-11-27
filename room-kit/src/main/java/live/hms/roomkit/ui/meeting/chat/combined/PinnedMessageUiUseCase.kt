@@ -20,7 +20,8 @@ class PinnedMessageUiUseCase {
     fun init(
         pinnedMessageRecyclerView: RecyclerView,
         pinCloseButton: ImageView,
-        unpinMessage: (SessionMetadataUseCase.PinnedMessage) -> Unit
+        unpinMessage: (SessionMetadataUseCase.PinnedMessage) -> Unit,
+        canPinMessages : Boolean
     ) {
         pinnedMessageRecyclerView.adapter = pinnedMessagesAdapter
         pinnedMessageRecyclerView.layoutManager = LinearLayoutManager(pinnedMessageRecyclerView.context)
@@ -36,13 +37,19 @@ class PinnedMessageUiUseCase {
 
         ))
         PagerSnapHelper().attachToRecyclerView(pinnedMessageRecyclerView)
-        pinCloseButton.setOnSingleClickListener {
-            val position = (pinnedMessageRecyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-            if(position != -1) {
-                val message = (pinnedMessagesAdapter.getItem(position) as PinnedMessageItem).receivedPinnedMessage
-                unpinMessage(message)
+        if(canPinMessages) {
+            pinCloseButton.visibility = View.VISIBLE
+            pinCloseButton.setOnSingleClickListener {
+                val position = (pinnedMessageRecyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                if(position != -1) {
+                    val message = (pinnedMessagesAdapter.getItem(position) as PinnedMessageItem).receivedPinnedMessage
+                    unpinMessage(message)
+                }
             }
+        } else {
+            pinCloseButton.visibility = View.GONE
         }
+
     }
 
     fun messagesUpdate(pinnedMessages : Array<SessionMetadataUseCase.PinnedMessage>,

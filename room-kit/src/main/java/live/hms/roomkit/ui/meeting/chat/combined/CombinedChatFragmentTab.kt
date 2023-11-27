@@ -65,7 +65,7 @@ class CombinedChatFragmentTab : Fragment() {
         meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
             chatViewModel.updateBlockList(chatBlockedPeerIdsList)
         }
-        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage)
+        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage, meetingViewModel.isAllowedToPinMessages())
         PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
         ChatUseCase().initiate(chatViewModel.messages,
             meetingViewModel.chatPauseState, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,

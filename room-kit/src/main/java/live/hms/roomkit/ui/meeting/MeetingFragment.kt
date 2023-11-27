@@ -288,7 +288,7 @@ class MeetingFragment : Fragment() {
             binding.chatOptionsCard,
             meetingViewModel
         )
-        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage)
+        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage, meetingViewModel.isAllowedToPinMessages())
         ChatUseCase().initiate(
             chatViewModel.messages,
             meetingViewModel.chatPauseState,
