@@ -270,6 +270,7 @@
     <!-- Footer menu -->
     <LinearLayout
         android:id="@+id/chatExtra"
+        android:visibility="gone"
         android:layout_above="@id/chatView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
