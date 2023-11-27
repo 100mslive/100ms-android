@@ -22,9 +22,10 @@ class RecipientHeader(private val recipientHeaderName: String) :
         with(viewBinding) {
             applyTheme()
             name.text = recipientHeaderName
-            root.setOnSingleClickListener {
-                expandableGroup.onToggleExpanded()
-            }
+            // Don't expand/collapse right now
+//            root.setOnSingleClickListener {
+//                expandableGroup.onToggleExpanded()
+//            }
         }
     }
     override fun getLayout(): Int = R.layout.layout_role_based_chat_message_bottom_sheet_item_header
