@@ -50,14 +50,14 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
         if(sentMessage.time != null) {
           time.text = formatter.format(Date(sentMessage.time))
         }
+
         sentTo.visibility = if(sentMessage.sentTo == null)
            View.GONE
         else
           View.VISIBLE
-        toGroup.visibility = if(sentMessage.toGroup == null)
-          View.GONE
-        else
-          View.VISIBLE
+
+        toGroup.visibility = View.GONE
+
         sentBackground.visibility = if(sentMessage.toGroup == null && sentMessage.sentTo == null) {
           View.GONE
         } else
