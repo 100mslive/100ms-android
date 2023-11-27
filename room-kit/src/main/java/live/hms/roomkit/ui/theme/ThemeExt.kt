@@ -312,7 +312,7 @@ internal fun TextView.buttonDisabled() {
 private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
-    configureChatControlsTheme(sendToBackground, sendToChipText)
+    configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
     chatView.background = getChatBackgroundDrawable()
     iconSend.drawable.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
@@ -1601,8 +1601,27 @@ fun getChatBackgroundDrawable(): ShapeDrawable {
 }
 private fun configureChatControlsTheme(
     sendToBackground: MaterialCardView,
-    sendToChipText: MaterialTextView
+    sendToChipText: MaterialTextView,
+    chatOptionsCard : MaterialCardView,
+    chatOptions : ImageView
 ) {
+    chatOptions.drawable.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+    ))
+
+    chatOptionsCard.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+    chatOptionsCard.strokeWidth = 1.dp()
+    chatOptionsCard.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
     sendToBackground.strokeColor = getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.borderBright,
         HMSPrebuiltTheme.getDefaults().border_bright
@@ -1627,37 +1646,10 @@ private fun configureChatControlsTheme(
         )
     )
 }
-//=with(chatControls){
-//    with(sendTo.chipBackground) {
-//        strokeColor = getColorOrDefault(
-//            HMSPrebuiltTheme.getColours()?.borderBright,
-//            HMSPrebuiltTheme.getDefaults().border_bright)
-//        setBackgroundColor(getColorOrDefault(
-//            HMSPrebuiltTheme.getColours()?.surfaceDefault,
-//            HMSPrebuiltTheme.getDefaults().surface_default))
-//    }
-//    sendTo.chipText.setTextColor(getColorOrDefault(
-//        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-//        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
-    configureChatControlsTheme(sendToBackground, sendToChipText)
-//    configureChatControlsTheme(chatControls)
-//    chatControls.sendTo.chipText.text = "Everyone"
+    configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
 
-    /*with(chatControls.previousSentTo.chipBackground) {
-        strokeColor = getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.borderBright,
-            HMSPrebuiltTheme.getDefaults().border_bright)
-        setBackgroundColor(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default))
-    }
-    chatControls.previousSentTo.chipText.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
-*/
-    //chatControls.sendTo.chipText.text = "Everyone"
     // Emptyview
     messageEmptyImage.drawable.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,

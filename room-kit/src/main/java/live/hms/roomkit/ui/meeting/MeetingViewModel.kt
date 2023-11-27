@@ -2195,6 +2195,7 @@ class MeetingViewModel(
 
     fun isAllowedToPinMessages(): Boolean = prebuiltInfoContainer.isAllowedToPinMessages()
 
-    fun availableRecipientsForChat()  = prebuiltInfoContainer.allowedToMessageWhatParticipants()//: List<Recipient> {
+    fun availableRecipientsForChat()  = prebuiltInfoContainer.allowedToMessageWhatParticipants()
+    fun isAllowedToPauseChat() : Boolean = prebuiltInfoContainer.isAllowedToPauseChat()
 }
 

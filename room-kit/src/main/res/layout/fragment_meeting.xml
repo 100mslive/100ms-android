@@ -309,17 +309,23 @@
                 tools:layout_editor_absoluteY="2dp" />
         </com.google.android.material.card.MaterialCardView>
         <View
-            android:layout_width="@dimen/spacing_d1"
-            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
             />
-        <ImageButton
-            android:visibility="gone"
-            android:id="@+id/searchButton"
-            android:background="@null"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/chatOptionsCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_search_24"
-            />
+            >
+            <ImageView
+                android:id="@+id/chatOptions"
+                android:padding="@dimen/spacing_d0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/chat_controls_pause_three_dots"
+                />
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
     <RelativeLayout
         android:id="@+id/chatView"
