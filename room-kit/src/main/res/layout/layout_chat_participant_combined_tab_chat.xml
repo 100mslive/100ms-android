@@ -152,10 +152,42 @@
         android:layout_marginBottom="@dimen/spacing_d2"
         >
 
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/chatPausedContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/spacing_d1"
+            android:paddingHorizontal="@dimen/spacing_d2"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:lineHeight="20sp"
+                android:textSize="14sp"
+                android:letterSpacing="0.01"
+                android:text="@string/chat_paused"
+                android:id="@+id/chatPausedTitle"
+                />
+            <TextView
+                android:id="@+id/chatPausedBy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:layout_marginTop="2dp"
+                android:lineHeight="16sp"
+                android:textSize="12sp"
+                android:letterSpacing="0.03"
+                tools:text="Chat paused by"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
         <TextView
             android:id="@+id/userBlocked"
             android:layout_width="match_parent"
             android:padding="@dimen/spacing_d1"
+            android:layout_below="@id/chatPausedContainer"
             android:lineHeight="20sp"
             android:layout_height="wrap_content"
             android:visibility="gone"

@@ -16,6 +16,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -312,6 +313,8 @@ internal fun TextView.buttonDisabled() {
 private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
+    userBlockedTheme(userBlocked)
+    chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
     configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
     chatView.background = getChatBackgroundDrawable()
     iconSend.drawable.setTint(getColorOrDefault(
@@ -542,6 +545,30 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )*/
 
 
+}
+
+private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
+    chatPausedTitle: TextView, chatPausedBy : TextView) {
+    chatPausedContainer.background = getChatBackgroundDrawable()
+    chatPausedTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+    chatPausedBy.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    )
+}
+
+private fun userBlockedTheme(userBlocked: TextView) {
+    userBlocked.background = getChatBackgroundDrawable()
+    userBlocked.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    )
 }
 
 internal fun FragmentActiveSpeakerBinding.applyTheme() {
@@ -1671,12 +1698,8 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
     )
-    userBlocked.background = getChatBackgroundDrawable()
-    userBlocked.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
-    )
+    userBlockedTheme(userBlocked)
+    chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
 
     editTextMessage.setHintTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
@@ -1685,12 +1708,6 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
         HMSPrebuiltTheme.getDefaults().onsurface_low_emp
     ))
-    userBlocked.background = getChatBackgroundDrawable()
-    userBlocked.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
-    )
 }
 
 internal fun ListItemChatBinding.applyTheme() {

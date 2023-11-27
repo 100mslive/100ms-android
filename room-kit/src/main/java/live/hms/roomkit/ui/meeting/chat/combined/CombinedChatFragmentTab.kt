@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
@@ -25,7 +26,7 @@ class CombinedChatFragmentTab : Fragment() {
         launchMessageOptionsDialog.launch(meetingViewModel,
         childFragmentManager, message) })
     }
-    val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
+    private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,10 +59,14 @@ class CombinedChatFragmentTab : Fragment() {
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
         }
         pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView)
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,
-            binding.iconSend, binding.editTextMessage, binding.userBlocked) {
-            meetingViewModel.prebuiltInfoContainer.isChatEnabled()
-        }
+        PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
+        ChatUseCase().initiate(chatViewModel.messages,
+            meetingViewModel.chatPauseState, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,
+            binding.iconSend, binding.editTextMessage, binding.userBlocked,
+            binding.chatPausedBy,
+            binding.chatPausedContainer,
+            meetingViewModel.prebuiltInfoContainer::isChatEnabled
+        ) { meetingViewModel.chatPauseState.value!! }
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }

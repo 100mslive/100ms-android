@@ -255,5 +255,7 @@
     <string name="view_more">View More</string>
     <string name="chat_with">To</string>
     <string name="blocked_from_sending_messages">You\'ve been blocked from sending messages</string>
+    <string name="chat_paused_by">Chat has been paused by %1$s.</string>
     <string name="block_from_chat">Block from Chat</string>
+    <string name="chat_paused">Chat Paused</string>
 </resources>
