@@ -95,6 +95,35 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/optionHideMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="@dimen/spacing_d2"
+                >
+                <ImageButton
+                    android:id="@+id/hideMessageIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/hide_message_icon"
+                    />
+
+                <TextView
+                    android:id="@+id/hideMessageText"
+                    android:layout_width="match_parent"
+                    android:fontFamily="@font/inter_semibold"
+                    android:lineHeight="20sp"
+                    android:textSize="14sp"
+                    android:translationY="1.53sp"
+                    android:lineSpacingExtra="3sp"
+                    android:layout_height="match_parent"
+                    android:text="Hide For Everyone"
+                    />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/optionBlockFromChat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -32,6 +32,7 @@ import live.hms.video.sdk.models.enums.HMSRecordingState
 const val CHAT_MESSAGE_OPTIONS_EXTRA = "ChatMessageOptionsExtra"
 class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
                                 private val allowedToBlock : Boolean,
+                                private val allowedToHideMessages : Boolean,
     private val allowedToPin : Boolean
 ): BottomSheetDialogFragment() {
 
@@ -83,6 +84,12 @@ class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
             binding.optionPinMessage.visibility = View.GONE
         }
 
+        if(allowedToHideMessages) {
+            binding.optionHideMessage.visibility = View.VISIBLE
+        } else {
+            binding.optionHideMessage.visibility = View.GONE
+        }
+
         with(binding) {
             optionPinMessage.setOnSingleClickListener {
                 meetingViewModel.pinMessage(chatMessage)
@@ -91,6 +98,11 @@ class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
 
             optionBlockFromChat.setOnSingleClickListener {
                 meetingViewModel.blockUser(chatMessage)
+                dismiss()
+            }
+
+            optionHideMessage.setOnSingleClickListener {
+                meetingViewModel.hideMessage(chatMessage)
                 dismiss()
             }
         }

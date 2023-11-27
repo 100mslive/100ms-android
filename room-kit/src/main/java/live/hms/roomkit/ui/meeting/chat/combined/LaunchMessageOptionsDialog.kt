@@ -14,13 +14,15 @@ class LaunchMessageOptionsDialog {
                chatMessage: ChatMessage,
                ) {
         // TODO RE-ENABLE
+        val isTest = true
         // If the user can't block or pin message, hide the entire dialog.
-        val allowedToBlock = true//meetingViewModel.isAllowedToBlockFromChat()
-        val allowedToPin = true//meetingViewModel.isAllowedToPinMessages()
-        if(!( allowedToPin || allowedToBlock) )
+        val allowedToBlock = isTest || meetingViewModel.isAllowedToBlockFromChat()
+        val allowedToPin = isTest || meetingViewModel.isAllowedToPinMessages()
+        val allowedToHideMessages = isTest || meetingViewModel.isAllowedToHideMessages()
+        if(!( allowedToPin || allowedToBlock || allowedToHideMessages) )
             return
 
-        MessageOptionsBottomSheet(chatMessage, allowedToBlock, allowedToPin).apply {
+        MessageOptionsBottomSheet(chatMessage, allowedToBlock, allowedToPin, allowedToHideMessages).apply {
             arguments = bundleOf(CHAT_MESSAGE_OPTIONS_EXTRA to chatMessage)
         }.show(childFragmentManager, TAG)
     }

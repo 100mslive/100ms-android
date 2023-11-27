@@ -2601,6 +2601,19 @@ private fun dialogBackground(resources: Resources): Drawable =
 
 fun BottomSheetMessageOptionsBinding.applyTheme() {
     root.background = dialogBackground(this.root.resources)
+    hideMessageIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    hideMessageText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 
     pinMessageIcon.drawable.setTint(
         getColorOrDefault(

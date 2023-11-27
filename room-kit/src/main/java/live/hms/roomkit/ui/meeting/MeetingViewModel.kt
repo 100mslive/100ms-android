@@ -696,6 +696,7 @@ class MeetingViewModel(
                 sessionMetadataUseCase.setSessionStore(sessionStore)
                 pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
                 blockUserUseCase.setSessionStore(sessionStore)
+                hideMessageUseCase.setSessionStore(sessionStore)
                 pauseChatUseCase.setSessionStore(sessionStore)
             }
 
@@ -750,6 +751,7 @@ class MeetingViewModel(
                 )
                 blockUserUseCase.addKeyChangeListener()
                 pauseChatUseCase.addKeyChangeListener()
+                hideMessageUseCase.addKeyChangeListener()
                 updatePolls()
                 participantPeerUpdate.postValue(Unit)
             }
@@ -1868,12 +1870,17 @@ class MeetingViewModel(
     private val sessionMetadataUseCase: SessionMetadataUseCase = SessionMetadataUseCase()
     private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
     private val blockUserUseCase : BlockUserUseCase = BlockUserUseCase()
+    private val hideMessageUseCase : HideMessageUseCase = HideMessageUseCase()
     private val pauseChatUseCase : PauseChatUseCase = PauseChatUseCase()
 
+    fun hideMessage(chatMessage: ChatMessage) {
+        hideMessageUseCase.hideMessage(chatMessage)
+    }
     fun blockUser(chatMessage: ChatMessage) {
         blockUserUseCase.blockUser(chatMessage)
     }
     val currentBlockList = blockUserUseCase.currentBlockList
+    val messageIdsToHide = hideMessageUseCase.messageIdsToHide
     fun pinMessage(message : ChatMessage) {
         sessionMetadataUseCase.addToPinnedMessages(message, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
@@ -2201,6 +2208,8 @@ class MeetingViewModel(
 
     fun availableRecipientsForChat()  = prebuiltInfoContainer.allowedToMessageWhatParticipants()
     fun isAllowedToPauseChat() : Boolean = prebuiltInfoContainer.isAllowedToPauseChat()
+
+    fun isAllowedToHideMessages() : Boolean = prebuiltInfoContainer.isAllowedToHideMessages()
 
     fun pauseChat(chatState : ChatState) {
         pauseChatUseCase.changeChatState(chatState)

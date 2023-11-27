@@ -390,6 +390,9 @@ class MeetingFragment : Fragment() {
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
         }
+        meetingViewModel.messageIdsToHide.observe(viewLifecycleOwner) { messageIdsToHide ->
+            chatViewModel.updateMessageHideList(messageIdsToHide)
+        }
         meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
             chatViewModel.updateBlockList(chatBlockedPeerIdsList)
         }

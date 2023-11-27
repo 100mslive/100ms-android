@@ -88,6 +88,12 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
                     ?.default?.elements?.chat?.realTimeControls?.canDisableChat == true
 
+    fun isAllowedToHideMessages(): Boolean = true || // TODO remove this true it's on for testing
+    roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+    ?.elements?.chat?.realTimeControls?.canHideMessage == true ||
+    roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+    ?.default?.elements?.chat?.realTimeControls?.canHideMessage == true
+
 }
 
 data class AllowedToMessageParticipants(
