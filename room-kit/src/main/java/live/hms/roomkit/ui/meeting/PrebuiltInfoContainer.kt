@@ -81,6 +81,13 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
         return AllowedToMessageParticipants(everyone, peerLevelDms, whitelistedRolesConference + whitelistedRolesHls)
     }
+
+    fun isAllowedToPauseChat(): Boolean = true || // TODO remove this true it's on for testing
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.realTimeControls?.canDisableChat == true ||
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat?.realTimeControls?.canDisableChat == true
+
 }
 
 data class AllowedToMessageParticipants(

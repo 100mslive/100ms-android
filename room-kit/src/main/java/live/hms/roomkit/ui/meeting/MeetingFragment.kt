@@ -31,7 +31,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -283,10 +282,23 @@ class MeetingFragment : Fragment() {
             startHLSStreamingIfRequired()
         }
         binding.chatMessages.isHeightContrained = true
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null,
-            binding.iconSend, binding.editTextMessage, binding.userBlocked) {
-            meetingViewModel.prebuiltInfoContainer.isChatEnabled()
-        }
+        PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
+        ChatUseCase().initiate(
+            chatViewModel.messages,
+            meetingViewModel.chatPauseState,
+            viewLifecycleOwner,
+            chatAdapter,
+            binding.chatMessages,
+            chatViewModel,
+            null,
+            binding.iconSend,
+            binding.editTextMessage,
+            binding.userBlocked,
+            binding.chatPausedBy,
+            binding.chatPausedContainer,
+            meetingViewModel.prebuiltInfoContainer::isChatEnabled
+        ) { meetingViewModel.chatPauseState.value!! }
+
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {

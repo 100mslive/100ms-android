@@ -4,13 +4,14 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSmoothScroller
 
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.launch
+import live.hms.roomkit.R
+import live.hms.roomkit.ui.meeting.ChatState
 
 
 /**
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 class ChatUseCase {
     fun initiate(
         messages: MutableLiveData<List<ChatMessage>>,
+        chatPauseState : MutableLiveData<ChatState>,
         viewlifecycleOwner: LifecycleOwner,
         chatAdapter: ChatAdapter,
         recyclerview: SingleSideFadeRecyclerview,
@@ -29,20 +31,36 @@ class ChatUseCase {
         sendButton: ImageView,
         editText: EditText,
         bannedText : TextView,
+        chatPausedBy : TextView,
+        chatPausedContainer : LinearLayoutCompat,
         isChatEnabled: () -> Boolean,
+        getChatState: () -> ChatState,
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
         recyclerview.adapter = chatAdapter
         toggleEmptyIndicator(emptyIndicator, messages.value)
+        // Chat pause observer
+        chatPauseState.observe(viewlifecycleOwner) { state ->
+            pauseBlockRegularUi(chatViewModel,
+                sendButton,
+                editText,
+                bannedText,
+                chatPausedBy,
+                chatPausedContainer,
+                state)
+        }
+        // Chat messages observer
         messages.observe(viewlifecycleOwner) {
             if (isChatEnabled()) {
-            if(chatViewModel.isUserBlockedFromChat()) {
-                // Then their edit text etc is hidden.
-                sendButton.visibility = View.GONE
-                editText.visibility = View.GONE
-                bannedText.visibility = View.VISIBLE
-            }
+                val state = getChatState()
+            pauseBlockRegularUi(chatViewModel,
+                sendButton,
+                editText,
+                bannedText,
+                chatPausedBy,
+                chatPausedContainer,
+                state)
             toggleEmptyIndicator(emptyIndicator, it)
             val chatList = mutableListOf<ChatMessage>()
             chatList.addAll(it)
@@ -62,6 +80,35 @@ class ChatUseCase {
                     chatViewModel.unreadMessagesCount.postValue(0)
             }
         }
+        }
+    }
+
+    private fun pauseBlockRegularUi(chatViewModel: ChatViewModel,
+                                    sendButton: ImageView,
+                                    editText: EditText,
+                                    bannedText : TextView,
+                                    chatPausedBy : TextView,
+                                    chatPausedContainer : LinearLayoutCompat,
+                                    state : ChatState) {
+        if(chatViewModel.isUserBlockedFromChat()) {
+            // Then their edit text etc is hidden.
+            sendButton.visibility = View.GONE
+            editText.visibility = View.GONE
+            bannedText.text = bannedText.context.getText(R.string.blocked_from_sending_messages)
+            bannedText.visibility = View.VISIBLE
+            chatPausedContainer.visibility = View.GONE
+        } else if(!state.enabled) {
+            sendButton.visibility = View.GONE
+            editText.visibility = View.GONE
+            chatPausedBy.text = bannedText.context.getString(R.string.chat_paused_by, state.updatedBy)
+            chatPausedContainer.visibility = View.VISIBLE
+            bannedText.visibility = View.GONE
+        } else {
+            // This isn't a given, depends on if the user decided to hide or show...
+            sendButton.visibility = View.VISIBLE
+            editText.visibility = View.VISIBLE
+            bannedText.visibility = View.GONE
+            chatPausedContainer.visibility = View.GONE
         }
     }
 

@@ -9,12 +9,8 @@ import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sessionstore.HMSKeyChangeListener
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.utils.GsonUtils.gson
-import live.hms.video.utils.toJson
 
-class BlockUserUseCase(
-
-    /*private val blockListUpdated : (List<String>?) -> Unit*/
-) : AutoCloseable {
+class BlockUserUseCase: AutoCloseable {
     private lateinit var hmsSessionStore: HmsSessionStore
     val TAG = "BlockUserUseCase"
     private val BLOCK_PEER_KEY = "chatPeerBlacklist"

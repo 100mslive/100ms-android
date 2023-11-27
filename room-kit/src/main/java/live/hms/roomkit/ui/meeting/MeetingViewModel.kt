@@ -696,6 +696,7 @@ class MeetingViewModel(
                 sessionMetadataUseCase.setSessionStore(sessionStore)
                 pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
                 blockUserUseCase.setSessionStore(sessionStore)
+                pauseChatUseCase.setSessionStore(sessionStore)
             }
 
             override fun onJoin(room: HMSRoom) {
@@ -748,6 +749,7 @@ class MeetingViewModel(
                     }
                 )
                 blockUserUseCase.addKeyChangeListener()
+                pauseChatUseCase.addKeyChangeListener()
                 updatePolls()
                 participantPeerUpdate.postValue(Unit)
             }
@@ -1866,6 +1868,7 @@ class MeetingViewModel(
     private val sessionMetadataUseCase: SessionMetadataUseCase = SessionMetadataUseCase()
     private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
     private val blockUserUseCase : BlockUserUseCase = BlockUserUseCase()
+    private val pauseChatUseCase : PauseChatUseCase = PauseChatUseCase()
 
     fun blockUser(chatMessage: ChatMessage) {
         blockUserUseCase.blockUser(chatMessage)
@@ -1902,6 +1905,7 @@ class MeetingViewModel(
         super.onCleared()
         sessionMetadataUseCase.close()
         blockUserUseCase.close()
+        pauseChatUseCase.close()
         leaveMeeting()
     }
 
@@ -2195,6 +2199,13 @@ class MeetingViewModel(
 
     fun isAllowedToPinMessages(): Boolean = prebuiltInfoContainer.isAllowedToPinMessages()
 
-    fun availableRecipientsForChat()  = prebuiltInfoContainer.allowedToMessageWhatParticipants()//: List<Recipient> {
+    fun availableRecipientsForChat()  = prebuiltInfoContainer.allowedToMessageWhatParticipants()
+    fun isAllowedToPauseChat() : Boolean = prebuiltInfoContainer.isAllowedToPauseChat()
+
+    fun pauseChat(chatState : ChatState) {
+        pauseChatUseCase.changeChatState(chatState)
+    }
+
+    val chatPauseState = pauseChatUseCase.currentChatState
 }
 
