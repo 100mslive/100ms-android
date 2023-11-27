@@ -60,6 +60,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
 import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_CHAT_ALONE
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
+import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
@@ -94,6 +95,7 @@ class MeetingFragment : Fragment() {
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
     private var hasStartedHls: Boolean = false
+    private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
     private lateinit var settings: SettingsStore
     var countDownTimer: CountDownTimer? = null
@@ -286,6 +288,7 @@ class MeetingFragment : Fragment() {
             binding.chatOptionsCard,
             meetingViewModel
         )
+        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage)
         ChatUseCase().initiate(
             chatViewModel.messages,
             meetingViewModel.chatPauseState,
@@ -410,6 +413,11 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
+        }
+
+        meetingViewModel.pinnedMessages.observe(viewLifecycleOwner) { pinnedMessages ->
+            pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
+                binding.pinnedMessagesDisplay)
         }
 
         meetingViewModel.recordingState.observe(viewLifecycleOwner) { state ->
