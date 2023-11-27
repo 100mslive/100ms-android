@@ -14,15 +14,15 @@ class BlockUserUseCase: AutoCloseable {
     private lateinit var hmsSessionStore: HmsSessionStore
     val TAG = "BlockUserUseCase"
     private val BLOCK_PEER_KEY = "chatPeerBlacklist"
-    val currentBlockList: MutableLiveData<List<String>> = MutableLiveData(emptyList())
+    val currentBlockList: MutableLiveData<Set<String>> = MutableLiveData(emptySet())
     private val keyChangeListener = object : HMSKeyChangeListener {
         override fun onKeyChanged(key: String, value: JsonElement?) {
             if (key == BLOCK_PEER_KEY) {
                 // If the value was null, turn it empty. Only stringify if it isn't.
-                val newList: List<String> = if (value == null) {
-                    emptyList()
+                val newList: Set<String> = if (value == null) {
+                    setOf()
                 } else {
-                    gson.fromJson(value.asJsonArray, Array<String>::class.java).toList()
+                    gson.fromJson(value.asJsonArray, Array<String>::class.java).toSet()
                 }
                 currentBlockList.postValue(newList)
             }
@@ -41,7 +41,7 @@ class BlockUserUseCase: AutoCloseable {
             // This is a list and will be updated.
             val newValue = currentBlockList.value
                 // Add the peer id or create a new list if null
-                ?.plus(chatMessage.senderPeerId) ?: listOf(chatMessage.senderPeerId)
+                ?.plus(chatMessage.senderPeerId) ?: setOf(chatMessage.senderPeerId)
             hmsSessionStore.set(newValue,
                 BLOCK_PEER_KEY,
                 object : HMSActionResultListener {

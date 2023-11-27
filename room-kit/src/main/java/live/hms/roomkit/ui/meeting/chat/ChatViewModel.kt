@@ -200,12 +200,12 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     // The blocklist throws away all messages from the blocked
     //  peer so there's no need to keep running it later.
     //  This is different from a role/peer filter which has to keep the messages.
-    fun updateBlockList(chatBlockedPeerIdsList: List<String>?) {
+    fun updateBlockList(chatBlockedPeerIdsList: Set<String>?) {
         // What does the adapter have to do?
         // Basically turn on a filter.
         // Ok so part of the problem is that we call submit list directly :(
         if (chatBlockedPeerIdsList.isNullOrEmpty()) return
-        blockedPeerIds = chatBlockedPeerIdsList.toSet()
+        blockedPeerIds = chatBlockedPeerIdsList
         // Refresh the current list
         _messages = _messages.filter { !blockedPeerIds.contains(it.senderPeerId) }.toMutableList()
         messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
