@@ -3,7 +3,9 @@ package live.hms.roomkit.ui.meeting.chat.combined
 import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
@@ -16,10 +18,12 @@ class PinnedMessageUiUseCase {
     fun init(pinnedMessageRecyclerView: RecyclerView) {
         pinnedMessageRecyclerView.adapter = pinnedMessagesAdapter
         pinnedMessageRecyclerView.layoutManager = LinearLayoutManager(pinnedMessageRecyclerView.context)
+        pinnedMessageRecyclerView.addItemDecoration(LinePagerIndicatorDecoration())
+        PagerSnapHelper().attachToRecyclerView(pinnedMessageRecyclerView)
     }
 
     fun messagesUpdate(pinnedMessages : Array<SessionMetadataUseCase.PinnedMessage>,
-                       pinnedMessagesContainer : LinearLayoutCompat
+                       pinnedMessagesContainer : ConstraintLayout
                        ) {
         if(pinnedMessages.isEmpty()) {
             pinnedMessagesContainer.visibility = View.GONE
