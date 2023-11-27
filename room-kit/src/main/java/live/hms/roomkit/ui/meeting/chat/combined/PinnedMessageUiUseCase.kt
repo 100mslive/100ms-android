@@ -12,13 +12,25 @@ import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
 import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.meeting.participants.PinnedMessageItem
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 
 class PinnedMessageUiUseCase {
     private val pinnedMessagesAdapter = GroupieAdapter()
     fun init(pinnedMessageRecyclerView: RecyclerView) {
         pinnedMessageRecyclerView.adapter = pinnedMessagesAdapter
         pinnedMessageRecyclerView.layoutManager = LinearLayoutManager(pinnedMessageRecyclerView.context)
-        pinnedMessageRecyclerView.addItemDecoration(LinePagerIndicatorDecoration())
+        pinnedMessageRecyclerView.addItemDecoration(LinePagerIndicatorDecoration(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            ),
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+
+        ))
         PagerSnapHelper().attachToRecyclerView(pinnedMessageRecyclerView)
     }
 

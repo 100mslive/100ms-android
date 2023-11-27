@@ -18,6 +18,8 @@ public class LinePagerIndicatorDecoration extends RecyclerView.ItemDecoration {
     private int colorActive = 0xFFFFFFFF;
     private int colorInactive = 0x66FFFFFF;
 
+
+
     private static final float DP = Resources.getSystem().getDisplayMetrics().density;
 
     /**
@@ -46,11 +48,13 @@ public class LinePagerIndicatorDecoration extends RecyclerView.ItemDecoration {
 
     private final Paint mPaint = new Paint();
 
-    public LinePagerIndicatorDecoration() {
+    public LinePagerIndicatorDecoration(int colorActive, int colorInactive) {
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(mIndicatorStrokeWidth);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setAntiAlias(true);
+        this.colorActive = colorActive;
+        this.colorInactive = colorInactive;
     }
 
     @Override
