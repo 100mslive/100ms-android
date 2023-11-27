@@ -58,6 +58,12 @@ class CombinedChatFragmentTab : Fragment() {
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
         }
+        meetingViewModel.messageIdsToHide.observe(viewLifecycleOwner) { messageIdsToHide ->
+            chatViewModel.updateMessageHideList(messageIdsToHide)
+        }
+        meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
+            chatViewModel.updateBlockList(chatBlockedPeerIdsList)
+        }
         pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView)
         PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
         ChatUseCase().initiate(chatViewModel.messages,
