@@ -13,8 +13,7 @@ class LaunchMessageOptionsDialog {
                childFragmentManager : FragmentManager,
                chatMessage: ChatMessage,
                ) {
-        // TODO RE-ENABLE
-        val isTest = true
+        val isTest = false
         // If the user can't block or pin message, hide the entire dialog.
         val allowedToBlock = isTest || meetingViewModel.isAllowedToBlockFromChat()
         val allowedToPin = isTest || meetingViewModel.isAllowedToPinMessages()

@@ -94,7 +94,7 @@ class RoleBasedChatBottomSheet(
             )
         }
 
-        val testing = true
+        val testing = false
         val allowedParticipants = meetingViewModel.availableRecipientsForChat()
         val initialRecipients = initialAddRecipients(allowedParticipants, testing)
         groupieAdapter.update(initialRecipients)
