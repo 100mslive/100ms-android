@@ -42,13 +42,17 @@ class ChatUseCase {
         toggleEmptyIndicator(emptyIndicator, messages.value)
         // Chat pause observer
         chatPauseState.observe(viewlifecycleOwner) { state ->
-            pauseBlockRegularUi(chatViewModel,
-                sendButton,
-                editText,
-                bannedText,
-                chatPausedBy,
-                chatPausedContainer,
-                state)
+            if (isChatEnabled()) {
+                pauseBlockRegularUi(
+                    chatViewModel,
+                    sendButton,
+                    editText,
+                    bannedText,
+                    chatPausedBy,
+                    chatPausedContainer,
+                    state
+                )
+            }
         }
         // Chat messages observer
         messages.observe(viewlifecycleOwner) {

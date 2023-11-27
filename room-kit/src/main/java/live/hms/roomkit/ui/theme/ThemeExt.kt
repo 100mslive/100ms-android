@@ -38,6 +38,7 @@ import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
 import live.hms.roomkit.util.EmailUtils
+import live.hms.roomkit.util.EmailUtils.addAlpha
 import live.hms.roomkit.util.dp
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.signal.init.HMSRoomLayout
@@ -549,7 +550,8 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
     chatPausedTitle: TextView, chatPausedBy : TextView) {
-    chatPausedContainer.background = getChatBackgroundDrawable()
+    chatPausedContainer.background = getChatBackgroundDrawable(0.64)
+
     chatPausedTitle.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
@@ -563,7 +565,7 @@ private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
 }
 
 private fun userBlockedTheme(userBlocked: TextView) {
-    userBlocked.background = getChatBackgroundDrawable()
+    userBlocked.background = getChatBackgroundDrawable(0.64)
     userBlocked.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
@@ -1616,12 +1618,16 @@ fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
     return stateList
 }
 
-fun getChatBackgroundDrawable(): ShapeDrawable {
+fun getChatBackgroundDrawable(alpha : Double? = null): ShapeDrawable {
     return getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
         .apply {
+            val initialColor = if(alpha == null) HMSPrebuiltTheme.getColours()?.surfaceDefault
+            else HMSPrebuiltTheme.getColours()?.surfaceDefault?.let { addAlpha(it, alpha) }
+            val defaultColor : String = if(alpha == null) HMSPrebuiltTheme.getDefaults().surface_default
+            else addAlpha(HMSPrebuiltTheme.getDefaults().surface_default, alpha)
             val color = getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.surfaceDefault,
-                HMSPrebuiltTheme.getDefaults().surface_default)
+                initialColor,
+                defaultColor)
             colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
