@@ -255,31 +255,18 @@
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+
+    <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
+        android:id="@+id/chatMessages"
+        android:visibility="gone"
         android:layout_alignParentStart="true"
-        android:layout_alignBottom="@id/chatExtra"
-        android:layout_height="wrap_content">
+        android:layout_above="@id/chatExtra"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/spacing_d1"
+        tools:listitem="@layout/list_item_chat"
+    />
 
-        <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
-            android:id="@+id/chatMessages"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_max="300dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/spacing_d1"
-            app:layout_constrainedHeight="true"
-            android:paddingBottom="?attr/actionBarSize"
-            tools:listitem="@layout/list_item_chat"
-
-            />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- Footer menu -->
     <LinearLayout
         android:id="@+id/chatExtra"

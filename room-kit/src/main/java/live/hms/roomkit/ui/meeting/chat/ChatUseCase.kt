@@ -6,10 +6,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearSmoothScroller
 
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.reflect.KFunction0
+import kotlinx.coroutines.launch
 
 
 /**
@@ -48,8 +49,6 @@ class ChatUseCase {
             chatAdapter.submitList(chatList)
             val position = it.size - 1
             if (position >= 0) {
-                // Without this sometimes the view won't update.
-                chatAdapter.notifyItemInserted(position)
                 // Scroll to the new message
                 val smoothScroller: RecyclerView.SmoothScroller =
                     object : LinearSmoothScroller(recyclerview.context) {
