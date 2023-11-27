@@ -103,10 +103,10 @@ public class LinePagerIndicatorDecoration extends RecyclerView.ItemDecoration {
         // width of item indicator including padding
         final float itemHeight = mIndicatorItemLength + mIndicatorItemPadding;
 
-        float start = indicatorStartX;
+        float start = indicatorPosY;
         for (int i = 0; i < itemCount; i++) {
             // draw the line for every item
-            c.drawLine(start, indicatorPosY, start + mIndicatorItemLength, indicatorPosY, mPaint);
+            c.drawLine(indicatorStartX, start, indicatorStartX, start + mIndicatorItemLength, mPaint);
             start += itemHeight;
         }
     }
@@ -140,6 +140,6 @@ public class LinePagerIndicatorDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
-        outRect.left = (int) (mIndicatorStrokeWidth + mIndicatorItemPadding * 2);
+        outRect.left = (int) (mIndicatorHeight);
     }
 }
