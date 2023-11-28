@@ -93,7 +93,9 @@ data class ChatState(
     @SerializedName("enabled")
     val enabled: Boolean = true,
     @SerializedName("updatedBy")
-    val updatedBy: UpdatedBy = UpdatedBy()
+    val updatedBy: UpdatedBy = UpdatedBy(),
+    @SerializedName("updatedAt")
+    val updatedAt : Long = System.currentTimeMillis()
 ) {
     data class UpdatedBy(
         @SerializedName("peerID")
@@ -101,6 +103,6 @@ data class ChatState(
         @SerializedName("userID")
         val userID : String = "",
         @SerializedName("userName")
-        val userName : String = ""
+        val userName : String = "",
     )
 }
