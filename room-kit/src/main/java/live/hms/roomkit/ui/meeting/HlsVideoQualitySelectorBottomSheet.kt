@@ -13,8 +13,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.DialogTrackSelectionBinding
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.hls_player.HmsHlsPlayer
-import live.hms.hls_player.HmsHlsLayer
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsPlayer
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsLayer
 
 
 class HlsVideoQualitySelectorBottomSheet(

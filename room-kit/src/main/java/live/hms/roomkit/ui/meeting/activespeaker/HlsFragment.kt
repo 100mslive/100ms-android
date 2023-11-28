@@ -11,28 +11,24 @@ import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.Player
-import androidx.media3.common.VideoSize
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+
 import androidx.navigation.fragment.navArgs
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+import com.google.android.exoplayer2.video.VideoSize
 import kotlinx.coroutines.launch
-import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsCue
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsException
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsPlaybackEvents
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsPlaybackState
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsPlayer
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.hls_player.*
-import live.hms.roomkit.R
-import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.meeting.chat.ChatAdapter
-import live.hms.roomkit.ui.meeting.chat.ChatUseCase
-import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
-import live.hms.stats.PlayerStatsListener
-import live.hms.stats.Utils
-import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
 
@@ -92,15 +88,6 @@ class HlsFragment : Fragment() {
         setPlayerStatsListener(true)
     }
 
-    private fun statsToString(playerStats: PlayerStatsModel): String {
-        return "bitrate : ${Utils.humanReadableByteCount(playerStats.videoInfo.averageBitrate.toLong(),true,true)}/s \n" +
-                "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue/1000} s \n" +
-                "video width : ${playerStats.videoInfo.videoWidth} px \n" +
-                "video height : ${playerStats.videoInfo.videoHeight} px \n" +
-                "frame rate : ${playerStats.videoInfo.frameRate} fps \n" +
-                "dropped frames : ${playerStats.frameInfo.droppedFrameCount} \n" +
-                "distance from live edge : ${playerStats.distanceFromLive.div(1000)} s"
-    }
 
     override fun onStart() {
         super.onStart()
@@ -186,42 +173,9 @@ class HlsFragment : Fragment() {
     private fun setPlayerStatsListener(enable : Boolean) {
         Log.d("SetPlayerStats","display: ${isStatsDisplayActive} && enable: ${enable}")
 
-        if(enable) {
-            player.setStatsMonitor(object : PlayerStatsListener {
-                override fun onError(error: HMSException) {
-                    Log.d(TAG,"Error $error")
-                }
-
-                @SuppressLint("SetTextI18n")
-                override fun onEventUpdate(playerStats: PlayerStatsModel) {
-//                    updateLiveButtonVisibility(playerStats)
-                    if(isStatsDisplayActive) {
-                        updateStatsView(playerStats)
-                    }
-                }
-            })
-        } else {
-            player.setStatsMonitor(null)
-        }
     }
 
-    fun updateStatsView(playerStats: PlayerStatsModel){
-        binding.bandwidthEstimateTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.bandWidthEstimate, si = true, isBits = true)}/s"
 
-        binding.networkActivityTv.text = "${Utils.humanReadableByteCount(playerStats.bandwidth.totalBytesLoaded, si = true, isBits = true)}"
-
-        binding.statsView.text = statsToString(playerStats)
-    }
-
-    fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
-        // It's live if the distance from the live edge is less than 10 seconds.
-        val isLive = playerStats.distanceFromLive/1000 < SECONDS_FROM_LIVE
-        // Show the button to go to live if it's not live.
-        binding.btnSeekLive.visibility =  if(!isLive)
-                View.VISIBLE
-            else
-                View.GONE
-    }
 
     override fun onStop() {
         super.onStop()

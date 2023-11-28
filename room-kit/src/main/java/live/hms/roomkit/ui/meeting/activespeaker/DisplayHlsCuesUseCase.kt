@@ -2,7 +2,7 @@ package live.hms.roomkit.ui.meeting.activespeaker
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.delay
-import live.hms.hls_player.HmsHlsCue
+import live.hms.roomkit.ui.meeting.activespeaker.portablehls.HmsHlsCue
 import live.hms.video.utils.GsonUtils
 
 class DisplayHlsCuesUseCase(val showText: (String) -> Unit) {

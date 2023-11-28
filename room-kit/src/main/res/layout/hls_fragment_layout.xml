@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"/>
 
     <!-- Player view -->
-    <androidx.media3.ui.PlayerView
+    <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/hls_view"
         app:use_controller="false"
         app:resize_mode="zoom"
