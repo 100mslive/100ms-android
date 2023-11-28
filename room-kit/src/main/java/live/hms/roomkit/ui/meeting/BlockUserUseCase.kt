@@ -36,12 +36,12 @@ class BlockUserUseCase: AutoCloseable {
             Log.e(TAG,"Tried to block user without session store inited")
             return
         }
-        if (chatMessage.senderPeerId != null) {
+        if (chatMessage.userIdForBlockList != null) {
             // the user is no longer present
             // This is a list and will be updated.
             val newValue = currentBlockList.value
                 // Add the peer id or create a new list if null
-                ?.plus(chatMessage.senderPeerId) ?: setOf(chatMessage.senderPeerId)
+                ?.plus(chatMessage.userIdForBlockList) ?: setOf(chatMessage.userIdForBlockList)
             hmsSessionStore.set(newValue,
                 BLOCK_PEER_KEY,
                 object : HMSActionResultListener {

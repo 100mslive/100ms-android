@@ -56,7 +56,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                     ChatMessage.sendTo(HMSMessageRecipientType.BROADCAST, null),
                     ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST),
                     hmssdk.getLocalPeer()?.peerID,
-                    hmssdk.getLocalPeer()?.hmsRole?.name
+                    hmssdk.getLocalPeer()?.hmsRole?.name,
+                    hmssdk.getLocalPeer()?.customerUserID ?: ""
                 )
             )
 
@@ -72,7 +73,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                     ChatMessage.sendTo(HMSMessageRecipientType.PEER, null),
                     ChatMessage.toGroup(HMSMessageRecipientType.PEER),
                     hmssdk.getLocalPeer()?.peerID,
-                    hmssdk.getLocalPeer()?.hmsRole?.name
+                    hmssdk.getLocalPeer()?.hmsRole?.name,
+                    hmssdk.getLocalPeer()?.customerUserID ?: ""
                 ), recipient.peer
             )
 
@@ -87,7 +89,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                     ChatMessage.sendTo(HMSMessageRecipientType.ROLES, listOf(recipient.role)),
                     ChatMessage.toGroup(HMSMessageRecipientType.ROLES),
                     hmssdk.getLocalPeer()?.peerID,
-                    hmssdk.getLocalPeer()?.hmsRole?.name
+                    hmssdk.getLocalPeer()?.hmsRole?.name,
+                    hmssdk.getLocalPeer()?.customerUserID
                 ), recipient.role
             )
         }
@@ -188,7 +191,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     private var blockedPeerIds: Set<String> = setOf()
 
     private fun shouldBlockMessage(message: ChatMessage): Boolean =
-        blockedPeerIds.contains(message.senderPeerId)
+        blockedPeerIds.contains(message.userIdForBlockList)
 
     fun updateMessageHideList(messageIdsToHide: Set<String>) {
         if(messageIdsToHide.isEmpty())
@@ -208,7 +211,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         if (chatBlockedPeerIdsList.isNullOrEmpty()) return
         blockedPeerIds = chatBlockedPeerIdsList
         // Refresh the current list
-        _messages = _messages.filter { !blockedPeerIds.contains(it.senderPeerId) }.toMutableList()
+        _messages = _messages.filter { !blockedPeerIds.contains(it.userIdForBlockList) }.toMutableList()
         messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
     }
 
