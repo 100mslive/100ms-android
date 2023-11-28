@@ -1,6 +1,7 @@
 package live.hms.app2.ui.home
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,14 +10,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.navigation.fragment.findNavController
 import live.hms.app2.R
 import live.hms.app2.databinding.FragmentHomeBinding
@@ -32,13 +30,14 @@ import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.roomkit.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
-import live.hms.roomkit.ui.settings.SettingsFragment
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.NameUtils.isValidUserName
 import live.hms.roomkit.util.contextSafe
+import java.util.UUID
 
+const val SAVED_USER_ID_FOR_BLOCK_LIST = "saved_user_id_blocklist"
 const val SETTINGS_FRAGMENT_TAG = "settings"
 class HomeFragment : Fragment() {
 
@@ -150,8 +149,11 @@ class HomeFragment : Fragment() {
     private fun launchPrebuilt(code: String) {
         contextSafe { _, activity ->
 
+            val consistentUserId = activity.getPreferences(Context.MODE_PRIVATE).getString(
+                SAVED_USER_ID_FOR_BLOCK_LIST, UUID.randomUUID().toString()
+            )
             HMSRoomKit.launchPrebuilt(
-                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = "random-user-id", debugInfo = settings.inPreBuiltDebugMode,
+                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = consistentUserId, debugInfo = settings.inPreBuiltDebugMode,
                     endPoints = hashMapOf<String, String>().apply {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")
