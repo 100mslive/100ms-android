@@ -216,7 +216,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     }
 
     fun isUserBlockedFromChat(): Boolean {
-        val peerId = hmssdk.getLocalPeer()?.customerUserID
-        return peerId != null && blockedPeerIds.contains(peerId)
+        val customerUserId = hmssdk.getLocalPeer()?.customerUserID
+        return customerUserId != null && blockedPeerIds.contains(customerUserId)
     }
 }
