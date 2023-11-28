@@ -201,7 +201,6 @@ class MeetingViewModel(
                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                     hmsRoomLayout = layoutConfig
                     prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
-                    initPrebuiltChatMessageRecipient.postValue(prebuiltInfoContainer.defaultRecipientToMessage())
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                     onHMSActionResultListener.onSuccess()
@@ -732,8 +731,8 @@ class MeetingViewModel(
                     recordingState.postValue(room.browserRecordingState.state)
                 if (room.hlsRecordingState.state in runningRecordingStates )
                     recordingState.postValue(room.hlsRecordingState.state)
-
                 sessionMetadataUseCase.updatePeerName(room.localPeer?.name ?: "Participant")
+                initPrebuiltChatMessageRecipient.postValue(prebuiltInfoContainer.defaultRecipientToMessage())
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
                     object : HMSActionResultListener {
                         override fun onError(error: HMSException) {}
