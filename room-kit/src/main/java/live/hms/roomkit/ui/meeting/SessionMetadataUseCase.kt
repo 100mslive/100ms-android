@@ -32,7 +32,7 @@ class SessionMetadataUseCase : Closeable {
             }
         }
     }
-    val pinnedMessages : MutableLiveData<Array<PinnedMessage>> = MutableLiveData()
+    val pinnedMessages : MutableLiveData<Array<PinnedMessage>> = MutableLiveData(arrayOf())
     fun updatePeerName(peerName : String?) {
         localPeerName = peerName
     }
