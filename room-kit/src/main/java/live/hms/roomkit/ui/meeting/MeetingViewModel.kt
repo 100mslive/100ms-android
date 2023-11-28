@@ -17,6 +17,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
+import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationType
@@ -65,6 +66,8 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    // This is needed in chat for it to determine what kind of chat it is.
+    val initPrebuiltChatMessageRecipient = MutableLiveData<Recipient?>()
     val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
@@ -198,6 +201,7 @@ class MeetingViewModel(
                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                     hmsRoomLayout = layoutConfig
                     prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
+                    initPrebuiltChatMessageRecipient.postValue(prebuiltInfoContainer.defaultRecipientToMessage())
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                     onHMSActionResultListener.onSuccess()
@@ -2223,8 +2227,21 @@ class MeetingViewModel(
 
     fun isAllowedToHideMessages() : Boolean = prebuiltInfoContainer.isAllowedToHideMessages()
 
-    fun pauseChat(chatState : ChatState) {
-        pauseChatUseCase.changeChatState(chatState)
+    fun togglePauseChat() {
+        val newState = chatPauseState.value!!
+        val localPeer = hmsSDK.getLocalPeer()
+        val updatedBy = with(localPeer) {
+            if(this == null) ChatState.UpdatedBy() else
+            ChatState.UpdatedBy(
+                peerID ?: "",
+                customerUserID ?: "",
+                name ?: "Participant"
+            )
+        }
+        newState.copy(enabled = !newState.enabled,
+            updatedBy = updatedBy
+        )
+        pauseChatUseCase.changeChatState(newState)
     }
 
     val chatPauseState = pauseChatUseCase.currentChatState

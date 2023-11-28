@@ -93,5 +93,14 @@ data class ChatState(
     @SerializedName("enabled")
     val enabled: Boolean = true,
     @SerializedName("updatedBy")
-    val updatedBy: String = ""
-)
+    val updatedBy: UpdatedBy = UpdatedBy()
+) {
+    data class UpdatedBy(
+        @SerializedName("peerID")
+        val peerID: String = "",
+        @SerializedName("userID")
+        val userID : String = "",
+        @SerializedName("userName")
+        val userName : String = ""
+    )
+}

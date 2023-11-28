@@ -12,7 +12,6 @@ import live.hms.video.sdk.HMSMessageResultListener
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.HMSMessage
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
@@ -23,25 +22,33 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     companion object {
         private const val TAG = "ChatViewModel"
     }
-    private val _currentlySelectedRecipient = MutableLiveData<Recipient>(Recipient.Everyone)
+    private var initialRecipientValueSet = false
+    private val _currentlySelectedRecipient = MutableLiveData<Recipient?>(null)
 
-    fun updateSelectedRecipientChatBottomSheet(recipient: Recipient) {
+    fun setInitialRecipient(recipient: Recipient?) {
+        if(!initialRecipientValueSet) {
+            initialRecipientValueSet = true
+            updateSelectedRecipientChatBottomSheet(recipient)
+        }
+    }
+
+    fun updateSelectedRecipientChatBottomSheet(recipient: Recipient?) {
         // Set a filter for the messages.
         chatmessageViewFilterHelper.setFilter(recipient)
         _currentlySelectedRecipient.value = recipient
         messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
     }
-    val currentlySelectedRecipientRbac : LiveData<Recipient> = _currentlySelectedRecipient
+    val currentlySelectedRecipientRbac : LiveData<Recipient?> = _currentlySelectedRecipient
 
     private var _messages = mutableListOf<ChatMessage>()
 
     fun sendMessage(messageStr: String) {
-
-        // Decide where it should go.
-        when (val recipient = currentlySelectedRecipientRbac.value!!) {
+        when (val recipient = currentlySelectedRecipientRbac.value) {
+            null -> {} // no-op if it's null
             Recipient.Everyone -> broadcast(
                 ChatMessage(
                     "You",
+                    hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
                     null, // Let the server alone set the time
                     messageStr,
                     true,
@@ -56,6 +63,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
             is Recipient.Peer -> directMessage(
                 ChatMessage(
                     "You",
+                    hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
                     null, // Let the server alone set the time
                     messageStr,
                     true,
@@ -71,6 +79,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
             is Recipient.Role -> groupMessage(
                 ChatMessage(
                     "You",
+                    hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
                     null, // Let the server alone set the time
                     messageStr,
                     true,
@@ -174,14 +183,6 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         MainScope().launch {
             addMessage(message)
         }
-    }
-
-    private fun convertPeersToChatMembers(
-        listOfParticipants: List<HMSRemotePeer>, roles: List<HMSRole>
-    ): List<Recipient> {
-        return listOf(Recipient.Everyone).plus(roles.map { Recipient.Role(it) })
-            // Remove local peers (yourself) from the list of people you can message.
-            .plus(listOfParticipants.map { Recipient.Peer(it) })
     }
 
     private var blockedPeerIds: Set<String> = setOf()

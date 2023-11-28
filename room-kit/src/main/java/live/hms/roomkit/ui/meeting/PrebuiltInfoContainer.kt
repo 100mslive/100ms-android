@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.init.HMSRoomLayout
 
@@ -56,10 +57,25 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             ?.forEach {data ->
                 data?.role?.let {
                     roleMap[it] = data
-                    //Log.d("Participant","$it, $data")
                 }
 
             }
+    }
+    fun defaultRecipientToMessage() : Recipient? {
+        val recipient =  allowedToMessageWhatParticipants()
+        return if(recipient.everyone) {
+            Recipient.Everyone
+        }
+        else if (recipient.roles.isNotEmpty()) {
+            val name = recipient.roles.first()
+            val role = hmssdk.getRoles().find { it.name == name }
+            if(role != null)
+                Recipient.Role(role)
+            else null
+        }
+        else if (recipient.peers)
+            null
+        else null
     }
 
     fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants {

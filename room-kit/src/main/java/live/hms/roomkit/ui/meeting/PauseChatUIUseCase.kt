@@ -12,12 +12,7 @@ class PauseChatUIUseCase {
     ) {
         materialCardView.visibility = if(meetingViewModel.isAllowedToPauseChat()) View.VISIBLE else View.GONE
         materialCardView.setOnSingleClickListener {
-            val newState = meetingViewModel.chatPauseState.value!!
-            meetingViewModel.pauseChat(
-                newState.copy(enabled = !newState.enabled,
-                    updatedBy = meetingViewModel.hmsSDK.getLocalPeer()?.name ?: "Participant"
-                    )
-            )
+            meetingViewModel.togglePauseChat()
         }
     }
 

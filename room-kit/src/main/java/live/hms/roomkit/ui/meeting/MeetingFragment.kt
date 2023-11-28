@@ -121,12 +121,6 @@ class MeetingFragment : Fragment() {
 
     private var isMeetingOngoing = false
 
-    private val rtmpBottomSheet by lazy {
-        RtmpRecordBottomSheet {
-//            binding.buttonGoLive?.visibility = View.GONE
-        }
-    }
-
     private val onSettingsChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             if (SettingsStore.APPLY_CONSTRAINTS_KEYS.contains(key)) {
@@ -392,6 +386,11 @@ class MeetingFragment : Fragment() {
     private fun initObservers() {
         binding.sendToBackground.setOnSingleClickListener {
             RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
+        }
+        // This only needs to be in meetingfragment since we always open it.
+        // Is that true for HLS? Double check.
+        meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
+            chatViewModel.setInitialRecipient(it)
         }
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)

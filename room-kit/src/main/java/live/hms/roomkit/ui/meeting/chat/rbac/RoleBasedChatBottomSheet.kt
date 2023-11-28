@@ -29,7 +29,7 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
 
 class RoleBasedChatBottomSheet(
-    private val getSelectedRecipient: () -> Recipient,
+    private val getSelectedRecipient: () -> Recipient?,
     private val recipientSelected: (Recipient) -> Unit
 ) : BottomSheetDialogFragment() {
 
@@ -45,7 +45,7 @@ class RoleBasedChatBottomSheet(
     companion object {
         val TAG = "RoleBasedChatBottomSheet"
         fun launch(fm: FragmentManager, chatViewModel: ChatViewModel) {
-            RoleBasedChatBottomSheet({ chatViewModel.currentlySelectedRecipientRbac.value!! },
+            RoleBasedChatBottomSheet({ chatViewModel.currentlySelectedRecipientRbac.value },
                 { selectedRecipient ->
                     chatViewModel.updateSelectedRecipientChatBottomSheet(selectedRecipient)
                 }).show(fm, TAG)
@@ -94,11 +94,10 @@ class RoleBasedChatBottomSheet(
             )
         }
 
-        val testing = false
         val allowedParticipants = meetingViewModel.availableRecipientsForChat()
-        val initialRecipients = initialAddRecipients(allowedParticipants, testing)
+        val initialRecipients = initialAddRecipients(allowedParticipants)
         groupieAdapter.update(initialRecipients)
-        if (allowedParticipants.peers || testing) {
+        if (allowedParticipants.peers) {
             // Update all peers everytime the peers change
             meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
                 groupieAdapter.update(
@@ -118,14 +117,14 @@ class RoleBasedChatBottomSheet(
     }
 
     private fun initialAddRecipients(
-        allowedParticipants: AllowedToMessageParticipants, forTestingAllowAll: Boolean
+        allowedParticipants: AllowedToMessageParticipants
     ): List<Group> {
         val hmsSDK = meetingViewModel.hmsSDK
         val recipients = mutableListOf<Group>()
         // For testing, remove when not needed
         // Add `everyone` general chat
         val currentSelectedRecipient = getSelectedRecipient()
-        if (allowedParticipants.everyone || forTestingAllowAll) {
+        if (allowedParticipants.everyone) {
             recipients.add(
                 RecipientItem(
                     Recipient.Everyone,
@@ -135,26 +134,15 @@ class RoleBasedChatBottomSheet(
             )
         }
         // Add roles
-        if (allowedParticipants.roles.isNotEmpty() || forTestingAllowAll) {
+        if (allowedParticipants.roles.isNotEmpty()) {
             // There aren't many roles so we'll choose n^2 runtime
-            val rolesToAdd = if (forTestingAllowAll) {
-                hmsSDK.getRoles().map {
-                    RecipientItem(
-                        Recipient.Role(it),
-                        currentSelectedRecipient,
-                        ::onRecipientSelected
-                    )
-                }
-            } else {
-                // Create a map of roles to their names
-                val allRoles = hmsSDK.getRoles().associateBy { it.name }
-                allowedParticipants.roles.mapNotNull { allRoles[it] }.map {
-                        RecipientItem(
-                            Recipient.Role(it),
-                            currentSelectedRecipient,
-                            ::onRecipientSelected
-                        )
-                    }
+            val allRoles = hmsSDK.getRoles().associateBy { it.name }
+            val rolesToAdd = allowedParticipants.roles.mapNotNull { allRoles[it] }.map {
+                RecipientItem(
+                    Recipient.Role(it),
+                    currentSelectedRecipient,
+                    ::onRecipientSelected
+                )
             }
             // Separate headers and roles
             val rolesGroup = ExpandableGroup(RecipientHeader("ROLES"), true).apply {
@@ -168,7 +156,7 @@ class RoleBasedChatBottomSheet(
 
     private fun getUpdatedPeersGroup(
         hmsSDK: HMSSDK,
-        currentSelectedRecipient: Recipient
+        currentSelectedRecipient: Recipient?
     ): ExpandableGroup {
         return ExpandableGroup(RecipientHeader("PARTICIPANTS"), true).apply {
                 addAll(

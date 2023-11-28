@@ -10,9 +10,9 @@ import live.hms.roomkit.ui.meeting.chat.Recipient
  * If Everyone is selected that means there's no filtering.
  */
 class ChatMessageViewFilterHelper {
-    private var filterRecipient : Recipient = Recipient.Everyone
+    private var filterRecipient : Recipient? = null
 //    private var filterGroup : String? = null
-    fun setFilter(recipient: Recipient) {
+    fun setFilter(recipient: Recipient?) {
         filterRecipient = recipient
     }
     private fun isSearching() = filterRecipient == Recipient.Everyone
@@ -28,6 +28,8 @@ class ChatMessageViewFilterHelper {
             is Recipient.Role -> m.filter {
                 it.senderRoleName == filterTargetRecipient.role.name || it.isSentByMe
             }
+            // Just receive messages even if you can't sent
+            null -> m
         }
 
     }

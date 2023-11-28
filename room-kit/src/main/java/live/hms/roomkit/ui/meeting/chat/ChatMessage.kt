@@ -13,6 +13,7 @@ const val DEFAULT_SENDER_NAME = "Participant"
 @Parcelize
 data class ChatMessage constructor(
     val senderName: String,
+    val localSenderRealNameForPinMessage : String,
     val time: Long? = null,
     val message: String,
     val isSentByMe: Boolean,
@@ -40,6 +41,7 @@ data class ChatMessage constructor(
     }
     constructor(message: HMSMessage, sentByMe: Boolean) : this(
         if(sentByMe) "You" else message.sender?.name ?: DEFAULT_SENDER_NAME,
+        message.sender?.name ?: DEFAULT_SENDER_NAME,
         message.serverReceiveTime,
         message.message,
         sentByMe,
