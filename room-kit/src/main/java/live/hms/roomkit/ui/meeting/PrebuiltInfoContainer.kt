@@ -80,14 +80,14 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
     fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants {
         val everyone = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.publicChatEnabled != null ||
+            ?.elements?.chat?.publicChatEnabled == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.publicChatEnabled != null
+                    ?.default?.elements?.chat?.publicChatEnabled == true
 
         val peerLevelDms = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.privateChatEnabled != null ||
+            ?.elements?.chat?.privateChatEnabled == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.privateChatEnabled != null
+                    ?.default?.elements?.chat?.privateChatEnabled == true
 
         val whitelistedRolesConference = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
             ?.default?.elements?.chat?.rolesWhiteList ?: emptyList()
