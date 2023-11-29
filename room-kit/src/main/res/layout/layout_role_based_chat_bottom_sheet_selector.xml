@@ -6,7 +6,6 @@
     app:cardCornerRadius="@dimen/sizeteen_dp"
     android:paddingBottom="16dp"
     android:id="@id/rootLayout"
-    android:background="@drawable/gray_shape_round_dialog"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent">
@@ -30,8 +29,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:drawablePadding="8dp"
+                android:lineHeight="24sp"
                 android:fontFamily="@font/inter_semibold"
-                android:text="Options"
+                android:text="Send Messages To"
                 android:textSize="16sp" />
 
             <ImageView
@@ -52,18 +52,16 @@
             android:id="@+id/border5"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="16dp"
+            android:layout_marginVertical="@dimen/spacing_d2"
             android:background="@drawable/gray_line_vertical_divider" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginBottom="@dimen/sizeteen_dp"
-            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="@dimen/sizeteen_dp"
             android:id="@+id/options_grid"
             android:nestedScrollingEnabled="false"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-
+            android:layout_height="match_parent"
+            />
 
     </LinearLayout>
 

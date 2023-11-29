@@ -1,12 +1,17 @@
 package live.hms.roomkit.ui.meeting.chat
 
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearSmoothScroller
 
 import androidx.recyclerview.widget.RecyclerView
-import kotlin.reflect.KFunction0
+import live.hms.roomkit.R
+import live.hms.roomkit.ui.meeting.ChatState
 
 
 /**
@@ -16,29 +21,56 @@ import kotlin.reflect.KFunction0
  */
 class ChatUseCase {
     fun initiate(
-        messages: MutableLiveData<ArrayList<ChatMessage>>,
+        messages: MutableLiveData<List<ChatMessage>>,
+        chatPauseState : MutableLiveData<ChatState>,
         viewlifecycleOwner: LifecycleOwner,
         chatAdapter: ChatAdapter,
         recyclerview: SingleSideFadeRecyclerview,
         chatViewModel: ChatViewModel,
         emptyIndicator: View? = null,
-        isChatEnabled: () -> Boolean
+        sendButton: ImageView,
+        editText: EditText,
+        bannedText : TextView,
+        chatPausedBy : TextView,
+        chatPausedContainer : LinearLayoutCompat,
+        isChatEnabled: () -> Boolean,
+        getChatState: () -> ChatState,
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
         recyclerview.adapter = chatAdapter
         toggleEmptyIndicator(emptyIndicator, messages.value)
+        // Chat pause observer
+        chatPauseState.observe(viewlifecycleOwner) { state ->
+            if (isChatEnabled()) {
+                pauseBlockRegularUi(
+                    chatViewModel,
+                    sendButton,
+                    editText,
+                    bannedText,
+                    chatPausedBy,
+                    chatPausedContainer,
+                    state
+                )
+            }
+        }
+        // Chat messages observer
         messages.observe(viewlifecycleOwner) {
             if (isChatEnabled()) {
-
+                val state = getChatState()
+            pauseBlockRegularUi(chatViewModel,
+                sendButton,
+                editText,
+                bannedText,
+                chatPausedBy,
+                chatPausedContainer,
+                state)
             toggleEmptyIndicator(emptyIndicator, it)
-                val chatList = mutableListOf<ChatMessage>()
-                chatList.addAll(it)
+            val chatList = mutableListOf<ChatMessage>()
+            chatList.addAll(it)
             chatAdapter.submitList(chatList)
             val position = it.size - 1
             if (position >= 0) {
-                // Without this sometimes the view won't update.
-                chatAdapter.notifyItemInserted(position)
                 // Scroll to the new message
                 val smoothScroller: RecyclerView.SmoothScroller =
                     object : LinearSmoothScroller(recyclerview.context) {
@@ -55,9 +87,38 @@ class ChatUseCase {
         }
     }
 
+    private fun pauseBlockRegularUi(chatViewModel: ChatViewModel,
+                                    sendButton: ImageView,
+                                    editText: EditText,
+                                    bannedText : TextView,
+                                    chatPausedBy : TextView,
+                                    chatPausedContainer : LinearLayoutCompat,
+                                    state : ChatState) {
+        if(chatViewModel.isUserBlockedFromChat()) {
+            // Then their edit text etc is hidden.
+            sendButton.visibility = View.GONE
+            editText.visibility = View.GONE
+            bannedText.text = bannedText.context.getText(R.string.blocked_from_sending_messages)
+            bannedText.visibility = View.VISIBLE
+            chatPausedContainer.visibility = View.GONE
+        } else if(!state.enabled) {
+            sendButton.visibility = View.GONE
+            editText.visibility = View.GONE
+            chatPausedBy.text = bannedText.context.getString(R.string.chat_paused_by, state.updatedBy)
+            chatPausedContainer.visibility = View.VISIBLE
+            bannedText.visibility = View.GONE
+        } else {
+            // This isn't a given, depends on if the user decided to hide or show...
+            sendButton.visibility = View.VISIBLE
+            editText.visibility = View.VISIBLE
+            bannedText.visibility = View.GONE
+            chatPausedContainer.visibility = View.GONE
+        }
+    }
+
     private fun toggleEmptyIndicator(
         emptyIndicator: View?,
-        messages: ArrayList<ChatMessage>?,
+        messages: List<ChatMessage>?,
     ) {
         emptyIndicator?.visibility = if( messages.isNullOrEmpty() ) {
             View.VISIBLE

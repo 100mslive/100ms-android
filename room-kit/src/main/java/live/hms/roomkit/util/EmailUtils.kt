@@ -6,21 +6,22 @@ import android.util.Log
 import androidx.core.content.FileProvider
 import live.hms.roomkit.BuildConfig
 import live.hms.video.utils.LogUtils
+import java.lang.Double.toHexString
 import java.util.*
+import kotlin.math.roundToInt
 
 object EmailUtils {
 
   const val TAG = "EmailUtils"
 
-  fun addAlpha(originalColor: String, alpha: Double): String? {
-    var originalColor = originalColor
-    val alphaFixed = Math.round(alpha * 255)
-    var alphaHex = java.lang.Long.toHexString(alphaFixed)
+  fun addAlpha(originalColor: String, alpha: Double): String {
+
+    val alphaFixed = (alpha * 255)
+    var alphaHex = toHexString(alphaFixed)
     if (alphaHex.length == 1) {
       alphaHex = "0$alphaHex"
     }
-    originalColor = originalColor.replace("#", "#$alphaHex")
-    return originalColor
+    return originalColor.replace("#", "#$alphaHex")
   }
   fun getNonFatalLogIntent(context: Context, throwable: Throwable? = null): Intent {
     val logFile = LogUtils.saveLogsToFile(context, "nonfatal-log")
