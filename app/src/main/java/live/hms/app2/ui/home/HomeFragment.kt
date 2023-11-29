@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -146,12 +147,26 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /**
+     * This should be a user id that has meaning for your app.
+     * It might be the userid for your logged in users.
+     * It should be different per user and always the same for the same user.
+     * This affects who remains blocked from chat, if this user was blocked.
+     */
+    private fun getConsistentUserIdOverSessions(): String {
+        val sharedPreferences = requireContext().getSharedPreferences(
+            "your-activity-preference", Context.MODE_PRIVATE
+        )
+        if(sharedPreferences.getString(SAVED_USER_ID_FOR_BLOCK_LIST, null) == null) {
+            sharedPreferences.edit { putString(SAVED_USER_ID_FOR_BLOCK_LIST, UUID.randomUUID().toString()) }
+        }
+        return sharedPreferences.getString(SAVED_USER_ID_FOR_BLOCK_LIST, null)!!
+    }
     private fun launchPrebuilt(code: String) {
         contextSafe { _, activity ->
 
-            val consistentUserId = activity.getPreferences(Context.MODE_PRIVATE).getString(
-                SAVED_USER_ID_FOR_BLOCK_LIST, UUID.randomUUID().toString()
-            )
+            val consistentUserId = getConsistentUserIdOverSessions()
+
             HMSRoomKit.launchPrebuilt(
                 code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = consistentUserId, debugInfo = settings.inPreBuiltDebugMode,
                     endPoints = hashMapOf<String, String>().apply {
