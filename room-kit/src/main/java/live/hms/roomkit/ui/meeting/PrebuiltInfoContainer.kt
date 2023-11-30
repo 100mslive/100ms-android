@@ -122,5 +122,5 @@ data class AllowedToMessageParticipants(
     val peers : Boolean,
     val roles : List<String>
 ) {
-    fun isChatSendingEnabled() : Boolean = (!(everyone || peers) && roles.isEmpty())
+    fun isChatSendingEnabled() : Boolean = everyone || peers || roles.isNotEmpty()
 }

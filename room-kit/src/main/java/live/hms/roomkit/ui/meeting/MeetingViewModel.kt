@@ -66,8 +66,9 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    var recNum = 0
     // This is needed in chat for it to determine what kind of chat it is.
-    val initPrebuiltChatMessageRecipient = MutableLiveData<Recipient?>()
+    val initPrebuiltChatMessageRecipient = MutableLiveData<Pair<Recipient?,Int>>()
     val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
@@ -732,7 +733,7 @@ class MeetingViewModel(
                 if (room.hlsRecordingState.state in runningRecordingStates )
                     recordingState.postValue(room.hlsRecordingState.state)
                 sessionMetadataUseCase.updatePeerName(room.localPeer?.name ?: "Participant")
-                initPrebuiltChatMessageRecipient.postValue(prebuiltInfoContainer.defaultRecipientToMessage())
+                initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), ++recNum))
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
                     object : HMSActionResultListener {
                         override fun onError(error: HMSException) {}
@@ -815,6 +816,7 @@ class MeetingViewModel(
                                 showHlsStreamYetToStartError.postValue(false)
                                 exitHlsViewIfRequired(false)
                             }
+
                         }
 
                         participantPeerUpdate.postValue(Unit)
@@ -1127,6 +1129,8 @@ class MeetingViewModel(
                 override fun onSuccess() {
               //      toggleRaiseHand(false)
                     setStatetoOngoing()
+                    recNum += 1
+                    initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), recNum))
                     updateThemeBasedOnCurrentRole(it.suggestedRole)
                     onSuccess.invoke()
                 }
@@ -2244,5 +2248,6 @@ class MeetingViewModel(
     }
 
     val chatPauseState = pauseChatUseCase.currentChatPauseState
+    fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
 }
 

@@ -70,10 +70,12 @@ class CombinedChatFragmentTab : Fragment() {
         ChatUseCase().initiate(
             chatViewModel.messages,
             meetingViewModel.chatPauseState,
+            meetingViewModel.roleChange,
             viewLifecycleOwner,
             chatAdapter,
             binding.chatMessages,
             chatViewModel,
+            meetingViewModel,
             binding.emptyIndicator,
             binding.iconSend,
             binding.editTextMessage,
@@ -81,7 +83,9 @@ class CombinedChatFragmentTab : Fragment() {
             binding.chatPausedBy,
             binding.chatPausedContainer,
             binding.chatExtra,
-            meetingViewModel.prebuiltInfoContainer::isChatEnabled
+            meetingViewModel.prebuiltInfoContainer::isChatEnabled,
+            meetingViewModel::availableRecipientsForChat,
+            chatViewModel::currentlySelectedRbacRecipient
         )
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
@@ -90,10 +94,6 @@ class CombinedChatFragmentTab : Fragment() {
             pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
                 binding.pinnedMessagesDisplay)
         }
-
-    }
-
-    fun unpinMessage(pinnedMessage : SessionMetadataUseCase.PinnedMessage) {
 
     }
 }

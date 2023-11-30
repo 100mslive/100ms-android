@@ -113,9 +113,10 @@ class MeetingFragment : Fragment() {
             childFragmentManager, message) }, ::onChatClick)
     }
 
-    private val chatViewModel: ChatViewModel by activityViewModels {
+    private val chatViewModel: ChatViewModel by activityViewModels<ChatViewModel> {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
     }
+
 
 
     private var isMeetingOngoing = false
@@ -285,10 +286,12 @@ class MeetingFragment : Fragment() {
         ChatUseCase().initiate(
             chatViewModel.messages,
             meetingViewModel.chatPauseState,
+            meetingViewModel.roleChange,
             viewLifecycleOwner,
             chatAdapter,
             binding.chatMessages,
             chatViewModel,
+            meetingViewModel,
             null,
             binding.iconSend,
             binding.editTextMessage,
@@ -296,7 +299,9 @@ class MeetingFragment : Fragment() {
             binding.chatPausedBy,
             binding.chatPausedContainer,
             binding.chatExtra,
-            meetingViewModel.prebuiltInfoContainer::isChatEnabled
+            meetingViewModel.prebuiltInfoContainer::isChatEnabled,
+            meetingViewModel::availableRecipientsForChat,
+            chatViewModel::currentlySelectedRbacRecipient
         )
 
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
@@ -390,7 +395,7 @@ class MeetingFragment : Fragment() {
         // This only needs to be in meetingfragment since we always open it.
         // Is that true for HLS? Double check.
         meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
-            chatViewModel.setInitialRecipient(it)
+            chatViewModel.setInitialRecipient(it.first, it.second)
         }
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)

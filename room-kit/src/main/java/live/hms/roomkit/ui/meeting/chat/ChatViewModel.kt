@@ -22,12 +22,11 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     companion object {
         private const val TAG = "ChatViewModel"
     }
-    private var initialRecipientValueSet = false
     private val _currentlySelectedRecipient = MutableLiveData<Recipient?>(null)
-
-    fun setInitialRecipient(recipient: Recipient?) {
-        if(!initialRecipientValueSet) {
-            initialRecipientValueSet = true
+    private var lastRecipientNum = 0
+    fun setInitialRecipient(recipient: Recipient?,num : Int) {
+        if(lastRecipientNum< num) {
+            lastRecipientNum = num
             updateSelectedRecipientChatBottomSheet(recipient)
         }
     }
@@ -35,7 +34,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     fun updateSelectedRecipientChatBottomSheet(recipient: Recipient?) {
         // Set a filter for the messages.
         chatmessageViewFilterHelper.setFilter(recipient)
-        _currentlySelectedRecipient.value = recipient
+        _currentlySelectedRecipient.postValue(recipient)
         messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
     }
     val currentlySelectedRecipientRbac : LiveData<Recipient?> = _currentlySelectedRecipient
@@ -218,5 +217,9 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     fun isUserBlockedFromChat(): Boolean {
         val customerUserId = hmssdk.getLocalPeer()?.customerUserID
         return customerUserId != null && blockedPeerIds.contains(customerUserId)
+    }
+
+    fun currentlySelectedRbacRecipient() : Recipient?{
+        return _currentlySelectedRecipient.value
     }
 }

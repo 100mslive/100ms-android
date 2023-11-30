@@ -12,7 +12,10 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
+import live.hms.roomkit.ui.meeting.AllowedToMessageParticipants
 import live.hms.roomkit.ui.meeting.ChatPauseState
+import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.video.sdk.models.HMSPeer
 
 
 /**
@@ -22,10 +25,13 @@ import live.hms.roomkit.ui.meeting.ChatPauseState
  */
 class ChatUseCase {
     private fun getOverallChatState(
+        meetingViewModel : MeetingViewModel,
+        chatViewModel: ChatViewModel,
         isChatEnabled: () -> Boolean,
         isUserBlocked : () -> Boolean,
         getCurrentRecipient: () -> Recipient?,
-        chatPauseState: ChatPauseState): ChatUiVisibilityState {
+        chatPauseState: ChatPauseState,
+        getAllowedRecipients : () -> AllowedToMessageParticipants?): ChatUiVisibilityState {
         return if(!isChatEnabled()) {
             ChatUiVisibilityState.DisabledFromLayout
         } else if(isUserBlocked()/*chatViewModel.isUserBlockedFromChat()*/) {
@@ -34,9 +40,18 @@ class ChatUseCase {
             if(!chatPauseState.enabled)
                 ChatUiVisibilityState.Paused(chatPauseState)
             else {
+                // Role fix
+                if(getCurrentRecipient() == null && getAllowedRecipients()?.isChatSendingEnabled() == true) {
+                    val recToMessage = meetingViewModel.defaultRecipientToMessage()
+                    chatViewModel.updateSelectedRecipientChatBottomSheet(recToMessage)
+                }
                 // Might be no recipients, might need a recipient select.
-                if(/*chatViewModel.currentlySelectedRecipientRbac.value*/ getCurrentRecipient() == null)
-                    ChatUiVisibilityState.NoRecipients
+                if(getCurrentRecipient() == null && meetingViewModel.defaultRecipientToMessage() == null) {
+                    if(getAllowedRecipients()?.peers == true)
+                        ChatUiVisibilityState.RecipientSelectNeeded
+                    else
+                        ChatUiVisibilityState.NoRecipients
+                }
                 else
                     ChatUiVisibilityState.Enabled
             }
@@ -45,10 +60,12 @@ class ChatUseCase {
     fun initiate(
         messages: MutableLiveData<List<ChatMessage>>,
         chatPauseState: MutableLiveData<ChatPauseState>,
+        roleChanged : MutableLiveData<HMSPeer>, //used to refresh options
         viewlifecycleOwner: LifecycleOwner,
         chatAdapter: ChatAdapter,
         recyclerview: SingleSideFadeRecyclerview,
         chatViewModel: ChatViewModel,
+        meetingViewModel: MeetingViewModel,
         emptyIndicator: View? = null,
         sendButton: ImageView,
         editText: EditText,
@@ -57,21 +74,27 @@ class ChatUseCase {
         chatPausedContainer: LinearLayoutCompat,
         recipientPickerContainer: LinearLayout,
         isChatEnabled: () -> Boolean,
+        getAllowedRecipients : () -> AllowedToMessageParticipants?,
+        currentRbac : () -> Recipient?
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
         recyclerview.adapter = chatAdapter
         toggleEmptyIndicator(emptyIndicator, messages.value)
         // Chat pause observer
-        chatPauseState.observe(viewlifecycleOwner) { pauseState ->
-            val overallChatState = getOverallChatState(
-                isChatEnabled,
-                chatViewModel::isUserBlockedFromChat,
-                { chatViewModel.currentlySelectedRecipientRbac.value },
-                pauseState
-            )
+        roleChanged.observe(viewlifecycleOwner) {
+            if(isChatEnabled()) {
+                val overallChatState = getOverallChatState(
+                    meetingViewModel,
+                    chatViewModel,
+                    isChatEnabled,
+                    chatViewModel::isUserBlockedFromChat,
+                    currentRbac,
+                    chatPauseState.value!!,
+                    getAllowedRecipients
 
-            if (isChatEnabled()) {
+                )
+
                 pauseBlockRegularUi(
                     sendButton,
                     editText,
@@ -83,14 +106,42 @@ class ChatUseCase {
                 )
             }
         }
+        chatPauseState.observe(viewlifecycleOwner) { pauseState ->
+            if(isChatEnabled()) {
+                val overallChatState = getOverallChatState(
+                    meetingViewModel,
+                    chatViewModel,
+                    isChatEnabled,
+                    chatViewModel::isUserBlockedFromChat,
+                    currentRbac,
+                    pauseState,
+                    getAllowedRecipients
+                )
+
+                if (isChatEnabled()) {
+                    pauseBlockRegularUi(
+                        sendButton,
+                        editText,
+                        bannedText,
+                        chatPausedBy,
+                        chatPausedContainer,
+                        recipientPickerContainer,
+                        overallChatState
+                    )
+                }
+            }
+        }
         // Chat messages observer
         messages.observe(viewlifecycleOwner) {
             if (isChatEnabled()) {
                 val overallChatState = getOverallChatState(
+                    meetingViewModel,
+                    chatViewModel,
                     isChatEnabled,
                     chatViewModel::isUserBlockedFromChat,
-                    { chatViewModel.currentlySelectedRecipientRbac.value },
-                    chatPauseState.value!!
+                    currentRbac,
+                    chatPauseState.value!!,
+                    getAllowedRecipients
                 )
                 pauseBlockRegularUi(
                     sendButton,
