@@ -1885,6 +1885,8 @@ class MeetingViewModel(
     }
     fun blockUser(chatMessage: ChatMessage) {
         blockUserUseCase.blockUser(chatMessage)
+        // For later
+//        sessionMetadataUseCase.userBlocked(chatMessage)
     }
     val currentBlockList = blockUserUseCase.currentBlockList
     val messageIdsToHide = hideMessageUseCase.messageIdsToHide
