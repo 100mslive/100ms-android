@@ -11,15 +11,15 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
     fun isAllowedToBlockUserFromChat() : Boolean =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.realTimeControls?.canBlockUser != null ||
+            ?.elements?.chat?.realTimeControls?.canBlockUser == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.realTimeControls?.canBlockUser != null
+                    ?.default?.elements?.chat?.realTimeControls?.canBlockUser == true
 
     fun isAllowedToPinMessages() : Boolean =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.allowPinningMessages != null ||
+            ?.elements?.chat?.allowPinningMessages == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.allowPinningMessages != null
+                    ?.default?.elements?.chat?.allowPinningMessages == true
 
     fun isChatEnabled(): Boolean =
         // how do we even know if it's in hls? What if they have both?
