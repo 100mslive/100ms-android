@@ -550,7 +550,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
     chatPausedTitle: TextView, chatPausedBy : TextView) {
-    chatPausedContainer.background = getChatBackgroundDrawable(0.64)
+    chatPausedContainer.background = getChatBackgroundDrawable()
 
     chatPausedTitle.setTextColor(
         getColorOrDefault(
@@ -565,7 +565,7 @@ private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
 }
 
 private fun userBlockedTheme(userBlocked: TextView) {
-    userBlocked.background = getChatBackgroundDrawable(0.64)
+    userBlocked.background = getChatBackgroundDrawable()
     userBlocked.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
