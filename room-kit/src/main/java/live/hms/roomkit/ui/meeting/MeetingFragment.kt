@@ -318,8 +318,10 @@ class MeetingFragment : Fragment() {
     private fun goToHomePage(details: HMSRemovedFromRoom? = null) {
 
         //only way to programmatically dismiss pip mode
-        if (activity?.isInPictureInPictureMode == true) {
-            activity?.moveTaskToBack(false)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (activity?.isInPictureInPictureMode == true) {
+                activity?.moveTaskToBack(false)
+            }
         }
 
         requireActivity().finish()
@@ -1045,11 +1047,15 @@ class MeetingFragment : Fragment() {
         handler.postDelayed(hideRunnable, delayMillis.toLong())
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun hideProgressBar() {
+        var isInPIPMode = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (activity?.isInPictureInPictureMode?.not() == true)
+                isInPIPMode = true
+        }
         binding.fragmentContainer.visibility = View.VISIBLE
         binding.bottomControls.visibility = View.VISIBLE
-        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
+        if (!isInPIPMode && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
         binding.progressBar.root.visibility = View.GONE
