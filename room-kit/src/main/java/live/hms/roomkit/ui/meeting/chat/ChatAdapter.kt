@@ -60,7 +60,10 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
         else
           View.VISIBLE
 
-        toGroup.visibility = View.GONE
+        toGroup.visibility = if(sentMessage.toGroup == null)
+          View.GONE
+        else
+          View.VISIBLE
 
         sentBackground.visibility = if(sentMessage.toGroup == null && sentMessage.sentTo == null) {
           View.GONE

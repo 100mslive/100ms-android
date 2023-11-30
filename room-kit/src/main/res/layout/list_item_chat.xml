@@ -55,9 +55,13 @@
         app:layout_constraintBaseline_toBaselineOf="@id/name"
         app:layout_constraintEnd_toStartOf="@id/viewMore"
         >
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBaseline_toBaselineOf="@id/name"
+            android:orientation="horizontal">
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/toGroup"
-        app:layout_constraintBaseline_toBaselineOf="@id/sentTo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="6dp"
@@ -66,11 +70,11 @@
         android:lineHeight="16px"
         android:maxLines="1"
         android:singleLine="true"
-        android:text="To Group"
+        android:text="To"
         android:textSize="12sp"
         app:fontFamily="@font/inter_regular"
         app:layout_constraintEnd_toStartOf="@id/sentTo"
-        tools:layout_editor_absoluteY="2dp" />
+         />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/sentTo"
@@ -83,9 +87,8 @@
         android:singleLine="true"
         android:textSize="12sp"
         app:fontFamily="@font/inter_regular"
-        app:layout_constraintBaseline_toBaselineOf="@id/name"
-        app:layout_constraintRight_toLeftOf="@id/viewMore"
         tools:text="Direct Message" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </com.google.android.material.card.MaterialCardView>
 
     <ImageButton
