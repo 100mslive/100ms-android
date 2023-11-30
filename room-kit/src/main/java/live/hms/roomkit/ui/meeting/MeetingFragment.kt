@@ -1266,6 +1266,7 @@ class MeetingFragment : Fragment() {
         //  wrapper visibility, which means chat can be enabled
         //  and controlled entirely by ChatUseCase but also hidden
         //  since we hide the wrapper that contains it.
+        binding.pinnedMessagesWrapper.visibility = binding.chatView.visibility
         binding.chatExtraWrapper.visibility = binding.chatView.visibility
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {

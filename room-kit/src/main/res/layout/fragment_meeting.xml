@@ -260,12 +260,20 @@
         android:id="@+id/chatMessages"
         android:visibility="gone"
         android:layout_alignParentStart="true"
-        android:layout_above="@id/pinnedMessagesDisplay"
+        android:layout_above="@id/pinnedMessagesWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="@dimen/spacing_d1"
         tools:listitem="@layout/list_item_chat"
     />
+
+    <FrameLayout
+        android:id="@+id/pinnedMessagesWrapper"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/chatExtraWrapper"
+        >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -313,6 +321,7 @@
             tools:itemCount="1"
             tools:listitem="@layout/layout_pinned_message" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
     <!-- Footer menu -->
     <FrameLayout
         android:id="@+id/chatExtraWrapper"
