@@ -278,7 +278,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:id="@+id/pinnedMessagesDisplay"
-        android:layout_above="@id/chatExtraWrapper"
         android:visibility="gone"
         android:layout_marginVertical="@dimen/spacing_d2"
         android:layout_marginHorizontal="@dimen/fixed_spacing_d1"
