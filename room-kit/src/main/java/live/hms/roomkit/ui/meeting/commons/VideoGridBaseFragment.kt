@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting.commons
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -490,7 +491,7 @@ abstract class VideoGridBaseFragment : Fragment() {
    */
   private fun hideOrShowGridsForPip(onlyIndexToShow : Int? = null) {
     var showAtleastOne = false
-    if (activity?.isInPictureInPictureMode == true && onlyIndexToShow != null && renderedViews.size > 0) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity?.isInPictureInPictureMode == true && onlyIndexToShow != null && renderedViews.size > 0) {
       renderedViews.forEachIndexed { index, renderedViewPair ->
         if (onlyIndexToShow == index && renderedViewPair.binding.root.isVisible.not()) {
           renderedViewPair.binding.root.visibility = View.VISIBLE
@@ -547,7 +548,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   override fun onPause() {
     super.onPause()
-    if (activity?.isInPictureInPictureMode == true) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity?.isInPictureInPictureMode == true) {
       wasLastModePip = true
       //force pip mode layout refresh
       hideOrShowGridsForPip(wasLastSpeakingViewIndex)

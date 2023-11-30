@@ -280,6 +280,8 @@
         android:id="@+id/pinnedMessagesDisplay"
         android:layout_above="@id/chatExtraWrapper"
         android:visibility="gone"
+        android:layout_marginVertical="@dimen/spacing_d2"
+        android:layout_marginHorizontal="@dimen/fixed_spacing_d1"
         tools:visibility="visible"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -297,6 +299,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:visibility="gone"
             android:id="@+id/pinCloseButton"
             android:layout_width="20dp"
             android:layout_height="20dp"

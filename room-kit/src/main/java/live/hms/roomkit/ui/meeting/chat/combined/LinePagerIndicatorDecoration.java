@@ -62,6 +62,9 @@ public class LinePagerIndicatorDecoration extends RecyclerView.ItemDecoration {
         super.onDrawOver(c, parent, state);
 
         int itemCount = parent.getAdapter().getItemCount();
+        if (itemCount <=1 ) {
+            return;
+        }
 
         // center horizontally, calculate width and subtract half from center
         float totalLength = mIndicatorItemLength * itemCount;
@@ -136,9 +139,9 @@ public class LinePagerIndicatorDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-    @Override
-    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-        super.getItemOffsets(outRect, view, parent, state);
-        outRect.left = (int) (mIndicatorHeight);
-    }
+//    @Override
+//    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+//        super.getItemOffsets(outRect, view, parent, state);
+//        outRect.left = (int) (mIndicatorHeight);
+//    }
 }

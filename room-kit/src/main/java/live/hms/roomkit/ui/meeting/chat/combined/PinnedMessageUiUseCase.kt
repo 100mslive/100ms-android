@@ -3,6 +3,8 @@ package live.hms.roomkit.ui.meeting.chat.combined
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -14,6 +16,7 @@ import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.meeting.participants.PinnedMessageItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.theme.getShape
 
 class PinnedMessageUiUseCase {
     private val pinnedMessagesAdapter = GroupieAdapter()
@@ -60,6 +63,15 @@ class PinnedMessageUiUseCase {
         } else {
             pinnedMessagesContainer.visibility = View.VISIBLE
         }
+        pinnedMessagesContainer.background = getShape()// ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
+            .apply {
+                val color = getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                    HMSPrebuiltTheme.getDefaults().surface_default)
+                colorFilter =
+                    BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+            }
+
         val group: Group = Section().apply {
             addAll(pinnedMessages.map { PinnedMessageItem(it) })
         }
