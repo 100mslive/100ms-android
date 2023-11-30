@@ -52,11 +52,11 @@ class SessionMetadataUseCase : Closeable {
 
     data class PinnedMessage(
         @SerializedName("text")
-        val text : String,
+        val text : String?,
         @SerializedName("id")
         val id : String,
         @SerializedName("pinnedBy")
-        val pinnedBy : String
+        val pinnedBy : String?
     )
 
     fun removeFromPinnedMessages(chatMessage: PinnedMessage, hmsActionResultListener: HMSActionResultListener) {
