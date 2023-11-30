@@ -9,6 +9,7 @@
         android:id="@+id/pinnedMessage"
         android:paddingStart="16dp"
         android:paddingEnd="@dimen/spacing_d2"
+        android:paddingVertical="8dp"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:maxLines="2"
