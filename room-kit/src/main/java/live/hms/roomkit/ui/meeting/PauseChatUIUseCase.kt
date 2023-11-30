@@ -10,7 +10,7 @@ class PauseChatUIUseCase {
         materialCardView: MaterialCardView,
         meetingViewModel: MeetingViewModel
     ) {
-        materialCardView.visibility = if(meetingViewModel.isAllowedToPauseChat()) View.VISIBLE else View.GONE
+        materialCardView.visibility = View.GONE//if(meetingViewModel.isAllowedToPauseChat()) View.VISIBLE else View.GONE
         materialCardView.setOnSingleClickListener {
             meetingViewModel.togglePauseChat()
         }
