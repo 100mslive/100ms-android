@@ -170,7 +170,10 @@ class ChatUseCase {
                 chatPausedContainer.visibility = View.GONE
             }
             ChatUiVisibilityState.DisabledFromLayout -> {} // Nothing to do  since the visibility toggle handled it
-            ChatUiVisibilityState.NoRecipients -> {} // Nothing to do since the visibility toggle handled it
+            ChatUiVisibilityState.NoRecipients -> {
+                bannedText.visibility = View.GONE
+                chatPausedContainer.visibility = View.GONE
+            } // Nothing to do since the visibility toggle handled it
             is ChatUiVisibilityState.Paused -> {
                 chatPausedBy.text = bannedText.context.getString(R.string.chat_paused_by, state.pausedState.updatedBy)
                 chatPausedContainer.visibility = View.VISIBLE
