@@ -8,6 +8,7 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
@@ -73,7 +74,7 @@ class PinnedMessageUiUseCase {
             }
 
         val group: Group = Section().apply {
-            addAll(pinnedMessages.map { PinnedMessageItem(it) })
+            addAll(pinnedMessages.map { ExpandableGroup(PinnedMessageItem(it), false) })
         }
         pinnedMessagesAdapter.update(listOf(group))
     }
