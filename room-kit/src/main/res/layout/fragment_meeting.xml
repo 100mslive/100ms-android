@@ -270,7 +270,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:id="@+id/pinnedMessagesDisplay"
-        android:layout_above="@id/chatExtra"
+        android:layout_above="@id/chatExtraWrapper"
         android:visibility="gone"
         tools:visibility="visible"
         android:layout_height="wrap_content"
@@ -314,10 +314,15 @@
             tools:listitem="@layout/layout_pinned_message" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <!-- Footer menu -->
+    <FrameLayout
+        android:id="@+id/chatExtraWrapper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/chatView"
+        >
     <LinearLayout
         android:id="@+id/chatExtra"
         android:visibility="gone"
-        android:layout_above="@id/chatView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_d2"
@@ -374,6 +379,7 @@
                 />
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
+    </FrameLayout>
     <RelativeLayout
         android:id="@+id/chatView"
         android:layout_width="match_parent"

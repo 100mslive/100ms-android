@@ -64,7 +64,6 @@ import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
-import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.HMSNotificationType
@@ -296,8 +295,9 @@ class MeetingFragment : Fragment() {
             binding.userBlocked,
             binding.chatPausedBy,
             binding.chatPausedContainer,
+            binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled
-        ) { meetingViewModel.chatPauseState.value!! }
+        )
 
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
@@ -394,6 +394,9 @@ class MeetingFragment : Fragment() {
         }
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
+            // if recipient is null, hide the chat.
+            // but recipient might be null if they're just selecting from roles/participants as well.
+
         }
         meetingViewModel.messageIdsToHide.observe(viewLifecycleOwner) { messageIdsToHide ->
             chatViewModel.updateMessageHideList(messageIdsToHide)
@@ -1243,7 +1246,17 @@ class MeetingFragment : Fragment() {
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
-        binding.chatExtra.visibility = binding.chatView.visibility
+        // Because the meeting fragment can toggle the
+        //  chat visibility and this applies
+        //  whether the chat is enabled or blocked or paused
+        //  we need a different way to show this UI, independent
+        //  of whether the UI should be hidden for chat RBAC feature reasons.
+        // So the UI that chat RBAC triggers is put into a wrapper.
+        // when this toggle button toggles hide/view it changes the
+        //  wrapper visibility, which means chat can be enabled
+        //  and controlled entirely by ChatUseCase but also hidden
+        //  since we hide the wrapper that contains it.
+        binding.chatExtraWrapper.visibility = binding.chatView.visibility
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1

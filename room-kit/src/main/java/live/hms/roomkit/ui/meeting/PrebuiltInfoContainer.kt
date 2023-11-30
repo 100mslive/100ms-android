@@ -62,7 +62,8 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             }
     }
     fun defaultRecipientToMessage() : Recipient? {
-        val recipient =  allowedToMessageWhatParticipants()
+        val recipient = allowedToMessageWhatParticipants() ?: return null
+
         return if(recipient.everyone) {
             Recipient.Everyone
         }
@@ -78,7 +79,11 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
         else null
     }
 
-    fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants {
+    fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants? {
+        // If there's no room, then the user hasn't joined either
+        if (hmssdk.getRoom() == null)
+            return null
+
         val everyone = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
             ?.elements?.chat?.publicChatEnabled == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
@@ -116,4 +121,6 @@ data class AllowedToMessageParticipants(
     val everyone : Boolean,
     val peers : Boolean,
     val roles : List<String>
-)
+) {
+    fun isChatSendingEnabled() : Boolean = (!(everyone || peers) && roles.isEmpty())
+}

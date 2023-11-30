@@ -2230,8 +2230,8 @@ class MeetingViewModel(
         val newState = chatPauseState.value!!
         val localPeer = hmsSDK.getLocalPeer()
         val updatedBy = with(localPeer) {
-            if(this == null) ChatState.UpdatedBy() else
-            ChatState.UpdatedBy(
+            if(this == null) ChatPauseState.UpdatedBy() else
+            ChatPauseState.UpdatedBy(
                 peerID ?: "",
                 customerUserID ?: "",
                 name ?: "Participant"
@@ -2243,6 +2243,6 @@ class MeetingViewModel(
         pauseChatUseCase.changeChatState(newState)
     }
 
-    val chatPauseState = pauseChatUseCase.currentChatState
+    val chatPauseState = pauseChatUseCase.currentChatPauseState
 }
 

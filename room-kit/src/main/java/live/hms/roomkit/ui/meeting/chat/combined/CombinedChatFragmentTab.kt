@@ -67,13 +67,22 @@ class CombinedChatFragmentTab : Fragment() {
         }
         pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage, meetingViewModel.isAllowedToPinMessages())
         PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
-        ChatUseCase().initiate(chatViewModel.messages,
-            meetingViewModel.chatPauseState, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,
-            binding.iconSend, binding.editTextMessage, binding.userBlocked,
+        ChatUseCase().initiate(
+            chatViewModel.messages,
+            meetingViewModel.chatPauseState,
+            viewLifecycleOwner,
+            chatAdapter,
+            binding.chatMessages,
+            chatViewModel,
+            binding.emptyIndicator,
+            binding.iconSend,
+            binding.editTextMessage,
+            binding.userBlocked,
             binding.chatPausedBy,
             binding.chatPausedContainer,
+            binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled
-        ) { meetingViewModel.chatPauseState.value!! }
+        )
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
