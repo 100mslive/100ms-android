@@ -94,7 +94,9 @@ class RoleBasedChatBottomSheet(
             )
         }
 
-        val allowedParticipants = meetingViewModel.availableRecipientsForChat()
+        // This would break many things if it were called when no participants were available.
+        // crash early to point it out.
+        val allowedParticipants = meetingViewModel.availableRecipientsForChat()!!
         val initialRecipients = initialAddRecipients(allowedParticipants)
         groupieAdapter.update(initialRecipients)
         if (allowedParticipants.peers) {

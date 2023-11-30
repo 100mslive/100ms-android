@@ -67,13 +67,26 @@ class CombinedChatFragmentTab : Fragment() {
         }
         pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage, meetingViewModel.isAllowedToPinMessages())
         PauseChatUIUseCase().setChatPauseVisible(binding.chatOptionsCard, meetingViewModel)
-        ChatUseCase().initiate(chatViewModel.messages,
-            meetingViewModel.chatPauseState, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, binding.emptyIndicator,
-            binding.iconSend, binding.editTextMessage, binding.userBlocked,
+        ChatUseCase().initiate(
+            chatViewModel.messages,
+            meetingViewModel.chatPauseState,
+            meetingViewModel.roleChange,
+            viewLifecycleOwner,
+            chatAdapter,
+            binding.chatMessages,
+            chatViewModel,
+            meetingViewModel,
+            binding.emptyIndicator,
+            binding.iconSend,
+            binding.editTextMessage,
+            binding.userBlocked,
             binding.chatPausedBy,
             binding.chatPausedContainer,
-            meetingViewModel.prebuiltInfoContainer::isChatEnabled
-        ) { meetingViewModel.chatPauseState.value!! }
+            binding.chatExtra,
+            meetingViewModel.prebuiltInfoContainer::isChatEnabled,
+            meetingViewModel::availableRecipientsForChat,
+            chatViewModel::currentlySelectedRbacRecipient
+        )
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
         }
@@ -81,10 +94,6 @@ class CombinedChatFragmentTab : Fragment() {
             pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
                 binding.pinnedMessagesDisplay)
         }
-
-    }
-
-    fun unpinMessage(pinnedMessage : SessionMetadataUseCase.PinnedMessage) {
 
     }
 }

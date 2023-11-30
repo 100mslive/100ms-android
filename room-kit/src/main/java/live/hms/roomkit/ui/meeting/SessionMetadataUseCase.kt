@@ -52,11 +52,13 @@ class SessionMetadataUseCase : Closeable {
 
     data class PinnedMessage(
         @SerializedName("text")
-        val text : String,
+        val text : String?,
         @SerializedName("id")
         val id : String,
         @SerializedName("pinnedBy")
-        val pinnedBy : String
+        val pinnedBy : String?,
+        @SerializedName("authorId")
+        val authorId : String?
     )
 
     fun removeFromPinnedMessages(chatMessage: PinnedMessage, hmsActionResultListener: HMSActionResultListener) {
@@ -67,7 +69,12 @@ class SessionMetadataUseCase : Closeable {
 
     fun addToPinnedMessages(data: ChatMessage, hmsActionResultListener: HMSActionResultListener) {
         // text, id, pinnedBy
-        val newPinnedMessage = PinnedMessage("${data.localSenderRealNameForPinMessage}: ${data.message}", data.messageId ?: "", localPeerName ?: "Participant")
+        val newPinnedMessage = PinnedMessage(
+            "${data.localSenderRealNameForPinMessage}: ${data.message}",
+            data.messageId ?: "",
+            localPeerName ?: "Participant",
+            data.userIdForBlockList ?: ""
+            )
         val existingPinnedMessages = pinnedMessages.value ?: arrayOf()
         val newMessages = if(existingPinnedMessages.size < MAX_PINNED_MESSAGES)
             existingPinnedMessages.plus(newPinnedMessage).toList()
@@ -88,6 +95,13 @@ class SessionMetadataUseCase : Closeable {
     }
     fun setSessionStore(sessionStore: HmsSessionStore) {
         this.hmsSessionStore = sessionStore
+    }
+
+    /**
+     * Unpin any messages this peer might have had.
+     */
+    fun userBlocked(chatMessage: ChatMessage) {
+//        chatMessage.senderPeerId
     }
 
 }

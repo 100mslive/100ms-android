@@ -45,6 +45,7 @@ class ChatParticipantAdapter(fragment: BottomSheetDialogFragment) : FragmentStat
 }
 const val OPEN_TO_PARTICIPANTS: String= "CHAT_COMBINED_OPEN_PARTICIPANTS"
 const val OPEN_TO_CHAT_ALONE: String= "CHAT_TAB_ONLY"
+const val CHAT_TAB_TITLE : String = "CHAT_TITLE_TEXT"
 class ChatParticipantCombinedFragment : BottomSheetDialogFragment() {
     private lateinit var binding : LayoutChatParticipantCombinedBinding//by viewLifecycle<LayoutChatParticipantCombinedBinding>()
     lateinit var pagerAdapter : FragmentStateAdapter//by lazy { PagerAdapter(meetingViewmodel, chatViewModel, chatAdapter, viewLifecycleOwner) }
@@ -59,6 +60,7 @@ companion object {
         setStyle(STYLE_NORMAL, R.style.RoundedTabDialogTheme);
     }
 
+    private fun getCustomChatTitle() = arguments?.getString(CHAT_TAB_TITLE)
     private fun hideParticipantTab() : Boolean =
         arguments?.getBoolean(OPEN_TO_CHAT_ALONE, false) == true
     private fun jumpToParticipantsTab() : Boolean =
@@ -85,7 +87,7 @@ companion object {
 
         binding.pager.adapter = pagerAdapter
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
-            tab.text = if(position == 0 ) "Chat" else "Participants"
+            tab.text = if(position == 0 ) getCustomChatTitle() else "Participants"
         }.apply {
             attach()
         }

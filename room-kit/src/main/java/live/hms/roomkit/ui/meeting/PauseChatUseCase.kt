@@ -14,17 +14,17 @@ class PauseChatUseCase : AutoCloseable {
     private lateinit var hmsSessionStore: HmsSessionStore
     val TAG = "BlockUserUseCase"
     private val PAUSE_CHAT_KEY = "chatState"
-    val currentChatState: MutableLiveData<ChatState> = MutableLiveData(ChatState())
+    val currentChatPauseState: MutableLiveData<ChatPauseState> = MutableLiveData(ChatPauseState())
     private val keyChangeListener = object : HMSKeyChangeListener {
         override fun onKeyChanged(key: String, value: JsonElement?) {
             if (key == PAUSE_CHAT_KEY) {
                 // If the value was null, turn it empty. Only stringify if it isn't.
-                val newState: ChatState = if (value == null) {
-                    ChatState()
+                val newState: ChatPauseState = if (value == null) {
+                    ChatPauseState()
                 } else {
-                    GsonUtils.gson.fromJson(value, ChatState::class.java)
+                    GsonUtils.gson.fromJson(value, ChatPauseState::class.java)
                 }
-                currentChatState.postValue(newState)
+                currentChatPauseState.postValue(newState)
             }
         }
     }
@@ -33,7 +33,7 @@ class PauseChatUseCase : AutoCloseable {
         this.hmsSessionStore = hmsSessionStore
     }
 
-    fun changeChatState(state: ChatState) {
+    fun changeChatState(state: ChatPauseState) {
         if (!::hmsSessionStore.isInitialized) {
             Log.e(TAG, "Tried to block user without session store inited")
             return
@@ -89,7 +89,7 @@ class PauseChatUseCase : AutoCloseable {
 
 }
 
-data class ChatState(
+data class ChatPauseState(
     @SerializedName("enabled")
     val enabled: Boolean = true,
     @SerializedName("updatedBy")

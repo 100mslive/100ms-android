@@ -39,10 +39,7 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
         openMessageOptions(bindingAdapterPosition)
         onClick()
       }
-      binding.root.setOnSingleClickListener(clickListener)
-      binding.name.setOnSingleClickListener(clickListener)
-      binding.time.setOnSingleClickListener(clickListener)
-      binding.message.setOnSingleClickListener(clickListener)
+      binding.viewMore.setOnSingleClickListener(clickListener)
     }
 
 
@@ -60,7 +57,10 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
         else
           View.VISIBLE
 
-        toGroup.visibility = View.GONE
+        toGroup.visibility = if(sentMessage.toGroup == null)
+          View.GONE
+        else
+          View.VISIBLE
 
         sentBackground.visibility = if(sentMessage.toGroup == null && sentMessage.sentTo == null) {
           View.GONE
@@ -78,7 +78,7 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
       parent,
       false
     )
-    return ChatMessageViewHolder(binding, { position -> openMessageOptions(getItem(position)) })
+    return ChatMessageViewHolder(binding) { position -> openMessageOptions(getItem(position)) }
   }
 
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {

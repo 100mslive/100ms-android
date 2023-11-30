@@ -11,15 +11,15 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
     fun isAllowedToBlockUserFromChat() : Boolean =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.realTimeControls?.canBlockUser != null ||
+            ?.elements?.chat?.realTimeControls?.canBlockUser == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.realTimeControls?.canBlockUser != null
+                    ?.default?.elements?.chat?.realTimeControls?.canBlockUser == true
 
     fun isAllowedToPinMessages() : Boolean =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-            ?.elements?.chat?.allowPinningMessages != null ||
+            ?.elements?.chat?.allowPinningMessages == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                    ?.default?.elements?.chat?.allowPinningMessages != null
+                    ?.default?.elements?.chat?.allowPinningMessages == true
 
     fun isChatEnabled(): Boolean =
         // how do we even know if it's in hls? What if they have both?
@@ -62,7 +62,8 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             }
     }
     fun defaultRecipientToMessage() : Recipient? {
-        val recipient =  allowedToMessageWhatParticipants()
+        val recipient = allowedToMessageWhatParticipants() ?: return null
+
         return if(recipient.everyone) {
             Recipient.Everyone
         }
@@ -78,7 +79,11 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
         else null
     }
 
-    fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants {
+    fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants? {
+        // If there's no room, then the user hasn't joined either
+        if (hmssdk.getRoom() == null)
+            return null
+
         val everyone = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
             ?.elements?.chat?.publicChatEnabled == true ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
@@ -110,10 +115,17 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     roleMap[localPeer.hmsRole.name]?.screens?.conferencing
     ?.default?.elements?.chat?.realTimeControls?.canHideMessage == true
 
+    fun getChatTitle(isHls : Boolean) : String = if(isHls) {
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.chatTitle ?: "Chat"
+    } else roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+        ?.default?.elements?.chat?.chatTitle ?: "Chat"
 }
 
 data class AllowedToMessageParticipants(
     val everyone : Boolean,
     val peers : Boolean,
     val roles : List<String>
-)
+) {
+    fun isChatSendingEnabled() : Boolean = everyone || peers || roles.isNotEmpty()
+}

@@ -314,6 +314,7 @@ internal fun TextView.buttonDisabled() {
 private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
+    pinMessageTheme(pinCloseButton)
     userBlockedTheme(userBlocked)
     chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
     configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
@@ -548,9 +549,18 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
 }
 
+fun pinMessageTheme(pinCloseButton: ImageView) {
+    pinCloseButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+        )
+
+}
+
 private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
     chatPausedTitle: TextView, chatPausedBy : TextView) {
-    chatPausedContainer.background = getChatBackgroundDrawable(0.64)
+    chatPausedContainer.background = getChatBackgroundDrawable()
 
     chatPausedTitle.setTextColor(
         getColorOrDefault(
@@ -565,7 +575,7 @@ private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
 }
 
 private fun userBlockedTheme(userBlocked: TextView) {
-    userBlocked.background = getChatBackgroundDrawable(0.64)
+    userBlocked.background = getChatBackgroundDrawable()
     userBlocked.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
@@ -1681,6 +1691,9 @@ private fun configureChatControlsTheme(
 }
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+    pinMessageTheme(pinCloseButton)
+    userBlockedTheme(userBlocked)
+    chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
     configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
 
     // Emptyview
@@ -1704,8 +1717,6 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
     )
-    userBlockedTheme(userBlocked)
-    chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
 
     editTextMessage.setHintTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
