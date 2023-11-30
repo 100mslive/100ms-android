@@ -39,10 +39,7 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
         openMessageOptions(bindingAdapterPosition)
         onClick()
       }
-      binding.root.setOnSingleClickListener(clickListener)
-      binding.name.setOnSingleClickListener(clickListener)
-      binding.time.setOnSingleClickListener(clickListener)
-      binding.message.setOnSingleClickListener(clickListener)
+      binding.viewMore.setOnSingleClickListener(clickListener)
     }
 
 
