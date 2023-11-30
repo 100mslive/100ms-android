@@ -81,7 +81,7 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
       parent,
       false
     )
-    return ChatMessageViewHolder(binding, { position -> openMessageOptions(getItem(position)) })
+    return ChatMessageViewHolder(binding) { position -> openMessageOptions(getItem(position)) }
   }
 
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
