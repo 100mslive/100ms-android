@@ -115,6 +115,11 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     roleMap[localPeer.hmsRole.name]?.screens?.conferencing
     ?.default?.elements?.chat?.realTimeControls?.canHideMessage == true
 
+    fun getChatTitle(isHls : Boolean) : String = if(isHls) {
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.chatTitle ?: "Chat"
+    } else roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+        ?.default?.elements?.chat?.chatTitle ?: "Chat"
 }
 
 data class AllowedToMessageParticipants(

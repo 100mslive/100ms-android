@@ -55,6 +55,7 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.meeting.chat.combined.CHAT_TAB_TITLE
 import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
 import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
 import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
@@ -1113,6 +1114,7 @@ class MeetingFragment : Fragment() {
                                 val args = Bundle()
                                     .apply {
                                         putBoolean(OPEN_TO_PARTICIPANTS, true)
+                                        putString(CHAT_TAB_TITLE, meetingViewModel.chatTitle())
                                     }
 
                                 ChatParticipantCombinedFragment()
@@ -1186,9 +1188,12 @@ class MeetingFragment : Fragment() {
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                 ChatParticipantCombinedFragment().apply {
-                    arguments = Bundle().apply { putBoolean(OPEN_TO_CHAT_ALONE,
+                    arguments = Bundle().apply {
+                        putBoolean(OPEN_TO_CHAT_ALONE,
                         !meetingViewModel.isParticpantListEnabled()
-                    ) }
+                    )
+                        putString(CHAT_TAB_TITLE, meetingViewModel.chatTitle())
+                    }
                 }.show(
                     childFragmentManager,
                     ChatParticipantCombinedFragment.TAG
