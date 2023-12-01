@@ -80,6 +80,8 @@ class MeetingViewModel(
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
+    private var numRoleChanges = 0
+    val roleChangeSingleShot : LiveData<Int> = roleChange.map { numRoleChanges++ }
 
     fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
 
@@ -802,8 +804,10 @@ class MeetingViewModel(
                             "RoleChangeUpdate",
                             "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
                         )
-                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED)
+                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED) {
+                            initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), ++recNum))
                             roleChange.postValue(hmsPeer)
+                        }
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
