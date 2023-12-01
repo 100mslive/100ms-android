@@ -35,11 +35,7 @@ class ParticipantsFragment : Fragment() {
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<FragmentParticipantsBinding>()
     private var alertDialog: AlertDialog? = null
-    private val meetingViewModel: MeetingViewModel by activityViewModels {
-        MeetingViewModelFactory(
-            requireActivity().application
-        )
-    }
+    private val meetingViewModel: MeetingViewModel by activityViewModels()
     private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, lifecycleScope,
         viewLifecycleOwner
     ) { binding.participantsBack.visibility = View.VISIBLE }

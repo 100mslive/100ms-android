@@ -11,12 +11,47 @@
     app:layout_heightPercent="@dimen/tall_bottom_sheet"
     android:orientation="vertical">
 
-    <FrameLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_margin="@dimen/spacing_d2"
         >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:id="@+id/pinnedMessagesDisplay"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/pinCloseButton"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/pin_close_item"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pinnedMessagesRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="2dp"
+                android:paddingEnd="@dimen/spacing_d2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/pinCloseButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:itemCount="1"
+                tools:listitem="@layout/layout_pinned_message" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
         android:layout_width="match_parent"
@@ -60,7 +95,68 @@
                 android:text="There are no messages here yet. Start a conversation by sending a message."
                 />
         </androidx.appcompat.widget.LinearLayoutCompat>
-    </FrameLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <LinearLayout
+            android:id="@+id/chatExtra"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_d2"
+            android:layout_marginVertical="@dimen/spacing_d1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/spacing_d1"
+                android:text="@string/chat_with" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/sendToBackground"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:strokeWidth="1dp"
+                app:contentPadding="@dimen/four_dp"
+                >
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/sendToChipText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:ellipsize="end"
+                    android:drawablePadding="@dimen/spacing_d0"
+                    android:fontFamily="@font/inter_bold"
+                    android:lineHeight="16px"
+                    android:drawableEnd="@drawable/tiny_down_chevron"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:text="To Group"
+                    android:textSize="12sp"
+                    app:fontFamily="@font/inter_regular"
+                    tools:layout_editor_absoluteY="2dp" />
+            </com.google.android.material.card.MaterialCardView>
+            <View
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chatOptionsCard"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+                <ImageView
+                    android:id="@+id/chatOptions"
+                    android:padding="@dimen/spacing_d0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/chat_controls_pause_three_dots"
+                    />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/chatView"
@@ -69,6 +165,52 @@
         android:layout_marginHorizontal="@dimen/spacing_d2"
         android:layout_marginBottom="@dimen/spacing_d2"
         >
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/chatPausedContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/spacing_d1"
+            android:paddingHorizontal="@dimen/spacing_d2"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_semibold"
+                android:lineHeight="20sp"
+                android:textSize="14sp"
+                android:letterSpacing="0.01"
+                android:text="@string/chat_paused"
+                android:id="@+id/chatPausedTitle"
+                />
+            <TextView
+                android:id="@+id/chatPausedBy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:layout_marginTop="2dp"
+                android:lineHeight="16sp"
+                android:textSize="12sp"
+                android:letterSpacing="0.03"
+                tools:text="Chat paused by"
+                />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <TextView
+            android:id="@+id/userBlocked"
+            android:layout_width="match_parent"
+            android:padding="@dimen/spacing_d1"
+            android:layout_below="@id/chatPausedContainer"
+            android:lineHeight="20sp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:textSize="14sp"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="center"
+            android:text="@string/blocked_from_sending_messages"
+            />
+
 
         <EditText
             android:id="@+id/edit_text_message"
@@ -82,8 +224,7 @@
             android:gravity="center_vertical"
             android:layout_height="wrap_content"
             android:hint="@string/send_messages_to_everyone"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
+            android:paddingHorizontal="@dimen/spacing_d1"
             android:layout_marginStart="8dp" />
 
 

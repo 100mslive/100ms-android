@@ -66,6 +66,9 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    var recNum = 0
+    // This is needed in chat for it to determine what kind of chat it is.
+    val initPrebuiltChatMessageRecipient = MutableLiveData<Pair<Recipient?,Int>>()
     val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
@@ -77,6 +80,8 @@ class MeetingViewModel(
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
+    private var numRoleChanges = 0
+    val roleChangeSingleShot : LiveData<Int> = roleChange.map { numRoleChanges++ }
 
     fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
 
@@ -694,8 +699,11 @@ class MeetingViewModel(
 
             override fun onSessionStoreAvailable(sessionStore: HmsSessionStore) {
                 super.onSessionStoreAvailable(sessionStore)
-                sessionMetadataUseCase = SessionMetadataUseCase(sessionStore)
+                sessionMetadataUseCase.setSessionStore(sessionStore)
                 pinnedTrackUseCase = PinnedTrackUseCase(sessionStore)
+                blockUserUseCase.setSessionStore(sessionStore)
+                hideMessageUseCase.setSessionStore(sessionStore)
+                pauseChatUseCase.setSessionStore(sessionStore)
             }
 
             override fun onJoin(room: HMSRoom) {
@@ -726,9 +734,9 @@ class MeetingViewModel(
                     recordingState.postValue(room.browserRecordingState.state)
                 if (room.hlsRecordingState.state in runningRecordingStates )
                     recordingState.postValue(room.hlsRecordingState.state)
-
+                sessionMetadataUseCase.updatePeerName(room.localPeer?.name ?: "Participant")
+                initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), ++recNum))
                 sessionMetadataUseCase.setPinnedMessageUpdateListener(
-                    { message -> _sessionMetadata.postValue(message) },
                     object : HMSActionResultListener {
                         override fun onError(error: HMSException) {}
                         override fun onSuccess() {}
@@ -747,6 +755,9 @@ class MeetingViewModel(
                         override fun onSuccess() {}
                     }
                 )
+                blockUserUseCase.addKeyChangeListener()
+                pauseChatUseCase.addKeyChangeListener()
+                hideMessageUseCase.addKeyChangeListener()
                 updatePolls()
                 participantPeerUpdate.postValue(Unit)
             }
@@ -793,8 +804,10 @@ class MeetingViewModel(
                             "RoleChangeUpdate",
                             "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
                         )
-                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED)
+                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED) {
+                            initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), ++recNum))
                             roleChange.postValue(hmsPeer)
+                        }
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
@@ -807,6 +820,7 @@ class MeetingViewModel(
                                 showHlsStreamYetToStartError.postValue(false)
                                 exitHlsViewIfRequired(false)
                             }
+
                         }
 
                         participantPeerUpdate.postValue(Unit)
@@ -960,12 +974,7 @@ class MeetingViewModel(
                     return
                 broadcastsReceived.postValue(
                     ChatMessage(
-                        message.sender?.name.orEmpty(),
-                        message.serverReceiveTime,
-                        message.message,
-                        false,
-                        recipient = Recipient.toRecipient(message.recipient),
-                        message.messageId
+                        message, false
                     )
                 )
             }
@@ -1124,6 +1133,8 @@ class MeetingViewModel(
                 override fun onSuccess() {
               //      toggleRaiseHand(false)
                     setStatetoOngoing()
+                    recNum += 1
+                    initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), recNum))
                     updateThemeBasedOnCurrentRole(it.suggestedRole)
                     onSuccess.invoke()
                 }
@@ -1867,13 +1878,61 @@ class MeetingViewModel(
         return currentAudioMode != AudioManager.MODE_IN_COMMUNICATION
     }
 
-    private lateinit var sessionMetadataUseCase: SessionMetadataUseCase
+    private val sessionMetadataUseCase: SessionMetadataUseCase = SessionMetadataUseCase()
     private lateinit var pinnedTrackUseCase: PinnedTrackUseCase
-    fun setSessionMetadata(data: String?) {
-        sessionMetadataUseCase.updatePinnedMessage(data, object : HMSActionResultListener {
+    private val blockUserUseCase : BlockUserUseCase = BlockUserUseCase()
+    private val hideMessageUseCase : HideMessageUseCase = HideMessageUseCase()
+    private val pauseChatUseCase : PauseChatUseCase = PauseChatUseCase()
+
+    fun hideMessage(chatMessage: ChatMessage) {
+        hideMessageUseCase.hideMessage(chatMessage, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
-                    _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+                    _events.emit(Event.SessionMetadataEvent("Cannot hide too many messages."))
+                }
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Updating hide message list successful")
+            }
+
+        })
+    }
+    fun blockUser(chatMessage: ChatMessage) {
+        blockUserUseCase.blockUser(chatMessage,object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Psst, too many peers blocked already."))
+                }
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Updating block successful")
+            }
+
+        })
+        // For later
+//        sessionMetadataUseCase.userBlocked(chatMessage)
+    }
+    val currentBlockList = blockUserUseCase.currentBlockList
+    val messageIdsToHide = hideMessageUseCase.messageIdsToHide
+    fun pinMessage(message : ChatMessage) {
+        sessionMetadataUseCase.addToPinnedMessages(message, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Psst, you cannot pin large messages."))
+                }
+            }
+
+            override fun onSuccess() {}
+        })
+    }
+
+    fun unPinMessage(pinnedMessage: SessionMetadataUseCase.PinnedMessage) {
+        sessionMetadataUseCase.removeFromPinnedMessages(pinnedMessage, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Session metadata removing pinned message ${error.message}"))
                 }
             }
 
@@ -1894,11 +1953,13 @@ class MeetingViewModel(
         })
     }
 
-    private val _sessionMetadata = MutableLiveData<String?>(null)
-    val sessionMetadata: LiveData<String?> = _sessionMetadata
+    val pinnedMessages: LiveData<Array<SessionMetadataUseCase.PinnedMessage>> = sessionMetadataUseCase.pinnedMessages
 
     override fun onCleared() {
         super.onCleared()
+        sessionMetadataUseCase.close()
+        blockUserUseCase.close()
+        pauseChatUseCase.close()
         leaveMeeting()
     }
 
@@ -2187,5 +2248,36 @@ class MeetingViewModel(
     fun showPollOnUi(): Boolean {
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollRead == true || hmsSDK.getLocalPeer()?.hmsRole?.permission?.pollWrite == true
     }
+
+    fun isAllowedToBlockFromChat(): Boolean = prebuiltInfoContainer.isAllowedToBlockUserFromChat()
+
+    fun isAllowedToPinMessages(): Boolean = prebuiltInfoContainer.isAllowedToPinMessages()
+
+    fun availableRecipientsForChat()  = prebuiltInfoContainer.allowedToMessageWhatParticipants()
+    fun isAllowedToPauseChat() : Boolean = prebuiltInfoContainer.isAllowedToPauseChat()
+
+    fun isAllowedToHideMessages() : Boolean = prebuiltInfoContainer.isAllowedToHideMessages()
+
+    fun togglePauseChat() {
+        val newState = chatPauseState.value!!
+        val localPeer = hmsSDK.getLocalPeer()
+        val updatedBy = with(localPeer) {
+            if(this == null) ChatPauseState.UpdatedBy() else
+            ChatPauseState.UpdatedBy(
+                peerID ?: "",
+                customerUserID ?: "",
+                name ?: "Participant"
+            )
+        }
+        newState.copy(enabled = !newState.enabled,
+            updatedBy = updatedBy
+        )
+        pauseChatUseCase.changeChatState(newState)
+    }
+
+    val chatPauseState = pauseChatUseCase.currentChatPauseState
+    fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
+
+    fun chatTitle() = prebuiltInfoContainer.getChatTitle()
 }
 

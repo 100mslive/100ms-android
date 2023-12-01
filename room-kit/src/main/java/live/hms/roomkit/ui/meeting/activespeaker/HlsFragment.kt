@@ -23,11 +23,6 @@ import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
-import live.hms.roomkit.R
-import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.meeting.chat.ChatAdapter
-import live.hms.roomkit.ui.meeting.chat.ChatUseCase
-import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.stats.PlayerStatsListener

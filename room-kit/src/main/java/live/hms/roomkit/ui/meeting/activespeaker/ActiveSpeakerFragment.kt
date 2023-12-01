@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -127,7 +128,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   override fun onPause() {
 
-    if (activity?.isInPictureInPictureMode == true) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity?.isInPictureInPictureMode == true) {
       //when it's pip mode don't unbind views
       wasLastModePip = true
       screenShareOverLocalVideoInGrid()
@@ -140,7 +141,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
   private fun screenShareOverLocalVideoInGrid() {
     //hide video grid when screen share is shown!
-    binding.container.visibility = if (screenShareTrack != null && activity?.isInPictureInPictureMode == true) {
+    binding.container.visibility = if (screenShareTrack != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity?.isInPictureInPictureMode == true) {
         View.GONE
     } else {
         View.VISIBLE

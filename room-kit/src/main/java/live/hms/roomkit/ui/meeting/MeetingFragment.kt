@@ -31,7 +31,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -56,12 +55,16 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.meeting.chat.combined.CHAT_TAB_TITLE
 import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
+import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
+import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_CHAT_ALONE
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
+import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
+import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
-import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.HMSNotificationType
@@ -84,9 +87,6 @@ val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
 val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 
 class MeetingFragment : Fragment() {
-    private val chatAdapter = ChatAdapter({
-        onChatClick()
-    })
     companion object {
         private const val TAG = "MeetingFragment"
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
@@ -95,6 +95,7 @@ class MeetingFragment : Fragment() {
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
     private var hasStartedHls: Boolean = false
+    private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
     private lateinit var settings: SettingsStore
     var countDownTimer: CountDownTimer? = null
@@ -107,19 +108,20 @@ class MeetingFragment : Fragment() {
             requireActivity().application
         )
     }
+    private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+    private val chatAdapter by lazy {
+        ChatAdapter({ message ->
+            launchMessageOptionsDialog.launch(meetingViewModel,
+            childFragmentManager, message) }, ::onChatClick, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
+    }
 
-    private val chatViewModel: ChatViewModel by activityViewModels {
+    private val chatViewModel: ChatViewModel by activityViewModels<ChatViewModel> {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
     }
 
 
-    private var isMeetingOngoing = false
 
-    private val rtmpBottomSheet by lazy {
-        RtmpRecordBottomSheet {
-//            binding.buttonGoLive?.visibility = View.GONE
-        }
-    }
+    private var isMeetingOngoing = false
 
     private val onSettingsChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -277,10 +279,34 @@ class MeetingFragment : Fragment() {
             //start HLS stream
             startHLSStreamingIfRequired()
         }
+        binding.chatMessages.isHeightContrained = true
+        PauseChatUIUseCase().setChatPauseVisible(
+            binding.chatOptionsCard,
+            meetingViewModel
+        )
+        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage, meetingViewModel.isAllowedToPinMessages())
+        ChatUseCase().initiate(
+            chatViewModel.messages,
+            meetingViewModel.chatPauseState,
+            meetingViewModel.roleChange,
+            meetingViewModel.currentBlockList,
+            viewLifecycleOwner,
+            chatAdapter,
+            binding.chatMessages,
+            chatViewModel,
+            meetingViewModel,
+            null,
+            binding.iconSend,
+            binding.editTextMessage,
+            binding.userBlocked,
+            binding.chatPausedBy,
+            binding.chatPausedContainer,
+            binding.chatExtra,
+            meetingViewModel.prebuiltInfoContainer::isChatEnabled,
+            meetingViewModel::availableRecipientsForChat,
+            chatViewModel::currentlySelectedRbacRecipient
+        )
 
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
-            meetingViewModel.prebuiltInfoContainer.isChatEnabled()
-        }
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {
@@ -300,8 +326,10 @@ class MeetingFragment : Fragment() {
     private fun goToHomePage(details: HMSRemovedFromRoom? = null) {
 
         //only way to programmatically dismiss pip mode
-        if (activity?.isInPictureInPictureMode == true) {
-            activity?.moveTaskToBack(false)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (activity?.isInPictureInPictureMode == true) {
+                activity?.moveTaskToBack(false)
+            }
         }
 
         requireActivity().finish()
@@ -366,7 +394,27 @@ class MeetingFragment : Fragment() {
     }
 
     private fun initObservers() {
+        binding.sendToBackground.setOnSingleClickListener {
+            RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
+        }
+        // This only needs to be in meetingfragment since we always open it.
+        // Is that true for HLS? Double check.
+        meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
+            chatViewModel.setInitialRecipient(it.first, it.second)
+            ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, it.first)
+        }
+        chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
+            ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
+            // if recipient is null, hide the chat.
+            // but recipient might be null if they're just selecting from roles/participants as well.
 
+        }
+        meetingViewModel.messageIdsToHide.observe(viewLifecycleOwner) { messageIdsToHide ->
+            chatViewModel.updateMessageHideList(messageIdsToHide)
+        }
+        meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
+            chatViewModel.updateBlockList(chatBlockedPeerIdsList)
+        }
         meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
                 binding.streamYetToStartContainer.visibility = if (showError) View.VISIBLE else View.GONE
         }
@@ -378,6 +426,11 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
+        }
+
+        meetingViewModel.pinnedMessages.observe(viewLifecycleOwner) { pinnedMessages ->
+            pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
+                binding.pinnedMessagesDisplay)
         }
 
         meetingViewModel.recordingState.observe(viewLifecycleOwner) { state ->
@@ -587,6 +640,7 @@ class MeetingFragment : Fragment() {
                 }
 
             }
+
         }
 
         meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->
@@ -625,10 +679,6 @@ class MeetingFragment : Fragment() {
                     setIconDisabled(R.drawable.avd_mic_on_to_off)
                 }
             }
-        }
-
-        meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
-            chatViewModel.peersUpdate()
         }
 
         meetingViewModel.roleChange.observe(viewLifecycleOwner) {
@@ -1009,11 +1059,15 @@ class MeetingFragment : Fragment() {
         handler.postDelayed(hideRunnable, delayMillis.toLong())
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun hideProgressBar() {
+        var isInPIPMode = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (activity?.isInPictureInPictureMode?.not() == true)
+                isInPIPMode = true
+        }
         binding.fragmentContainer.visibility = View.VISIBLE
         binding.bottomControls.visibility = View.VISIBLE
-        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
+        if (!isInPIPMode && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
         binding.progressBar.root.visibility = View.GONE
@@ -1069,6 +1123,7 @@ class MeetingFragment : Fragment() {
                                 val args = Bundle()
                                     .apply {
                                         putBoolean(OPEN_TO_PARTICIPANTS, true)
+                                        putString(CHAT_TAB_TITLE, meetingViewModel.chatTitle())
                                     }
 
                                 ChatParticipantCombinedFragment()
@@ -1142,9 +1197,12 @@ class MeetingFragment : Fragment() {
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                 ChatParticipantCombinedFragment().apply {
-                    arguments = Bundle().apply { putBoolean(OPEN_TO_CHAT_ALONE,
+                    arguments = Bundle().apply {
+                        putBoolean(OPEN_TO_CHAT_ALONE,
                         !meetingViewModel.isParticpantListEnabled()
-                    ) }
+                    )
+                        putString(CHAT_TAB_TITLE, meetingViewModel.chatTitle())
+                    }
                 }.show(
                     childFragmentManager,
                     ChatParticipantCombinedFragment.TAG
@@ -1207,6 +1265,18 @@ class MeetingFragment : Fragment() {
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
+        // Because the meeting fragment can toggle the
+        //  chat visibility and this applies
+        //  whether the chat is enabled or blocked or paused
+        //  we need a different way to show this UI, independent
+        //  of whether the UI should be hidden for chat RBAC feature reasons.
+        // So the UI that chat RBAC triggers is put into a wrapper.
+        // when this toggle button toggles hide/view it changes the
+        //  wrapper visibility, which means chat can be enabled
+        //  and controlled entirely by ChatUseCase but also hidden
+        //  since we hide the wrapper that contains it.
+        binding.pinnedMessagesWrapper.visibility = binding.chatView.visibility
+        binding.chatExtraWrapper.visibility = binding.chatView.visibility
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1
