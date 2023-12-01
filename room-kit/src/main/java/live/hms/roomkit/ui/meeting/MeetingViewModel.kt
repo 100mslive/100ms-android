@@ -2252,6 +2252,6 @@ class MeetingViewModel(
     val chatPauseState = pauseChatUseCase.currentChatPauseState
     fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
 
-    fun chatTitle() = prebuiltInfoContainer.getChatTitle(false)
+    fun chatTitle() = prebuiltInfoContainer.getChatTitle()
 }
 
