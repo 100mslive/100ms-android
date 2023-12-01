@@ -109,9 +109,10 @@ class MeetingFragment : Fragment() {
         )
     }
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
-    private val chatAdapter by lazy { ChatAdapter({ message ->
-        launchMessageOptionsDialog.launch(meetingViewModel,
-            childFragmentManager, message) }, ::onChatClick)
+    private val chatAdapter by lazy {
+        ChatAdapter({ message ->
+            launchMessageOptionsDialog.launch(meetingViewModel,
+            childFragmentManager, message) }, ::onChatClick, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
     }
 
     private val chatViewModel: ChatViewModel by activityViewModels<ChatViewModel> {

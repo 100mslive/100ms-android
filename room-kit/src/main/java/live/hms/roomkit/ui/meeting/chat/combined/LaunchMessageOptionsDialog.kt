@@ -17,7 +17,7 @@ class LaunchMessageOptionsDialog {
         val allowedToBlock = meetingViewModel.isAllowedToBlockFromChat()
         val allowedToPin = meetingViewModel.isAllowedToPinMessages()
         val allowedToHideMessages = meetingViewModel.isAllowedToHideMessages()
-        if(!( allowedToPin || allowedToBlock || allowedToHideMessages) )
+        if(MessageOptionsBottomSheet.showMessageOptions(meetingViewModel))
             return
 
         MessageOptionsBottomSheet(chatMessage, allowedToBlock, allowedToPin, allowedToHideMessages).apply {

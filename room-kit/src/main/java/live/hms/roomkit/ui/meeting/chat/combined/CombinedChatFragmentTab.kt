@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.meeting.MessageOptionsBottomSheet
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
 import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
@@ -25,7 +26,7 @@ class CombinedChatFragmentTab : Fragment() {
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
     private val chatAdapter by lazy { ChatAdapter({ message ->
         launchMessageOptionsDialog.launch(meetingViewModel,
-        childFragmentManager, message) })
+        childFragmentManager, message) },{}, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
     }
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
