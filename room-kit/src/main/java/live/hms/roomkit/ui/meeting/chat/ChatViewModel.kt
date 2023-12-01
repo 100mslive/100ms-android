@@ -170,6 +170,8 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         // Check if the last sender was also the same person
         if(shouldBlockMessage(message))
             return
+        if(messageIdsToHide?.contains(message.messageId) == true)
+            return
 
         if (_messages.find { it.messageId == message.messageId } == null) {
             if (!message.isSentByMe) {
@@ -192,9 +194,11 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     private fun shouldBlockMessage(message: ChatMessage): Boolean =
         blockedPeerIds.contains(message.userIdForBlockList)
 
+    private var messageIdsToHide : Set<String>? = null
     fun updateMessageHideList(messageIdsToHide: Set<String>) {
         if(messageIdsToHide.isEmpty())
             return
+        this.messageIdsToHide = messageIdsToHide
         // Refresh the current list
         _messages = _messages.filter { !messageIdsToHide.contains(it.messageId) }.toMutableList()
         messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
@@ -204,15 +208,19 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     //  peer so there's no need to keep running it later.
     //  This is different from a role/peer filter which has to keep the messages.
     fun updateBlockList(chatBlockedPeerIdsList: Set<String>?) {
-        val disableRemovingBlockedUserMessages = true
+        val removeBlockedUserMessages = false
         // What does the adapter have to do?
         // Basically turn on a filter.
         // Ok so part of the problem is that we call submit list directly :(
-        if (chatBlockedPeerIdsList.isNullOrEmpty() || disableRemovingBlockedUserMessages) return
+        if (chatBlockedPeerIdsList.isNullOrEmpty()) return
+        // Update the blocklist
         blockedPeerIds = chatBlockedPeerIdsList
-        // Refresh the current list
-        _messages = _messages.filter { !blockedPeerIds.contains(it.userIdForBlockList) }.toMutableList()
-        messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+        if(removeBlockedUserMessages) {
+            // Refresh the current list
+            _messages =
+                _messages.filter { !blockedPeerIds.contains(it.userIdForBlockList) }.toMutableList()
+            messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+        }
     }
 
     fun isUserBlockedFromChat(): Boolean {

@@ -31,7 +31,7 @@ class HideMessageUseCase: AutoCloseable {
     fun setSessionStore(hmsSessionStore : HmsSessionStore) {
         this.hmsSessionStore = hmsSessionStore
     }
-    fun hideMessage(chatMessage: ChatMessage) {
+    fun hideMessage(chatMessage: ChatMessage, resultListener: HMSActionResultListener) {
         if(!::hmsSessionStore.isInitialized ) {
             Log.e(TAG,"Tried to hide message without session store inited")
             return
@@ -44,16 +44,7 @@ class HideMessageUseCase: AutoCloseable {
                 ?.plus(chatMessage.messageId) ?: listOf(chatMessage.messageId)
             hmsSessionStore.set(newValue,
                 HIDE_MESSAGE_KEY,
-                object : HMSActionResultListener {
-                    override fun onError(error: HMSException) {
-                        Log.e(TAG, "Updating hide message failed with $error")
-                    }
-
-                    override fun onSuccess() {
-                        Log.d(TAG, "Updating hide message list successful")
-                    }
-
-                })
+                resultListener)
         }
     }
 

@@ -9,23 +9,24 @@ import androidx.fragment.app.activityViewModels
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.meeting.MessageOptionsBottomSheet
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
-import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
+import kotlin.reflect.KFunction0
 
-class CombinedChatFragmentTab : Fragment() {
+class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedTabChatBinding>()
     val meetingViewModel : MeetingViewModel by activityViewModels()
     private val chatViewModel : ChatViewModel by activityViewModels()
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
     private val chatAdapter by lazy { ChatAdapter({ message ->
         launchMessageOptionsDialog.launch(meetingViewModel,
-        childFragmentManager, message) })
+        childFragmentManager, message) },{}, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
     }
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
@@ -52,9 +53,20 @@ class CombinedChatFragmentTab : Fragment() {
     }
 
 
+    var roleChangeSingleShot = -1
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        roleChangeSingleShot = meetingViewModel.roleChangeSingleShot.value ?:0
         binding.sendToBackground.setOnSingleClickListener {
             RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
+        }
+        meetingViewModel.roleChangeSingleShot.observe(viewLifecycleOwner) {
+            if(roleChangeSingleShot != it) {
+                roleChangeSingleShot = it
+                dismissAllowingStateLoss()
+            }
+        }
+        meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
+            chatViewModel.setInitialRecipient(it.first, it.second)
         }
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
@@ -71,6 +83,7 @@ class CombinedChatFragmentTab : Fragment() {
             chatViewModel.messages,
             meetingViewModel.chatPauseState,
             meetingViewModel.roleChange,
+            meetingViewModel.currentBlockList,
             viewLifecycleOwner,
             chatAdapter,
             binding.chatMessages,

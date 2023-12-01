@@ -16,7 +16,9 @@ import java.util.*
 
 
 class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
-                  val onClick: () -> Unit = {}) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+                  val onClick: () -> Unit = {},
+  private val shouldShowMessageOptions : () -> Boolean
+  ) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
   private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
   companion object {
     private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
@@ -68,6 +70,7 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
           View.VISIBLE
         sentTo.text = sentMessage.sentTo
         toGroup.text = sentMessage.toGroup
+        viewMore.visibility = if(shouldShowMessageOptions()) View.VISIBLE else View.GONE
       }
     }
   }

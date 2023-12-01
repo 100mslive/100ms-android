@@ -32,9 +32,18 @@ import live.hms.video.sdk.models.enums.HMSRecordingState
 const val CHAT_MESSAGE_OPTIONS_EXTRA = "ChatMessageOptionsExtra"
 class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
                                 private val allowedToBlock : Boolean,
-                                private val allowedToHideMessages : Boolean,
-    private val allowedToPin : Boolean
+                                private val allowedToPin : Boolean,
+                                private val allowedToHideMessages : Boolean
 ): BottomSheetDialogFragment() {
+
+    companion object {
+        fun showMessageOptions(meetingViewModel: MeetingViewModel) : Boolean {
+            val allowedToBlock = meetingViewModel.isAllowedToBlockFromChat()
+            val allowedToPin = meetingViewModel.isAllowedToPinMessages()
+            val allowedToHideMessages = meetingViewModel.isAllowedToHideMessages()
+            return allowedToPin || allowedToBlock || allowedToHideMessages
+        }
+    }
 
     private var binding by viewLifecycle<BottomSheetMessageOptionsBinding>()
 //    private val chatMessage: ChatMessage? = arguments?.getParcelable(CHAT_MESSAGE_OPTIONS_EXTRA) as ChatMessage?

@@ -2,11 +2,9 @@ package live.hms.roomkit.ui.meeting.chat.combined
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -15,22 +13,21 @@ import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.participants.ParticipantsTabFragment
 import live.hms.roomkit.ui.theme.applyTheme
 
 
-class ChatOnlyAdapter(fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
+class ChatOnlyAdapter(val fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
 
     override fun getItemCount(): Int = 1
 
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int).
 
-        return CombinedChatFragmentTab()
+        return CombinedChatFragmentTab(fragment::dismissAllowingStateLoss)
     }
 }
-class ChatParticipantAdapter(fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
+class ChatParticipantAdapter(val fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
     val partFragment = ParticipantsTabFragment(fragment::dismiss)
     override fun getItemCount(): Int = 2
 
@@ -38,7 +35,7 @@ class ChatParticipantAdapter(fragment: BottomSheetDialogFragment) : FragmentStat
         // Return a NEW fragment instance in createFragment(int).
 
         return if (position == 0)
-            CombinedChatFragmentTab()
+            CombinedChatFragmentTab(fragment::dismissAllowingStateLoss)
         else
             partFragment
     }

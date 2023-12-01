@@ -3,8 +3,10 @@ package live.hms.roomkit.ui.meeting.chat.combined
 import android.view.View
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -12,12 +14,14 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
+import live.hms.roomkit.R
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.meeting.participants.PinnedMessageItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
+import live.hms.roomkit.util.dp
 
 class PinnedMessageUiUseCase {
     private val pinnedMessagesAdapter = GroupieAdapter()
@@ -42,7 +46,9 @@ class PinnedMessageUiUseCase {
         ))
         PagerSnapHelper().attachToRecyclerView(pinnedMessageRecyclerView)
         if(canPinMessages) {
-            pinCloseButton.visibility = View.VISIBLE
+            pinCloseButton.setImageDrawable(ResourcesCompat.getDrawable(pinnedMessageRecyclerView.resources,
+                R.drawable.pin_close_item, null))
+            pinCloseButton.updateLayoutParams { this.width = 20.dp() }
             pinCloseButton.setOnSingleClickListener {
                 val position = (pinnedMessageRecyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                 if(position != -1) {
@@ -51,7 +57,8 @@ class PinnedMessageUiUseCase {
                 }
             }
         } else {
-            pinCloseButton.visibility = View.GONE
+            pinCloseButton.setImageDrawable(null)
+            pinCloseButton.updateLayoutParams { this.width = 1.dp() }
         }
 
     }

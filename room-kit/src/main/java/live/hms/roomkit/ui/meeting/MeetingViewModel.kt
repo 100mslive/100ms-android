@@ -80,6 +80,8 @@ class MeetingViewModel(
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
+    private var numRoleChanges = 0
+    val roleChangeSingleShot : LiveData<Int> = roleChange.map { numRoleChanges++ }
 
     fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
 
@@ -802,8 +804,10 @@ class MeetingViewModel(
                             "RoleChangeUpdate",
                             "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
                         )
-                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED)
+                        if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED) {
+                            initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), ++recNum))
                             roleChange.postValue(hmsPeer)
+                        }
                         peerLiveData.postValue(hmsPeer)
                         if (hmsPeer.isLocal) {
                             // get the hls URL from the Room, if it exists
@@ -1881,10 +1885,32 @@ class MeetingViewModel(
     private val pauseChatUseCase : PauseChatUseCase = PauseChatUseCase()
 
     fun hideMessage(chatMessage: ChatMessage) {
-        hideMessageUseCase.hideMessage(chatMessage)
+        hideMessageUseCase.hideMessage(chatMessage, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Cannot hide too many messages."))
+                }
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Updating hide message list successful")
+            }
+
+        })
     }
     fun blockUser(chatMessage: ChatMessage) {
-        blockUserUseCase.blockUser(chatMessage)
+        blockUserUseCase.blockUser(chatMessage,object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Psst, too many peers blocked already."))
+                }
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Updating block successful")
+            }
+
+        })
         // For later
 //        sessionMetadataUseCase.userBlocked(chatMessage)
     }
@@ -1894,7 +1920,7 @@ class MeetingViewModel(
         sessionMetadataUseCase.addToPinnedMessages(message, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
-                    _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+                    _events.emit(Event.SessionMetadataEvent("Psst, you cannot pin large messages."))
                 }
             }
 
@@ -2252,6 +2278,6 @@ class MeetingViewModel(
     val chatPauseState = pauseChatUseCase.currentChatPauseState
     fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
 
-    fun chatTitle() = prebuiltInfoContainer.getChatTitle(false)
+    fun chatTitle() = prebuiltInfoContainer.getChatTitle()
 }
 

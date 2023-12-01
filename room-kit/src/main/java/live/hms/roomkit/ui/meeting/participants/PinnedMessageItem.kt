@@ -16,7 +16,8 @@ import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.theme.applyTheme
 
-class PinnedMessageItem(val receivedPinnedMessage: SessionMetadataUseCase.PinnedMessage)
+class PinnedMessageItem(val receivedPinnedMessage: SessionMetadataUseCase.PinnedMessage,
+    )
     : BindableItem<LayoutPinnedMessageBinding>(receivedPinnedMessage.hashCode().toLong()), ExpandableItem {
     private lateinit var expand : ExpandableGroup
     override fun bind(viewBinding: LayoutPinnedMessageBinding, position: Int) {

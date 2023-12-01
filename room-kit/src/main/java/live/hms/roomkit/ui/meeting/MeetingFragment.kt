@@ -109,9 +109,10 @@ class MeetingFragment : Fragment() {
         )
     }
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
-    private val chatAdapter by lazy { ChatAdapter({ message ->
-        launchMessageOptionsDialog.launch(meetingViewModel,
-            childFragmentManager, message) }, ::onChatClick)
+    private val chatAdapter by lazy {
+        ChatAdapter({ message ->
+            launchMessageOptionsDialog.launch(meetingViewModel,
+            childFragmentManager, message) }, ::onChatClick, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
     }
 
     private val chatViewModel: ChatViewModel by activityViewModels<ChatViewModel> {
@@ -288,6 +289,7 @@ class MeetingFragment : Fragment() {
             chatViewModel.messages,
             meetingViewModel.chatPauseState,
             meetingViewModel.roleChange,
+            meetingViewModel.currentBlockList,
             viewLifecycleOwner,
             chatAdapter,
             binding.chatMessages,
@@ -399,6 +401,7 @@ class MeetingFragment : Fragment() {
         // Is that true for HLS? Double check.
         meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
             chatViewModel.setInitialRecipient(it.first, it.second)
+            ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, it.first)
         }
         chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
