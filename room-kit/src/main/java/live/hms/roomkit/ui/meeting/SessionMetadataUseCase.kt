@@ -69,13 +69,18 @@ class SessionMetadataUseCase : Closeable {
 
     fun addToPinnedMessages(data: ChatMessage, hmsActionResultListener: HMSActionResultListener) {
         // text, id, pinnedBy
+        val existingPinnedMessages = pinnedMessages.value ?: arrayOf()
+        // Don't pin existing messages
+        if(existingPinnedMessages.find { it.id == data.messageId } != null)
+            return
+
         val newPinnedMessage = PinnedMessage(
             "${data.localSenderRealNameForPinMessage}: ${data.message}",
             data.messageId ?: "",
             localPeerName ?: "Participant",
             data.userIdForBlockList ?: ""
-            )
-        val existingPinnedMessages = pinnedMessages.value ?: arrayOf()
+        )
+
         val newMessages = if(existingPinnedMessages.size < MAX_PINNED_MESSAGES)
             existingPinnedMessages.plus(newPinnedMessage).toList()
         else
