@@ -91,8 +91,8 @@ class ChatUseCase {
         toggleEmptyIndicator(emptyIndicator, messages.value)
         // Chat pause observer
         roleChanged.observe(viewlifecycleOwner) {
-            if(isChatEnabled()) {
-                val overallChatState = getOverallChatState(
+            val overallChatState =
+                getOverallChatState(
                     meetingViewModel,
                     chatViewModel,
                     isChatEnabled,
@@ -112,7 +112,6 @@ class ChatUseCase {
                     recipientPickerContainer,
                     overallChatState
                 )
-            }
         }
         chatPauseState.observe(viewlifecycleOwner) { pauseState ->
             if(isChatEnabled()) {
