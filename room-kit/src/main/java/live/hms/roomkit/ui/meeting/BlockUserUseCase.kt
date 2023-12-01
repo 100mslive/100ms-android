@@ -31,7 +31,7 @@ class BlockUserUseCase: AutoCloseable {
     fun setSessionStore(hmsSessionStore : HmsSessionStore) {
         this.hmsSessionStore = hmsSessionStore
     }
-    fun blockUser(chatMessage: ChatMessage) {
+    fun blockUser(chatMessage: ChatMessage, hmsActionResultListener: HMSActionResultListener) {
         if(!::hmsSessionStore.isInitialized ) {
             Log.e(TAG,"Tried to block user without session store inited")
             return
@@ -43,17 +43,7 @@ class BlockUserUseCase: AutoCloseable {
                 // Add the peer id or create a new list if null
                 ?.plus(chatMessage.userIdForBlockList) ?: setOf(chatMessage.userIdForBlockList)
             hmsSessionStore.set(newValue,
-                BLOCK_PEER_KEY,
-                object : HMSActionResultListener {
-                    override fun onError(error: HMSException) {
-                        Log.e(TAG, "Updating block list failed with $error")
-                    }
-
-                    override fun onSuccess() {
-                        Log.d(TAG, "Updating block list successful")
-                    }
-
-                })
+                BLOCK_PEER_KEY,hmsActionResultListener)
         }
     }
 

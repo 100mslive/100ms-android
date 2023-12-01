@@ -1885,10 +1885,32 @@ class MeetingViewModel(
     private val pauseChatUseCase : PauseChatUseCase = PauseChatUseCase()
 
     fun hideMessage(chatMessage: ChatMessage) {
-        hideMessageUseCase.hideMessage(chatMessage)
+        hideMessageUseCase.hideMessage(chatMessage, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Cannot hide too many messages."))
+                }
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Updating hide message list successful")
+            }
+
+        })
     }
     fun blockUser(chatMessage: ChatMessage) {
-        blockUserUseCase.blockUser(chatMessage)
+        blockUserUseCase.blockUser(chatMessage,object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                viewModelScope.launch {
+                    _events.emit(Event.SessionMetadataEvent("Psst, too many peers blocked already."))
+                }
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Updating block successful")
+            }
+
+        })
         // For later
 //        sessionMetadataUseCase.userBlocked(chatMessage)
     }
@@ -1898,7 +1920,7 @@ class MeetingViewModel(
         sessionMetadataUseCase.addToPinnedMessages(message, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 viewModelScope.launch {
-                    _events.emit(Event.SessionMetadataEvent("Session metadata error setting ${error.message}"))
+                    _events.emit(Event.SessionMetadataEvent("Psst, you cannot pin large messages."))
                 }
             }
 
