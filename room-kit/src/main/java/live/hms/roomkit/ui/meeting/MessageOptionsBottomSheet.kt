@@ -32,8 +32,8 @@ import live.hms.video.sdk.models.enums.HMSRecordingState
 const val CHAT_MESSAGE_OPTIONS_EXTRA = "ChatMessageOptionsExtra"
 class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
                                 private val allowedToBlock : Boolean,
-                                private val allowedToHideMessages : Boolean,
-    private val allowedToPin : Boolean
+                                private val allowedToPin : Boolean,
+                                private val allowedToHideMessages : Boolean
 ): BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetMessageOptionsBinding>()
