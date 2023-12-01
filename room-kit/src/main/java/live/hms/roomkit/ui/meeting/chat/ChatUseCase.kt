@@ -40,8 +40,16 @@ class ChatUseCase {
             if(!chatPauseState.enabled)
                 ChatUiVisibilityState.Paused(chatPauseState)
             else {
+                val chatSendingEnabled = getAllowedRecipients()?.isChatSendingEnabled()
                 // Role fix
-                if(getCurrentRecipient() == null && getAllowedRecipients()?.isChatSendingEnabled() == true) {
+                val tempRecipient = getCurrentRecipient()
+                if( tempRecipient == null && chatSendingEnabled == true) {
+                    // Take it out of null when it shouldn't be
+                    val recToMessage = meetingViewModel.defaultRecipientToMessage()
+                    chatViewModel.updateSelectedRecipientChatBottomSheet(recToMessage)
+                }
+                if( tempRecipient != null && chatSendingEnabled == false) {
+                    // Make it null when it should be.
                     val recToMessage = meetingViewModel.defaultRecipientToMessage()
                     chatViewModel.updateSelectedRecipientChatBottomSheet(recToMessage)
                 }
