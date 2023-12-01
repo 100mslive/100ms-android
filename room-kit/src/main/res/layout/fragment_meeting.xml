@@ -275,7 +275,7 @@
         android:layout_above="@id/chatExtraWrapper"
         >
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:id="@+id/pinnedMessagesDisplay"
         android:visibility="gone"
@@ -285,6 +285,17 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pinnedMessagesRecyclerView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"
+            android:paddingEnd="@dimen/spacing_d2"
+            tools:itemCount="1"
+            tools:listitem="@layout/layout_pinned_message" />
+
+
         <ImageView
             android:visibility="gone"
             android:id="@+id/pinCloseButton"
@@ -293,24 +304,8 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/pin_close_item"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/pinnedMessagesRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="2dp"
-            android:paddingEnd="@dimen/spacing_d2"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/pinCloseButton"
-            tools:itemCount="1"
-            tools:listitem="@layout/layout_pinned_message" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:src="@drawable/pin_close_item" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
     </FrameLayout>
     <!-- Footer menu -->
     <FrameLayout

@@ -6,6 +6,7 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.TextUtils
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.View
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.ExpandableItem
@@ -17,6 +18,7 @@ import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.theme.applyTheme
 
 class PinnedMessageItem(val receivedPinnedMessage: SessionMetadataUseCase.PinnedMessage,
+    val sizeUpdated: (Int, Int) -> Unit
     )
     : BindableItem<LayoutPinnedMessageBinding>(receivedPinnedMessage.hashCode().toLong()), ExpandableItem {
     private lateinit var expand : ExpandableGroup
@@ -24,13 +26,18 @@ class PinnedMessageItem(val receivedPinnedMessage: SessionMetadataUseCase.Pinned
         with(viewBinding) {
             applyTheme()
             pinnedMessage.text = boldTheSenderName(receivedPinnedMessage.text)
+
             root.setOnSingleClickListener {
                 expand.onToggleExpanded()
                 pinnedMessage.maxLines = if(expand.isExpanded) {
                     100
                 } else
                     2
+                sizeUpdated(pinnedMessage.measuredHeight, position)
+
+                Log.d("PinnedMessageHeight", "${pinnedMessage.height}")
             }
+            sizeUpdated(pinnedMessage.measuredHeight, position)
         }
     }
 

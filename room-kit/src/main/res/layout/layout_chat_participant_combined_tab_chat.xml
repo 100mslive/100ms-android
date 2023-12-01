@@ -19,7 +19,7 @@
         android:layout_margin="@dimen/spacing_d2"
         >
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:id="@+id/pinnedMessagesDisplay"
             android:visibility="gone"
@@ -27,6 +27,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pinnedMessagesRecyclerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginBottom="2dp"
+                android:paddingEnd="@dimen/spacing_d2"
+                tools:itemCount="1"
+                tools:listitem="@layout/layout_pinned_message" />
             <ImageView
                 android:id="@+id/pinCloseButton"
                 android:layout_width="20dp"
@@ -35,23 +44,8 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/pin_close_item"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/pinnedMessagesRecyclerView"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginBottom="2dp"
-                android:paddingEnd="@dimen/spacing_d2"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/pinCloseButton"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="1"
-                tools:listitem="@layout/layout_pinned_message" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                 />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
         android:id="@+id/chatMessages"
         android:layout_width="match_parent"
