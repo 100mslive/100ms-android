@@ -43,8 +43,15 @@ class HlsFragment : Fragment() {
     val TAG = "HlsFragment"
     var isStatsDisplayActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-    val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
-    val displayHlsCuesUseCase = DisplayHlsCuesUseCase { text -> binding.hlsCues.text = text }
+    private val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
+    val displayHlsCuesUseCase = DisplayHlsCuesUseCase( { text -> binding.hlsCues.text = text })
+    { pollId ->
+        lifecycleScope.launch {
+            val hmsPoll = meetingViewModel.getPollForPollId(pollId)
+            if(hmsPoll != null)
+                meetingViewModel.triggerPollsNotification(hmsPoll)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -150,9 +157,9 @@ class HlsFragment : Fragment() {
                 Log.d("HMSHLSPLAYER","From App, playback state: $p1")
             }
 
-            override fun onCue(hlsCue : HmsHlsCue) {
+            override fun onCue(cue : HmsHlsCue) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    displayHlsCuesUseCase.addCue(hlsCue)
+                    displayHlsCuesUseCase.addCue(cue)
                 }
             }
         })

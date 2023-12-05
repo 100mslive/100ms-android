@@ -26,6 +26,7 @@ import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
@@ -123,11 +124,14 @@ class MeetingViewModel(
                 ) {
                     when(hmsPollUpdateType) {
                         HMSPollUpdateType.started -> viewModelScope.launch {
-                            _events.emit(Event.PollStarted(hmsPoll))
-                            // Only show latest polls
-                            if (lastPollStartedTime < hmsPoll.startedAt) {
-                                lastPollStartedTime = hmsPoll.startedAt
-                                triggerPollsNotification(hmsPoll)
+                            if(!isHlsPeer(hmsSDK.getLocalPeer()?.hmsRole)) {
+                                _events.emit(Event.PollStarted(hmsPoll))
+                                // Only show latest polls
+                                if (lastPollStartedTime < hmsPoll.startedAt) {
+                                    lastPollStartedTime = hmsPoll.startedAt
+                                    triggerPollsNotification(hmsPoll)
+
+                                }
                             }
                         }
                         HMSPollUpdateType.stopped -> viewModelScope.launch {
@@ -2018,14 +2022,21 @@ class MeetingViewModel(
                 QuestionUi.AddAnotherItemView, -> { /*Nothing to do here*/}
             }
         }
+        val pollBuilder = hmsPollBuilder.build()
 
-        localHmsInteractivityCenter.quickStartPoll(hmsPollBuilder.build(), object : HMSActionResultListener {
+        localHmsInteractivityCenter.quickStartPoll(pollBuilder, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 Log.d("Polls","Error $error")
             }
 
             override fun onSuccess() {
                 Log.d("Polls","Success")
+                // Now send a notification into the hls cue,
+                //  it's ok if this fails since that just means there's no hls stream
+                //  to send it into.
+                // Might need to avoid sending it hls viewers though.
+                val hlsPollEvent = HMSHLSTimedMetadata("$POLL_IDENTIFIER_FOR_HLS_CUE${pollBuilder.pollId}",1000)
+                sendHlsMetadata(hlsPollEvent)
             }
 
         })
