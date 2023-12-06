@@ -151,7 +151,9 @@ class SessionOptionBottomSheet(
             add(raiseHandOption)
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
-            add(changeName)
+            if(!meetingViewModel.disableNameEdit()) {
+                add(changeName)
+            }
             if (meetingViewModel.showPollOnUi()) {
                 add(GridOptionItem(
                         "Polls and Quizzes", R.drawable.poll_vote, {

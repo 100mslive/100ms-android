@@ -168,7 +168,7 @@ class HomeFragment : Fragment() {
             val consistentUserId = getConsistentUserIdOverSessions()
 
             HMSRoomKit.launchPrebuilt(
-                code, activity, HMSPrebuiltOptions(userName = getUsername(), userId = consistentUserId, debugInfo = settings.inPreBuiltDebugMode,
+                code, activity, HMSPrebuiltOptions(userName = if(settings.setInitialNameFromClient) getUsername() else null, userId = consistentUserId, debugInfo = settings.inPreBuiltDebugMode,
                     endPoints = hashMapOf<String, String>().apply {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")

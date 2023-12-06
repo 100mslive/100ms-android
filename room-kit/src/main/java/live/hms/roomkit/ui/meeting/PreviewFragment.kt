@@ -233,6 +233,9 @@ class PreviewFragment : Fragment() {
     }
 
     private fun setupUI(roleName: String) {
+        // don't allow editing the name if there's supposed to be a fixed one
+        binding.editTextName.isEnabled = !meetingViewModel.disableNameEdit()
+
         var introAnimationOffset = 450
         if (meetingViewModel.getHmsRoomLayout()
                 ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.title.isNullOrEmpty()

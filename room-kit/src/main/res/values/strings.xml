@@ -146,7 +146,7 @@
     <string name="yes">YES</string>
     <string name="no">NO</string>
     <string name="role_change">Role Change</string>
-    <string name="switch_enable_subscribe_degradation">Enable subscribe degradation</string>
+    <string name="switch_set_initial_name">Enable initial name setting from client</string>
     <string name="end_room">End room</string>
     <string name="end_and_lock_room">Lock and end room</string>
     <string name="remote_mute_all_desc">Remote Mute All</string>
