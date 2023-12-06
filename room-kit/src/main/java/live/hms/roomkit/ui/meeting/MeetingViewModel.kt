@@ -1059,10 +1059,16 @@ class MeetingViewModel(
 
     }
 
+    private var lastStartedPoll : HmsPoll? = null
     private fun updatePolls() {
         // Just running this is enough since it will trigger the poll started notifications
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
+                // Put the last poll in the list.
+                lastStartedPoll = result.maxByOrNull { it.startedAt }
+//                Log.d("PollInfoS","${lastStartedPoll?.pollId} at ${lastStartedPoll?.startedAt}")
+                // This happens only once.
+//                _events.emit(Event.PollStarted(hmsPoll))
 //                viewModelScope.launch {
 //                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
 //                        _events.emit(Event.PollStarted(firstPoll))
@@ -2290,5 +2296,23 @@ class MeetingViewModel(
     fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
 
     fun chatTitle() = prebuiltInfoContainer.getChatTitle()
+
+    private var initialPollShown = false
+    fun hlsPlayerBeganToPlay() {
+        val lp = lastStartedPoll
+        if(lp == null)
+            return
+        val isPollLaunchedGreaterThan20SecondsAgo = Date().time - lp.startedAt > 20_000
+//        val t = Date().time
+//        Log.d("PollInfoS","diff: $isPollLaunchedGreaterThan20SecondsAgo lastPollTime : ${lp.startedAt} current time : $t diff : ${Date().time - lp.startedAt}")
+
+        if(!initialPollShown && isPollLaunchedGreaterThan20SecondsAgo) {
+            initialPollShown = true
+//            Log.d("PollInfoS","Launching")
+            viewModelScope.launch {
+                triggerPollsNotification(lp)
+            }
+        }
+    }
 }
 

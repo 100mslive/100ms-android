@@ -6,8 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -110,7 +108,7 @@ class HlsFragment : Fragment() {
         player.play(args.hlsStreamUrl)
     }
 
-    fun resumePlay() {
+    private fun resumePlay() {
 
         binding.hlsView.player = player.getNativePlayer()
         player.getNativePlayer().addListener(object : Player.Listener {
@@ -148,13 +146,14 @@ class HlsFragment : Fragment() {
             }
 
             @SuppressLint("UnsafeOptInUsageError")
-            override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
+            override fun onPlaybackStateChanged(state : HmsHlsPlaybackState){
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
-
+                        if(state == HmsHlsPlaybackState.playing)
+                            meetingViewModel.hlsPlayerBeganToPlay()
                     }
                 }
-                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
+                Log.d("HMSHLSPLAYER","From App, playback state: $state")
             }
 
             override fun onCue(cue : HmsHlsCue) {
