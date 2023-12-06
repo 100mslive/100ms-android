@@ -26,6 +26,7 @@ import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
@@ -123,11 +124,14 @@ class MeetingViewModel(
                 ) {
                     when(hmsPollUpdateType) {
                         HMSPollUpdateType.started -> viewModelScope.launch {
-                            _events.emit(Event.PollStarted(hmsPoll))
-                            // Only show latest polls
-                            if (lastPollStartedTime < hmsPoll.startedAt) {
-                                lastPollStartedTime = hmsPoll.startedAt
-                                triggerPollsNotification(hmsPoll)
+                            if(!isHlsPeer(hmsSDK.getLocalPeer()?.hmsRole)) {
+                                _events.emit(Event.PollStarted(hmsPoll))
+                                // Only show latest polls
+                                if (lastPollStartedTime < hmsPoll.startedAt) {
+                                    lastPollStartedTime = hmsPoll.startedAt
+                                    triggerPollsNotification(hmsPoll)
+
+                                }
                             }
                         }
                         HMSPollUpdateType.stopped -> viewModelScope.launch {
@@ -1057,10 +1061,16 @@ class MeetingViewModel(
 
     }
 
+    private var lastStartedPoll : HmsPoll? = null
     private fun updatePolls() {
         // Just running this is enough since it will trigger the poll started notifications
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STARTED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
+                // Put the last poll in the list.
+                lastStartedPoll = result.maxByOrNull { it.startedAt }
+//                Log.d("PollInfoS","${lastStartedPoll?.pollId} at ${lastStartedPoll?.startedAt}")
+                // This happens only once.
+//                _events.emit(Event.PollStarted(hmsPoll))
 //                viewModelScope.launch {
 //                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
 //                        _events.emit(Event.PollStarted(firstPoll))
@@ -2020,14 +2030,21 @@ class MeetingViewModel(
                 QuestionUi.AddAnotherItemView, -> { /*Nothing to do here*/}
             }
         }
+        val pollBuilder = hmsPollBuilder.build()
 
-        localHmsInteractivityCenter.quickStartPoll(hmsPollBuilder.build(), object : HMSActionResultListener {
+        localHmsInteractivityCenter.quickStartPoll(pollBuilder, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 Log.d("Polls","Error $error")
             }
 
             override fun onSuccess() {
                 Log.d("Polls","Success")
+                // Now send a notification into the hls cue,
+                //  it's ok if this fails since that just means there's no hls stream
+                //  to send it into.
+                // Might need to avoid sending it hls viewers though.
+                val hlsPollEvent = HMSHLSTimedMetadata("$POLL_IDENTIFIER_FOR_HLS_CUE${pollBuilder.pollId}",1000)
+                sendHlsMetadata(hlsPollEvent)
             }
 
         })
@@ -2281,6 +2298,24 @@ class MeetingViewModel(
     fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
 
     fun chatTitle() = prebuiltInfoContainer.getChatTitle()
+
+    private var initialPollShown = false
+    fun hlsPlayerBeganToPlay() {
+        val lp = lastStartedPoll
+        if(lp == null)
+            return
+        val isPollLaunchedGreaterThan20SecondsAgo = Date().time - lp.startedAt > 20_000
+//        val t = Date().time
+//        Log.d("PollInfoS","diff: $isPollLaunchedGreaterThan20SecondsAgo lastPollTime : ${lp.startedAt} current time : $t diff : ${Date().time - lp.startedAt}")
+
+        if(!initialPollShown && isPollLaunchedGreaterThan20SecondsAgo) {
+            initialPollShown = true
+//            Log.d("PollInfoS","Launching")
+            viewModelScope.launch {
+                triggerPollsNotification(lp)
+            }
+        }
+    }
 
     fun disableNameEdit() = prebuiltOptions?.userName != null
 }
