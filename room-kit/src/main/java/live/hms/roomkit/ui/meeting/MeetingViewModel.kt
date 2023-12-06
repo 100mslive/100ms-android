@@ -143,12 +143,14 @@ class MeetingViewModel(
         }
     fun getHmsRoomLayout() = hmsRoomLayout
 
+    var prebuiltOptions : HMSPrebuiltOptions? = null
     fun initSdk(
         roomCode: String,
         token: String,
         hmsPrebuiltOptions: HMSPrebuiltOptions?,
         onHMSActionResultListener: HMSActionResultListener
     ) {
+        this.prebuiltOptions = hmsPrebuiltOptions
         if (hasValidToken) {
             onHMSActionResultListener.onSuccess()
             return
@@ -2279,5 +2281,7 @@ class MeetingViewModel(
     fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
 
     fun chatTitle() = prebuiltInfoContainer.getChatTitle()
+
+    fun disableNameEdit() = prebuiltOptions?.userName != null
 }
 
