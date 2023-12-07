@@ -364,11 +364,9 @@
                 app:layout_constraintTop_toTopOf="@+id/edit_text_guideline">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:enabled="false"
                     android:id="@+id/edit_text_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Name"
                     android:inputType="textPersonName"
                     android:maxLines="1"
                     android:textCursorDrawable="@drawable/cursor_drawable" />
