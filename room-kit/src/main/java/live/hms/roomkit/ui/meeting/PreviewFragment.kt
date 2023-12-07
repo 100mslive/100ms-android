@@ -197,7 +197,7 @@ class PreviewFragment : Fragment() {
             if(!isEnabled) {
                 binding.editContainerName.isHintEnabled = false
             } else {
-                hint = "Enter Name"
+                hint = "Enter Name…"
             }
         }
         requireActivity().invalidateOptionsMenu()
