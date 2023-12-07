@@ -192,6 +192,14 @@ class PreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initIntroAnimation()
         binding.applyTheme()
+        with(binding.editTextName) {
+            isEnabled = !meetingViewModel.disableNameEdit()
+            if(!isEnabled) {
+                binding.editContainerName.isHintEnabled = false
+            } else {
+                hint = "Enter Name"
+            }
+        }
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
@@ -234,7 +242,6 @@ class PreviewFragment : Fragment() {
 
     private fun setupUI(roleName: String) {
         // don't allow editing the name if there's supposed to be a fixed one
-        binding.editTextName.isEnabled = !meetingViewModel.disableNameEdit()
 
         var introAnimationOffset = 450
         if (meetingViewModel.getHmsRoomLayout()
