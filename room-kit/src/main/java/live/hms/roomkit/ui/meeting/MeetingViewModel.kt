@@ -2299,22 +2299,26 @@ class MeetingViewModel(
 
     fun chatTitle() = prebuiltInfoContainer.getChatTitle()
 
-    private var initialPollShown = false
+    private var playerStarted = false
     fun hlsPlayerBeganToPlay() {
         val lp = lastStartedPoll
-        if(lp == null)
+        if(lp == null) {
+            playerStarted = true
             return
-        val isPollLaunchedGreaterThan20SecondsAgo = Date().time - lp.startedAt > 20_000
-//        val t = Date().time
-//        Log.d("PollInfoS","diff: $isPollLaunchedGreaterThan20SecondsAgo lastPollTime : ${lp.startedAt} current time : $t diff : ${Date().time - lp.startedAt}")
+        }
 
-        if(!initialPollShown && isPollLaunchedGreaterThan20SecondsAgo) {
-            initialPollShown = true
+        val currentUnixTimestampInSeconds = (System.currentTimeMillis()/1000L)
+        val isPollLaunchedGreaterThan20SecondsAgo = currentUnixTimestampInSeconds - lp.startedAt > 20
+//        val t = Date().time
+        Log.d("PollInfoS","diff: $isPollLaunchedGreaterThan20SecondsAgo lastPollTime : ${lp.startedAt} current time : $currentUnixTimestampInSeconds diff : ${currentUnixTimestampInSeconds - lp.startedAt}")
+
+        if(!playerStarted && isPollLaunchedGreaterThan20SecondsAgo) {
 //            Log.d("PollInfoS","Launching")
             viewModelScope.launch {
                 triggerPollsNotification(lp)
             }
         }
+        playerStarted = true
     }
 
     fun disableNameEdit() = prebuiltOptions?.userName != null
