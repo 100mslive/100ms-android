@@ -268,18 +268,7 @@ class MeetingActivity : AppCompatActivity() {
             }
 
             is HMSNotificationType.OpenPollOrQuiz -> {
-
-                val args = Bundle()
-                    .apply {
-                        putString(POLL_TO_DISPLAY, type.pollId)
-                    }
-
-                PollDisplayFragment()
-                    .apply { arguments = args }
-                    .show(
-                        supportFragmentManager,
-                        ChatParticipantCombinedFragment.TAG
-                    )
+                PollDisplayFragment.launch(type.pollId, supportFragmentManager)
                 handleNotificationDismissClick()
             }
 

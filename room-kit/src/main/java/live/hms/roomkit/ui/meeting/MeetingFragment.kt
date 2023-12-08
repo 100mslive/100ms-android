@@ -68,6 +68,9 @@ import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.HMSNotificationType
+import live.hms.roomkit.ui.polls.PollsCreationFragment
+import live.hms.roomkit.ui.polls.display.POLL_TO_DISPLAY
+import live.hms.roomkit.ui.polls.display.PollDisplayFragment
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.util.*
@@ -1136,7 +1139,13 @@ class MeetingFragment : Fragment() {
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
                         onNameChange = {  },
-                        showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
+                        showPolls = {
+                            PollsCreationFragment()
+                                .show(
+                                    childFragmentManager,
+                                    PollsCreationFragment.TAG
+                                )
+                        },
                         onRecordingClicked = {
                             val isBrowserRecordingRunning = meetingViewModel.hmsSDK.getRoom()?.browserRecordingState?.state in listOf(
                                 HMSRecordingState.STARTING, HMSRecordingState.STARTED,

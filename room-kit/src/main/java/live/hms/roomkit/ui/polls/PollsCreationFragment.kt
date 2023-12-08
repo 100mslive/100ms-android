@@ -5,15 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsCreationBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.polls.display.PollDisplayFragment
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
 import live.hms.roomkit.ui.polls.previous.PreviousPollsInfo
 import live.hms.roomkit.ui.theme.applyTheme
@@ -26,12 +27,16 @@ import live.hms.roomkit.util.viewLifecycle
  * The values are gathered into a data model in the PollsViewModel which is
  * expected to be used in further screens.
  */
-class PollsCreationFragment : Fragment(){
+class PollsCreationFragment : BottomSheetDialogFragment(){
+    companion object {
+        const val TAG: String = "PollsCreationFragment"
+    }
+
     private var binding by viewLifecycle<LayoutPollsCreationBinding>()
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel : MeetingViewModel by activityViewModels()
-    val previousPollsAdaptor by lazy {PreviousPollsAdaptor{previousPollsInfo ->
-        findNavController().navigate(PollsCreationFragmentDirections.actionPollsCreationFragmentToPollDisplayFragment(previousPollsInfo.pollId))
+    private val previousPollsAdaptor by lazy {PreviousPollsAdaptor{previousPollsInfo ->
+        PollDisplayFragment.launch(previousPollsInfo.pollId, parentFragmentManager)
     }}
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,7 +53,12 @@ class PollsCreationFragment : Fragment(){
         binding.creationFlowUi.visibility = if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
         with(binding) {
             applyTheme()
-            backButton.setOnSingleClickListener { findNavController().popBackStack() }
+            backButton.setOnSingleClickListener {
+                parentFragmentManager
+                .beginTransaction()
+                .remove(this@PollsCreationFragment)
+                .commitAllowingStateLoss()
+            }
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
             pollButton.setOnSingleClickListener {
                 highlightPollOrQuiz(true)
