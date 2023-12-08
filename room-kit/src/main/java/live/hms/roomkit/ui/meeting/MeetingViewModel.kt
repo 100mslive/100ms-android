@@ -42,6 +42,7 @@ import live.hms.video.polls.models.HMSPollUpdateType
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
+import live.hms.video.polls.models.HmsPollUserTrackingMode
 import live.hms.video.polls.models.answer.PollAnswerResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
@@ -2061,7 +2062,7 @@ class MeetingViewModel(
             (answer.length > (question.answerLongMinLength ?: 0) )
 
         if(valid) {
-            val response = HMSPollResponseBuilder(hmsPoll, null)
+            val response = getResponseBuilder(hmsPoll)
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
@@ -2076,13 +2077,25 @@ class MeetingViewModel(
         }
         return valid
     }
+
+    private fun getResponseBuilder(hmsPoll: HmsPoll): HMSPollResponseBuilder {
+        val userIdentifier = when(hmsPoll.mode) {
+            // default is userId
+            null,
+            HmsPollUserTrackingMode.USER_ID -> hmsSDK.getLocalPeer()?.customerUserID
+            HmsPollUserTrackingMode.PEER_ID -> hmsSDK.getLocalPeer()?.peerID
+            HmsPollUserTrackingMode.USERNAME -> hmsSDK.getLocalPeer()?.name
+        }
+        return HMSPollResponseBuilder(hmsPoll, userIdentifier)
+    }
+
     fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll) : Boolean {
         if(option == null) {
             return false
         }
         val answer = question.options?.get(option)
         if(answer != null) {
-            val response = HMSPollResponseBuilder(hmsPoll, null)
+            val response = getResponseBuilder(hmsPoll)
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
@@ -2108,7 +2121,7 @@ class MeetingViewModel(
             options?.contains(index) == true
         }
         if(valid && answer != null) {
-            val response = HMSPollResponseBuilder(hmsPoll, null)
+            val response = getResponseBuilder(hmsPoll)
                 .addResponse(question, answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
