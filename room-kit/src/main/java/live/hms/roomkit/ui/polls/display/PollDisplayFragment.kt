@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
+
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -30,7 +30,25 @@ import live.hms.video.polls.models.HmsPollState
  * This is shown via a toast that pops up when we receive an HmsPoll event.
  *
  */
-class PollDisplayFragment : Fragment() {
+const val POLL_TO_DISPLAY = "pollId"
+class PollDisplayFragment : BottomSheetDialogFragment() {
+    companion object {
+        const val TAG: String = "PollDisplayFragment"
+        fun launch(pollId : String, fm : FragmentManager) {
+            val args = Bundle()
+                .apply {
+                    putString(POLL_TO_DISPLAY, pollId)
+                }
+
+            PollDisplayFragment()
+                .apply { arguments = args }
+                .show(
+                    fm,
+                    PollDisplayFragment.TAG
+                )
+        }
+    }
+
     private var binding by viewLifecycle<LayoutPollsDisplayBinding>()
     lateinit var pollsDisplayAdaptor: PollsDisplayAdaptor
     private val meetingViewModel: MeetingViewModel by activityViewModels()
@@ -50,11 +68,11 @@ class PollDisplayFragment : Fragment() {
 
         initOnBackPress()
         lifecycleScope.launch {
-            val pollId = arguments?.getString("pollId")
+            val pollId = arguments?.getString(POLL_TO_DISPLAY)
             val returnedPoll = if(pollId == null) null else meetingViewModel.getPollForPollId(pollId)
             if(returnedPoll == null) {
                 // Close the fragment and exit
-                findNavController().popBackStack()
+                closePollDisplay()
                 return@launch
             }
 
@@ -72,8 +90,7 @@ class PollDisplayFragment : Fragment() {
 
             with(binding) {
                 backButton.setOnSingleClickListener {
-
-                    findNavController().popBackStack()
+                    closePollDisplay()
                 }
                 val startedType = if(poll.category == HmsPollCategory.QUIZ) "Quiz" else "Poll"
                 pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name?: "Participant", startedType)
@@ -107,6 +124,14 @@ class PollDisplayFragment : Fragment() {
 
         }
     }
+
+    private fun closePollDisplay() {
+        parentFragmentManager
+            .beginTransaction()
+            .remove(this@PollDisplayFragment)
+            .commitAllowingStateLoss()
+    }
+
     private fun initOnBackPress() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
