@@ -20,3 +20,4 @@ val REGEX_TOKEN_ENDPOINT = Regex("https?://.*.100ms.live/hmsapi/([a-zA-Z0-9-.]+.
 
 val REGEX_MEETING_CODE = Regex("^[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+$")
 val REGEX_MEETING_ROOM_ID = Regex("^[a-zA-Z0-9]+$")
+val POLL_IDENTIFIER_FOR_HLS_CUE = "poll:"

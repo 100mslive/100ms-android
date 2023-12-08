@@ -367,7 +367,6 @@
                     android:id="@+id/edit_text_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Name"
                     android:inputType="textPersonName"
                     android:maxLines="1"
                     android:textCursorDrawable="@drawable/cursor_drawable" />

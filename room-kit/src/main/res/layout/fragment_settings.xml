@@ -232,11 +232,11 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_subscribe_degradation_enabled"
+            android:id="@+id/switch_set_initial_name"
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/switch_enable_subscribe_degradation"
+            android:text="@string/switch_set_initial_name"
             android:visibility="visible" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial

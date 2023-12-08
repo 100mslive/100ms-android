@@ -120,6 +120,11 @@ class LocalTileBottomSheet(val onMinimizeClicked: () -> Unit, val onNameChange: 
             dismissAllowingStateLoss()
         }
 
+        val nameVisibility = if(meetingViewModel.disableNameEdit()) View.GONE else
+            View.VISIBLE
+        binding.changeName.visibility = nameVisibility
+        binding.border6.visibility = nameVisibility
+
         binding.changeName.setOnSingleClickListener(200L) {
             onNameChange.invoke()
             dismissAllowingStateLoss()
