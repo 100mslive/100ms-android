@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
+
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.delay
@@ -74,7 +72,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
             val returnedPoll = if(pollId == null) null else meetingViewModel.getPollForPollId(pollId)
             if(returnedPoll == null) {
                 // Close the fragment and exit
-                findNavController().popBackStack()
+                closePollDisplay()
                 return@launch
             }
 
@@ -92,10 +90,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
 
             with(binding) {
                 backButton.setOnSingleClickListener {
-                    parentFragmentManager
-                        .beginTransaction()
-                        .remove(this@PollDisplayFragment)
-                        .commitAllowingStateLoss()
+                    closePollDisplay()
                 }
                 val startedType = if(poll.category == HmsPollCategory.QUIZ) "Quiz" else "Poll"
                 pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name?: "Participant", startedType)
@@ -129,6 +124,14 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
 
         }
     }
+
+    private fun closePollDisplay() {
+        parentFragmentManager
+            .beginTransaction()
+            .remove(this@PollDisplayFragment)
+            .commitAllowingStateLoss()
+    }
+
     private fun initOnBackPress() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
