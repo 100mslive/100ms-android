@@ -158,13 +158,6 @@ class MeetingActivity : AppCompatActivity() {
             tryRemovingNotification(it)
         }
 
-        meetingViewModel.openPollOrQuizzTrgger.observe(this) { pollID ->
-            if (pollID.isEmpty().not()) {
-                meetingViewModel.openPollOrQuizzTrgger.value = ""
-                findNavController(R.id.nav_host_fragment)
-                    .navigate(R.id.action_global_pollDisplayFragment, bundleOf("pollId" to pollID))
-            }
-        }
     }
 
     private fun triggerNotification(hmsNotification: HMSNotification) {
