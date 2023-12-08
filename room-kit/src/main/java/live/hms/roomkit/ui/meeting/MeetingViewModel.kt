@@ -2213,11 +2213,6 @@ class MeetingViewModel(
         changeRole(handRaisePeer.peerID, onStageRole, false)
     }
 
-    val openPollOrQuizzTrgger by lazy { MutableLiveData<String>() }
-    fun openPollsOrQuizTrigger(pollID: String) {
-        openPollOrQuizzTrgger.value = pollID
-    }
-
     fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {
         hmsNotificationEvent.postValue(
             HMSNotification(
