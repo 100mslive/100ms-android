@@ -36,6 +36,7 @@ class PollsCreationFragment : BottomSheetDialogFragment(){
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel : MeetingViewModel by activityViewModels()
     private val previousPollsAdaptor by lazy {PreviousPollsAdaptor{previousPollsInfo ->
+        dismissAllowingStateLoss()
         PollDisplayFragment.launch(previousPollsInfo.pollId, parentFragmentManager)
     }}
     override fun onCreateView(
