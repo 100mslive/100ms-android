@@ -797,16 +797,10 @@ class MeetingFragment : Fragment() {
 
 
         if(modeEnteredOrExitedHls) {
-            val overlayIsVisible = isOverlayChatVisible()
-            if (meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
-                val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
-                if (overlayIsVisible && !isChatOverlay)
-                    toggleChatVisibility()
-                else if (!overlayIsVisible && isChatOverlay)
-                    toggleChatVisibility()
-            } else if (overlayIsVisible) {
-                toggleChatVisibility()
-            }
+            val isChatEnabled = meetingViewModel.prebuiltInfoContainer.isChatEnabled()
+            val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
+            val isChatOpenByDefault = meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()
+            toggleChatVisibility(isChatEnabled && isChatOverlay && isChatOpenByDefault)
         }
         if(triggerFirstUpdate){
             updateChatButtonWhenRoleChanges()
@@ -1256,12 +1250,16 @@ class MeetingFragment : Fragment() {
     private fun isOverlayChatVisible() : Boolean {
         return binding.chatView.visibility == View.VISIBLE
     }
-    private fun toggleChatVisibility() {
+    private fun toggleChatVisibility(forceState : Boolean? = null) {
         with(binding.chatView) {
-            visibility = if (visibility == View.GONE) {
-                View.VISIBLE
+            visibility = if(forceState == null) {
+                if (visibility == View.GONE) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             } else {
-                View.GONE
+                if(forceState) View.VISIBLE else View.GONE
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
