@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsCreationBinding
+import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.display.PollDisplayFragment
 import live.hms.roomkit.ui.polls.previous.PreviousPollsAdaptor
@@ -49,7 +50,7 @@ class PollsCreationFragment : Fragment(){
         binding.creationFlowUi.visibility = if (meetingViewModel.isAllowedToCreatePolls()) View.VISIBLE else View.GONE
         with(binding) {
             applyTheme()
-            backButton.setOnSingleClickListener { findNavController().popBackStack() }
+            backButton.setOnSingleClickListener { closeFragment() }
             hideVoteCount.setOnCheckedChangeListener { _, isChecked -> pollsViewModel.markHideVoteCount(isChecked) }
             pollButton.setOnSingleClickListener {
                 highlightPollOrQuiz(true)
@@ -76,6 +77,16 @@ class PollsCreationFragment : Fragment(){
                 refreshPreviousPollsList()
             }
 
+            meetingViewModel.state.observe(viewLifecycleOwner) {state ->
+                when(state) {
+                    is MeetingState.Failure,
+                       is MeetingState.RoleChangeRequest,
+                        is MeetingState.Disconnected,
+                    is MeetingState.ForceLeave -> closeFragment()
+                    else -> {} // nothing to do in other cases
+                }
+            }
+
             lifecycleScope.launch {
                 meetingViewModel.events.collect { event ->
                     if(event is MeetingViewModel.Event.PollStarted || event is MeetingViewModel.Event.PollEnded) {
@@ -85,6 +96,10 @@ class PollsCreationFragment : Fragment(){
             }
 
         }
+    }
+
+    private fun closeFragment() {
+        findNavController().popBackStack()
     }
 
     private fun refreshPreviousPollsList() {
@@ -123,7 +138,7 @@ class PollsCreationFragment : Fragment(){
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    binding.backButton.callOnClick()
+                    closeFragment()
                 }
             })
     }
