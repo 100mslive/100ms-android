@@ -2210,7 +2210,7 @@ class MeetingViewModel(
     }
 
     fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
-        changeRole(handRaisePeer.peerID, onStageRole, false)
+        changeRole(handRaisePeer.peerID, onStageRole, prebuiltInfoContainer.shouldForceRoleChange())
     }
 
     fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {
