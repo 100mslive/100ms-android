@@ -91,7 +91,7 @@ class ParticipantItem(
                                 override fun onSuccess() {
                                     val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
                                     if(role != null)
-                                        changeRole(hmsPeer.peerID, role, false)
+                                        changeRole(hmsPeer.peerID, role, prebuiltInfoContainer.shouldForceRoleChange())
                                 }
                             })
                         mypopupWindow.dismiss()

@@ -9,6 +9,7 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     private val roleMap : MutableMap<String, HMSRoomLayout.HMSRoomLayoutData> = mutableMapOf()
     private val localPeer by lazy { hmssdk.getLocalPeer()!! }
 
+    fun shouldForceRoleChange() : Boolean = onStageExp(localPeer.hmsRole.name)?.skipPreviewForRoleChange == true
     fun isAllowedToBlockUserFromChat() : Boolean =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
             ?.elements?.chat?.realTimeControls?.canBlockUser == true ||
