@@ -25,7 +25,6 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.*
@@ -799,7 +798,12 @@ class MeetingFragment : Fragment() {
             val isChatEnabled = meetingViewModel.prebuiltInfoContainer.isChatEnabled()
             val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
             val isChatOpenByDefault = meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()
-            toggleChatVisibility(isChatEnabled && isChatOverlay && isChatOpenByDefault)
+            val chatVisible = isChatEnabled && isChatOverlay && isChatOpenByDefault
+            toggleChatVisibility(chatVisible)
+            if(chatVisible)
+                moveChat(up = true, bottomMenuHeight = binding.bottomControls.height.toFloat())
+            else
+                moveChat(up = false, binding.topMenu.height.toFloat())
         }
         if(triggerFirstUpdate){
             updateChatButtonWhenRoleChanges()
@@ -926,7 +930,7 @@ class MeetingFragment : Fragment() {
                     showSystemBars()
                     // This prevents the bar from moving twice as high as it should
                     if(shouldHideAfterDelay)
-                        moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
+                        moveChat(up = true, bottomMenuHeight = binding.bottomControls.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -982,13 +986,13 @@ class MeetingFragment : Fragment() {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ALIGN_BOTTOM)
                     addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
-                    updateMargins(bottom = bottomMenuHeight.toInt() + resources.getDimension(R.dimen.eight_dp).toInt())
+                    updateMargins(bottom = bottomMenuHeight.toInt() + 8.dp())
                 }
             } else {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ABOVE)
                     addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, R.id.meeting_container)
-                    updateMargins(bottom = 8)
+                    updateMargins(bottom = 8.dp())
                 }
             }
         }
@@ -1004,7 +1008,7 @@ class MeetingFragment : Fragment() {
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
                     topMenu.visibility = View.VISIBLE
-                    moveChat(up = false, topMenu!!.height.toFloat())
+                    moveChat(up = false, bottomMenu.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
