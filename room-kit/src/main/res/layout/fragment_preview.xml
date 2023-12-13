@@ -401,6 +401,7 @@
             <TextView
                 android:id="@+id/button_join_meeting"
                 android:layout_width="0dp"
+                app:layout_constraintHeight="match_constraint"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="16dp"
@@ -416,7 +417,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline"
+                app:layout_constraintTop_toTopOf="@+id/edit_container_name"
                 app:layout_constraintVertical_bias="0.0" />
 
             <androidx.constraintlayout.widget.Guideline
