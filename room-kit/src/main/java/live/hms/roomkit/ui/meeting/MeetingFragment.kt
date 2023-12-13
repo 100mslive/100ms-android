@@ -179,7 +179,6 @@ class MeetingFragment : Fragment() {
         isCountdownManuallyCancelled = true
         hasStartedHls = false
         countDownTimer?.cancel()
-        unregisterPipActionListener()
     }
 
     override fun onPause() {
@@ -646,7 +645,7 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
             //to show or hide mic icon [eg in HLS mode mic is not required]
-            updatePipMicState(allowed, true)
+
         }
 
         meetingViewModel.isLocalVideoPresent.observe(viewLifecycleOwner) { allowed ->
@@ -670,7 +669,6 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
-            updatePipMicState(isMicOn = enabled)
             (binding.buttonToggleAudio as? ShapeableImageView)?.apply {
 
                 if (enabled) {
@@ -713,7 +711,6 @@ class MeetingFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        registerPipActionListener()
     }
 
     private fun updatePipEndCall() {
@@ -1055,10 +1052,6 @@ class MeetingFragment : Fragment() {
 
     private fun hideProgressBar() {
         var isInPIPMode = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (activity?.isInPictureInPictureMode?.not() == true)
-                isInPIPMode = true
-        }
         binding.fragmentContainer.visibility = View.VISIBLE
         binding.bottomControls.visibility = View.VISIBLE
         if (!isInPIPMode && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
@@ -1214,7 +1207,6 @@ class MeetingFragment : Fragment() {
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
 
-        updatePipEndCall()
 
         binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
