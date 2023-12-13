@@ -99,6 +99,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
 
         binding.buttonJoinMeeting.setOnClickListener {
             meetingViewModel.participantPreviousRoleChangeUseCase.setPreviousRole(meetingViewModel.hmsSDK.getLocalPeer()!!,
+                meetingViewModel.roleOnJoining?.name,
                 object : HMSActionResultListener {
                     override fun onError(error: HMSException) {
                         Log.e("RolePreviewFragment", "Error $error")

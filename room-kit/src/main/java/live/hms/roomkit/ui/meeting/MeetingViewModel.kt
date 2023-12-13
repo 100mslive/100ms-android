@@ -83,6 +83,8 @@ class MeetingViewModel(
     val roleChange = MutableLiveData<HMSPeer>()
     private var numRoleChanges = 0
     val roleChangeSingleShot : LiveData<Int> = roleChange.map { numRoleChanges++ }
+    var roleOnJoining : HMSRole? = null
+        private set
 
     fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
 
@@ -724,6 +726,7 @@ class MeetingViewModel(
                 Log.d(TAG, "Room name is ${room.name}")
                 Log.d(TAG, "SessionId is: ${room.sessionId}")
                 Log.d(TAG, "Room started at: ${room.startedAt}")
+                roleOnJoining = room.localPeer?.hmsRole
 
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = room.hlsStreamingState.variants?.get(0)?.hlsStreamUrl
@@ -811,6 +814,16 @@ class MeetingViewModel(
                             "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
                         )
                         if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED) {
+                            // Changed on a force change. This will happen twice.
+                            // when a person is brought to offstage
+                            participantPreviousRoleChangeUseCase.setPreviousRole(
+                                hmsSDK.getLocalPeer()!!,
+                                roleOnJoining?.name,
+                                object : HMSActionResultListener {
+                                    override fun onError(error: HMSException) {}
+                                    override fun onSuccess() {}
+                                })
+
                             initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), ++recNum))
                             roleChange.postValue(hmsPeer)
                         }

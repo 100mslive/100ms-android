@@ -11,15 +11,18 @@ class ParticipantPreviousRoleChangeUseCase(private val changeMetadata: (String, 
     fun getPreviousRole(peer: HMSPeer) : String? =
         CustomPeerMetadata.fromJson(peer.metadata)?.prevRole
 
-    fun setPreviousRole(peer : HMSPeer, hmsActionResultListener: HMSActionResultListener, toggleHandraise : Boolean =false) {
+    fun setPreviousRole(peer : HMSPeer, roleName : String?, hmsActionResultListener: HMSActionResultListener, toggleHandraise : Boolean =false) {
         val existingMetadata = CustomPeerMetadata.fromJson(peer.metadata)
         // Set the role or create a new metadata object with it.
-        val updatedMetadata = existingMetadata?.copy(prevRole = peer.hmsRole.name, isHandRaised = false)
+        val updatedMetadata = existingMetadata?.copy(prevRole = roleName,
+            name = peer.name,
+            isHandRaised = false,
+            isBRBOn = false)
             ?: CustomPeerMetadata(
                 isHandRaised = false,
                 isBRBOn = false,
                 name = peer.name,
-                prevRole = peer.hmsRole.name
+                prevRole = roleName
             )
 
         changeMetadata(updatedMetadata.toJson(), hmsActionResultListener)
