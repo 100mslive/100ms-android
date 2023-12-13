@@ -196,8 +196,7 @@ class MeetingFragment : Fragment() {
     private fun updateActionVolumeMenuIcon(
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
-        binding.iconOutputDevice?.visibility = View.VISIBLE
-        binding.iconOutputDevice?.apply {
+        binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
                     setIconEnabled(R.drawable.phone)
@@ -398,6 +397,9 @@ class MeetingFragment : Fragment() {
         }
         // This only needs to be in meetingfragment since we always open it.
         // Is that true for HLS? Double check.
+        meetingViewModel.showAudioIcon.observe(viewLifecycleOwner) { visible ->
+            binding.iconOutputDevice.visibility = if(visible) View.VISIBLE else View.GONE
+        }
         meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
             chatViewModel.setInitialRecipient(it.first, it.second)
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, it.first)

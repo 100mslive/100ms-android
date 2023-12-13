@@ -820,6 +820,7 @@ class MeetingViewModel(
                             updateThemeBasedOnCurrentRole(hmsPeer.hmsRole)
                             val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
                             val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
+                            showAudioIcon.postValue(!isHlsPeer)
                             if (isHlsPeer) {
                                 switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
                             } else {
@@ -1194,10 +1195,12 @@ class MeetingViewModel(
         }
     }
 
+    val showAudioIcon : MutableLiveData<Boolean> = MutableLiveData(false)
     val showHlsStreamYetToStartError = MutableLiveData<Boolean>(false)
     private fun switchToHlsViewIfRequired(role: HMSRole?, streamUrl: String?) {
         var started = false
         val isHlsPeer = isHlsPeer(role)
+        showAudioIcon.postValue(!isHlsPeer)
         if (isHlsPeer && streamUrl != null) {
             started = true
             switchToHlsView(streamUrl)
