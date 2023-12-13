@@ -416,7 +416,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline" />
+                app:layout_constraintTop_toTopOf="@+id/edit_container_name" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/btn_txt_guideline"
