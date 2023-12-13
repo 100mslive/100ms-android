@@ -17,6 +17,7 @@ import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.show
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
+import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
@@ -44,7 +45,8 @@ class ParticipantItem(
     private val prebuiltInfoContainer: PrebuiltInfoContainer,
     private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
     private val requestPeerLeave: (hmsPeer: HMSRemotePeer, reason: String) -> Unit,
-    private val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>>
+    private val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>>,
+    private val lowerRemotePeerHand : (HMSPeer, HMSActionResultListener) -> Unit
 ) : BindableItem<ListItemPeerListBinding>(hmsPeer.peerID.hashCode().toLong()){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
@@ -83,11 +85,24 @@ class ParticipantItem(
                     popBinding.onStage.setOnClickListener {
                         val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
                         if(role != null) {
+                            val force = prebuiltInfoContainer.shouldForceRoleChange()
                             changeRole(
                                 hmsPeer.peerID,
                                 role,
-                                prebuiltInfoContainer.shouldForceRoleChange()
+                                force
                             )
+                            if(force) {
+                                lowerRemotePeerHand(hmsPeer, object : HMSActionResultListener {
+                                    override fun onError(error: HMSException) {
+//                                        Log.d(TAG,"Failed to lower peer's hand $error")
+                                    }
+
+                                    override fun onSuccess() {
+//                                        Log.d(TAG,"Lowered peer's hand since the role was force changed")
+                                    }
+
+                                })
+                            }
                         }
                         mypopupWindow.dismiss()
                     }

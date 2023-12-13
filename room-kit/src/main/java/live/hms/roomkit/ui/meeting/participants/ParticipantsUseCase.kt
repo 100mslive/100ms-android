@@ -247,7 +247,8 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                             meetingViewModel.prebuiltInfoContainer,
                             meetingViewModel.participantPreviousRoleChangeUseCase,
                             meetingViewModel::requestPeerLeave,
-                            meetingViewModel.activeSpeakers
+                            meetingViewModel.activeSpeakers,
+                            meetingViewModel::lowerRemotePeerHand
                         )
                     }!!)
                 }
