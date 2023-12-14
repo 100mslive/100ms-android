@@ -2224,9 +2224,25 @@ class MeetingViewModel(
             null
         }
     }
+    fun lowerRemotePeerHand(hmsPeer: HMSPeer, hmsActionResultListener: HMSActionResultListener)
+     = hmsSDK.lowerRemotePeerHand(hmsPeer, hmsActionResultListener)
 
     fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
-        changeRole(handRaisePeer.peerID, onStageRole, prebuiltInfoContainer.shouldForceRoleChange())
+        val force = prebuiltInfoContainer.shouldForceRoleChange()
+        changeRole(handRaisePeer.peerID, onStageRole, force)
+
+        if(force) {
+            hmsSDK.lowerRemotePeerHand(handRaisePeer, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    Log.d(TAG,"Failed to lower peer's hand $error")
+                }
+
+                override fun onSuccess() {
+                    Log.d(TAG,"Lowered peer's hand since the role was force changed")
+                }
+
+            })
+        }
     }
 
     fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {

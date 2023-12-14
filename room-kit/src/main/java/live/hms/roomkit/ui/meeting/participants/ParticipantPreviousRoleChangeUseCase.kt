@@ -1,17 +1,18 @@
 package live.hms.roomkit.ui.meeting.participants
 
-import kotlinx.coroutines.CompletableDeferred
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
-import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSActionResultListener
-import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 
 class ParticipantPreviousRoleChangeUseCase(private val changeMetadata: (String, HMSActionResultListener) -> Unit) {
     fun getPreviousRole(peer: HMSPeer) : String? =
         CustomPeerMetadata.fromJson(peer.metadata)?.prevRole
 
-    fun setPreviousRole(peer : HMSPeer, roleName : String?, hmsActionResultListener: HMSActionResultListener, toggleHandraise : Boolean =false) {
+    fun setPreviousRole(
+        peer: HMSPeer,
+        roleName: String?,
+        hmsActionResultListener: HMSActionResultListener
+    ) {
         val existingMetadata = CustomPeerMetadata.fromJson(peer.metadata)
         // Set the role or create a new metadata object with it.
         val updatedMetadata = existingMetadata?.copy(prevRole = roleName,
