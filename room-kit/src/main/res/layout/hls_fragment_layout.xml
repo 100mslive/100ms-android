@@ -83,30 +83,16 @@
     </LinearLayout>
 
     <!-- Goto live and track selector -->
-    <FrameLayout
-        android:id="@+id/extra_properties"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="24dp"
-        android:paddingHorizontal="8dp"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal">
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/btn_track_selection"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:fontFamily="@font/inter_semibold"
-            android:src="@drawable/settings_icon"
-            android:text="Settings"
-            android:textAllCaps="false" />
-        <Space
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            />
-    </FrameLayout>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/btn_track_selection"
+        android:layout_width="32dp"
+        android:padding="4dp"
+        android:layout_margin="@dimen/spacing_d2"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_height="32dp"
+        android:src="@drawable/settings"
+         />
 
     <!-- To show timed metadata -->
     <TextView
