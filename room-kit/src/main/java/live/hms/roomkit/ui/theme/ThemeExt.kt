@@ -1756,7 +1756,9 @@ internal fun ListItemChatBinding.applyTheme() {
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {
 
-
+    btnTrackSelection.drawable?.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
     progressBar.progressTintList = ColorStateList.valueOf(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.primaryDefault,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
@@ -1971,7 +1973,7 @@ fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
     }
 }
 
-private fun trackTintList() : ColorStateList {
+ fun trackTintList() : ColorStateList {
     val checkedUncheckedState = arrayOf(intArrayOf(android.R.attr.state_checked),
         intArrayOf(-android.R.attr.state_checked))
 
