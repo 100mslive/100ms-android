@@ -81,29 +81,23 @@ class ParticipantItem(
                 if(bringOnStage) {
                     popBinding.onStage.text = "Bring OnStage"
                     popBinding.onStage.setOnClickListener {
-                        participantPreviousRoleChangeUseCase.setPreviousRole(hmsPeer, object :
-                            HMSActionResultListener {
-                                override fun onError(error: HMSException) {
-                                    // Throw error
-                                    Log.d("BringOnStageError","$error")
-                                }
-
-                                override fun onSuccess() {
-                                    val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
-                                    if(role != null)
-                                        changeRole(hmsPeer.peerID, role, prebuiltInfoContainer.shouldForceRoleChange())
-                                }
-                            })
+                        val role = prebuiltInfoContainer.onStageExp(viewerPeer.hmsRole.name)?.onStageRole
+                        if(role != null) {
+                            changeRole(
+                                hmsPeer.peerID,
+                                role,
+                                prebuiltInfoContainer.shouldForceRoleChange()
+                            )
+                        }
                         mypopupWindow.dismiss()
                     }
-                }
-                if(bringOffStage){
+                } else if(bringOffStage){
                     popBinding.onStage.text = "Remove From Stage"
                     popBinding.onStage.setOnClickListener {
                         val role = participantPreviousRoleChangeUseCase.getPreviousRole(hmsPeer)
-                            Log.d("RolesChangingTo","$role")
-                            if(role != null)
-                                changeRole(hmsPeer.peerID, role, true)
+                        if(role != null) {
+                            changeRole(hmsPeer.peerID, role, true)
+                        }
                         mypopupWindow.dismiss()
                     }
                 }
