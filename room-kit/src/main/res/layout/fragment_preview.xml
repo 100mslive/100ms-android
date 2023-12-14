@@ -376,16 +376,18 @@
             <FrameLayout
                 android:id="@+id/join_loader"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:elevation="8dp"
                 android:gravity="center"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@id/edit_container_name"
                 app:layout_constraintEnd_toEndOf="@+id/button_join_meeting"
                 app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@id/button_join_meeting"
-                app:layout_constraintTop_toTopOf="@+id/button_join_meeting">
+                app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
+                app:layout_constraintTop_toTopOf="@+id/edit_container_name"
+                app:layout_constraintVertical_bias="0.0">
 
                 <ProgressBar
                     android:id="@+id/join_loader_progress"
