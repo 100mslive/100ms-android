@@ -23,7 +23,6 @@
 
     <!-- Stats for nerds -->
     <LinearLayout
-        android:layout_below="@id/extra_properties"
         android:id="@+id/stats_view_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
