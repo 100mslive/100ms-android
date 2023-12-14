@@ -23,6 +23,7 @@
             android:layout_width="match_parent"
             android:id="@+id/pinnedMessagesDisplay"
             android:visibility="gone"
+            android:minHeight="52dp"
             tools:visibility="visible"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
