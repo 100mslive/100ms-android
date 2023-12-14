@@ -46,7 +46,7 @@ class SettingsStore(context: Context) {
     const val SHOW_PREVIEW_BEFORE_JOIN = "show-preview-before-join"
     const val AUDIO_TRACK_INIT_STATE = "audio-track-init-state"
     const val VIDEO_TRACK_INIT_STATE = "video-track-init-state"
-    const val SUBSCRIBE_DEGRADATION = "subscribe-degradation-enabling"
+    const val SET_INITIAL_NAME_FROM_CLIENT = "set-initial-name-from-client"
     const val RTMP_URL_LIST = "rtmp-url-list"
     const val USE_HARDWARE_AEC = "use-hardware-aec"
     const val SHOW_STATS = "show-video-stats"
@@ -122,9 +122,9 @@ class SettingsStore(context: Context) {
     }
   }
 
-  var enableSubscribeDegradation: Boolean
-    get() = sharedPreferences.getBoolean(SUBSCRIBE_DEGRADATION, true)
-    set(value) = putBoolean(SUBSCRIBE_DEGRADATION, value)
+  var setInitialNameFromClient: Boolean
+    get() = sharedPreferences.getBoolean(SET_INITIAL_NAME_FROM_CLIENT, true)
+    set(value) = putBoolean(SET_INITIAL_NAME_FROM_CLIENT, value)
 
   // Set to true to enable Hardware echo cancellation else set to false to enable SW based
   var enableHardwareAEC: Boolean
@@ -132,7 +132,7 @@ class SettingsStore(context: Context) {
     set(value) = putBoolean(USE_HARDWARE_AEC, value)
 
   var showStats: Boolean
-    get() = sharedPreferences.getBoolean(SHOW_STATS, true)
+    get() = sharedPreferences.getBoolean(SHOW_STATS, false)
     set(value) = putBoolean(SHOW_STATS, value)
 
   var disableAutoResize: Boolean
@@ -344,7 +344,7 @@ class SettingsStore(context: Context) {
     fun setLogLevel100msSdk(value: HMSLogger.LogLevel) =
       apply { editor.putString(LOG_LEVEL_100MS_SDK, value.toString()) }
 
-    fun setSubscribeDegradation(value: Boolean) = apply { editor.putBoolean(SUBSCRIBE_DEGRADATION, value) }
+    fun setInitialNameFromClient(value: Boolean) = apply { editor.putBoolean(SET_INITIAL_NAME_FROM_CLIENT, value) }
     fun setUseHardwareAEC(value: Boolean) = apply { editor.putBoolean(USE_HARDWARE_AEC, value) }
     fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
     fun setDisableAutoResize(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_RESIZE, value) }

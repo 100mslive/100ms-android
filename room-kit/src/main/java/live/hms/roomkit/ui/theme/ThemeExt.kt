@@ -16,7 +16,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.appcompat.widget.SwitchCompat
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
@@ -24,12 +24,12 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textview.MaterialTextView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableEnd
@@ -38,6 +38,7 @@ import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
 import live.hms.roomkit.util.EmailUtils
+import live.hms.roomkit.util.EmailUtils.addAlpha
 import live.hms.roomkit.util.dp
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.signal.init.HMSRoomLayout
@@ -233,7 +234,29 @@ internal fun ShapeableImageView.setIconDisabled(
 
 }
 
+internal fun TextView.alertButtonEnabled() {
+    this.isEnabled = true
 
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default,
+        null
+    )
+
+    this.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+}
 internal fun TextView.buttonEnabled() {
     this.isEnabled = true
 
@@ -291,6 +314,10 @@ internal fun TextView.buttonDisabled() {
 private fun String.toColorInt(): Int = android.graphics.Color.parseColor(this)
 
 internal fun FragmentMeetingBinding.applyTheme() {
+    pinMessageTheme(pinCloseButton)
+    userBlockedTheme(userBlocked)
+    chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
+    configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
     chatView.background = getChatBackgroundDrawable()
     iconSend.drawable.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
@@ -411,14 +438,14 @@ internal fun FragmentMeetingBinding.applyTheme() {
 //        )
 //    )
 
-    tvRecordingTime?.setTextColor(
+    tvStreamingTime.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
 
-    tvViewersCount?.setTextColor(
+    tvViewersCount.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
@@ -435,6 +462,13 @@ internal fun FragmentMeetingBinding.applyTheme() {
     recordingSignal.drawable.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    recordingPause.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -513,6 +547,40 @@ internal fun FragmentMeetingBinding.applyTheme() {
         )*/
 
 
+}
+
+fun pinMessageTheme(pinCloseButton: ImageView) {
+    pinCloseButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+        )
+
+}
+
+private fun chatPausedTheme(chatPausedContainer : LinearLayoutCompat,
+    chatPausedTitle: TextView, chatPausedBy : TextView) {
+    chatPausedContainer.background = getChatBackgroundDrawable()
+
+    chatPausedTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp)
+    )
+    chatPausedBy.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    )
+}
+
+private fun userBlockedTheme(userBlocked: TextView) {
+    userBlocked.background = getChatBackgroundDrawable()
+    userBlocked.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
+    )
 }
 
 internal fun FragmentActiveSpeakerBinding.applyTheme() {
@@ -1209,12 +1277,14 @@ fun FragmentGridVideoBinding.applyTheme() {
 
     tabLayoutDotsRemoteScreenShare.setBackgroundColor(Color.TRANSPARENT)
 
-    iconOption.setBackgroundColor(
-        getColorOrDefault(
-            EmailUtils.addAlpha(HMSPrebuiltTheme.getColours()?.surfaceDefault!!, 0.6),
-            HMSPrebuiltTheme.getDefaults().surface_default
+    HMSPrebuiltTheme.getColours()?.surfaceDefault?.let {
+        iconOption.setBackgroundColor(
+            getColorOrDefault(
+                EmailUtils.addAlpha(it, 0.6),
+                HMSPrebuiltTheme.getDefaults().surface_default
+            )
         )
-    )
+    }
 
 
     rootLayout.setBackgroundColor(
@@ -1558,18 +1628,74 @@ fun LayoutChatParticipantCombinedBinding.getTabStateList(): StateListDrawable {
     return stateList
 }
 
-private fun getChatBackgroundDrawable(): ShapeDrawable {
+fun getChatBackgroundDrawable(alpha : Double? = null): ShapeDrawable {
     return getShape()//ResourcesCompat.getDrawable(this.root.resources,R.drawable.send_message_background, null)!!
         .apply {
+            val initialColor = if(alpha == null) HMSPrebuiltTheme.getColours()?.surfaceDefault
+            else HMSPrebuiltTheme.getColours()?.surfaceDefault?.let { addAlpha(it, alpha) }
+            val defaultColor : String = if(alpha == null) HMSPrebuiltTheme.getDefaults().surface_default
+            else addAlpha(HMSPrebuiltTheme.getDefaults().surface_default, alpha)
             val color = getColorOrDefault(
-                HMSPrebuiltTheme.getColours()?.surfaceDefault,
-                HMSPrebuiltTheme.getDefaults().surface_default)
+                initialColor,
+                defaultColor)
             colorFilter =
                 BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
         }
 }
+private fun configureChatControlsTheme(
+    sendToBackground: MaterialCardView,
+    sendToChipText: MaterialTextView,
+    chatOptionsCard : MaterialCardView,
+    chatOptions : ImageView
+) {
+    chatOptions.drawable.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+    ))
+
+    chatOptionsCard.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+    chatOptionsCard.strokeWidth = 1.dp()
+    chatOptionsCard.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
+    sendToBackground.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+    sendToBackground.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default
+        )
+    )
+
+    sendToChipText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    sendToChipText.drawableEnd?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
 
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
+    pinMessageTheme(pinCloseButton)
+    userBlockedTheme(userBlocked)
+    chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
+    configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
+
     // Emptyview
     messageEmptyImage.drawable.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
@@ -1585,6 +1711,7 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
     // Chat
     chatView.background = getChatBackgroundDrawable()
     editTextMessage.background = getChatBackgroundDrawable()
+
     editTextMessage.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
@@ -1601,7 +1728,13 @@ internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
 }
 
 internal fun ListItemChatBinding.applyTheme() {
+    sentBackground.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright)
 
+    sentBackground.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default))
     name.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
@@ -1611,6 +1744,14 @@ internal fun ListItemChatBinding.applyTheme() {
     time.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
         HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+
+    toGroup.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+
+    sentTo.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
 }
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {
@@ -2203,13 +2344,6 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
 
     setSwitchThemes(notRequiredToAnswer)
 
-    deleteOptionTrashButton.drawable.setTint(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
-
     saveButton.saveButtonEnabled()
 
 
@@ -2261,6 +2395,34 @@ internal fun TextView.saveButtonDisabled() {
 
 }
 
+
+fun LayoutPollQuizOptionsItemMultiChoiceBinding.applyTheme() {
+    backingCard.setCardBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().surface_default)
+    )
+
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    editQuestionButton.saveButtonEnabled()
+    questionNumbering.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+    questionTitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
+
 fun LayoutPollQuizOptionsItemBinding.setTheme() {
 
     text.setBackgroundAndColor(
@@ -2285,7 +2447,12 @@ fun LayoutPollQuizOptionsItemBinding.setTheme() {
 
     radioButton.buttonTintList = trackTintList()
     checkbox.buttonTintList = trackTintList()
-
+    deleteOptionTrashButton.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
 }
 
 fun TextView.pollsStatusLiveDraftEnded(state: HmsPollState) {
@@ -2405,4 +2572,125 @@ fun MaterialCardView.highlightCorrectAnswer(isCorrect : Boolean) {
         )
     }
     strokeWidth = 1.dp()
+}
+
+internal fun LayoutMultiChoiceQuestionOptionItemBinding.applyTheme() {
+    optionText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+}
+
+fun LayoutPinnedMessageBinding.applyTheme() {
+    root.background = getShape()// ResourcesCompat.getDrawable(this.root.resources,R.drawable.gray_shape_round_dialog, null)!!
+        .apply {
+            val color = getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                HMSPrebuiltTheme.getDefaults().surface_default)
+            colorFilter =
+                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+        }
+
+    pinnedMessage.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
+
+private fun dialogBackground(resources: Resources): Drawable =
+    ResourcesCompat.getDrawable(resources,R.drawable.gray_shape_round_dialog, null)!!.apply {
+        val color = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+        setColorFilter(color, PorterDuff.Mode.ADD)
+    }
+
+fun BottomSheetMessageOptionsBinding.applyTheme() {
+    root.background = dialogBackground(this.root.resources)
+    hideMessageIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    hideMessageText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    pinMessageIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    pinMessageText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    blockFromChatIcon.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+    blockFromChatText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            HMSPrebuiltTheme.getDefaults().error_default
+        )
+    )
+
+}
+
+fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
+    root.background = dialogBackground(this.root.resources)
+    border5.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+}
+fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+}
+fun LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding.applyTheme() {
+    image.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    tick.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    name.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
 }

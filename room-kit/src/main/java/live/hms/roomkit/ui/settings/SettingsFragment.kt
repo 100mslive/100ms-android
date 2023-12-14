@@ -463,9 +463,9 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
-        settings.enableSubscribeDegradation,
-        switchSubscribeDegradationEnabled
-      ) { commitHelper.setSubscribeDegradation(it) }
+        settings.setInitialNameFromClient,
+        switchSetInitialName
+      ) { commitHelper.setInitialNameFromClient(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

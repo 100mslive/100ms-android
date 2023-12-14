@@ -39,7 +39,6 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="right"
-                android:layout_marginEnd="16dp"
                 android:elevation="3dp"
                 android:src="@drawable/ic_close_16"
                 app:layout_constraintStart_toStartOf="parent"

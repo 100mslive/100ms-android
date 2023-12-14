@@ -22,9 +22,6 @@
             app:destination="@id/RolePreviewFragment" />
 
         <action
-            android:id="@+id/action_MeetingFragment_to_ChatBottomSheetFragment"
-            app:destination="@id/ChatBottomSheetFragment" />
-        <action
             android:id="@+id/action_MeetingFragment_to_SettingsFragment"
             app:destination="@id/SettingsFragment" />
         <action
@@ -53,20 +50,6 @@
             android:id="@+id/action_MeetingFragment_to_pollDisplayFragment"
             app:destination="@id/pollDisplayFragment" />
     </fragment>
-
-    <dialog
-        android:id="@+id/ChatBottomSheetFragment"
-        android:name="live.hms.roomkit.ui.meeting.chat.ChatBottomSheetFragment"
-        android:label="@string/chat_fragment"
-        tools:layout="@layout/dialog_bottom_sheet_chat">
-
-
-        <argument
-            android:name="currentUserCustomerId"
-            app:argType="string"
-            app:nullable="false" />
-
-    </dialog>
 
     <fragment
         android:id="@+id/ParticipantsFragment"
@@ -164,6 +147,7 @@
         android:id="@+id/pollsCreationFragment"
         android:name="live.hms.roomkit.ui.polls.PollsCreationFragment"
         android:label="PollsCreationFragment" >
+
         <action
             android:id="@+id/action_pollsCreationFragment_to_pollQuestionCreation"
             app:destination="@id/pollQuestionCreation" />
@@ -174,7 +158,15 @@
     <fragment
         android:id="@+id/pollQuestionCreation"
         android:name="live.hms.roomkit.ui.polls.PollQuestionCreation"
-        android:label="PollQuestionCreation" />
+        android:label="PollQuestionCreation" >
+
+        <argument
+            app:nullable="false"
+            android:defaultValue="false"
+            android:name="isPoll"
+            app:argType="boolean" />
+
+    </fragment>
     <fragment
         android:id="@+id/pollDisplayFragment"
         android:name="live.hms.roomkit.ui.polls.display.PollDisplayFragment"

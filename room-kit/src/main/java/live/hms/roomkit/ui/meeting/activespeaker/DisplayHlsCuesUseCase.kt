@@ -3,9 +3,11 @@ package live.hms.roomkit.ui.meeting.activespeaker
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.delay
 import live.hms.hls_player.HmsHlsCue
+import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.video.utils.GsonUtils
 
-class DisplayHlsCuesUseCase(val showText: (String) -> Unit) {
+class DisplayHlsCuesUseCase(val showText: (String) -> Unit,
+    val openPoll : (pollId :String) -> Unit) {
 
     private val listToShow = mutableListOf<String>()
 
@@ -21,12 +23,18 @@ class DisplayHlsCuesUseCase(val showText: (String) -> Unit) {
             ((hlsCue.endDate?.time ?: 0) - hlsCue.startDate.time).toInt()
         }
         if (duration > 0) {
-            val result = convert(hlsCue.payloadval)
-            listToShow.add(result)
-            showList()
-            delay(duration.toLong())
-            listToShow.remove(result)
-            showList()
+            when(val result = convert(hlsCue.payloadval)) {
+                CueTypes.Invalid -> {} // do nothing
+                is CueTypes.DisplayText-> {
+                    listToShow.add(result.text)
+                    showList()
+                    delay(duration.toLong())
+                    listToShow.remove(result.text)
+                    showList()
+                }
+                // Might need to be single shot somehow.
+                is CueTypes.PollId -> openPoll(result.pollId)
+            }
         }
     }
 
@@ -37,32 +45,49 @@ class DisplayHlsCuesUseCase(val showText: (String) -> Unit) {
         showText(text)
     }
 
-    private fun convert(text: String?): String {
+    private fun convert(text: String?): CueTypes {
         if (text == null)
-            return "null"
+            return CueTypes.Invalid
 
         val isEmojiReact = text.contains("type") && text.contains("emojiId")
-        if (!isEmojiReact)
-            return text
+        val isPoll = text.startsWith(POLL_IDENTIFIER_FOR_HLS_CUE)
+        if(isEmojiReact) {
+            val emojiReact = GsonUtils.gson.fromJson(text, EmojiReact::class.java)
+            if (emojiReact.type != "EMOJI_REACTION")
+                return CueTypes.DisplayText.Text(text)
 
-        val emojiReact = GsonUtils.gson.fromJson(text, EmojiReact::class.java)
-        if (emojiReact.type != "EMOJI_REACTION")
-            return text
-
-        return when (emojiReact.emojiId) {
-            "+1" -> "👍"
-            "-1" -> "👎"
-            "wave" -> "👋"
-            "clap" -> "👏"
-            "fire" -> "🔥"
-            "tada" -> "🎉"
-            "heart_eyes" -> "😍"
-            "joy" -> "😂"
-            "open_mouth" -> "😮"
-            "sob" -> "😭"
-            else -> text
+            val emoji = when (emojiReact.emojiId) {
+                "+1" -> "👍"
+                "-1" -> "👎"
+                "wave" -> "👋"
+                "clap" -> "👏"
+                "fire" -> "🔥"
+                "tada" -> "🎉"
+                "heart_eyes" -> "😍"
+                "joy" -> "😂"
+                "open_mouth" -> "😮"
+                "sob" -> "😭"
+                else -> null
+            }
+            if(emoji == null)
+                CueTypes.DisplayText.Text(text)
+            else CueTypes.DisplayText.Emoji(emoji)
+        } else if (isPoll) {
+            return CueTypes.PollId(text.drop(POLL_IDENTIFIER_FOR_HLS_CUE.length))
         }
+
+        return CueTypes.DisplayText.Text(text)
     }
+}
+
+sealed class CueTypes {
+    object Invalid :CueTypes()
+    sealed class DisplayText(open val text : String) : CueTypes() {
+        data class Text(override val text : String) : DisplayText(text)
+        data class Emoji(override val text : String) : DisplayText(text)
+    }
+
+    data class PollId(val pollId :String) : CueTypes()
 }
 
 private data class EmojiReact(

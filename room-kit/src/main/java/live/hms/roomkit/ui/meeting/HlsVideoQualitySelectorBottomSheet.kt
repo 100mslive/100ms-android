@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.TextView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.DialogTrackSelectionBinding
@@ -62,6 +64,10 @@ class HlsVideoQualitySelectorBottomSheet(
             )
         )
 
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
         binding.closeBtn.setOnClickListener {
             dismiss()
         }

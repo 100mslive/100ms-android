@@ -42,9 +42,6 @@ fun View.setOnSingleClickListener(l: View.OnClickListener) {
 private fun getDip(): Float = Resources.getSystem().displayMetrics.density
 fun Float.dp() = this * getDip()
 fun Int.dp() = (this * getDip()).roundToInt()
-fun View.setOnSingleClickListener(l: (View) -> Unit) {
-  setOnClickListener(OnSingleClickListener(l))
-}
 
 // Keep the listener at last such that we can use kotlin lambda
 fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {

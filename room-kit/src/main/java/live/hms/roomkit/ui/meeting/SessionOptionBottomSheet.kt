@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
@@ -18,8 +20,9 @@ import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.util.contextSafe
+import live.hms.roomkit.ui.theme.getShape
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.sdk.models.enums.HMSRecordingState
 
 class SessionOptionBottomSheet(
     private val onScreenShareClicked: () -> Unit,
@@ -59,6 +62,10 @@ class SessionOptionBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         applyTheme()
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
@@ -144,7 +151,9 @@ class SessionOptionBottomSheet(
             add(raiseHandOption)
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
-            add(changeName)
+            if(!meetingViewModel.disableNameEdit()) {
+                add(changeName)
+            }
             if (meetingViewModel.showPollOnUi()) {
                 add(GridOptionItem(
                         "Polls and Quizzes", R.drawable.poll_vote, {
@@ -159,8 +168,11 @@ class SessionOptionBottomSheet(
 
 
 
-        meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
-            val isRecording = meetingViewModel.isRecordingState()
+        meetingViewModel.recordingState.observe(viewLifecycleOwner) { state ->
+
+            val isRecording = state in listOf(HMSRecordingState.STARTED, HMSRecordingState.PAUSED,
+                HMSRecordingState.RESUMED)
+
             recordingOption.setSelectedButton(isRecording)
             recordingOption.setText(if (isRecording) resources.getString(R.string.stop_recording) else resources.getString(R.string.start_record_meeting))
         }
@@ -181,9 +193,9 @@ class SessionOptionBottomSheet(
         }
 
 
-        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
+        meetingViewModel.recordingState.observe(viewLifecycleOwner) {
             Log.d("SessionOptionBottoSheet", "isRecordingInProgess: $it")
-            recordingOption.showProgress(it)
+            recordingOption.showProgress(it == HMSRecordingState.STARTING)
         }
 
     }
@@ -191,12 +203,13 @@ class SessionOptionBottomSheet(
     private fun applyTheme() {
 
 
-        binding.rootLayout.background = resources.getDrawable(R.drawable.gray_shape_round_dialog)
-            .apply {
-                val color = getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.backgroundDefault,
-                    HMSPrebuiltTheme.getDefaults().background_default)
-                setColorFilter(color, PorterDuff.Mode.ADD);
+        binding.rootLayout.background =
+            resources.getDrawable(R.drawable.gray_shape_round_dialog).apply {
+                    val color = getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.backgroundDefault,
+                        HMSPrebuiltTheme.getDefaults().background_default
+                    )
+                    setColorFilter(color, PorterDuff.Mode.ADD)
             }
 
 

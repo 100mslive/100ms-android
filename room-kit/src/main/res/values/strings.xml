@@ -146,7 +146,7 @@
     <string name="yes">YES</string>
     <string name="no">NO</string>
     <string name="role_change">Role Change</string>
-    <string name="switch_enable_subscribe_degradation">Enable subscribe degradation</string>
+    <string name="switch_set_initial_name">Enable initial name setting from client</string>
     <string name="end_room">End room</string>
     <string name="end_and_lock_room">Lock and end room</string>
     <string name="remote_mute_all_desc">Remote Mute All</string>
@@ -245,7 +245,17 @@
     <string name="polls_answer_button">Vote</string>
     <string name="polls_answer_button_complete">Voted</string>
     <string name="polls_quiz_answer_button">Answer</string>
-po    <string name="polls_quiz_answer_button_complete">Answered</string>
+    <string name="polls_quiz_answer_button_complete">Answered</string>
     <string name="poll_title_heading">%1$s %2$s</string>
     <string name="quiz_your_answer">Your Answer</string>
+    <string name="hms_start_poll">Start Poll</string>
+    <string name="hms_start_quiz">Start Quiz</string>
+    <string name="hms_name_this_poll">Name this poll</string>
+    <string name="hms_name_this_quiz">Name this quiz</string>
+    <string name="view_more">View More</string>
+    <string name="chat_with">To</string>
+    <string name="blocked_from_sending_messages">You\'ve been blocked from sending messages</string>
+    <string name="chat_paused_by">Chat has been paused by %1$s.</string>
+    <string name="block_from_chat">Block from Chat</string>
+    <string name="chat_paused">Chat Paused</string>
 </resources>

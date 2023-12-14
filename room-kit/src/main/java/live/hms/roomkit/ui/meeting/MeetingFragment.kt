@@ -8,6 +8,7 @@ import android.app.RemoteAction
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.Icon
@@ -24,19 +25,16 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,12 +54,16 @@ import live.hms.roomkit.ui.meeting.broadcastreceiver.PipUtils.muteTogglePipEvent
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.meeting.chat.combined.CHAT_TAB_TITLE
 import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
+import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
+import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_CHAT_ALONE
 import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
+import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
+import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
-import live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.HMSNotificationType
@@ -72,10 +74,11 @@ import live.hms.video.audio.HMSAudioManager
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
-import live.hms.video.polls.models.HmsPoll
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSHlsRecordingConfig
 import live.hms.video.sdk.models.HMSRemovedFromRoom
+import live.hms.video.sdk.models.enums.HMSRecordingState
+import live.hms.video.sdk.models.enums.HMSStreamingState
 
 
 val LEAVE_INFORMATION_PERSON = "bundle-leave-information-person"
@@ -83,7 +86,6 @@ val LEAVE_INFORMATION_REASON = "bundle-leave-information-reason"
 val LEAVE_INFROMATION_WAS_END_ROOM = "bundle-leave-information-end-room"
 
 class MeetingFragment : Fragment() {
-    private val chatAdapter = ChatAdapter()
     companion object {
         private const val TAG = "MeetingFragment"
         const val AudioSwitchBottomSheetTAG = "audioSwitchBottomSheet"
@@ -91,9 +93,8 @@ class MeetingFragment : Fragment() {
 
     private var binding by viewLifecycle<FragmentMeetingBinding>()
     private lateinit var currentFragment: Fragment
-
-
-
+    private var hasStartedHls: Boolean = false
+    private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
     private lateinit var settings: SettingsStore
     var countDownTimer: CountDownTimer? = null
@@ -106,19 +107,20 @@ class MeetingFragment : Fragment() {
             requireActivity().application
         )
     }
+    private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+    private val chatAdapter by lazy {
+        ChatAdapter({ message ->
+            launchMessageOptionsDialog.launch(meetingViewModel,
+            childFragmentManager, message) }, ::onChatClick, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
+    }
 
-    private val chatViewModel: ChatViewModel by activityViewModels {
+    private val chatViewModel: ChatViewModel by activityViewModels<ChatViewModel> {
         ChatViewModelFactory(meetingViewModel.hmsSDK)
     }
 
 
-    private var isMeetingOngoing = false
 
-    private val rtmpBottomSheet by lazy {
-        RtmpRecordBottomSheet {
-//            binding.buttonGoLive?.visibility = View.GONE
-        }
-    }
+    private var isMeetingOngoing = false
 
     private val onSettingsChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -130,7 +132,7 @@ class MeetingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         isCountdownManuallyCancelled = false
-        setupRecordingTimeView()
+        setupStreamingTimeView()
         settings.registerOnSharedPreferenceChangeListener(onSettingsChangeListener)
     }
 
@@ -145,6 +147,12 @@ class MeetingFragment : Fragment() {
         cancelCallback()
     }
 
+    private fun onChatClick() {
+        if (controlBarsVisible && meetingViewModel.prebuiltInfoContainer.isChatOverlay())
+            hideControlBars()
+        else
+            showControlBars(true)
+    }
     private fun cancelCallback() = handler.removeCallbacks(hideRunnable)
 
     var resultLauncher =
@@ -168,8 +176,8 @@ class MeetingFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         isCountdownManuallyCancelled = true
+        hasStartedHls = false
         countDownTimer?.cancel()
-        unregisterPipActionListener()
     }
 
     override fun onPause() {
@@ -181,14 +189,13 @@ class MeetingFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         isCountdownManuallyCancelled = false
-        setupRecordingTimeView()
+        setupStreamingTimeView()
     }
 
     private fun updateActionVolumeMenuIcon(
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
-        binding.iconOutputDevice?.visibility = View.VISIBLE
-        binding.iconOutputDevice?.apply {
+        binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
                     setIconEnabled(R.drawable.phone)
@@ -217,63 +224,7 @@ class MeetingFragment : Fragment() {
         }
     }
 
-    private fun updateGoLiveButton(recordingState: RecordingState) {
-        if ((meetingViewModel.isHlsKitUrl || meetingViewModel.hmsSDK.getLocalPeer()
-                ?.isWebrtcPeer() == true) && (meetingViewModel.isAllowedToHlsStream() || meetingViewModel.isAllowedToRtmpStream())
-        ) {
-//            binding.buttonGoLive?.visibility = View.VISIBLE
-        } else {
-//            binding.buttonGoLive?.visibility = View.GONE
-        }
-        if (recordingState == RecordingState.STREAMING_AND_RECORDING ) {
-            binding.meetingFragmentProgress?.visibility = View.GONE
-//            binding.buttonGoLive?.setImageDrawable(
-//                ContextCompat.getDrawable(
-//                    requireContext(),
-//                    R.drawable.ic_stop_circle
-//                )
-//            )
-//            binding.buttonGoLive?.setBackgroundAndColor(DefaultTheme.getColours()?.alertErrorDefault,
-//                DefaultTheme.getDefaults().error_default)
-            binding.liveTitleCard?.visibility = View.VISIBLE
-            binding.tvViewersCountCard?.visibility = View.VISIBLE
-            binding.recordingSignal.visibility = View.VISIBLE
-
-            if (meetingViewModel.isRTMPRunning()) {
-                binding.liveTitle?.text = "Live with RTMP"
-            } else {
-                binding.liveTitle?.text = "Live"
-            }
-            binding.tvViewersCount?.visibility = View.VISIBLE
-            binding.tvViewersCountCard.visibility = View.VISIBLE
-            setupRecordingTimeView()
-        } else if (recordingState == RecordingState.RECORDING ){
-            binding.liveTitleCard?.visibility = View.GONE
-            binding.recordingSignal.visibility = View.VISIBLE
-            binding.tvViewersCount?.visibility = View.GONE
-            binding.tvViewersCountCard.visibility = View.GONE
-        } else if (recordingState == RecordingState.STREAMING) {
-            binding.liveTitleCard?.visibility = View.VISIBLE
-            binding.tvViewersCountCard?.visibility = View.VISIBLE
-            binding.recordingSignal.visibility = View.GONE
-
-            if (meetingViewModel.isRTMPRunning()) {
-                binding.liveTitle?.text = "Live with RTMP"
-            } else {
-                binding.liveTitle?.text = "Live"
-            }
-            binding.tvViewersCount?.visibility = View.VISIBLE
-            binding.tvViewersCountCard.visibility = View.VISIBLE
-        }
-        else {
-            binding.recordingSignal.visibility = View.GONE
-            binding.liveTitleCard?.visibility = View.GONE
-            binding.tvViewersCount?.visibility = View.GONE
-            binding.tvViewersCountCard.visibility = View.GONE
-        }
-    }
-
-    private fun setupRecordingTimeView() {
+    private fun setupStreamingTimeView() {
         countDownTimer?.cancel()
         countDownTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(l: Long) {
@@ -282,8 +233,8 @@ class MeetingFragment : Fragment() {
                         ?: meetingViewModel.hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
-                        binding.tvRecordingTime?.visibility = View.VISIBLE
-                        binding.tvRecordingTime?.text =
+                        binding.tvStreamingTime.visibility = View.VISIBLE
+                        binding.tvStreamingTime.text =
                             millisecondsToTime(System.currentTimeMillis().minus(startedAt))
                     }
                 }
@@ -315,30 +266,44 @@ class MeetingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         initObservers()
-        meetingViewModel.isRecording.observe(
+        initButtons()
+        initOnBackPress()
+
+        if (meetingViewModel.state.value is MeetingState.Disconnected) {
+            // Handles configuration changes
+            meetingViewModel.startMeeting()
+        } else {
+            //start HLS stream
+            startHLSStreamingIfRequired()
+        }
+        binding.chatMessages.isHeightContrained = true
+        PauseChatUIUseCase().setChatPauseVisible(
+            binding.chatOptionsCard,
+            meetingViewModel
+        )
+        pinnedMessageUiUseCase.init(binding.pinnedMessagesRecyclerView, binding.pinCloseButton, meetingViewModel::unPinMessage, meetingViewModel.isAllowedToPinMessages())
+        ChatUseCase().initiate(
+            chatViewModel.messages,
+            meetingViewModel.chatPauseState,
+            meetingViewModel.roleChange,
+            meetingViewModel.currentBlockList,
             viewLifecycleOwner,
-            Observer {
-                updateGoLiveButton(it)
-            })
+            chatAdapter,
+            binding.chatMessages,
+            chatViewModel,
+            meetingViewModel,
+            null,
+            binding.iconSend,
+            binding.editTextMessage,
+            binding.userBlocked,
+            binding.chatPausedBy,
+            binding.chatPausedContainer,
+            binding.chatExtra,
+            meetingViewModel.prebuiltInfoContainer::isChatEnabled,
+            meetingViewModel::availableRecipientsForChat,
+            chatViewModel::currentlySelectedRbacRecipient
+        )
 
-
-        meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
-            if (isHandRaised) {
-                binding.buttonRaiseHand?.setIconDisabled(R.drawable.ic_raise_hand)
-            } else {
-                binding.buttonRaiseHand?.setIconEnabled(R.drawable.ic_raise_hand)
-            }
-        }
-        binding.iconSend.setOnSingleClickListener {
-            val messageStr = binding.editTextMessage.text.toString().trim()
-            if (messageStr.isNotEmpty()) {
-                chatViewModel.sendMessage(messageStr)
-                binding.editTextMessage.setText("")
-            }
-        }
-        ChatUseCase().initiate(chatViewModel.messages, viewLifecycleOwner, chatAdapter, binding.chatMessages, chatViewModel, null) {
-            meetingViewModel.prebuiltInfoContainer.isChatEnabled()
-        }
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {
@@ -352,50 +317,110 @@ class MeetingFragment : Fragment() {
     ): View {
         binding = FragmentMeetingBinding.inflate(inflater, container, false)
 
-        initButtons()
-        initOnBackPress()
-
-        if (meetingViewModel.state.value is MeetingState.Disconnected) {
-            // Handles configuration changes
-            meetingViewModel.startMeeting()
-        } else {
-            //start HLS stream
-           if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
-               binding.meetingFragmentProgress?.visibility = View.VISIBLE
-               meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
-           }
-
-        }
         return binding.root
     }
 
     private fun goToHomePage(details: HMSRemovedFromRoom? = null) {
 
         //only way to programmatically dismiss pip mode
-        if (activity?.isInPictureInPictureMode == true) {
-            activity?.moveTaskToBack(false)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (activity?.isInPictureInPictureMode == true) {
+                activity?.moveTaskToBack(false)
+            }
         }
 
-        /*Intent(requireContext(), HomeActivity::class.java).apply {
-            crashlyticsLog(TAG, "MeetingActivity.finish() -> going to HomeActivity :: $this")
-            if (details != null) {
-                putExtra(LEAVE_INFORMATION_PERSON, details.peerWhoRemoved?.name ?: "Someone")
-                putExtra(LEAVE_INFORMATION_REASON, details.reason)
-                putExtra(LEAVE_INFROMATION_WAS_END_ROOM, details.roomWasEnded)
-            }
-            startActivity(this)
-        }*/
         requireActivity().finish()
     }
 
-    private fun initObservers() {
+    private fun updateRecordingViews(state: HMSRecordingState) {
+        when (state) {
+            HMSRecordingState.STARTING -> {
+                binding.recordingSignalProgress.visibility = View.VISIBLE
+                binding.recordingSignal.visibility = View.GONE
+                binding.recordingPause.visibility = View.GONE
+            }
+            HMSRecordingState.RESUMED, HMSRecordingState.STARTED -> {
+                binding.recordingSignalProgress.visibility = View.GONE
+                binding.recordingSignal.visibility = View.VISIBLE
+                binding.recordingPause.visibility = View.GONE
+            }
+            HMSRecordingState.PAUSED -> {
+                binding.recordingSignalProgress.visibility = View.GONE
+                binding.recordingSignal.visibility = View.GONE
+                binding.recordingPause.visibility = View.VISIBLE
+            }
+            HMSRecordingState.FAILED, HMSRecordingState.NONE, HMSRecordingState.STOPPED -> {
+                binding.recordingSignalProgress.visibility = View.GONE
+                binding.recordingSignal.visibility = View.GONE
+                binding.recordingPause.visibility = View.GONE
+            }
+        }
+    }
 
+    private fun updateStreamingViews(state: HMSStreamingState) {
+        when (state) {
+            HMSStreamingState.STARTING -> {
+                // Remove the loader on getting STARTING notification for any peer who has hlsStreaming permission
+                if (meetingViewModel.isAllowedToHlsStream()) {
+                    binding.meetingFragmentProgress.visibility = View.GONE
+                }
+            }
+
+            HMSStreamingState.STARTED -> {
+                binding.meetingFragmentProgress.visibility = View.GONE
+                binding.liveTitleCard.visibility = View.VISIBLE
+                if (meetingViewModel.isRTMPRunning()) {
+                    binding.liveTitle.text = "Live with RTMP"
+                } else {
+                    binding.liveTitle.text = "Live"
+                }
+                binding.tvViewersCountCard.visibility = View.VISIBLE
+                binding.tvViewersCount.visibility = View.VISIBLE
+                setupStreamingTimeView()
+            }
+
+            HMSStreamingState.NONE, HMSStreamingState.STOPPED, HMSStreamingState.FAILED -> {
+                if (state != HMSStreamingState.NONE)
+                    binding.meetingFragmentProgress.visibility = View.GONE
+                binding.liveTitleCard.visibility = View.GONE
+                binding.tvViewersCount.visibility = View.GONE
+                binding.tvViewersCountCard.visibility = View.GONE
+            }
+
+        }
+    }
+
+    private fun initObservers() {
+        binding.sendToBackground.setOnSingleClickListener {
+            RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
+        }
+        // This only needs to be in meetingfragment since we always open it.
+        // Is that true for HLS? Double check.
+        meetingViewModel.showAudioIcon.observe(viewLifecycleOwner) { visible ->
+            binding.iconOutputDevice.visibility = if(visible) View.VISIBLE else View.GONE
+        }
+        meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
+            chatViewModel.setInitialRecipient(it.first, it.second)
+            ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, it.first)
+        }
+        chatViewModel.currentlySelectedRecipientRbac.observe(viewLifecycleOwner) { recipient ->
+            ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, recipient)
+            // if recipient is null, hide the chat.
+            // but recipient might be null if they're just selecting from roles/participants as well.
+
+        }
+        meetingViewModel.messageIdsToHide.observe(viewLifecycleOwner) { messageIdsToHide ->
+            chatViewModel.updateMessageHideList(messageIdsToHide)
+        }
+        meetingViewModel.currentBlockList.observe(viewLifecycleOwner) { chatBlockedPeerIdsList ->
+            chatViewModel.updateBlockList(chatBlockedPeerIdsList)
+        }
         meetingViewModel.showHlsStreamYetToStartError.observe(viewLifecycleOwner) { showError ->
-                binding.streamYetToStartContainer?.visibility = if (showError) View.VISIBLE else View.GONE
+                binding.streamYetToStartContainer.visibility = if (showError) View.VISIBLE else View.GONE
         }
 
         meetingViewModel.peerCount.observe(viewLifecycleOwner) {
-            binding.tvViewersCount?.text =it.toString()
+            binding.tvViewersCount.text =it.toString()
 
         }
 
@@ -403,30 +428,29 @@ class MeetingFragment : Fragment() {
             chatViewModel.receivedMessage(it)
         }
 
-        meetingViewModel.isRecordingInProgess.observe(viewLifecycleOwner) {
-            if (it) {
-                binding.recordingSignalProgress.visibility = View.VISIBLE
+        meetingViewModel.pinnedMessages.observe(viewLifecycleOwner) { pinnedMessages ->
+            pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
+                binding.pinnedMessagesDisplay)
+        }
+
+        meetingViewModel.recordingState.observe(viewLifecycleOwner) { state ->
+            updateRecordingViews(state)
+        }
+
+        meetingViewModel.streamingState.observe(viewLifecycleOwner) { state ->
+            updateStreamingViews(state)
+        }
+
+        meetingViewModel.isHandRaised.observe(viewLifecycleOwner) { isHandRaised ->
+            if (isHandRaised) {
+                binding.buttonRaiseHand.setIconDisabled(R.drawable.ic_raise_hand)
             } else {
-                binding.recordingSignalProgress.visibility = View.GONE
+                binding.buttonRaiseHand.setIconEnabled(R.drawable.ic_raise_hand)
             }
         }
-
-
-        meetingViewModel.isRecording.observe(viewLifecycleOwner) {recordingState ->
-            val isRecording = meetingViewModel.isRecordingState()
-            binding.recordingSignal.visibility =  if (isRecording) View.VISIBLE else View.GONE
-        }
-
 
         meetingViewModel.isScreenShare.observe(viewLifecycleOwner) {
             meetingViewModel.triggerScreenShareNotification(it)
-        }
-
-        meetingViewModel.hlsToggleUpdateLiveData.observe(viewLifecycleOwner) {
-            when(it) {
-                true -> binding.meetingFragmentProgress?.visibility = View.VISIBLE
-                false -> binding.meetingFragmentProgress?.visibility = View.GONE
-            }
         }
 
         meetingViewModel.meetingViewMode.observe(viewLifecycleOwner) {
@@ -616,12 +640,13 @@ class MeetingFragment : Fragment() {
                 }
 
             }
+
         }
 
         meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
             //to show or hide mic icon [eg in HLS mode mic is not required]
-            updatePipMicState(allowed, true)
+
         }
 
         meetingViewModel.isLocalVideoPresent.observe(viewLifecycleOwner) { allowed ->
@@ -645,7 +670,6 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
-            updatePipMicState(isMicOn = enabled)
             (binding.buttonToggleAudio as? ShapeableImageView)?.apply {
 
                 if (enabled) {
@@ -656,23 +680,19 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        meetingViewModel.peerLiveData.observe(viewLifecycleOwner) {
-            chatViewModel.peersUpdate()
-        }
-
         meetingViewModel.roleChange.observe(viewLifecycleOwner) {
             updateChatButtonWhenRoleChanges()
         }
 
     }
 
-//    private fun showPollStart(poll: HmsPoll) {
-//        val pollId = poll.pollId
-//        if (!showedPolls.contains(pollId)) {
-//            showedPolls.add(pollId)
-//            meetingViewModel.triggerPollsNotification(poll)
-//        }
-//    }
+    private fun startHLSStreamingIfRequired() {
+        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
+            binding.meetingFragmentProgress.visibility = View.VISIBLE
+            hasStartedHls = true
+            meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
+        }
+    }
 
     private val pipReceiver by lazy {
         PipBroadcastReceiver(
@@ -692,7 +712,6 @@ class MeetingFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        registerPipActionListener()
     }
 
     private fun updatePipEndCall() {
@@ -756,23 +775,35 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        //handle orientation change
+        when(mode) {
+            is MeetingViewMode.HLS_VIEWER -> {
+                    contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR }
+            }
+            else -> {
+                contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+            }
+        }
+
         childFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, currentFragment)
             .addToBackStack(null)
             .commit()
 
+
+
+
         if(modeEnteredOrExitedHls) {
-            val overlayIsVisible = isOverlayChatVisible()
-            if (meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
-                val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
-                if (overlayIsVisible && !isChatOverlay)
-                    toggleChatVisibility()
-                else if (!overlayIsVisible && isChatOverlay)
-                    toggleChatVisibility()
-            } else if (overlayIsVisible) {
-                toggleChatVisibility()
-            }
+            val isChatEnabled = meetingViewModel.prebuiltInfoContainer.isChatEnabled()
+            val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
+            val isChatOpenByDefault = meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()
+            val chatVisible = isChatEnabled && isChatOverlay && isChatOpenByDefault
+            toggleChatVisibility(chatVisible)
+            if(chatVisible)
+                moveChat(up = true, bottomMenuHeight = binding.bottomControls.height.toFloat())
+            else
+                moveChat(up = false, binding.topMenu.height.toFloat())
         }
         if(triggerFirstUpdate){
             updateChatButtonWhenRoleChanges()
@@ -820,7 +851,7 @@ class MeetingFragment : Fragment() {
 
 
 
-        binding.topMenu?.setBackgroundColor(
+        binding.topMenu.setBackgroundColor(
             getColorOrDefault(
                 HMSPrebuiltTheme.getColours()?.backgroundDim,
                 HMSPrebuiltTheme.getDefaults().background_default
@@ -832,7 +863,7 @@ class MeetingFragment : Fragment() {
                 HMSPrebuiltTheme.getDefaults().background_default
             )
         )
-        binding.buttonRaiseHand?.visibility = View.GONE
+        binding.buttonRaiseHand.visibility = View.GONE
 
         WindowCompat.setDecorFitsSystemWindows(activity!!.window, true)
 
@@ -868,7 +899,7 @@ class MeetingFragment : Fragment() {
         )
         , Color.TRANSPARENT, GradientDrawable.Orientation.BOTTOM_TOP)
 
-        binding.buttonRaiseHand?.visibility = View.VISIBLE
+        binding.buttonRaiseHand.visibility = View.VISIBLE
 
         binding.fragmentContainer.setOnSingleClickListener(500L) {
             if (controlBarsVisible)
@@ -899,7 +930,7 @@ class MeetingFragment : Fragment() {
                     showSystemBars()
                     // This prevents the bar from moving twice as high as it should
                     if(shouldHideAfterDelay)
-                        moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
+                        moveChat(up = true, bottomMenuHeight = binding.bottomControls.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -912,7 +943,7 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
-                    binding.topMenu?.visibility = View.VISIBLE
+                    binding.topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
@@ -955,13 +986,13 @@ class MeetingFragment : Fragment() {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ALIGN_BOTTOM)
                     addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
-                    updateMargins(bottom = bottomMenuHeight.toInt() + resources.getDimension(R.dimen.eight_dp).toInt())
+                    updateMargins(bottom = bottomMenuHeight.toInt() + 8.dp())
                 }
             } else {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ABOVE)
                     addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, R.id.meeting_container)
-                    updateMargins(bottom = 8)
+                    updateMargins(bottom = 8.dp())
                 }
             }
         }
@@ -977,7 +1008,7 @@ class MeetingFragment : Fragment() {
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
                     topMenu.visibility = View.VISIBLE
-                    moveChat(up = false, topMenu!!.height.toFloat())
+                    moveChat(up = false, bottomMenu.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -1025,16 +1056,14 @@ class MeetingFragment : Fragment() {
         handler.postDelayed(hideRunnable, delayMillis.toLong())
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun hideProgressBar() {
+        var isInPIPMode = false
         binding.fragmentContainer.visibility = View.VISIBLE
         binding.bottomControls.visibility = View.VISIBLE
-        if (activity?.isInPictureInPictureMode?.not() == true && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
+        if (!isInPIPMode && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
-
         binding.progressBar.root.visibility = View.GONE
-        binding.meetingFragmentProgress?.visibility = View.GONE
     }
 
     private fun showProgressBar() {
@@ -1056,10 +1085,15 @@ class MeetingFragment : Fragment() {
             }
         }
 
+        binding.iconSend.setOnSingleClickListener {
+            val messageStr = binding.editTextMessage.text.toString().trim()
+            if (messageStr.isNotEmpty()) {
+                chatViewModel.sendMessage(messageStr)
+                binding.editTextMessage.setText("")
+            }
+        }
 
-
-
-        binding.buttonSettingsMenu?.apply {
+        binding.buttonSettingsMenu.apply {
 
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonSettingsMenu.onClick()")
@@ -1082,6 +1116,7 @@ class MeetingFragment : Fragment() {
                                 val args = Bundle()
                                     .apply {
                                         putBoolean(OPEN_TO_PARTICIPANTS, true)
+                                        putString(CHAT_TAB_TITLE, meetingViewModel.chatTitle())
                                     }
 
                                 ChatParticipantCombinedFragment()
@@ -1096,7 +1131,11 @@ class MeetingFragment : Fragment() {
                         onNameChange = {  },
                         showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
                         onRecordingClicked = {
-                            if (meetingViewModel.isRecordingState().not()) {
+                            val isBrowserRecordingRunning = meetingViewModel.hmsSDK.getRoom()?.browserRecordingState?.state in listOf(
+                                HMSRecordingState.STARTING, HMSRecordingState.STARTED,
+                                HMSRecordingState.RESUMED, HMSRecordingState.PAUSED
+                            )
+                            if (isBrowserRecordingRunning.not()) {
                                 meetingViewModel.recordMeeting(true, runnable = it)
                             } else {
                                 StopRecordingBottomSheet {
@@ -1108,11 +1147,9 @@ class MeetingFragment : Fragment() {
                                     StopRecordingBottomSheet.TAG
                                 )
                             }
-
-
                         },
                     ).show(
-                        childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+                        childFragmentManager, AudioSwitchBottomSheetTAG
                     )
 
                 } else {
@@ -1153,9 +1190,12 @@ class MeetingFragment : Fragment() {
         binding.buttonOpenChat.setOnSingleClickListener {
             if( !meetingViewModel.prebuiltInfoContainer.isChatOverlay()) {
                 ChatParticipantCombinedFragment().apply {
-                    arguments = Bundle().apply { putBoolean(OPEN_TO_CHAT_ALONE,
+                    arguments = Bundle().apply {
+                        putBoolean(OPEN_TO_CHAT_ALONE,
                         !meetingViewModel.isParticpantListEnabled()
-                    ) }
+                    )
+                        putString(CHAT_TAB_TITLE, meetingViewModel.chatTitle())
+                    }
                 }.show(
                     childFragmentManager,
                     ChatParticipantCombinedFragment.TAG
@@ -1173,9 +1213,8 @@ class MeetingFragment : Fragment() {
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
 
-        updatePipEndCall()
 
-        binding.iconOutputDevice?.apply {
+        binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconOutputDevice.onClick()")
 
@@ -1189,7 +1228,7 @@ class MeetingFragment : Fragment() {
 
         updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
 
-        binding.buttonSwitchCamera?.setOnSingleClickListener(200L) {
+        binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             meetingViewModel.flipCamera()
             if (it.isEnabled) meetingViewModel.flipCamera()
         }
@@ -1197,8 +1236,8 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url.isNullOrEmpty()) {
             binding.logoIv?.visibility = View.GONE
         } else {
-            binding.logoIv?.visibility = View.VISIBLE
-            binding.logoIv?.let {
+            binding.logoIv.visibility = View.VISIBLE
+            binding.logoIv.let {
                 Glide.with(this)
                     .load(meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url)
                     .into(it)
@@ -1209,15 +1248,31 @@ class MeetingFragment : Fragment() {
     private fun isOverlayChatVisible() : Boolean {
         return binding.chatView.visibility == View.VISIBLE
     }
-    private fun toggleChatVisibility() {
+    private fun toggleChatVisibility(forceState : Boolean? = null) {
         with(binding.chatView) {
-            visibility = if (visibility == View.GONE) {
-                View.VISIBLE
+            visibility = if(forceState == null) {
+                if (visibility == View.GONE) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             } else {
-                View.GONE
+                if(forceState) View.VISIBLE else View.GONE
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility
+        // Because the meeting fragment can toggle the
+        //  chat visibility and this applies
+        //  whether the chat is enabled or blocked or paused
+        //  we need a different way to show this UI, independent
+        //  of whether the UI should be hidden for chat RBAC feature reasons.
+        // So the UI that chat RBAC triggers is put into a wrapper.
+        // when this toggle button toggles hide/view it changes the
+        //  wrapper visibility, which means chat can be enabled
+        //  and controlled entirely by ChatUseCase but also hidden
+        //  since we hide the wrapper that contains it.
+        binding.pinnedMessagesWrapper.visibility = binding.chatView.visibility
+        binding.chatExtraWrapper.visibility = binding.chatView.visibility
         // Scroll to the latest message if it's visible
         if (binding.chatMessages.visibility == View.VISIBLE) {
             val position = chatAdapter.itemCount - 1
@@ -1290,31 +1345,7 @@ class MeetingFragment : Fragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-                    val recordingState = meetingViewModel.isRecording.value
-
-//                    if (recordingState == RecordingState.NOT_RECORDING_OR_STREAMING && meetingViewModel.isHlsKitUrl
-//                    ) {
-//
-//                        val endCallDialog = Dialog(requireContext())
-//                        endCallDialog.setContentView(R.layout.exit_confirmation_dialog)
-//                        endCallDialog.findViewById<TextView>(R.id.dialog_title).text =
-//                            "Leave Meeting"
-//                        endCallDialog.findViewById<TextView>(R.id.dialog_description).text =
-//                            "You're about to quit the meeting, are you sure?"
-//                        endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn).text =
-//                            "Don’t Leave"
-//                        endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn).text = "Leave"
-//                        endCallDialog.findViewById<AppCompatButton>(R.id.cancel_btn)
-//                            .setOnClickListener { endCallDialog.dismiss() }
-//                        endCallDialog.findViewById<AppCompatButton>(R.id.accept_btn)
-//                            .setOnClickListener {
-//                                endCallDialog.dismiss()
-//                                meetingViewModel.leaveMeeting()
-//                            }
-//                        endCallDialog.show()
-//                    } else {
                     inflateExitFlow()
-//                    }
                 }
             })
     }

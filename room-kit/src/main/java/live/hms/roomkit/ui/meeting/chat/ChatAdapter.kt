@@ -9,12 +9,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ListItemChatBinding
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.theme.applyTheme
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
+class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
+                  val onClick: () -> Unit = {},
+  private val shouldShowMessageOptions : () -> Boolean
+  ) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
   private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
   companion object {
     private val DIFFUTIL_CALLBACK = object : DiffUtil.ItemCallback<ChatMessage>() {
@@ -27,30 +31,48 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
     }
   }
 
-  inner class ChatMessageViewHolder(val binding: ListItemChatBinding) :
+  inner class ChatMessageViewHolder(val binding: ListItemChatBinding, openMessageOptions : (Int) -> Unit) :
     RecyclerView.ViewHolder(binding.root) {
     init {
-        binding.applyTheme()
+      binding.applyTheme()
+      val clickListener = fun ( _ : View ) {
+        // Setting a click listener on the entire root. Watch
+        //  out if there are other buttons on this.
+        openMessageOptions(bindingAdapterPosition)
+        onClick()
+      }
+      binding.viewMore.setOnSingleClickListener(clickListener)
     }
 
 
     fun bind(sentMessage: ChatMessage) {
       with(binding) {
-        name.text = "${sentMessage.senderName}${getRecipientText(sentMessage)}"
+        name.text = sentMessage.senderName
         message.text = sentMessage.message
         blueBar.visibility = if (sentMessage.isSentByMe) View.VISIBLE else View.GONE
         if(sentMessage.time != null) {
           time.text = formatter.format(Date(sentMessage.time))
         }
+
+        sentTo.visibility = if(sentMessage.sentTo == null)
+           View.GONE
+        else
+          View.VISIBLE
+
+        toGroup.visibility = if(sentMessage.toGroup == null)
+          View.GONE
+        else
+          View.VISIBLE
+
+        sentBackground.visibility = if(sentMessage.toGroup == null && sentMessage.sentTo == null) {
+          View.GONE
+        } else
+          View.VISIBLE
+        sentTo.text = sentMessage.sentTo
+        toGroup.text = sentMessage.toGroup
+        viewMore.visibility = if(shouldShowMessageOptions()) View.VISIBLE else View.GONE
       }
     }
-
-    private fun getRecipientText(message: ChatMessage): String =
-      when(message.recipient) {
-        Recipient.Everyone -> ""
-        is Recipient.Peer -> " (to ${message.recipient.peer.name})"
-        is Recipient.Role -> " (to ${message.recipient.role.name})"
-      }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatMessageViewHolder {
@@ -59,19 +81,11 @@ class ChatAdapter : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(
       parent,
       false
     )
-    return ChatMessageViewHolder(binding)
+    return ChatMessageViewHolder(binding) { position -> openMessageOptions(getItem(position)) }
   }
 
   override fun onBindViewHolder(holder: ChatMessageViewHolder, position: Int) {
     holder.bind(getItem(position))
   }
 
-  override fun onBindViewHolder(
-    holder: ChatMessageViewHolder,
-    position: Int,
-    payloads: MutableList<Any>
-  ) {
-    super.onBindViewHolder(holder, position, payloads)
-    // Skip doing anything maybe it just relayouts
-  }
 }

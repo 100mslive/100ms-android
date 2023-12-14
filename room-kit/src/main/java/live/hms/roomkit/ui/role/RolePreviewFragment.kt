@@ -98,31 +98,20 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
         }
 
         binding.buttonJoinMeeting.setOnClickListener {
-            meetingViewModel.participantPreviousRoleChangeUseCase.setPreviousRole(meetingViewModel.hmsSDK.getLocalPeer()!!,
-                object : HMSActionResultListener {
-                    override fun onError(error: HMSException) {
-                        Log.e("RolePreviewFragment", "Error $error")
+            meetingViewModel.changeRoleAccept(onSuccess = {
+                contextSafe { context, activity ->
+                    activity.runOnUiThread {
+                        binding.previewView.removeTrack()
+                        meetingViewModel.lowerLocalPeerHand()
+                        findNavController().navigate(
+                            RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
+                                false
+                            )
+                        )
+
                     }
-
-                    override fun onSuccess() {
-                        meetingViewModel.changeRoleAccept(onSuccess = {
-                            contextSafe { context, activity ->
-                                activity.runOnUiThread {
-                                    binding.previewView.removeTrack()
-                                    meetingViewModel.lowerLocalPeerHand()
-                                    findNavController().navigate(
-                                        RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
-                                            false
-                                        )
-                                    )
-
-                                }
-                            }
-                        })
-                    }
-
-                }, toggleHandraise = true)
-
+                }
+            })
         }
 
         binding.declineButton.setOnClickListener {

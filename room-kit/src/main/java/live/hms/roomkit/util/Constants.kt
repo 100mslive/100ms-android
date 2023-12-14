@@ -2,6 +2,7 @@ package live.hms.roomkit.util
 
 const val ROOM_DETAILS = "room-details"
 const val ROOM_CODE = "room-code"
+const val TOKEN = "token"
 const val ROOM_PREBUILT = "room-prebuilt"
 const val MEETING_URL = "meeting-url"
 const val USERNAME = "username"
@@ -19,3 +20,4 @@ val REGEX_TOKEN_ENDPOINT = Regex("https?://.*.100ms.live/hmsapi/([a-zA-Z0-9-.]+.
 
 val REGEX_MEETING_CODE = Regex("^[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+$")
 val REGEX_MEETING_ROOM_ID = Regex("^[a-zA-Z0-9]+$")
+val POLL_IDENTIFIER_FOR_HLS_CUE = "poll:"

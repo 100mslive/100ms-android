@@ -367,7 +367,6 @@
                     android:id="@+id/edit_text_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Name"
                     android:inputType="textPersonName"
                     android:maxLines="1"
                     android:textCursorDrawable="@drawable/cursor_drawable" />
@@ -402,10 +401,10 @@
             <TextView
                 android:id="@+id/button_join_meeting"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="46dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="44dp"
+                android:fontFamily="@font/inter_bold"
                 android:gravity="center"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
@@ -413,11 +412,12 @@
                 android:textColor="#EFF0FA"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/inter_bold"
+                app:layout_constraintBottom_toBottomOf="@id/edit_container_name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@id/btn_txt_guideline"
-                app:layout_constraintTop_toTopOf="@+id/edit_text_guideline" />
+                app:layout_constraintTop_toTopOf="@+id/edit_container_name"
+                app:layout_constraintVertical_bias="0.0" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/btn_txt_guideline"

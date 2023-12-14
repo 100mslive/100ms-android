@@ -5,12 +5,7 @@
     android:layout_width="match_parent"
     android:id="@+id/root"
     android:windowSoftInputMode="adjustPan"
-    android:layout_height="match_parent">
-
-    <ScrollView
-        android:scrollbars="none"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -154,17 +149,6 @@
             android:layout_marginVertical="@dimen/spacing_d1"
             android:background="@drawable/gray_line_vertical_divider" />
 
-
-        <ImageView
-            android:id="@+id/deleteOptionTrashButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:scaleType="center"
-            android:src="@drawable/delete_trash"
-            app:layout_constraintBottom_toBottomOf="@id/saveButton"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="@id/saveButton" />
-
         <TextView
             android:id="@+id/saveButton"
             android:gravity="center"
@@ -182,6 +166,4 @@
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </ScrollView>
 </com.google.android.material.card.MaterialCardView>

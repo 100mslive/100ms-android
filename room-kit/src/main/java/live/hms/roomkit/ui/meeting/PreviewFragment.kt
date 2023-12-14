@@ -57,6 +57,8 @@ import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSRoom
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.sdk.models.enums.HMSRecordingState
+import live.hms.video.sdk.models.enums.HMSStreamingState
 import live.hms.video.sdk.models.role.PublishParams
 import live.hms.videoview.VideoViewStateChangeListener
 
@@ -89,7 +91,7 @@ class PreviewFragment : Fragment() {
     private var setTextOnce = false
     private var isPreviewLoaded = false
     private var nameEditText: String? = null
-    private var isHlsRunning = false
+    private var isBeamRunning = false
     private var isFirstRender : Boolean = true
     private var startHlsStream : Boolean = false
 
@@ -99,7 +101,7 @@ class PreviewFragment : Fragment() {
         val hlsJoinButtonFromLayoutConfig = meetingViewModel.getHmsRoomLayout()
             ?.getPreviewLayout(roleName)?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
 
-        if (isHlsRunning.not() && hlsJoinButtonFromLayoutConfig) {
+        if (isBeamRunning.not() && hlsJoinButtonFromLayoutConfig) {
             if (binding.buttonJoinMeeting.drawableStart == null) {
                 binding.buttonJoinMeeting.setDrawables(
                     start = ContextCompat.getDrawable(
@@ -190,6 +192,14 @@ class PreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initIntroAnimation()
         binding.applyTheme()
+        with(binding.editTextName) {
+            isEnabled = !meetingViewModel.disableNameEdit()
+            if(!isEnabled) {
+                binding.editContainerName.isHintEnabled = false
+            } else {
+                hint = "Enter Name…"
+            }
+        }
         requireActivity().invalidateOptionsMenu()
         setHasOptionsMenu(true)
         settings = SettingsStore(requireContext())
@@ -231,6 +241,8 @@ class PreviewFragment : Fragment() {
     }
 
     private fun setupUI(roleName: String) {
+        // don't allow editing the name if there's supposed to be a fixed one
+
         var introAnimationOffset = 450
         if (meetingViewModel.getHmsRoomLayout()
                 ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.title.isNullOrEmpty()
@@ -252,7 +264,6 @@ class PreviewFragment : Fragment() {
             binding.descriptionTv.startBounceAnimationUpwards()
         }
 
-
         if (meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url.isNullOrEmpty()) {
             binding.logoIv.visibility = View.INVISIBLE
         } else {
@@ -264,9 +275,6 @@ class PreviewFragment : Fragment() {
             binding.logoIv.startBounceAnimationUpwards()
 
         }
-
-
-
     }
 
     private fun setupKeyboardAnimation() {
@@ -326,32 +334,12 @@ class PreviewFragment : Fragment() {
 
     private fun initButtons() {
 
-        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
-            if (it.second.peerCount != null) {
-                binding.iconParticipants.visibility = View.VISIBLE
-                binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
-                binding.iconParticipants.startBounceAnimationUpwards()
-            }
-            isHlsRunning = it.second.hlsStreamingState?.running == true
-            updateJoinButtonTextIfHlsIsEnabled(it?.second?.localPeer?.hmsRole?.name)
-
-            if (it.second.hlsStreamingState?.running == true) {
-                binding.liveHlsGroup.visibility = View.VISIBLE
-                binding.hlsSession.startBounceAnimationUpwards()
-            } else {
-                binding.liveHlsGroup.visibility = View.GONE
-            }
-
-
-        }
-
         binding.closeBtn.setOnSingleClickListener(300L) {
             contextSafe { context, activity ->
                 meetingViewModel.leaveMeeting()
                 goToHomePage()
             }
         }
-
 
         binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
@@ -498,13 +486,7 @@ class PreviewFragment : Fragment() {
     }
 
 
-    private fun goToHomePage() {/*Intent(requireContext(), HomeActivity::class.java).apply {
-            crashlyticsLog(
-                TAG,
-                "MeetingActivity.finish() -> going to HomeActivity :: $this"
-            )
-            startActivity(this)
-        }*/
+    private fun goToHomePage() {
         requireActivity().finish()
     }
 
@@ -536,6 +518,27 @@ class PreviewFragment : Fragment() {
                 else -> {
 
                 }
+            }
+        }
+
+        meetingViewModel.previewRoomStateLiveData.observe(viewLifecycleOwner) {
+            if (it.second.peerCount != null) {
+                binding.iconParticipants.visibility = View.VISIBLE
+                binding.participantCountText.text = it.second.peerCount.formatNames().orEmpty()
+                binding.iconParticipants.startBounceAnimationUpwards()
+            }
+            isBeamRunning = it.second.hlsStreamingState.state == HMSStreamingState.STARTED ||
+                    it.second.rtmpHMSRtmpStreamingState.state == HMSStreamingState.STARTED ||
+                    it.second.browserRecordingState.state == HMSRecordingState.STARTED
+            updateJoinButtonTextIfHlsIsEnabled(it?.second?.localPeer?.hmsRole?.name)
+
+            val isLiveWithHLSOrRTMP = it.second.hlsStreamingState.state == HMSStreamingState.STARTED ||
+                    it.second.rtmpHMSRtmpStreamingState.state == HMSStreamingState.STARTED
+            if (isLiveWithHLSOrRTMP) {
+                binding.liveHlsGroup.visibility = View.VISIBLE
+                binding.hlsSession.startBounceAnimationUpwards()
+            } else {
+                binding.liveHlsGroup.visibility = View.GONE
             }
         }
 
@@ -637,7 +640,7 @@ class PreviewFragment : Fragment() {
 
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
 
-                    updateJoinButtonTextIfHlsIsEnabled(room?.localPeer?.hmsRole?.name)
+                    updateJoinButtonTextIfHlsIsEnabled(room.localPeer?.hmsRole?.name)
                     enableDisableJoinNowButton()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                     updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
@@ -663,8 +666,6 @@ class PreviewFragment : Fragment() {
 
     private fun updateUiBasedOnPublishParams(publishParams: PublishParams?) {
         if (publishParams == null) return
-
-
 
         if (publishParams.allowed.contains("audio")) {
             binding.buttonToggleAudio.visibility = View.VISIBLE

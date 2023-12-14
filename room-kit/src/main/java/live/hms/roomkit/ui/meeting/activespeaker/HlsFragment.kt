@@ -6,8 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import androidx.core.view.updateMargins
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -23,11 +21,6 @@ import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
-import live.hms.roomkit.R
-import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.meeting.chat.ChatAdapter
-import live.hms.roomkit.ui.meeting.chat.ChatUseCase
-import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.stats.PlayerStatsListener
@@ -48,8 +41,15 @@ class HlsFragment : Fragment() {
     val TAG = "HlsFragment"
     var isStatsDisplayActive: Boolean = false
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
-    val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
-    val displayHlsCuesUseCase = DisplayHlsCuesUseCase { text -> binding.hlsCues.text = text }
+    private val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
+    val displayHlsCuesUseCase = DisplayHlsCuesUseCase( { text -> binding.hlsCues.text = text })
+    { pollId ->
+        lifecycleScope.launch {
+            val hmsPoll = meetingViewModel.getPollForPollId(pollId)
+            if(hmsPoll != null)
+                meetingViewModel.triggerPollsNotification(hmsPoll)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -105,7 +105,7 @@ class HlsFragment : Fragment() {
         player.play(args.hlsStreamUrl)
     }
 
-    fun resumePlay() {
+    private fun resumePlay() {
 
         binding.hlsView.player = player.getNativePlayer()
         player.getNativePlayer().addListener(object : Player.Listener {
@@ -143,18 +143,19 @@ class HlsFragment : Fragment() {
             }
 
             @SuppressLint("UnsafeOptInUsageError")
-            override fun onPlaybackStateChanged(p1 : HmsHlsPlaybackState){
+            override fun onPlaybackStateChanged(state : HmsHlsPlaybackState){
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
-
+                        if(state == HmsHlsPlaybackState.playing)
+                            meetingViewModel.hlsPlayerBeganToPlay()
                     }
                 }
-                Log.d("HMSHLSPLAYER","From App, playback state: $p1")
+                Log.d("HMSHLSPLAYER","From App, playback state: $state")
             }
 
-            override fun onCue(hlsCue : HmsHlsCue) {
+            override fun onCue(cue : HmsHlsCue) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    displayHlsCuesUseCase.addCue(hlsCue)
+                    displayHlsCuesUseCase.addCue(cue)
                 }
             }
         })
