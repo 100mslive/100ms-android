@@ -77,16 +77,31 @@ class HlsFragment : Fragment() {
         }
 
         binding.btnTrackSelection.setOnClickListener {
-            binding.hlsView.let {
-                val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
-                trackSelectionBottomSheet.show(
-                    requireActivity().supportFragmentManager,
-                    "trackSelectionBottomSheet"
-                )
+            fadeinOutTrackSelectionButton()
+            if (binding.btnTrackSelection.alpha == 1f) {
+                binding.hlsView.let {
+                    val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
+                    trackSelectionBottomSheet.show(
+                        requireActivity().supportFragmentManager,
+                        "trackSelectionBottomSheet"
+                    )
+                }
             }
         }
 
+        binding.hlsView.setOnTouchListener { v, event ->
+            fadeinOutTrackSelectionButton()
+            false
+        }
+
+
         setPlayerStatsListener(true)
+    }
+
+    private fun fadeinOutTrackSelectionButton() {
+        binding.btnTrackSelection.animate().cancel()
+        binding.btnTrackSelection.alpha = 1f
+        binding.btnTrackSelection.animate().alpha(0f).setStartDelay(3000).start()
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {
