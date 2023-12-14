@@ -39,12 +39,15 @@ To put the room kit library in your computer as a library locally:
 2. Run the following command to build and put the library in your local storage. `./gradlew clean publishToMavenLocal`
 3. Verify the library was built correctly by seeing if it is in `ls ~/.m2/repository/live/100ms/room-kit`
 4. In your app find where the `mavenCentral()` repository is referenced and add `mavenLocal()` before it. Eg:
-- ` allprojects {
+``` 
+   allprojects {
          repositories {
          mavenLocal()
          mavenCentral()
      }
-  }` 
+  }
+```
+
 5. Add the import for `room kit` as you would do for any library `implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"` 
 
 That's it. Once you sync, the library should be available to your app.  
