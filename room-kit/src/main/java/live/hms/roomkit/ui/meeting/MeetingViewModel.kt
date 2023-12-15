@@ -497,6 +497,7 @@ class MeetingViewModel(
             }
 
             override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
+                unMuteAllTracks(localTracks)
                 previewUpdateData.postValue(Pair(room, localTracks))
             }
 
@@ -509,6 +510,15 @@ class MeetingViewModel(
             }
 
         })
+    }
+
+    private fun unMuteAllTracks(localTracks: Array<HMSTrack>) {
+        localTracks.forEach {
+            if (it is HMSLocalVideoTrack)
+                it.setMute(false)
+            else if(it is HMSLocalAudioTrack)
+                it.setMute(false)
+        }
     }
 
     fun setLocalVideoEnabled(enabled: Boolean) {
@@ -1110,6 +1120,7 @@ class MeetingViewModel(
                 }
 
                 override fun onTracks(localTracks: Array<HMSTrack>) {
+                    unMuteAllTracks(localTracks)
                     rolePreviewListener.onTracks(localTracks)
                 }
 

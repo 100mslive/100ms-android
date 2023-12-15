@@ -205,11 +205,11 @@ class SettingsStore(context: Context) {
     set(value) = putLong(AUDIO_POLL_INTERVAL, value)
 
   var isAudioTrackInitStateEnabled: Boolean
-    get() = sharedPreferences.getBoolean(AUDIO_TRACK_INIT_STATE, true)
+    get() = sharedPreferences.getBoolean(AUDIO_TRACK_INIT_STATE, false)
     set(value) = putBoolean(AUDIO_TRACK_INIT_STATE, value)
 
   var isVideoTrackInitStateEnabled: Boolean
-    get() = sharedPreferences.getBoolean(VIDEO_TRACK_INIT_STATE, true)
+    get() = sharedPreferences.getBoolean(VIDEO_TRACK_INIT_STATE, false)
     set(value) = putBoolean(VIDEO_TRACK_INIT_STATE, value)
 
   var silenceAudioLevelThreshold: Int
