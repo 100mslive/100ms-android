@@ -347,14 +347,14 @@
             android:id="@+id/switch_audio_track_init_state"
             style="@style/MaterialSwitch"
             android:layout_width="match_parent"
-            android:checked="true"
+            android:checked="false"
             android:layout_height="wrap_content"
             android:text="@string/disable_audio_track_before_joining" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_video_track_init_state"
             style="@style/MaterialSwitch"
-            android:checked="true"
+            android:checked="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/disable_video_track_before_joining" />

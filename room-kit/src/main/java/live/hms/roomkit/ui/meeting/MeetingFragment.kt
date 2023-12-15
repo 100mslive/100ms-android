@@ -25,7 +25,6 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.*
@@ -179,7 +178,6 @@ class MeetingFragment : Fragment() {
         isCountdownManuallyCancelled = true
         hasStartedHls = false
         countDownTimer?.cancel()
-        unregisterPipActionListener()
     }
 
     override fun onPause() {
@@ -197,8 +195,7 @@ class MeetingFragment : Fragment() {
     private fun updateActionVolumeMenuIcon(
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
-        binding.iconOutputDevice?.visibility = View.VISIBLE
-        binding.iconOutputDevice?.apply {
+        binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
                     setIconEnabled(R.drawable.phone)
@@ -399,6 +396,9 @@ class MeetingFragment : Fragment() {
         }
         // This only needs to be in meetingfragment since we always open it.
         // Is that true for HLS? Double check.
+        meetingViewModel.showAudioIcon.observe(viewLifecycleOwner) { visible ->
+            binding.iconOutputDevice.visibility = if(visible) View.VISIBLE else View.GONE
+        }
         meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
             chatViewModel.setInitialRecipient(it.first, it.second)
             ChatRbacRecipientHandling().updateChipRecipientUI(binding.sendToChipText, it.first)
@@ -646,7 +646,7 @@ class MeetingFragment : Fragment() {
         meetingViewModel.isLocalAudioPresent.observe(viewLifecycleOwner) { allowed ->
             binding.buttonToggleAudio.visibility = if (allowed) View.VISIBLE else View.GONE
             //to show or hide mic icon [eg in HLS mode mic is not required]
-            updatePipMicState(allowed, true)
+
         }
 
         meetingViewModel.isLocalVideoPresent.observe(viewLifecycleOwner) { allowed ->
@@ -670,7 +670,6 @@ class MeetingFragment : Fragment() {
 
         meetingViewModel.isLocalAudioEnabled.observe(viewLifecycleOwner) { enabled ->
             //enable/disable mic on/off state
-            updatePipMicState(isMicOn = enabled)
             (binding.buttonToggleAudio as? ShapeableImageView)?.apply {
 
                 if (enabled) {
@@ -713,7 +712,6 @@ class MeetingFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        registerPipActionListener()
     }
 
     private fun updatePipEndCall() {
@@ -797,16 +795,15 @@ class MeetingFragment : Fragment() {
 
 
         if(modeEnteredOrExitedHls) {
-            val overlayIsVisible = isOverlayChatVisible()
-            if (meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
-                val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
-                if (overlayIsVisible && !isChatOverlay)
-                    toggleChatVisibility()
-                else if (!overlayIsVisible && isChatOverlay)
-                    toggleChatVisibility()
-            } else if (overlayIsVisible) {
-                toggleChatVisibility()
-            }
+            val isChatEnabled = meetingViewModel.prebuiltInfoContainer.isChatEnabled()
+            val isChatOverlay = meetingViewModel.prebuiltInfoContainer.isChatOverlay()
+            val isChatOpenByDefault = meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()
+            val chatVisible = isChatEnabled && isChatOverlay && isChatOpenByDefault
+            toggleChatVisibility(chatVisible)
+            if(chatVisible)
+                moveChat(up = true, bottomMenuHeight = binding.bottomControls.height.toFloat())
+            else
+                moveChat(up = false, binding.topMenu.height.toFloat())
         }
         if(triggerFirstUpdate){
             updateChatButtonWhenRoleChanges()
@@ -933,7 +930,7 @@ class MeetingFragment : Fragment() {
                     showSystemBars()
                     // This prevents the bar from moving twice as high as it should
                     if(shouldHideAfterDelay)
-                        moveChat(up = true, bottomMenuHeight = binding.topMenu.height.toFloat())
+                        moveChat(up = true, bottomMenuHeight = binding.bottomControls.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -989,13 +986,13 @@ class MeetingFragment : Fragment() {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ALIGN_BOTTOM)
                     addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
-                    updateMargins(bottom = bottomMenuHeight.toInt() + resources.getDimension(R.dimen.eight_dp).toInt())
+                    updateMargins(bottom = bottomMenuHeight.toInt() + 8.dp())
                 }
             } else {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
                     removeRule(RelativeLayout.ABOVE)
                     addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, R.id.meeting_container)
-                    updateMargins(bottom = 8)
+                    updateMargins(bottom = 8.dp())
                 }
             }
         }
@@ -1011,7 +1008,7 @@ class MeetingFragment : Fragment() {
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
                     topMenu.visibility = View.VISIBLE
-                    moveChat(up = false, topMenu!!.height.toFloat())
+                    moveChat(up = false, bottomMenu.height.toFloat())
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -1061,10 +1058,6 @@ class MeetingFragment : Fragment() {
 
     private fun hideProgressBar() {
         var isInPIPMode = false
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            if (activity?.isInPictureInPictureMode?.not() == true)
-                isInPIPMode = true
-        }
         binding.fragmentContainer.visibility = View.VISIBLE
         binding.bottomControls.visibility = View.VISIBLE
         if (!isInPIPMode && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
@@ -1220,7 +1213,6 @@ class MeetingFragment : Fragment() {
 
         binding.buttonEndCall.setOnSingleClickListener(350L) { requireActivity().onBackPressed() }
 
-        updatePipEndCall()
 
         binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
@@ -1256,12 +1248,16 @@ class MeetingFragment : Fragment() {
     private fun isOverlayChatVisible() : Boolean {
         return binding.chatView.visibility == View.VISIBLE
     }
-    private fun toggleChatVisibility() {
+    private fun toggleChatVisibility(forceState : Boolean? = null) {
         with(binding.chatView) {
-            visibility = if (visibility == View.GONE) {
-                View.VISIBLE
+            visibility = if(forceState == null) {
+                if (visibility == View.GONE) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             } else {
-                View.GONE
+                if(forceState) View.VISIBLE else View.GONE
             }
         }
         binding.chatMessages.visibility = binding.chatView.visibility

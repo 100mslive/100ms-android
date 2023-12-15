@@ -34,7 +34,7 @@ class ChatUseCase {
         getAllowedRecipients : () -> AllowedToMessageParticipants?): ChatUiVisibilityState {
         return if(!isChatEnabled()) {
             ChatUiVisibilityState.DisabledFromLayout
-        } else if(isUserBlocked()/*chatViewModel.isUserBlockedFromChat()*/) {
+        } else if(isUserBlocked()) {
             ChatUiVisibilityState.Blocked
         } else {
             if(!chatPauseState.enabled)
@@ -91,13 +91,13 @@ class ChatUseCase {
         fun updateState(externalChatPauseState: ChatPauseState? = null) {
             val overallChatState =
                 getOverallChatState(
-                    meetingViewModel,
-                    chatViewModel,
-                    isChatEnabled,
-                    chatViewModel::isUserBlockedFromChat,
-                    currentRbac,
-                    externalChatPauseState ?: chatPauseState.value!!,
-                    getAllowedRecipients
+                    meetingViewModel = meetingViewModel,
+                    chatViewModel = chatViewModel,
+                    isChatEnabled = isChatEnabled,
+                    isUserBlocked = chatViewModel::isUserBlockedFromChat,
+                    getCurrentRecipient = currentRbac,
+                    chatPauseState = externalChatPauseState ?: chatPauseState.value!!,
+                    getAllowedRecipients = getAllowedRecipients
 
                 )
 

@@ -83,6 +83,8 @@ class MeetingViewModel(
     val roleChange = MutableLiveData<HMSPeer>()
     private var numRoleChanges = 0
     val roleChangeSingleShot : LiveData<Int> = roleChange.map { numRoleChanges++ }
+    var roleOnJoining : HMSRole? = null
+        private set
 
     fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
 
@@ -495,6 +497,7 @@ class MeetingViewModel(
             }
 
             override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
+                unMuteAllTracks(localTracks)
                 previewUpdateData.postValue(Pair(room, localTracks))
             }
 
@@ -507,6 +510,15 @@ class MeetingViewModel(
             }
 
         })
+    }
+
+    private fun unMuteAllTracks(localTracks: Array<HMSTrack>) {
+        localTracks.forEach {
+            if (it is HMSLocalVideoTrack)
+                it.setMute(false)
+            else if(it is HMSLocalAudioTrack)
+                it.setMute(false)
+        }
     }
 
     fun setLocalVideoEnabled(enabled: Boolean) {
@@ -724,6 +736,7 @@ class MeetingViewModel(
                 Log.d(TAG, "Room name is ${room.name}")
                 Log.d(TAG, "SessionId is: ${room.sessionId}")
                 Log.d(TAG, "Room started at: ${room.startedAt}")
+                roleOnJoining = room.localPeer?.hmsRole
 
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = room.hlsStreamingState.variants?.get(0)?.hlsStreamUrl
@@ -811,6 +824,16 @@ class MeetingViewModel(
                             "${hmsPeer.name} changed to ${hmsPeer.hmsRole.name}"
                         )
                         if(hmsPeer.isLocal && type == HMSPeerUpdate.ROLE_CHANGED) {
+                            // Changed on a force change. This will happen twice.
+                            // when a person is brought to offstage
+                            participantPreviousRoleChangeUseCase.setPreviousRole(
+                                hmsSDK.getLocalPeer()!!,
+                                roleOnJoining?.name,
+                                object : HMSActionResultListener {
+                                    override fun onError(error: HMSException) {}
+                                    override fun onSuccess() {}
+                                })
+
                             initPrebuiltChatMessageRecipient.postValue(Pair(prebuiltInfoContainer.defaultRecipientToMessage(), ++recNum))
                             roleChange.postValue(hmsPeer)
                         }
@@ -820,6 +843,7 @@ class MeetingViewModel(
                             updateThemeBasedOnCurrentRole(hmsPeer.hmsRole)
                             val hlsUrl = hmsRoom?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
                             val isHlsPeer = isHlsPeer(hmsPeer.hmsRole)
+                            showAudioIcon.postValue(!isHlsPeer)
                             if (isHlsPeer) {
                                 switchToHlsViewIfRequired(hmsPeer.hmsRole, hlsUrl)
                             } else {
@@ -1096,6 +1120,7 @@ class MeetingViewModel(
                 }
 
                 override fun onTracks(localTracks: Array<HMSTrack>) {
+                    unMuteAllTracks(localTracks)
                     rolePreviewListener.onTracks(localTracks)
                 }
 
@@ -1194,10 +1219,12 @@ class MeetingViewModel(
         }
     }
 
+    val showAudioIcon : MutableLiveData<Boolean> = MutableLiveData(false)
     val showHlsStreamYetToStartError = MutableLiveData<Boolean>(false)
     private fun switchToHlsViewIfRequired(role: HMSRole?, streamUrl: String?) {
         var started = false
         val isHlsPeer = isHlsPeer(role)
+        showAudioIcon.postValue(!isHlsPeer)
         if (isHlsPeer && streamUrl != null) {
             started = true
             switchToHlsView(streamUrl)
@@ -2208,9 +2235,25 @@ class MeetingViewModel(
             null
         }
     }
+    fun lowerRemotePeerHand(hmsPeer: HMSPeer, hmsActionResultListener: HMSActionResultListener)
+     = hmsSDK.lowerRemotePeerHand(hmsPeer, hmsActionResultListener)
 
     fun requestBringOnStage(handRaisePeer: HMSPeer, onStageRole: String) {
-        changeRole(handRaisePeer.peerID, onStageRole, false)
+        val force = prebuiltInfoContainer.shouldForceRoleChange()
+        changeRole(handRaisePeer.peerID, onStageRole, force)
+
+        if(force) {
+            hmsSDK.lowerRemotePeerHand(handRaisePeer, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    Log.d(TAG,"Failed to lower peer's hand $error")
+                }
+
+                override fun onSuccess() {
+                    Log.d(TAG,"Lowered peer's hand since the role was force changed")
+                }
+
+            })
+        }
     }
 
     fun triggerErrorNotification(message: String, isDismissible: Boolean = true, type: HMSNotificationType = HMSNotificationType.Error, actionButtonText:String ="") {

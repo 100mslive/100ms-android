@@ -65,9 +65,6 @@ class HlsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        binding.btnSeekLive.setOnClickListener {
-            player.seekToLivePosition()
-        }
 
         meetingViewModel.showAudioMuted.observe(viewLifecycleOwner) { muted ->
             player.mute(muted)
@@ -80,16 +77,31 @@ class HlsFragment : Fragment() {
         }
 
         binding.btnTrackSelection.setOnClickListener {
-            binding.hlsView.let {
-                val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
-                trackSelectionBottomSheet.show(
-                    requireActivity().supportFragmentManager,
-                    "trackSelectionBottomSheet"
-                )
+            fadeinOutTrackSelectionButton()
+            if (binding.btnTrackSelection.alpha == 1f) {
+                binding.hlsView.let {
+                    val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
+                    trackSelectionBottomSheet.show(
+                        requireActivity().supportFragmentManager,
+                        "trackSelectionBottomSheet"
+                    )
+                }
             }
         }
 
+        binding.hlsView.setOnTouchListener { v, event ->
+            fadeinOutTrackSelectionButton()
+            false
+        }
+
+
         setPlayerStatsListener(true)
+    }
+
+    private fun fadeinOutTrackSelectionButton() {
+        binding.btnTrackSelection.animate().cancel()
+        binding.btnTrackSelection.alpha = 1f
+        binding.btnTrackSelection.animate().alpha(0f).setStartDelay(3000).start()
     }
 
     private fun statsToString(playerStats: PlayerStatsModel): String {
@@ -218,10 +230,6 @@ class HlsFragment : Fragment() {
         // It's live if the distance from the live edge is less than 10 seconds.
         val isLive = playerStats.distanceFromLive/1000 < SECONDS_FROM_LIVE
         // Show the button to go to live if it's not live.
-        binding.btnSeekLive.visibility =  if(!isLive)
-                View.VISIBLE
-            else
-                View.GONE
     }
 
     override fun onStop() {

@@ -279,6 +279,7 @@
         android:layout_width="match_parent"
         android:id="@+id/pinnedMessagesDisplay"
         android:visibility="gone"
+        android:minHeight="52dp"
         android:layout_marginVertical="@dimen/spacing_d2"
         android:layout_marginHorizontal="@dimen/fixed_spacing_d1"
         tools:visibility="visible"
@@ -432,7 +433,7 @@
             android:gravity="center"
             android:textSize="14sp"
             android:fontFamily="@font/inter_regular"
-            tools:text="@string/blocked_from_sending_messages"
+            android:text="@string/blocked_from_sending_messages"
             />
         <EditText
             android:id="@+id/edit_text_message"
