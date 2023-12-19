@@ -38,9 +38,6 @@
             app:destination="@id/RolePreviewFragment" />
 
         <action
-            android:id="@+id/action_MeetingFragment_to_SettingsFragment"
-            app:destination="@id/SettingsFragment" />
-        <action
             android:id="@+id/action_MeetingFragment_to_ParticipantsFragment"
             app:destination="@id/ParticipantsFragment" />
         <action
@@ -90,19 +87,6 @@
         <action
             android:id="@+id/action_RolePreviewFragment_to_MeetingFragment"
             app:destination="@id/MeetingFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/SettingsFragment"
-        android:name="live.hms.roomkit.ui.settings.SettingsFragment"
-        android:label="@string/settings_fragment"
-        tools:layout="@layout/fragment_settings">
-
-        <argument
-            android:name="mode"
-            app:argType="live.hms.roomkit.ui.settings.SettingsMode"
-            app:nullable="false" />
 
     </fragment>
 
