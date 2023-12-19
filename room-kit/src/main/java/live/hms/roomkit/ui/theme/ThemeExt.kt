@@ -1665,27 +1665,27 @@ private fun configureChatControlsTheme(
         )
     )
 
-    sendToBackground.strokeColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright
-    )
+//    sendToBackground.strokeColor = getColorOrDefault(
+//        HMSPrebuiltTheme.getColours()?.borderBright,
+//        HMSPrebuiltTheme.getDefaults().border_bright
+//    )
     sendToBackground.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default
         )
     )
 
     sendToChipText.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
     sendToChipText.drawableEnd?.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
 }
@@ -2678,8 +2678,8 @@ fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
 fun LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding.applyTheme() {
     image.drawable.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
+            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
         )
     )
     tick.drawable.setTint(

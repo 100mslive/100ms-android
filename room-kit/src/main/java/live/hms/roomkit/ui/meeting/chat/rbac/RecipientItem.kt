@@ -1,12 +1,15 @@
 package live.hms.roomkit.ui.meeting.chat.rbac
 
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 
 class RecipientItem(private val recipient: Recipient,
                     private val currentSelectedRecipient: Recipient?,
@@ -20,7 +23,21 @@ class RecipientItem(private val recipient: Recipient,
             }
             name.text = getTextForItem(recipient)
             tick.visibility = if(currentSelectedRecipient == recipient) View.VISIBLE else View.GONE
-            image.visibility = if(recipient == Recipient.Everyone) View.VISIBLE else View.GONE
+            val headerIcon = when(recipient) {
+                Recipient.Everyone -> R.drawable.everyone_rbac_icon
+                is Recipient.Role -> R.drawable.role_rbac_icon
+                is Recipient.Peer -> R.drawable.dm_rbac_icon
+            }
+            image.setImageDrawable(AppCompatResources.getDrawable(
+                viewBinding.root.context, headerIcon
+            )?.apply {
+                setTint(
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+                    )
+                )
+            })
         }
     }
 
