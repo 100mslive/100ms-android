@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import live.hms.roomkit.ui.meeting.chat.rbac.ChatMessageViewFilterHelper
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSMessageResultListener
 import live.hms.video.sdk.HMSSDK
@@ -17,7 +16,6 @@ import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
 
 class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
-    private val chatmessageViewFilterHelper = ChatMessageViewFilterHelper()
 
     companion object {
         private const val TAG = "ChatViewModel"
@@ -33,9 +31,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
     fun updateSelectedRecipientChatBottomSheet(recipient: Recipient?) {
         // Set a filter for the messages.
-        chatmessageViewFilterHelper.setFilter(recipient)
         _currentlySelectedRecipient.postValue(recipient)
-        messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
     }
     val currentlySelectedRecipientRbac : LiveData<Recipient?> = _currentlySelectedRecipient
 
@@ -178,7 +174,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                 unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
             }
             _messages.add(message)
-            messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+            messages.postValue(_messages)
         }
     }
 
@@ -201,7 +197,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         this.messageIdsToHide = messageIdsToHide
         // Refresh the current list
         _messages = _messages.filter { !messageIdsToHide.contains(it.messageId) }.toMutableList()
-        messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+        messages.postValue(_messages)
     }
 
     // The blocklist throws away all messages from the blocked
@@ -219,7 +215,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
             // Refresh the current list
             _messages =
                 _messages.filter { !blockedPeerIds.contains(it.userIdForBlockList) }.toMutableList()
-            messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+            messages.postValue(_messages)
         }
     }
 
