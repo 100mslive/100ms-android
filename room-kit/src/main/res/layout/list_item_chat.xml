@@ -30,6 +30,18 @@
         tools:text="@string/john_doe" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/spacing_d0"
+        android:id="@+id/sentTo"
+        android:textSize="12sp"
+        android:letterSpacing="0.03"
+        android:fontFamily="@font/inter_regular"
+        app:layout_constraintBaseline_toBaselineOf="@id/name"
+        app:layout_constraintStart_toEndOf="@id/name"
+        tools:text="@string/chat_to_dm_label"
+        />
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +54,7 @@
         android:textSize="12sp"
         app:fontFamily="@font/inter_regular"
         app:layout_constraintBaseline_toBaselineOf="@id/name"
-        app:layout_constraintStart_toEndOf="@id/name"
+        app:layout_constraintEnd_toStartOf="@id/viewMore"
         tools:text="2:13 pm" />
 
     <com.google.android.material.card.MaterialCardView
@@ -54,47 +66,12 @@
         app:contentPadding="@dimen/four_dp"
         app:layout_constraintBaseline_toBaselineOf="@id/name"
         app:layout_constraintEnd_toStartOf="@id/viewMore"
-        >
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBaseline_toBaselineOf="@id/name"
-            android:orientation="horizontal">
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/toGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="6dp"
-        android:ellipsize="end"
-        android:fontFamily="@font/inter_bold"
-        android:lineHeight="16px"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:text="To"
-        android:textSize="12sp"
-        app:fontFamily="@font/inter_regular"
-        app:layout_constraintEnd_toStartOf="@id/sentTo"
-         />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/sentTo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="@font/inter_bold"
-        android:lineHeight="16px"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:textSize="12sp"
-        app:fontFamily="@font/inter_regular"
-        tools:text="Direct Message" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-    </com.google.android.material.card.MaterialCardView>
+        />
 
     <ImageButton
         android:id="@+id/viewMore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:background="@null"
         android:contentDescription="@string/view_more"
         android:src="@drawable/chat_view_more"

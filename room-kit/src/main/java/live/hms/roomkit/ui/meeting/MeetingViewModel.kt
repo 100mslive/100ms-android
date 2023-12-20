@@ -86,6 +86,9 @@ class MeetingViewModel(
     var roleOnJoining : HMSRole? = null
         private set
 
+    var localPeerId : String? = null
+        private set
+
     fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
 
     private val hmsTrackSettings = HMSTrackSettings.Builder()
@@ -737,6 +740,7 @@ class MeetingViewModel(
                 Log.d(TAG, "SessionId is: ${room.sessionId}")
                 Log.d(TAG, "Room started at: ${room.startedAt}")
                 roleOnJoining = room.localPeer?.hmsRole
+                localPeerId = room.localPeer?.peerID
 
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = room.hlsStreamingState.variants?.get(0)?.hlsStreamUrl
@@ -1003,8 +1007,10 @@ class MeetingViewModel(
                 if(message.type != HMSMessageType.CHAT)
                     return
                 broadcastsReceived.postValue(
+
                     ChatMessage(
-                        message, false
+                        message, false,
+                        message.recipient.recipientPeer?.peerID == localPeerId
                     )
                 )
             }

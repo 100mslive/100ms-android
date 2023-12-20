@@ -4,6 +4,9 @@ import live.hms.video.sdk.models.HMSMessageRecipient
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.role.HMSRole
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 
 sealed class Recipient {
     object Everyone : Recipient() {
