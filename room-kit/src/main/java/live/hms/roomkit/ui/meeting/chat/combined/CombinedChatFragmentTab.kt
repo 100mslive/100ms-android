@@ -98,7 +98,8 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
             binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled,
             meetingViewModel::availableRecipientsForChat,
-            chatViewModel::currentlySelectedRbacRecipient
+            chatViewModel::currentlySelectedRbacRecipient,
+            chatViewModel.currentlySelectedRecipientRbac
         )
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)

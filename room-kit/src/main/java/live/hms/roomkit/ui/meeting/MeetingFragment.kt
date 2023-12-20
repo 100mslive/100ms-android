@@ -301,7 +301,8 @@ class MeetingFragment : Fragment() {
             binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled,
             meetingViewModel::availableRecipientsForChat,
-            chatViewModel::currentlySelectedRbacRecipient
+            chatViewModel::currentlySelectedRbacRecipient,
+            chatViewModel.currentlySelectedRecipientRbac,
         )
 
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
