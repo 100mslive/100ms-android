@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/backButton"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/spacing_d3"
+            android:layout_gravity="center_vertical"
+            android:background="@null"
+            android:src="@drawable/left_arrow" />
+
+        <TextView
+            android:id="@+id/heading"
+            style="@style/HmsHeadings"
+            android:lineHeight="24px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/twelve_dp"
+            android:layout_gravity="center_vertical"
+            android:text="Leaderboard" />
+
+        <TextView
+            android:id="@+id/pollsLive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:fontFamily="@font/inter_regular"
+            android:lineHeight="16px"
+            android:paddingHorizontal="@dimen/spacing_d1"
+            android:paddingVertical="4dp"
+            android:layout_gravity="center_vertical"
+            android:text="Live"
+            android:textSize="10sp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="64dp"
+        android:id="@+id/questionsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</FrameLayout>

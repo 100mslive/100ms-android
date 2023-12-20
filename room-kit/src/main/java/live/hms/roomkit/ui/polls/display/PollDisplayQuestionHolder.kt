@@ -65,6 +65,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             }
         }
         else {
+            //todd
             with(binding as LayoutEndPollButtonBinding) {
                 launchPollQuiz.text = "End Poll"
                 if(poll.state == HmsPollState.STARTED &&  canEndPoll) {

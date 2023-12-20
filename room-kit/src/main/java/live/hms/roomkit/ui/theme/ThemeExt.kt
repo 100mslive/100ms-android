@@ -2213,6 +2213,25 @@ fun MaterialCardView.isSelectedStroke(isSelected : Boolean) {
 
 }
 
+fun LayoutQuizLeaderboardBinding.applyTheme() {
+    backButton.backgroundTintList =
+        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    pollsLive.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+    ))
+    pollsLive.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    ))
+}
+
 
 fun LayoutPollsDisplayBinding.applyTheme() {
     backButton.backgroundTintList =

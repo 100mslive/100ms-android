@@ -52,6 +52,7 @@ class PollsDisplayAdaptor(
     val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll) -> Boolean,
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
     val endPoll : (HmsPoll) -> Unit,
+    val showLeaderBoard : (pollId : String) -> Unit,
 ) : ListAdapter<QuestionContainer, PollDisplayQuestionHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
 ) {

@@ -2019,16 +2019,8 @@ class MeetingViewModel(
 
     })
 
-    fun fetchLeaderboard(hmsPoll: HmsPoll) {
-        localHmsInteractivityCenter.fetchLeaderboard(hmsPoll.pollId, completion = object : HmsTypedActionResultListener<PollLeaderboardResponse> {
-            override fun onError(error: HMSException) {
-                Log.e("Leaderboard","Error $error")
-            }
-            override fun onSuccess(result: PollLeaderboardResponse) {
-                Log.d("Leaderboard","Success $result")
-            }
-
-        })
+    fun fetchLeaderboard(pollId: String, completion: HmsTypedActionResultListener<PollLeaderboardResponse>) {
+        localHmsInteractivityCenter.fetchLeaderboard(pollId, completion = completion)
     }
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll

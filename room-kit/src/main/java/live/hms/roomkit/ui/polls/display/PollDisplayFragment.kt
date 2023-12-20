@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPollsDisplayBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.polls.leaderboard.LeaderBoardBottomSheetFragment
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.pollsStatusLiveDraftEnded
 import live.hms.roomkit.util.setOnSingleClickListener
@@ -84,7 +85,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 meetingViewModel::saveInfoMultiChoice,
                 meetingViewModel::saveSkipped,
                 meetingViewModel::endPoll
-            )
+            ) { LeaderBoardBottomSheetFragment.launch(it, requireFragmentManager()) }
 
             poll = returnedPoll
 
