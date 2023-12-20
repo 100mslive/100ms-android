@@ -1665,16 +1665,13 @@ private fun configureChatControlsTheme(
         )
     )
 
-//    sendToBackground.strokeColor = getColorOrDefault(
-//        HMSPrebuiltTheme.getColours()?.borderBright,
-//        HMSPrebuiltTheme.getDefaults().border_bright
-//    )
-    sendToBackground.setBackgroundColor(
-        getColorOrDefault(
+    sendToBackground.background = getShape().apply {
+        val color = getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.primaryDefault,
-            HMSPrebuiltTheme.getDefaults().primary_default
-        )
-    )
+            HMSPrebuiltTheme.getDefaults().primary_default)
+        colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+    }
 
     sendToChipText.setTextColor(
         getColorOrDefault(
@@ -1682,6 +1679,12 @@ private fun configureChatControlsTheme(
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
+    sendToBackground.strokeWidth = 0
+//    sendToBackground.strokeColor = getColorOrDefault(
+//        HMSPrebuiltTheme.getColours()?.borderBright,
+//        HMSPrebuiltTheme.getDefaults().border_bright
+//    )
+
     sendToChipText.drawableEnd?.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryHigh,

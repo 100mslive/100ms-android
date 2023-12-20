@@ -23,21 +23,7 @@ class RecipientItem(private val recipient: Recipient,
             }
             name.text = getTextForItem(recipient)
             tick.visibility = if(currentSelectedRecipient == recipient) View.VISIBLE else View.GONE
-            val headerIcon = when(recipient) {
-                Recipient.Everyone -> R.drawable.everyone_rbac_icon
-                is Recipient.Role -> R.drawable.role_rbac_icon
-                is Recipient.Peer -> R.drawable.dm_rbac_icon
-            }
-            image.setImageDrawable(AppCompatResources.getDrawable(
-                viewBinding.root.context, headerIcon
-            )?.apply {
-                setTint(
-                    getColorOrDefault(
-                        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-                        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
-                    )
-                )
-            })
+            image.visibility = if(recipient == Recipient.Everyone) View.VISIBLE else View.GONE
         }
     }
 

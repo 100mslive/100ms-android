@@ -18,8 +18,8 @@ class ChatRbacRecipientHandling {
         // Set the drawable next to it
         val chevron = when(recipient) {
             Recipient.Everyone -> R.drawable.tiny_chip_everyone
-            is Recipient.Peer,
-            is Recipient.Role -> R.drawable.tiny_chip_dm
+            is Recipient.Role -> R.drawable.tiny_chip_roles
+            is Recipient.Peer -> R.drawable.tiny_chip_dm
         }
 
         sendToChipText.drawableStart = AppCompatResources.getDrawable(

@@ -147,7 +147,7 @@ class RoleBasedChatBottomSheet(
                 )
             }
             // Separate headers and roles
-            val rolesGroup = ExpandableGroup(RecipientHeader("ROLES"), true).apply {
+            val rolesGroup = ExpandableGroup(RecipientHeader(RECIPIENT_ROLES), true).apply {
                     addAll(rolesToAdd)
                 }
             recipients.add(rolesGroup)
@@ -160,7 +160,7 @@ class RoleBasedChatBottomSheet(
         hmsSDK: HMSSDK,
         currentSelectedRecipient: Recipient?
     ): ExpandableGroup {
-        return ExpandableGroup(RecipientHeader("PARTICIPANTS"), true).apply {
+        return ExpandableGroup(RecipientHeader(RECIPIENT_PEERS), true).apply {
                 addAll(
                     hmsSDK.getRemotePeers().map {
                         RecipientItem(
