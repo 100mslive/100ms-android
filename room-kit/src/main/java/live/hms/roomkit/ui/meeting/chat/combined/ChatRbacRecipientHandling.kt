@@ -11,9 +11,13 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 class ChatRbacRecipientHandling {
     fun updateChipRecipientUI(sendToChipText : MaterialTextView,
                               recipient: Recipient?) {
-      //TODO might be able to change the UI to handle send to no one here.
-        if(recipient == null)
+        if(recipient == null) {
+            sendToChipText.text =
+                sendToChipText.resources.getString(R.string.chat_rbac_picker_send_to)
+            // TODO need a search glass image here
+            // and to also set the drawable tint
             return
+        }
         sendToChipText.text = recipient.toString()
         // Set the drawable next to it
         val chevron = when(recipient) {
