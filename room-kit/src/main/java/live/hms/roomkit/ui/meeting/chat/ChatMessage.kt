@@ -43,7 +43,7 @@ data class ChatMessage constructor(
             sentToMe: Boolean
         ) : String? = when(recipient) {
             HMSMessageRecipientType.BROADCAST -> null
-            HMSMessageRecipientType.PEER -> if(sentToMe) "You" else peer?.name // We don't know if this should be 'you' or 'name'
+            HMSMessageRecipientType.PEER -> if(sentToMe) "You" else peer?.name
             HMSMessageRecipientType.ROLES -> roles?.firstOrNull()?.name ?: "Role"
         }
     }
