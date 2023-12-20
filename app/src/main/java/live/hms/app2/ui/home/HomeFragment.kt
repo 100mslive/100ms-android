@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -31,6 +32,7 @@ import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.roomkit.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
+import live.hms.roomkit.ui.settings.SettingsFragment.Companion.SETTINGS_MODE
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.EmailUtils
@@ -82,8 +84,10 @@ class HomeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
+
                 findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToSettingsFragment(SettingsMode.HOME)
+                    R.id.action_HomeFragment_to_SettingsFragment,
+                    bundleOf(SETTINGS_MODE to SettingsMode.HOME.name)
                 )
 
             }
