@@ -304,7 +304,9 @@ class MeetingFragment : Fragment() {
             chatViewModel::currentlySelectedRbacRecipient,
             chatViewModel.currentlySelectedRecipientRbac,
         )
-
+        meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
+            chatViewModel.updatePeerLeave(it)
+        }
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {

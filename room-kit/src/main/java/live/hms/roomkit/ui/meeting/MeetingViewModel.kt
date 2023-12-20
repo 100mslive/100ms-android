@@ -453,6 +453,7 @@ class MeetingViewModel(
     // Live data which changes on any change of peer
     val peerLiveData = MutableLiveData<HMSPeer>()
     val participantPeerUpdate = MutableLiveData<Unit>()
+    val peerLeaveUpdate = MutableLiveData<String?>(null)
     private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
     val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
@@ -801,6 +802,7 @@ class MeetingViewModel(
                             peerLiveData.postValue(hmsPeer)
                         }
                         participantPeerUpdate.postValue(Unit)
+                        peerLeaveUpdate.postValue(hmsPeer.peerID)
                     }
 
                     HMSPeerUpdate.PEER_JOINED -> {

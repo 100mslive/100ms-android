@@ -244,4 +244,14 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     fun currentlySelectedRbacRecipient() : Recipient?{
         return _currentlySelectedRecipient.value
     }
+
+    fun updatePeerLeave(leavingPeerId : String?) {
+        if(leavingPeerId == null)
+            return
+
+        val current = _currentlySelectedRecipient.value
+        if(current is Recipient.Peer && current.peer.peerID == leavingPeerId)
+            _currentlySelectedRecipient.postValue(null)
+
+    }
 }

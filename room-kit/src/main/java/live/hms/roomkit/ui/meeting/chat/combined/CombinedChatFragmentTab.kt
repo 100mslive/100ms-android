@@ -108,6 +108,9 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
             pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
                 binding.pinnedMessagesDisplay)
         }
+        meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
+            chatViewModel.updatePeerLeave(it)
+        }
 
     }
 }
