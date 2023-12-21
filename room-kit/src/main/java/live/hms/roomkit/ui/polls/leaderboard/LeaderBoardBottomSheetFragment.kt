@@ -14,7 +14,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutQuizLeaderboardBinding
+import live.hms.roomkit.ui.meeting.InsetItemDecoration
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.display.POLL_TO_DISPLAY
 import live.hms.roomkit.ui.polls.display.PollDisplayFragment
@@ -22,7 +24,9 @@ import live.hms.roomkit.ui.polls.leaderboard.item.ApplyRadiusatVertex
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardHeader
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardNameSection
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardSubGrid
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
@@ -82,6 +86,15 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 layoutManager = GridLayoutManager(context, leaderBoardListadapter.spanCount).apply {
                     spanSizeLookup = leaderBoardListadapter.spanSizeLookup
                 }
+                addItemDecoration(
+                    InsetItemDecoration(
+                        getColorOrDefault(
+                            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+                            HMSPrebuiltTheme.getDefaults().background_default
+                        ), resources.getDimension(R.dimen.twelve_dp).toInt(), "inset", "inset"
+                    )
+                )
+
             }
 
             meetingViewModel.fetchLeaderboard(pollId,
@@ -101,7 +114,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                                 "Error fetching leaderboard ${error.localizedMessage}",
                                 Toast.LENGTH_SHORT
                             ).show()
-
+                            dismissAllowingStateLoss()
                         }
                     }
 
@@ -115,27 +128,27 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         if (model?.summary != null) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
             with(model.summary!!) {
-//                if ((totalPeersCount ?: 0) >= (respondedPeersCount
-//                        ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
-//                ) {
-//                    leaderBoardListadapter.add(
-//                        LeaderBoardSubGrid(
-//                            "VOTED",
-//                            "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
-//                        )
-//                    )
-//                }
-//
-//                leaderBoardListadapter.add(
-//                    LeaderBoardSubGrid(
-//                        "CORRECT ANSWERS", "${respondedCorrectlyPeersCount}"
-//                    )
-//                )
-//                leaderBoardListadapter.add(
-//                    LeaderBoardSubGrid(
-//                        "AVG. TIME TAKEN", averageTime.toString()
-//                    )
-//                )
+                if ((totalPeersCount ?: 0) >= (respondedPeersCount
+                        ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
+                ) {
+                    leaderBoardListadapter.add(
+                        LeaderBoardSubGrid(
+                            "VOTED",
+                            "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
+                        )
+                    )
+                }
+
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "CORRECT ANSWERS", "${respondedCorrectlyPeersCount}"
+                    )
+                )
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "AVG. TIME TAKEN", averageTime.toString()
+                    )
+                )
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
                         "AVG. SCORE", averageScore.toString()

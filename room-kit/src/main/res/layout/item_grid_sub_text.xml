@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="2dp"
-
+    android:layout_marginHorizontal="2dp"
     android:clipToPadding="false"
 
     android:padding="@dimen/spacing_d2"
