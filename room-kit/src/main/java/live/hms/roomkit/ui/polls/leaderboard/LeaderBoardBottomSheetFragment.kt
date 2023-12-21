@@ -100,14 +100,14 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
         if (model?.summary != null) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
-            with(model.summary) {
-                if ((totalPeersCount ?: 0) >= (respondedPeersCount
+            with(model.summary!!) {
+                if ((totalPeersCount?:0) >= (respondedPeersCount
                         ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
                 ) {
                     leaderBoardListadapter.add(
                         LeaderBoardSubGrid(
                             "VOTED",
-                            "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
+                            "${(respondedPeersCount?:0) / (totalPeersCount?:1) * 100}% (${(respondedPeersCount?:0)}/${(totalPeersCount?:0)})"
                         )
                     )
                 }
