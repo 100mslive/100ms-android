@@ -35,7 +35,6 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
     val leaderBoardListadapter = GroupieAdapter()
 
-    constructor()
 
     companion object {
         const val TAG: String = "LeaderBoardBottomSheetFragment"
@@ -75,8 +74,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
 
-            meetingViewModel.fetchLeaderboard(
-                pollId,
+            meetingViewModel.fetchLeaderboard(pollId,
                 object : HmsTypedActionResultListener<PollLeaderboardResponse> {
                     override fun onSuccess(result: PollLeaderboardResponse) {
                         loadList(result)
@@ -131,5 +129,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 )
             }
         }
+
+
     }
 }

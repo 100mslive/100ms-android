@@ -2278,7 +2278,7 @@ fun LayoutHeaderBinding.applyTheme() {
 fun ItemGridSubTextBinding.applyTheme() {
     subtitle.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_low_emp
         )
     )
@@ -2289,6 +2289,61 @@ fun ItemGridSubTextBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+
+}
+
+fun ItemNameSectionBinding.applyTheme() {
+
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    correctAnswer.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    correctAnswer.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    timeTaken.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    timeTaken.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    rank.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.circle_secondary_80
+    )
+
+
+
 
 }
 
