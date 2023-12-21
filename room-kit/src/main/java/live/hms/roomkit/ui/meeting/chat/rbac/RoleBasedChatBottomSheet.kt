@@ -114,6 +114,11 @@ class RoleBasedChatBottomSheet(
                         )
                     )
 
+                binding.emptyView.visibility = if(list.isEmpty())
+                    View.VISIBLE
+                else
+                    View.GONE
+
                 groupieAdapter.update(
                     list
                 )

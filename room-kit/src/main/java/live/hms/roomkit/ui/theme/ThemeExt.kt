@@ -2664,7 +2664,12 @@ fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().border_bright
         )
     )
-
+    emptyView.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
 }
 fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
     name.setTextColor(
