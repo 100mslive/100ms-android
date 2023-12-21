@@ -12,7 +12,7 @@ import live.hms.roomkit.ui.theme.getShape
 class LeaderBoardNameSection(
     private val titleStr: String,
     private val subtitleStr: String,
-    private val rankStr: Int,
+    private val rankStr: String,
     private val timetakenStr: String? = null,
     private val correctAnswerStr: String? = null,
     private val isSelected: Boolean

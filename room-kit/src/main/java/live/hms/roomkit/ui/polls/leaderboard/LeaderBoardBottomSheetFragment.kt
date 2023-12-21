@@ -17,6 +17,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.display.POLL_TO_DISPLAY
 import live.hms.roomkit.ui.polls.display.PollDisplayFragment
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardHeader
+import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardNameSection
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardSubGrid
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
@@ -74,7 +75,8 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
 
-            meetingViewModel.fetchLeaderboard(pollId,
+            meetingViewModel.fetchLeaderboard(
+                pollId,
                 object : HmsTypedActionResultListener<PollLeaderboardResponse> {
                     override fun onSuccess(result: PollLeaderboardResponse) {
                         loadList(result)
@@ -101,13 +103,13 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         if (model?.summary != null) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
             with(model.summary!!) {
-                if ((totalPeersCount?:0) >= (respondedPeersCount
+                if ((totalPeersCount ?: 0) >= (respondedPeersCount
                         ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
                 ) {
                     leaderBoardListadapter.add(
                         LeaderBoardSubGrid(
                             "VOTED",
-                            "${(respondedPeersCount?:0) / (totalPeersCount?:1) * 100}% (${(respondedPeersCount?:0)}/${(totalPeersCount?:0)})"
+                            "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
                         )
                     )
                 }
@@ -130,6 +132,24 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
 
+
+
+        if (model.entries.isNullOrEmpty().not()) {
+            leaderBoardListadapter.add(LeaderBoardHeader("Leaderboard"))
+
+            model.entries?.forEachIndexed { index, entry ->
+                leaderBoardListadapter.add(
+                    LeaderBoardNameSection(
+                        titleStr = entry.peer?.username.orEmpty(),
+                        subtitleStr = "${entry.score} points",
+                        rankStr = entry.position.toString(),
+                        isSelected = false,
+                        timetakenStr = "${entry.duration} seconds",
+                        correctAnswerStr = "${entry.correctResponses}/${entry.totalResponses} correct answers"
+                    )
+                )
+            }
+        }
 
     }
 }
