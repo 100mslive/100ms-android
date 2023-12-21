@@ -37,6 +37,7 @@ import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
+import live.hms.roomkit.ui.polls.leaderboard.item.ApplyRadiusatVertex
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.EmailUtils.addAlpha
 import live.hms.roomkit.util.dp
@@ -1589,9 +1590,20 @@ internal fun LayoutChatParticipantCombinedBinding.applyTheme(hideParticipantTab 
 
 }
 
-fun getShape(): ShapeDrawable {
+fun getShape(radiusAt : ApplyRadiusatVertex = ApplyRadiusatVertex.ALL_CORNERS): ShapeDrawable {
     val eightDp = 8.dp().toFloat()
-    val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)
+
+    val lines = floatArrayOf(
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f
+    )
+
     return ShapeDrawable(
         RoundRectShape(
             lines, null,

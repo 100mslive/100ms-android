@@ -9,13 +9,20 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
 
+enum class ApplyRadiusatVertex {
+    TOP,
+    ALL_CORNERS,
+    BOTTOM,
+    NONE
+}
 class LeaderBoardNameSection(
     private val titleStr: String,
     private val subtitleStr: String,
     private val rankStr: String,
     private val timetakenStr: String? = null,
     private val correctAnswerStr: String? = null,
-    private val isSelected: Boolean
+    private val isSelected: Boolean,
+    private val position: ApplyRadiusatVertex = ApplyRadiusatVertex.NONE
 ) : BindableItem<ItemNameSectionBinding>() {
 
 
@@ -48,7 +55,7 @@ class LeaderBoardNameSection(
 
     private fun setSelectedView(isSelected: Boolean, v: ItemNameSectionBinding) {
         v.rootLayout.background = if (isSelected.not()) {
-            getShape().apply {
+            getShape(position).apply {
                 setTint(
                     getColorOrDefault(
                         HMSPrebuiltTheme.getColours()?.backgroundDefault,
@@ -57,7 +64,7 @@ class LeaderBoardNameSection(
                 )
             }
         } else {
-            getShape().apply {
+            getShape(position).apply {
                 setTint(
                     getColorOrDefault(
                         HMSPrebuiltTheme.getColours()?.surfaceBrighter,

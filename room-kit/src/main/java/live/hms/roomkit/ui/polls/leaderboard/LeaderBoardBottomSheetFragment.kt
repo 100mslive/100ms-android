@@ -18,6 +18,7 @@ import live.hms.roomkit.databinding.LayoutQuizLeaderboardBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.polls.display.POLL_TO_DISPLAY
 import live.hms.roomkit.ui.polls.display.PollDisplayFragment
+import live.hms.roomkit.ui.polls.leaderboard.item.ApplyRadiusatVertex
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardHeader
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardNameSection
 import live.hms.roomkit.ui.polls.leaderboard.item.LeaderBoardSubGrid
@@ -154,9 +155,12 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                         titleStr = entry.peer?.username.orEmpty(),
                         subtitleStr = "${entry.score} points",
                         rankStr = entry.position.toString(),
-                        isSelected = false,
-                        timetakenStr = "${entry.duration} seconds",
-                        correctAnswerStr = "${entry.correctResponses}/${entry.totalResponses} correct answers"
+                        isSelected = true,
+                        timetakenStr = "${entry.duration}",
+                        correctAnswerStr = "${entry.correctResponses}/${entry.totalResponses}",
+                        position = if (index == 0) ApplyRadiusatVertex.TOP
+                        else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
+                        else ApplyRadiusatVertex.NONE
                     )
                 )
             }

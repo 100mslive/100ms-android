@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
-    android:padding="@dimen/spacing_d2"
+   android:paddingVertical="@dimen/spacing_d2"
+    android:paddingRight="@dimen/spacing_d2"
+    android:layout_marginHorizontal="@dimen/spacing_d3"
     tools:background="@android:color/holo_red_dark">
 
 
@@ -16,6 +18,7 @@
         android:layout_height="24dp"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
+        android:layout_marginStart="8dp"
         android:background="@drawable/circle_secondary_80"
         android:fontFamily="@font/inter_extrabold"
         android:gravity="center"
@@ -64,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:drawableStart="@drawable/ic_baseline_access_time_24"
+        android:drawableStart="@drawable/clock"
         android:drawablePadding="4dp"
         android:fontFamily="@font/inter_regular"
         android:lineHeight="16sp"
@@ -79,7 +82,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:drawableStart="@drawable/circle_tick"
+        android:layout_marginEnd="4dp"
+        android:drawableStart="@drawable/tick_check_in_circle"
         android:drawablePadding="4dp"
         android:fontFamily="@font/inter_regular"
         android:lineHeight="16sp"
