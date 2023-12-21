@@ -27,6 +27,7 @@ class LeaderBoardHeader(private val titlestr: String, private val subtitle: Stri
 
     override fun getLayout(): Int = R.layout.layout_header
 
+
     override fun initializeViewBinding(view: View): LayoutHeaderBinding =
         LayoutHeaderBinding.bind(view)
 

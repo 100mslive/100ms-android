@@ -79,6 +79,7 @@ class LeaderBoardNameSection(
     override fun getLayout(): Int = R.layout.item_name_section
 
 
+
     override fun initializeViewBinding(view: View) = ItemNameSectionBinding.bind(view)
 
 }

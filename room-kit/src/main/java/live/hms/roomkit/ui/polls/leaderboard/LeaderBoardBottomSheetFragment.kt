@@ -75,6 +75,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             val poll = meetingViewModel.getPollForPollId(pollId) ?: {
                 dismissAllowingStateLoss()
             }
+            leaderBoardListadapter.spanCount = 12
 
             binding.leaderboardRecyclerView.apply {
                 adapter = leaderBoardListadapter
@@ -113,7 +114,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
         if (model?.summary != null) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
-//            with(model.summary!!) {
+            with(model.summary!!) {
 //                if ((totalPeersCount ?: 0) >= (respondedPeersCount
 //                        ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
 //                ) {
@@ -135,12 +136,12 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 //                        "AVG. TIME TAKEN", averageTime.toString()
 //                    )
 //                )
-//                leaderBoardListadapter.add(
-//                    LeaderBoardSubGrid(
-//                        "AVG. SCORE", averageScore.toString()
-//                    )
-//                )
-//            }
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "AVG. SCORE", averageScore.toString()
+                    )
+                )
+            }
         }
 
 

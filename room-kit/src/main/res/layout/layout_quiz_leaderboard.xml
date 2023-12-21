@@ -46,6 +46,7 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
+        android:paddingHorizontal="@dimen/spacing_d3"
         android:layout_marginTop="64dp"
         android:clipToPadding="false"
         android:id="@+id/leaderboardRecyclerView"
