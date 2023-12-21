@@ -9,6 +9,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
@@ -61,6 +63,11 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+
         lifecycleScope.launch {
             val pollId: String =
                 (arguments?.getString(POLL_TO_DISPLAY) ?: dismissAllowingStateLoss()).toString()
@@ -79,7 +86,11 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 pollId,
                 object : HmsTypedActionResultListener<PollLeaderboardResponse> {
                     override fun onSuccess(result: PollLeaderboardResponse) {
-                        loadList(result)
+                        contextSafe { context, activity ->
+                            activity.runOnUiThread {
+                                loadList(result)
+                            }
+                        }
                     }
 
                     override fun onError(error: HMSException) {
@@ -102,34 +113,34 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
         if (model?.summary != null) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
-            with(model.summary!!) {
-                if ((totalPeersCount ?: 0) >= (respondedPeersCount
-                        ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
-                ) {
-                    leaderBoardListadapter.add(
-                        LeaderBoardSubGrid(
-                            "VOTED",
-                            "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
-                        )
-                    )
-                }
-
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "CORRECT ANSWERS", "${respondedCorrectlyPeersCount}"
-                    )
-                )
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", averageTime.toString()
-                    )
-                )
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "AVG. SCORE", averageScore.toString()
-                    )
-                )
-            }
+//            with(model.summary!!) {
+//                if ((totalPeersCount ?: 0) >= (respondedPeersCount
+//                        ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
+//                ) {
+//                    leaderBoardListadapter.add(
+//                        LeaderBoardSubGrid(
+//                            "VOTED",
+//                            "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
+//                        )
+//                    )
+//                }
+//
+//                leaderBoardListadapter.add(
+//                    LeaderBoardSubGrid(
+//                        "CORRECT ANSWERS", "${respondedCorrectlyPeersCount}"
+//                    )
+//                )
+//                leaderBoardListadapter.add(
+//                    LeaderBoardSubGrid(
+//                        "AVG. TIME TAKEN", averageTime.toString()
+//                    )
+//                )
+//                leaderBoardListadapter.add(
+//                    LeaderBoardSubGrid(
+//                        "AVG. SCORE", averageScore.toString()
+//                    )
+//                )
+//            }
         }
 
 

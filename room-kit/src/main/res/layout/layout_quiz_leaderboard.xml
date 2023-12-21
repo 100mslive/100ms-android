@@ -39,7 +39,7 @@
             android:paddingHorizontal="@dimen/spacing_d1"
             android:paddingVertical="4dp"
             android:layout_gravity="center_vertical"
-            android:text="Live"
+            android:text="Ended"
             android:textSize="10sp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 

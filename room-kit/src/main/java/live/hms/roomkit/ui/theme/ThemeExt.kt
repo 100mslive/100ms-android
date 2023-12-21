@@ -2222,12 +2222,19 @@ fun LayoutQuizLeaderboardBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
     pollsLive.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
         HMSPrebuiltTheme.getDefaults().onprimary_high_emp
     ))
     pollsLive.setBackgroundColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().error_default
     ))
 }
@@ -2266,6 +2273,12 @@ fun LayoutHeaderBinding.applyTheme() {
         )
     )
 
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
     title.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
