@@ -34,8 +34,7 @@ class PollsCreationFragment : Fragment(){
     private val pollsViewModel: PollsViewModel by activityViewModels()
     private val meetingViewModel : MeetingViewModel by activityViewModels()
     private val previousPollsAdaptor by lazy {PreviousPollsAdaptor{previousPollsInfo ->
-        LeaderBoardBottomSheetFragment.launch(previousPollsInfo.pollId, requireFragmentManager())
-        //PollDisplayFragment.launch(previousPollsInfo.pollId, parentFragmentManager)
+        PollDisplayFragment.launch(previousPollsInfo.pollId, parentFragmentManager)
     }}
     override fun onCreateView(
         inflater: LayoutInflater,

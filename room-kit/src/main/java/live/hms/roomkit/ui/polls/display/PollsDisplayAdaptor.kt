@@ -2,12 +2,10 @@ package live.hms.roomkit.ui.polls.display
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.graphics.drawable.DrawableCompat.applyTheme
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.databinding.LayoutEndPollButtonBinding
-import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.ui.theme.applyTheme
@@ -104,7 +102,7 @@ class PollsDisplayAdaptor(
             EndPollViewType -> LayoutEndPollButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID)
+        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID, showLeaderBoard)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
             updater.add(questionHolder)
         }
