@@ -83,8 +83,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 }
             }
 
-            meetingViewModel.fetchLeaderboard(
-                pollId,
+            meetingViewModel.fetchLeaderboard(pollId,
                 object : HmsTypedActionResultListener<PollLeaderboardResponse> {
                     override fun onSuccess(result: PollLeaderboardResponse) {
                         contextSafe { context, activity ->
@@ -156,7 +155,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                         subtitleStr = "${entry.score} points",
                         rankStr = entry.position.toString(),
                         isSelected = true,
-                        timetakenStr = "${entry.duration}",
+                        timetakenStr = "${if (entry.duration == 0L) "" else entry.duration}",
                         correctAnswerStr = "${entry.correctResponses}/${entry.totalResponses}",
                         position = if (index == 0) ApplyRadiusatVertex.TOP
                         else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
