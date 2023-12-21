@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import live.hms.roomkit.ui.meeting.chat.rbac.ChatMessageViewFilterHelper
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.HMSMessageResultListener
 import live.hms.video.sdk.HMSSDK
@@ -17,7 +16,6 @@ import live.hms.video.sdk.models.enums.HMSMessageType
 import live.hms.video.sdk.models.role.HMSRole
 
 class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
-    private val chatmessageViewFilterHelper = ChatMessageViewFilterHelper()
 
     companion object {
         private const val TAG = "ChatViewModel"
@@ -33,9 +31,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
     fun updateSelectedRecipientChatBottomSheet(recipient: Recipient?) {
         // Set a filter for the messages.
-        chatmessageViewFilterHelper.setFilter(recipient)
         _currentlySelectedRecipient.postValue(recipient)
-        messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
     }
     val currentlySelectedRecipientRbac : LiveData<Recipient?> = _currentlySelectedRecipient
 
@@ -46,50 +42,67 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
             null -> {} // no-op if it's null
             Recipient.Everyone -> broadcast(
                 ChatMessage(
-                    "You",
-                    hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
-                    null, // Let the server alone set the time
-                    messageStr,
-                    true,
-                    null,
-                    ChatMessage.sendTo(HMSMessageRecipientType.BROADCAST, null),
-                    ChatMessage.toGroup(HMSMessageRecipientType.BROADCAST),
-                    hmssdk.getLocalPeer()?.peerID,
-                    hmssdk.getLocalPeer()?.hmsRole?.name,
-                    hmssdk.getLocalPeer()?.customerUserID ?: ""
+                    senderName = "You",
+                    localSenderRealNameForPinMessage = hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
+                    time = null, // Let the server alone set the time
+                    message = messageStr,
+                    isSentByMe = true,
+                    isDmToMe = false,
+                    isDm = false,
+                    messageId = null,
+                    toGroup = ChatMessage.sendTo(
+                        recipient = HMSMessageRecipientType.BROADCAST,
+                        peer = null,
+                        roles = null,
+                        false
+                    ),
+                    senderPeerId = hmssdk.getLocalPeer()?.peerID,
+                    senderRoleName = hmssdk.getLocalPeer()?.hmsRole?.name,
+                    userIdForBlockList = hmssdk.getLocalPeer()?.customerUserID ?: ""
                 )
             )
 
             is Recipient.Peer -> directMessage(
                 ChatMessage(
-                    "You",
-                    hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
-                    null, // Let the server alone set the time
-                    messageStr,
-                    true,
-
-                    null,
-                    ChatMessage.sendTo(HMSMessageRecipientType.PEER, null),
-                    ChatMessage.toGroup(HMSMessageRecipientType.PEER),
-                    hmssdk.getLocalPeer()?.peerID,
-                    hmssdk.getLocalPeer()?.hmsRole?.name,
-                    hmssdk.getLocalPeer()?.customerUserID ?: ""
+                    senderName = "You",
+                    localSenderRealNameForPinMessage = hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
+                    time = null, // Let the server alone set the time
+                    message = messageStr,
+                    isSentByMe = true,
+                    isDmToMe = false,
+                    isDm = true,
+                    messageId = null,
+                    toGroup = ChatMessage.sendTo(
+                        recipient = HMSMessageRecipientType.PEER,
+                        peer = recipient.peer,
+                        roles = null,
+                        sentToMe = false
+                    ),
+                    senderPeerId = hmssdk.getLocalPeer()?.peerID,
+                    senderRoleName = hmssdk.getLocalPeer()?.hmsRole?.name,
+                    userIdForBlockList = hmssdk.getLocalPeer()?.customerUserID ?: ""
                 ), recipient.peer
             )
 
             is Recipient.Role -> groupMessage(
                 ChatMessage(
-                    "You",
-                    hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
-                    null, // Let the server alone set the time
-                    messageStr,
-                    true,
-                    null,
-                    ChatMessage.sendTo(HMSMessageRecipientType.ROLES, listOf(recipient.role)),
-                    ChatMessage.toGroup(HMSMessageRecipientType.ROLES),
-                    hmssdk.getLocalPeer()?.peerID,
-                    hmssdk.getLocalPeer()?.hmsRole?.name,
-                    hmssdk.getLocalPeer()?.customerUserID
+                    senderName = "You",
+                    localSenderRealNameForPinMessage = hmssdk.getLocalPeer()?.name ?: DEFAULT_SENDER_NAME,
+                    time = null, // Let the server alone set the time
+                    message = messageStr,
+                    isSentByMe = true,
+                    isDmToMe = false,
+                    isDm = false,
+                    messageId = null,
+                    toGroup = ChatMessage.sendTo(
+                        recipient = HMSMessageRecipientType.ROLES,
+                        peer = null,
+                        roles = listOf(recipient.role),
+                        sentToMe = false
+                    ),
+                    senderPeerId = hmssdk.getLocalPeer()?.peerID,
+                    senderRoleName = hmssdk.getLocalPeer()?.hmsRole?.name,
+                    userIdForBlockList = hmssdk.getLocalPeer()?.customerUserID
                 ), recipient.role
             )
         }
@@ -108,7 +121,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                 override fun onSuccess(hmsMessage: HMSMessage) {
                     // Request Successfully sent to server
                     MainScope().launch {
-                        addMessage(ChatMessage(hmsMessage, true))
+                        addMessage(ChatMessage(hmsMessage, true, false))
                     }
                 }
 
@@ -128,7 +141,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                 override fun onSuccess(hmsMessage: HMSMessage) {
                     // Request Successfully sent to server
                     MainScope().launch {
-                        addMessage(ChatMessage(hmsMessage, true))
+                        addMessage(ChatMessage(hmsMessage, true, false))
                     }
                 }
 
@@ -147,7 +160,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                 override fun onSuccess(hmsMessage: HMSMessage) {
                     // Request Successfully sent to server
                     MainScope().launch {
-                        addMessage(ChatMessage(hmsMessage, true))
+                        addMessage(ChatMessage(hmsMessage, true, false))
                     }
                 }
 
@@ -178,7 +191,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
                 unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
             }
             _messages.add(message)
-            messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+            messages.postValue(_messages)
         }
     }
 
@@ -201,7 +214,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
         this.messageIdsToHide = messageIdsToHide
         // Refresh the current list
         _messages = _messages.filter { !messageIdsToHide.contains(it.messageId) }.toMutableList()
-        messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+        messages.postValue(_messages)
     }
 
     // The blocklist throws away all messages from the blocked
@@ -219,7 +232,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
             // Refresh the current list
             _messages =
                 _messages.filter { !blockedPeerIds.contains(it.userIdForBlockList) }.toMutableList()
-            messages.postValue(chatmessageViewFilterHelper.getSearchFilteredPeersIfNeeded(_messages))
+            messages.postValue(_messages)
         }
     }
 
@@ -230,5 +243,15 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
     fun currentlySelectedRbacRecipient() : Recipient?{
         return _currentlySelectedRecipient.value
+    }
+
+    fun updatePeerLeave(leavingPeerId : String?) {
+        if(leavingPeerId == null)
+            return
+
+        val current = _currentlySelectedRecipient.value
+        if(current is Recipient.Peer && current.peer.peerID == leavingPeerId)
+            _currentlySelectedRecipient.postValue(null)
+
     }
 }

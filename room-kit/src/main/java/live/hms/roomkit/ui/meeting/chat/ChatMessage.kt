@@ -3,9 +3,11 @@ package live.hms.roomkit.ui.meeting.chat
 import live.hms.video.sdk.models.HMSMessage
 import live.hms.video.sdk.models.enums.HMSMessageRecipientType
 import live.hms.video.sdk.models.role.HMSRole
-import java.util.*
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import live.hms.roomkit.ui.meeting.chat.rbac.RecipientItem
+import live.hms.video.sdk.models.HMSMessageRecipient
+import live.hms.video.sdk.models.HMSPeer
 
 const val DEFAULT_SENDER_NAME = "Participant"
 
@@ -17,38 +19,44 @@ data class ChatMessage constructor(
     val time: Long? = null,
     val message: String,
     val isSentByMe: Boolean,
+    val isDmToMe : Boolean,
+    val isDm : Boolean,
     var messageId : String? = null,
-    val sentTo : String?,
     val toGroup : String?,
     val senderPeerId : String?,
     val senderRoleName : String?,
-    val userIdForBlockList : String?
+    val userIdForBlockList : String?,
 )  : Parcelable {
     companion object {
-        fun sendTo(message: HMSMessage) : String? = sendTo(message.recipient.recipientType,
-            message.recipient.recipientRoles)
+        fun sendTo(recipient: HMSMessageRecipient, sentByMe: Boolean, sentToMe: Boolean) : String? =
+            sendTo(
+                recipient.recipientType,
+                recipient.recipientPeer,
+                recipient.recipientRoles,
+                sentToMe
+            )
 
-        fun sendTo(recipient: HMSMessageRecipientType,
-                           roles : List<HMSRole>?) : String? = when(recipient) {
+        fun sendTo(
+            recipient: HMSMessageRecipientType,
+            peer: HMSPeer?,
+            roles: List<HMSRole>?,
+            sentToMe: Boolean
+        ) : String? = when(recipient) {
             HMSMessageRecipientType.BROADCAST -> null
-            HMSMessageRecipientType.PEER -> "Direct Message"
+            HMSMessageRecipientType.PEER -> if(sentToMe) "You" else peer?.name
             HMSMessageRecipientType.ROLES -> roles?.firstOrNull()?.name ?: "Role"
         }
-
-        fun toGroup(recipient: HMSMessageRecipientType) = when(recipient) {
-            HMSMessageRecipientType.PEER, HMSMessageRecipientType.BROADCAST -> null
-            HMSMessageRecipientType.ROLES -> "To Group"
-        }
     }
-    constructor(message: HMSMessage, sentByMe: Boolean) : this(
+    constructor(message: HMSMessage, sentByMe: Boolean, sentToMe : Boolean) : this(
         if(sentByMe) "You" else message.sender?.name ?: DEFAULT_SENDER_NAME,
         message.sender?.name ?: DEFAULT_SENDER_NAME,
         message.serverReceiveTime,
         message.message,
         sentByMe,
+        sentToMe,
+        message.recipient.recipientType == HMSMessageRecipientType.PEER,
         messageId = message.messageId,
-        sentTo = sendTo(message),
-        toGroup = toGroup(message.recipient.recipientType),
+        toGroup = sendTo(message.recipient, sentByMe, sentToMe),
         message.sender?.peerID,
         message.sender?.hmsRole?.name,
         message.sender?.customerUserID

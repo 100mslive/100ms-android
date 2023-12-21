@@ -301,9 +301,12 @@ class MeetingFragment : Fragment() {
             binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled,
             meetingViewModel::availableRecipientsForChat,
-            chatViewModel::currentlySelectedRbacRecipient
+            chatViewModel::currentlySelectedRbacRecipient,
+            chatViewModel.currentlySelectedRecipientRbac,
         )
-
+        meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
+            chatViewModel.updatePeerLeave(it)
+        }
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {
@@ -865,7 +868,7 @@ class MeetingFragment : Fragment() {
         )
         binding.buttonRaiseHand.visibility = View.GONE
 
-        WindowCompat.setDecorFitsSystemWindows(activity!!.window, true)
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
 
         showSystemBars()
     }
@@ -953,7 +956,7 @@ class MeetingFragment : Fragment() {
 
             })?.start()
 
-        val screenHeight = activity!!.window.decorView.height
+        val screenHeight = requireActivity().window.decorView.height
         binding.bottomControls.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1001,9 +1004,9 @@ class MeetingFragment : Fragment() {
     private fun hideControlBars() {
         val topMenu = binding.topMenu
         val bottomMenu = binding.bottomControls
-        val screenHeight = activity!!.window.decorView.height
+        val screenHeight = requireActivity().window.decorView.height
         controlBarsVisible = false
-        topMenu?.animate()
+        topMenu.animate()
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1348,53 +1351,6 @@ class MeetingFragment : Fragment() {
                     inflateExitFlow()
                 }
             })
-    }
-
-    fun roleChangeRemote() {
-
-        val isAllowedToMuteUnmute =
-            meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers()
-        var remotePeersAreMute: Boolean? = null
-        if (isAllowedToMuteUnmute) {
-            remotePeersAreMute = meetingViewModel.areAllRemotePeersMute()
-        }
-
-        val cancelRoleName = "Cancel"
-        val availableRoles = meetingViewModel.getAvailableRoles().map { it.name }
-        val rolesToSend = availableRoles.plus(cancelRoleName)
-        binding.roleSpinner.root.initAdapters(
-            rolesToSend,
-            if (remotePeersAreMute == null) "Nothing to change" else if (remotePeersAreMute) "Remote Unmute Role" else "Remote Mute Role",
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val stringRole = parent?.adapter?.getItem(position) as String
-                    if (remotePeersAreMute == null) {
-                        Toast.makeText(
-                            requireContext(),
-                            "No remote peers, or their audio tracks are absent",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else {
-                        if (stringRole != cancelRoleName) {
-                            meetingViewModel.remoteMute(
-                                !remotePeersAreMute,
-                                listOf(stringRole)
-                            )
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // Nothing
-                }
-
-            })
-        binding.roleSpinner.root.performClick()
     }
 
     fun inflateExitFlow() {

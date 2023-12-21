@@ -54,22 +54,30 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
           time.text = formatter.format(Date(sentMessage.time))
         }
 
-        sentTo.visibility = if(sentMessage.sentTo == null)
-           View.GONE
+        val isSentToVisible = sentMessage.toGroup != null
+        sentTo.visibility = if(isSentToVisible)
+           View.VISIBLE
         else
-          View.VISIBLE
-
-        toGroup.visibility = if(sentMessage.toGroup == null)
           View.GONE
-        else
-          View.VISIBLE
 
-        sentBackground.visibility = if(sentMessage.toGroup == null && sentMessage.sentTo == null) {
+        if(isSentToVisible) {
+          val r = binding.root.resources
+          sentTo.text =
+            r.getString(R.string.chat_to_label,
+              sentMessage.toGroup,
+              if(sentMessage.isDmToMe || sentMessage.isDm)
+                r.getString(R.string.chat_to_dm_label)
+              else
+                r.getString(R.string.chat_to_group_label)
+            )
+        }
+
+        sentBackground.visibility = if(sentMessage.toGroup == null) {
           View.GONE
         } else
           View.VISIBLE
-        sentTo.text = sentMessage.sentTo
-        toGroup.text = sentMessage.toGroup
+
+
         viewMore.visibility = if(shouldShowMessageOptions()) View.VISIBLE else View.GONE
       }
     }
