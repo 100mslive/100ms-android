@@ -1353,53 +1353,6 @@ class MeetingFragment : Fragment() {
             })
     }
 
-    fun roleChangeRemote() {
-
-        val isAllowedToMuteUnmute =
-            meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers()
-        var remotePeersAreMute: Boolean? = null
-        if (isAllowedToMuteUnmute) {
-            remotePeersAreMute = meetingViewModel.areAllRemotePeersMute()
-        }
-
-        val cancelRoleName = "Cancel"
-        val availableRoles = meetingViewModel.getAvailableRoles().map { it.name }
-        val rolesToSend = availableRoles.plus(cancelRoleName)
-        binding.roleSpinner.root.initAdapters(
-            rolesToSend,
-            if (remotePeersAreMute == null) "Nothing to change" else if (remotePeersAreMute) "Remote Unmute Role" else "Remote Mute Role",
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val stringRole = parent?.adapter?.getItem(position) as String
-                    if (remotePeersAreMute == null) {
-                        Toast.makeText(
-                            requireContext(),
-                            "No remote peers, or their audio tracks are absent",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else {
-                        if (stringRole != cancelRoleName) {
-                            meetingViewModel.remoteMute(
-                                !remotePeersAreMute,
-                                listOf(stringRole)
-                            )
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // Nothing
-                }
-
-            })
-        binding.roleSpinner.root.performClick()
-    }
-
     fun inflateExitFlow() {
         if (meetingViewModel.isAllowedToEndMeeting() || (meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning())) {
             MultipleLeaveOptionBottomSheet()
