@@ -27,6 +27,7 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
+import live.hms.video.sdk.models.HMSPeer
 
 class RoleBasedChatBottomSheet(
     private val getSelectedRecipient: () -> Recipient?,
@@ -102,12 +103,19 @@ class RoleBasedChatBottomSheet(
         if (allowedParticipants.peers) {
             // Update all peers everytime the peers change
             meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
-                groupieAdapter.update(
+                val peers = meetingViewModel.hmsSDK.getRemotePeers()
+                // Remove the "participants" option if there are no others.
+                val list = if(peers.isEmpty())
+                    initialRecipients
+                else
                     initialRecipients.plus(
                         getUpdatedPeersGroup(
-                            meetingViewModel.hmsSDK, getSelectedRecipient()
+                            peers, getSelectedRecipient()
                         )
                     )
+
+                groupieAdapter.update(
+                    list
                 )
             }
         }
@@ -157,12 +165,12 @@ class RoleBasedChatBottomSheet(
     }
 
     private fun getUpdatedPeersGroup(
-        hmsSDK: HMSSDK,
+        peers : List<HMSPeer>,
         currentSelectedRecipient: Recipient?
     ): ExpandableGroup {
         return ExpandableGroup(RecipientHeader(RECIPIENT_PEERS), true).apply {
                 addAll(
-                    hmsSDK.getRemotePeers().map {
+                    peers.map {
                         RecipientItem(
                             Recipient.Peer(it),
                             currentSelectedRecipient,
