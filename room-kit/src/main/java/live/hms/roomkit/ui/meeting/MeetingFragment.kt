@@ -868,7 +868,7 @@ class MeetingFragment : Fragment() {
         )
         binding.buttonRaiseHand.visibility = View.GONE
 
-        WindowCompat.setDecorFitsSystemWindows(activity!!.window, true)
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
 
         showSystemBars()
     }
@@ -956,7 +956,7 @@ class MeetingFragment : Fragment() {
 
             })?.start()
 
-        val screenHeight = activity!!.window.decorView.height
+        val screenHeight = requireActivity().window.decorView.height
         binding.bottomControls.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1004,9 +1004,9 @@ class MeetingFragment : Fragment() {
     private fun hideControlBars() {
         val topMenu = binding.topMenu
         val bottomMenu = binding.bottomControls
-        val screenHeight = activity!!.window.decorView.height
+        val screenHeight = requireActivity().window.decorView.height
         controlBarsVisible = false
-        topMenu?.animate()
+        topMenu.animate()
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
