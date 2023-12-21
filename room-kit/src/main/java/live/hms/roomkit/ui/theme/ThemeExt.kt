@@ -2258,6 +2258,40 @@ fun LayoutPollsDisplayBinding.applyTheme() {
     ))
 }
 
+fun LayoutHeaderBinding.applyTheme() {
+    subheading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    title.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+}
+
+fun ItemGridSubTextBinding.applyTheme() {
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+}
+
 fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {
     questionNumbering.setTextColor(
         getColorOrDefault(
