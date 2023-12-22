@@ -16,6 +16,7 @@ import live.hms.roomkit.databinding.LayoutParticipantsMergeBinding
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 
 class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
@@ -45,7 +46,7 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        binding.applyTheme()
+        binding.applyTheme()
         initViewModels()
         initOnBackPress()
         initViews()
