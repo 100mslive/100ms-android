@@ -27,7 +27,16 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
+import live.hms.video.signal.init.HMSRoomLayout
 
+/**
+ * The chip that lets you select who to chat with opens this.
+ * This determines what options to show based on what the role is allowed in [HMSRoomLayout].
+ * @param getSelectedRecipient the [ChatViewModel] keeps the state and knows what recipient
+ *  is selected, so this fragment needs to load that info from it.
+ * @param recipientSelected if the dialog changes what recipient is selected this communicates
+ *  it back to [ChatViewModel].
+ */
 class RoleBasedChatBottomSheet(
     private val getSelectedRecipient: () -> Recipient?,
     private val recipientSelected: (Recipient) -> Unit
