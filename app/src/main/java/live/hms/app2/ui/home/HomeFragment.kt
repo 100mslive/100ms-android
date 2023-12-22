@@ -32,7 +32,6 @@ import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.roomkit.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
-import live.hms.roomkit.ui.settings.SettingsFragment.Companion.SETTINGS_MODE
 import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.EmailUtils
@@ -84,12 +83,7 @@ class HomeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-
-                findNavController().navigate(
-                    R.id.action_HomeFragment_to_SettingsFragment,
-                    bundleOf(SETTINGS_MODE to SettingsMode.HOME.name)
-                )
-
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSettingsFragment())
             }
             R.id.action_email_logs -> {
                 requireContext().startActivity(
@@ -267,13 +261,13 @@ class HomeFragment : Fragment() {
     private fun enableButton() {
         binding.btnJoinNow.isEnabled = true
         binding.btnJoinNow.background =
-            ContextCompat.getDrawable(requireContext(), R.drawable.primary_blue_round_drawable)
+            ContextCompat.getDrawable(requireContext(), live.hms.roomkit.R.drawable.primary_blue_round_drawable)
     }
 
     private fun disableButton() {
         binding.btnJoinNow.isEnabled = false
         binding.btnJoinNow.background =
-            ContextCompat.getDrawable(requireContext(), R.drawable.primary_disabled_round_drawable)
+            ContextCompat.getDrawable(requireContext(), live.hms.roomkit.R.drawable.primary_disabled_round_drawable)
 
     }
 
