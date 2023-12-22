@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:drawableStart="@drawable/ic_search_24"
                     android:drawablePadding="@dimen/spacing_d1"
-                    android:hint="cats"
+                    android:hint="@string/search_participants"
                     android:inputType="textNoSuggestions"
                     android:padding="@dimen/spacing_d2" />
             </com.google.android.material.card.MaterialCardView>
