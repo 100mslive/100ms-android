@@ -25,7 +25,6 @@ import java.util.*
 class SettingsFragment : Fragment() {
 
   companion object {
-    const val SETTINGS_MODE = "hms_settings_mode_arg"
     private const val TAG = "SettingsFragment"
 
     private val VIDEO_RESOLUTIONS = mapOf(
@@ -83,8 +82,7 @@ class SettingsFragment : Fragment() {
     binding = FragmentSettingsBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
     commitHelper = settings.MultiCommitHelper()
-    val settings = arguments?.getString(SETTINGS_MODE)!!
-    mode = SettingsMode.valueOf(settings)
+    mode = SettingsMode.HOME // Do not open this in meetings.
 
     initEditTexts()
     initAutoCompleteViews()
