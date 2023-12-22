@@ -2371,11 +2371,6 @@ fun ItemNameSectionBinding.applyTheme() {
         )
     )
 
-    rank.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
-        HMSPrebuiltTheme.getDefaults().secondary_default,
-        R.drawable.circle_secondary_80
-    )
 
 
 

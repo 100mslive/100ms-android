@@ -39,7 +39,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<LayoutQuizLeaderboardBinding>()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    lateinit var poll: HmsPoll
+    var poll: HmsPoll? = null
 
     val leaderBoardListadapter = GroupieAdapter()
 
@@ -76,9 +76,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         lifecycleScope.launch {
             val pollId: String =
                 (arguments?.getString(POLL_TO_DISPLAY) ?: dismissAllowingStateLoss()).toString()
-            val poll = meetingViewModel.getPollForPollId(pollId) ?: {
-                dismissAllowingStateLoss()
-            }
+            poll = meetingViewModel.getPollForPollId(pollId)
             leaderBoardListadapter.spanCount = 12
 
             binding.leaderboardRecyclerView.apply {
@@ -97,8 +95,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
             }
 
-            meetingViewModel.fetchLeaderboard(
-                pollId,
+            meetingViewModel.fetchLeaderboard(pollId,
                 object : HmsTypedActionResultListener<PollLeaderboardResponse> {
                     override fun onSuccess(result: PollLeaderboardResponse) {
                         contextSafe { context, activity ->
@@ -178,18 +175,22 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         if (model.entries.isNullOrEmpty().not()) {
             leaderBoardListadapter.add(LeaderBoardHeader("Leaderboard"))
 
+            val rankTOColorMap = mapOf(
+                "1" to "#D69516", "2" to "#3E3E3E", "3" to "#583B0F"
+            )
             model.entries?.forEachIndexed { index, entry ->
                 leaderBoardListadapter.add(
                     LeaderBoardNameSection(
                         titleStr = entry.peer?.username.orEmpty(),
-                        subtitleStr = "${entry.score} points",
+                        subtitleStr = "${entry.score}/${poll?.questions?.map { it.weight }?.toList()?.sum()?:0} points",
                         rankStr = entry.position.toString(),
                         isSelected = true,
                         timetakenStr = "${if (entry.duration == 0L) "" else entry.duration}",
-                        correctAnswerStr = "${entry.correctResponses}/${entry.totalResponses}",
+                        correctAnswerStr = "${entry.correctResponses}/${poll?.questions?.size ?: 0}",
                         position = if (index == 0) ApplyRadiusatVertex.TOP
                         else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
-                        else ApplyRadiusatVertex.NONE
+                        else ApplyRadiusatVertex.NONE,
+                        rankBackGroundColor = rankTOColorMap.getOrDefault(entry.position.toString(), HMSPrebuiltTheme.getColours()?.secondaryDefault)
                     )
                 )
             }
