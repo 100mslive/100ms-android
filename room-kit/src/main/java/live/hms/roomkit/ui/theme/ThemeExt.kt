@@ -2670,6 +2670,31 @@ fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_low_emp
         )
     )
+
+    textInputSearch.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
+    textInputSearch.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+    textInputSearch.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDim,
+        HMSPrebuiltTheme.getDefaults().surface_dim
+    ))
+    textInputSearch.drawableStart?.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    containerSearch.strokeWidth = 1.dp()
+    containerSearch.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
 }
 fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
     name.setTextColor(

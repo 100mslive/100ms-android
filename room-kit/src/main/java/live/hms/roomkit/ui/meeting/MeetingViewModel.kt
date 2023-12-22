@@ -81,8 +81,7 @@ class MeetingViewModel(
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
-    private var numRoleChanges = 0
-    val roleChangeSingleShot : LiveData<Int> = roleChange.map { numRoleChanges++ }
+
     var roleOnJoining : HMSRole? = null
         private set
 
