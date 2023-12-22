@@ -162,7 +162,7 @@ class RoleBasedChatBottomSheet(
     private fun updateInitialRecipients() {
         allowedParticipants = meetingViewModel.availableRecipientsForChat()
         initialRecipients = initialAddRecipients(getAllowedParticipants())
-        chatRecipientSearchUseCase.setSearchVisibility(binding.textInputSearch, getAllowedParticipants())
+        chatRecipientSearchUseCase.setSearchVisibility(binding.containerSearch, getAllowedParticipants())
     }
 
     private fun getAllowedParticipants() = allowedParticipants!!

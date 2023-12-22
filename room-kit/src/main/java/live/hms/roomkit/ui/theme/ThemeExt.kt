@@ -2672,10 +2672,16 @@ fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
     )
 
     textInputSearch.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
     ))
 
+    textInputSearch.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
     textInputSearch.setBackgroundColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.surfaceDim,
         HMSPrebuiltTheme.getDefaults().surface_dim

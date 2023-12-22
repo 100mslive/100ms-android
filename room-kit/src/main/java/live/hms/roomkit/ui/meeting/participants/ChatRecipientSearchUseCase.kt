@@ -4,6 +4,7 @@ import android.view.View
 import android.widget.EditText
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 import live.hms.roomkit.ui.meeting.AllowedToMessageParticipants
@@ -12,9 +13,9 @@ import live.hms.video.sdk.models.HMSPeer
 class ChatRecipientSearchUseCase(private val updateList : suspend () -> Unit) {
     private var filterText : String? = null
     fun isSearching() = !filterText.isNullOrEmpty()
-    fun setSearchVisibility(textInputSearch : EditText,
+    fun setSearchVisibility(containerSearch : MaterialCardView,
                             allowedToMessageParticipants: AllowedToMessageParticipants) {
-        textInputSearch.visibility = if(allowedToMessageParticipants.peers) View.VISIBLE else View.GONE
+        containerSearch.visibility = if(allowedToMessageParticipants.peers) View.VISIBLE else View.GONE
     }
     fun initSearchView(textInputSearch : EditText, scope : LifecycleCoroutineScope) {
         textInputSearch.apply {
