@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutRoleBasedChatBottomSheetSelectorBinding
 import live.hms.roomkit.ui.meeting.AllowedToMessageParticipants
@@ -47,7 +48,7 @@ class RoleBasedChatBottomSheet(
 
     private var initialRecipients : List<Group> = emptyList()
     private var allowedParticipants : AllowedToMessageParticipants? = null
-    private val chatRecipientSearchUseCase : ChatRecipientSearchUseCase = ChatRecipientSearchUseCase()
+    private val chatRecipientSearchUseCase : ChatRecipientSearchUseCase = ChatRecipientSearchUseCase(::updateListWithPeers)
     private var binding by viewLifecycle<LayoutRoleBasedChatBottomSheetSelectorBinding>()
     private val groupieAdapter = GroupieAdapter()
 
@@ -95,6 +96,7 @@ class RoleBasedChatBottomSheet(
             dismissAllowingStateLoss()
         }
 
+        chatRecipientSearchUseCase.initSearchView(binding.textInputSearch, lifecycleScope)
         with(binding.optionsGrid) {
             adapter = groupieAdapter
             layoutManager = LinearLayoutManager(context)
@@ -118,23 +120,36 @@ class RoleBasedChatBottomSheet(
         // There's no need for role change to emit the first time this runs.
         meetingViewModel.roleChange.observe(viewLifecycleOwner) {
             // When the role changes, the allowed participants might have changed.
-            updateInitialRecipients()
-            updateListWithPeers()
+            lifecycleScope.launch {
+                updateInitialRecipients()
+                updateListWithPeers()
+            }
         }
         // Update all peers everytime the peers change
         meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
-            updateListWithPeers()
+            lifecycleScope.launch {
+                updateListWithPeers()
+            }
         }
 
     }
 
-    private fun updateListWithPeers() {
-        val peers = getPeerGroup()
-        val list = if(peers == null) {
-            initialRecipients
+    private suspend fun updateListWithPeers() {
+        val list = if(chatRecipientSearchUseCase.isSearching()) {
+            val filteredPeers = chatRecipientSearchUseCase
+                .getFilteredPeers(meetingViewModel.hmsSDK.getRemotePeers())
+            listOf(getUpdatedPeersGroup(
+                filteredPeers, getSelectedRecipient()
+            ))
         } else {
-            initialRecipients.plus(peers)
+            val peers = getPeerGroup()
+            if(peers == null) {
+                initialRecipients
+            } else {
+                initialRecipients.plus(peers)
+            }
         }
+
         groupieAdapter.update(list)
         // Toggle empty view
         binding.emptyView.visibility = if (list.isEmpty())
@@ -147,6 +162,7 @@ class RoleBasedChatBottomSheet(
     private fun updateInitialRecipients() {
         allowedParticipants = meetingViewModel.availableRecipientsForChat()
         initialRecipients = initialAddRecipients(getAllowedParticipants())
+        chatRecipientSearchUseCase.setSearchVisibility(binding.textInputSearch, getAllowedParticipants())
     }
 
     private fun getAllowedParticipants() = allowedParticipants!!
