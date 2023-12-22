@@ -18,7 +18,7 @@
         android:layout_height="24dp"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:background="@drawable/circle_secondary_80"
         android:fontFamily="@font/inter_extrabold"
         android:gravity="center"

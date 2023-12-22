@@ -22,14 +22,6 @@ class LeaderBoardSubGrid(
         viewBinding.subtitle.text = subtitle
         viewBinding.heading.text = title
 
-        viewBinding.rootLayout.background = getShape().apply {
-            setTint(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.surfaceBrighter,
-                    HMSPrebuiltTheme.getDefaults().surface_bright,
-                )
-            )
-        }
 
     }
 

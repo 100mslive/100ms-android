@@ -67,7 +67,7 @@ class LeaderBoardNameSection(
             getShape(position).apply {
                 setTint(
                     getColorOrDefault(
-                        HMSPrebuiltTheme.getColours()?.surfaceBrighter,
+                        HMSPrebuiltTheme.getColours()?.surfaceDefault,
                         HMSPrebuiltTheme.getDefaults().surface_bright,
                     )
                 )

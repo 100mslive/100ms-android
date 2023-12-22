@@ -97,7 +97,8 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
             }
 
-            meetingViewModel.fetchLeaderboard(pollId,
+            meetingViewModel.fetchLeaderboard(
+                pollId,
                 object : HmsTypedActionResultListener<PollLeaderboardResponse> {
                     override fun onSuccess(result: PollLeaderboardResponse) {
                         contextSafe { context, activity ->
@@ -125,30 +126,46 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
     fun loadList(model: PollLeaderboardResponse) {
         leaderBoardListadapter.clear()
 
-        if (model?.summary != null) {
-            leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
-            with(model.summary!!) {
-                if ((totalPeersCount ?: 0) >= (respondedPeersCount
-                        ?: 0) && (totalPeersCount != null || totalPeersCount != 0)
-                ) {
-                    leaderBoardListadapter.add(
-                        LeaderBoardSubGrid(
-                            "VOTED",
-                            "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
-                        )
-                    )
-                }
+        val isAverageTimeEmpty =
+            model.summary?.averageTime == null || model.summary?.averageTime == 0f
+        val isAverageScoreEmpty =
+            model.summary?.averageScore == null || model.summary?.averageScore == 0f
+        val isCorrectAnswerEmpty =
+            model.summary?.respondedCorrectlyPeersCount == null || model.summary?.respondedCorrectlyPeersCount == 0
+        val isTotalPeerCountEmpty =
+            model.summary?.totalPeersCount == null || model.summary?.totalPeersCount == 0
 
+
+        if (isAverageScoreEmpty.not() || isAverageTimeEmpty.not() || isCorrectAnswerEmpty.not() || isTotalPeerCountEmpty.not()) {
+            leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
+        }
+
+        if (model.summary != null) with(model.summary!!) {
+            if (isTotalPeerCountEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "CORRECT ANSWERS", "${respondedCorrectlyPeersCount}"
+                        "VOTED",
+                        "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
                     )
                 )
+            }
+
+            if (isCorrectAnswerEmpty.not()) {
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "CORRECT ANSWERS", "$respondedCorrectlyPeersCount"
+                    )
+                )
+            }
+            if (isAverageTimeEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
                         "AVG. TIME TAKEN", averageTime.toString()
                     )
                 )
+            }
+
+            if (isAverageScoreEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
                         "AVG. SCORE", averageScore.toString()
@@ -156,7 +173,6 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 )
             }
         }
-
 
 
         if (model.entries.isNullOrEmpty().not()) {

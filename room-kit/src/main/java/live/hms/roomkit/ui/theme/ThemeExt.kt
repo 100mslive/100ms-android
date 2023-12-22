@@ -2237,12 +2237,12 @@ fun LayoutQuizLeaderboardBinding.applyTheme() {
 
     root.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getColours()?.surfaceDim,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
     pollsLive.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onprimary_high_emp
     ))
     pollsLive.setBackgroundColor(getColorOrDefault(
@@ -2287,7 +2287,7 @@ fun LayoutHeaderBinding.applyTheme() {
 
     root.setBackgroundColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDefault,
+            HMSPrebuiltTheme.getColours()?.surfaceDim,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -2314,6 +2314,16 @@ fun ItemGridSubTextBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+
+    rootLayout.background = getShape().apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                HMSPrebuiltTheme.getDefaults().surface_bright,
+            )
+        )
+    }
+
 
 }
 
