@@ -1,12 +1,15 @@
 package live.hms.roomkit.ui.meeting.chat.rbac
 
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 
 class RecipientItem(private val recipient: Recipient,
                     private val currentSelectedRecipient: Recipient?,

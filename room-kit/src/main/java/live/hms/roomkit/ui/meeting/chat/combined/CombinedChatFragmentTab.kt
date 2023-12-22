@@ -91,7 +91,8 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
             binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled,
             meetingViewModel::availableRecipientsForChat,
-            chatViewModel::currentlySelectedRbacRecipient
+            chatViewModel::currentlySelectedRbacRecipient,
+            chatViewModel.currentlySelectedRecipientRbac
         )
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
@@ -99,6 +100,9 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
         meetingViewModel.pinnedMessages.observe(viewLifecycleOwner) { pinnedMessages ->
             pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
                 binding.pinnedMessagesDisplay)
+        }
+        meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
+            chatViewModel.updatePeerLeave(it)
         }
 
     }

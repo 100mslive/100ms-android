@@ -30,6 +30,7 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.init.HMSRoomLayout
+import live.hms.video.sdk.models.HMSPeer
 
 /**
  * The chip that lets you select who to chat with opens this.
@@ -44,6 +45,8 @@ class RoleBasedChatBottomSheet(
     private val recipientSelected: (Recipient) -> Unit
 ) : BottomSheetDialogFragment() {
 
+    private var initialRecipients : List<Group> = emptyList()
+    private var allowedParticipants : AllowedToMessageParticipants? = null
     private val chatRecipientSearchUseCase : ChatRecipientSearchUseCase = ChatRecipientSearchUseCase()
     private var binding by viewLifecycle<LayoutRoleBasedChatBottomSheetSelectorBinding>()
     private val groupieAdapter = GroupieAdapter()
@@ -106,24 +109,64 @@ class RoleBasedChatBottomSheet(
             )
         }
 
+
         // This would break many things if it were called when no participants were available.
         // crash early to point it out.
-        val allowedParticipants = meetingViewModel.availableRecipientsForChat()!!
-        val initialRecipients = initialAddRecipients(allowedParticipants)
+        updateInitialRecipients()
         groupieAdapter.update(initialRecipients)
-        if (allowedParticipants.peers) {
-            // Update all peers everytime the peers change
-            meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
-                groupieAdapter.update(
-                    initialRecipients.plus(
-                        getUpdatedPeersGroup(
-                            meetingViewModel.hmsSDK, getSelectedRecipient()
-                        )
-                    )
+
+        // There's no need for role change to emit the first time this runs.
+        meetingViewModel.roleChange.observe(viewLifecycleOwner) {
+            // When the role changes, the allowed participants might have changed.
+            updateInitialRecipients()
+            updateListWithPeers()
+        }
+        // Update all peers everytime the peers change
+        meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
+            updateListWithPeers()
+        }
+
+    }
+
+    private fun updateListWithPeers() {
+        val peers = getPeerGroup()
+        val list = if(peers == null) {
+            initialRecipients
+        } else {
+            initialRecipients.plus(peers)
+        }
+        groupieAdapter.update(list)
+        // Toggle empty view
+        binding.emptyView.visibility = if (list.isEmpty())
+            View.VISIBLE
+        else
+            View.GONE
+
+    }
+
+    private fun updateInitialRecipients() {
+        allowedParticipants = meetingViewModel.availableRecipientsForChat()
+        initialRecipients = initialAddRecipients(getAllowedParticipants())
+    }
+
+    private fun getAllowedParticipants() = allowedParticipants!!
+    private fun getInitialRecipients() = initialRecipients
+
+    private fun getPeerGroup(): ExpandableGroup? {
+        return if (getAllowedParticipants().peers) {
+            val peers = meetingViewModel.hmsSDK.getRemotePeers()
+            // Remove the "participants" option if there are no others.
+            if (peers.isEmpty())
+                null
+            else
+                getUpdatedPeersGroup(
+                    peers, getSelectedRecipient()
                 )
-            }
+        } else {
+            null
         }
     }
+
 
     private fun onRecipientSelected(recipient: Recipient) {
         recipientSelected(recipient)
@@ -159,7 +202,7 @@ class RoleBasedChatBottomSheet(
                 )
             }
             // Separate headers and roles
-            val rolesGroup = ExpandableGroup(RecipientHeader("ROLES"), true).apply {
+            val rolesGroup = ExpandableGroup(RecipientHeader(RECIPIENT_ROLES), true).apply {
                     addAll(rolesToAdd)
                 }
             recipients.add(rolesGroup)
@@ -169,12 +212,12 @@ class RoleBasedChatBottomSheet(
     }
 
     private fun getUpdatedPeersGroup(
-        hmsSDK: HMSSDK,
+        peers : List<HMSPeer>,
         currentSelectedRecipient: Recipient?
     ): ExpandableGroup {
-        return ExpandableGroup(RecipientHeader("PARTICIPANTS"), true).apply {
+        return ExpandableGroup(RecipientHeader(RECIPIENT_PEERS), true).apply {
                 addAll(
-                    hmsSDK.getRemotePeers().map {
+                    peers.map {
                         RecipientItem(
                             Recipient.Peer(it),
                             currentSelectedRecipient,

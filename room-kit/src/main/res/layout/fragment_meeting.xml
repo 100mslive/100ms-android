@@ -356,7 +356,7 @@
                 android:drawableEnd="@drawable/tiny_down_chevron"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="To Group"
+                android:text="@string/chat_rbac_picker_send_to"
                 android:textSize="12sp"
                 app:fontFamily="@font/inter_regular"
                 tools:layout_editor_absoluteY="2dp" />
@@ -369,6 +369,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/chatOptionsCard"
             android:visibility="gone"
+            tools:visibility="visible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             >
