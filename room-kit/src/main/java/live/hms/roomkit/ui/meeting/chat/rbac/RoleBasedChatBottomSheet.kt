@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -21,6 +22,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.Recipient
+import live.hms.roomkit.ui.meeting.participants.ChatRecipientSearchUseCase
 import live.hms.roomkit.ui.meeting.participants.MessageHeaderItemDecoration
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
@@ -42,6 +44,7 @@ class RoleBasedChatBottomSheet(
     private val recipientSelected: (Recipient) -> Unit
 ) : BottomSheetDialogFragment() {
 
+    private val chatRecipientSearchUseCase : ChatRecipientSearchUseCase = ChatRecipientSearchUseCase()
     private var binding by viewLifecycle<LayoutRoleBasedChatBottomSheetSelectorBinding>()
     private val groupieAdapter = GroupieAdapter()
 
