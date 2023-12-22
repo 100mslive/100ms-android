@@ -52,8 +52,24 @@
             android:id="@+id/border5"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="@dimen/spacing_d2"
+            android:layout_marginVertical="@dimen/twelve_dp"
             android:background="@drawable/gray_line_vertical_divider" />
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/container_search"
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/spacing_d2"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="1dp"
+            android:layout_height="wrap_content"
+            app:startIconDrawable="@drawable/ic_search_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/text_input_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/search_participants"
+                android:inputType="textNoSuggestions" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_marginVertical="@dimen/sizeteen_dp"

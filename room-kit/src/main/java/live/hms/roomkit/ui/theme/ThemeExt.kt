@@ -2666,6 +2666,18 @@ fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
         )
     )
 
+    textInputSearch.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    containerSearch.startIconDrawable?.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    containerSearch.boxStrokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
 }
 fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
     name.setTextColor(
