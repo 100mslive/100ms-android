@@ -9,6 +9,7 @@ import android.graphics.drawable.shapes.RoundRectShape
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
@@ -1837,8 +1838,7 @@ internal fun FragmentParticipantsBinding.applyTheme() {
 }
 
 internal fun LayoutParticipantsMergeBinding.applyTheme() {
-    containerSearch.applyTheme()
-    textInputSearch.applyTheme()
+    searchViewTheme(containerSearch, textInputSearch)
 }
 private fun backgroundShape(inset: Boolean = false, innerRadii : Float = 8.dp().toFloat()): ShapeDrawable {
     val lines = floatArrayOf(
@@ -2793,21 +2793,7 @@ fun BottomSheetMessageOptionsBinding.applyTheme() {
     )
 
 }
-
-fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
-    root.background = dialogBackground(this.root.resources)
-    border5.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.borderBright,
-            HMSPrebuiltTheme.getDefaults().border_bright
-        )
-    )
-    emptyView.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
-        )
-    )
+private fun searchViewTheme(containerSearch : MaterialCardView, textInputSearch : EditText) {
 
     textInputSearch.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
@@ -2833,6 +2819,22 @@ fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.borderBright,
         HMSPrebuiltTheme.getDefaults().border_bright
     )
+}
+fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
+    root.background = dialogBackground(this.root.resources)
+    border5.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+    emptyView.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+    searchViewTheme(containerSearch, textInputSearch)
 }
 fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
     name.setTextColor(
