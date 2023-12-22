@@ -45,6 +45,7 @@ import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.PollAnswerResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
+import live.hms.video.polls.network.PollLeaderboardResponse
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.*
@@ -2024,6 +2025,10 @@ class MeetingViewModel(
         }
 
     })
+
+    fun fetchLeaderboard(pollId: String, completion: HmsTypedActionResultListener<PollLeaderboardResponse>) {
+        localHmsInteractivityCenter.fetchLeaderboard(pollId, completion = completion)
+    }
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll
 

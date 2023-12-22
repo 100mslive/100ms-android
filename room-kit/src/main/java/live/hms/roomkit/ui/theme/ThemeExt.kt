@@ -37,6 +37,7 @@ import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
+import live.hms.roomkit.ui.polls.leaderboard.item.ApplyRadiusatVertex
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.EmailUtils.addAlpha
 import live.hms.roomkit.util.dp
@@ -1589,9 +1590,20 @@ internal fun LayoutChatParticipantCombinedBinding.applyTheme(hideParticipantTab 
 
 }
 
-fun getShape(): ShapeDrawable {
+fun getShape(radiusAt : ApplyRadiusatVertex = ApplyRadiusatVertex.ALL_CORNERS): ShapeDrawable {
     val eightDp = 8.dp().toFloat()
-    val lines = floatArrayOf(eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp,eightDp)
+
+    val lines = floatArrayOf(
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.TOP || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f,
+        if(radiusAt == ApplyRadiusatVertex.BOTTOM || radiusAt == ApplyRadiusatVertex.ALL_CORNERS) eightDp else 0f
+    )
+
     return ShapeDrawable(
         RoundRectShape(
             lines, null,
@@ -2212,6 +2224,32 @@ fun MaterialCardView.isSelectedStroke(isSelected : Boolean) {
 
 }
 
+fun LayoutQuizLeaderboardBinding.applyTheme() {
+    backButton.backgroundTintList =
+        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDim,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    pollsLive.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+    ))
+    pollsLive.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
+        HMSPrebuiltTheme.getDefaults().error_default
+    ))
+}
+
 
 fun LayoutPollsDisplayBinding.applyTheme() {
     backButton.backgroundTintList =
@@ -2236,6 +2274,106 @@ fun LayoutPollsDisplayBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
         HMSPrebuiltTheme.getDefaults().error_default
     ))
+}
+
+fun LayoutHeaderBinding.applyTheme() {
+    subheading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    root.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDim,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+    title.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+}
+
+fun ItemGridSubTextBinding.applyTheme() {
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    rootLayout.background = getShape().apply {
+        setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.surfaceDefault,
+                HMSPrebuiltTheme.getDefaults().surface_bright,
+            )
+        )
+    }
+
+
+}
+
+fun ItemNameSectionBinding.applyTheme() {
+
+    subtitle.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    correctAnswer.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    correctAnswer.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    timeTaken.drawableStart?.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    timeTaken.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+
+    heading.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+
+
+
 }
 
 fun LayoutPollsDisplayChoicesQuesionBinding.applyTheme() {
