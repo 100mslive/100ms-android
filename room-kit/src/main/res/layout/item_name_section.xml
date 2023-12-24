@@ -32,7 +32,9 @@
 
     <TextView
         android:id="@+id/heading"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:singleLine="true"
+        android:ellipsize="end"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginStart="12dp"
@@ -45,7 +47,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/rank"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Dummy text" />
+        tools:text="Dummy textDummy textDummy textDummy text" />
 
     <TextView
         android:id="@+id/subtitle"
@@ -81,6 +83,7 @@
         android:id="@+id/correct_answer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        tools:visibility="gone"
         android:layout_gravity="center"
         android:layout_marginEnd="4dp"
         android:drawableStart="@drawable/tick_check_in_circle"

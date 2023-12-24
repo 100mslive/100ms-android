@@ -1,5 +1,7 @@
 package live.hms.roomkit.ui.polls.leaderboard
 
+import android.app.Dialog
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.databinding.LayoutQuizLeaderboardBinding
 import live.hms.roomkit.ui.meeting.InsetItemDecoration
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -57,21 +60,28 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        binding = LayoutQuizLeaderboardBinding.inflate(inflater, container, false)
-            .also { it.applyTheme() }
-        return binding.root
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val bottomSheet = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        val view = View.inflate(context, R.layout.layout_quiz_leaderboard, null)
+
+        binding = LayoutQuizLeaderboardBinding.bind(view)
+        binding.applyTheme()
+        bottomSheet.setContentView(view)
+
+        return bottomSheet
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         dialog?.let {
             val sheet = it as BottomSheetDialog
+            sheet.behavior.skipCollapsed = true
+            sheet.behavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
             sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+
 
         lifecycleScope.launch {
             val pollId: String =
