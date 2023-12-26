@@ -133,18 +133,19 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             model.summary?.respondedCorrectlyPeersCount == null || model.summary?.respondedCorrectlyPeersCount == 0
         val isTotalPeerCountEmpty =
             model.summary?.totalPeersCount == null || model.summary?.totalPeersCount == 0
-
+        val isVotedPeerCountEmpty =
+            model.summary?.respondedPeersCount == null || model.summary?.respondedPeersCount == 0
 
         if (isAverageScoreEmpty.not() || isAverageTimeEmpty.not() || isCorrectAnswerEmpty.not() || isTotalPeerCountEmpty.not()) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
         }
 
         if (model.summary != null) with(model.summary!!) {
-            if (isTotalPeerCountEmpty.not()) {
+            if (isVotedPeerCountEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
                         "VOTED",
-                        "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
+                        "${model.summary?.respondedPeersCount}"
                     )
                 )
             }
@@ -159,7 +160,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             if (isAverageTimeEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", averageTime.toString()
+                        "AVG. TIME TAKEN", "${averageTime?.toInt().toString()} sec"
                     )
                 )
             }
