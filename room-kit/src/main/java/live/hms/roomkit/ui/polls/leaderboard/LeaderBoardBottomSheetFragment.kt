@@ -158,7 +158,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             if (isCorrectAnswerEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "CORRECT ANSWERS", "$respondedCorrectlyPeersCount"
+                        "CORRECT ANSWERS", "${(((respondedCorrectlyPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedCorrectlyPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
                     )
                 )
             }
