@@ -45,7 +45,7 @@ class LeaderBoardNameSection(
 
             if (timetakenStr.isNullOrEmpty().not()) {
                 timeTaken.visibility = View.VISIBLE
-                timeTaken.text = timetakenStr.toString()
+                timeTaken.text = "${timetakenStr.toString()}s"
             } else {
                 timeTaken.visibility = View.GONE
             }
