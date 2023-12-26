@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.polls
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
@@ -123,11 +124,19 @@ class PollQuestionViewHolder<T : ViewBinding>(
                 it.onOptionTextChanged = { optionIndex, changedText ->
                     val question =
                         getItem(bindingAdapterPosition).currentQuestion as QuestionUi.ChoiceQuestions
-                    val changedList: List<String> = question.options.toMutableList().apply {
-                        this[optionIndex] = changedText
+                    val options = question.options
+                    if(optionIndex >= options.size)
+                        Log.e(TAG,"Skip invalid index change")
+                    else {
+                        val changedList: List<String> = options.toMutableList().apply {
+                            this[optionIndex] = changedText
+                        }
+                        question.options = changedList
+                        validateSaveButtonEnabledState(
+                            getItem(bindingAdapterPosition),
+                            binding.saveButton
+                        )
                     }
-                    question.options = changedList
-                    validateSaveButtonEnabledState(getItem(bindingAdapterPosition), binding.saveButton)
                 }
                 it.onSingleOptionSelected = { position ->
                     updateSelection(bindingAdapterPosition, listOf(position), null)
