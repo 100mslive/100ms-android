@@ -132,9 +132,9 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         leaderBoardListadapter.clear()
 
         val isAverageTimeEmpty =
-            model.summary?.averageTime == null || model.summary?.averageTime == 0f
+            model.summary?.averageTime == null
         val isAverageScoreEmpty =
-            model.summary?.averageScore == null || model.summary?.averageScore == 0f
+            model.summary?.averageScore == null
         val isCorrectAnswerEmpty =
             model.summary?.respondedCorrectlyPeersCount == null
         val isTotalPeerCountEmpty =
@@ -150,7 +150,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
                         "VOTED",
-                        "${((respondedPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
+                        "${(((respondedPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
                     )
                 )
             }
