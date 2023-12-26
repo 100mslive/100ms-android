@@ -60,17 +60,13 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val bottomSheet = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
-        val view = View.inflate(context, R.layout.layout_quiz_leaderboard, null)
-
-        binding = LayoutQuizLeaderboardBinding.bind(view)
-        binding.applyTheme()
-        bottomSheet.setContentView(view)
-
-        return bottomSheet
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        binding = LayoutQuizLeaderboardBinding.inflate(inflater, container, false)
+            .also { it.applyTheme() }
+        return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
