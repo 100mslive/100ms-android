@@ -79,6 +79,8 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             poll = meetingViewModel.getPollForPollId(pollId)
             leaderBoardListadapter.spanCount = 12
 
+            binding.backButton.setOnClickListener { dismissAllowingStateLoss() }
+            binding.closeBtn.setOnClickListener { dismissAllowingStateLoss() }
             binding.leaderboardRecyclerView.apply {
                 adapter = leaderBoardListadapter
                 layoutManager = GridLayoutManager(context, leaderBoardListadapter.spanCount).apply {
