@@ -19,6 +19,8 @@
             android:src="@drawable/left_arrow" />
 
         <TextView
+            android:maxLength="18"
+            android:ellipsize="start"
             android:id="@+id/heading"
             style="@style/HmsHeadings"
             android:lineHeight="24px"
