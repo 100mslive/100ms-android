@@ -108,6 +108,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                     override fun onSuccess(result: PollLeaderboardResponse) {
                         contextSafe { context, activity ->
                             activity.runOnUiThread {
+                                binding.heading.text = poll?.title
                                 loadList(result)
                             }
                         }
