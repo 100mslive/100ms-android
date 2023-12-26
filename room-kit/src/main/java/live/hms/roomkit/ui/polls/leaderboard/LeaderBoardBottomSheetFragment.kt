@@ -133,19 +133,18 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             model.summary?.respondedCorrectlyPeersCount == null || model.summary?.respondedCorrectlyPeersCount == 0
         val isTotalPeerCountEmpty =
             model.summary?.totalPeersCount == null || model.summary?.totalPeersCount == 0
-        val isVotedPeerCountEmpty =
-            model.summary?.respondedPeersCount == null || model.summary?.respondedPeersCount == 0
+
 
         if (isAverageScoreEmpty.not() || isAverageTimeEmpty.not() || isCorrectAnswerEmpty.not() || isTotalPeerCountEmpty.not()) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
         }
 
         if (model.summary != null) with(model.summary!!) {
-            if (isVotedPeerCountEmpty.not()) {
+            if (isTotalPeerCountEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
                         "VOTED",
-                        "${model.summary?.respondedPeersCount}"
+                        "${(respondedPeersCount ?: 0) / (totalPeersCount ?: 1) * 100}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
                     )
                 )
             }
