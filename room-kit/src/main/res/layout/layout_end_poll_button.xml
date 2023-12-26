@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginBottom="@dimen/spacing_d3"
         android:paddingHorizontal="@dimen/spacing_d2"
         android:paddingVertical="@dimen/spacing_d1"
         tools:text="Launch Poll"

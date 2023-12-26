@@ -2233,6 +2233,8 @@ fun LayoutQuizLeaderboardBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+    closeBtn.backgroundTintList =
+        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 
     root.setBackgroundColor(
         getColorOrDefault(

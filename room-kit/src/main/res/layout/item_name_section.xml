@@ -32,7 +32,7 @@
 
     <TextView
         android:id="@+id/heading"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginStart="12dp"
@@ -40,16 +40,18 @@
         android:lineHeight="16sp"
         android:textAllCaps="true"
         android:textSize="14sp"
+        android:singleLine="true"
+        android:ellipsize="end"
         app:layout_constraintBottom_toTopOf="@id/subtitle"
-        app:layout_constraintEnd_toStartOf="@+id/correct_answer"
+        app:layout_constraintEnd_toStartOf="@+id/trophyicon"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/rank"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Dummy text" />
+        tools:text="Dummy textDummy textDummy textDummy text Dummy textDummy textDummy text" />
 
     <TextView
         android:id="@+id/subtitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="4dp"
@@ -58,9 +60,11 @@
         android:lineHeight="16sp"
         android:textSize="13sp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/heading"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/heading"
         app:layout_constraintTop_toBottomOf="@+id/heading"
-        tools:text="Dummy text" />
+        tools:text="Dummy text Dummy textDummy textDummy text" />
 
     <TextView
         android:id="@+id/time_taken"
@@ -78,9 +82,22 @@
         tools:text="Dummy text" />
 
     <TextView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:text="🏆"
+        android:gravity="center"
+        tools:visibility="visible"
+        android:visibility="gone"
+        android:id="@+id/trophyicon"
+        app:layout_constraintBottom_toBottomOf="@+id/correct_answer"
+        app:layout_constraintEnd_toStartOf="@+id/correct_answer"
+        app:layout_constraintTop_toTopOf="@+id/correct_answer" />
+
+    <TextView
         android:id="@+id/correct_answer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        tools:visibility="gone"
         android:layout_gravity="center"
         android:layout_marginEnd="4dp"
         android:drawableStart="@drawable/tick_check_in_circle"

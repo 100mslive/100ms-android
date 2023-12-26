@@ -1,5 +1,7 @@
 package live.hms.roomkit.ui.polls.leaderboard
 
+import android.app.Dialog
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.databinding.LayoutQuizLeaderboardBinding
 import live.hms.roomkit.ui.meeting.InsetItemDecoration
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -70,8 +73,11 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
         dialog?.let {
             val sheet = it as BottomSheetDialog
+            sheet.behavior.skipCollapsed = true
+            sheet.behavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
             sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+
 
         lifecycleScope.launch {
             val pollId: String =
@@ -79,6 +85,8 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             poll = meetingViewModel.getPollForPollId(pollId)
             leaderBoardListadapter.spanCount = 12
 
+            binding.backButton.setOnClickListener { dismissAllowingStateLoss() }
+            binding.closeBtn.setOnClickListener { dismissAllowingStateLoss() }
             binding.leaderboardRecyclerView.apply {
                 adapter = leaderBoardListadapter
                 layoutManager = GridLayoutManager(context, leaderBoardListadapter.spanCount).apply {
@@ -157,7 +165,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             if (isAverageTimeEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", averageTime.toString()
+                        "AVG. TIME TAKEN", "${averageTime?.toInt().toString()} sec"
                     )
                 )
             }
