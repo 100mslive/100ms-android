@@ -2027,7 +2027,7 @@ class MeetingViewModel(
     })
 
     fun fetchLeaderboard(pollId: String, completion: HmsTypedActionResultListener<PollLeaderboardResponse>) {
-        localHmsInteractivityCenter.fetchLeaderboard(pollId, completion = completion)
+        localHmsInteractivityCenter.fetchLeaderboard(pollId, count = 200, completion = completion)
     }
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll
