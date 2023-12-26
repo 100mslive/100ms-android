@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="64dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatImageButton
@@ -14,34 +17,57 @@
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/spacing_d3"
             android:layout_gravity="center_vertical"
+            android:layout_marginStart="24dp"
             android:background="@null"
-            android:src="@drawable/left_arrow" />
+            android:src="@drawable/left_arrow"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/heading"
             style="@style/HmsHeadings"
-            android:lineHeight="24px"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/twelve_dp"
             android:layout_gravity="center_vertical"
-            android:text="Leaderboard" />
+            android:layout_marginHorizontal="@dimen/twelve_dp"
+            android:layout_marginStart="24dp"
+            android:lineHeight="24px"
+            android:text="Leaderboard"
+            app:layout_constraintBottom_toBottomOf="@+id/backButton"
+            app:layout_constraintStart_toEndOf="@+id/backButton"
+            app:layout_constraintTop_toTopOf="@+id/backButton" />
 
         <TextView
             android:id="@+id/pollsLive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="12dp"
             android:fontFamily="@font/inter_regular"
             android:lineHeight="16px"
             android:paddingHorizontal="@dimen/spacing_d1"
             android:paddingVertical="4dp"
-            android:layout_gravity="center_vertical"
             android:text="Ended"
-            android:textSize="10sp" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/heading"
+            app:layout_constraintStart_toEndOf="@+id/heading"
+            app:layout_constraintTop_toTopOf="@+id/heading" />
+
+        <ImageView
+            android:id="@+id/close_btn"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="right"
+            android:layout_marginEnd="24dp"
+            android:elevation="3dp"
+            android:src="@drawable/ic_close_16"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 

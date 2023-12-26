@@ -53,6 +53,11 @@ class LeaderBoardNameSection(
                 correctAnswer.visibility = View.GONE
             }
 
+            if (rankStr == "1")
+                trophyicon.visibility = View.VISIBLE
+            else
+                trophyicon.visibility = View.GONE
+
             rank.setBackgroundAndColor(
                 rankBackGroundColor,
                 HMSPrebuiltTheme.getDefaults().secondary_default,
