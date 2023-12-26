@@ -9,7 +9,6 @@ import android.widget.AutoCompleteTextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -70,7 +69,6 @@ class SettingsFragment : Fragment() {
   }
 
   private var binding by viewLifecycle<FragmentSettingsBinding>()
-  private val args: SettingsFragmentArgs by navArgs()
 
   private lateinit var settings: SettingsStore
   private lateinit var commitHelper: SettingsStore.MultiCommitHelper
@@ -84,7 +82,7 @@ class SettingsFragment : Fragment() {
     binding = FragmentSettingsBinding.inflate(inflater, container, false)
     settings = SettingsStore(requireContext())
     commitHelper = settings.MultiCommitHelper()
-    mode = args.mode
+    mode = SettingsMode.HOME // Do not open this in meetings.
 
     initEditTexts()
     initAutoCompleteViews()

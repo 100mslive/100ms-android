@@ -37,7 +37,11 @@ class LeaderBoardNameSection(
             applyTheme()
             heading.text = titleStr
             subtitle.text = subtitleStr
-            rank.text = rankStr.toString()
+
+            if (rankStr.isNullOrEmpty().not())
+            rank.text = rankStr
+            else
+            rank.text = "-"
 
             if (timetakenStr.isNullOrEmpty().not()) {
                 timeTaken.visibility = View.VISIBLE
@@ -52,6 +56,11 @@ class LeaderBoardNameSection(
             } else {
                 correctAnswer.visibility = View.GONE
             }
+
+            if (rankStr == "1")
+                trophyicon.visibility = View.VISIBLE
+            else
+                trophyicon.visibility = View.GONE
 
             rank.setBackgroundAndColor(
                 rankBackGroundColor,

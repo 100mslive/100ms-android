@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting.participants
 
+import android.widget.EditText
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -108,7 +109,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
             }
     }
 
-    fun initSearchView(textInputSearch : TextInputEditText, scope : LifecycleCoroutineScope) {
+    fun initSearchView(textInputSearch : EditText, scope : LifecycleCoroutineScope) {
         textInputSearch.apply {
             addTextChangedListener { text ->
                 scope.launch {

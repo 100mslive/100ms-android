@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -82,10 +83,7 @@ class HomeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_settings -> {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeFragmentToSettingsFragment(SettingsMode.HOME)
-                )
-
+                findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSettingsFragment())
             }
             R.id.action_email_logs -> {
                 requireContext().startActivity(
@@ -263,13 +261,13 @@ class HomeFragment : Fragment() {
     private fun enableButton() {
         binding.btnJoinNow.isEnabled = true
         binding.btnJoinNow.background =
-            ContextCompat.getDrawable(requireContext(), R.drawable.primary_blue_round_drawable)
+            ContextCompat.getDrawable(requireContext(), live.hms.roomkit.R.drawable.primary_blue_round_drawable)
     }
 
     private fun disableButton() {
         binding.btnJoinNow.isEnabled = false
         binding.btnJoinNow.background =
-            ContextCompat.getDrawable(requireContext(), R.drawable.primary_disabled_round_drawable)
+            ContextCompat.getDrawable(requireContext(), live.hms.roomkit.R.drawable.primary_disabled_round_drawable)
 
     }
 

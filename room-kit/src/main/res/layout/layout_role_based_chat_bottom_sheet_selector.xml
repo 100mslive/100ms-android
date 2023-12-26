@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     app:cardCornerRadius="@dimen/sizeteen_dp"
     android:paddingBottom="16dp"
     android:id="@id/rootLayout"
@@ -47,22 +48,65 @@
 
         </FrameLayout>
 
-
         <View
             android:id="@+id/border5"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="@dimen/spacing_d2"
+            android:layout_marginVertical="@dimen/twelve_dp"
             android:background="@drawable/gray_line_vertical_divider" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginVertical="@dimen/sizeteen_dp"
-            android:id="@+id/options_grid"
-            android:nestedScrollingEnabled="false"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/container_search"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_d3"
+            android:layout_marginTop="@dimen/spacing_d2">
 
+            <EditText
+                android:id="@+id/text_input_search"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_search_24"
+                android:drawablePadding="@dimen/spacing_d1"
+                android:hint="@string/search_participants"
+                android:inputType="textNoSuggestions"
+                android:padding="@dimen/spacing_d2" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/spacing_d2"/>
+
+        <FrameLayout
+            android:layout_gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/options_grid"
+                android:nestedScrollingEnabled="false"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <TextView
+                android:id="@+id/emptyView"
+                android:visibility="gone"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:letterSpacing="0.01"
+                android:lineHeight="20sp"
+                android:lineSpacingExtra="3sp"
+                android:fontFamily="@font/inter_regular"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/no_recipients_yet_message_options_recyclerview"
+                />
+        </FrameLayout>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_marginBottom="@dimen/sizeteen_dp"/>
     </LinearLayout>
 
 </FrameLayout>

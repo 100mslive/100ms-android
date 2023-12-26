@@ -20,7 +20,7 @@
             android:lineHeight="16px"
             android:maxLines="1"
             android:singleLine="true"
-            android:text="To Group"
+            android:text="@string/chat_rbac_picker_send_to"
             android:textSize="12sp"
             app:fontFamily="@font/inter_regular"
             tools:layout_editor_absoluteY="2dp" />

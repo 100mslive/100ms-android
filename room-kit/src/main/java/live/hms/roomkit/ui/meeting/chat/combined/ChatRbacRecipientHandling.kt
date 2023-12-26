@@ -9,28 +9,34 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 
 class ChatRbacRecipientHandling {
-    fun updateChipRecipientUI(sendToChipText : MaterialTextView,
-                              recipient: Recipient?) {
-      //TODO might be able to change the UI to handle send to no one here.
-        if(recipient == null)
-            return
-        sendToChipText.text = recipient.toString()
+    fun updateChipRecipientUI(
+        sendToChipText: MaterialTextView,
+        recipient: Recipient?
+    ) {
+
+        sendToChipText.text = recipient?.toString()
+            ?: sendToChipText.resources.getString(R.string.chat_rbac_picker_send_to)
         // Set the drawable next to it
-        val chevron = when(recipient) {
+        val chevron = when (recipient) {
             Recipient.Everyone -> R.drawable.tiny_chip_everyone
-            is Recipient.Peer,
-            is Recipient.Role -> R.drawable.tiny_chip_dm
+            is Recipient.Role -> R.drawable.tiny_chip_roles
+            is Recipient.Peer -> R.drawable.tiny_chip_dm
+            null -> null
         }
 
-        sendToChipText.drawableStart = AppCompatResources.getDrawable(
-            sendToChipText.context, chevron
-        )?.apply {
-            setTint(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-                    HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        sendToChipText.drawableStart = if (chevron == null) {
+            null
+        } else {
+            AppCompatResources.getDrawable(
+                sendToChipText.context, chevron
+            )?.apply {
+                setTint(
+                    getColorOrDefault(
+                        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+                    )
                 )
-            )
+            }
         }
     }
 }

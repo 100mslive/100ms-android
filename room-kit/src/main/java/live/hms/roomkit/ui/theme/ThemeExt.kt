@@ -9,6 +9,7 @@ import android.graphics.drawable.shapes.RoundRectShape
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.ColorInt
@@ -1677,27 +1678,30 @@ private fun configureChatControlsTheme(
         )
     )
 
-    sendToBackground.strokeColor = getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.borderBright,
-        HMSPrebuiltTheme.getDefaults().border_bright
-    )
-    sendToBackground.setBackgroundColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.surfaceDefault,
-            HMSPrebuiltTheme.getDefaults().surface_default
-        )
-    )
+    sendToBackground.background = getShape().apply {
+        val color = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().primary_default)
+        colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+    }
 
     sendToChipText.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
+    sendToBackground.strokeWidth = 0
+//    sendToBackground.strokeColor = getColorOrDefault(
+//        HMSPrebuiltTheme.getColours()?.borderBright,
+//        HMSPrebuiltTheme.getDefaults().border_bright
+//    )
+
     sendToChipText.drawableEnd?.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
         )
     )
 }
@@ -1754,16 +1758,12 @@ internal fun ListItemChatBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
     time.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
-
-    toGroup.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+        HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+        HMSPrebuiltTheme.getDefaults().onsurface_low_emp))
 
     sentTo.setTextColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 }
 
 internal fun HlsFragmentLayoutBinding.applyTheme() {
@@ -1838,8 +1838,7 @@ internal fun FragmentParticipantsBinding.applyTheme() {
 }
 
 internal fun LayoutParticipantsMergeBinding.applyTheme() {
-    containerSearch.applyTheme()
-    textInputSearch.applyTheme()
+    searchViewTheme(containerSearch, textInputSearch)
 }
 private fun backgroundShape(inset: Boolean = false, innerRadii : Float = 8.dp().toFloat()): ShapeDrawable {
     val lines = floatArrayOf(
@@ -2234,6 +2233,8 @@ fun LayoutQuizLeaderboardBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
+    closeBtn.backgroundTintList =
+        ColorStateList.valueOf(getColorOrDefault(HMSPrebuiltTheme.getColours()?.onSurfaceMedium, HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 
     root.setBackgroundColor(
         getColorOrDefault(
@@ -2794,7 +2795,33 @@ fun BottomSheetMessageOptionsBinding.applyTheme() {
     )
 
 }
+private fun searchViewTheme(containerSearch : MaterialCardView, textInputSearch : EditText) {
 
+    textInputSearch.setTextColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+        HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+    ))
+
+    textInputSearch.setHintTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        )
+    )
+    textInputSearch.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.surfaceDim,
+        HMSPrebuiltTheme.getDefaults().surface_dim
+    ))
+    textInputSearch.drawableStart?.setTint(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+    ))
+    containerSearch.strokeWidth = 1.dp()
+    containerSearch.strokeColor = getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+}
 fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
     root.background = dialogBackground(this.root.resources)
     border5.setBackgroundColor(
@@ -2803,7 +2830,13 @@ fun LayoutRoleBasedChatBottomSheetSelectorBinding.applyTheme() {
             HMSPrebuiltTheme.getDefaults().border_bright
         )
     )
-
+    emptyView.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+        )
+    )
+    searchViewTheme(containerSearch, textInputSearch)
 }
 fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
     name.setTextColor(
@@ -2816,8 +2849,8 @@ fun LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding.applyTheme() {
 fun LayoutRoleBasedChatMessageBottomSheetItemRecipientBinding.applyTheme() {
     image.drawable.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            HMSPrebuiltTheme.getColours()?.onPrimaryMedium,
+            HMSPrebuiltTheme.getDefaults().onprimary_med_emp
         )
     )
     tick.drawable.setTint(

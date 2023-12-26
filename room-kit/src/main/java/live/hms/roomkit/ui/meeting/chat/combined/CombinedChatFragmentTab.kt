@@ -53,17 +53,10 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
     }
 
 
-    var roleChangeSingleShot = -1
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        roleChangeSingleShot = meetingViewModel.roleChangeSingleShot.value ?:0
+
         binding.sendToBackground.setOnSingleClickListener {
             RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
-        }
-        meetingViewModel.roleChangeSingleShot.observe(viewLifecycleOwner) {
-            if(roleChangeSingleShot != it) {
-                roleChangeSingleShot = it
-                dismissAllowingStateLoss()
-            }
         }
         meetingViewModel.initPrebuiltChatMessageRecipient.observe(viewLifecycleOwner) {
             chatViewModel.setInitialRecipient(it.first, it.second)
@@ -98,7 +91,8 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
             binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled,
             meetingViewModel::availableRecipientsForChat,
-            chatViewModel::currentlySelectedRbacRecipient
+            chatViewModel::currentlySelectedRbacRecipient,
+            chatViewModel.currentlySelectedRecipientRbac
         )
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)
@@ -106,6 +100,9 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
         meetingViewModel.pinnedMessages.observe(viewLifecycleOwner) { pinnedMessages ->
             pinnedMessageUiUseCase.messagesUpdate(pinnedMessages,
                 binding.pinnedMessagesDisplay)
+        }
+        meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
+            chatViewModel.updatePeerLeave(it)
         }
 
     }
