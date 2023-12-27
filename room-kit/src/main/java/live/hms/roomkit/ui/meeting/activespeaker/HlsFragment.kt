@@ -1,12 +1,8 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
-import android.annotation.SuppressLint
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+/*
+
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
@@ -29,6 +25,8 @@ import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
+*/
+
 
 /**
  * If the stream is this many seconds behind live
@@ -37,7 +35,7 @@ import kotlin.math.absoluteValue
 private const val SECONDS_FROM_LIVE = 10
 class HlsFragment : Fragment() {
 
-    private val args: HlsFragmentArgs by navArgs()
+    /*private val args: HlsFragmentArgs by navArgs()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
     val TAG = "HlsFragment"
     var isStatsDisplayActive: Boolean = false
@@ -241,5 +239,5 @@ class HlsFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         player.stop()
-    }
+    }*/
 }

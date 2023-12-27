@@ -13,13 +13,13 @@
         android:layout_height="wrap_content"/>
 
     <!-- Player view -->
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/hls_view"
-        app:use_controller="false"
-        app:resize_mode="zoom"
-        android:visibility="invisible"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+<!--    <androidx.media3.ui.PlayerView-->
+<!--        android:id="@+id/hls_view"-->
+<!--        app:use_controller="false"-->
+<!--        app:resize_mode="zoom"-->
+<!--        android:visibility="invisible"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" />-->
 
     <!-- Stats for nerds -->
     <LinearLayout

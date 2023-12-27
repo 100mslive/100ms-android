@@ -1,20 +1,14 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
-import com.google.gson.annotations.SerializedName
-import kotlinx.coroutines.delay
-import live.hms.hls_player.HmsHlsCue
-import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
-import live.hms.video.utils.GsonUtils
-
-class DisplayHlsCuesUseCase(val showText: (String) -> Unit,
+/*class DisplayHlsCuesUseCase(val showText: (String) -> Unit,
     val openPoll : (pollId :String) -> Unit) {
 
     private val listToShow = mutableListOf<String>()
 
-    /**
+    *//**
      * The only reason this is a suspending function is so that it will be queued
      * and that the listToShow will never run into concurrent modification.
-     */
+     *//*
     suspend fun addCue(hlsCue: HmsHlsCue) {
         val duration = if (hlsCue.endDate?.time == null) {
             Integer.MAX_VALUE
@@ -93,4 +87,4 @@ sealed class CueTypes {
 private data class EmojiReact(
     @SerializedName("type") val type: String,
     @SerializedName("emojiId") val emojiId: String
-)
+)*/
