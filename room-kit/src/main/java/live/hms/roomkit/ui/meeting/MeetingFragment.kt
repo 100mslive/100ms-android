@@ -557,12 +557,10 @@ class MeetingFragment : Fragment() {
                         Log.d("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.RtmpEvent -> {
-                        meetingViewModel.triggerErrorNotification(event.message)
-                        Log.d("RecordingState", event.message)
+                        Log.i("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.ServerRecordEvent -> {
-                        meetingViewModel.triggerErrorNotification(event.message)
-                        Log.d("RecordingState", event.message)
+                        Log.i("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.HlsEvent, is MeetingViewModel.Event.HlsRecordingEvent -> {
                         Log.d("RecordingState", "HlsEvent: ${event}")
