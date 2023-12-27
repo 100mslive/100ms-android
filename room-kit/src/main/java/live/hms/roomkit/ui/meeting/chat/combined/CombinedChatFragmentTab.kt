@@ -26,7 +26,7 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
     private val chatAdapter by lazy { ChatAdapter({ message ->
         launchMessageOptionsDialog.launch(meetingViewModel,
-        childFragmentManager, message) },{}, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
+        childFragmentManager, message) },{}, { message -> MessageOptionsBottomSheet.showMessageOptions(meetingViewModel, message)})
     }
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
