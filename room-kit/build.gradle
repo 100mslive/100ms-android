@@ -76,7 +76,8 @@ dependencies {
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
-    implementation "live.100ms:hls-player:$hmsVersion"
+
+//    implementation "live.100ms:hls-player:$hmsVersion"
     implementation "live.100ms:video-filters:$hmsVersion"
 
     // Navigation
