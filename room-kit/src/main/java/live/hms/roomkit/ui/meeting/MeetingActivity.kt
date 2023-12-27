@@ -8,11 +8,9 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
@@ -21,9 +19,6 @@ import live.hms.roomkit.R
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
-import live.hms.roomkit.ui.meeting.chat.combined.CHAT_TAB_TITLE
-import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
-import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
 import live.hms.roomkit.ui.notification.CardStackListener
 import live.hms.roomkit.ui.notification.Direction
@@ -31,7 +26,6 @@ import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationAdapter
 import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
 import live.hms.roomkit.ui.notification.HMSNotificationType
-import live.hms.roomkit.ui.polls.display.POLL_TO_DISPLAY
 import live.hms.roomkit.ui.polls.display.PollDisplayFragment
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.ROOM_CODE
@@ -94,31 +88,9 @@ class MeetingActivity : AppCompatActivity() {
 
 
         binding.progressBar.visibility = View.VISIBLE
-        //todo show a loader UI
-        meetingViewModel.initSdk(roomCode, token, hmsPrebuiltOption, object : HMSActionResultListener {
-            override fun onError(error: HMSException) {
-                runOnUiThread {
-                    Toast.makeText(this@MeetingActivity, error.message, Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-            }
+        meetingViewModel.initSdk(roomCode, token, hmsPrebuiltOption, null)
 
-            override fun onSuccess() {
-                runOnUiThread {
-                    binding.progressBar.visibility = View.GONE
-                    val navHostFragment =
-                        supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-                    val navController = navHostFragment.navController
-                    val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-                    if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not()) navController?.setGraph(
-                        R.navigation.meeting_nav_graph, intent.extras
-                    )
-                    else navController?.setGraph(R.navigation.no_preview_nav_graph, intent.extras)
-
-                    initViewModels()
-                }
-            }
-        })
+        initObservers()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -138,7 +110,7 @@ class MeetingActivity : AppCompatActivity() {
         _binding = null
     }
 
-    private fun initViewModels() {
+    private fun initObservers() {
         meetingViewModel.recordingState.observe(this) {
             invalidateOptionsMenu()
         }
@@ -158,6 +130,25 @@ class MeetingActivity : AppCompatActivity() {
             tryRemovingNotification(it)
         }
 
+        meetingViewModel.roomLayoutLiveData.observe(this) {success ->
+            if(success) {
+                binding.progressBar.visibility = View.GONE
+                val navHostFragment =
+                    supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                val navController = navHostFragment.navController
+                val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+                navController.setGraph(
+                    R.navigation.meeting_nav_graph, intent.extras
+                )
+                /*if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not()) navController?.setGraph(
+                    R.navigation.meeting_nav_graph, intent.extras
+                )
+                else navController?.setGraph(R.navigation.no_preview_nav_graph, intent.extras)*/
+            } else {
+                Toast.makeText(this@MeetingActivity, "Error while Getting Room Layout Data", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
     private fun triggerNotification(hmsNotification: HMSNotification) {

@@ -265,17 +265,36 @@ class MeetingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        initObservers()
-        initButtons()
-        initOnBackPress()
 
-        if (meetingViewModel.state.value is MeetingState.Disconnected) {
-            // Handles configuration changes
-            meetingViewModel.startMeeting()
+        if (savedInstanceState != null) {
+            // Recreated Fragment
+            meetingViewModel.roomLayoutLiveData.observe(viewLifecycleOwner) {success ->
+                if (success) {
+                    meetingViewModel.state.observe(viewLifecycleOwner) { state ->
+                        if (state is MeetingState.Ongoing) {
+                            hideProgressBar()
+                            isMeetingOngoing = true
+                            meetingViewModel.state.removeObservers(viewLifecycleOwner)
+                            initializeUI()
+                        }
+                    }
+                    meetingViewModel.roomLayoutLiveData.removeObservers(viewLifecycleOwner)
+                    meetingViewModel.startMeeting()
+                } else {
+                    this.activity?.finish()
+                }
+            }
         } else {
-            //start HLS stream
+            initializeUI()
             startHLSStreamingIfRequired()
         }
+    }
+
+    private fun initializeUI() {
+        initButtons()
+        initObservers()
+        initOnBackPress()
+
         binding.chatMessages.isHeightContrained = true
         PauseChatUIUseCase().setChatPauseVisible(
             binding.chatOptionsCard,

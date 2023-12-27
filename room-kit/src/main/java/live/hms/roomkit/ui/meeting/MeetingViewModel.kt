@@ -157,11 +157,12 @@ class MeetingViewModel(
         roomCode: String,
         token: String,
         hmsPrebuiltOptions: HMSPrebuiltOptions?,
-        onHMSActionResultListener: HMSActionResultListener
+        onHMSActionResultListener: HMSActionResultListener?
     ) {
         this.prebuiltOptions = hmsPrebuiltOptions
         if (hasValidToken) {
-            onHMSActionResultListener.onSuccess()
+            onHMSActionResultListener?.onSuccess()
+            roomLayoutLiveData.postValue(true)
             return
         }
         //if empty is uses the prod token url else uses the debug token url
@@ -181,7 +182,8 @@ class MeetingViewModel(
             object : HMSTokenListener {
                 override fun onError(error: HMSException) {
                     hasValidToken = false
-                    onHMSActionResultListener.onError(error)
+                    onHMSActionResultListener?.onError(error)
+                    roomLayoutLiveData.postValue(false)
                 }
 
                 override fun onTokenSuccess(token: String) {
@@ -189,12 +191,10 @@ class MeetingViewModel(
                 }
 
             })
-
-
     }
 
 
-    fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+    fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener?) {
 
         val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
             hmsPrebuiltOptions.endPoints["init"].orEmpty()
@@ -209,15 +209,18 @@ class MeetingViewModel(
                 HMSLayoutListener {
                 override fun onError(error: HMSException) {
                     Log.e(TAG, "onError: ", error)
-                    onHMSActionResultListener.onError(error)
+                    onHMSActionResultListener?.onError(error)
+                    roomLayoutLiveData.postValue(false)
                 }
 
                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                     hmsRoomLayout = layoutConfig
                     prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
+                    Log.d("Pratim", "Setting HMS Config")
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
-                    onHMSActionResultListener.onSuccess()
+                    onHMSActionResultListener?.onSuccess()
+                    roomLayoutLiveData.postValue(true)
                 }
 
             })
@@ -317,6 +320,7 @@ class MeetingViewModel(
     val hmsRemoveNotificationEvent = MutableLiveData<HMSNotificationType>()
     val updateGridLayoutDimensions = SingleLiveEvent<Boolean>()
     val hmsScreenShareBottomSheetEvent = SingleLiveEvent<String>()
+    val roomLayoutLiveData : MutableLiveData<Boolean> = MutableLiveData()
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {
@@ -501,6 +505,7 @@ class MeetingViewModel(
             }
 
             override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
+                Log.d("Pratim", "onPreview called")
                 unMuteAllTracks(localTracks)
                 previewUpdateData.postValue(Pair(room, localTracks))
             }
