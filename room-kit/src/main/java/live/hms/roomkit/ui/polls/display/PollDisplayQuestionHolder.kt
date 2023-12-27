@@ -77,7 +77,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                     binding.root.visibility = View.GONE
                 }
 
-                if (poll.state == HmsPollState.STOPPED ) {
+                if (poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
                     binding.root.visibility = View.VISIBLE
                     launchPollQuiz.text = "View Results"
                     launchPollQuiz.buttonEnabled()
