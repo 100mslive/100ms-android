@@ -30,6 +30,6 @@ class ChatRecipientSearchUseCase(private val updateList : suspend () -> Unit) {
 
     fun getFilteredPeers(remotePeers : List<HMSPeer>) : List<HMSPeer> {
         val filterText = filterText ?: return remotePeers
-        return remotePeers.filter { it.name.contains(filterText) }
+        return remotePeers.filter { it.name.contains(filterText, ignoreCase = true) }
     }
 }
