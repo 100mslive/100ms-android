@@ -37,8 +37,8 @@ class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
 ): BottomSheetDialogFragment() {
 
     companion object {
-        fun showMessageOptions(meetingViewModel: MeetingViewModel) : Boolean {
-            val allowedToBlock = meetingViewModel.isAllowedToBlockFromChat()
+        fun showMessageOptions(meetingViewModel: MeetingViewModel, message: ChatMessage) : Boolean {
+            val allowedToBlock = meetingViewModel.isAllowedToBlockFromChat() && !message.isSentByMe
             val allowedToPin = meetingViewModel.isAllowedToPinMessages()
             val allowedToHideMessages = meetingViewModel.isAllowedToHideMessages()
             return allowedToPin || allowedToBlock || allowedToHideMessages

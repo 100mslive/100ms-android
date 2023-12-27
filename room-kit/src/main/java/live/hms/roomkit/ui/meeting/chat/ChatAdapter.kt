@@ -17,7 +17,7 @@ import java.util.*
 
 class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
                   val onClick: () -> Unit = {},
-  private val shouldShowMessageOptions : () -> Boolean
+  private val shouldShowMessageOptions : (ChatMessage) -> Boolean
   ) : ListAdapter<ChatMessage, ChatAdapter.ChatMessageViewHolder>(DIFFUTIL_CALLBACK) {
   private val formatter = SimpleDateFormat("h:mm a", Locale.getDefault())
   companion object {
@@ -78,7 +78,7 @@ class ChatAdapter(private val openMessageOptions : (ChatMessage) -> Unit,
           View.VISIBLE
 
 
-        viewMore.visibility = if(shouldShowMessageOptions()) View.VISIBLE else View.GONE
+        viewMore.visibility = if(shouldShowMessageOptions(sentMessage)) View.VISIBLE else View.GONE
       }
     }
   }
