@@ -38,7 +38,7 @@ class LeaderBoardNameSection(
             heading.text = titleStr
             subtitle.text = subtitleStr
 
-            if (rankStr.isNullOrEmpty().not())
+            if ((rankStr == "0").not())
             rank.text = rankStr
             else
             rank.text = "-"
