@@ -67,7 +67,18 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
         return if(recipient.everyone) {
             Recipient.Everyone
-        } else null
+        }
+        else if (recipient.roles.isNotEmpty()) {
+            val localPeerRole = hmssdk.getLocalPeer()?.hmsRole?.name
+            val name = recipient.roles.filter { it != localPeerRole }.firstOrNull()
+            val role = hmssdk.getRoles().find { it.name == name }
+            if(role != null)
+                Recipient.Role(role)
+            else null
+        }
+        else if (recipient.peers)
+            null
+        else null
     }
 
     fun allowedToMessageWhatParticipants(): AllowedToMessageParticipants? {
