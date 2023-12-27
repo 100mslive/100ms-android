@@ -69,7 +69,8 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             Recipient.Everyone
         }
         else if (recipient.roles.isNotEmpty()) {
-            val name = recipient.roles.first()
+            val localPeerRole = hmssdk.getLocalPeer()?.hmsRole?.name
+            val name = recipient.roles.filter { it != localPeerRole }.firstOrNull()
             val role = hmssdk.getRoles().find { it.name == name }
             if(role != null)
                 Recipient.Role(role)
