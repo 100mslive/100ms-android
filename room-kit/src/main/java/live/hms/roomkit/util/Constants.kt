@@ -23,5 +23,6 @@ val REGEX_MEETING_ROOM_ID = Regex("^[a-zA-Z0-9]+$")
 val POLL_IDENTIFIER_FOR_HLS_CUE = "poll:"
 
 const val LOGO_URL = "room-logo-url"
-const val LIVE_ICONS_STATUS = "live-icons-status"
+const val LIVE_ICON_STATUS = "live-icon-status"
+const val RECORDING_ICONS_STATUS = "recording-icons-status"
 const val PREVIEW_SCREEN_STATUS = "preview-screen-status"
