@@ -66,7 +66,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         else {
             //todd
             with(binding as LayoutEndPollButtonBinding) {
-                launchPollQuiz.text = "End Poll"
+                launchPollQuiz.text = if (poll.category == HmsPollCategory.QUIZ) "End Quiz" else "End Poll"
                 if(poll.state == HmsPollState.STARTED &&  canEndPoll) {
                     launchPollQuiz.alertButtonEnabled()
                     launchPollQuiz.setOnClickListener {
