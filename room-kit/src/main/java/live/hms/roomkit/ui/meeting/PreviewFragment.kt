@@ -39,7 +39,6 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonDisabled
 import live.hms.roomkit.ui.theme.buttonEnabled
-import live.hms.roomkit.ui.theme.getCurrentRoleData
 import live.hms.roomkit.ui.theme.getPreviewLayout
 import live.hms.roomkit.ui.theme.setIconDisabled
 import live.hms.roomkit.ui.theme.setIconEnabled
@@ -291,17 +290,29 @@ class PreviewFragment : Fragment() {
             binding.descriptionTv.startBounceAnimationUpwards()
         }
 
-        if (meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url.isNullOrEmpty()) {
-            binding.logoIv.visibility = View.INVISIBLE
-        } else {
+        if(!meetingViewModel.roomLogoUrl.isNullOrEmpty()){
             binding.logoIv.visibility = View.VISIBLE
             Glide.with(this)
-                .load(meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url)
+                .load(meetingViewModel.roomLogoUrl)
                 .into(binding.logoIv);
             introAnimationOffset += 50
             binding.logoIv.startBounceAnimationUpwards()
-
+        }else{
+            binding.logoIv.visibility = View.INVISIBLE
         }
+
+        /***
+        if (meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url.isNullOrEmpty()) {
+        binding.logoIv.visibility = View.INVISIBLE
+        } else {
+        binding.logoIv.visibility = View.VISIBLE
+        Glide.with(this)
+        .load(meetingViewModel.getHmsRoomLayout()?.getCurrentRoleData(roleName)?.logo?.url)
+        .into(binding.logoIv);
+        introAnimationOffset += 50
+        binding.logoIv.startBounceAnimationUpwards()
+
+        }***/
     }
 
     private fun setupKeyboardAnimation() {
