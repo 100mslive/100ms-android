@@ -16,10 +16,4 @@ class PauseChatUIUseCase {
         }
     }
 
-    fun observeChatPauseState(viewLifecycleOwner: LifecycleOwner, meetingViewModel: MeetingViewModel) {
-        meetingViewModel.chatPauseState.observe(viewLifecycleOwner) { chatState ->
-            // Set the chat as paused (can use the block UI I guess)
-
-        }
-    }
 }

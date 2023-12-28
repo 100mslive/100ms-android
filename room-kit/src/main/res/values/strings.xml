@@ -258,4 +258,10 @@
     <string name="chat_paused_by">Chat has been paused by %1$s.</string>
     <string name="block_from_chat">Block from Chat</string>
     <string name="chat_paused">Chat Paused</string>
+    <string name="chat_to_label">to %1$s %2$s</string>
+    <string name="chat_to_group_label">(Group)</string>
+    <string name="chat_to_dm_label">(DM)</string>
+    <string name="you">You</string>
+    <string name="chat_rbac_picker_send_to">Choose a Recipient</string>
+    <string name="no_recipients_yet_message_options_recyclerview">No Recipients Yet</string>
 </resources>

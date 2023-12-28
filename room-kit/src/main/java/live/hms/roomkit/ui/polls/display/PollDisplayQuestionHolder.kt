@@ -7,9 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.GoLiveBottomSheetBinding
 import live.hms.roomkit.databinding.LayoutEndPollButtonBinding
-import live.hms.roomkit.databinding.LayoutLaunchPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.drawableStart
@@ -38,6 +36,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
     val endPoll : (HmsPoll) -> Unit,
     val canEndPoll : Boolean,
+    val showLeaderBoard: (pollId: String) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
@@ -65,8 +64,9 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             }
         }
         else {
+            //todd
             with(binding as LayoutEndPollButtonBinding) {
-                launchPollQuiz.text = "End Poll"
+                launchPollQuiz.text = if (poll.category == HmsPollCategory.QUIZ) "End Quiz" else "End Poll"
                 if(poll.state == HmsPollState.STARTED &&  canEndPoll) {
                     launchPollQuiz.alertButtonEnabled()
                     launchPollQuiz.setOnClickListener {
@@ -75,6 +75,16 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                     binding.root.visibility = View.VISIBLE
                 } else {
                     binding.root.visibility = View.GONE
+                }
+
+                if (poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
+                    binding.root.visibility = View.VISIBLE
+                    launchPollQuiz.text = "View Results"
+                    launchPollQuiz.buttonEnabled()
+                    launchPollQuiz.setOnClickListener {
+                        showLeaderBoard(poll.pollId)
+                    }
+                    binding.root.visibility = View.VISIBLE
                 }
             }
         }

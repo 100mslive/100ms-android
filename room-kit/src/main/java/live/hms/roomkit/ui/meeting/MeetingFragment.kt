@@ -111,7 +111,7 @@ class MeetingFragment : Fragment() {
     private val chatAdapter by lazy {
         ChatAdapter({ message ->
             launchMessageOptionsDialog.launch(meetingViewModel,
-            childFragmentManager, message) }, ::onChatClick, { MessageOptionsBottomSheet.showMessageOptions(meetingViewModel)})
+            childFragmentManager, message) }, ::onChatClick, { message -> MessageOptionsBottomSheet.showMessageOptions(meetingViewModel, message)})
     }
 
     private val chatViewModel: ChatViewModel by activityViewModels<ChatViewModel> {
@@ -265,17 +265,36 @@ class MeetingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        initObservers()
-        initButtons()
-        initOnBackPress()
 
-        if (meetingViewModel.state.value is MeetingState.Disconnected) {
-            // Handles configuration changes
-            meetingViewModel.startMeeting()
+        if (savedInstanceState != null) {
+            // Recreated Fragment
+            meetingViewModel.roomLayoutLiveData.observe(viewLifecycleOwner) {success ->
+                if (success) {
+                    meetingViewModel.state.observe(viewLifecycleOwner) { state ->
+                        if (state is MeetingState.Ongoing) {
+                            hideProgressBar()
+                            isMeetingOngoing = true
+                            meetingViewModel.state.removeObservers(viewLifecycleOwner)
+                            initializeUI()
+                        }
+                    }
+                    meetingViewModel.roomLayoutLiveData.removeObservers(viewLifecycleOwner)
+                    meetingViewModel.startMeeting()
+                } else {
+                    this.activity?.finish()
+                }
+            }
         } else {
-            //start HLS stream
+            initializeUI()
             startHLSStreamingIfRequired()
         }
+    }
+
+    private fun initializeUI() {
+        initButtons()
+        initObservers()
+        initOnBackPress()
+
         binding.chatMessages.isHeightContrained = true
         PauseChatUIUseCase().setChatPauseVisible(
             binding.chatOptionsCard,
@@ -301,9 +320,12 @@ class MeetingFragment : Fragment() {
             binding.chatExtra,
             meetingViewModel.prebuiltInfoContainer::isChatEnabled,
             meetingViewModel::availableRecipientsForChat,
-            chatViewModel::currentlySelectedRbacRecipient
+            chatViewModel::currentlySelectedRbacRecipient,
+            chatViewModel.currentlySelectedRecipientRbac,
         )
-
+        meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
+            chatViewModel.updatePeerLeave(it)
+        }
         if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
         } else {
@@ -535,12 +557,10 @@ class MeetingFragment : Fragment() {
                         Log.d("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.RtmpEvent -> {
-                        meetingViewModel.triggerErrorNotification(event.message)
-                        Log.d("RecordingState", event.message)
+                        Log.i("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.ServerRecordEvent -> {
-                        meetingViewModel.triggerErrorNotification(event.message)
-                        Log.d("RecordingState", event.message)
+                        Log.i("RecordingState", event.message)
                     }
                     is MeetingViewModel.Event.HlsEvent, is MeetingViewModel.Event.HlsRecordingEvent -> {
                         Log.d("RecordingState", "HlsEvent: ${event}")
@@ -865,7 +885,7 @@ class MeetingFragment : Fragment() {
         )
         binding.buttonRaiseHand.visibility = View.GONE
 
-        WindowCompat.setDecorFitsSystemWindows(activity!!.window, true)
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
 
         showSystemBars()
     }
@@ -953,7 +973,7 @@ class MeetingFragment : Fragment() {
 
             })?.start()
 
-        val screenHeight = activity!!.window.decorView.height
+        val screenHeight = requireActivity().window.decorView.height
         binding.bottomControls.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1001,9 +1021,9 @@ class MeetingFragment : Fragment() {
     private fun hideControlBars() {
         val topMenu = binding.topMenu
         val bottomMenu = binding.bottomControls
-        val screenHeight = activity!!.window.decorView.height
+        val screenHeight = requireActivity().window.decorView.height
         controlBarsVisible = false
-        topMenu?.animate()
+        topMenu.animate()
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1348,53 +1368,6 @@ class MeetingFragment : Fragment() {
                     inflateExitFlow()
                 }
             })
-    }
-
-    fun roleChangeRemote() {
-
-        val isAllowedToMuteUnmute =
-            meetingViewModel.isAllowedToMutePeers() && meetingViewModel.isAllowedToAskUnmutePeers()
-        var remotePeersAreMute: Boolean? = null
-        if (isAllowedToMuteUnmute) {
-            remotePeersAreMute = meetingViewModel.areAllRemotePeersMute()
-        }
-
-        val cancelRoleName = "Cancel"
-        val availableRoles = meetingViewModel.getAvailableRoles().map { it.name }
-        val rolesToSend = availableRoles.plus(cancelRoleName)
-        binding.roleSpinner.root.initAdapters(
-            rolesToSend,
-            if (remotePeersAreMute == null) "Nothing to change" else if (remotePeersAreMute) "Remote Unmute Role" else "Remote Mute Role",
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val stringRole = parent?.adapter?.getItem(position) as String
-                    if (remotePeersAreMute == null) {
-                        Toast.makeText(
-                            requireContext(),
-                            "No remote peers, or their audio tracks are absent",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    } else {
-                        if (stringRole != cancelRoleName) {
-                            meetingViewModel.remoteMute(
-                                !remotePeersAreMute,
-                                listOf(stringRole)
-                            )
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    // Nothing
-                }
-
-            })
-        binding.roleSpinner.root.performClick()
     }
 
     fun inflateExitFlow() {

@@ -31,8 +31,12 @@
         android:layout_marginStart="12dp"
         android:fontFamily="@font/inter_semibold"
         tools:text="Poll/Quiz"
+        android:maxLength="20"
         android:lineHeight="24px"
         android:textSize="20sp"
+        android:ellipsize="end"
+        android:maxEms="20"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@id/backButton"
         app:layout_constraintLeft_toRightOf="@id/backButton"
         app:layout_constraintTop_toTopOf="@id/backButton" />

@@ -24,17 +24,17 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
     fun isChatEnabled(): Boolean =
         // how do we even know if it's in hls? What if they have both?
-            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-                ?.elements?.chat != null ||
-            roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                ?.default?.elements?.chat != null
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat != null ||
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat != null
 
     fun chatInitialStateOpen(): Boolean {
         val isChatInitialOpen =
             roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
                     ||
-            roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-                ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
+                    roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                        ?.default?.elements?.chat?.initialState == "CHAT_STATE_OPEN"
 
         // Initial open is only valid for overlay chat
         return isChatOverlay() && isChatInitialOpen
@@ -42,8 +42,8 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     fun isChatOverlay() =
         roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.overlayView == true
                 ||
-        roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-            ?.default?.elements?.chat?.overlayView == true
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat?.overlayView == true
 
 
     fun onStageExp(role : String) =
@@ -69,7 +69,8 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             Recipient.Everyone
         }
         else if (recipient.roles.isNotEmpty()) {
-            val name = recipient.roles.first()
+            val localPeerRole = hmssdk.getLocalPeer()?.hmsRole?.name
+            val name = recipient.roles.filter { it != localPeerRole }.firstOrNull()
             val role = hmssdk.getRoles().find { it.name == name }
             if(role != null)
                 Recipient.Role(role)
@@ -111,10 +112,10 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                     ?.default?.elements?.chat?.realTimeControls?.canDisableChat == true
 
     fun isAllowedToHideMessages(): Boolean =
-    roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
-    ?.elements?.chat?.realTimeControls?.canHideMessage == true ||
-    roleMap[localPeer.hmsRole.name]?.screens?.conferencing
-    ?.default?.elements?.chat?.realTimeControls?.canHideMessage == true
+        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+            ?.elements?.chat?.realTimeControls?.canHideMessage == true ||
+                roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                    ?.default?.elements?.chat?.realTimeControls?.canHideMessage == true
 
     fun getChatTitle(): String  {
         val hlsTitle = roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming

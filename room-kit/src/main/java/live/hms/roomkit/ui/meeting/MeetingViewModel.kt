@@ -45,6 +45,7 @@ import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.PollAnswerResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
+import live.hms.video.polls.network.PollLeaderboardResponse
 import live.hms.video.sdk.*
 import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.*
@@ -81,9 +82,11 @@ class MeetingViewModel(
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
-    private var numRoleChanges = 0
-    val roleChangeSingleShot : LiveData<Int> = roleChange.map { numRoleChanges++ }
+
     var roleOnJoining : HMSRole? = null
+        private set
+
+    var localPeerId : String? = null
         private set
 
     fun isLargeRoom() = hmsRoom?.isLargeRoom?:false
@@ -154,11 +157,12 @@ class MeetingViewModel(
         roomCode: String,
         token: String,
         hmsPrebuiltOptions: HMSPrebuiltOptions?,
-        onHMSActionResultListener: HMSActionResultListener
+        onHMSActionResultListener: HMSActionResultListener?
     ) {
         this.prebuiltOptions = hmsPrebuiltOptions
         if (hasValidToken) {
-            onHMSActionResultListener.onSuccess()
+            onHMSActionResultListener?.onSuccess()
+            roomLayoutLiveData.postValue(true)
             return
         }
         //if empty is uses the prod token url else uses the debug token url
@@ -178,7 +182,8 @@ class MeetingViewModel(
             object : HMSTokenListener {
                 override fun onError(error: HMSException) {
                     hasValidToken = false
-                    onHMSActionResultListener.onError(error)
+                    onHMSActionResultListener?.onError(error)
+                    roomLayoutLiveData.postValue(false)
                 }
 
                 override fun onTokenSuccess(token: String) {
@@ -186,12 +191,10 @@ class MeetingViewModel(
                 }
 
             })
-
-
     }
 
 
-    fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener) {
+    fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener?) {
 
         val initURL: String = if (hmsPrebuiltOptions?.endPoints?.containsKey("init") == true)
             hmsPrebuiltOptions.endPoints["init"].orEmpty()
@@ -206,15 +209,18 @@ class MeetingViewModel(
                 HMSLayoutListener {
                 override fun onError(error: HMSException) {
                     Log.e(TAG, "onError: ", error)
-                    onHMSActionResultListener.onError(error)
+                    onHMSActionResultListener?.onError(error)
+                    roomLayoutLiveData.postValue(false)
                 }
 
                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                     hmsRoomLayout = layoutConfig
                     prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
+                    Log.d("Pratim", "Setting HMS Config")
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
-                    onHMSActionResultListener.onSuccess()
+                    onHMSActionResultListener?.onSuccess()
+                    roomLayoutLiveData.postValue(true)
                 }
 
             })
@@ -314,6 +320,7 @@ class MeetingViewModel(
     val hmsRemoveNotificationEvent = MutableLiveData<HMSNotificationType>()
     val updateGridLayoutDimensions = SingleLiveEvent<Boolean>()
     val hmsScreenShareBottomSheetEvent = SingleLiveEvent<String>()
+    val roomLayoutLiveData : MutableLiveData<Boolean> = MutableLiveData()
 
     fun setMeetingViewMode(mode: MeetingViewMode) {
         if (mode != meetingViewMode.value) {
@@ -450,6 +457,7 @@ class MeetingViewModel(
     // Live data which changes on any change of peer
     val peerLiveData = MutableLiveData<HMSPeer>()
     val participantPeerUpdate = MutableLiveData<Unit>()
+    val peerLeaveUpdate = MutableLiveData<String?>(null)
     private val _peerMetadataNameUpdate = MutableLiveData<Pair<HMSPeer, HMSPeerUpdate>>()
     val peerMetadataNameUpdate: LiveData<Pair<HMSPeer, HMSPeerUpdate>> = _peerMetadataNameUpdate
 
@@ -497,6 +505,7 @@ class MeetingViewModel(
             }
 
             override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
+                Log.d("Pratim", "onPreview called")
                 unMuteAllTracks(localTracks)
                 previewUpdateData.postValue(Pair(room, localTracks))
             }
@@ -737,6 +746,7 @@ class MeetingViewModel(
                 Log.d(TAG, "SessionId is: ${room.sessionId}")
                 Log.d(TAG, "Room started at: ${room.startedAt}")
                 roleOnJoining = room.localPeer?.hmsRole
+                localPeerId = room.localPeer?.peerID
 
                 // get the hls URL from the Room, if it exists
                 val hlsUrl = room.hlsStreamingState.variants?.get(0)?.hlsStreamUrl
@@ -797,6 +807,7 @@ class MeetingViewModel(
                             peerLiveData.postValue(hmsPeer)
                         }
                         participantPeerUpdate.postValue(Unit)
+                        peerLeaveUpdate.postValue(hmsPeer.peerID)
                     }
 
                     HMSPeerUpdate.PEER_JOINED -> {
@@ -1003,8 +1014,10 @@ class MeetingViewModel(
                 if(message.type != HMSMessageType.CHAT)
                     return
                 broadcastsReceived.postValue(
+
                     ChatMessage(
-                        message, false
+                        message, false,
+                        message.recipient.recipientPeer?.peerID == localPeerId
                     )
                 )
             }
@@ -2017,6 +2030,10 @@ class MeetingViewModel(
         }
 
     })
+
+    fun fetchLeaderboard(pollId: String, completion: HmsTypedActionResultListener<PollLeaderboardResponse>) {
+        localHmsInteractivityCenter.fetchLeaderboard(pollId, count = 200, completion = completion)
+    }
     fun startPoll(currentList: List<QuestionUi>, pollCreationInfo: PollCreationInfo) {
         // To start a poll
 

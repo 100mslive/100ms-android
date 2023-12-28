@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearSmoothScroller
 
@@ -68,8 +69,8 @@ class ChatUseCase {
     fun initiate(
         messages: MutableLiveData<List<ChatMessage>>,
         chatPauseState: MutableLiveData<ChatPauseState>,
-        roleChanged : MutableLiveData<HMSPeer>, //used to refresh options
-        blockList : MutableLiveData<Set<String>>,
+        roleChanged: MutableLiveData<HMSPeer>, //used to refresh options
+        blockList: MutableLiveData<Set<String>>,
         viewlifecycleOwner: LifecycleOwner,
         chatAdapter: ChatAdapter,
         recyclerview: SingleSideFadeRecyclerview,
@@ -83,8 +84,9 @@ class ChatUseCase {
         chatPausedContainer: LinearLayoutCompat,
         recipientPickerContainer: LinearLayout,
         isChatEnabled: () -> Boolean,
-        getAllowedRecipients : () -> AllowedToMessageParticipants?,
-        currentRbac : () -> Recipient?
+        getAllowedRecipients: () -> AllowedToMessageParticipants?,
+        currentRbac: () -> Recipient?,
+        currentlySelectedRecipientRbac: LiveData<Recipient?>
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
@@ -113,6 +115,10 @@ class ChatUseCase {
         }
         recyclerview.adapter = chatAdapter
         toggleEmptyIndicator(emptyIndicator, messages.value)
+
+        currentlySelectedRecipientRbac.observe(viewlifecycleOwner) {
+            updateState()
+        }
         // Chat pause observer
         blockList.observe(viewlifecycleOwner) {
             updateState()
@@ -206,6 +212,8 @@ class ChatUseCase {
             }
             ChatUiVisibilityState.RecipientSelectNeeded -> {
                 // Change the picker maybe?
+                bannedText.visibility = View.GONE
+                chatPausedContainer.visibility = View.GONE
             }
             ChatUiVisibilityState.Enabled -> {
                 bannedText.visibility = View.GONE

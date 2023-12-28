@@ -4,9 +4,17 @@
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/spacing_d2"
     android:paddingHorizontal="@dimen/spacing_d2"
+    android:gravity="center_vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal">
 
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/spacing_d1"
+        android:src="@drawable/everyone_rbac_icon"
+        />
     <TextView
         android:id="@+id/name"
         android:fontFamily="@font/inter_regular"
