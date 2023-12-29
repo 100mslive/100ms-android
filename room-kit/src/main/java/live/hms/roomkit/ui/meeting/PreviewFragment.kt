@@ -604,7 +604,7 @@ class PreviewFragment : Fragment() {
 
             val isLiveWithHLSOrRTMP = it.second.hlsStreamingState.state == HMSStreamingState.STARTED ||
                     it.second.rtmpHMSRtmpStreamingState.state == HMSStreamingState.STARTED
-            if (isLiveWithHLSOrRTMP) {
+            if ((isLiveWithHLSOrRTMP) && (meetingViewModel.isLiveIconEnabled == true || meetingViewModel.isLiveIconEnabled == null)) {
                 binding.liveHlsGroup.visibility = View.VISIBLE
                 binding.hlsSession.startBounceAnimationUpwards()
             } else {
