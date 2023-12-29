@@ -399,8 +399,7 @@ class MeetingFragment : Fragment() {
                 binding.meetingFragmentProgress.visibility = View.GONE
 
                 /** binding.liveTitleCard.visibility = View.VISIBLE **/
-                val liveTitleCardVisibility = if (meetingViewModel.isLiveIconEnabled==false) View.GONE else View.VISIBLE
-                binding.liveTitleCard.visibility = liveTitleCardVisibility
+                binding.liveTitleCard.visibility = if (meetingViewModel.isLiveIconEnabled==false) View.GONE else View.VISIBLE
 
                 if (meetingViewModel.isRTMPRunning()) {
                     binding.liveTitle.text = "Live with RTMP"
