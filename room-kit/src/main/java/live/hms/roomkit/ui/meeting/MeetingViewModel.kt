@@ -2177,9 +2177,14 @@ class MeetingViewModel(
 
     suspend fun getPollForPollId(pollId: String): HmsPoll? {
         val pollWithQuestions = CompletableDeferred<HmsPoll?>()
-        localHmsInteractivityCenter.polls.find { it.pollId == pollId }!!
-            .also { existingPoll ->
-                if (existingPoll.questions == null || (existingPoll?.questions?.isEmpty() == true)) {
+        val poll: HmsPoll? = localHmsInteractivityCenter.polls.find { it.pollId == pollId }
+
+        if (poll == null)
+            getAllPolls()
+
+        localHmsInteractivityCenter.polls.find { it.pollId == pollId }
+            ?.also { existingPoll ->
+                if (existingPoll.questions == null || (existingPoll.questions?.isEmpty() == true)) {
                     localHmsInteractivityCenter.fetchPollQuestions(
                         existingPoll,
                         object : HmsTypedActionResultListener<List<HMSPollQuestion>> {
