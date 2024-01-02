@@ -190,7 +190,35 @@ class PreviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initIntroAnimation()
+         initIntroAnimation()
+         initOnBackPress()
+         initButtons()
+         initObservers()
+
+
+        if (savedInstanceState != null) {
+            // Recreated Fragment
+            meetingViewModel.roomLayoutLiveData.observe(viewLifecycleOwner) {success ->
+                if (success) {
+                    meetingViewModel.roomLayoutLiveData.removeObservers(viewLifecycleOwner)
+                    initUI()
+                    meetingViewModel.startPreview()
+                    enableDisableJoinNowButton()
+
+                } else {
+                    this.activity?.finish()
+                }
+            }
+        } else {
+            initUI()
+            meetingViewModel.startPreview()
+            enableDisableJoinNowButton()
+        }
+
+
+    }
+
+    fun initUI() {
         binding.applyTheme()
         with(binding.editTextName) {
             isEnabled = !meetingViewModel.disableNameEdit()
@@ -205,8 +233,6 @@ class PreviewFragment : Fragment() {
         settings = SettingsStore(requireContext())
         startFixedIntroAnimation()
         setupKeyboardAnimation()
-
-        enableDisableJoinNowButton()
     }
 
     private fun startFixedIntroAnimation() {
@@ -323,12 +349,6 @@ class PreviewFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentPreviewBinding.inflate(inflater, container, false)
-
-        initOnBackPress()
-        initButtons()
-        initObservers()
-        meetingViewModel.startPreview()
-
         return binding.root
     }
 
