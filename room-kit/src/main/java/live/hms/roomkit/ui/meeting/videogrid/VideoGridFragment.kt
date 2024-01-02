@@ -198,61 +198,81 @@ class VideoGridFragment : Fragment() {
 
 
         meetingViewModel.tracks.observe(viewLifecycleOwner) {
-            localMeeting = it.filter { it.isLocal && it.isScreen.not() }.firstOrNull()
+            synchronized(it) {
+                localMeeting = it.filter { it.isLocal && it.isScreen.not() }.firstOrNull()
 
-            //show or hide inset
-            if (meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole).not())
-                binding.insetPill.visibility = View.GONE
-            else if ( (it.size == 1 && localMeeting != null)
-                || (it.size == 2 && it.filter { it.isLocal }.size == 2)
-            ) {
-                binding.insetPill.visibility = View.GONE
-            } else if (it.size > 1 && localMeeting != null) {
-                binding.insetPill.visibility = View.VISIBLE
-            } else if (localMeeting == null) {
-                binding.insetPill.visibility = View.GONE
-            }
-
-            localMeeting?.let {
-
-                if (it.audio?.isMute == true) {
-                    if (binding.minimizedIconAudioOff.isEnabled)
-                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_on_to_off , R.dimen.two_dp )
-                    binding.minimizedIconAudioOff.isEnabled = false
-                    binding.iconAudioOff.visibility = View.VISIBLE
-                    binding.iconAudioLevel.alpha = visibilityOpacity(false)
-                } else {
-                    binding.iconAudioOff.visibility = View.INVISIBLE
-                    binding.iconAudioLevel.alpha = visibilityOpacity(true)
-                    if (binding.minimizedIconAudioOff.isEnabled.not())
-                        binding.minimizedIconAudioOff.setIconDisabled(R.drawable.avd_mic_off_to_on, R.dimen.two_dp)
-                    binding.minimizedIconAudioOff.isEnabled = true
+                //show or hide inset
+                if (meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole)
+                        .not()
+                )
+                    binding.insetPill.visibility = View.GONE
+                else if ((it.size == 1 && localMeeting != null)
+                    || (it.size == 2 && it.filter { it.isLocal }.size == 2)
+                ) {
+                    binding.insetPill.visibility = View.GONE
+                } else if (it.size > 1 && localMeeting != null) {
+                    binding.insetPill.visibility = View.VISIBLE
+                } else if (localMeeting == null) {
+                    binding.insetPill.visibility = View.GONE
                 }
 
-                if (it.video?.isMute == true) {
+                localMeeting?.let {
 
-                    if (binding.minimizedIconVideoOff.isEnabled)
-                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_on_to_off, R.dimen.two_dp)
-                    binding.minimizedIconVideoOff.isEnabled = false
+                    if (it.audio?.isMute == true) {
+                        if (binding.minimizedIconAudioOff.isEnabled)
+                            binding.minimizedIconAudioOff.setIconDisabled(
+                                R.drawable.avd_mic_on_to_off,
+                                R.dimen.two_dp
+                            )
+                        binding.minimizedIconAudioOff.isEnabled = false
+                        binding.iconAudioOff.visibility = View.VISIBLE
+                        binding.iconAudioLevel.alpha = visibilityOpacity(false)
+                    } else {
+                        binding.iconAudioOff.visibility = View.INVISIBLE
+                        binding.iconAudioLevel.alpha = visibilityOpacity(true)
+                        if (binding.minimizedIconAudioOff.isEnabled.not())
+                            binding.minimizedIconAudioOff.setIconDisabled(
+                                R.drawable.avd_mic_off_to_on,
+                                R.dimen.two_dp
+                            )
+                        binding.minimizedIconAudioOff.isEnabled = true
+                    }
 
-                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
-                    updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, it)
-                    lastVideoMuteState = true
-                    binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
-                } else {
+                    if (it.video?.isMute == true) {
+
+                        if (binding.minimizedIconVideoOff.isEnabled)
+                            binding.minimizedIconVideoOff.setIconDisabled(
+                                R.drawable.avd_video_on_to_off,
+                                R.dimen.two_dp
+                            )
+                        binding.minimizedIconVideoOff.isEnabled = false
+
+                        if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
+                            updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, it)
+                        lastVideoMuteState = true
+                        binding.nameInitials.text = NameUtils.getInitials(it.peer.name.orEmpty())
+                    } else {
 
 
-                    if (binding.minimizedIconVideoOff.isEnabled.not())
-                        binding.minimizedIconVideoOff.setIconDisabled(R.drawable.avd_video_off_to_on, R.dimen.two_dp)
-                    binding.minimizedIconVideoOff.isEnabled = true
+                        if (binding.minimizedIconVideoOff.isEnabled.not())
+                            binding.minimizedIconVideoOff.setIconDisabled(
+                                R.drawable.avd_video_off_to_on,
+                                R.dimen.two_dp
+                            )
+                        binding.minimizedIconVideoOff.isEnabled = true
 
-                    if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
-                    updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, it)
-                    lastVideoMuteState = false
+                        if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
+                            updateVideoViewLayout(
+                                binding.insetPillMaximised,
+                                isVideoOff = false,
+                                it
+                            )
+                        lastVideoMuteState = false
+                    }
+
                 }
 
             }
-
         }
     }
 
@@ -293,78 +313,82 @@ class VideoGridFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
-
-            val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
-            var newRowCount = 0
-            var newColumnCount = 0
-            var newGuideLinePercentage = 0f
-            //is screen share track is present then reduce the grid and column span else restore
-            if (screenShareTrackList.isEmpty()) {
-                binding.screenShareContainer.visibility = View.GONE
-                newRowCount = 3
-                newColumnCount = 2
-                newGuideLinePercentage = 0f
-
-            } else {
-                binding.screenShareContainer.visibility = View.VISIBLE
-                newRowCount = 1
-                newColumnCount = 2
-                newGuideLinePercentage = 0.75f
-            }
-
-            //smart updates cause updating evenrything at once would call layout()
-            if (lastGuideLinePercentage != newGuideLinePercentage) {
-                if (newGuideLinePercentage == 0.0f) {
-                    //un docked state
-                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        height = ViewGroup.LayoutParams.MATCH_PARENT
-                    }
-
-                    binding.rootLayout.applyConstraint {
-                        binding.viewPagerVideoGrid.clearTop()
-                    }
+            synchronized(tracks) {
+                val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
+                var newRowCount = 0
+                var newColumnCount = 0
+                var newGuideLinePercentage = 0f
+                //is screen share track is present then reduce the grid and column span else restore
+                if (screenShareTrackList.isEmpty()) {
+                    binding.screenShareContainer.visibility = View.GONE
+                    newRowCount = 3
+                    newColumnCount = 2
+                    newGuideLinePercentage = 0f
 
                 } else {
-                    //docked state
-                    binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
-                    }
-                    binding.rootLayout.applyConstraint {
-                        binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
-                    }
+                    binding.screenShareContainer.visibility = View.VISIBLE
+                    newRowCount = 1
+                    newColumnCount = 2
+                    newGuideLinePercentage = 0.75f
                 }
 
-                binding.divider.setGuidelinePercent(newGuideLinePercentage)
-                lastGuideLinePercentage = newGuideLinePercentage
+                //smart updates cause updating evenrything at once would call layout()
+                if (lastGuideLinePercentage != newGuideLinePercentage) {
+                    if (newGuideLinePercentage == 0.0f) {
+                        //un docked state
+                        binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            height = ViewGroup.LayoutParams.MATCH_PARENT
+                        }
+
+                        binding.rootLayout.applyConstraint {
+                            binding.viewPagerVideoGrid.clearTop()
+                        }
+
+                    } else {
+                        //docked state
+                        binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                            height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+                        }
+                        binding.rootLayout.applyConstraint {
+                            binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
+                        }
+                    }
+
+                    binding.divider.setGuidelinePercent(newGuideLinePercentage)
+                    lastGuideLinePercentage = newGuideLinePercentage
+                }
+
+                if (screenShareTrackList.size <= 1) {
+                    binding.tabLayoutDotsRemoteScreenShare.visibility = View.GONE
+                } else {
+                    binding.tabLayoutDotsRemoteScreenShare.visibility = View.VISIBLE
+                }
+
+
+                meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
+                    Pair(newRowCount, newColumnCount)
+
+                val itemsPerPage = newRowCount * newColumnCount
+
+
+                val remoteScreenShareTilesCount = screenShareTrackList.size
+                val localScreenShareTileCount = tracks.filter { it.isLocal && it.isScreen }.size
+                val hasLocalTile = tracks.filter { it.isLocal && it.isScreen.not() }.size == 1
+                val bothLocalTile = (tracks.size == 2 && tracks.filter { it.isLocal }.size == 2)
+                val hasRemotePeers = tracks.filter { it.isLocal.not() }.isNotEmpty()
+                val hasInsetTileVisible =
+                    meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole) && hasLocalTile && bothLocalTile.not() && hasRemotePeers
+                val onthePeerGridTileCount =
+                    tracks.size - remoteScreenShareTilesCount - localScreenShareTileCount + (1 * if (hasInsetTileVisible) -1 else 0)
+                // Without this, the extra inset adds one more tile than they should
+                val expectedPages =
+                    Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
+                screenShareAdapter.totalPages = remoteScreenShareTilesCount
+                peerGridVideoAdapter.totalPages = expectedPages
+
+                binding.tabLayoutDots.visibility =
+                    if (peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
             }
-
-            if (screenShareTrackList.size <=1){
-                binding.tabLayoutDotsRemoteScreenShare.visibility = View.GONE
-            } else {
-                binding.tabLayoutDotsRemoteScreenShare.visibility = View.VISIBLE
-            }
-
-
-            meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
-                Pair(newRowCount, newColumnCount)
-
-            val itemsPerPage = newRowCount * newColumnCount
-
-
-            val remoteScreenShareTilesCount = screenShareTrackList.size
-            val localScreenShareTileCount = tracks.filter { it.isLocal && it.isScreen}.size
-            val hasLocalTile = tracks.filter { it.isLocal && it.isScreen.not()}.size == 1
-            val bothLocalTile = (tracks.size == 2 && tracks.filter { it.isLocal }.size == 2)
-            val hasRemotePeers = tracks.filter { it.isLocal.not() }.isNotEmpty()
-            val hasInsetTileVisible = meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole) && hasLocalTile && bothLocalTile.not() && hasRemotePeers
-            val onthePeerGridTileCount = tracks.size - remoteScreenShareTilesCount - localScreenShareTileCount + (1 * if(hasInsetTileVisible) -1 else 0)
-            // Without this, the extra inset adds one more tile than they should
-            val expectedPages = Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
-            screenShareAdapter.totalPages = remoteScreenShareTilesCount
-            peerGridVideoAdapter.totalPages = expectedPages
-
-            binding.tabLayoutDots.visibility =
-                if (peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
         }
 
         meetingViewModel.hmsScreenShareBottomSheetEvent.observe(viewLifecycleOwner) {
