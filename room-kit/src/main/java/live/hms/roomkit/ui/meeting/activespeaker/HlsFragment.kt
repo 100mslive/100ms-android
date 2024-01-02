@@ -45,6 +45,7 @@ class HlsFragment : Fragment() {
     val displayHlsCuesUseCase = DisplayHlsCuesUseCase( { text -> binding.hlsCues.text = text })
     { pollId ->
         lifecycleScope.launch {
+            meetingViewModel.getAllPolls()
             val hmsPoll = meetingViewModel.getPollForPollId(pollId)
             if(hmsPoll != null)
                 meetingViewModel.triggerPollsNotification(hmsPoll)
