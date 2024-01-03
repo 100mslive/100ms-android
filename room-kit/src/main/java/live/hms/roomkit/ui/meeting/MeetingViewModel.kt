@@ -43,6 +43,7 @@ import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.PollAnswerResponse
+import live.hms.video.polls.models.network.HMSPollQuestionResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.polls.network.PollLeaderboardResponse
@@ -1105,18 +1106,9 @@ class MeetingViewModel(
             override fun onSuccess(result: List<HmsPoll>) {
                 // Put the last poll in the list.
                 lastStartedPoll = result.maxByOrNull { it.startedAt }
-//                Log.d("PollInfoS","${lastStartedPoll?.pollId} at ${lastStartedPoll?.startedAt}")
-                // This happens only once.
-//                _events.emit(Event.PollStarted(hmsPoll))
-//                viewModelScope.launch {
-//                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
-//                        _events.emit(Event.PollStarted(firstPoll))
-//                    }
-//                }
             }
 
             override fun onError(error: HMSException) {
-//                Log.d(TAG,"Polls error $error")
             }
 
         })
@@ -2171,16 +2163,15 @@ class MeetingViewModel(
 
     suspend fun getPollForPollId(pollId: String): HmsPoll? {
         val pollWithQuestions = CompletableDeferred<HmsPoll?>()
-        localHmsInteractivityCenter.polls.find { it.pollId == pollId }!!
-            .also { existingPoll ->
-                if (existingPoll.questions == null || (existingPoll?.questions?.isEmpty() == true)) {
+        localHmsInteractivityCenter.polls.find { it.pollId == pollId }
+            ?.also { existingPoll ->
+                if (existingPoll.questions == null || (existingPoll.questions?.isEmpty() == true)) {
                     localHmsInteractivityCenter.fetchPollQuestions(
                         existingPoll,
                         object : HmsTypedActionResultListener<List<HMSPollQuestion>> {
                             override fun onSuccess(result: List<HMSPollQuestion>) {
-                                val newPoll =
-                                    localHmsInteractivityCenter.polls.find { newPolls -> newPolls.pollId == pollId }
-                                pollWithQuestions.complete(newPoll)
+                                localHmsInteractivityCenter.polls.find { newPolls -> newPolls.pollId == pollId }
+                                        ?.let { addResponses(it, pollWithQuestions)  }
                             }
 
                             override fun onError(error: HMSException) {
@@ -2188,6 +2179,8 @@ class MeetingViewModel(
                             }
 
                         })
+                } else if (existingPoll.questions?.flatMap { it.myResponses }?.isEmpty() != false) {
+                    addResponses(existingPoll, pollWithQuestions)
                 } else {
                     pollWithQuestions.complete(existingPoll)
                 }
@@ -2198,6 +2191,20 @@ class MeetingViewModel(
             null
         }
     }
+
+    private fun addResponses(requestedPoll: HmsPoll, pollWithQuestions: CompletableDeferred<HmsPoll?>, ) {
+        localHmsInteractivityCenter.getResponses(requestedPoll, ownResponsesOnly = false, completion = object : HmsTypedActionResultListener<List<HMSPollQuestionResponse>> {
+            override fun onSuccess(result: List<HMSPollQuestionResponse>) {
+                pollWithQuestions.complete(localHmsInteractivityCenter.polls.find { existingPoll -> existingPoll.pollId == requestedPoll.pollId }!!)
+            }
+
+            override fun onError(error: HMSException) {
+                pollWithQuestions.complete(requestedPoll)
+            }
+
+        })
+    }
+
     fun hasPoll() : HmsPoll? = localHmsInteractivityCenter.polls.firstOrNull()
 
     fun hmsInteractivityCenterPolls() = localHmsInteractivityCenter.polls
