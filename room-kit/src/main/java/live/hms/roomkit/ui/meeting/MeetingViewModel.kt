@@ -2197,7 +2197,7 @@ class MeetingViewModel(
                 } else {
                     pollWithQuestions.complete(existingPoll)
                 }
-            }
+            }?:return null
         return try {
             pollWithQuestions.await()
         } catch (error: HMSException) {
