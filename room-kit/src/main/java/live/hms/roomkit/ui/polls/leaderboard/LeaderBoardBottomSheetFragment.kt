@@ -138,7 +138,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         leaderBoardListadapter.clear()
 
         val isAverageTimeEmpty =
-            model.summary?.averageTime == null
+            model.summary?.averageTime == null || model.summary?.averageTime == 0f
         val isAverageScoreEmpty =
             model.summary?.averageScore == null
         val isCorrectAnswerEmpty =
