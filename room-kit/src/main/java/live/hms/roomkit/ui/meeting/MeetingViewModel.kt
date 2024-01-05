@@ -366,7 +366,6 @@ class MeetingViewModel(
     val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
     val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
-    private val _isRecording = MutableLiveData(StreamingRecordingState.NOT_RECORDING_OR_STREAMING)
     private var hmsRoom: HMSRoom? = null
 
     // Live data for enabling/disabling mute buttons
@@ -1737,13 +1736,6 @@ class MeetingViewModel(
 
     fun stopAudioshare(actionListener: HMSActionResultListener) {
         hmsSDK.stopAudioshare(actionListener)
-    }
-
-
-    fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
-    }
-
-    fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
     }
 
     private val _events = MutableSharedFlow<Event?>()
