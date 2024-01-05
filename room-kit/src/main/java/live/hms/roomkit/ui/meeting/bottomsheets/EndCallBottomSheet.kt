@@ -63,7 +63,6 @@ class EndCallBottomSheet : BottomSheetDialogFragment() {
                 meetingViewModel.endRoom(false)
             } else {
                 meetingViewModel.stopHls()
-                meetingViewModel.leaveMeeting()
             }
 
 
