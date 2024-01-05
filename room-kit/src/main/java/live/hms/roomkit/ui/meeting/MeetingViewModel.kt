@@ -1220,8 +1220,15 @@ class MeetingViewModel(
     }
     private fun getOnStageRole(currentRole : HMSRole?) = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole
 
-    private fun switchToHlsView(streamUrl: String) =
-        meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
+    private fun switchToHlsView(streamUrl: String) {
+        val currentMode = meetingViewMode.value
+        if( currentMode is MeetingViewMode.HLS_VIEWER && currentMode.url == streamUrl) {
+            // If there's nothing to change, don't restart hls fragment
+        } else
+        {
+            meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
+        }
+    }
 
     private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
         if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS_VIEWER) {
@@ -1238,7 +1245,7 @@ class MeetingViewModel(
         // If we don't check if the stream is started, it might try to open the hls view again when
         //  the stream was stopped. This happens when a running stream is stopped and buffers
         //  the stream.
-        if (isHlsPeer && streamUrl != null && streamingState.value != HMSStreamingState.STARTED) {
+        if (isHlsPeer && streamUrl != null) {
             started = true
             switchToHlsView(streamUrl)
         }
