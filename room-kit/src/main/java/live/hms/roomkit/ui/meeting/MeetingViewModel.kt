@@ -43,6 +43,7 @@ import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.polls.models.answer.PollAnswerResponse
+import live.hms.video.polls.models.network.HMSPollQuestionResponse
 import live.hms.video.polls.models.question.HMSPollQuestion
 import live.hms.video.polls.models.question.HMSPollQuestionType
 import live.hms.video.polls.network.PollLeaderboardResponse
@@ -365,7 +366,6 @@ class MeetingViewModel(
     val isLocalAudioEnabled = MutableLiveData(settings.publishAudio)
     val isLocalVideoEnabled = MutableLiveData(settings.publishVideo)
 
-    private val _isRecording = MutableLiveData(StreamingRecordingState.NOT_RECORDING_OR_STREAMING)
     private var hmsRoom: HMSRoom? = null
 
     // Live data for enabling/disabling mute buttons
@@ -424,18 +424,24 @@ class MeetingViewModel(
             // Add all tracks as they come in.
             addSource(tracks) { meetTracks: List<MeetingTrack> ->
                 //if remote peer and local peer is present inset mode
+               synchronized(tracks) {
+                   val excludeLocalTrackIfRemotePeerIsPreset =
+                       //Don't inset when local peer and local screen share track is found
+                       if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(
+                               hmsSDK.getLocalPeer()?.hmsRole
+                           )
+                       )
+                           meetTracks
+                       else if (meetTracks.size > 1 && hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
+                           meetTracks.filter { !it.isLocal }.toList()
+                       else
+                           meetTracks
 
-               val excludeLocalTrackIfRemotePeerIsPreset =
-                   //Don't inset when local peer and local screen share track is found
-                   if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
-                       meetTracks
-                 else if(meetTracks.size > 1 &&  hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
-                       meetTracks.filter { !it.isLocal }.toList()
-                    else
-                        meetTracks
+                   val result =
+                       speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset.filter { it.isScreen.not() })
+                   setValue(result)
+               }
 
-                val result = speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset.filter { it.isScreen.not() })
-                setValue(result)
             }
 
         }
@@ -1105,18 +1111,9 @@ class MeetingViewModel(
             override fun onSuccess(result: List<HmsPoll>) {
                 // Put the last poll in the list.
                 lastStartedPoll = result.maxByOrNull { it.startedAt }
-//                Log.d("PollInfoS","${lastStartedPoll?.pollId} at ${lastStartedPoll?.startedAt}")
-                // This happens only once.
-//                _events.emit(Event.PollStarted(hmsPoll))
-//                viewModelScope.launch {
-//                    result.sortedBy { it.startedAt }.firstOrNull()?.also { firstPoll ->
-//                        _events.emit(Event.PollStarted(firstPoll))
-//                    }
-//                }
             }
 
             override fun onError(error: HMSException) {
-//                Log.d(TAG,"Polls error $error")
             }
 
         })
@@ -1223,8 +1220,15 @@ class MeetingViewModel(
     }
     private fun getOnStageRole(currentRole : HMSRole?) = hmsRoomLayout?.data?.findLast { it?.role ==  currentRole?.name }?.screens?.conferencing?.default?.elements?.onStageExp?.onStageRole
 
-    private fun switchToHlsView(streamUrl: String) =
-        meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
+    private fun switchToHlsView(streamUrl: String) {
+        val currentMode = meetingViewMode.value
+        if( currentMode is MeetingViewMode.HLS_VIEWER && currentMode.url == streamUrl) {
+            // If there's nothing to change, don't restart hls fragment
+        } else
+        {
+            meetingViewMode.postValue(MeetingViewMode.HLS_VIEWER(streamUrl))
+        }
+    }
 
     private fun exitHlsViewIfRequired(isHlsPeer: Boolean) {
         if (!isHlsPeer && meetingViewMode.value is MeetingViewMode.HLS_VIEWER) {
@@ -1238,6 +1242,9 @@ class MeetingViewModel(
         var started = false
         val isHlsPeer = isHlsPeer(role)
         showAudioIcon.postValue(!isHlsPeer)
+        // If we don't check if the stream is started, it might try to open the hls view again when
+        //  the stream was stopped. This happens when a running stream is stopped and buffers
+        //  the stream.
         if (isHlsPeer && streamUrl != null) {
             started = true
             switchToHlsView(streamUrl)
@@ -1741,13 +1748,6 @@ class MeetingViewModel(
         hmsSDK.stopAudioshare(actionListener)
     }
 
-
-    fun startVirtualBackgroundPlugin(context: Context?, actionListener: HMSActionResultListener) {
-    }
-
-    fun stopVirtualBackgroundPlugin(actionListener: HMSActionResultListener) {
-    }
-
     private val _events = MutableSharedFlow<Event?>()
     val events: SharedFlow<Event?> = _events
 
@@ -2171,16 +2171,20 @@ class MeetingViewModel(
 
     suspend fun getPollForPollId(pollId: String): HmsPoll? {
         val pollWithQuestions = CompletableDeferred<HmsPoll?>()
-        localHmsInteractivityCenter.polls.find { it.pollId == pollId }!!
-            .also { existingPoll ->
-                if (existingPoll.questions == null || (existingPoll?.questions?.isEmpty() == true)) {
+        val poll: HmsPoll? = localHmsInteractivityCenter.polls.find { it.pollId == pollId }
+
+        if (poll == null)
+            getAllPolls()
+
+        localHmsInteractivityCenter.polls.find { it.pollId == pollId }
+            ?.also { existingPoll ->
+                if (existingPoll.questions == null || (existingPoll.questions?.isEmpty() == true)) {
                     localHmsInteractivityCenter.fetchPollQuestions(
                         existingPoll,
                         object : HmsTypedActionResultListener<List<HMSPollQuestion>> {
                             override fun onSuccess(result: List<HMSPollQuestion>) {
-                                val newPoll =
-                                    localHmsInteractivityCenter.polls.find { newPolls -> newPolls.pollId == pollId }
-                                pollWithQuestions.complete(newPoll)
+                                localHmsInteractivityCenter.polls.find { newPolls -> newPolls.pollId == pollId }
+                                        ?.let { addResponses(it, pollWithQuestions)  }
                             }
 
                             override fun onError(error: HMSException) {
@@ -2188,16 +2192,32 @@ class MeetingViewModel(
                             }
 
                         })
+                } else if (existingPoll.questions?.flatMap { it.myResponses }?.isEmpty() != false) {
+                    addResponses(existingPoll, pollWithQuestions)
                 } else {
                     pollWithQuestions.complete(existingPoll)
                 }
-            }
+            }?:return null
         return try {
             pollWithQuestions.await()
         } catch (error: HMSException) {
             null
         }
     }
+
+    private fun addResponses(requestedPoll: HmsPoll, pollWithQuestions: CompletableDeferred<HmsPoll?>, ) {
+        localHmsInteractivityCenter.getResponses(requestedPoll, ownResponsesOnly = false, completion = object : HmsTypedActionResultListener<List<HMSPollQuestionResponse>> {
+            override fun onSuccess(result: List<HMSPollQuestionResponse>) {
+                pollWithQuestions.complete(localHmsInteractivityCenter.polls.find { existingPoll -> existingPoll.pollId == requestedPoll.pollId }!!)
+            }
+
+            override fun onError(error: HMSException) {
+                pollWithQuestions.complete(requestedPoll)
+            }
+
+        })
+    }
+
     fun hasPoll() : HmsPoll? = localHmsInteractivityCenter.polls.firstOrNull()
 
     fun hmsInteractivityCenterPolls() = localHmsInteractivityCenter.polls
@@ -2214,16 +2234,6 @@ class MeetingViewModel(
             }
 
         })
-//        val getCreatedPolls = CompletableDeferred<List<HmsPoll>>()
-//        localHmsInteractivityCenter.fetchPollList(HmsPollState.CREATED, object : HmsTypedActionResultListener<List<HmsPoll>>{
-//            override fun onSuccess(result: List<HmsPoll>) {
-//                getCreatedPolls.complete(result)
-//            }
-//
-//            override fun onError(error: HMSException) {
-//                getCreatedPolls.completeExceptionally(error)
-//            }
-//        })
         val getEndedPolls = CompletableDeferred<List<HmsPoll>>()
         localHmsInteractivityCenter.fetchPollList(HmsPollState.STOPPED, object : HmsTypedActionResultListener<List<HmsPoll>>{
             override fun onSuccess(result: List<HmsPoll>) {
@@ -2364,11 +2374,7 @@ class MeetingViewModel(
 
         val currentUnixTimestampInSeconds = (System.currentTimeMillis()/1000L)
         val isPollLaunchedGreaterThan20SecondsAgo = currentUnixTimestampInSeconds - lp.startedAt > 20
-//        val t = Date().time
-        Log.d("PollInfoS","diff: $isPollLaunchedGreaterThan20SecondsAgo lastPollTime : ${lp.startedAt} current time : $currentUnixTimestampInSeconds diff : ${currentUnixTimestampInSeconds - lp.startedAt}")
-
         if(!playerStarted && isPollLaunchedGreaterThan20SecondsAgo) {
-//            Log.d("PollInfoS","Launching")
             viewModelScope.launch {
                 triggerPollsNotification(lp)
             }

@@ -70,7 +70,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
         initOnBackPress()
         lifecycleScope.launch {
             val pollId = arguments?.getString(POLL_TO_DISPLAY)
-            val returnedPoll = if(pollId == null) null else meetingViewModel.getPollForPollId(pollId)
+            val returnedPoll = if(pollId.isNullOrEmpty()) null else meetingViewModel.getPollForPollId(pollId)
             if(returnedPoll == null) {
                 // Close the fragment and exit
                 closePollDisplay()

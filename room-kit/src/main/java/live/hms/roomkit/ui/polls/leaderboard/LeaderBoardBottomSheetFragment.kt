@@ -83,6 +83,11 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             val pollId: String =
                 (arguments?.getString(POLL_TO_DISPLAY) ?: dismissAllowingStateLoss()).toString()
             poll = meetingViewModel.getPollForPollId(pollId)
+            if (poll == null) {
+                // Close the fragment and exit
+                dismissAllowingStateLoss()
+                return@launch
+            }
             leaderBoardListadapter.spanCount = 12
 
             binding.backButton.setOnClickListener { dismissAllowingStateLoss() }
@@ -133,7 +138,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         leaderBoardListadapter.clear()
 
         val isAverageTimeEmpty =
-            model.summary?.averageTime == null
+            model.summary?.averageTime == null || model.summary?.averageTime == 0f
         val isAverageScoreEmpty =
             model.summary?.averageScore == null
         val isCorrectAnswerEmpty =

@@ -21,6 +21,7 @@ import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.*
+import live.hms.roomkit.ui.meeting.bottomsheets.StreamEnded
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.stats.PlayerStatsListener
@@ -161,8 +162,13 @@ class HlsFragment : Fragment() {
             override fun onPlaybackStateChanged(state : HmsHlsPlaybackState){
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
-                        if(state == HmsHlsPlaybackState.playing)
+                        if(state == HmsHlsPlaybackState.playing) {
                             meetingViewModel.hlsPlayerBeganToPlay()
+                        }
+                        else if (state == HmsHlsPlaybackState.stopped) {
+                            // Open end stream fragment.
+                            StreamEnded.launch(parentFragmentManager)
+                        }
                     }
                 }
                 Log.d("HMSHLSPLAYER","From App, playback state: $state")

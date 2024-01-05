@@ -264,4 +264,6 @@
     <string name="you">You</string>
     <string name="chat_rbac_picker_send_to">Choose a Recipient</string>
     <string name="no_recipients_yet_message_options_recyclerview">No Recipients Yet</string>
+    <string name="stream_ended">Stream Ended</string>
+    <string name="stream_ended_subtitle">Have a nice day!</string>
 </resources>
