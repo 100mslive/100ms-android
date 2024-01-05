@@ -15,6 +15,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.sdk.models.enums.HMSStreamingState
 import live.hms.video.utils.HMSLogger
 
 class MultipleLeaveOptionBottomSheet() : BottomSheetDialogFragment() {
@@ -75,6 +76,12 @@ class MultipleLeaveOptionBottomSheet() : BottomSheetDialogFragment() {
         binding.endSessionLayout.setOnSingleClickListener(200L) {
             EndCallBottomSheet().show(parentFragmentManager, null)
             dismissAllowingStateLoss()
+        }
+
+        binding.endSessionLayout.visibility = if(meetingViewModel.streamingState.value != HMSStreamingState.STARTED ) {
+            View.GONE
+        } else {
+            View.VISIBLE
         }
     }
 
