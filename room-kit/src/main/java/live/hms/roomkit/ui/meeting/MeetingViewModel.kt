@@ -1235,7 +1235,10 @@ class MeetingViewModel(
         var started = false
         val isHlsPeer = isHlsPeer(role)
         showAudioIcon.postValue(!isHlsPeer)
-        if (isHlsPeer && streamUrl != null) {
+        // If we don't check if the stream is started, it might try to open the hls view again when
+        //  the stream was stopped. This happens when a running stream is stopped and buffers
+        //  the stream.
+        if (isHlsPeer && streamUrl != null && streamingState.value != HMSStreamingState.STARTED) {
             started = true
             switchToHlsView(streamUrl)
         }
