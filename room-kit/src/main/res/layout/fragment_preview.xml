@@ -142,7 +142,6 @@
             android:fontFamily="@font/inter_regular"
             android:gravity="center"
             android:lineHeight="20sp"
-            android:maxLines="2"
             tools:text="Setup your audio and video before joining"
             android:textAlignment="center"
             android:textSize="14sp"

@@ -271,7 +271,19 @@ class PreviewFragment : Fragment() {
         // don't allow editing the name if there's supposed to be a fixed one
 
         var introAnimationOffset = 450
-        if (meetingViewModel.getHmsRoomLayout()
+        if (!meetingViewModel.liveClassName.isNullOrEmpty()){
+            binding.nameTv.text = buildString {
+                append(getString(R.string.welcome_text))
+                append(" ")
+                append(meetingViewModel.liveClassName)
+            }
+            binding.nameTv.startBounceAnimationUpwards()
+        }else{
+            binding.nameTv.text = meetingViewModel.getHmsRoomLayout()
+                ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.title
+            binding.nameTv.startBounceAnimationUpwards()
+        }
+/*        if (meetingViewModel.getHmsRoomLayout()
                 ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.title.isNullOrEmpty()
         ) {
             binding.nameTv.visibility = View.GONE
@@ -279,7 +291,7 @@ class PreviewFragment : Fragment() {
             binding.nameTv.text = meetingViewModel.getHmsRoomLayout()
                 ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.title
             binding.nameTv.startBounceAnimationUpwards()
-        }
+        }*/
 
         if (meetingViewModel.getHmsRoomLayout()
                 ?.getPreviewLayout(roleName)?.default?.elements?.previewHeader?.subTitle.isNullOrEmpty()
