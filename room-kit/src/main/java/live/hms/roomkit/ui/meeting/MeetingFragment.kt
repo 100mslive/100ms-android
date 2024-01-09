@@ -707,7 +707,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun startHLSStreamingIfRequired() {
-        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
+        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning().not()) {
             binding.meetingFragmentProgress.visibility = View.VISIBLE
             hasStartedHls = true
             meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
