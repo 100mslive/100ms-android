@@ -271,4 +271,5 @@
     <string name="hms_poll">poll</string>
     <string name="hms_quiz">quiz</string>
     <string name="hms_started_quiz_poll_notification">%1$s started a new %2$s</string>
+    <string name="preview_screen_icon_disabled_toast_text">No audio or video is allowed; please use the hand-raise feature to ask questions.</string>
 </resources>

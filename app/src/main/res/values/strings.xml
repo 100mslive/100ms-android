@@ -198,4 +198,5 @@
     <string name="end_stream_str">End Stream</string>
     <string name="device_stats_str">Device Info</string>
     <item name="IS_INT" type="id"/>
+    <string name="preview_screen_icon_disabled_toast_text">No audio or video is allowed; please use the hand-raise feature to ask questions.</string>
 </resources>

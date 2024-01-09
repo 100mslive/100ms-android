@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -437,8 +438,13 @@ class PreviewFragment : Fragment() {
                         binding.buttonSwitchCamera.isEnabled = false
                         binding.buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
                     }
+                } ?: run {
+                    Toast.makeText(
+                        context,
+                        resources.getString(R.string.preview_screen_icon_disabled_toast_text),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-
             }
         }
 
@@ -454,6 +460,12 @@ class PreviewFragment : Fragment() {
                     } else {
                         binding.buttonToggleAudio.setIconEnabled(R.drawable.avd_mic_off_to_on)
                     }
+                } ?: run {
+                    Toast.makeText(
+                        context,
+                        resources.getString(R.string.preview_screen_icon_disabled_toast_text),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -738,6 +750,7 @@ class PreviewFragment : Fragment() {
     private fun updateUiBasedOnPublishParams(publishParams: PublishParams?) {
         if (publishParams == null) return
 
+        /**
         if (publishParams.allowed.contains("audio")) {
             binding.buttonToggleAudio.visibility = View.VISIBLE
             updateNoiseCancellationIcon()
@@ -762,6 +775,32 @@ class PreviewFragment : Fragment() {
             binding.videoCardContainer.visibility = View.GONE
             binding.iconNoiseCancellation.visibility = View.GONE
         }
+         **/
+
+        with(binding) {
+            val audioAllowed = "audio" in publishParams.allowed
+            val videoAllowed = "video" in publishParams.allowed
+
+            iconOutputDevice.startBounceAnimationUpwards()
+            setViewVisibleAndBounceAnimation(
+                view = buttonToggleAudio,
+                isViewEnabled = audioAllowed
+            )
+            setViewVisibleAndBounceAnimation(
+                view = buttonToggleVideo,
+                isViewEnabled = videoAllowed
+            )
+            setViewVisibleAndBounceAnimation(
+                view = buttonSwitchCamera,
+                isViewEnabled = videoAllowed
+            )
+            videoCardContainer.visibility = if (videoAllowed) View.VISIBLE else View.GONE
+            if (!videoAllowed) topMarging.setGuidelinePercent(0.35f)
+        }
+    }
+    private fun setViewVisibleAndBounceAnimation(view: View, isViewEnabled: Boolean) {
+        view.visibility = View.VISIBLE
+        view.startBounceAnimationUpwards(forceAlpha = if (isViewEnabled) 1.0f else 0.5f)
     }
 
     private fun updateNetworkQualityView(
