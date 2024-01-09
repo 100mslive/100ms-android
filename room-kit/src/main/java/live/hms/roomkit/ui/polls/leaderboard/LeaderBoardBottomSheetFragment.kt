@@ -204,7 +204,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                         position = if (index == 0) ApplyRadiusatVertex.TOP
                         else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
                         else ApplyRadiusatVertex.NONE,
-                        rankBackGroundColor = rankTOColorMap.getOrDefault(entry.position.toString(), HMSPrebuiltTheme.getColours()?.secondaryDefault)
+                        rankBackGroundColor = rankTOColorMap[entry.position.toString()]?:HMSPrebuiltTheme.getColours()?.secondaryDefault
                     )
                 )
             }
