@@ -266,6 +266,6 @@
     <string name="no_recipients_yet_message_options_recyclerview">No Recipients Yet</string>
     <string name="stream_ended">Stream Ended</string>
     <string name="stream_ended_subtitle">Have a nice day!</string>
-    <string name="preview_screen_icon_disabled_toast_text">No audio or video is allowed; please use the hand-raise feature to ask questions.</string>
+    <string name="preview_screen_icon_disabled_toast_text">No media permission. Raise your hand to ask.</string>
     <string name="welcome_text">Welcome to</string>
 </resources>
