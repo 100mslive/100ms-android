@@ -10,11 +10,11 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_gravity="right"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="24dp"
         android:elevation="3dp"
-        android:src="@drawable/ic_close_16"
-        android:paddingVertical="24dp"
-        android:paddingHorizontal="24dp"
+        android:src="@drawable/ic_close_new"
+        android:paddingVertical="22dp"
+        android:paddingHorizontal="22dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,11 +23,11 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_gravity="right"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="24dp"
         android:elevation="3dp"
-        android:src="@android:drawable/ic_menu_rotate"
-        android:paddingVertical="24dp"
-        android:paddingHorizontal="24dp"
+        android:src="@drawable/ic_rotate_new"
+        android:paddingVertical="22dp"
+        android:paddingHorizontal="22dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 

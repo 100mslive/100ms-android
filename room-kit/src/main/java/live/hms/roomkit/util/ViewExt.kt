@@ -122,7 +122,7 @@ fun Context.showTileListDialog(
   builder.setTitle("Perform Action")
   val intentList = mutableListOf("Screen Capture", "Mirror")
   if (isLocalTrack.not())
-    intentList+= "Simulcast"
+    intentList+= "Quality"
   builder.setItems(intentList.toTypedArray()) { _, which ->
     when (which) {
       0 -> { onScreenCapture.invoke() }
