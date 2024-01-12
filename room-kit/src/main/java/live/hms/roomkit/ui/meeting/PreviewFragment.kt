@@ -383,7 +383,8 @@ class PreviewFragment : Fragment() {
                 Log.v(TAG, "iconOutputDevice.onClick()")
 
                 AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
-
+                    if (isMuted)
+                        updateActionVolumeMenuIcon()
                 }.show(
                     childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )

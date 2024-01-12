@@ -1240,6 +1240,8 @@ class MeetingFragment : Fragment() {
 
                 AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
 
+                    if (isMuted)
+                        updateActionVolumeMenuIcon()
                 }.show(
                     childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
@@ -1262,8 +1264,6 @@ class MeetingFragment : Fragment() {
             }
         })
 
-
-        updateActionVolumeMenuIcon()
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             meetingViewModel.flipCamera()
