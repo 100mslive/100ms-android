@@ -1245,7 +1245,7 @@ class MeetingFragment : Fragment() {
                 )
             }
         }
-
+        updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
         meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
             HMSAudioManager.AudioManagerDeviceChangeListener {
             override fun onAudioDeviceChanged(
