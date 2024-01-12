@@ -1239,14 +1239,31 @@ class MeetingFragment : Fragment() {
                 Log.v(TAG, "iconOutputDevice.onClick()")
 
                 AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
-                    updateActionVolumeMenuIcon(audioDevice)
+
                 }.show(
                     childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
             }
         }
 
-        updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
+        meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
+            HMSAudioManager.AudioManagerDeviceChangeListener {
+            override fun onAudioDeviceChanged(
+                p0: HMSAudioManager.AudioDevice,
+                p1: Set<HMSAudioManager.AudioDevice>
+            ) {
+                lifecycleScope.launch {
+                    updateActionVolumeMenuIcon(p0)
+                }
+            }
+
+
+            override fun onError(p0: HMSException) {
+            }
+        })
+
+
+        updateActionVolumeMenuIcon()
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             meetingViewModel.flipCamera()

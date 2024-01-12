@@ -51,6 +51,7 @@ import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.switchCamera
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.audio.HMSAudioManager
+import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.models.HMSLocalPeer
@@ -361,12 +362,28 @@ class PreviewFragment : Fragment() {
             }
         }
 
+        meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
+            HMSAudioManager.AudioManagerDeviceChangeListener {
+             override fun onAudioDeviceChanged(
+                p0: HMSAudioManager.AudioDevice,
+                p1: Set<HMSAudioManager.AudioDevice>
+            ) {
+                lifecycleScope.launch {
+                    updateActionVolumeMenuIcon(p0)
+                }
+            }
+
+
+            override fun onError(p0: HMSException) {
+            }
+        })
+
         binding.iconOutputDevice.apply {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconOutputDevice.onClick()")
 
                 AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
-                    updateActionVolumeMenuIcon(audioDevice)
+
                 }.show(
                     childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
@@ -663,7 +680,7 @@ class PreviewFragment : Fragment() {
                     updateJoinButtonTextIfHlsIsEnabled(room.localPeer?.hmsRole?.name)
                     enableDisableJoinNowButton()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
-                    updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
+
                 } else {
                     updateActionVolumeMenuIcon()
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
