@@ -233,9 +233,12 @@ class MeetingFragment : Fragment() {
                         ?: meetingViewModel.hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
-                        binding.tvStreamingTime.visibility = View.VISIBLE
-                        binding.tvStreamingTime.text =
-                            millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            binding.tvStreamingTime.visibility = View.VISIBLE
+                            binding.tvStreamingTime.text =
+                                millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+
+                        }
                     }
                 }
             }
