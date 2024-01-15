@@ -2383,5 +2383,10 @@ class MeetingViewModel(
     }
 
     fun disableNameEdit() = prebuiltOptions?.userName != null
+
+    val countDownTimerStartedAt = MutableLiveData<Long?>(null)
+    fun setCountDownTimerStartedAt(startedAt: Long?) {
+        countDownTimerStartedAt.postValue(startedAt)
+    }
 }
 

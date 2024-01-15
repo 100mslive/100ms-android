@@ -177,12 +177,14 @@ class MeetingFragment : Fragment() {
         super.onDestroy()
         isCountdownManuallyCancelled = true
         hasStartedHls = false
+        meetingViewModel.setCountDownTimerStartedAt(null)
         countDownTimer?.cancel()
     }
 
     override fun onPause() {
         super.onPause()
         isCountdownManuallyCancelled = true
+        meetingViewModel.setCountDownTimerStartedAt(null)
         countDownTimer?.cancel()
     }
 
@@ -226,6 +228,7 @@ class MeetingFragment : Fragment() {
 
     private fun setupStreamingTimeView() {
         countDownTimer?.cancel()
+        meetingViewModel.setCountDownTimerStartedAt(null)
         countDownTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(l: Long) {
                 val startedAt =
@@ -233,12 +236,7 @@ class MeetingFragment : Fragment() {
                         ?: meetingViewModel.hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
-                        lifecycleScope.launch {
-                            binding.tvStreamingTime.visibility = View.VISIBLE
-                            binding.tvStreamingTime.text =
-                                millisecondsToTime(System.currentTimeMillis().minus(startedAt))
-
-                        }
+                        meetingViewModel.setCountDownTimerStartedAt(startedAt)
                     }
                 }
             }
@@ -298,6 +296,15 @@ class MeetingFragment : Fragment() {
         initObservers()
         initOnBackPress()
 
+        meetingViewModel.countDownTimerStartedAt.observe(viewLifecycleOwner) { startedAt ->
+            if (startedAt != null) {
+                binding.tvStreamingTime.visibility = View.VISIBLE
+                binding.tvStreamingTime.text =
+                    millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+            } else {
+                binding.tvStreamingTime.visibility = View.GONE
+            }
+        }
         binding.chatMessages.isHeightContrained = true
         PauseChatUIUseCase().setChatPauseVisible(
             binding.chatOptionsCard,
