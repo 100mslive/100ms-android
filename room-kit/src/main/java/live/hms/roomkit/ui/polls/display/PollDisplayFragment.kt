@@ -1,15 +1,19 @@
 package live.hms.roomkit.ui.polls.display
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -95,7 +99,14 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 }
                 val startedType = if(poll.category == HmsPollCategory.QUIZ) "Quiz" else "Poll"
                 pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name?: "Participant", startedType)
-                questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+
+                // Quizzes only scroll horizontally and snap to questions
+                if(poll.category == HmsPollCategory.QUIZ) {
+                    questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
+                    PagerSnapHelper().attachToRecyclerView(questionsRecyclerView)
+                } else {
+                    questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+                }
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
                 pollsLive.pollsStatusLiveDraftEnded(poll.state)
