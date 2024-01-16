@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_d2"
+            tools:textColor="@android:color/black"
             android:layout_marginLeft="@dimen/spacing_d2"
             android:lineHeight="16dp"
             android:lineSpacingExtra="3sp"
@@ -28,12 +29,15 @@
             android:textAppearance="@style/poll_display_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            tools:textColor="@android:color/black"
+            tools:text="How many cats do you have?"
             android:layout_marginLeft="@dimen/spacing_d2"
             android:layout_marginTop="@dimen/spacing_d2" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/options"
             android:layout_marginLeft="@dimen/spacing_d2"
+            tools:itemCount="3"
             android:layout_gravity="right"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +47,9 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/votingProgressBars"
             android:layout_width="match_parent"
+            tools:visibility="gone"
             android:layout_height="wrap_content"
+            tools:itemCount="3"
             android:layout_marginTop="@dimen/spacing_d2"
             android:nestedScrollingEnabled="false" />
 
