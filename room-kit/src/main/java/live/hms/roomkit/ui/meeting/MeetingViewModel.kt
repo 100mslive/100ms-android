@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.util.Log
@@ -1092,12 +1091,17 @@ class MeetingViewModel(
     }
 
      fun triggerPollsNotification(poll: HmsPoll) {
+
+         val res = getApplication<Application>().resources
+         val pollOrQuiz = res.getString(if (poll.category == HmsPollCategory.POLL) R.string.hms_poll else R.string.hms_quiz)
+         val actionButtonText = res.getString(if (poll.category == HmsPollCategory.POLL) R.string.hms_vote else R.string.hms_answer)
+
         hmsNotificationEvent.postValue(
             HMSNotification(
-                title = "${poll.createdBy?.name.orEmpty()} started a new ${if (poll.category == HmsPollCategory.POLL) "poll" else "quiz"}",
+                title = res.getString(R.string.hms_started_quiz_poll_notification, poll.createdBy?.name.orEmpty(), pollOrQuiz),
                 isDismissible = true,
                 icon = R.drawable.poll_vote,
-                actionButtonText = if (poll.category == HmsPollCategory.POLL) "Vote" else "Join",
+                actionButtonText = actionButtonText,
                 type = HMSNotificationType.OpenPollOrQuiz(pollId = poll.pollId)
             )
         )
