@@ -2120,14 +2120,14 @@ class MeetingViewModel(
         }
         return valid
     }
-    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll) : Boolean {
+    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
         if(option == null) {
             return false
         }
         val answer = question.options?.get(option)
         if(answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
-                .addResponse(question, answer)
+                .addResponse(question.copy(duration = timeTakenMillis), answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
                     Log.d("PollAnswer","Success")
@@ -2146,14 +2146,14 @@ class MeetingViewModel(
 //
 //        localHmsInteractivityCenter.add()
     }
-    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll) : Boolean {
+    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
         val valid = options != null
         val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
             options?.contains(index) == true
         }
         if(valid && answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
-                .addResponse(question, answer)
+                .addResponse(question.copy(duration = timeTakenMillis ), answer)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
                     Log.d("PollAnswer","Success $result")
