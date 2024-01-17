@@ -146,7 +146,7 @@ class SessionOptionBottomSheet(
                     childFragmentManager,
                     ChangeNameDialogFragment.TAG
                 )
-                dismiss()
+           
             }, isSelected = false
         )
 
