@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
 import android.app.Application
-import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.util.Log
@@ -57,6 +56,7 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
@@ -119,6 +119,9 @@ class MeetingViewModel(
         .setLogSettings(hmsLogSettings)
         .build()
 
+
+    val filterPlugin  by lazy {HMSVirtualBackground(hmsSDK)}
+
     private var lastPollStartedTime : Long = 0
 
     val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
@@ -177,6 +180,8 @@ class MeetingViewModel(
             return
         }
 
+
+
         hmsSDK.getAuthTokenByRoomCode(
             TokenRequest(roomCode, hmsPrebuiltOptions?.userId ?: UUID.randomUUID().toString()),
             TokenRequestOptions(tokenURL),
@@ -192,6 +197,23 @@ class MeetingViewModel(
                 }
 
             })
+    }
+
+    private fun setupFilterVideoPlugin() {
+
+        if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
+            filterPlugin.init()
+            hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess() {
+
+                }
+
+            }, 30)
+        }
     }
 
 
@@ -514,6 +536,7 @@ class MeetingViewModel(
                 Log.d("Pratim", "onPreview called")
                 unMuteAllTracks(localTracks)
                 previewUpdateData.postValue(Pair(room, localTracks))
+
             }
 
             override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {

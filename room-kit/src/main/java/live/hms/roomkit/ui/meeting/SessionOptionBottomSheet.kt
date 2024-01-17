@@ -18,6 +18,7 @@ import com.xwray.groupie.Section
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
+import live.hms.roomkit.ui.filters.FilterBottomSheet
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
@@ -139,6 +140,16 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val videoFilter = GridOptionItem(
+            "Video Filter", R.drawable.emoji_icon, {
+                FilterBottomSheet().show(
+                    childFragmentManager,
+                    ChangeNameDialogFragment.TAG
+                )
+            }, isSelected = false
+        )
+
+
 
 
         val group: Group = Section().apply {
@@ -163,6 +174,9 @@ class SessionOptionBottomSheet(
                     )
                 )
             }
+            //if (meetingViewModel.isLocalVideoEnabled() == true) {
+                add(videoFilter)
+            //}
         }
         gridOptionAdapter.update(listOf(group))
 
