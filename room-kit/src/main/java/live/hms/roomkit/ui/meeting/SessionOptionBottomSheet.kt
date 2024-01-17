@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -15,6 +16,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
@@ -142,11 +145,9 @@ class SessionOptionBottomSheet(
 
         val videoFilter = GridOptionItem(
             "Video Filter", R.drawable.emoji_icon, {
-                FilterBottomSheet().show(
-                    childFragmentManager,
-                    ChangeNameDialogFragment.TAG
-                )
-           
+                onNameChange.invoke()
+                dismissAllowingStateLoss()
+
             }, isSelected = false
         )
 
