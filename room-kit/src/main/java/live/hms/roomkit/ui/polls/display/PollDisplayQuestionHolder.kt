@@ -37,6 +37,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val endPoll : (HmsPoll) -> Unit,
     val canEndPoll : Boolean,
     val showLeaderBoard: (pollId: String) -> Unit,
+    val setQuestionStartTime : (QuestionContainer.Question) -> Unit,
+    val getQuestionStartTime : (QuestionContainer.Question) -> Long?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
@@ -57,6 +59,11 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                         }
 
                     optionsBinder(question)
+                    // The scroller way of getting positions won't ever get the first one.
+                    // Since we don't jump to last unanswered question this won't be an issue.
+                    if(absoluteAdapterPosition == 0) {
+                        setQuestionStartTime(question)
+                    }
                 }
 
                 HMSPollQuestionType.shortAnswer,
@@ -226,13 +233,12 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 // TODO skip
 
             }
-            // Start timer.
-            val startedAt = System.currentTimeMillis()
+
             votebutton.setOnSingleClickListener {
                 val voted : Boolean = if(question.question.type == HMSPollQuestionType.singleChoice){
-                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll, System.currentTimeMillis() - startedAt)
+                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll, System.currentTimeMillis() - (getQuestionStartTime(question) ?:0))
                 } else if(question.question.type == HMSPollQuestionType.multiChoice) {
-                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll,System.currentTimeMillis() - startedAt)
+                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll,System.currentTimeMillis() - (getQuestionStartTime(question) ?:0))
                 } else {
                     saveInfoText("What?", bindingAdapterPosition)
                 }

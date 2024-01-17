@@ -1,11 +1,9 @@
 package live.hms.roomkit.ui.polls.display
 
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -88,7 +86,9 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 meetingViewModel::saveInfoSingleChoice,
                 meetingViewModel::saveInfoMultiChoice,
                 meetingViewModel::saveSkipped,
-                meetingViewModel::endPoll
+                meetingViewModel::endPoll,
+                meetingViewModel.getQuestionStartTime,
+                meetingViewModel.setQuestionStartTime
             ) { LeaderBoardBottomSheetFragment.launch(it, requireFragmentManager()) }
 
             poll = returnedPoll
@@ -103,6 +103,29 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 // Quizzes only scroll horizontally and snap to questions
                 if(poll.category == HmsPollCategory.QUIZ) {
                     questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
+                    /**
+                     * We have to start tracking the time the question is being taken to answer
+                     * from the time it's displayed.
+                     * This is complicated by the fact that recyclerview preloads views.
+                     * So if you just try to save the time from when it's bound, the first
+                     * view will be ok, even the second but the third will be preloaded.
+                     * Thus messing up how long it really took.
+                     * So we need two things to be able to track this correctly:
+                     * 1. On a scroll, we check the current visible item and mark it as seen.
+                     * 2. The very first view won't be saved this way since it was never scrolled to.
+                     *      So that has to be saved separately, which we will do in the onBind.
+                     */
+                    questionsRecyclerView.addOnScrollListener(object :
+                        RecyclerView.OnScrollListener() {
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+                            val position = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                            val question = pollsDisplayAdaptor.getItemForPosition(position)
+                            if(question is QuestionContainer.Question) {
+                                meetingViewModel.setQuestionStartTime(question)
+                            }
+                        }
+                    })
                     PagerSnapHelper().attachToRecyclerView(questionsRecyclerView)
                 } else {
                     questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)

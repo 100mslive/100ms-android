@@ -50,6 +50,8 @@ class PollsDisplayAdaptor(
     val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll,timeTakenMillis : Long) -> Boolean,
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
     val endPoll : (HmsPoll) -> Unit,
+    val getQuestionStartTime : (QuestionContainer.Question) -> Long?,
+    val setQuestionStartTime : (QuestionContainer.Question) -> Unit,
     val showLeaderBoard : (pollId : String) -> Unit,
 ) : ListAdapter<QuestionContainer, PollDisplayQuestionHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
@@ -102,7 +104,7 @@ class PollsDisplayAdaptor(
             EndPollViewType -> LayoutEndPollButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID, showLeaderBoard)
+        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID, showLeaderBoard, setQuestionStartTime, getQuestionStartTime)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
             updater.add(questionHolder)
         }
@@ -138,4 +140,5 @@ class PollsDisplayAdaptor(
             }
         }
     }
+    fun getItemForPosition(position: Int) = getItem(position)
 }

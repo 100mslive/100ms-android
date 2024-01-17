@@ -2388,5 +2388,8 @@ class MeetingViewModel(
     fun setCountDownTimerStartedAt(startedAt: Long?) {
         countDownTimerStartedAt.postValue(startedAt)
     }
+    private val questionTimingUseCase = QuizQuestionTimingUseCase()
+    val setQuestionStartTime = questionTimingUseCase::setQuestionStartTime
+    val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
 }
 
