@@ -1,11 +1,14 @@
 package live.hms.roomkit.ui.filters
 
 
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.SnapHelper
@@ -34,6 +37,8 @@ class FilterBottomSheet(
         )
     }
 
+
+    var currentSelectedFilter: VideoFilter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,19 +109,20 @@ class FilterBottomSheet(
                 )
 
             )
-            addTab(this.newTab().setText("Brightness"))
-            addTab(this.newTab().setText("Saturation"))
-            addTab(this.newTab().setText("Sharpness"))
+            addTab(this.newTab().setText("Brightness").setTag(VideoFilter.Brightness))
+            addTab(this.newTab().setText("Saturation").setTag(VideoFilter.Saturation))
+            addTab(this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness))
+            setSelectedTabIndicatorColor(Color.TRANSPARENT)
         }
 
-        var pickerLayoutManager =
+        val pickerLayoutManager =
             PickerLayoutManager(context, PickerLayoutManager.HORIZONTAL, false).apply {
                 isChangeAlpha = true;
                 scaleDownBy = 0.99f;
                 scaleDownDistance = 0.8f;
             }
 
-        val adapters = PickerAdapter(requireContext(), getData(100), binding.list)
+        val adapters = PickerAdapter(requireContext(), getData(-100, 100), binding.list)
         val snapHelper: SnapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(binding.list)
         binding.list.apply {
@@ -124,9 +130,44 @@ class FilterBottomSheet(
             adapter = adapters
         }
 
+        pickerLayoutManager.setOnScrollStopListener { view ->
+
+            val text = view.findViewById<TextView>(R.id.picker_item).text.toString()
+            if (text.isNullOrEmpty().not()) {
+                Toast.makeText(
+                    requireContext(),
+                    "Selected value : $text",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            }
+        }
+
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.tag) {
+                    is VideoFilter.Brightness -> {
+                        currentSelectedFilter = VideoFilter.Brightness
+                        adapters.swapData(getData(-100, 100))
+                        binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
+                    }
 
+                    is VideoFilter.Sharpness -> {
+                        currentSelectedFilter = VideoFilter.Sharpness
+                        adapters.swapData(getData(-100, 100))
+                        binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
+                    }
+
+                    is VideoFilter.Saturation -> {
+                        currentSelectedFilter = VideoFilter.Saturation
+                        adapters.swapData(getData(-100, 100))
+                        binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
+                    }
+
+                    else -> {
+
+                    }
+                }
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
@@ -166,10 +207,19 @@ class FilterBottomSheet(
 
     }
 
-    private fun getData(count: Int): List<String> {
+    private fun getData(from: Int, to: Int): List<String> {
         val data: MutableList<String> = ArrayList()
-        for (i in 0 until count) {
+
+        val padding = 8
+        for (i in 0 until padding) {
+            data.add("")
+        }
+        for (i in from until to) {
             data.add(i.toString())
+        }
+
+        for (i in 0 until padding) {
+            data.add("")
         }
         return data
     }
