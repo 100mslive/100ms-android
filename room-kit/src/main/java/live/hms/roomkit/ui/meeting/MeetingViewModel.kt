@@ -2127,7 +2127,7 @@ class MeetingViewModel(
         val answer = question.options?.get(option)
         if(answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
-                .addResponse(question.copy(duration = timeTakenMillis), answer)
+                .addResponse(question, answer, timeTakenMillis)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
                     Log.d("PollAnswer","Success")
@@ -2153,7 +2153,7 @@ class MeetingViewModel(
         }
         if(valid && answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
-                .addResponse(question.copy(duration = timeTakenMillis ), answer)
+                .addResponse(question, answer, timeTakenMillis)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
                     Log.d("PollAnswer","Success $result")
