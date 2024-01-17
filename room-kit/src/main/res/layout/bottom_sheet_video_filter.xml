@@ -55,7 +55,9 @@
 
 
         <com.google.android.material.tabs.TabLayout
+            android:layout_marginTop="@dimen/spacing_d3"
             android:id="@+id/tab_layout"
+            app:tabIndicatorHeight="0dp"
             android:background="@android:color/transparent"
             android:layout_width="match_parent"
             android:layout_height="36dp"

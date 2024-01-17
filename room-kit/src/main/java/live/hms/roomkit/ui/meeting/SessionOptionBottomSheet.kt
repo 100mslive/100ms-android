@@ -146,6 +146,7 @@ class SessionOptionBottomSheet(
                     childFragmentManager,
                     ChangeNameDialogFragment.TAG
                 )
+                dismiss()
             }, isSelected = false
         )
 
@@ -174,9 +175,9 @@ class SessionOptionBottomSheet(
                     )
                 )
             }
-            //if (meetingViewModel.isLocalVideoEnabled() == true) {
+            if (meetingViewModel.isLocalVideoEnabled() == true) {
                 add(videoFilter)
-            //}
+            }
         }
         gridOptionAdapter.update(listOf(group))
 

@@ -199,7 +199,7 @@ class MeetingViewModel(
             })
     }
 
-    private fun setupFilterVideoPlugin() {
+     fun setupFilterVideoPlugin() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
             filterPlugin.init()

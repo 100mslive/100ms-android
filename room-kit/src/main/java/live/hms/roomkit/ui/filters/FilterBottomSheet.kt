@@ -4,6 +4,7 @@ package live.hms.roomkit.ui.filters
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -96,6 +97,42 @@ class FilterBottomSheet(
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
         }
+        val pickerLayoutManager =
+            PickerLayoutManager(context, PickerLayoutManager.HORIZONTAL, false).apply {
+                isChangeAlpha = true;
+                scaleDownBy = 0.99f;
+                scaleDownDistance = 0.8f;
+            }
+
+
+        pickerLayoutManager.setOnScrollStopListener { view ->
+
+            val text = view.findViewById<TextView>(R.id.picker_item).text.toString()
+            if (text.isNullOrEmpty().not() && text.toIntOrNull() != null) {
+                Log.d(
+                    "XXXY", "$text"
+                )
+                val number = text.toInt()
+                when (currentSelectedFilter) {
+                    is VideoFilter.Brightness -> {
+                        meetingViewModel.filterPlugin.setBrightness(number / 100.0f)
+                    }
+
+                    is VideoFilter.Sharpness -> {
+                        meetingViewModel.filterPlugin.setSharpness(number / 100.0f)
+                    }
+
+                    is VideoFilter.Saturation -> {
+                        meetingViewModel.filterPlugin.setContrast(number / 100.0f)
+                    }
+
+                    null -> {
+
+                    }
+                }
+
+            }
+        }
 
 
         binding.tabLayout.apply {
@@ -109,20 +146,14 @@ class FilterBottomSheet(
                 )
 
             )
-            addTab(this.newTab().setText("Brightness").setTag(VideoFilter.Brightness))
+            addTab(this.newTab().setText("Brightness").setTag(VideoFilter.Brightness), true)
             addTab(this.newTab().setText("Saturation").setTag(VideoFilter.Saturation))
             addTab(this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness))
             setSelectedTabIndicatorColor(Color.TRANSPARENT)
         }
 
-        val pickerLayoutManager =
-            PickerLayoutManager(context, PickerLayoutManager.HORIZONTAL, false).apply {
-                isChangeAlpha = true;
-                scaleDownBy = 0.99f;
-                scaleDownDistance = 0.8f;
-            }
 
-        val adapters = PickerAdapter(requireContext(), getData(-100, 100), binding.list)
+        val adapters = PickerAdapter(requireContext(), listOf(), binding.list)
         val snapHelper: SnapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(binding.list)
         binding.list.apply {
@@ -130,37 +161,28 @@ class FilterBottomSheet(
             adapter = adapters
         }
 
-        pickerLayoutManager.setOnScrollStopListener { view ->
 
-            val text = view.findViewById<TextView>(R.id.picker_item).text.toString()
-            if (text.isNullOrEmpty().not()) {
-                Toast.makeText(
-                    requireContext(),
-                    "Selected value : $text",
-                    Toast.LENGTH_SHORT
-                ).show()
+        meetingViewModel.setupFilterVideoPlugin()
 
-            }
-        }
 
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.tag) {
                     is VideoFilter.Brightness -> {
                         currentSelectedFilter = VideoFilter.Brightness
-                        adapters.swapData(getData(-100, 100))
+                        adapters.swapData(getData(0, 100))
                         binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
                     }
 
                     is VideoFilter.Sharpness -> {
                         currentSelectedFilter = VideoFilter.Sharpness
-                        adapters.swapData(getData(-100, 100))
+                        adapters.swapData(getData(0, 100))
                         binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
                     }
 
                     is VideoFilter.Saturation -> {
                         currentSelectedFilter = VideoFilter.Saturation
-                        adapters.swapData(getData(-100, 100))
+                        adapters.swapData(getData(0, 100))
                         binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
                     }
 
