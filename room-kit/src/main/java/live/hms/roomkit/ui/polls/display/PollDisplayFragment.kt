@@ -1,17 +1,19 @@
 package live.hms.roomkit.ui.polls.display
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -28,6 +30,7 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
+
 
 /**
  * This is shown via a toast that pops up when we receive an HmsPoll event.
@@ -102,6 +105,31 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
 
                 // Quizzes only scroll horizontally and snap to questions
                 if(poll.category == HmsPollCategory.QUIZ) {
+                    var moving = false
+                    questionsRecyclerView.addOnItemTouchListener(object :
+                        RecyclerView.SimpleOnItemTouchListener() {
+
+                        override fun onInterceptTouchEvent(
+                            rv: RecyclerView,
+                            e: MotionEvent
+                        ): Boolean {
+
+                            // It's a scroll event
+                            if(rv.scrollState == RecyclerView.SCROLL_STATE_DRAGGING && !moving) {
+                                val isRightSwipe = e.historySize > 0 && e.x < e.getHistoricalX(0)
+                                Log.d("VerifyAnswer","Is right swipe? ${isRightSwipe}")
+                                if(isRightSwipe){
+                                    val answered = isQuestionAnswered((questionsRecyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition())
+                                    Log.d("VerifyAnswer","Is question answered? $answered")
+                                    if(answered)
+                                        moving = true
+                                    return !answered
+                                } else return false
+                            }
+                            return false
+//                            return rv.scrollState == RecyclerView.SCROLL_STATE_DRAGGING
+                        }
+                    })
                     questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
                     /**
                      * We have to start tracking the time the question is being taken to answer
@@ -117,12 +145,14 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                      */
                     questionsRecyclerView.addOnScrollListener(object :
                         RecyclerView.OnScrollListener() {
+
                         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                             super.onScrolled(recyclerView, dx, dy)
                             val position = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                             val question = pollsDisplayAdaptor.getItemForPosition(position)
                             if(question is QuestionContainer.Question) {
                                 meetingViewModel.setQuestionStartTime(question)
+                                moving = false
                             }
                         }
                     })
@@ -175,6 +205,11 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                     binding.backButton.callOnClick()
                 }
             })
+    }
+    private fun isQuestionAnswered(position: Int): Boolean {
+        if(position == NO_POSITION) return false
+        val item = pollsDisplayAdaptor.getItemForPosition(position)
+        return item is QuestionContainer.Question && item.voted
     }
 
 }
