@@ -46,10 +46,12 @@ class PollsDisplayAdaptor(
     val localPeer : HMSPeer,
     val getPoll : HmsPoll,
     val saveInfoText : (question: HMSPollQuestion, answer : String, hmsPoll : HmsPoll) -> Boolean,
-    val saveInfoSingleChoice : (question : HMSPollQuestion, Int?, hmsPoll : HmsPoll) -> Boolean,
-    val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll) -> Boolean,
+    val saveInfoSingleChoice : (question : HMSPollQuestion, Int?, hmsPoll : HmsPoll,timeTakenMillis : Long) -> Boolean,
+    val saveInfoMultiChoice : (question : HMSPollQuestion, List<Int>?, hmsPoll : HmsPoll,timeTakenMillis : Long) -> Boolean,
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
     val endPoll : (HmsPoll) -> Unit,
+    val getQuestionStartTime : (QuestionContainer.Question) -> Long?,
+    val setQuestionStartTime : (QuestionContainer.Question) -> Unit,
     val showLeaderBoard : (pollId : String) -> Unit,
 ) : ListAdapter<QuestionContainer, PollDisplayQuestionHolder<ViewBinding>>(
     DIFFUTIL_CALLBACK
@@ -63,7 +65,7 @@ class PollsDisplayAdaptor(
     fun displayPoll(hmsPoll: HmsPoll) {
         val questions = hmsPoll.questions?.map { QuestionContainer.Question(hmsPoll, it, voted = it.voted) }
         if(questions != null) {
-            submitList(questions.plus(QuestionContainer.EndPollButton))
+            submitList(questions)
         }
         this.pollId = hmsPoll.pollId
         this.oldPoll = hmsPoll
@@ -102,7 +104,12 @@ class PollsDisplayAdaptor(
             EndPollViewType -> LayoutEndPollButtonBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             else -> null
         }
-        val questionHolder = PollDisplayQuestionHolder(view!!, canViewResponses(getPoll, localPeer), getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice, skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID, showLeaderBoard)
+        val questionHolder = PollDisplayQuestionHolder(view!!,
+            canViewResponses(getPoll, localPeer),
+            getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice,
+            skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID,
+            showLeaderBoard, setQuestionStartTime, getQuestionStartTime,
+            itemCount)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
             updater.add(questionHolder)
         }
@@ -138,4 +145,5 @@ class PollsDisplayAdaptor(
             }
         }
     }
+    fun getItemForPosition(position: Int): QuestionContainer = getItem(position)
 }

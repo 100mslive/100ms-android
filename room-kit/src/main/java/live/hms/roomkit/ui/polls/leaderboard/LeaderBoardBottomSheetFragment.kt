@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.polls.leaderboard
 
-import android.app.Dialog
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +16,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.databinding.LayoutQuizLeaderboardBinding
 import live.hms.roomkit.ui.meeting.InsetItemDecoration
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -34,8 +32,11 @@ import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.network.HMSPollResponsePeerInfo
+import live.hms.video.polls.network.HMSPollLeaderboardEntry
 import live.hms.video.polls.network.PollLeaderboardResponse
 import live.hms.video.sdk.HmsTypedActionResultListener
+import live.hms.video.sdk.models.HMSPeer
 
 
 class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
@@ -151,38 +152,44 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
         }
 
-        if (model.summary != null) with(model.summary!!) {
-            if (isTotalPeerCountEmpty.not()) {
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "VOTED",
-                        "${(((respondedPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
-                    )
-                )
-            }
+        val localPeer = meetingViewModel.hmsSDK.getLocalPeer()!!
+        val peerData : HMSPollLeaderboardEntry? = model.entries?.filter{ it.peer != null }?.find { isSelfPeer(
+            it.peer!!,
+            localPeer
+        ) }
+        if (peerData != null) with(peerData) {
 
-            if (isCorrectAnswerEmpty.not()) {
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "CORRECT ANSWERS", "${(((respondedCorrectlyPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedCorrectlyPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
-                    )
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "YOUR RANK",
+                    "$position/${model.entries!!.size}"
                 )
-            }
-            if (isAverageTimeEmpty.not()) {
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", "${averageTime?.toInt().toString()} sec"
-                    )
-                )
-            }
+            )
 
             if (isAverageScoreEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. SCORE", averageScore.toString()
+                        "POINTS", score.toString()
                     )
                 )
             }
+
+            val time = millisToText(duration, true, " secs")
+
+            // TODO add quantity string for seconds
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "TIME TAKEN", time
+                )
+            )
+
+            // TODO this may show incorrect info
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "CORRECT ANSWERS", "${(correctResponses ?: 0)}/${(totalResponses ?: 0)}"
+                )
+            )
+
         }
 
 
@@ -199,7 +206,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                         subtitleStr = "${entry.score}/${poll?.questions?.map { it.weight }?.toList()?.sum()?:0} points",
                         rankStr = entry.position.toString(),
                         isSelected = true,
-                        timetakenStr = "${if (entry.duration == 0L) "" else entry.duration}",
+                        timetakenStr =  millisToText(entry.duration, false, "s"),
                         correctAnswerStr = "${entry.correctResponses}/${poll?.questions?.size ?: 0}",
                         position = if (index == 0) ApplyRadiusatVertex.TOP
                         else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
@@ -210,5 +217,33 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
 
+    }
+
+    private fun isSelfPeer(peer: HMSPollResponsePeerInfo, localPeer: HMSPeer) : Boolean {
+//        poll mode is empty from the server so far and can't be relied on.
+//        when(poll?.mode) {
+//            HmsPollUserTrackingMode.USER_ID -> peer.userid == localPeer.customerUserID
+//            HmsPollUserTrackingMode.PEER_ID -> peer.peerid == localPeer.peerID
+//            HmsPollUserTrackingMode.USERNAME -> peer.username == localPeer.name
+//            null -> false
+//        }
+        return peer.userid == localPeer.customerUserID || peer.peerid == localPeer.peerID
+    }
+    private fun millisToText(milliseconds : Long?,
+                             hyphenateEmptyValues : Boolean,
+                             secondsText : String): String {
+        return if (milliseconds == 0L || milliseconds == null) {
+            if(hyphenateEmptyValues) "-" else ""
+        }
+        else {
+            val minutes = milliseconds / 1000 / 60
+            val seconds = milliseconds / 1000f % 60
+
+            val prefix = if (minutes != 0L) {
+                "$minutes" + "m "
+            } else ""
+            val suffix = String.format("%.1f$secondsText", seconds)
+            "$prefix$suffix"
+        }
     }
 }
