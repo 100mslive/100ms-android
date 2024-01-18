@@ -110,31 +110,8 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
 
                 // Quizzes only scroll horizontally and snap to questions
                 if(poll.category == HmsPollCategory.QUIZ && poll.state == HmsPollState.STARTED) {
-                    var moving = false
-                    questionsRecyclerView.addOnItemTouchListener(object :
-                        RecyclerView.SimpleOnItemTouchListener() {
-
-                        override fun onInterceptTouchEvent(
-                            rv: RecyclerView,
-                            e: MotionEvent
-                        ): Boolean {
-
-                            // It's a scroll event
-                            if(rv.scrollState == RecyclerView.SCROLL_STATE_DRAGGING && !moving) {
-                                val isRightSwipe = e.historySize > 0 && e.x < e.getHistoricalX(0)
-                                Log.d("VerifyAnswer","Is right swipe? ${isRightSwipe}")
-                                if(isRightSwipe){
-                                    val answered = isQuestionAnswered((questionsRecyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition())
-                                    Log.d("VerifyAnswer","Is question answered? $answered")
-                                    if(answered)
-                                        moving = true
-                                    return !answered
-                                } else return false
-                            }
-                            return false
-//                            return rv.scrollState == RecyclerView.SCROLL_STATE_DRAGGING
-                        }
-                    })
+                    val touchListener = QuizDisableSwipingConditionally(::isQuestionAnswered)
+                    questionsRecyclerView.addOnItemTouchListener(touchListener)
                     questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
                     /**
                      * We have to start tracking the time the question is being taken to answer
@@ -157,7 +134,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                             val question = pollsDisplayAdaptor.getItemForPosition(position)
                             if(question is QuestionContainer.Question) {
                                 meetingViewModel.setQuestionStartTime(question)
-                                moving = false
+                                touchListener.isMoving = false
                             }
                         }
                     })
