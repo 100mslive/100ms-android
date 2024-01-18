@@ -102,7 +102,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         // For polls we see answers immediately and they are updated.
         // For quizzes, we do not see the answers.
         if(poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
-            root.highlightCorrectAnswer(isQuestionCorrectlyAnswered(question))
+            backingCard.highlightCorrectAnswer(isQuestionCorrectlyAnswered(question))
         }
         if(question.voted || poll.state == HmsPollState.STOPPED) {
             if(!question.voted) {
