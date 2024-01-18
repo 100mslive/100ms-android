@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.polls.display
 
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,13 +40,43 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     val showLeaderBoard: (pollId: String) -> Unit,
     val setQuestionStartTime : (QuestionContainer.Question) -> Unit,
     val getQuestionStartTime : (QuestionContainer.Question) -> Long?,
+    val totalItems : Int,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
         if(binding is LayoutPollsDisplayChoicesQuesionBinding){
             binding.votebutton.isEnabled = answersSelected
+            if(absoluteAdapterPosition == totalItems -1)
+                setEndButton(binding.launchPollQuiz)
+            else
+                binding.launchPollQuiz.visibility = View.GONE
         }
     }
+
+    private fun setEndButton(launchPollQuiz: TextView) {
+
+        launchPollQuiz.text = if (poll.category == HmsPollCategory.QUIZ) "End Quiz" else "End Poll"
+        if(poll.state == HmsPollState.STARTED &&  canEndPoll) {
+            launchPollQuiz.alertButtonEnabled()
+            launchPollQuiz.setOnClickListener {
+                endPoll(poll)
+            }
+            launchPollQuiz.visibility = View.VISIBLE
+        } else {
+            launchPollQuiz.visibility = View.GONE
+        }
+
+        if (poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
+            launchPollQuiz.visibility = View.VISIBLE
+            launchPollQuiz.text = "View Results"
+            launchPollQuiz.buttonEnabled()
+            launchPollQuiz.setOnClickListener {
+                showLeaderBoard(poll.pollId)
+            }
+            launchPollQuiz.visibility = View.VISIBLE
+        }
+    }
+
     var votingProgressAdapter : VotingProgressAdapter? = null
 
     // There are two different layouts.
@@ -64,35 +95,16 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                     if(absoluteAdapterPosition == 0) {
                         setQuestionStartTime(question)
                     }
+
+                    binding as LayoutPollsDisplayChoicesQuesionBinding
+                    if(absoluteAdapterPosition == totalItems -1)
+                        setEndButton(binding.launchPollQuiz)
+                    else
+                        binding.launchPollQuiz.visibility = View.GONE
                 }
 
                 HMSPollQuestionType.shortAnswer,
                 HMSPollQuestionType.longAnswer -> textBinder(question)
-            }
-        }
-        else {
-            //todd
-            with(binding as LayoutEndPollButtonBinding) {
-                launchPollQuiz.text = if (poll.category == HmsPollCategory.QUIZ) "End Quiz" else "End Poll"
-                if(poll.state == HmsPollState.STARTED &&  canEndPoll) {
-                    launchPollQuiz.alertButtonEnabled()
-                    launchPollQuiz.setOnClickListener {
-                        endPoll(poll)
-                    }
-                    binding.root.visibility = View.VISIBLE
-                } else {
-                    binding.root.visibility = View.GONE
-                }
-
-                if (poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
-                    binding.root.visibility = View.VISIBLE
-                    launchPollQuiz.text = "View Results"
-                    launchPollQuiz.buttonEnabled()
-                    launchPollQuiz.setOnClickListener {
-                        showLeaderBoard(poll.pollId)
-                    }
-                    binding.root.visibility = View.VISIBLE
-                }
             }
         }
     }

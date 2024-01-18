@@ -86,8 +86,13 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 meetingViewModel.peers.find { it.isLocal }!!,
                 returnedPoll,
                 meetingViewModel::saveInfoText,
-                meetingViewModel::saveInfoSingleChoice,
-                meetingViewModel::saveInfoMultiChoice,
+                { q,i,p,t ->
+                    answerSelected()
+                    meetingViewModel.saveInfoSingleChoice(q,i,p,t)
+                } ,
+                { q,i,p,t ->
+                    answerSelected()
+                    meetingViewModel.saveInfoMultiChoice(q,i,p,t)},
                 meetingViewModel::saveSkipped,
                 meetingViewModel::endPoll,
                 meetingViewModel.getQuestionStartTime,
@@ -104,7 +109,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name?: "Participant", startedType)
 
                 // Quizzes only scroll horizontally and snap to questions
-                if(poll.category == HmsPollCategory.QUIZ) {
+                if(poll.category == HmsPollCategory.QUIZ && poll.state == HmsPollState.STARTED) {
                     var moving = false
                     questionsRecyclerView.addOnItemTouchListener(object :
                         RecyclerView.SimpleOnItemTouchListener() {
@@ -178,6 +183,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                     if( it is MeetingViewModel.Event.PollEnded) {
                         if(pollsDisplayAdaptor.getPoll.pollId == it.hmsPoll.pollId) {
                             binding.pollsLive.pollsStatusLiveDraftEnded(HmsPollState.STOPPED)
+                            binding.questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                             pollsDisplayAdaptor.notifyDataSetChanged()
                             // Doesn't show up without the delay
                             delay(300)
@@ -212,4 +218,10 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
         return item is QuestionContainer.Question && item.voted
     }
 
+    // Scroll when the answer is selected
+    private fun answerSelected() {
+        val position = (binding.questionsRecyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+        if(position != NO_POSITION &&  position + 1 < pollsDisplayAdaptor.itemCount )
+            binding.questionsRecyclerView.smoothScrollToPosition(position + 1)
+    }
 }
