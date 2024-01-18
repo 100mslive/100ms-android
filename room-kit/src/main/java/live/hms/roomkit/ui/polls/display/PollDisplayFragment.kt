@@ -160,6 +160,7 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                     if( it is MeetingViewModel.Event.PollEnded) {
                         if(pollsDisplayAdaptor.getPoll.pollId == it.hmsPoll.pollId) {
                             binding.pollsLive.pollsStatusLiveDraftEnded(HmsPollState.STOPPED)
+                            // reset the quiz layout to vertical after it's ended
                             binding.questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                             pollsDisplayAdaptor.notifyDataSetChanged()
                             // Doesn't show up without the delay
