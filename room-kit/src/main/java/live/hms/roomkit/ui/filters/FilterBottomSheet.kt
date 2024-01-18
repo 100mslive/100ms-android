@@ -1,6 +1,8 @@
 package live.hms.roomkit.ui.filters
 
 
+import android.app.Dialog
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -8,6 +10,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
@@ -39,7 +43,16 @@ class FilterBottomSheet(
     }
 
 
+
+
     var currentSelectedFilter: VideoFilter? = null
+
+    val padding = 8
+
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +79,6 @@ class FilterBottomSheet(
             )
             setColorFilter(color, PorterDuff.Mode.ADD);
         }
-
 
         var btnArray = arrayOf(
             binding.audioOt
@@ -105,55 +117,7 @@ class FilterBottomSheet(
             }
 
 
-        pickerLayoutManager.setOnScrollStopListener { view ->
-
-            val text = view.findViewById<TextView>(R.id.picker_item).text.toString()
-            if (text.isNullOrEmpty().not() && text.toIntOrNull() != null) {
-                Log.d(
-                    "XXXY", "$text"
-                )
-                val number = text.toInt()
-                when (currentSelectedFilter) {
-                    is VideoFilter.Brightness -> {
-                        meetingViewModel.filterPlugin.setBrightness(number / 100.0f)
-                    }
-
-                    is VideoFilter.Sharpness -> {
-                        meetingViewModel.filterPlugin.setSharpness(number / 100.0f)
-                    }
-
-                    is VideoFilter.Saturation -> {
-                        meetingViewModel.filterPlugin.setContrast(number / 100.0f)
-                    }
-
-                    null -> {
-
-                    }
-                }
-
-            }
-        }
-
-
-        binding.tabLayout.apply {
-            setTabTextColors(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceLow,
-                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-                ), getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-                )
-
-            )
-            addTab(this.newTab().setText("Brightness").setTag(VideoFilter.Brightness), true)
-            addTab(this.newTab().setText("Saturation").setTag(VideoFilter.Saturation))
-            addTab(this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness))
-            setSelectedTabIndicatorColor(Color.TRANSPARENT)
-        }
-
-
-        val adapters = PickerAdapter(requireContext(), listOf(), binding.list)
+        val adapters = PickerAdapter(requireContext(), getData(0, 100), binding.list)
         val snapHelper: SnapHelper = LinearSnapHelper()
         snapHelper.attachToRecyclerView(binding.list)
         binding.list.apply {
@@ -165,25 +129,87 @@ class FilterBottomSheet(
         meetingViewModel.setupFilterVideoPlugin()
 
 
+        pickerLayoutManager.setOnScrollStopListener { view ->
+
+            val text = view.findViewById<TextView>(R.id.picker_item).text.toString()
+            if (text.isNullOrEmpty().not() && text.toIntOrNull() != null) {
+
+                val number = text.toInt()
+                when (currentSelectedFilter) {
+                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(number)
+                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(number)
+                    is VideoFilter.Saturation -> meetingViewModel.filterPlugin.setSaturation(number)
+                    VideoFilter.Hue -> meetingViewModel.filterPlugin.setHue(number)
+                    VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(number)
+                    VideoFilter.Exposure -> meetingViewModel.filterPlugin.setExposure(number)
+                    null -> {}
+                }
+
+            }
+        }
+
+
+
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.tag) {
                     is VideoFilter.Brightness -> {
                         currentSelectedFilter = VideoFilter.Brightness
-                        adapters.swapData(getData(0, 100))
-                        binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
+                        binding.list.smoothScrollToPosition(
+                            (meetingViewModel.filterPlugin.getBrightnessProgress() + padding - 1).coerceIn(
+                                0, 100
+                            )
+                        )
                     }
 
                     is VideoFilter.Sharpness -> {
                         currentSelectedFilter = VideoFilter.Sharpness
-                        adapters.swapData(getData(0, 100))
-                        binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
+                        binding.list.smoothScrollToPosition(
+                            (meetingViewModel.filterPlugin.getSharpnessProgress() + padding - 1).coerceIn(
+                                0, 100
+                            )
+                        )
+
                     }
 
                     is VideoFilter.Saturation -> {
                         currentSelectedFilter = VideoFilter.Saturation
-                        adapters.swapData(getData(0, 100))
-                        binding.list.scrollToPosition(((adapters.itemCount / 2) - 1).coerceAtLeast(0))
+                        binding.list.smoothScrollToPosition(
+                            (meetingViewModel.filterPlugin.getSaturationProgress() + padding - 1).coerceIn(
+                                0, 100
+                            )
+                        )
+
+                    }
+
+                    is VideoFilter.Hue -> {
+                        currentSelectedFilter = VideoFilter.Hue
+                        binding.list.smoothScrollToPosition(
+                            (meetingViewModel.filterPlugin.getHueProgress() + padding - 1).coerceIn(
+                                0, 100
+                            )
+                        )
+
+                    }
+
+                    is VideoFilter.Contrast -> {
+                        currentSelectedFilter = VideoFilter.Contrast
+                        binding.list.smoothScrollToPosition(
+                            (meetingViewModel.filterPlugin.getContrastProgress() + padding - 1).coerceIn(
+                                0, 100
+                            )
+                        )
+
+                    }
+
+                    is VideoFilter.Exposure -> {
+                        currentSelectedFilter = VideoFilter.Exposure
+                        binding.list.smoothScrollToPosition(
+                            (meetingViewModel.filterPlugin.getExposureProgress() + padding - 1).coerceIn(
+                                0, 100
+                            )
+                        )
+
                     }
 
                     else -> {
@@ -201,6 +227,39 @@ class FilterBottomSheet(
             }
 
         })
+
+
+
+        binding.tabLayout.apply {
+            setTabTextColors(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                ), getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+
+            )
+            addTab(
+                this.newTab().setText(VideoFilter.Brightness.toString())
+                    .setTag(VideoFilter.Brightness), true
+            )
+            addTab(
+                this.newTab().setText(VideoFilter.Saturation.toString())
+                    .setTag(VideoFilter.Saturation)
+            )
+            addTab(
+                this.newTab().setText(VideoFilter.Sharpness.toString())
+                    .setTag(VideoFilter.Sharpness)
+            )
+            addTab(this.newTab().setText(VideoFilter.Hue.toString()).setTag(VideoFilter.Hue))
+            setSelectedTabIndicatorColor(Color.TRANSPARENT)
+        }
+
+
+
+
 
 
 
@@ -232,7 +291,7 @@ class FilterBottomSheet(
     private fun getData(from: Int, to: Int): List<String> {
         val data: MutableList<String> = ArrayList()
 
-        val padding = 8
+
         for (i in 0 until padding) {
             data.add("")
         }
