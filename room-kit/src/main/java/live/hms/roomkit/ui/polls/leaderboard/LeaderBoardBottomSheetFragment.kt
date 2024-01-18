@@ -17,7 +17,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.databinding.LayoutQuizLeaderboardBinding
 import live.hms.roomkit.ui.meeting.InsetItemDecoration
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -34,8 +33,12 @@ import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.HmsPollUserTrackingMode
+import live.hms.video.polls.models.network.HMSPollResponsePeerInfo
+import live.hms.video.polls.network.HMSPollLeaderboardEntry
 import live.hms.video.polls.network.PollLeaderboardResponse
 import live.hms.video.sdk.HmsTypedActionResultListener
+import live.hms.video.sdk.models.HMSPeer
 
 
 class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
@@ -151,42 +154,43 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
         }
 
-        if (model.summary != null) with(model.summary!!) {
-            if (isTotalPeerCountEmpty.not()) {
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "VOTED",
-                        "${(((respondedPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
-                    )
-                )
-            }
+        val localPeer = meetingViewModel.hmsSDK.getLocalPeer()!!
+        val peerData : HMSPollLeaderboardEntry? = model.entries?.filter{ it.peer != null }?.find { isSelfPeer(poll, it.peer!!, localPeer) }
+        if (peerData != null) with(peerData) {
 
-            if (isCorrectAnswerEmpty.not()) {
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "CORRECT ANSWERS", "${(((respondedCorrectlyPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedCorrectlyPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
-                    )
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "YOUR RANK",
+                    "$position/$totalResponses"
                 )
-            }
-            if (isAverageTimeEmpty.not()) {
-                val time = averageTime?.div(1000)?.let {
-                    String.format("%.2f", it)
-                } ?: "-"
-
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", "$time sec"
-                    )
-                )
-            }
+            )
 
             if (isAverageScoreEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. SCORE", averageScore.toString()
+                        "POINTS", score.toString()
                     )
                 )
             }
+
+            val time = duration?.div(1000f)?.let {
+                String.format("%.1f", it)
+            } ?: "-"
+
+            // TODO add quantity string for seconds
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "TIME TAKEN", "$time secs"
+                )
+            )
+
+            // TODO this may show incorrect info
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "CORRECT ANSWERS", "${(correctResponses ?: 0)}/${(totalResponses ?: 0)}"
+                )
+            )
+
         }
 
 
@@ -215,4 +219,12 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
     }
+
+    fun isSelfPeer(poll: HmsPoll?, peer: HMSPollResponsePeerInfo, localPeer : HMSPeer) : Boolean =
+        when(poll?.mode) {
+            HmsPollUserTrackingMode.USER_ID -> peer.userid == localPeer.customerUserID
+            HmsPollUserTrackingMode.PEER_ID -> peer.peerid == localPeer.peerID
+            HmsPollUserTrackingMode.USERNAME -> peer.username == localPeer.name
+            null -> false
+        }
 }
