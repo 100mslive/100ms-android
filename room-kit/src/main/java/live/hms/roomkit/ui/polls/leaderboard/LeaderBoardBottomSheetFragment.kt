@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.polls.leaderboard
 
-import android.app.Dialog
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -33,7 +32,6 @@ import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
 import live.hms.video.polls.models.HmsPoll
-import live.hms.video.polls.models.HmsPollUserTrackingMode
 import live.hms.video.polls.models.network.HMSPollResponsePeerInfo
 import live.hms.video.polls.network.HMSPollLeaderboardEntry
 import live.hms.video.polls.network.PollLeaderboardResponse
@@ -155,7 +153,10 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         val localPeer = meetingViewModel.hmsSDK.getLocalPeer()!!
-        val peerData : HMSPollLeaderboardEntry? = model.entries?.filter{ it.peer != null }?.find { isSelfPeer(poll, it.peer!!, localPeer) }
+        val peerData : HMSPollLeaderboardEntry? = model.entries?.filter{ it.peer != null }?.find { isSelfPeer(
+            it.peer!!,
+            localPeer
+        ) }
         if (peerData != null) with(peerData) {
 
             leaderBoardListadapter.add(
@@ -173,14 +174,12 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 )
             }
 
-            val time = duration?.div(1000f)?.let {
-                String.format("%.1f", it)
-            } ?: "-"
+            val time = millisToText(duration, true, " secs")
 
             // TODO add quantity string for seconds
             leaderBoardListadapter.add(
                 LeaderBoardSubGrid(
-                    "TIME TAKEN", "$time secs"
+                    "TIME TAKEN", time
                 )
             )
 
@@ -207,7 +206,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                         subtitleStr = "${entry.score}/${poll?.questions?.map { it.weight }?.toList()?.sum()?:0} points",
                         rankStr = entry.position.toString(),
                         isSelected = true,
-                        timetakenStr = "${if (entry.duration == 0L) "" else entry.duration}",
+                        timetakenStr =  millisToText(entry.duration, false, "s"),
                         correctAnswerStr = "${entry.correctResponses}/${poll?.questions?.size ?: 0}",
                         position = if (index == 0) ApplyRadiusatVertex.TOP
                         else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
@@ -220,7 +219,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
     }
 
-    private fun isSelfPeer(poll: HmsPoll?, peer: HMSPollResponsePeerInfo, localPeer : HMSPeer) : Boolean {
+    private fun isSelfPeer(peer: HMSPollResponsePeerInfo, localPeer: HMSPeer) : Boolean {
 //        poll mode is empty from the server so far and can't be relied on.
 //        when(poll?.mode) {
 //            HmsPollUserTrackingMode.USER_ID -> peer.userid == localPeer.customerUserID
@@ -229,5 +228,22 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 //            null -> false
 //        }
         return peer.userid == localPeer.customerUserID || peer.peerid == localPeer.peerID
+    }
+    private fun millisToText(milliseconds : Long?,
+                             hyphenateEmptyValues : Boolean,
+                             secondsText : String): String {
+        return if (milliseconds == 0L || milliseconds == null) {
+            if(hyphenateEmptyValues) "-" else ""
+        }
+        else {
+            val minutes = milliseconds / 1000 / 60
+            val seconds = milliseconds / 1000f % 60
+
+            val prefix = if (minutes != 0L) {
+                "$minutes" + "m "
+            } else ""
+            val suffix = String.format("%.1f$secondsText", seconds)
+            "$prefix$suffix"
+        }
     }
 }
