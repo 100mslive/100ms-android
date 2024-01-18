@@ -60,7 +60,7 @@ public class PickerLayoutManager extends LinearLayoutManager {
     @Override
     public void onScrollStateChanged(int state) {
         super.onScrollStateChanged(state);
-        if (state == 0) {
+        if (true) {
             if (onScrollStopListener != null) {
                 int selected = 0;
                 float lastHeight = 0f;
