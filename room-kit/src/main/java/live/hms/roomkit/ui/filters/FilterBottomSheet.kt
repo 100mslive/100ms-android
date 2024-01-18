@@ -43,8 +43,6 @@ class FilterBottomSheet(
     }
 
 
-
-
     var currentSelectedFilter: VideoFilter? = null
 
     val padding = 8
@@ -242,18 +240,21 @@ class FilterBottomSheet(
 
             )
             addTab(
-                this.newTab().setText(VideoFilter.Brightness.toString())
-                    .setTag(VideoFilter.Brightness), true
+                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness), true
             )
             addTab(
-                this.newTab().setText(VideoFilter.Saturation.toString())
-                    .setTag(VideoFilter.Saturation)
+                this.newTab().setText("Saturation").setTag(VideoFilter.Saturation)
             )
             addTab(
-                this.newTab().setText(VideoFilter.Sharpness.toString())
-                    .setTag(VideoFilter.Sharpness)
+                this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
             )
-            addTab(this.newTab().setText(VideoFilter.Hue.toString()).setTag(VideoFilter.Hue))
+            addTab(
+                this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
+            )
+            addTab(
+                this.newTab().setText("Exposure").setTag(VideoFilter.Exposure)
+            )
+            addTab(this.newTab().setText("Hue").setTag(VideoFilter.Hue))
             setSelectedTabIndicatorColor(Color.TRANSPARENT)
         }
 
