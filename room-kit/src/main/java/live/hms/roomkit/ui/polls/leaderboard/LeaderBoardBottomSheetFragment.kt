@@ -161,7 +161,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             leaderBoardListadapter.add(
                 LeaderBoardSubGrid(
                     "YOUR RANK",
-                    "$position/$totalResponses"
+                    "$position/${model.entries!!.size}"
                 )
             )
 
@@ -220,11 +220,14 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 
     }
 
-    fun isSelfPeer(poll: HmsPoll?, peer: HMSPollResponsePeerInfo, localPeer : HMSPeer) : Boolean =
-        when(poll?.mode) {
-            HmsPollUserTrackingMode.USER_ID -> peer.userid == localPeer.customerUserID
-            HmsPollUserTrackingMode.PEER_ID -> peer.peerid == localPeer.peerID
-            HmsPollUserTrackingMode.USERNAME -> peer.username == localPeer.name
-            null -> false
-        }
+    private fun isSelfPeer(poll: HmsPoll?, peer: HMSPollResponsePeerInfo, localPeer : HMSPeer) : Boolean {
+//        poll mode is empty from the server so far and can't be relied on.
+//        when(poll?.mode) {
+//            HmsPollUserTrackingMode.USER_ID -> peer.userid == localPeer.customerUserID
+//            HmsPollUserTrackingMode.PEER_ID -> peer.peerid == localPeer.peerID
+//            HmsPollUserTrackingMode.USERNAME -> peer.username == localPeer.name
+//            null -> false
+//        }
+        return peer.userid == localPeer.customerUserID || peer.peerid == localPeer.peerID
+    }
 }
