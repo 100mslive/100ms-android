@@ -169,9 +169,13 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 )
             }
             if (isAverageTimeEmpty.not()) {
+                val time = averageTime?.div(1000)?.let {
+                    String.format("%.2f", it)
+                } ?: "-"
+
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", "${averageTime?.toInt().toString()} sec"
+                        "AVG. TIME TAKEN", "$time sec"
                     )
                 )
             }
