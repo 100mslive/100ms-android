@@ -139,7 +139,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         leaderBoardListadapter.clear()
 
         val isAverageTimeEmpty =
-            model.summary?.averageTime == null || model.summary?.averageTime == 0f
+            model.summary?.averageTime == null || model.summary?.averageTime == 0L
         val isAverageScoreEmpty =
             model.summary?.averageScore == null
         val isCorrectAnswerEmpty =
@@ -262,7 +262,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             if (isAverageTimeEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", "${averageTime?.toInt().toString()} sec"
+                        "AVG. TIME TAKEN", millisToText(averageTime, false, "sec")
                     )
                 )
             }
