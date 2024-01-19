@@ -8,9 +8,11 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -115,7 +117,18 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 }
                 val startedType = if(poll.category == HmsPollCategory.QUIZ) "Quiz" else "Poll"
                 pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name?: "Participant", startedType)
-
+                val divider =
+                    DividerItemDecoration(
+                        binding.root.context,
+                        RecyclerView.VERTICAL
+                    ).apply {
+                        setDrawable(AppCompatResources.getDrawable(binding.root.context, R.drawable.polls_display_progress_items_divider)!!)
+                    }
+                // Remove all item decorators
+                while (questionsRecyclerView.itemDecorationCount > 0) {
+                    questionsRecyclerView.removeItemDecorationAt(0);
+                }
+                questionsRecyclerView.addItemDecoration(divider)
                 // Quizzes only scroll horizontally and snap to questions
                 if(poll.category == HmsPollCategory.QUIZ && poll.state == HmsPollState.STARTED) {
                     val touchListener = QuizDisableSwipingConditionally(::isQuestionAnswered)
