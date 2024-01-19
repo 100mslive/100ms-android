@@ -205,6 +205,13 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
         if(position != NO_POSITION &&  position + 1 < pollsDisplayAdaptor.itemCount ) {
             binding.questionsRecyclerView.scrollToPosition(position + 1)
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(300)
+            dialog?.let {
+                val sheet = it as BottomSheetDialog
+                sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
 
     }
 }
