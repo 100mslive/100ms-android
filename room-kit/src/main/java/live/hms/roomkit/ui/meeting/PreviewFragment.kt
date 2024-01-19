@@ -368,14 +368,16 @@ class PreviewFragment : Fragment() {
                 p0: HMSAudioManager.AudioDevice,
                 p1: Set<HMSAudioManager.AudioDevice>
             ) {
-                lifecycleScope.launch {
-                    updateActionVolumeMenuIcon(p0)
-                }
+                meetingViewModel.updateAudioDeviceChange(p0)
             }
 
 
             override fun onError(p0: HMSException) {
             }
+        })
+
+        meetingViewModel.audioDeviceChange.observe(viewLifecycleOwner, Observer{
+            updateActionVolumeMenuIcon(it)
         })
 
         binding.iconOutputDevice.apply {
