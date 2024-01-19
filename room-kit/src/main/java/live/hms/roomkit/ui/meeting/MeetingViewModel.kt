@@ -27,6 +27,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
+import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
@@ -71,6 +72,7 @@ class MeetingViewModel(
     var recNum = 0
     // This is needed in chat for it to determine what kind of chat it is.
     val initPrebuiltChatMessageRecipient = MutableLiveData<Pair<Recipient?,Int>>()
+    val audioDeviceChange = MutableLiveData<HMSAudioManager.AudioDevice>()
     val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null

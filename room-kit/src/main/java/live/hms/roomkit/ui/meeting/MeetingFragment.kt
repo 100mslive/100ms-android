@@ -30,6 +30,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -1264,14 +1265,16 @@ class MeetingFragment : Fragment() {
                 p0: HMSAudioManager.AudioDevice,
                 p1: Set<HMSAudioManager.AudioDevice>
             ) {
-                lifecycleScope.launch {
-                    updateActionVolumeMenuIcon(p0)
-                }
+                meetingViewModel.audioDeviceChange.postValue(p0)
             }
 
 
             override fun onError(p0: HMSException) {
             }
+        })
+
+        meetingViewModel.audioDeviceChange.observe(viewLifecycleOwner, Observer{
+            updateActionVolumeMenuIcon(it)
         })
 
 
