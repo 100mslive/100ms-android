@@ -117,6 +117,8 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
         binding.declineButton.setOnClickListener {
             meetingViewModel.setStatetoOngoing()
             meetingViewModel.lowerLocalPeerHand()
+            localVideoTrack?.setMute(true)
+            localAudioTrack?.setMute(true)
             binding.previewView.removeTrack()
             findNavController().navigate(
                 RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
