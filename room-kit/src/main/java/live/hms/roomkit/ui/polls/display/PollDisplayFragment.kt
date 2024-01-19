@@ -74,7 +74,12 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.skipCollapsed = true
+            sheet.behavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
         initOnBackPress()
         lifecycleScope.launch {
             val pollId = arguments?.getString(POLL_TO_DISPLAY)
@@ -204,6 +209,13 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
         val position = (binding.questionsRecyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
         if(position != NO_POSITION &&  position + 1 < pollsDisplayAdaptor.itemCount ) {
             binding.questionsRecyclerView.scrollToPosition(position + 1)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(300)
+            dialog?.let {
+                val sheet = it as BottomSheetDialog
+                sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
         }
 
     }
