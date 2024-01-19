@@ -153,43 +153,14 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         val localPeer = meetingViewModel.hmsSDK.getLocalPeer()!!
-        val peerData : HMSPollLeaderboardEntry? = model.entries?.filter{ it.peer != null }?.find { isSelfPeer(
-            it.peer!!,
-            localPeer
-        ) }
-        if (peerData != null) with(peerData) {
-
-            leaderBoardListadapter.add(
-                LeaderBoardSubGrid(
-                    "YOUR RANK",
-                    "$position/${model.entries!!.size}"
-                )
+        if (localPeer.peerID == poll?.createdBy?.peerID) {
+            showPollCreatorSummary(
+                model, isTotalPeerCountEmpty,
+                isCorrectAnswerEmpty, isAverageTimeEmpty,
+                isAverageScoreEmpty
             )
-
-            if (isAverageScoreEmpty.not()) {
-                leaderBoardListadapter.add(
-                    LeaderBoardSubGrid(
-                        "POINTS", score.toString()
-                    )
-                )
-            }
-
-            val time = millisToText(duration, true, " secs")
-
-            // TODO add quantity string for seconds
-            leaderBoardListadapter.add(
-                LeaderBoardSubGrid(
-                    "TIME TAKEN", time
-                )
-            )
-
-            // TODO this may show incorrect info
-            leaderBoardListadapter.add(
-                LeaderBoardSubGrid(
-                    "CORRECT ANSWERS", "${(correctResponses ?: 0)}/${(totalResponses ?: 0)}"
-                )
-            )
-
+        } else {
+            showPollParticipantSummary(model, localPeer)
         }
 
 
@@ -217,6 +188,93 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             }
         }
 
+    }
+
+    private fun showPollParticipantSummary(
+        model: PollLeaderboardResponse,
+        localPeer: HMSPeer
+    ) {
+        val peerData : HMSPollLeaderboardEntry? = model.entries?.filter{ it.peer != null }?.find { isSelfPeer(
+            it.peer!!,
+            localPeer
+        ) }
+        if (peerData != null) with(peerData) {
+
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "YOUR RANK",
+                    "$position/${model.entries!!.size}"
+                )
+            )
+
+
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "POINTS", score.toString()
+                )
+            )
+
+            val time = millisToText(duration, true, " secs")
+
+            // TODO add quantity string for seconds
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "TIME TAKEN", time
+                )
+            )
+
+            // TODO this may show incorrect info
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "CORRECT ANSWERS", "${(correctResponses ?: 0)}/${(totalResponses ?: 0)}"
+                )
+            )
+
+        }
+
+    }
+
+    private fun showPollCreatorSummary(
+        model: PollLeaderboardResponse,
+        isTotalPeerCountEmpty: Boolean,
+        isCorrectAnswerEmpty: Boolean,
+        isAverageTimeEmpty: Boolean,
+        isAverageScoreEmpty: Boolean
+    ) {
+
+        if (model.summary != null) with(model.summary!!) {
+            if (isTotalPeerCountEmpty.not()) {
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "VOTED",
+                        "${(((respondedPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
+                    )
+                )
+            }
+
+            if (isCorrectAnswerEmpty.not()) {
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "CORRECT ANSWERS", "${(((respondedCorrectlyPeersCount?.toFloat()?:1f)/(totalPeersCount?.toFloat()?:1f)) * 100.0f).toInt()}% (${(respondedCorrectlyPeersCount ?: 0)}/${(totalPeersCount ?: 0)})"
+                    )
+                )
+            }
+            if (isAverageTimeEmpty.not()) {
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "AVG. TIME TAKEN", "${averageTime?.toInt().toString()} sec"
+                    )
+                )
+            }
+
+            if (isAverageScoreEmpty.not()) {
+                leaderBoardListadapter.add(
+                    LeaderBoardSubGrid(
+                        "AVG. SCORE", averageScore.toString()
+                    )
+                )
+            }
+        }
     }
 
     private fun isSelfPeer(peer: HMSPollResponsePeerInfo, localPeer: HMSPeer) : Boolean {
