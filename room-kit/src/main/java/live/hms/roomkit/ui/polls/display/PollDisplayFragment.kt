@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.polls.display
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -199,7 +202,9 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
     // Scroll when the answer is selected
     private fun answerSelected() {
         val position = (binding.questionsRecyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-        if(position != NO_POSITION &&  position + 1 < pollsDisplayAdaptor.itemCount )
-            binding.questionsRecyclerView.smoothScrollToPosition(position + 1)
+        if(position != NO_POSITION &&  position + 1 < pollsDisplayAdaptor.itemCount ) {
+            binding.questionsRecyclerView.scrollToPosition(position + 1)
+        }
+
     }
 }
