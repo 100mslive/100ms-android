@@ -30,6 +30,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -177,12 +178,14 @@ class MeetingFragment : Fragment() {
         super.onDestroy()
         isCountdownManuallyCancelled = true
         hasStartedHls = false
+        meetingViewModel.setCountDownTimerStartedAt(null)
         countDownTimer?.cancel()
     }
 
     override fun onPause() {
         super.onPause()
         isCountdownManuallyCancelled = true
+        meetingViewModel.setCountDownTimerStartedAt(null)
         countDownTimer?.cancel()
     }
 
@@ -226,6 +229,7 @@ class MeetingFragment : Fragment() {
 
     private fun setupStreamingTimeView() {
         countDownTimer?.cancel()
+        meetingViewModel.setCountDownTimerStartedAt(null)
         countDownTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(l: Long) {
                 val startedAt =
@@ -233,9 +237,7 @@ class MeetingFragment : Fragment() {
                         ?: meetingViewModel.hmsSDK.getRoom()?.rtmpHMSRtmpStreamingState?.startedAt
                 startedAt?.let {
                     if (startedAt > 0) {
-                        binding.tvStreamingTime.visibility = View.VISIBLE
-                        binding.tvStreamingTime.text =
-                            millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+                        meetingViewModel.setCountDownTimerStartedAt(startedAt)
                     }
                 }
             }
@@ -295,6 +297,15 @@ class MeetingFragment : Fragment() {
         initObservers()
         initOnBackPress()
 
+        meetingViewModel.countDownTimerStartedAt.observe(viewLifecycleOwner) { startedAt ->
+            if (startedAt != null) {
+                binding.tvStreamingTime.visibility = View.VISIBLE
+                binding.tvStreamingTime.text =
+                    millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+            } else {
+                binding.tvStreamingTime.visibility = View.GONE
+            }
+        }
         binding.chatMessages.isHeightContrained = true
         PauseChatUIUseCase().setChatPauseVisible(
             binding.chatOptionsCard,
@@ -707,7 +718,7 @@ class MeetingFragment : Fragment() {
     }
 
     private fun startHLSStreamingIfRequired() {
-        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream()) {
+        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning().not()) {
             binding.meetingFragmentProgress.visibility = View.VISIBLE
             hasStartedHls = true
             meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
@@ -1239,14 +1250,33 @@ class MeetingFragment : Fragment() {
                 Log.v(TAG, "iconOutputDevice.onClick()")
 
                 AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
-                    updateActionVolumeMenuIcon(audioDevice)
+
+                    if (isMuted)
+                        updateActionVolumeMenuIcon()
                 }.show(
                     childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
             }
         }
-
         updateActionVolumeMenuIcon(meetingViewModel.getAudioOutputRouteType())
+        meetingViewModel.hmsSDK.setAudioDeviceChangeListener(object :
+            HMSAudioManager.AudioManagerDeviceChangeListener {
+            override fun onAudioDeviceChanged(
+                p0: HMSAudioManager.AudioDevice,
+                p1: Set<HMSAudioManager.AudioDevice>
+            ) {
+                meetingViewModel.updateAudioDeviceChange(p0)
+            }
+
+
+            override fun onError(p0: HMSException) {
+            }
+        })
+
+        meetingViewModel.audioDeviceChange.observe(viewLifecycleOwner, Observer{
+            updateActionVolumeMenuIcon(it)
+        })
+
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             meetingViewModel.flipCamera()

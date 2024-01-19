@@ -12,6 +12,7 @@ import com.xwray.groupie.ExpandableItem
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutPinnedMessageBinding
+import live.hms.roomkit.horizontalscroll
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.theme.applyTheme
@@ -24,6 +25,7 @@ class PinnedMessageItem(val receivedPinnedMessage: SessionMetadataUseCase.Pinned
         with(viewBinding) {
             applyTheme()
             pinnedMessage.text = boldTheSenderName(receivedPinnedMessage.text)
+            pinnedMessage.horizontalscroll()
             root.setOnSingleClickListener {
                 expand.onToggleExpanded()
                 pinnedMessage.maxLines = if(expand.isExpanded) {

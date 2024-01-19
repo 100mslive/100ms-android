@@ -266,4 +266,9 @@
     <string name="no_recipients_yet_message_options_recyclerview">No Recipients Yet</string>
     <string name="stream_ended">Stream Ended</string>
     <string name="stream_ended_subtitle">Have a nice day!</string>
+    <string name="hms_vote">Vote</string>
+    <string name="hms_answer">Answer</string>
+    <string name="hms_poll">poll</string>
+    <string name="hms_quiz">quiz</string>
+    <string name="hms_started_quiz_poll_notification">%1$s started a new %2$s</string>
 </resources>

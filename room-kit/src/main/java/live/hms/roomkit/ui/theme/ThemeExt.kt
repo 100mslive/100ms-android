@@ -2302,14 +2302,14 @@ fun LayoutHeaderBinding.applyTheme() {
 }
 
 fun ItemGridSubTextBinding.applyTheme() {
-    subtitle.setTextColor(
+    heading.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_low_emp
         )
     )
 
-    heading.setTextColor(
+    subtitle.setTextColor(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp

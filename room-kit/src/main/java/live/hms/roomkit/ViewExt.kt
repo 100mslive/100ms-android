@@ -10,6 +10,7 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Looper
+import android.text.TextUtils
 import android.util.Log
 import android.view.*
 import android.view.accessibility.AccessibilityManager
@@ -28,6 +29,7 @@ import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.videoview.HMSVideoView
+import org.w3c.dom.Text
 import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
 import java.io.File
@@ -117,6 +119,13 @@ private val TextView.drawables: Array<Drawable?>
 
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
+}
+
+fun TextView.horizontalscroll() {
+    setEllipsize(TextUtils.TruncateAt.MARQUEE);
+    setSingleLine(true);
+    setMarqueeRepeatLimit(-1);
+    setSelected(true);
 }
 
 fun Activity.hideKeyboard() {
