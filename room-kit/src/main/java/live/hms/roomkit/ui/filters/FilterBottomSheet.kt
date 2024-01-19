@@ -243,18 +243,12 @@ class FilterBottomSheet(
                 this.newTab().setText("Brightness").setTag(VideoFilter.Brightness), true
             )
             addTab(
-                this.newTab().setText("Saturation").setTag(VideoFilter.Saturation)
+                this.newTab().setText("Beauty level").setTag(VideoFilter.Contrast)
             )
+            addTab(this.newTab().setText("Tone").setTag(VideoFilter.Exposure))
             addTab(
                 this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
             )
-            addTab(
-                this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
-            )
-            addTab(
-                this.newTab().setText("Exposure").setTag(VideoFilter.Exposure)
-            )
-            addTab(this.newTab().setText("Hue").setTag(VideoFilter.Hue))
             setSelectedTabIndicatorColor(Color.TRANSPARENT)
         }
 
