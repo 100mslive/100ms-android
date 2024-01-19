@@ -368,7 +368,7 @@ class PreviewFragment : Fragment() {
                 p0: HMSAudioManager.AudioDevice,
                 p1: Set<HMSAudioManager.AudioDevice>
             ) {
-                meetingViewModel.audioDeviceChange.postValue(p0)
+                meetingViewModel.updateAudioDeviceChange(p0)
             }
 
 

@@ -2394,6 +2394,11 @@ class MeetingViewModel(
     fun setCountDownTimerStartedAt(startedAt: Long?) {
         countDownTimerStartedAt.postValue(startedAt)
     }
+
+    fun updateAudioDeviceChange(p0: HMSAudioManager.AudioDevice) {
+        audioDeviceChange.postValue(p0)
+    }
+
     private val questionTimingUseCase = QuizQuestionTimingUseCase()
     val setQuestionStartTime = questionTimingUseCase::setQuestionStartTime
     val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
