@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.LayoutEndPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.drawableStart
@@ -46,10 +45,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
         if(binding is LayoutPollsDisplayChoicesQuesionBinding){
             binding.votebutton.isEnabled = answersSelected
-            if(absoluteAdapterPosition == totalItems -1)
-                setEndButton(binding.launchPollQuiz)
-            else
-                binding.launchPollQuiz.visibility = View.GONE
+            determineEndButtonVisibility(binding)
         }
     }
 
@@ -97,16 +93,20 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                     }
 
                     binding as LayoutPollsDisplayChoicesQuesionBinding
-                    if(absoluteAdapterPosition == totalItems -1)
-                        setEndButton(binding.launchPollQuiz)
-                    else
-                        binding.launchPollQuiz.visibility = View.GONE
+                    determineEndButtonVisibility(binding)
                 }
 
                 HMSPollQuestionType.shortAnswer,
                 HMSPollQuestionType.longAnswer -> textBinder(question)
             }
         }
+    }
+
+    private fun determineEndButtonVisibility(binding: LayoutPollsDisplayChoicesQuesionBinding) {
+        if(absoluteAdapterPosition == totalItems - 1 || (poll.state == HmsPollState.STARTED && poll.category == HmsPollCategory.QUIZ))
+            setEndButton(binding.launchPollQuiz)
+        else
+            binding.launchPollQuiz.visibility = View.GONE
     }
 
     private fun manageVisibility(question : QuestionContainer.Question, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
