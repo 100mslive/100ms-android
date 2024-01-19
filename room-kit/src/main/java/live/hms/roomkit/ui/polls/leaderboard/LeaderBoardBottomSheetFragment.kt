@@ -262,7 +262,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             if (isAverageTimeEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", millisToText(averageTime, false, "sec")
+                        "AVG. TIME TAKEN", millisToText(averageTime, false, " sec")
                     )
                 )
             }
