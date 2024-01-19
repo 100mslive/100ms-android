@@ -74,7 +74,12 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.skipCollapsed = true
+            sheet.behavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
         initOnBackPress()
         lifecycleScope.launch {
             val pollId = arguments?.getString(POLL_TO_DISPLAY)
