@@ -204,6 +204,8 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
+                    localVideoTrack?.setMute(true)
+                    localAudioTrack?.setMute(true)
                     binding.previewView.removeTrack()
                     meetingViewModel.setStatetoOngoing()
                     binding?.previewView?.removeTrack()
