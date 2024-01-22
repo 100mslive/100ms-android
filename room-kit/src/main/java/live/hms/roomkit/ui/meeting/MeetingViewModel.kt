@@ -57,6 +57,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
+import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
@@ -120,7 +121,7 @@ class MeetingViewModel(
         .build()
 
 
-    val filterPlugin  by lazy {HMSVirtualBackground(hmsSDK)}
+    val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
 
     private var lastPollStartedTime : Long = 0
 
