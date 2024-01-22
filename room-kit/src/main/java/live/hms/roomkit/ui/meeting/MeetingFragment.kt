@@ -933,6 +933,9 @@ class MeetingFragment : Fragment() {
         binding.buttonRaiseHand.visibility = View.VISIBLE
 
         binding.fragmentContainer.setOnSingleClickListener(500L) {
+            // The bars are disabled in hls fragment view
+            if(meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER)
+                return@setOnSingleClickListener
             if (controlBarsVisible)
                 hideControlBars()
             else
