@@ -25,8 +25,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -102,6 +104,7 @@ import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
+import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
@@ -553,7 +556,8 @@ fun ChatPreview() {
 
 @Composable
 fun HlsBottomBar(maximizeClicked : () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth().padding(Spacing1),
+    Row(modifier = Modifier
+        .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically){
         GoLiveText()
         Spacer(Modifier.weight(1f))
@@ -610,8 +614,8 @@ fun SettingsButton(
         contentDescription = "Layer Select",
         modifier = Modifier
             .clickable { onClickAction() }
-            .wrapContentSize()
-            .padding(16.dp))
+            .padding(1.dp)
+            .size(32.dp))
 }
 //
 //val configuration = LocalConfiguration.current
@@ -662,11 +666,20 @@ fun HlsComposable(
 
             // There's one column, with two rows.
             // A spacer puts a gap between items on any one row.
-            Column {
+            Column(Modifier.padding(Spacing1)) {
                 // Top Row
                 Row {
-                    Text("Hello")
+                    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_close_button), contentDescription = "Close",
+                        contentScale = ContentScale.None, modifier = Modifier
+                            .clickable { }
+                            .padding(1.dp)
+                            .size(32.dp))
                     Spacer(modifier = Modifier.weight(1f))
+                    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_closed_caption_button), contentDescription = "Close",
+                        contentScale = ContentScale.None, modifier = Modifier
+                            .clickable { }
+                            .height(32.dp))
+                    Spacer(modifier = Modifier.padding(Spacing2))
                     androidx.compose.animation.AnimatedVisibility(
                         visible = controlsVisible,
                         enter = fadeIn(animationSpec = tween(2000)),
