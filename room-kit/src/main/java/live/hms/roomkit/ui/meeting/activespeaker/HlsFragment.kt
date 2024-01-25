@@ -174,6 +174,7 @@ private const val SECONDS_FROM_LIVE = 10
     }
 
     private fun goLive(player: HmsHlsPlayer) {
+        hlsViewModel.isPlaying.postValue(true)
         player.getNativePlayer().seekToDefaultPosition()
     }
 
