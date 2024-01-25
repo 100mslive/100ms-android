@@ -68,7 +68,9 @@ import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.navArgs
-import coil.compose.AsyncImage
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import kotlinx.coroutines.launch
 import live.hms.hls_player.*
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
@@ -382,6 +384,7 @@ class HlsFragment : Fragment() {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ChatHeader(headingText: String, logoUrl: String?, viewers: Long, startedMillis: Long) {
     fun getViewersDisplayNum(viewers: Long): String =
@@ -401,9 +404,9 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Long, startedMill
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        AsyncImage(
+        GlideImage(
             model = logoUrl,
-            placeholder = if (LocalInspectionMode.current) painterResource(id = R.drawable.exo_edit_mode_logo) else null,
+            loading = if (LocalInspectionMode.current) placeholder(R.drawable.exo_edit_mode_logo) else null,
             contentDescription = "Logo"
         )
         Column {
