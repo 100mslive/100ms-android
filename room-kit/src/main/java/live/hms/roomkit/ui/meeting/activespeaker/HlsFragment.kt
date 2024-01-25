@@ -793,15 +793,15 @@ fun ChatUI(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     AndroidView({
-        LayoutInflater.from(context).inflate(live.hms.roomkit.R.layout.layout_chat_merge, null)
-    }, modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()) { view ->
+        val view = LayoutInflater.from(context).inflate(live.hms.roomkit.R.layout.layout_chat_merge, null)
         with(LayoutChatMergeBinding.bind(view)) {
             applyTheme()
             chatRelatedObservers(this, lifecycleOwner)
         }
-    }
+        view
+    }, modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight())
 }
 
 @Composable
