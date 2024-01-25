@@ -552,7 +552,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
 }
 
 fun pinMessageTheme(pinCloseButton: ImageView) {
-    pinCloseButton.drawable.setTint(
+    pinCloseButton?.drawable?.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
