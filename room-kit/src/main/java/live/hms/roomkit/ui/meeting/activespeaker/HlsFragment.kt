@@ -178,6 +178,7 @@ private const val SECONDS_FROM_LIVE = 10
                 var controlsVisible by remember { mutableStateOf(false) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
+                var chatOpen by remember { mutableStateOf(true)}
 
 //                val controlsAlpha: Float by animateFloatAsState(
 //                    targetValue = if (controlsVisible) 1f else 0f,
@@ -208,15 +209,15 @@ private const val SECONDS_FROM_LIVE = 10
                     )
                 } else {
 
-                    OrientationSwapper({
+                    OrientationSwapper({ isLandScape ->
                         Row {
 
                             HlsComposable(
-                                hlsViewModel,
-                                controlsVisible,
-                                { controlsVisible = !controlsVisible },
-                                context,
-                                player,
+                                hlsViewModel = hlsViewModel,
+                                controlsVisible = controlsVisible,
+                                videoTapped = { controlsVisible = !controlsVisible },
+                                context = context,
+                                player = player,
                                 settingsButtonTapped = { showTrackSelection(player) },
                                 maximizeClicked = {maximized = !maximized },
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
@@ -225,14 +226,53 @@ private const val SECONDS_FROM_LIVE = 10
                                 else
                                     player.getNativePlayer().play()
                                     hlsViewModel.isPlaying.postValue(isPlaying?.not())
-                                                               }, isPlaying)}
+                                                               }, isPlaying)},
+                                hlsChatIcon = {HlsChatIcon{chatOpen = !chatOpen}},
+                                chatOpen = chatOpen,
+                                isLandscape = isLandScape
                             )
                             Column {
+                                if(chatOpen) {
+                                    ChatHeader(
+                                        "Tech talks",
+                                        meetingViewModel.getLogo(),
+                                        1200,
+                                        35 * 60 * 1000
+                                    )
+                                    ChatUI(
+                                        childFragmentManager,
+                                        chatViewModel,
+                                        meetingViewModel,
+                                        pinnedMessageUiUseCase,
+                                        chatAdapter
+                                    )
+                                }
+                            }
+                        }
+                    }, { isLandscape ->
+                        Column {
+                            HlsComposable(
+                                hlsViewModel = hlsViewModel,
+                                controlsVisible = controlsVisible,
+                                videoTapped = { controlsVisible = !controlsVisible },
+                                context = context,
+                                player = player,
+                                settingsButtonTapped = { showTrackSelection(player) },
+                                maximizeClicked = {maximized = !maximized },
+                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
+                                pauseButton = {PlayPauseButton({if(player.getNativePlayer().isPlaying)
+                                    player.getNativePlayer().pause()
+                                else
+                                    player.getNativePlayer().play()
+                                    hlsViewModel.isPlaying.postValue(isPlaying?.not())
+                                }, isPlaying)},
+                                hlsChatIcon = {HlsChatIcon{chatOpen = !chatOpen}},
+                                chatOpen = chatOpen,
+                                isLandscape = isLandscape
+                            )
+                            if(chatOpen) {
                                 ChatHeader(
-                                    "Tech talks",
-                                    meetingViewModel.getLogo(),
-                                    1200,
-                                    35 * 60 * 1000
+                                    "Tech talks", meetingViewModel.getLogo(), 1200, 35 * 60 * 1000
                                 )
                                 ChatUI(
                                     childFragmentManager,
@@ -242,35 +282,6 @@ private const val SECONDS_FROM_LIVE = 10
                                     chatAdapter
                                 )
                             }
-                        }
-                    }, {
-                        Column {
-                            HlsComposable(
-                                hlsViewModel,
-                                controlsVisible,
-                                { controlsVisible = !controlsVisible },
-                                context,
-                                player,
-                                settingsButtonTapped = { showTrackSelection(player) },
-                                maximizeClicked = {maximized = !maximized },
-                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
-                                pauseButton = {PlayPauseButton({if(player.getNativePlayer().isPlaying)
-                                    player.getNativePlayer().pause()
-                                else
-                                    player.getNativePlayer().play()
-                                    hlsViewModel.isPlaying.postValue(isPlaying?.not())
-                                }, isPlaying)}
-                            )
-                            ChatHeader(
-                                "Tech talks", meetingViewModel.getLogo(), 1200, 35 * 60 * 1000
-                            )
-                            ChatUI(
-                                childFragmentManager,
-                                chatViewModel,
-                                meetingViewModel,
-                                pinnedMessageUiUseCase,
-                                chatAdapter
-                            )
                         }
                     })
 
@@ -668,20 +679,43 @@ fun HlsComposable(
     settingsButtonTapped: () -> Unit,
     maximizeClicked: () -> Unit,
     pauseButton : @Composable () -> Unit,
-    closedCaptionsButton : @Composable () -> Unit
+    closedCaptionsButton : @Composable () -> Unit,
+    hlsChatIcon : @Composable () -> Unit,
+    chatOpen : Boolean,
+    isLandscape : Boolean
 ) {
 
     // Keeping it one box so rows and columns don't change the layout
     Box {
 
-        val hlsModifier = Modifier
-            .aspectRatio(ratio = 16f / 9)
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    videoTapped()
-                })
-            }
-            .fillMaxWidth()
+        val hlsModifier = if(chatOpen && !isLandscape) {
+            Modifier
+                .aspectRatio(ratio = 16f / 9)
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        videoTapped()
+                    })
+                }
+                .fillMaxWidth()
+        } else if(chatOpen && isLandscape) {
+            Modifier
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        videoTapped()
+                    })
+                }
+                .fillMaxWidth(0.6f)
+        }
+        else {
+            Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        videoTapped()
+                    })
+                }
+        }
+
         AndroidView(modifier = hlsModifier, factory = {
             PlayerView(context).apply {
                 useController = false
@@ -709,6 +743,10 @@ fun HlsComposable(
                         CloseButton()
 
                         Spacer(modifier = Modifier.weight(1f))
+
+                        hlsChatIcon()
+
+                        Spacer(modifier = Modifier.padding(Spacing2))
 
                         closedCaptionsButton()
 
@@ -858,16 +896,16 @@ fun ChatUI(
 
 @Composable
 fun OrientationSwapper(
-    landscape: @Composable () -> Unit, portrait: @Composable () -> Unit
+    landscape: @Composable (isLandcape : Boolean) -> Unit, portrait: @Composable (isLandcape : Boolean) -> Unit
 ) {
     val configuration = LocalConfiguration.current
     when (configuration.orientation) {
         Configuration.ORIENTATION_LANDSCAPE -> {
-            landscape()
+            landscape(true)
         }
 
         else -> {
-            portrait()
+            portrait(false)
         }
     }
 }
@@ -881,5 +919,15 @@ fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
         contentDescription = "Play",
         contentScale = ContentScale.None
     )
+}
 
+@Composable
+fun HlsChatIcon(buttonClicked: () -> Unit) {
+        Image(painter =
+        painterResource(id = live.hms.roomkit.R.drawable.hls_chat_off),
+            contentDescription = "Chat Open",
+            contentScale = ContentScale.None,
+            modifier = Modifier
+                .clickable { buttonClicked() }
+                .height(32.dp))
 }
