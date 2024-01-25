@@ -2402,5 +2402,8 @@ class MeetingViewModel(
     private val questionTimingUseCase = QuizQuestionTimingUseCase()
     val setQuestionStartTime = questionTimingUseCase::setQuestionStartTime
     val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
+
+    fun getLogo() = getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
+    //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
 }
 

@@ -1766,14 +1766,16 @@ internal fun ListItemChatBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
 }
 
-internal fun HlsFragmentLayoutBinding.applyTheme() {
+internal fun LayoutChatMergeBinding.applyTheme() {
+    pinMessageTheme(pinCloseButton)
+    userBlockedTheme(userBlocked)
+    chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
+    configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
 
-    btnTrackSelection.drawable?.setTint(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
-        HMSPrebuiltTheme.getDefaults().onsurface_med_emp))
-    progressBar.progressTintList = ColorStateList.valueOf(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.primaryDefault,
-        HMSPrebuiltTheme.getDefaults().onsurface_high_emp))
+}
+internal fun HlsFragmentLayoutBinding.applyTheme() {
+//    chatMerge.applyTheme()
+//    meetingViewModel.getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
 }
 
 private fun TextInputLayout.applyTheme() {

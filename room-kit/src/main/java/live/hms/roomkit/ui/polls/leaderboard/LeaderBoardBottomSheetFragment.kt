@@ -287,21 +287,4 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
 //        }
         return peer.userid == localPeer.customerUserID || peer.peerid == localPeer.peerID
     }
-    private fun millisToText(milliseconds : Long?,
-                             hyphenateEmptyValues : Boolean,
-                             secondsText : String): String {
-        return if (milliseconds == 0L || milliseconds == null) {
-            if(hyphenateEmptyValues) "-" else ""
-        }
-        else {
-            val minutes = milliseconds / 1000 / 60
-            val seconds = milliseconds / 1000f % 60
-
-            val prefix = if (minutes != 0L) {
-                "$minutes" + "m "
-            } else ""
-            val suffix = String.format("%.1f$secondsText", seconds)
-            "$prefix$suffix"
-        }
-    }
 }
