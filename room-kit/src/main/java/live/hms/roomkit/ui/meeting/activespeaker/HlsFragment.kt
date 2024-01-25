@@ -36,8 +36,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -71,6 +73,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.map
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
@@ -83,6 +86,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import live.hms.hls_player.*
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
@@ -107,6 +111,7 @@ import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
+import live.hms.roomkit.ui.polls.leaderboard.millisecondsToDisplayTime
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
@@ -115,6 +120,7 @@ import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.seconds
 
 
 /**
@@ -194,6 +200,18 @@ private const val SECONDS_FROM_LIVE = 10
                 var chatOpen by remember { mutableStateOf(true)}
                 val isLive by hlsViewModel.isLive.observeAsState()
                 val viewers by meetingViewModel.peerCount.observeAsState()
+                val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
+                var ticks by remember { mutableLongStateOf(0) }
+
+                LaunchedEffect(elapsedTime) {
+                    elapsedTime?.let {
+                        ticks = System.currentTimeMillis().minus(it)
+                        while (true) {
+                            delay(1.seconds)
+                            ticks++
+                        }
+                    }
+                }
 
 //                val controlsAlpha: Float by animateFloatAsState(
 //                    targetValue = if (controlsVisible) 1f else 0f,
@@ -259,7 +277,7 @@ private const val SECONDS_FROM_LIVE = 10
                                         "Tech talks",
                                         meetingViewModel.getLogo(),
                                         viewers ?:0,
-                                        35 * 60 * 1000
+                                        ticks
                                     )
                                     ChatUI(
                                         childFragmentManager,
@@ -301,7 +319,9 @@ private const val SECONDS_FROM_LIVE = 10
                             )
                             if(chatOpen) {
                                 ChatHeader(
-                                    "Tech talks", meetingViewModel.getLogo(), 1200, 35 * 60 * 1000
+                                    "Tech talks", meetingViewModel.getLogo(),
+                                    viewers ?:0,
+                                    ticks
                                 )
                                 ChatUI(
                                     childFragmentManager,
@@ -505,7 +525,7 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(Variables.Spacing2),
+            .padding(Spacing2),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -20,7 +20,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.AdapterView
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -68,6 +67,7 @@ import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.HMSNotificationType
+import live.hms.roomkit.ui.polls.leaderboard.millisecondsToDisplayTime
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.util.*
@@ -252,18 +252,6 @@ class MeetingFragment : Fragment() {
         }.start()
     }
 
-    private fun millisecondsToTime(milliseconds: Long): String? {
-        val minutes = milliseconds / 1000 / 60
-        val seconds = milliseconds / 1000 % 60
-        val secondsStr = seconds.toString()
-        val secs: String = if (secondsStr.length >= 2) {
-            secondsStr.substring(0, 2)
-        } else {
-            "0$secondsStr"
-        }
-        return "$minutes:$secs"
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
@@ -301,7 +289,7 @@ class MeetingFragment : Fragment() {
             if (startedAt != null) {
                 binding.tvStreamingTime.visibility = View.VISIBLE
                 binding.tvStreamingTime.text =
-                    millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+                    millisecondsToDisplayTime(System.currentTimeMillis().minus(startedAt))
             } else {
                 binding.tvStreamingTime.visibility = View.GONE
             }

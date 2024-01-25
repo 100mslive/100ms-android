@@ -1,5 +1,16 @@
 package live.hms.roomkit.ui.polls.leaderboard
 
+fun millisecondsToDisplayTime(milliseconds: Long): String {
+    val minutes = milliseconds / 1000 / 60
+    val seconds = milliseconds / 1000 % 60
+    val secondsStr = seconds.toString()
+    val secs: String = if (secondsStr.length >= 2) {
+        secondsStr.substring(0, 2)
+    } else {
+        "0$secondsStr"
+    }
+    return "$minutes:$secs"
+}
 fun millisToText(milliseconds : Long?,
                  hyphenateEmptyValues : Boolean,
                  secondsText : String): String {
@@ -15,7 +26,7 @@ fun millisToText(milliseconds : Long?,
         val seconds = milliseconds / 1000f % 60
 
         val prefix = if (hasHours) {
-            "$hours $minutes" + "m"
+            "$hours" + 'h' + " $minutes" + "m"
         } else if (hasMinutes) {
                 "$minutes" + "m"
         } else {
