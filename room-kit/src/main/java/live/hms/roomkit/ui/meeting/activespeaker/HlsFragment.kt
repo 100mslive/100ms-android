@@ -193,6 +193,7 @@ private const val SECONDS_FROM_LIVE = 10
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
                 var chatOpen by remember { mutableStateOf(true)}
                 val isLive by hlsViewModel.isLive.observeAsState()
+                val viewers by meetingViewModel.peerCount.observeAsState()
 
 //                val controlsAlpha: Float by animateFloatAsState(
 //                    targetValue = if (controlsVisible) 1f else 0f,
@@ -257,7 +258,7 @@ private const val SECONDS_FROM_LIVE = 10
                                     ChatHeader(
                                         "Tech talks",
                                         meetingViewModel.getLogo(),
-                                        1200,
+                                        viewers ?:0,
                                         35 * 60 * 1000
                                     )
                                     ChatUI(
@@ -494,8 +495,8 @@ private const val SECONDS_FROM_LIVE = 10
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatHeader(headingText: String, logoUrl: String?, viewers: Long, startedMillis: Long) {
-    fun getViewersDisplayNum(viewers: Long): String = if (viewers < 1000) {
+fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMillis: Long) {
+    fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
         "$viewers"
     } else "${viewers / 1000f}K"
 
