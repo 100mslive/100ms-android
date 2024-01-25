@@ -183,7 +183,6 @@ private const val SECONDS_FROM_LIVE = 10
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                var maximized by remember { mutableStateOf(false) }
                 var controlsVisible by remember { mutableStateOf(false) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
@@ -229,15 +228,19 @@ private const val SECONDS_FROM_LIVE = 10
                                 context = context,
                                 player = player,
                                 settingsButtonTapped = { showTrackSelection(player) },
-                                maximizeClicked = {maximized = !maximized },
+                                maximizeClicked = {chatOpen = !chatOpen },
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
-                                pauseButton = {PlayPauseButton({if(player.getNativePlayer().isPlaying)
+                                pauseButton = {
+                                    PlayPauseButton({if(player.getNativePlayer().isPlaying) {
                                     player.getNativePlayer().pause()
-                                else
+                                    hlsViewModel.isLive.postValue(false)
+                                }
+                                else {
                                     player.getNativePlayer().play()
-                                    hlsViewModel.isPlaying.postValue(isPlaying?.not())
+                                }
+                                hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
-                                hlsChatIcon = {HlsChatIcon{chatOpen = !chatOpen}},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon{chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
@@ -270,15 +273,19 @@ private const val SECONDS_FROM_LIVE = 10
                                 context = context,
                                 player = player,
                                 settingsButtonTapped = { showTrackSelection(player) },
-                                maximizeClicked = {maximized = !maximized },
+                                maximizeClicked = {chatOpen = !chatOpen },
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
-                                pauseButton = {PlayPauseButton({if(player.getNativePlayer().isPlaying)
-                                    player.getNativePlayer().pause()
-                                else
-                                    player.getNativePlayer().play()
-                                    hlsViewModel.isPlaying.postValue(isPlaying?.not())
-                                }, isPlaying)},
-                                hlsChatIcon = {HlsChatIcon{chatOpen = !chatOpen}},
+                                pauseButton = {
+                                    PlayPauseButton({if(player.getNativePlayer().isPlaying) {
+                                        player.getNativePlayer().pause()
+                                        hlsViewModel.isLive.postValue(false)
+                                    }
+                                    else {
+                                        player.getNativePlayer().play()
+                                    }
+                                        hlsViewModel.isPlaying.postValue(isPlaying?.not())
+                                    }, isPlaying)},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon{chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
@@ -607,19 +614,19 @@ fun ChatPreview() {
 }
 
 @Composable
-fun HlsBottomBar(isLive : Boolean?, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
+fun HlsBottomBar(isLive : Boolean?,isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically){
         GoLiveText(isLive ?: false, goLiveClicked)
         Spacer(Modifier.weight(1f))
-        MaximizeButton(maximizeClicked)
+        MaximizeButton(maximizeClicked,isMaximized)
     }
 }
 @Preview
 @Composable
 fun BottomBarPreview() {
-    HlsBottomBar(false,{}){}
+    HlsBottomBar(false,false,{}){}
 }
 @Composable
 fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
@@ -650,9 +657,10 @@ fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
 }
 @Composable
 fun MaximizeButton(
-    onClickAction: () -> Unit
+    onClickAction: () -> Unit,
+    isMaximized : Boolean
 ) {
-    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_maximize),
+    Image(painter = painterResource(id = if(isMaximized) live.hms.roomkit.R.drawable.hls_minimize else live.hms.roomkit.R.drawable.hls_maximize),
         contentScale = ContentScale.None,
         contentDescription = "Maximize Video",
         modifier = Modifier
@@ -707,6 +715,7 @@ fun HlsComposable(
     Box {
 
         val hlsModifier = if(chatOpen && !isLandscape) {
+            //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
                 .aspectRatio(ratio = 16f / 9)
                 .pointerInput(Unit) {
@@ -716,6 +725,7 @@ fun HlsComposable(
                 }
                 .fillMaxWidth()
         } else if(chatOpen && isLandscape) {
+            //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = {
@@ -725,9 +735,9 @@ fun HlsComposable(
                 .fillMaxWidth(0.6f)
         }
         else {
+//            hlsViewModel.allowZoom()
             Modifier
                 .fillMaxSize()
-                // TODO fix zoom
 //                .pointerInteropFilter { event ->
 //                    scaleGestureListener.onTouchEvent(event)
 //                }
@@ -779,7 +789,12 @@ fun HlsComposable(
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     // Bottom Row
-                    HlsBottomBar(isLive,maximizeClicked, goLiveClicked)
+                    HlsBottomBar(
+                        isLive = isLive,
+                        isMaximized = !chatOpen,
+                        maximizeClicked = maximizeClicked,
+                        goLiveClicked = goLiveClicked
+                    )
                 }
                 pauseButton()
             }
