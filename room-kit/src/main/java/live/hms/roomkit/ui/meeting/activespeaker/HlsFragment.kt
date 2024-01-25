@@ -170,7 +170,7 @@ class HlsFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 var maximized by remember { mutableStateOf(false) }
-                var controlsVisible by remember { mutableStateOf(true) }
+                var controlsVisible by remember { mutableStateOf(false) }
 
 //                val controlsAlpha: Float by animateFloatAsState(
 //                    targetValue = if (controlsVisible) 1f else 0f,
@@ -206,8 +206,9 @@ class HlsFragment : Fragment() {
                                 { controlsVisible = !controlsVisible },
                                 context,
                                 player,
-                                {maximized = !maximized }
-                            ) { showTrackSelection(player) }
+                                settingsButtonTapped = { showTrackSelection(player) },
+                                maximizeClicked = {maximized = !maximized },
+                            )
                             Column {
                                 ChatHeader(
                                     "Tech talks",
@@ -232,8 +233,9 @@ class HlsFragment : Fragment() {
                                 { controlsVisible = !controlsVisible },
                                 context,
                                 player,
-                                {maximized = !maximized }
-                            ) { showTrackSelection(player) }
+                                settingsButtonTapped = { showTrackSelection(player) },
+                                maximizeClicked = {maximized = !maximized },
+                            )
                             ChatHeader(
                                 "Tech talks", meetingViewModel.getLogo(), 1200, 35 * 60 * 1000
                             )
@@ -660,37 +662,41 @@ fun HlsComposable(
         }, update = {
             it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
         })
-        // Draw the items in a grid with the same size as
-        // the hls video by applying hls video size with BoxWithConstraints.
-        BoxWithConstraints(modifier = hlsModifier) {
+        androidx.compose.animation.AnimatedVisibility(
+            visible = controlsVisible,
+            enter = fadeIn(animationSpec = tween(2000)),
+            exit = fadeOut(animationSpec = tween(2000))
+        ) {
+            // Draw the items in a grid with the same size as
+            // the hls video by applying hls video size with BoxWithConstraints.
+            BoxWithConstraints(modifier = hlsModifier) {
 
-            // There's one column, with two rows.
-            // A spacer puts a gap between items on any one row.
-            Column(Modifier.padding(Spacing1)) {
-                // Top Row
-                Row {
-                    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_close_button), contentDescription = "Close",
-                        contentScale = ContentScale.None, modifier = Modifier
-                            .clickable { }
-                            .padding(1.dp)
-                            .size(32.dp))
-                    Spacer(modifier = Modifier.weight(1f))
-                    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_closed_caption_button), contentDescription = "Close",
-                        contentScale = ContentScale.None, modifier = Modifier
-                            .clickable { }
-                            .height(32.dp))
-                    Spacer(modifier = Modifier.padding(Spacing2))
-                    androidx.compose.animation.AnimatedVisibility(
-                        visible = controlsVisible,
-                        enter = fadeIn(animationSpec = tween(2000)),
-                        exit = fadeOut(animationSpec = tween(2000))
-                    ) {
+                // There's one column, with two rows.
+                // A spacer puts a gap between items on any one row.
+                Column(Modifier.padding(Spacing1)) {
+                    // Top Row
+                    Row {
+                        Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_close_button),
+                            contentDescription = "Close",
+                            contentScale = ContentScale.None,
+                            modifier = Modifier
+                                .clickable { }
+                                .padding(1.dp)
+                                .size(32.dp))
+                        Spacer(modifier = Modifier.weight(1f))
+                        Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_closed_caption_button),
+                            contentDescription = "Close",
+                            contentScale = ContentScale.None,
+                            modifier = Modifier
+                                .clickable { }
+                                .height(32.dp))
+                        Spacer(modifier = Modifier.padding(Spacing2))
                         SettingsButton(settingsButtonTapped)
                     }
+                    Spacer(modifier = Modifier.weight(1f))
+                    // Bottom Row
+                    HlsBottomBar(maximizeClicked)
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                // Bottom Row
-                HlsBottomBar(maximizeClicked)
             }
         }
     }
