@@ -92,6 +92,7 @@ import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MessageOptionsBottomSheet
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
+import live.hms.roomkit.ui.meeting.bottomsheets.LeaveCallBottomSheet
 import live.hms.roomkit.ui.meeting.bottomsheets.StreamEnded
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
@@ -244,7 +245,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
-                                goLiveClicked = {goLive(player)}
+                                goLiveClicked = {goLive(player)},
+                                onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)}
                             )
                             Column {
                                 if(chatOpen) {
@@ -289,7 +291,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
-                                goLiveClicked = {goLive(player)}
+                                goLiveClicked = {goLive(player)},
+                                onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)}
                             )
                             if(chatOpen) {
                                 ChatHeader(
@@ -707,7 +710,8 @@ fun HlsComposable(
     chatOpen : Boolean,
     isLandscape : Boolean,
     isLive : Boolean?,
-    goLiveClicked : () -> Unit
+    goLiveClicked : () -> Unit,
+    onCloseButtonClicked: () -> Unit
 ) {
 
     lateinit var scaleGestureListener : ScaleGestureDetector
@@ -773,7 +777,7 @@ fun HlsComposable(
                 Column(Modifier.padding(Spacing1)) {
                     // Top Row
                     Row {
-                        CloseButton()
+                        CloseButton(onCloseButtonClicked)
 
                         Spacer(modifier = Modifier.weight(1f))
 
@@ -803,12 +807,12 @@ fun HlsComposable(
 }
 
 @Composable
-fun CloseButton() {
+fun CloseButton(onCloseButtonClicked: () -> Unit) {
     Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_close_button),
         contentDescription = "Close",
         contentScale = ContentScale.None,
         modifier = Modifier
-            .clickable { }
+            .clickable { onCloseButtonClicked() }
             .padding(1.dp)
             .size(32.dp))
 }
