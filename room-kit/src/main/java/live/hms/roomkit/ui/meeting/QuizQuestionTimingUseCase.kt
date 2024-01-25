@@ -15,7 +15,7 @@ class QuizQuestionTimingUseCase {
     }
 
     fun getQuestionStartTime(question: QuestionContainer.Question): Long?  {
-        return questionSeenTimeMap.getOrDefault(getIdForQuestion(question), null)
+        return questionSeenTimeMap[getIdForQuestion(question)]
     }
 
     private fun getIdForQuestion(question: QuestionContainer.Question): String {
