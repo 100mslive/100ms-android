@@ -17,13 +17,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,9 +41,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.BottomStart
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -158,6 +166,7 @@ class HlsFragment : Fragment() {
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
+                var maximized by remember { mutableStateOf(false) }
                 var controlsVisible by remember { mutableStateOf(true) }
 
 //                val controlsAlpha: Float by animateFloatAsState(
@@ -193,7 +202,8 @@ class HlsFragment : Fragment() {
                                 controlsVisible,
                                 { controlsVisible = !controlsVisible },
                                 context,
-                                player
+                                player,
+                                {maximized = !maximized }
                             ) { showTrackSelection(player) }
                             Column {
                                 ChatHeader(
@@ -218,7 +228,8 @@ class HlsFragment : Fragment() {
                                 controlsVisible,
                                 { controlsVisible = !controlsVisible },
                                 context,
-                                player
+                                player,
+                                {maximized = !maximized }
                             ) { showTrackSelection(player) }
                             ChatHeader(
                                 "Tech talks", meetingViewModel.getLogo(), 1200, 35 * 60 * 1000
@@ -541,6 +552,57 @@ fun ChatPreview() {
 }
 
 @Composable
+fun HlsBottomBar(maximizeClicked : () -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth().padding(Spacing1),
+        verticalAlignment = Alignment.CenterVertically){
+        GoLiveText()
+        Spacer(Modifier.weight(1f))
+        MaximizeButton(maximizeClicked)
+    }
+}
+@Preview
+@Composable
+fun BottomBarPreview() {
+    HlsBottomBar{}
+}
+@Composable
+fun GoLiveText() {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+
+        Image(
+            painter = painterResource(id = live.hms.roomkit.R.drawable.hls_go_live_dot),
+            contentDescription = "Gray",
+            modifier = Modifier
+                // Margin right
+                .padding(end = Spacing1)
+        )
+        Text(
+            text = "GO LIVE",
+            style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                fontWeight = FontWeight(600),
+                color = Variables.OnSurfaceMedium,
+                letterSpacing = 0.5.sp,
+            )
+        )
+
+    }
+}
+@Composable
+fun MaximizeButton(
+    onClickAction: () -> Unit
+) {
+    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_maximize),
+        contentScale = ContentScale.None,
+        contentDescription = "Maximize Video",
+        modifier = Modifier
+            .clickable { onClickAction() }
+            .padding(1.dp)
+            .size(32.dp))
+}
+@Composable
 fun SettingsButton(
     onClickAction: () -> Unit
 ) {
@@ -570,35 +632,54 @@ fun HlsComposable(
     videoTapped: () -> Unit,
     context: Context,
     player: HmsHlsPlayer,
-    settingsButtonTapped: () -> Unit
+    settingsButtonTapped: () -> Unit,
+    maximizeClicked: () -> Unit,
 ) {
-    Box(contentAlignment = TopEnd) {
 
-        AndroidView(modifier = Modifier
+    // Keeping it one box so rows and columns don't change the layout
+    Box {
+
+        val hlsModifier = Modifier
             .aspectRatio(ratio = 16f / 9)
             .pointerInput(Unit) {
                 detectTapGestures(onTap = {
                     videoTapped()
                 })
             }
-            .fillMaxWidth(), factory = {
+            .fillMaxWidth()
+        AndroidView(modifier = hlsModifier, factory = {
             PlayerView(context).apply {
-                    useController = false
-                    resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
-                    this.player = player.getNativePlayer()
-                }
+                useController = false
+                resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+                this.player = player.getNativePlayer()
+            }
         }, update = {
             it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
         })
+        // Draw the items in a grid with the same size as
+        // the hls video by applying hls video size with BoxWithConstraints.
+        BoxWithConstraints(modifier = hlsModifier) {
 
-        androidx.compose.animation.AnimatedVisibility(
-            visible = controlsVisible,
-            enter = fadeIn(animationSpec = tween(2000)),
-            exit = fadeOut(animationSpec = tween(2000))
-        ) {
-            SettingsButton(settingsButtonTapped)
+            // There's one column, with two rows.
+            // A spacer puts a gap between items on any one row.
+            Column {
+                // Top Row
+                Row {
+                    Text("Hello")
+                    Spacer(modifier = Modifier.weight(1f))
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = controlsVisible,
+                        enter = fadeIn(animationSpec = tween(2000)),
+                        exit = fadeOut(animationSpec = tween(2000))
+                    ) {
+                        SettingsButton(settingsButtonTapped)
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                // Bottom Row
+                HlsBottomBar(maximizeClicked)
+            }
         }
-
     }
 }
 
