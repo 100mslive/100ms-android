@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -43,8 +44,10 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -126,7 +129,9 @@ private const val SECONDS_FROM_LIVE = 10
     private val meetingViewModel: MeetingViewModel by activityViewModels()
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
+    lateinit var scaleGestureListener : CustomOnScaleGestureListener
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+
     private val chatAdapter by lazy {
         ChatAdapter({ message ->
             launchMessageOptionsDialog.launch(
@@ -167,6 +172,10 @@ private const val SECONDS_FROM_LIVE = 10
 
     }
 
+    private fun goLive(player: HmsHlsPlayer) {
+        player.getNativePlayer().seekToDefaultPosition()
+    }
+
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -179,6 +188,7 @@ private const val SECONDS_FROM_LIVE = 10
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
                 var chatOpen by remember { mutableStateOf(true)}
+                val isLive by hlsViewModel.isLive.observeAsState()
 
 //                val controlsAlpha: Float by animateFloatAsState(
 //                    targetValue = if (controlsVisible) 1f else 0f,
@@ -229,7 +239,9 @@ private const val SECONDS_FROM_LIVE = 10
                                                                }, isPlaying)},
                                 hlsChatIcon = {HlsChatIcon{chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
-                                isLandscape = isLandScape
+                                isLandscape = isLandScape,
+                                isLive = isLive,
+                                goLiveClicked = {goLive(player)}
                             )
                             Column {
                                 if(chatOpen) {
@@ -268,7 +280,9 @@ private const val SECONDS_FROM_LIVE = 10
                                 }, isPlaying)},
                                 hlsChatIcon = {HlsChatIcon{chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
-                                isLandscape = isLandscape
+                                isLandscape = isLandscape,
+                                isLive = isLive,
+                                goLiveClicked = {goLive(player)}
                             )
                             if(chatOpen) {
                                 ChatHeader(
@@ -297,10 +311,7 @@ private const val SECONDS_FROM_LIVE = 10
                         }
 
                         Lifecycle.Event.ON_RESUME -> {
-                            if (isStatsDisplayActive) {
-                                setPlayerStatsListener(true, player)
-                            }
-
+                            setPlayerStatsListener(true, player)
                         }
 
                         else -> {}
@@ -358,14 +369,14 @@ private const val SECONDS_FROM_LIVE = 10
                         val width = videoSize.width
                         val height = videoSize.height
 
-                        //landscape play
-                        if (width > height) {
-                            hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
-//                            binding.hlsView.resizeMode = RESIZE_MODE_FIT
-                        } else {
-                            hlsViewModel.resizeMode.postValue(RESIZE_MODE_ZOOM)
-//                            binding.hlsView.resizeMode = RESIZE_MODE_ZOOM
-                        }
+//                        //landscape play
+//                        if (width > height) {
+//                            hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
+////                            binding.hlsView.resizeMode = RESIZE_MODE_FIT
+//                        } else {
+//                            hlsViewModel.resizeMode.postValue(RESIZE_MODE_ZOOM)
+////                            binding.hlsView.resizeMode = RESIZE_MODE_ZOOM
+//                        }
 //                        binding.progressBar.visibility = View.GONE
 //                        binding.hlsView.visibility = View.VISIBLE
                     }
@@ -425,7 +436,7 @@ private const val SECONDS_FROM_LIVE = 10
 
                 @SuppressLint("SetTextI18n")
                 override fun onEventUpdate(playerStatsModel: PlayerStatsModel) {
-//                    updateLiveButtonVisibility(playerStats)
+                    updateLiveButtonVisibility(playerStatsModel)
                     if (isStatsDisplayActive) {
                         updateStatsView(playerStatsModel)
                     }
@@ -455,6 +466,7 @@ private const val SECONDS_FROM_LIVE = 10
     fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
         // It's live if the distance from the live edge is less than 10 seconds.
         val isLive = playerStats.distanceFromLive / 1000 < SECONDS_FROM_LIVE
+        hlsViewModel.isLive.postValue(isLive)
         // Show the button to go to live if it's not live.
     }
 
@@ -595,11 +607,11 @@ fun ChatPreview() {
 }
 
 @Composable
-fun HlsBottomBar(maximizeClicked : () -> Unit) {
+fun HlsBottomBar(isLive : Boolean?, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically){
-        GoLiveText()
+        GoLiveText(isLive ?: false, goLiveClicked)
         Spacer(Modifier.weight(1f))
         MaximizeButton(maximizeClicked)
     }
@@ -607,27 +619,29 @@ fun HlsBottomBar(maximizeClicked : () -> Unit) {
 @Preview
 @Composable
 fun BottomBarPreview() {
-    HlsBottomBar{}
+    HlsBottomBar(false,{}){}
 }
 @Composable
-fun GoLiveText() {
+fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
 
         Image(
-            painter = painterResource(id = live.hms.roomkit.R.drawable.hls_go_live_dot),
+            painter = painterResource(id =
+            if(isLive) live.hms.roomkit.R.drawable.hls_live_dot else  live.hms.roomkit.R.drawable.hls_go_live_dot),
             contentDescription = "Gray",
             modifier = Modifier
                 // Margin right
                 .padding(end = Spacing1)
         )
         Text(
-            text = "GO LIVE",
+            text = if(isLive) "LIVE" else "GO LIVE",
+            modifier = Modifier.clickable { goLiveClicked() },
             style = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
                 fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
                 fontWeight = FontWeight(600),
-                color = Variables.OnSurfaceMedium,
+                color = if(isLive) Variables.OnSurfaceHigh else Variables.OnSurfaceMedium,
                 letterSpacing = 0.5.sp,
             )
         )
@@ -668,6 +682,7 @@ fun SettingsButton(
 //    }
 //}
 
+@OptIn(ExperimentalComposeUiApi::class)
 @UnstableApi
 @Composable
 fun HlsComposable(
@@ -682,9 +697,12 @@ fun HlsComposable(
     closedCaptionsButton : @Composable () -> Unit,
     hlsChatIcon : @Composable () -> Unit,
     chatOpen : Boolean,
-    isLandscape : Boolean
+    isLandscape : Boolean,
+    isLive : Boolean?,
+    goLiveClicked : () -> Unit
 ) {
 
+    lateinit var scaleGestureListener : ScaleGestureDetector
     // Keeping it one box so rows and columns don't change the layout
     Box {
 
@@ -709,6 +727,10 @@ fun HlsComposable(
         else {
             Modifier
                 .fillMaxSize()
+                // TODO fix zoom
+//                .pointerInteropFilter { event ->
+//                    scaleGestureListener.onTouchEvent(event)
+//                }
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = {
                         videoTapped()
@@ -721,6 +743,7 @@ fun HlsComposable(
                 useController = false
                 resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
                 this.player = player.getNativePlayer()
+                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this))
             }
         }, update = {
             it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
@@ -756,7 +779,7 @@ fun HlsComposable(
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     // Bottom Row
-                    HlsBottomBar(maximizeClicked)
+                    HlsBottomBar(isLive,maximizeClicked, goLiveClicked)
                 }
                 pauseButton()
             }
