@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -43,14 +42,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Bottom
-import androidx.compose.ui.Alignment.Companion.BottomStart
-import androidx.compose.ui.Alignment.Companion.TopCenter
-import androidx.compose.ui.Alignment.Companion.TopEnd
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -73,9 +68,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
@@ -115,13 +112,14 @@ import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import kotlin.math.absoluteValue
 
+
 /**
  * If the stream is this many seconds behind live
  *  show the live buttons.
  */
 private const val SECONDS_FROM_LIVE = 10
 
-class HlsFragment : Fragment() {
+@UnstableApi class HlsFragment : Fragment() {
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     private val args: HlsFragmentArgs by navArgs()
     private val hlsViewModel: HlsViewModel by activityViewModels()
@@ -161,6 +159,13 @@ class HlsFragment : Fragment() {
         composeView = binding.composeView
         return binding.root
     }
+    private fun enableClosedCaptions(player: HmsHlsPlayer, enable : Boolean) = with(player.getNativePlayer()){
+        trackSelectionParameters =
+            ParametersBuilder(requireContext())
+                .setRendererDisabled(C.TRACK_TYPE_VIDEO, !enable)
+                .build()
+
+    }
 
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -171,6 +176,8 @@ class HlsFragment : Fragment() {
             setContent {
                 var maximized by remember { mutableStateOf(false) }
                 var controlsVisible by remember { mutableStateOf(false) }
+                var closedCaptionsEnabled by remember { mutableStateOf(true) }
+                val isPlaying by hlsViewModel.isPlaying.observeAsState()
 
 //                val controlsAlpha: Float by animateFloatAsState(
 //                    targetValue = if (controlsVisible) 1f else 0f,
@@ -187,6 +194,10 @@ class HlsFragment : Fragment() {
                         play(args.hlsStreamUrl)
                     }
                 }
+
+
+                enableClosedCaptions(player, closedCaptionsEnabled)
+
 
                 if (visibility == true) {
                     CircularProgressIndicator(
@@ -208,6 +219,13 @@ class HlsFragment : Fragment() {
                                 player,
                                 settingsButtonTapped = { showTrackSelection(player) },
                                 maximizeClicked = {maximized = !maximized },
+                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
+                                pauseButton = {PlayPauseButton({if(player.getNativePlayer().isPlaying)
+                                    player.getNativePlayer().pause()
+                                else
+                                    player.getNativePlayer().play()
+                                    hlsViewModel.isPlaying.postValue(isPlaying?.not())
+                                                               }, isPlaying)}
                             )
                             Column {
                                 ChatHeader(
@@ -235,6 +253,13 @@ class HlsFragment : Fragment() {
                                 player,
                                 settingsButtonTapped = { showTrackSelection(player) },
                                 maximizeClicked = {maximized = !maximized },
+                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
+                                pauseButton = {PlayPauseButton({if(player.getNativePlayer().isPlaying)
+                                    player.getNativePlayer().pause()
+                                else
+                                    player.getNativePlayer().play()
+                                    hlsViewModel.isPlaying.postValue(isPlaying?.not())
+                                }, isPlaying)}
                             )
                             ChatHeader(
                                 "Tech talks", meetingViewModel.getLogo(), 1200, 35 * 60 * 1000
@@ -350,10 +375,12 @@ class HlsFragment : Fragment() {
                     activity.runOnUiThread {
                         if (state == HmsHlsPlaybackState.playing) {
                             meetingViewModel.hlsPlayerBeganToPlay()
+                            hlsViewModel.isPlaying.postValue(true)
                         } else if (state == HmsHlsPlaybackState.stopped) {
                             // Open end stream fragment.
                             StreamEnded.launch(parentFragmentManager)
-                        }
+                            hlsViewModel.isPlaying.postValue(false)
+                        } else hlsViewModel.isPlaying.postValue(true)
                     }
                 }
                 Log.d("HMSHLSPLAYER", "From App, playback state: $state")
@@ -640,6 +667,8 @@ fun HlsComposable(
     player: HmsHlsPlayer,
     settingsButtonTapped: () -> Unit,
     maximizeClicked: () -> Unit,
+    pauseButton : @Composable () -> Unit,
+    closedCaptionsButton : @Composable () -> Unit
 ) {
 
     // Keeping it one box so rows and columns don't change the layout
@@ -669,37 +698,54 @@ fun HlsComposable(
         ) {
             // Draw the items in a grid with the same size as
             // the hls video by applying hls video size with BoxWithConstraints.
-            BoxWithConstraints(modifier = hlsModifier) {
+            BoxWithConstraints(modifier = hlsModifier,
+                contentAlignment = Center) {
 
                 // There's one column, with two rows.
                 // A spacer puts a gap between items on any one row.
                 Column(Modifier.padding(Spacing1)) {
                     // Top Row
                     Row {
-                        Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_close_button),
-                            contentDescription = "Close",
-                            contentScale = ContentScale.None,
-                            modifier = Modifier
-                                .clickable { }
-                                .padding(1.dp)
-                                .size(32.dp))
+                        CloseButton()
+
                         Spacer(modifier = Modifier.weight(1f))
-                        Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_closed_caption_button),
-                            contentDescription = "Close",
-                            contentScale = ContentScale.None,
-                            modifier = Modifier
-                                .clickable { }
-                                .height(32.dp))
+
+                        closedCaptionsButton()
+
                         Spacer(modifier = Modifier.padding(Spacing2))
+
                         SettingsButton(settingsButtonTapped)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     // Bottom Row
                     HlsBottomBar(maximizeClicked)
                 }
+                pauseButton()
             }
         }
     }
+}
+
+@Composable
+fun CloseButton() {
+    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_close_button),
+        contentDescription = "Close",
+        contentScale = ContentScale.None,
+        modifier = Modifier
+            .clickable { }
+            .padding(1.dp)
+            .size(32.dp))
+}
+
+@Composable
+fun ClosedCaptionsButton(closedCaptionsToggleClicked: () -> Unit, closedCaptionsEnabled : Boolean) {
+    Image(painter =
+    painterResource(id = if(closedCaptionsEnabled) live.hms.roomkit.R.drawable.hls_closed_caption_button else live.hms.roomkit.R.drawable.hls_closed_captions_disabled),
+        contentDescription = "Closed Captions",
+        contentScale = ContentScale.None,
+        modifier = Modifier
+            .clickable { closedCaptionsToggleClicked() }
+            .height(32.dp))
 }
 
 @Composable
@@ -824,4 +870,16 @@ fun OrientationSwapper(
             portrait()
         }
     }
+}
+@Composable
+fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
+    Image(
+        modifier = Modifier
+            .clickable { buttonClicked() }
+            .size(64.dp),
+        painter = painterResource(id = if(isPlaying == true) live.hms.roomkit.R.drawable.hls_paused_btn else live.hms.roomkit.R.drawable.hls_play_btn),
+        contentDescription = "Play",
+        contentScale = ContentScale.None
+    )
+
 }

@@ -7,6 +7,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 
 @UnstableApi class HlsViewModel : ViewModel() {
+    val isPlaying = MutableLiveData(true)
     val videoVisible = MutableLiveData<Boolean>(false)
     val progressBarVisible = videoVisible.map { !it }
     val resizeMode = MutableLiveData<Int>(RESIZE_MODE_FIT)
