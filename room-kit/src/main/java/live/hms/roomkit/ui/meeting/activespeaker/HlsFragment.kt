@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.meeting.activespeaker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -117,13 +119,11 @@ class HlsFragment : Fragment() {
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
     private val chatAdapter by lazy {
-        ChatAdapter(
-            { message ->
-                launchMessageOptionsDialog.launch(
-                    meetingViewModel,
-                    childFragmentManager, message
-                )
-            },
+        ChatAdapter({ message ->
+            launchMessageOptionsDialog.launch(
+                meetingViewModel, childFragmentManager, message
+            )
+        },
             {},
             { message -> MessageOptionsBottomSheet.showMessageOptions(meetingViewModel, message) })
     }
@@ -132,21 +132,19 @@ class HlsFragment : Fragment() {
     var isStatsDisplayActive: Boolean = false
 
     //    private val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
-    val displayHlsCuesUseCase = DisplayHlsCuesUseCase({ text -> binding.hlsCues.text = text })
-    { pollId ->
-        lifecycleScope.launch {
-            val hmsPoll = meetingViewModel.getPollForPollId(pollId)
-            if (hmsPoll != null)
-                meetingViewModel.triggerPollsNotification(hmsPoll)
+    val displayHlsCuesUseCase =
+        DisplayHlsCuesUseCase({ text -> binding.hlsCues.text = text }) { pollId ->
+            lifecycleScope.launch {
+                val hmsPoll = meetingViewModel.getPollForPollId(pollId)
+                if (hmsPoll != null) meetingViewModel.triggerPollsNotification(hmsPoll)
+            }
         }
-    }
 
-    private lateinit var composeView : ComposeView
+    private lateinit var composeView: ComposeView
+
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = HlsFragmentLayoutBinding.inflate(inflater, container, false)
         composeView = binding.composeView
@@ -186,36 +184,73 @@ class HlsFragment : Fragment() {
                         color = PrimaryDefault
                     )
                 } else {
-                    Column {
-                        HlsComposable(hlsViewModel, controlsVisible,
-                            {controlsVisible = !controlsVisible},
-                            context,
-                            player){ showTrackSelection(player) }
-                        ChatHeader(
-                            "Tech talks",
-                            meetingViewModel.getLogo(),
-                            1200,
-                            35 * 60 * 1000
-                        )
-                        ChatUI(childFragmentManager, chatViewModel, meetingViewModel, pinnedMessageUiUseCase, chatAdapter)
-                    }
+
+                    OrientationSwapper({
+                        Row {
+
+                            HlsComposable(
+                                hlsViewModel,
+                                controlsVisible,
+                                { controlsVisible = !controlsVisible },
+                                context,
+                                player
+                            ) { showTrackSelection(player) }
+                            Column {
+                                ChatHeader(
+                                    "Tech talks",
+                                    meetingViewModel.getLogo(),
+                                    1200,
+                                    35 * 60 * 1000
+                                )
+                                ChatUI(
+                                    childFragmentManager,
+                                    chatViewModel,
+                                    meetingViewModel,
+                                    pinnedMessageUiUseCase,
+                                    chatAdapter
+                                )
+                            }
+                        }
+                    }, {
+                        Column {
+                            HlsComposable(
+                                hlsViewModel,
+                                controlsVisible,
+                                { controlsVisible = !controlsVisible },
+                                context,
+                                player
+                            ) { showTrackSelection(player) }
+                            ChatHeader(
+                                "Tech talks", meetingViewModel.getLogo(), 1200, 35 * 60 * 1000
+                            )
+                            ChatUI(
+                                childFragmentManager,
+                                chatViewModel,
+                                meetingViewModel,
+                                pinnedMessageUiUseCase,
+                                chatAdapter
+                            )
+                        }
+                    })
+
                 }
 
                 val muteState by meetingViewModel.showAudioMuted.observeAsState()
                 player.mute(muteState ?: false)
 
-                OnLifecycleEvent{
-                    _, event ->
-                    when(event) {
+                OnLifecycleEvent { _, event ->
+                    when (event) {
                         Lifecycle.Event.ON_PAUSE -> {
                             setPlayerStatsListener(false, player)
                         }
+
                         Lifecycle.Event.ON_RESUME -> {
                             if (isStatsDisplayActive) {
                                 setPlayerStatsListener(true, player)
                             }
 
                         }
+
                         else -> {}
                     }
                 }
@@ -227,6 +262,7 @@ class HlsFragment : Fragment() {
         statsObservers()
 
     }
+
     private fun statsObservers() {
         meetingViewModel.statsToggleData.observe(viewLifecycleOwner) {
             isStatsDisplayActive = it
@@ -237,17 +273,13 @@ class HlsFragment : Fragment() {
     private fun statsToString(playerStats: PlayerStatsModel): String {
         return "bitrate : ${
             Utils.humanReadableByteCount(
-                playerStats.videoInfo.averageBitrate.toLong(),
-                true,
-                true
+                playerStats.videoInfo.averageBitrate.toLong(), true, true
             )
-        }/s \n" +
-                "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue / 1000} s \n" +
-                "video width : ${playerStats.videoInfo.videoWidth} px \n" +
-                "video height : ${playerStats.videoInfo.videoHeight} px \n" +
-                "frame rate : ${playerStats.videoInfo.frameRate} fps \n" +
-                "dropped frames : ${playerStats.frameInfo.droppedFrameCount} \n" +
-                "distance from live edge : ${playerStats.distanceFromLive.div(1000)} s"
+        }/s \n" + "bufferedDuration  : ${playerStats.bufferedDuration.absoluteValue / 1000} s \n" + "video width : ${playerStats.videoInfo.videoWidth} px \n" + "video height : ${playerStats.videoInfo.videoHeight} px \n" + "frame rate : ${playerStats.videoInfo.frameRate} fps \n" + "dropped frames : ${playerStats.frameInfo.droppedFrameCount} \n" + "distance from live edge : ${
+            playerStats.distanceFromLive.div(
+                1000
+            )
+        } s"
     }
 
     private fun resumePlay(player: HmsHlsPlayer) {
@@ -319,6 +351,7 @@ class HlsFragment : Fragment() {
         })
 
     }
+
     private fun setStatsVisibility(enable: Boolean) {
         if (isStatsDisplayActive && enable) {
             binding.statsViewParent.visibility = View.VISIBLE
@@ -352,17 +385,13 @@ class HlsFragment : Fragment() {
     fun updateStatsView(playerStats: PlayerStatsModel) {
         binding.bandwidthEstimateTv.text = "${
             Utils.humanReadableByteCount(
-                playerStats.bandwidth.bandWidthEstimate,
-                si = true,
-                isBits = true
+                playerStats.bandwidth.bandWidthEstimate, si = true, isBits = true
             )
         }/s"
 
         binding.networkActivityTv.text = "${
             Utils.humanReadableByteCount(
-                playerStats.bandwidth.totalBytesLoaded,
-                si = true,
-                isBits = true
+                playerStats.bandwidth.totalBytesLoaded, si = true, isBits = true
             )
         }"
 
@@ -378,8 +407,7 @@ class HlsFragment : Fragment() {
     private fun showTrackSelection(player: HmsHlsPlayer) {
         val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
         trackSelectionBottomSheet.show(
-            requireActivity().supportFragmentManager,
-            "trackSelectionBottomSheet"
+            requireActivity().supportFragmentManager, "trackSelectionBottomSheet"
         )
     }
 }
@@ -387,14 +415,11 @@ class HlsFragment : Fragment() {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ChatHeader(headingText: String, logoUrl: String?, viewers: Long, startedMillis: Long) {
-    fun getViewersDisplayNum(viewers: Long): String =
-        if (viewers < 1000) {
-            "$viewers"
-        } else
-            "${viewers / 1000f}K"
+    fun getViewersDisplayNum(viewers: Long): String = if (viewers < 1000) {
+        "$viewers"
+    } else "${viewers / 1000f}K"
 
-    fun getTimeDisplayNum(startedMillis: Long): String =
-        millisToText(startedMillis, false, "s")
+    fun getTimeDisplayNum(startedMillis: Long): String = millisToText(startedMillis, false, "s")
 
     Row(
         Modifier
@@ -425,8 +450,7 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Long, startedMill
                     getTimeDisplayNum(
                         startedMillis
                     )
-                } ago",
-                style = TextStyle(
+                } ago", style = TextStyle(
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
@@ -459,8 +483,7 @@ fun Chat(messages: List<ChatMessage>) {
     ) {
         items(messages) {
             ChatMessage(
-                name = it.senderName,
-                message = it.message
+                name = it.senderName, message = it.message
             )
         }
     }
@@ -472,8 +495,7 @@ fun ChatMessage(name: String, message: String) {
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            name,
-            style = TextStyle(
+            name, style = TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
                 fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
@@ -483,8 +505,7 @@ fun ChatMessage(name: String, message: String) {
             )
         )
         Text(
-            message,
-            style = TextStyle(
+            message, style = TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
                 fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
@@ -523,14 +544,12 @@ fun ChatPreview() {
 fun SettingsButton(
     onClickAction: () -> Unit
 ) {
-    Image(
-        painter = painterResource(id = live.hms.roomkit.R.drawable.settings),
+    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.settings),
         contentDescription = "Layer Select",
         modifier = Modifier
             .clickable { onClickAction() }
             .wrapContentSize()
-            .padding(16.dp)
-    )
+            .padding(16.dp))
 }
 //
 //val configuration = LocalConfiguration.current
@@ -545,38 +564,32 @@ fun SettingsButton(
 
 @UnstableApi
 @Composable
-fun HlsComposable(hlsViewModel : HlsViewModel,
-                  controlsVisible : Boolean,
-                  videoTapped : () -> Unit,
-                  context : Context,
-                  player : HmsHlsPlayer,
-                  settingsButtonTapped : () -> Unit
+fun HlsComposable(
+    hlsViewModel: HlsViewModel,
+    controlsVisible: Boolean,
+    videoTapped: () -> Unit,
+    context: Context,
+    player: HmsHlsPlayer,
+    settingsButtonTapped: () -> Unit
 ) {
     Box(contentAlignment = TopEnd) {
 
-        AndroidView(
-            modifier = Modifier
-                .aspectRatio(ratio = 16f / 9)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            videoTapped()
-                        }
-                    )
+        AndroidView(modifier = Modifier
+            .aspectRatio(ratio = 16f / 9)
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    videoTapped()
+                })
+            }
+            .fillMaxWidth(), factory = {
+            PlayerView(context).apply {
+                    useController = false
+                    resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+                    this.player = player.getNativePlayer()
                 }
-                .fillMaxWidth(),
-            factory = {
-                PlayerView(context)
-                    .apply {
-                        useController = false
-                        resizeMode =
-                            hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
-                        this.player = player.getNativePlayer()
-                    }
-            },
-            update = {
-                it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
-            })
+        }, update = {
+            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+        })
 
         androidx.compose.animation.AnimatedVisibility(
             visible = controlsVisible,
@@ -608,15 +621,17 @@ fun OnLifecycleEvent(onEvent: (owner: LifecycleOwner, event: Lifecycle.Event) ->
 }
 
 @Composable
-fun ChatUI(childFragmentManager : FragmentManager,
-           chatViewModel: ChatViewModel,
-           meetingViewModel : MeetingViewModel,
-           pinnedMessageUiUseCase : PinnedMessageUiUseCase,
-           chatAdapter : ChatAdapter) {
+fun ChatUI(
+    childFragmentManager: FragmentManager,
+    chatViewModel: ChatViewModel,
+    meetingViewModel: MeetingViewModel,
+    pinnedMessageUiUseCase: PinnedMessageUiUseCase,
+    chatAdapter: ChatAdapter
+) {
 
-    fun chatRelatedObservers(binding: LayoutChatMergeBinding,
-                                     viewLifecycleOwner : LifecycleOwner
-                                     ) = with(binding){
+    fun chatRelatedObservers(
+        binding: LayoutChatMergeBinding, viewLifecycleOwner: LifecycleOwner
+    ) = with(binding) {
         sendToBackground.setOnSingleClickListener {
             RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
         }
@@ -673,23 +688,40 @@ fun ChatUI(childFragmentManager : FragmentManager,
         }
         meetingViewModel.pinnedMessages.observe(viewLifecycleOwner) { pinnedMessages ->
             pinnedMessageUiUseCase.messagesUpdate(
-                pinnedMessages,
-                pinnedMessagesDisplay
+                pinnedMessages, pinnedMessagesDisplay
             )
         }
         meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
             chatViewModel.updatePeerLeave(it)
         }
     }
+
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     AndroidView({
         LayoutInflater.from(context).inflate(live.hms.roomkit.R.layout.layout_chat_merge, null)
-    },
-        modifier = Modifier.fillMaxWidth().fillMaxHeight()) { view ->
+    }, modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()) { view ->
         with(LayoutChatMergeBinding.bind(view)) {
             applyTheme()
-            chatRelatedObservers(this,lifecycleOwner )
+            chatRelatedObservers(this, lifecycleOwner)
+        }
+    }
+}
+
+@Composable
+fun OrientationSwapper(
+    landscape: @Composable () -> Unit, portrait: @Composable () -> Unit
+) {
+    val configuration = LocalConfiguration.current
+    when (configuration.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> {
+            landscape()
+        }
+
+        else -> {
+            portrait()
         }
     }
 }
