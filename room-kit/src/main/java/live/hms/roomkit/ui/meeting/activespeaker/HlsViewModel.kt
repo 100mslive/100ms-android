@@ -15,12 +15,13 @@ import kotlinx.coroutines.launch
     val isPlaying = MutableLiveData(true)
     val videoVisible = MutableLiveData(false)
     val progressBarVisible = videoVisible.map { !it }
-    val resizeMode = MutableLiveData(RESIZE_MODE_FIT)
+    val isZoomEnabled = MutableLiveData(false)
     val isLive = MutableLiveData(true)
     fun allowZoom() {
-        viewModelScope.launch {
-            delay(400)
-            resizeMode.postValue(RESIZE_MODE_ZOOM)
-        }
+        isZoomEnabled.postValue(true)
+//        viewModelScope.launch {
+//            delay(400)
+//            resizeMode.postValue(RESIZE_MODE_ZOOM)
+//        }
     }
 }

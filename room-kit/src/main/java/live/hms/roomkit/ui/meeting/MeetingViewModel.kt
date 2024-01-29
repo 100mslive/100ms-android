@@ -69,6 +69,7 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    val launchParticipantsFromHls = SingleLiveEvent<Unit>()
     var recNum = 0
     // This is needed in chat for it to determine what kind of chat it is.
     val initPrebuiltChatMessageRecipient = MutableLiveData<Pair<Recipient?,Int>>()

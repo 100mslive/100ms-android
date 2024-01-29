@@ -19,6 +19,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
+import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
 import live.hms.roomkit.ui.notification.CardStackListener
 import live.hms.roomkit.ui.notification.Direction
@@ -148,6 +149,13 @@ class MeetingActivity : AppCompatActivity() {
                 Toast.makeText(this@MeetingActivity, "Error while Getting Room Layout Data", Toast.LENGTH_SHORT).show()
                 finish()
             }
+        }
+
+        meetingViewModel.launchParticipantsFromHls.observe(this) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.fragment_container, ParticipantsFragment())
+                .commit()
         }
     }
 

@@ -82,6 +82,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersB
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -93,23 +94,31 @@ import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.databinding.LayoutChatMergeBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
+import live.hms.roomkit.ui.meeting.MeetingFragment
+import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MessageOptionsBottomSheet
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
+import live.hms.roomkit.ui.meeting.SessionOptionBottomSheet
+import live.hms.roomkit.ui.meeting.StopRecordingBottomSheet
 import live.hms.roomkit.ui.meeting.bottomsheets.LeaveCallBottomSheet
 import live.hms.roomkit.ui.meeting.bottomsheets.StreamEnded
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
+import live.hms.roomkit.ui.meeting.chat.combined.CHAT_TAB_TITLE
+import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
 import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
 import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
+import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
+import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.polls.leaderboard.millisecondsToDisplayTime
 import live.hms.roomkit.ui.theme.applyTheme
@@ -119,6 +128,7 @@ import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
+import live.hms.video.sdk.models.enums.HMSRecordingState
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -284,7 +294,8 @@ private const val SECONDS_FROM_LIVE = 10
                                         chatViewModel,
                                         meetingViewModel,
                                         pinnedMessageUiUseCase,
-                                        chatAdapter
+                                        chatAdapter,
+                                        ::openPolls
                                     )
                                 }
                             }
@@ -328,7 +339,8 @@ private const val SECONDS_FROM_LIVE = 10
                                     chatViewModel,
                                     meetingViewModel,
                                     pinnedMessageUiUseCase,
-                                    chatAdapter
+                                    chatAdapter,
+                                    ::openPolls
                                 )
                             }
                         }
@@ -359,6 +371,10 @@ private const val SECONDS_FROM_LIVE = 10
 //        chatRelatedObservers()
         statsObservers()
 
+    }
+
+    private fun openPolls() {
+        findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
     }
 
     private fun statsObservers() {
@@ -780,12 +796,13 @@ fun HlsComposable(
         AndroidView(modifier = hlsModifier, factory = {
             PlayerView(context).apply {
                 useController = false
-                resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+//                resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+
                 this.player = player.getNativePlayer()
                 scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this))
             }
         }, update = {
-            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+//            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
         })
         androidx.compose.animation.AnimatedVisibility(
             visible = controlsVisible,
@@ -877,12 +894,39 @@ fun ChatUI(
     chatViewModel: ChatViewModel,
     meetingViewModel: MeetingViewModel,
     pinnedMessageUiUseCase: PinnedMessageUiUseCase,
-    chatAdapter: ChatAdapter
+    chatAdapter: ChatAdapter,
+    openPolls : () -> Unit
 ) {
 
     fun chatRelatedObservers(
         binding: LayoutChatMergeBinding, viewLifecycleOwner: LifecycleOwner
     ) = with(binding) {
+        chatHamburgerMenu.setOnSingleClickListener(200L) {
+            SessionOptionBottomSheet(
+                onScreenShareClicked = {  },
+                onBRBClicked = {  },
+                onPeerListClicked = {
+                    meetingViewModel.launchParticipantsFromHls.postValue(Unit)
+                },
+                onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
+                onNameChange = {  },
+                showPolls = { openPolls() },
+                onRecordingClicked = {},
+                disableHandRaiseDisplay = true
+            ).show(
+                childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+            )
+        }
+        meetingViewModel.isHandRaised.observe(viewLifecycleOwner) {handRaised ->
+            if(handRaised)
+                handRaise.setImageResource(live.hms.roomkit.R.drawable.hand_off)
+            else
+                handRaise.setImageResource(live.hms.roomkit.R.drawable.hand_on)
+
+        }
+        handRaise.setOnClickListener {
+            meetingViewModel.toggleRaiseHand()
+        }
         sendToBackground.setOnSingleClickListener {
             RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
         }

@@ -154,12 +154,20 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/chatView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/spacing_d2"
-        android:layout_marginBottom="@dimen/spacing_d2">
+        android:layout_marginBottom="@dimen/spacing_d2"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:id="@+id/chatViewBackground"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            >
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/chatPausedContainer"
@@ -231,8 +239,27 @@
             android:layout_gravity="center"
             android:padding="8dp"
             android:src="@drawable/send_icon" />
+        </RelativeLayout>
 
-    </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/handRaise"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/twelve_dp"
+            android:padding="@dimen/spacing_d1"
+            android:layout_height="wrap_content"
+            android:src="@drawable/hand_on"
+            />
+
+        <ImageView
+            android:id="@+id/chatHamburgerMenu"
+            android:layout_width="wrap_content"
+            android:padding="@dimen/spacing_d1"
+            android:layout_marginLeft="@dimen/twelve_dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/hls_hamburger_menu"
+            />
+    </LinearLayout>
 
 
 </LinearLayout>

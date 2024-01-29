@@ -1771,7 +1771,27 @@ internal fun LayoutChatMergeBinding.applyTheme() {
     userBlockedTheme(userBlocked)
     chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
     configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
-
+    chatViewBackground.background = getShape().apply {
+        val color = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default)
+        colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+    }
+    handRaise.background = getShape().apply {
+        val color = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default)
+        colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+    }
+    chatHamburgerMenu.background = getShape().apply {
+        val color = getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceDefault,
+            HMSPrebuiltTheme.getDefaults().surface_default)
+        colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC)
+    }
 }
 internal fun HlsFragmentLayoutBinding.applyTheme() {
 //    chatMerge.applyTheme()
