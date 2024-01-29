@@ -213,6 +213,14 @@ private const val SECONDS_FROM_LIVE = 10
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
                 var ticks by remember { mutableLongStateOf(0) }
 
+                // Turn off controls 3 seconds after they become visible
+                LaunchedEffect(controlsVisible) {
+                    if(controlsVisible) {
+                        delay(3.seconds)
+                        controlsVisible = false
+                    }
+                }
+
                 LaunchedEffect(elapsedTime) {
                     elapsedTime?.let {
                         ticks = System.currentTimeMillis().minus(it)
