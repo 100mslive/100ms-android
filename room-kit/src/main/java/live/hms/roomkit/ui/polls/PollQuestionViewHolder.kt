@@ -175,7 +175,7 @@ class PollQuestionViewHolder<T : ViewBinding>(
             }
             var skipSelection = true
             // Remove all item decorators
-            while (optionsListView.getItemDecorationCount() > 0) {
+            while (optionsListView.itemDecorationCount > 0) {
                 optionsListView.removeItemDecorationAt(0);
             }
             // Add it back if it's polls.
@@ -294,33 +294,5 @@ class PollQuestionViewHolder<T : ViewBinding>(
             options.adapter = adapter
         }
     }
-
-//    private fun bind(questionUi: QuestionUi.SingleChoiceQuestion) {
-//        with(binding as LayoutPollQuizOptionsItemMultiChoiceBinding) {
-//            applyTheme()
-//            questionTitle.text = questionUi.withTitle
-//            questionNumbering.text = "QUESTION ${questionUi.index} of something"
-//            val adapter = GroupieAdapter()
-//            adapter.addAll(questionUi.options.map {
-//                MultiChoiceQuestionOptionItem(questionUi, it)
-//            })
-//            options.layoutManager = LinearLayoutManager(binding.root.context)
-//            options.adapter = adapter
-//        }
-//    }
-
-//    private fun bind(questionUi: QuestionUi.ShortAnswer) {
-//        with(binding as LayoutPollQuizItemShortAnswerBinding) {
-//            questionNumberHeading.text = "QUESTION ${questionUi.index} : Short Answer"
-//            questionHeading.text = questionUi.text
-//        }
-//    }
-//
-//    private fun bind(questionUi: QuestionUi.LongAnswer) {
-//        with(binding as LayoutPollQuizItemShortAnswerBinding) {
-//            questionNumberHeading.text = "QUESTION ${questionUi.index} : Long Answer"
-//            questionHeading.text = questionUi.text
-//        }
-//    }
 
 }
