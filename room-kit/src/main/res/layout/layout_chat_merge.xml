@@ -246,7 +246,7 @@
             android:id="@+id/handRaise"
             android:layout_width="wrap_content"
             android:layout_marginLeft="@dimen/twelve_dp"
-            android:padding="@dimen/spacing_d1"
+            android:padding="@dimen/twelve_dp"
             android:layout_height="wrap_content"
             android:src="@drawable/hand_on"
             />
@@ -254,7 +254,7 @@
         <ImageView
             android:id="@+id/chatHamburgerMenu"
             android:layout_width="wrap_content"
-            android:padding="@dimen/spacing_d1"
+            android:padding="@dimen/twelve_dp"
             android:layout_marginLeft="@dimen/twelve_dp"
             android:layout_height="wrap_content"
             android:src="@drawable/hls_hamburger_menu"
