@@ -124,6 +124,7 @@ import live.hms.roomkit.ui.polls.leaderboard.millisecondsToDisplayTime
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -560,16 +561,16 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
             contentDescription = "Logo"
         )
         Column {
-            Text(
-                headingText, style = TextStyle(
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-                    fontWeight = FontWeight(600),
-                    color = Variables.OnSecondaryHigh,
-                    letterSpacing = 0.1.sp,
-                )
-            )
+//            Text(
+//                headingText, style = TextStyle(
+//                    fontSize = 14.sp,
+//                    lineHeight = 20.sp,
+//                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+//                    fontWeight = FontWeight(600),
+//                    color = Variables.OnSecondaryHigh,
+//                    letterSpacing = 0.1.sp,
+//                )
+//            )
             Text(
                 "${getViewersDisplayNum(viewers)} watching ● Started ${
                     getTimeDisplayNum(
