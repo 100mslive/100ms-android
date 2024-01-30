@@ -22,8 +22,8 @@ fun millisToText(milliseconds : Long?,
         val hasMinutes = milliseconds > 1000*60
 
         val hours = milliseconds / 1000 / (60*60)
-        val minutes = milliseconds / 1000 / 60 % 60
-        val seconds = milliseconds / 1000f % 60
+        val minutes = (milliseconds / 1000 / 60) % 60
+        val seconds = (milliseconds / 1000) % 60
 
         val prefix = if (hasHours) {
             "$hours" + 'h' + " $minutes" + "m"
@@ -35,7 +35,7 @@ fun millisToText(milliseconds : Long?,
 
         val suffix = if(hasHours || hasMinutes) // if it has hours then don't show seconds
             ""
-            else  String.format("%.1f$secondsText", seconds)
+            else  String.format("%d$secondsText", seconds)
         "$prefix$suffix"
     }
 }

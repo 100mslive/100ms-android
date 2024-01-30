@@ -15,7 +15,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +51,6 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -76,14 +74,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.map
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -103,18 +98,14 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MessageOptionsBottomSheet
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
 import live.hms.roomkit.ui.meeting.SessionOptionBottomSheet
-import live.hms.roomkit.ui.meeting.StopRecordingBottomSheet
 import live.hms.roomkit.ui.meeting.bottomsheets.LeaveCallBottomSheet
 import live.hms.roomkit.ui.meeting.bottomsheets.StreamEnded
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
-import live.hms.roomkit.ui.meeting.chat.combined.CHAT_TAB_TITLE
-import live.hms.roomkit.ui.meeting.chat.combined.ChatParticipantCombinedFragment
 import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
 import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
-import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.compose.Variables
@@ -122,18 +113,14 @@ import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing0
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
-import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
-import live.hms.roomkit.ui.polls.leaderboard.millisecondsToDisplayTime
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
-import live.hms.video.sdk.models.enums.HMSRecordingState
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -232,7 +219,7 @@ private const val SECONDS_FROM_LIVE = 10
                         ticks = System.currentTimeMillis().minus(it)
                         while (true) {
                             delay(1.seconds)
-                            ticks++
+                            ticks += 1000
                         }
                     }
                 }
@@ -270,6 +257,7 @@ private const val SECONDS_FROM_LIVE = 10
                         Row {
 
                             HlsComposable(
+                                isChatEnabled = isChatEnabled,
                                 hlsViewModel = hlsViewModel,
                                 controlsVisible = controlsVisible,
                                 videoTapped = { controlsVisible = !controlsVisible },
@@ -297,12 +285,6 @@ private const val SECONDS_FROM_LIVE = 10
                             )
                             Column {
                                 if(chatOpen) {
-                                    ChatHeader(
-                                        "Tech talks",
-                                        meetingViewModel.getLogo(),
-                                        viewers ?:0,
-                                        ticks
-                                    )
                                     ChatUI(
                                         childFragmentManager,
                                         chatViewModel,
@@ -317,6 +299,7 @@ private const val SECONDS_FROM_LIVE = 10
                     }, { isLandscape ->
                         Column {
                             HlsComposable(
+                                isChatEnabled = isChatEnabled,
                                 hlsViewModel = hlsViewModel,
                                 controlsVisible = controlsVisible,
                                 videoTapped = { controlsVisible = !controlsVisible },
@@ -365,20 +348,8 @@ private const val SECONDS_FROM_LIVE = 10
                 val muteState by meetingViewModel.showAudioMuted.observeAsState()
                 player.mute(muteState ?: false)
 
-                OnLifecycleEvent { _, event ->
-                    when (event) {
-                        Lifecycle.Event.ON_PAUSE -> {
-                            setPlayerStatsListener(false, player)
-                        }
-
-                        Lifecycle.Event.ON_RESUME -> {
-                            setPlayerStatsListener(true, player)
-                        }
-
-                        else -> {}
-                    }
-                }
-
+                PauseWhenLeaving(player)
+                RemoveStatsWhenPaused(::setPlayerStatsListener, player)
 
             }
         }
@@ -681,19 +652,21 @@ fun ChatPreview() {
 }
 
 @Composable
-fun HlsBottomBar(isLive : Boolean?,isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
+fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?,isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically){
         GoLiveText(isLive ?: false, goLiveClicked)
         Spacer(Modifier.weight(1f))
-        MaximizeButton(maximizeClicked,isMaximized)
+        if(isChatEnabled) {
+            MaximizeButton(maximizeClicked, isMaximized)
+        }
     }
 }
 @Preview
 @Composable
 fun BottomBarPreview() {
-    HlsBottomBar(false,false,{}){}
+    HlsBottomBar(true,false,false,{}){}
 }
 @Composable
 fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
@@ -774,6 +747,7 @@ fun HlsComposable(
     chatOpen : Boolean,
     isLandscape : Boolean,
     isLive : Boolean?,
+    isChatEnabled : Boolean,
     goLiveClicked : () -> Unit,
     onCloseButtonClicked: () -> Unit
 ) {
@@ -800,6 +774,7 @@ fun HlsComposable(
                         videoTapped()
                     })
                 }
+                .fillMaxHeight()
                 .fillMaxWidth(0.6f)
         }
         else {
@@ -860,6 +835,7 @@ fun HlsComposable(
                     Spacer(modifier = Modifier.weight(1f))
                     // Bottom Row
                     HlsBottomBar(
+                        isChatEnabled = isChatEnabled,
                         isLive = isLive,
                         isMaximized = !chatOpen,
                         maximizeClicked = maximizeClicked,
@@ -1076,5 +1052,41 @@ fun HlsChatIcon(chatEnabled : Boolean, buttonClicked: () -> Unit) {
             modifier = Modifier
                 .clickable { buttonClicked() }
                 .height(32.dp))
+    }
+}
+
+@Composable
+fun PauseWhenLeaving(player : HmsHlsPlayer) {
+    OnLifecycleEvent { _, event ->
+        when(event)
+        {
+            Lifecycle.Event.ON_PAUSE -> {
+                player.pause()
+            }
+
+            Lifecycle.Event.ON_RESUME -> {
+                player.resume()
+                player.seekToLivePosition()
+            }
+
+            else -> {}
+        }
+    }
+}
+
+@Composable
+fun RemoveStatsWhenPaused(setPlayerStatsListener: (Boolean, HmsHlsPlayer) -> Unit, player: HmsHlsPlayer) {
+    OnLifecycleEvent { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_PAUSE -> {
+                setPlayerStatsListener(false, player)
+            }
+
+            Lifecycle.Event.ON_RESUME -> {
+                setPlayerStatsListener(true, player)
+            }
+
+            else -> {}
+        }
     }
 }
