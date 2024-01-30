@@ -40,8 +40,6 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
         return isChatOverlay() && isChatInitialOpen
     }
     fun isChatOverlay() =
-        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.overlayView == true
-                ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
                     ?.default?.elements?.chat?.overlayView == true
 
