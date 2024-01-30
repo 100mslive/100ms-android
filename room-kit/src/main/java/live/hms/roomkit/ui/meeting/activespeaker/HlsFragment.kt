@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -118,6 +119,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
+import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing0
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
@@ -824,7 +826,9 @@ fun HlsComposable(
         }, update = {
 //            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
         })
-        androidx.compose.animation.AnimatedVisibility(
+        // Only hide if it's landscape and fullscreen and the controls are hidden
+
+        AnimatedVisibility(
             visible = controlsVisible,
             enter = fadeIn(animationSpec = tween(2000)),
             exit = fadeOut(animationSpec = tween(2000))
@@ -839,7 +843,6 @@ fun HlsComposable(
                 Column(Modifier.padding(Spacing1)) {
                     // Top Row
                     Row {
-                        CloseButton(onCloseButtonClicked)
 
                         Spacer(modifier = Modifier.weight(1f))
 
@@ -866,6 +869,14 @@ fun HlsComposable(
 //                pauseButton()
             }
         }
+
+        AnimatedVisibility(
+            visible = !(isLandscape && !chatOpen && !controlsVisible),
+            enter = fadeIn(animationSpec = tween(2000)),
+            exit = fadeOut(animationSpec = tween(2000))
+        ) {
+            CloseButton(onCloseButtonClicked)
+        }
     }
 }
 
@@ -876,8 +887,9 @@ fun CloseButton(onCloseButtonClicked: () -> Unit) {
         contentScale = ContentScale.None,
         modifier = Modifier
             .clickable { onCloseButtonClicked() }
-            .padding(1.dp)
-            .size(32.dp))
+            .padding(Spacing0)
+            .padding(Spacing1)
+        )
 }
 
 @Composable
