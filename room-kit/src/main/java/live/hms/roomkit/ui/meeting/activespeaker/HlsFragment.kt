@@ -212,7 +212,8 @@ private const val SECONDS_FROM_LIVE = 10
                 var controlsVisible by remember { mutableStateOf(false) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
-                var chatOpen by remember { mutableStateOf(true)}
+                val isChatEnabled by remember { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
+                var chatOpen by remember { mutableStateOf(isChatEnabled)}
                 val isLive by hlsViewModel.isLive.observeAsState()
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
@@ -287,7 +288,7 @@ private const val SECONDS_FROM_LIVE = 10
                                 }
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon{chatOpen = !chatOpen}},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
@@ -334,7 +335,7 @@ private const val SECONDS_FROM_LIVE = 10
                                     }
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon{chatOpen = !chatOpen}},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
@@ -1066,7 +1067,8 @@ fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
 }
 
 @Composable
-fun HlsChatIcon(buttonClicked: () -> Unit) {
+fun HlsChatIcon(chatEnabled : Boolean, buttonClicked: () -> Unit) {
+    if(chatEnabled) {
         Image(painter =
         painterResource(id = live.hms.roomkit.R.drawable.hls_chat_off),
             contentDescription = "Chat Open",
@@ -1074,4 +1076,5 @@ fun HlsChatIcon(buttonClicked: () -> Unit) {
             modifier = Modifier
                 .clickable { buttonClicked() }
                 .height(32.dp))
+    }
 }
