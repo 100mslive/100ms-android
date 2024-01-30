@@ -285,12 +285,6 @@ private const val SECONDS_FROM_LIVE = 10
                             )
                             Column {
                                 if(chatOpen) {
-                                    ChatHeader(
-                                        "Tech talks",
-                                        meetingViewModel.getLogo(),
-                                        viewers ?:0,
-                                        ticks
-                                    )
                                     ChatUI(
                                         childFragmentManager,
                                         chatViewModel,
