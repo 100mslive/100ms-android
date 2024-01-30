@@ -9,11 +9,13 @@ import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +35,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -116,6 +119,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
+import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing0
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
@@ -124,6 +128,7 @@ import live.hms.roomkit.ui.polls.leaderboard.millisecondsToDisplayTime
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -207,7 +212,8 @@ private const val SECONDS_FROM_LIVE = 10
                 var controlsVisible by remember { mutableStateOf(false) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
-                var chatOpen by remember { mutableStateOf(true)}
+                val isChatEnabled by remember { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
+                var chatOpen by remember { mutableStateOf(isChatEnabled)}
                 val isLive by hlsViewModel.isLive.observeAsState()
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
@@ -282,12 +288,12 @@ private const val SECONDS_FROM_LIVE = 10
                                 }
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon{chatOpen = !chatOpen}},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
                                 goLiveClicked = {goLive(player)},
-                                onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)}
+                                onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)}
                             )
                             Column {
                                 if(chatOpen) {
@@ -329,7 +335,7 @@ private const val SECONDS_FROM_LIVE = 10
                                     }
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon{chatOpen = !chatOpen}},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
@@ -546,6 +552,7 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
 
     fun getTimeDisplayNum(startedMillis: Long): String = millisToText(startedMillis, false, "s")
 
+    Column {
     Row(
         Modifier
             .fillMaxWidth()
@@ -560,18 +567,18 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
             contentDescription = "Logo"
         )
         Column {
+//            Text(
+//                headingText, style = TextStyle(
+//                    fontSize = 14.sp,
+//                    lineHeight = 20.sp,
+//                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+//                    fontWeight = FontWeight(600),
+//                    color = Variables.OnSecondaryHigh,
+//                    letterSpacing = 0.1.sp,
+//                )
+//            )
             Text(
-                headingText, style = TextStyle(
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-                    fontWeight = FontWeight(600),
-                    color = Variables.OnSecondaryHigh,
-                    letterSpacing = 0.1.sp,
-                )
-            )
-            Text(
-                "${getViewersDisplayNum(viewers)} watching ● Started ${
+                "${getViewersDisplayNum(viewers)} watching · Started ${
                     getTimeDisplayNum(
                         startedMillis
                     )
@@ -584,7 +591,15 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
                     letterSpacing = 0.4.sp,
                 )
             )
+
         }
+    }
+    Divider (
+        color = Variables.BorderBright,
+        modifier = Modifier
+            .height(1.dp)
+            .fillMaxWidth()
+    )
     }
 }
 
@@ -812,7 +827,9 @@ fun HlsComposable(
         }, update = {
 //            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
         })
-        androidx.compose.animation.AnimatedVisibility(
+        // Only hide if it's landscape and fullscreen and the controls are hidden
+
+        AnimatedVisibility(
             visible = controlsVisible,
             enter = fadeIn(animationSpec = tween(2000)),
             exit = fadeOut(animationSpec = tween(2000))
@@ -827,17 +844,16 @@ fun HlsComposable(
                 Column(Modifier.padding(Spacing1)) {
                     // Top Row
                     Row {
-                        CloseButton(onCloseButtonClicked)
 
                         Spacer(modifier = Modifier.weight(1f))
 
                         hlsChatIcon()
 
-                        Spacer(modifier = Modifier.padding(Spacing2))
+                        Spacer(modifier = Modifier.padding(start = Spacing2))
 
                         closedCaptionsButton()
 
-                        Spacer(modifier = Modifier.padding(Spacing2))
+                        Spacer(modifier = Modifier.padding(start = Spacing2))
 
                         SettingsButton(settingsButtonTapped)
                     }
@@ -850,8 +866,17 @@ fun HlsComposable(
                         goLiveClicked = goLiveClicked
                     )
                 }
-                pauseButton()
+                // We don't know about DVR yet so pause might not be possible.
+//                pauseButton()
             }
+        }
+
+        AnimatedVisibility(
+            visible = !(isLandscape && !chatOpen && !controlsVisible),
+            enter = fadeIn(animationSpec = tween(2000)),
+            exit = fadeOut(animationSpec = tween(2000))
+        ) {
+            CloseButton(onCloseButtonClicked)
         }
     }
 }
@@ -863,8 +888,9 @@ fun CloseButton(onCloseButtonClicked: () -> Unit) {
         contentScale = ContentScale.None,
         modifier = Modifier
             .clickable { onCloseButtonClicked() }
-            .padding(1.dp)
-            .size(32.dp))
+            .padding(Spacing0)
+            .padding(Spacing1)
+        )
 }
 
 @Composable
@@ -1041,7 +1067,8 @@ fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
 }
 
 @Composable
-fun HlsChatIcon(buttonClicked: () -> Unit) {
+fun HlsChatIcon(chatEnabled : Boolean, buttonClicked: () -> Unit) {
+    if(chatEnabled) {
         Image(painter =
         painterResource(id = live.hms.roomkit.R.drawable.hls_chat_off),
             contentDescription = "Chat Open",
@@ -1049,4 +1076,5 @@ fun HlsChatIcon(buttonClicked: () -> Unit) {
             modifier = Modifier
                 .clickable { buttonClicked() }
                 .height(32.dp))
+    }
 }

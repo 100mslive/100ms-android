@@ -9,6 +9,7 @@ class Variables {
     companion object {
         val Spacing2 = 16.dp
         val Spacing1 = 8.dp
+        val Spacing0 = 4.dp
         val PrimaryDefault : Color = Color(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.primaryDefault,
             HMSPrebuiltTheme.getDefaults().primary_default))
@@ -24,6 +25,10 @@ class Variables {
         val OnSurfaceMedium = Color(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
+        ))
+        val BorderBright = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
         ))
     }
 }
