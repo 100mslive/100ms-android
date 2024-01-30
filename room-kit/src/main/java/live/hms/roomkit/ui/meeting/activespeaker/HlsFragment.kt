@@ -833,11 +833,11 @@ fun HlsComposable(
 
                         hlsChatIcon()
 
-                        Spacer(modifier = Modifier.padding(Spacing2))
+                        Spacer(modifier = Modifier.padding(start = Spacing2))
 
                         closedCaptionsButton()
 
-                        Spacer(modifier = Modifier.padding(Spacing2))
+                        Spacer(modifier = Modifier.padding(start = Spacing2))
 
                         SettingsButton(settingsButtonTapped)
                     }
