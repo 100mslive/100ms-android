@@ -774,6 +774,7 @@ fun HlsComposable(
                         videoTapped()
                     })
                 }
+                .fillMaxHeight()
                 .fillMaxWidth(0.6f)
         }
         else {
