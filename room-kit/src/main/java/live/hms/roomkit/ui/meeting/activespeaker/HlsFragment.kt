@@ -219,7 +219,7 @@ private const val SECONDS_FROM_LIVE = 10
                         ticks = System.currentTimeMillis().minus(it)
                         while (true) {
                             delay(1.seconds)
-                            ticks++
+                            ticks += 1000
                         }
                     }
                 }
