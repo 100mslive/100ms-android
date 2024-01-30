@@ -257,6 +257,7 @@ private const val SECONDS_FROM_LIVE = 10
                         Row {
 
                             HlsComposable(
+                                isChatEnabled = isChatEnabled,
                                 hlsViewModel = hlsViewModel,
                                 controlsVisible = controlsVisible,
                                 videoTapped = { controlsVisible = !controlsVisible },
@@ -304,6 +305,7 @@ private const val SECONDS_FROM_LIVE = 10
                     }, { isLandscape ->
                         Column {
                             HlsComposable(
+                                isChatEnabled = isChatEnabled,
                                 hlsViewModel = hlsViewModel,
                                 controlsVisible = controlsVisible,
                                 videoTapped = { controlsVisible = !controlsVisible },
@@ -656,19 +658,21 @@ fun ChatPreview() {
 }
 
 @Composable
-fun HlsBottomBar(isLive : Boolean?,isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
+fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?,isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically){
         GoLiveText(isLive ?: false, goLiveClicked)
         Spacer(Modifier.weight(1f))
-        MaximizeButton(maximizeClicked,isMaximized)
+        if(isChatEnabled) {
+            MaximizeButton(maximizeClicked, isMaximized)
+        }
     }
 }
 @Preview
 @Composable
 fun BottomBarPreview() {
-    HlsBottomBar(false,false,{}){}
+    HlsBottomBar(true,false,false,{}){}
 }
 @Composable
 fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
@@ -749,6 +753,7 @@ fun HlsComposable(
     chatOpen : Boolean,
     isLandscape : Boolean,
     isLive : Boolean?,
+    isChatEnabled : Boolean,
     goLiveClicked : () -> Unit,
     onCloseButtonClicked: () -> Unit
 ) {
@@ -835,6 +840,7 @@ fun HlsComposable(
                     Spacer(modifier = Modifier.weight(1f))
                     // Bottom Row
                     HlsBottomBar(
+                        isChatEnabled = isChatEnabled,
                         isLive = isLive,
                         isMaximized = !chatOpen,
                         maximizeClicked = maximizeClicked,
