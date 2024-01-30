@@ -25,5 +25,9 @@ class Variables {
             HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         ))
+        val BorderBright = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        ))
     }
 }

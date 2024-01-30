@@ -14,6 +14,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +34,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -288,7 +290,7 @@ private const val SECONDS_FROM_LIVE = 10
                                 isLandscape = isLandScape,
                                 isLive = isLive,
                                 goLiveClicked = {goLive(player)},
-                                onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)}
+                                onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)}
                             )
                             Column {
                                 if(chatOpen) {
@@ -547,6 +549,7 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
 
     fun getTimeDisplayNum(startedMillis: Long): String = millisToText(startedMillis, false, "s")
 
+    Column {
     Row(
         Modifier
             .fillMaxWidth()
@@ -585,7 +588,15 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
                     letterSpacing = 0.4.sp,
                 )
             )
+
         }
+    }
+    Divider (
+        color = Variables.BorderBright,
+        modifier = Modifier
+            .height(1.dp)
+            .fillMaxWidth()
+    )
     }
 }
 
