@@ -575,7 +575,7 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
 //                )
 //            )
             Text(
-                "${getViewersDisplayNum(viewers)} watching ● Started ${
+                "${getViewersDisplayNum(viewers)} watching · Started ${
                     getTimeDisplayNum(
                         startedMillis
                     )
