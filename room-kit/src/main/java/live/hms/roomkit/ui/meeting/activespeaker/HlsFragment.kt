@@ -862,7 +862,8 @@ fun HlsComposable(
                         goLiveClicked = goLiveClicked
                     )
                 }
-                pauseButton()
+                // We don't know about DVR yet so pause might not be possible.
+//                pauseButton()
             }
         }
     }
