@@ -124,6 +124,10 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
 
         return confTitle ?: hlsTitle ?: "Chat"
     }
+
+    fun shouldSkipPreview(): Boolean {
+        return hmsRoomLayout?.data?.get(0)?.screens?.preview?.skipPreview == true
+    }
 }
 
 data class AllowedToMessageParticipants(
