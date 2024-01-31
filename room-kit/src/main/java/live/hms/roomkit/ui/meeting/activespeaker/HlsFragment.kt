@@ -75,8 +75,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
-import androidx.media3.common.Player
-import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
 import androidx.media3.ui.PlayerView
@@ -115,7 +113,6 @@ import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
@@ -134,8 +131,21 @@ private const val SECONDS_FROM_LIVE = 10
 @UnstableApi class HlsFragment : Fragment() {
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
     private val args: HlsFragmentArgs by navArgs()
-    private val hlsViewModel: HlsViewModel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels()
+    private val displayHlsCuesUseCase by lazy {
+        DisplayHlsCuesUseCase({ text -> binding.hlsCues.text = text }) { pollId ->
+            lifecycleScope.launch {
+                val hmsPoll = meetingViewModel.getPollForPollId(pollId)
+                if (hmsPoll != null) meetingViewModel.triggerPollsNotification(hmsPoll)
+            }
+        }
+    }
+    private val hlsViewModel: HlsViewModel by activityViewModels {
+        HlsViewModelFactory(requireActivity().application,args.hlsStreamUrl, meetingViewModel.hmsSDK,
+            meetingViewModel::hlsPlayerBeganToPlay
+        ) { displayHlsCuesUseCase }
+    }
+    private val player by lazy { hlsViewModel.player }
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
     lateinit var scaleGestureListener : CustomOnScaleGestureListener
@@ -155,13 +165,7 @@ private const val SECONDS_FROM_LIVE = 10
     var isStatsDisplayActive: Boolean = false
 
     //    private val player by lazy{ HmsHlsPlayer(requireContext(), meetingViewModel.hmsSDK) }
-    val displayHlsCuesUseCase =
-        DisplayHlsCuesUseCase({ text -> binding.hlsCues.text = text }) { pollId ->
-            lifecycleScope.launch {
-                val hmsPoll = meetingViewModel.getPollForPollId(pollId)
-                if (hmsPoll != null) meetingViewModel.triggerPollsNotification(hmsPoll)
-            }
-        }
+
 
     private lateinit var composeView: ComposeView
 
@@ -192,6 +196,9 @@ private const val SECONDS_FROM_LIVE = 10
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        hlsViewModel.streamEndedEvent.observe(viewLifecycleOwner) {
+            StreamEnded.launch(parentFragmentManager)
+        }
         binding.applyTheme()
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -233,12 +240,6 @@ private const val SECONDS_FROM_LIVE = 10
 //                )
 
                 val visibility by hlsViewModel.progressBarVisible.observeAsState()
-                val player = remember {
-                    HmsHlsPlayer(context, meetingViewModel.hmsSDK).apply {
-                        resumePlay(this)
-                        play(args.hlsStreamUrl)
-                    }
-                }
 
 
                 enableClosedCaptions(player, closedCaptionsEnabled)
@@ -376,79 +377,9 @@ private const val SECONDS_FROM_LIVE = 10
             )
         } s"
     }
-
-    private fun resumePlay(player: HmsHlsPlayer) {
-//        binding.hlsView.player = player.getNativePlayer()
-        player.getNativePlayer().addListener(@UnstableApi object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                super.onIsPlayingChanged(isPlaying)
-                if (isPlaying) {
-                    hlsViewModel.videoVisible.postValue(true)
-                }
-            }
-
-            @SuppressLint("UnsafeOptInUsageError")
-            override fun onSurfaceSizeChanged(width: Int, height: Int) {
-                super.onSurfaceSizeChanged(width, height)
-
-            }
-
-            override fun onVideoSizeChanged(videoSize: VideoSize) {
-                super.onVideoSizeChanged(videoSize)
-                viewLifecycleOwner.lifecycleScope.launch {
-
-                    if (videoSize.height != 0 && videoSize.width != 0) {
-                        val width = videoSize.width
-                        val height = videoSize.height
-
-//                        //landscape play
-//                        if (width > height) {
-//                            hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
-////                            binding.hlsView.resizeMode = RESIZE_MODE_FIT
-//                        } else {
-//                            hlsViewModel.resizeMode.postValue(RESIZE_MODE_ZOOM)
-////                            binding.hlsView.resizeMode = RESIZE_MODE_ZOOM
-//                        }
-//                        binding.progressBar.visibility = View.GONE
-//                        binding.hlsView.visibility = View.VISIBLE
-                    }
-                }
-
-            }
-        })
-
-        player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
-
-            override fun onPlaybackFailure(error: HmsHlsException) {
-                Log.d("HMSHLSPLAYER", "From App, error: $error")
-            }
-
-            @SuppressLint("UnsafeOptInUsageError")
-            override fun onPlaybackStateChanged(state: HmsHlsPlaybackState) {
-                contextSafe { context, activity ->
-                    activity.runOnUiThread {
-                        if (state == HmsHlsPlaybackState.playing) {
-                            meetingViewModel.hlsPlayerBeganToPlay()
-                            hlsViewModel.isPlaying.postValue(true)
-                        } else if (state == HmsHlsPlaybackState.stopped) {
-                            // Open end stream fragment.
-                            StreamEnded.launch(parentFragmentManager)
-                            hlsViewModel.isPlaying.postValue(false)
-                        } else hlsViewModel.isPlaying.postValue(true)
-                    }
-                }
-                Log.d("HMSHLSPLAYER", "From App, playback state: $state")
-            }
-
-            override fun onCue(cue: HmsHlsCue) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    displayHlsCuesUseCase.addCue(cue)
-                }
-            }
-        })
+    private fun streamEnded() {
 
     }
-
     private fun setStatsVisibility(enable: Boolean) {
         if (isStatsDisplayActive && enable) {
             binding.statsViewParent.visibility = View.VISIBLE
