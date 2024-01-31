@@ -350,7 +350,6 @@ private const val SECONDS_FROM_LIVE = 10
 
             }
         }
-//        chatRelatedObservers()
         statsObservers()
 
     }
