@@ -890,10 +890,11 @@ class MeetingFragment : Fragment() {
     }
 
     private fun configureHLSView() {
-        updateBindings()
-
-
-        delayedHide(3000)
+        // They aren't present by default when
+        //  the view starts in hls
+        // But will be present after role changes
+        //  so it's important to attempt to hide them.
+        hideControlBars()
     }
 
     private fun updateBindings() {
