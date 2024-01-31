@@ -345,9 +345,6 @@ private const val SECONDS_FROM_LIVE = 10
 
                 }
 
-                val muteState by meetingViewModel.showAudioMuted.observeAsState()
-                player.mute(muteState ?: false)
-
                 PauseWhenLeaving(player)
                 RemoveStatsWhenPaused(::setPlayerStatsListener, player)
 
