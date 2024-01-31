@@ -16,11 +16,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.TransformableState
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.gestures.zoomBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -54,11 +52,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -696,11 +692,18 @@ fun HlsComposable(
         // Ignoring rotation so it's replaced with _
         val state = rememberTransformableState { zoomChange, offsetChange, _ ->
             // Don't allow making it smaller than it is.
-            if(scale * zoomChange >= 1)
+
+            val scaleChanged = scale * zoomChange >= 1
+            if(scaleChanged) {
                 scale *= zoomChange
+            }
             // Don't allow rotation changes
 //            rotation += rotationChange
-            offset += offsetChange
+            if(scaleChanged) {
+                offset += offsetChange
+            } else {
+                offset = Offset.Zero
+            }
         }
 
         val hlsModifier = if(chatOpen && !isLandscape) {
@@ -754,10 +757,12 @@ fun HlsComposable(
 //                resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
 
                 this.player = player.getNativePlayer()
-                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this) {})
+//                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this) {})
             }
         }, update = {
 //            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+            it.scaleX = scale
+            it.scaleY = scale
         })
         // Only hide if it's landscape and fullscreen and the controls are hidden
 
