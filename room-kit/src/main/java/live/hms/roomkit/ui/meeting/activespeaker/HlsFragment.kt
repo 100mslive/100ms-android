@@ -239,13 +239,13 @@ private const val SECONDS_FROM_LIVE = 10
 //                    ), label = "control hiding alpha transition"
 //                )
 
-                val visibility by hlsViewModel.progressBarVisible.observeAsState()
+                val progressBarVisibility by hlsViewModel.progressBarVisible.observeAsState()
 
 
                 enableClosedCaptions(player, closedCaptionsEnabled)
 
 
-                if (visibility == true) {
+                if (progressBarVisibility == true) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()
