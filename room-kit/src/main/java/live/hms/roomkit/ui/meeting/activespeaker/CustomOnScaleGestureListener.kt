@@ -6,7 +6,8 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 
 @UnstableApi class CustomOnScaleGestureListener(
-    private val player: PlayerView
+    private val player: PlayerView,
+    private val scaleFactorUpdated : (Float) -> Unit
 ) : ScaleGestureDetector.SimpleOnScaleGestureListener() {
     private var scaleFactor = 0f
 
@@ -14,6 +15,7 @@ import androidx.media3.ui.PlayerView
         detector: ScaleGestureDetector
     ): Boolean {
         scaleFactor = detector.scaleFactor
+        scaleFactorUpdated(scaleFactor)
         return true
     }
 

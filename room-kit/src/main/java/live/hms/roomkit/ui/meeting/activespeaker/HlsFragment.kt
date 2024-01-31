@@ -16,7 +16,11 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.TransformableState
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.gestures.zoomBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -50,7 +54,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -682,6 +690,18 @@ fun HlsComposable(
     lateinit var scaleGestureListener : ScaleGestureDetector
     // Keeping it one box so rows and columns don't change the layout
     Box {
+        var scale by remember { mutableStateOf(1f) }
+        var rotation by remember { mutableStateOf(0f) }
+        var offset by remember { mutableStateOf(Offset.Zero) }
+        // Ignoring rotation so it's replaced with _
+        val state = rememberTransformableState { zoomChange, offsetChange, _ ->
+            // Don't allow making it smaller than it is.
+            if(scale * zoomChange >= 1)
+                scale *= zoomChange
+            // Don't allow rotation changes
+//            rotation += rotationChange
+            offset += offsetChange
+        }
 
         val hlsModifier = if(chatOpen && !isLandscape) {
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
@@ -707,6 +727,16 @@ fun HlsComposable(
         else {
 //            hlsViewModel.allowZoom()
             Modifier
+                .graphicsLayer(
+                    scaleX = scale,
+                    scaleY = scale,
+                    rotationZ = rotation,
+                    translationX = offset.x,
+                    translationY = offset.y
+                )
+                // add transformable to listen to multitouch transformation events
+                // after offset
+                .transformable(state = state)
                 .fillMaxSize()
 //                .pointerInteropFilter { event ->
 //                    scaleGestureListener.onTouchEvent(event)
@@ -724,7 +754,7 @@ fun HlsComposable(
 //                resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
 
                 this.player = player.getNativePlayer()
-                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this))
+                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this) {})
             }
         }, update = {
 //            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
