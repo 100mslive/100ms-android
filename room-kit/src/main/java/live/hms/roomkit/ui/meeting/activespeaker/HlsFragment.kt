@@ -699,14 +699,31 @@ fun HlsComposable(
         val state = rememberTransformableState { zoomChange, offsetChange, _ ->
             // Don't allow making it smaller than it is.
 
-            val scaleChanged = scale * zoomChange >= 1
-            if(scaleChanged) {
-                scale *= zoomChange
+            val proposedScale = scale * zoomChange
+
+            // Don't allow the scale to go below 1, i.e shrink.
+            // At a minimum it can be set back to the original scale of 1.0
+            if(proposedScale >= 1) {
+                scale = proposedScale
             }
+
             // Don't allow rotation changes
 //            rotation += rotationChange
-            if(scaleChanged) {
-                offset += offsetChange
+
+            // If the screen isn't zoomed, don't allow it to be moved.
+            if(proposedScale > 1) {
+                var proposedOffset = offset + offsetChange
+                // TODO this currently won't work because 0,0 is center.
+                //  we need the width and height of the view to do this effectively.
+//                val resetX = proposedOffset.x < 0f
+//                val resetY = proposedOffset.y < 0f
+//                // Don't allow scrolling out of bounds (TODO handle the opposite edges)
+//                if(resetX || resetY) {
+//                    proposedOffset = proposedOffset.copy(x = if(resetX) 0f else proposedOffset.x,
+//                        y = if(resetY) 0f else proposedOffset.y)
+//                }
+                offset = proposedOffset
+                Log.d("Offset", "Offset: $offset, OffsetChange: $offsetChange")
             } else {
                 offset = Offset.Zero
             }
