@@ -741,7 +741,9 @@ fun HlsComposable(
                     override fun onZoomSurfaceCreated(view: ZoomSurfaceView) {
                         player.getNativePlayer().setVideoSurface(view.surface)
                     }
-                    override fun onZoomSurfaceDestroyed(view: ZoomSurfaceView) {}
+                    override fun onZoomSurfaceDestroyed(view: ZoomSurfaceView) {
+                        player.getNativePlayer().setVideoSurface(null)
+                    }
                 })
 
                 player.getNativePlayer().addListener(object : Player.Listener {
