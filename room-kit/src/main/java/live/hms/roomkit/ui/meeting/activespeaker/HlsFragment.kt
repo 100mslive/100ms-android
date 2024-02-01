@@ -739,7 +739,9 @@ fun HlsComposable(
                     override fun onZoomSurfaceCreated(view: ZoomSurfaceView) {
                         player.getNativePlayer().setVideoSurface(view.surface)
                     }
-                    override fun onZoomSurfaceDestroyed(view: ZoomSurfaceView) {}
+                    override fun onZoomSurfaceDestroyed(view: ZoomSurfaceView) {
+                        player.getNativePlayer().setVideoSurface(null)
+                    }
                 })
 
                 player.getNativePlayer().addListener(object : Player.Listener {
@@ -754,6 +756,8 @@ fun HlsComposable(
 //            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
 
 
+        }, onRelease = {
+            player.getNativePlayer().setVideoSurface(null)
         })
         // Only hide if it's landscape and fullscreen and the controls are hidden
 
