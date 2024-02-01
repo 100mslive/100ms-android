@@ -125,6 +125,7 @@ import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
+import live.hms.video.sdk.models.enums.HMSRecordingState
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -218,6 +219,7 @@ private const val SECONDS_FROM_LIVE = 10
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
                 var ticks by remember { mutableLongStateOf(0) }
+                val recordingState by meetingViewModel.recordingState.observeAsState()
 
                 // Turn off controls 3 seconds after they become visible
                 LaunchedEffect(controlsVisible) {
@@ -336,7 +338,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 ChatHeader(
                                     "Tech talks", meetingViewModel.getLogo(),
                                     viewers ?:0,
-                                    ticks
+                                    ticks,
+                                    recordingState
                                 )
                                 ChatUI(
                                     childFragmentManager,
@@ -449,7 +452,9 @@ private const val SECONDS_FROM_LIVE = 10
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMillis: Long) {
+fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMillis: Long,
+               recordingState : HMSRecordingState?
+) {
     fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
         "$viewers"
     } else "${viewers / 1000f}K"
@@ -486,7 +491,7 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
                     getTimeDisplayNum(
                         startedMillis
                     )
-                } ago", style = TextStyle(
+                } ago${if (recordingState == HMSRecordingState.STARTED) " · Recording" else "" }", style = TextStyle(
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
@@ -514,7 +519,8 @@ fun ChatHeaderPreview() {
         headingText = "Tech talks",
         "https://storage.googleapis.com/100ms-cms-prod/cms/100ms_18a29f69f2/100ms_18a29f69f2.png",
         1000,
-        30 * 60 * 1000
+        30 * 60 * 1000,
+        HMSRecordingState.STARTING
     )
 }
 
