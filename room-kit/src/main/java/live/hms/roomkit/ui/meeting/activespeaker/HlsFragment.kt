@@ -79,6 +79,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
+import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
 import androidx.media3.ui.PlayerView
@@ -87,6 +89,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
+import com.otaliastudios.zoom.ZoomSurfaceView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import live.hms.hls_player.*
@@ -690,21 +693,7 @@ fun HlsComposable(
         var rotation by remember { mutableStateOf(0f) }
         var offset by remember { mutableStateOf(Offset.Zero) }
         // Ignoring rotation so it's replaced with _
-        val state = rememberTransformableState { zoomChange, offsetChange, _ ->
-            // Don't allow making it smaller than it is.
 
-            val scaleChanged = scale * zoomChange >= 1
-            if(scaleChanged) {
-                scale *= zoomChange
-            }
-            // Don't allow rotation changes
-//            rotation += rotationChange
-            if(scaleChanged) {
-                offset += offsetChange
-            } else {
-                offset = Offset.Zero
-            }
-        }
 
         val hlsModifier = if(chatOpen && !isLandscape) {
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
@@ -730,16 +719,8 @@ fun HlsComposable(
         else {
 //            hlsViewModel.allowZoom()
             Modifier
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    rotationZ = rotation,
-                    translationX = offset.x,
-                    translationY = offset.y
-                )
                 // add transformable to listen to multitouch transformation events
                 // after offset
-                .transformable(state = state)
                 .fillMaxSize()
 //                .pointerInteropFilter { event ->
 //                    scaleGestureListener.onTouchEvent(event)
@@ -752,17 +733,27 @@ fun HlsComposable(
         }
 
         AndroidView(modifier = hlsModifier, factory = {
-            PlayerView(context).apply {
-                useController = false
-//                resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
 
-                this.player = player.getNativePlayer()
-//                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this) {})
+            ZoomSurfaceView(it).apply {
+                addCallback(object : ZoomSurfaceView.Callback {
+                    override fun onZoomSurfaceCreated(view: ZoomSurfaceView) {
+                        player.getNativePlayer().setVideoSurface(view.surface)
+                    }
+                    override fun onZoomSurfaceDestroyed(view: ZoomSurfaceView) {}
+                })
+
+                player.getNativePlayer().addListener(object : Player.Listener {
+                    override fun onVideoSizeChanged(videoSize: VideoSize) {
+                         setContentSize(videoSize.width.toFloat(), videoSize.height.toFloat())
+                    }
+                })
             }
-        }, update = {
+
+
+        }, update = {surface ->
 //            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
-            it.scaleX = scale
-            it.scaleY = scale
+
+
         })
         // Only hide if it's landscape and fullscreen and the controls are hidden
 
