@@ -275,8 +275,26 @@ class MeetingFragment : Fragment() {
                 }
             }
         } else {
-            initializeUI()
-            startHLSStreamingIfRequired()
+            // To handle skip_preview -> we need to call join Directly and wait for the response before showing the UI
+            meetingViewModel.roomLayoutLiveData.observe(viewLifecycleOwner) {success ->
+                if (success) {
+                    meetingViewModel.state.observe(viewLifecycleOwner) { state ->
+                        if (state is MeetingState.Disconnected)
+                            meetingViewModel.startMeeting()
+                        if (state is MeetingState.Ongoing) {
+                            hideProgressBar()
+                            isMeetingOngoing = true
+                            meetingViewModel.state.removeObservers(viewLifecycleOwner)
+                            initializeUI()
+                            startHLSStreamingIfRequired()
+                        }
+                    }
+                    meetingViewModel.roomLayoutLiveData.removeObservers(viewLifecycleOwner)
+
+                } else {
+                    this.activity?.finish()
+                }
+            }
         }
     }
 
@@ -706,7 +724,9 @@ class MeetingFragment : Fragment() {
     }
 
     private fun startHLSStreamingIfRequired() {
-        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning().not()) {
+        val canStartHlsStreamFromConfig = meetingViewModel.getHmsRoomLayout()
+            ?.getPreviewLayout(null)?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
+        if (canStartHlsStreamFromConfig && meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning().not()) {
             binding.meetingFragmentProgress.visibility = View.VISIBLE
             hasStartedHls = true
             meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))

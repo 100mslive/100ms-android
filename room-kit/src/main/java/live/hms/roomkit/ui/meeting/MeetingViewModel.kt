@@ -244,7 +244,7 @@ class MeetingViewModel(
         initURL: String
     ) {
         hmsConfig = HMSConfig(
-            userName = hmsPrebuiltOptions?.userName.orEmpty(),
+            userName = hmsPrebuiltOptions?.userName ?: UUID.randomUUID().toString(),
             token,
             Gson().toJson(
                 CustomPeerMetadata(
@@ -2370,6 +2370,8 @@ class MeetingViewModel(
     fun defaultRecipientToMessage() = prebuiltInfoContainer.defaultRecipientToMessage()
 
     fun chatTitle() = prebuiltInfoContainer.getChatTitle()
+
+    fun shouldSkipPreview() = prebuiltInfoContainer.shouldSkipPreview()
 
     private var playerStarted = false
     fun hlsPlayerBeganToPlay() {
