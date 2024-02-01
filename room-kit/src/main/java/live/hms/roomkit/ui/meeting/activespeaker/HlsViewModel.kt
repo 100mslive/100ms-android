@@ -33,7 +33,6 @@ import live.hms.video.sdk.HMSSDK
     val isZoomEnabled = MutableLiveData(false)
     val isLive = MutableLiveData(true)
     val streamEndedEvent = SingleLiveEvent<Unit>()
-    val hlsCueEvent = SingleLiveEvent<HmsHlsCue>()
 
     val player = HmsHlsPlayer(application, hmsSdk).apply {
         setListeners(this)

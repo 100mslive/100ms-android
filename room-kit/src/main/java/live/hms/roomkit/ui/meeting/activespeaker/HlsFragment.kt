@@ -43,6 +43,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,6 +84,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -125,6 +128,7 @@ import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
+import live.hms.video.sdk.models.enums.HMSRecordingState
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -155,7 +159,6 @@ private const val SECONDS_FROM_LIVE = 10
     private val player by lazy { hlsViewModel.player }
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
-    lateinit var scaleGestureListener : CustomOnScaleGestureListener
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
 
     private val chatAdapter by lazy {
@@ -219,6 +222,7 @@ private const val SECONDS_FROM_LIVE = 10
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
                 var ticks by remember { mutableLongStateOf(0) }
+                val recordingState by meetingViewModel.recordingState.observeAsState()
 
                 // Turn off controls 3 seconds after they become visible
                 LaunchedEffect(controlsVisible) {
@@ -337,7 +341,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 ChatHeader(
                                     "Tech talks", meetingViewModel.getLogo(),
                                     viewers ?:0,
-                                    ticks
+                                    ticks,
+                                    recordingState
                                 )
                                 ChatUI(
                                     childFragmentManager,
@@ -450,7 +455,9 @@ private const val SECONDS_FROM_LIVE = 10
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMillis: Long) {
+fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMillis: Long,
+               recordingState : HMSRecordingState?
+) {
     fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
         "$viewers"
     } else "${viewers / 1000f}K"
@@ -487,7 +494,7 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
                     getTimeDisplayNum(
                         startedMillis
                     )
-                } ago", style = TextStyle(
+                } ago${if (recordingState == HMSRecordingState.STARTED) " · Recording" else "" }", style = TextStyle(
                     fontSize = 12.sp,
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
@@ -515,7 +522,8 @@ fun ChatHeaderPreview() {
         headingText = "Tech talks",
         "https://storage.googleapis.com/100ms-cms-prod/cms/100ms_18a29f69f2/100ms_18a29f69f2.png",
         1000,
-        30 * 60 * 1000
+        30 * 60 * 1000,
+        HMSRecordingState.STARTING
     )
 }
 
@@ -689,11 +697,6 @@ fun HlsComposable(
     lateinit var scaleGestureListener : ScaleGestureDetector
     // Keeping it one box so rows and columns don't change the layout
     Box {
-        var scale by remember { mutableStateOf(1f) }
-        var rotation by remember { mutableStateOf(0f) }
-        var offset by remember { mutableStateOf(Offset.Zero) }
-        // Ignoring rotation so it's replaced with _
-
 
         val hlsModifier = if(chatOpen && !isLandscape) {
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
@@ -717,7 +720,6 @@ fun HlsComposable(
                 .fillMaxWidth(0.6f)
         }
         else {
-//            hlsViewModel.allowZoom()
             Modifier
                 // add transformable to listen to multitouch transformation events
                 // after offset
