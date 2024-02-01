@@ -155,7 +155,6 @@ private const val SECONDS_FROM_LIVE = 10
     private val player by lazy { hlsViewModel.player }
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
-    lateinit var scaleGestureListener : CustomOnScaleGestureListener
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
 
     private val chatAdapter by lazy {
@@ -762,10 +761,7 @@ fun HlsComposable(
         AndroidView(modifier = hlsModifier, factory = {
             PlayerView(context).apply {
                 useController = false
-//                resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
-
                 this.player = player.getNativePlayer()
-//                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this) {})
             }
         }, update = {
             if(scale == 1f){
