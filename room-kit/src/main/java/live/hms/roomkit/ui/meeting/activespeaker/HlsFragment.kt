@@ -697,15 +697,6 @@ fun HlsComposable(
     lateinit var scaleGestureListener : ScaleGestureDetector
     // Keeping it one box so rows and columns don't change the layout
     Box {
-        var scale by remember { mutableFloatStateOf(1f) }
-        var rotation by remember { mutableFloatStateOf(0f) }
-        var offset by remember { mutableStateOf(Offset.Zero) }
-        fun resetZoom() {
-            scale = 1f
-            offset = Offset.Zero
-        }
-        // Ignoring rotation so it's replaced with _
-
 
         val hlsModifier = if(chatOpen && !isLandscape) {
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
@@ -718,7 +709,6 @@ fun HlsComposable(
                 }
                 .fillMaxWidth()
         } else if(chatOpen && isLandscape) {
-            resetZoom()
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
                 .pointerInput(Unit) {
