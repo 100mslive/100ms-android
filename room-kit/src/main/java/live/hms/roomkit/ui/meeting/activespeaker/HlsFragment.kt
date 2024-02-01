@@ -43,6 +43,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,6 +82,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
+import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -686,9 +689,13 @@ fun HlsComposable(
     lateinit var scaleGestureListener : ScaleGestureDetector
     // Keeping it one box so rows and columns don't change the layout
     Box {
-        var scale by remember { mutableStateOf(1f) }
-        var rotation by remember { mutableStateOf(0f) }
+        var scale by remember { mutableFloatStateOf(1f) }
+        var rotation by remember { mutableFloatStateOf(0f) }
         var offset by remember { mutableStateOf(Offset.Zero) }
+        fun resetZoom() {
+            scale = 1f
+            offset = Offset.Zero
+        }
         // Ignoring rotation so it's replaced with _
         val state = rememberTransformableState { zoomChange, offsetChange, _ ->
             // Don't allow making it smaller than it is.
@@ -707,6 +714,7 @@ fun HlsComposable(
         }
 
         val hlsModifier = if(chatOpen && !isLandscape) {
+            resetZoom()
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
                 .aspectRatio(ratio = 16f / 9)
@@ -717,6 +725,7 @@ fun HlsComposable(
                 }
                 .fillMaxWidth()
         } else if(chatOpen && isLandscape) {
+            resetZoom()
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
                 .pointerInput(Unit) {
@@ -728,7 +737,6 @@ fun HlsComposable(
                 .fillMaxWidth(0.6f)
         }
         else {
-//            hlsViewModel.allowZoom()
             Modifier
                 .graphicsLayer(
                     scaleX = scale,
@@ -760,7 +768,11 @@ fun HlsComposable(
 //                scaleGestureListener = ScaleGestureDetector(context, CustomOnScaleGestureListener(this) {})
             }
         }, update = {
-//            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
+            if(scale == 1f){
+                it.resizeMode = RESIZE_MODE_FIT
+            } else {
+                it.resizeMode = RESIZE_MODE_ZOOM
+            }
             it.scaleX = scale
             it.scaleY = scale
         })
