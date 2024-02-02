@@ -235,18 +235,13 @@ private const val SECONDS_FROM_LIVE = 10
                     }
                 }
 
-//                val controlsAlpha: Float by animateFloatAsState(
-//                    targetValue = if (controlsVisible) 1f else 0f,
-//                    animationSpec = tween(
-//                        durationMillis = 3000,
-//                        easing = LinearEasing,
-//                    ), label = "control hiding alpha transition"
-//                )
 
                 val progressBarVisibility by hlsViewModel.progressBarVisible.observeAsState()
                 val viewMode by meetingViewModel.state.observeAsState()
 
-                enableClosedCaptions(player, closedCaptionsEnabled)
+                LaunchedEffect(closedCaptionsEnabled) {
+                    enableClosedCaptions(player, closedCaptionsEnabled)
+                }
 
 
                 if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing) {
@@ -759,8 +754,8 @@ fun HlsComposable(
 
         AnimatedVisibility(
             visible = controlsVisible,
-            enter = fadeIn(animationSpec = tween(2000)),
-            exit = fadeOut(animationSpec = tween(2000))
+            enter = fadeIn(animationSpec = tween(250)),
+            exit = fadeOut(animationSpec = tween(250))
         ) {
             // Draw the items in a grid with the same size as
             // the hls video by applying hls video size with BoxWithConstraints.
@@ -802,8 +797,8 @@ fun HlsComposable(
 
         AnimatedVisibility(
             visible = !(isLandscape && !chatOpen && !controlsVisible),
-            enter = fadeIn(animationSpec = tween(2000)),
-            exit = fadeOut(animationSpec = tween(2000))
+            enter = fadeIn(animationSpec = tween(250)),
+            exit = fadeOut(animationSpec = tween(250))
         ) {
             CloseButton(onCloseButtonClicked)
         }
