@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -17,8 +18,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -43,7 +42,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,8 +51,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -84,9 +80,6 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
-import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -735,8 +728,11 @@ fun HlsComposable(
         }
 
         AndroidView(modifier = hlsModifier, factory = {
-
+            val tapGestureHandler = GestureDetector(it, ShortTapListener(videoTapped))
             ZoomSurfaceView(it).apply {
+                setOnTouchListener { _, motionEvent ->
+                    tapGestureHandler.onTouchEvent(motionEvent)
+                }
                 addCallback(object : ZoomSurfaceView.Callback {
                     override fun onZoomSurfaceCreated(view: ZoomSurfaceView) {
                         player.getNativePlayer().setVideoSurface(view.surface)
@@ -752,10 +748,6 @@ fun HlsComposable(
                     }
                 })
             }
-
-
-        }, update = {surface ->
-//            it.resizeMode = hlsViewModel.resizeMode.value ?: RESIZE_MODE_FIT
 
 
         }, onRelease = {
