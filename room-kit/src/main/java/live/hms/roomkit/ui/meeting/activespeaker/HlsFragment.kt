@@ -218,8 +218,6 @@ private const val SECONDS_FROM_LIVE = 10
                 var controlsVisible by remember { mutableStateOf(false) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
-                val isChatEnabled by rememberSaveable { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
-                var chatOpen by remember { mutableStateOf(isChatEnabled)}
                 val isLive by hlsViewModel.isLive.observeAsState()
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
@@ -266,6 +264,8 @@ private const val SECONDS_FROM_LIVE = 10
                         color = PrimaryDefault
                     )
                 } else {
+                    val isChatEnabled by remember { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
+                    var chatOpen by remember { mutableStateOf(isChatEnabled)}
 
                     OrientationSwapper({ isLandScape ->
                         Row {
