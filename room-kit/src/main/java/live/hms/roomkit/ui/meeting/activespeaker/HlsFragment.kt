@@ -46,6 +46,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -95,6 +96,7 @@ import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
+import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MessageOptionsBottomSheet
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
@@ -209,8 +211,6 @@ private const val SECONDS_FROM_LIVE = 10
                 var controlsVisible by remember { mutableStateOf(false) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
-                val isChatEnabled by remember { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
-                var chatOpen by remember { mutableStateOf(isChatEnabled)}
                 val isLive by hlsViewModel.isLive.observeAsState()
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
@@ -244,12 +244,12 @@ private const val SECONDS_FROM_LIVE = 10
 //                )
 
                 val progressBarVisibility by hlsViewModel.progressBarVisible.observeAsState()
-
+                val viewMode by meetingViewModel.state.observeAsState()
 
                 enableClosedCaptions(player, closedCaptionsEnabled)
 
 
-                if (progressBarVisibility == true) {
+                if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()
@@ -257,6 +257,8 @@ private const val SECONDS_FROM_LIVE = 10
                         color = PrimaryDefault
                     )
                 } else {
+                    val isChatEnabled by remember { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
+                    var chatOpen by remember { mutableStateOf(isChatEnabled)}
 
                     OrientationSwapper({ isLandScape ->
                         Row {
