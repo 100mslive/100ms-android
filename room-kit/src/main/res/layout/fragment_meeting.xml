@@ -82,6 +82,7 @@
 
     <include
         android:id="@+id/progress_bar"
+        android:visibility="gone"
         layout="@layout/progress_bar" />
 
     <include
