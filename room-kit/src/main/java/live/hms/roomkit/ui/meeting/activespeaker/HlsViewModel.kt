@@ -7,9 +7,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
+import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import live.hms.hls_player.HmsHlsCue
@@ -33,10 +36,18 @@ import live.hms.video.sdk.HMSSDK
     val isZoomEnabled = MutableLiveData(false)
     val isLive = MutableLiveData(true)
     val streamEndedEvent = SingleLiveEvent<Unit>()
+    val currentSubtitles = MutableLiveData<String?>()
 
     val player = HmsHlsPlayer(application, hmsSdk).apply {
         setListeners(this)
         play(hlsStreamUrl)
+        with(getNativePlayer()) {
+        trackSelectionParameters =
+            trackSelectionParameters
+                .buildUpon()
+                .setPreferredTextLanguage(trackSelectionParameters.preferredTextLanguages.firstOrNull())
+                .build()
+        }
     }
     private fun setListeners(player: HmsHlsPlayer) {
 //        binding.hlsView.player = player.getNativePlayer()
@@ -56,6 +67,11 @@ import live.hms.video.sdk.HMSSDK
 
             override fun onVideoSizeChanged(videoSize: VideoSize) {
                 super.onVideoSizeChanged(videoSize)
+            }
+
+            override fun onCues(cueGroup: CueGroup) {
+                super.onCues(cueGroup)
+                currentSubtitles.postValue(cueGroup.cues.firstOrNull()?.text?.toString())
             }
         })
 
