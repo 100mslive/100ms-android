@@ -36,6 +36,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -52,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -81,6 +83,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
+import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -182,13 +185,6 @@ private const val SECONDS_FROM_LIVE = 10
         composeView = binding.composeView
         return binding.root
     }
-    private fun enableClosedCaptions(player: HmsHlsPlayer, enable : Boolean) = with(player.getNativePlayer()){
-        trackSelectionParameters =
-            ParametersBuilder(requireContext())
-                .setRendererDisabled(C.TRACK_TYPE_VIDEO, !enable)
-                .build()
-
-    }
 
     private fun goLive(player: HmsHlsPlayer) {
         hlsViewModel.isPlaying.postValue(true)
@@ -239,11 +235,6 @@ private const val SECONDS_FROM_LIVE = 10
                 val progressBarVisibility by hlsViewModel.progressBarVisible.observeAsState()
                 val viewMode by meetingViewModel.state.observeAsState()
 
-                LaunchedEffect(closedCaptionsEnabled) {
-                    enableClosedCaptions(player, closedCaptionsEnabled)
-                }
-
-
                 if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -283,7 +274,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 isLandscape = isLandScape,
                                 isLive = isLive,
                                 goLiveClicked = {goLive(player)},
-                                onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)}
+                                onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)},
+                                closedCaptionsEnabled = closedCaptionsEnabled
                             )
                             Column {
                                 if(chatOpen) {
@@ -325,7 +317,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 isLandscape = isLandscape,
                                 isLive = isLive,
                                 goLiveClicked = {goLive(player)},
-                                onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)}
+                                onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)},
+                                closedCaptionsEnabled = closedCaptionsEnabled
                             )
                             if(chatOpen) {
                                 ChatHeader(
@@ -681,7 +674,8 @@ fun HlsComposable(
     isLive : Boolean?,
     isChatEnabled : Boolean,
     goLiveClicked : () -> Unit,
-    onCloseButtonClicked: () -> Unit
+    onCloseButtonClicked: () -> Unit,
+    closedCaptionsEnabled : Boolean
 ) {
 
     lateinit var scaleGestureListener : ScaleGestureDetector
@@ -752,6 +746,34 @@ fun HlsComposable(
         })
         // Only hide if it's landscape and fullscreen and the controls are hidden
 
+
+        if (closedCaptionsEnabled) {
+            BoxWithConstraints(
+                modifier = hlsModifier,
+                contentAlignment = Alignment.BottomCenter
+            ) {
+
+                val subtitles by hlsViewModel.currentSubtitles.observeAsState()
+                if(!subtitles.isNullOrEmpty()) {
+                    Box(modifier = Modifier.padding(horizontal = Spacing0)) {
+                        Surface(color = Color.DarkGray) {
+                            Text(
+                                text = subtitles ?: "",
+                                modifier = Modifier.padding(Spacing1),
+                                style = TextStyle(
+                                    fontSize = 14.sp,
+                                    lineHeight = 16.sp,
+                                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_bold)),
+                                    fontWeight = FontWeight(600),
+                                    color = Color.White,
+                                    letterSpacing = 0.5.sp,
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
         AnimatedVisibility(
             visible = controlsVisible,
             enter = fadeIn(animationSpec = tween(250)),
