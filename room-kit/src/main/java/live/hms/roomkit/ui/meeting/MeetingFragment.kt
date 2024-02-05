@@ -874,7 +874,7 @@ class MeetingFragment : Fragment() {
     private fun configureWebrtcView() {
 
 
-        binding.topMenu?.visibility = View.VISIBLE
+        binding.topMenu.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
         showControlBars(false)
         cancelCallback()
@@ -1050,7 +1050,6 @@ class MeetingFragment : Fragment() {
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
-                    topMenu.visibility = View.VISIBLE
                     moveChat(up = false, bottomMenu.height.toFloat())
                 }
 
@@ -1060,7 +1059,6 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
-                    topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
@@ -1074,7 +1072,6 @@ class MeetingFragment : Fragment() {
             ?.translationY((bottomMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
-                    bottomMenu.visibility = View.VISIBLE
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -1083,7 +1080,6 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
-                    bottomMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
