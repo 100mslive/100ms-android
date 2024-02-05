@@ -60,13 +60,19 @@
         />
 
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:layout_below="@id/pollStarterUsername"
+        >
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/questionsRecyclerView"
-        android:layout_below="@id/pollStarterUsername"
         android:layout_width="match_parent"
         tools:itemCount="3"
         tools:listitem="@layout/layout_polls_display_choices_quesion"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         />
+    </ScrollView>
 
 </RelativeLayout>

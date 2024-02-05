@@ -71,8 +71,8 @@ class HlsVideoQualitySelectorBottomSheet(
         binding.closeBtn.setOnClickListener {
             dismiss()
         }
-        val allLayers = hlsPlayer.getHmsHlsLayers()
         val currentLayer = hlsPlayer.getCurrentHmsHlsLayer()
+        val allLayers = hlsPlayer.getHmsHlsLayers()
 
         addAutoView(currentLayer == HmsHlsLayer.AUTO)
         allLayers.forEachIndexed { index, layer ->

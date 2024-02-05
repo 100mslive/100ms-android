@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="none"
     android:animateLayoutChanges="false"
     android:fitsSystemWindows="true"
+    app:layout_constraintWidth_max="320dp"
     android:orientation="vertical"
     android:paddingHorizontal="16dp"
     android:paddingVertical="16dp"
-    tools:context=".ui.meeting.MeetingActivity">
+    android:layout_marginHorizontal="64dp"
+    tools:context=".ui.meeting.MeetingActivity"
+    tools:ignore="PxUsage">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -72,4 +76,4 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</ScrollView>

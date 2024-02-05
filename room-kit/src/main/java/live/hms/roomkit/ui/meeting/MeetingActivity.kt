@@ -19,6 +19,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
 import live.hms.roomkit.databinding.ActivityMeetingBinding
 import live.hms.roomkit.ui.HMSPrebuiltOptions
+import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
 import live.hms.roomkit.ui.notification.CardStackListener
 import live.hms.roomkit.ui.notification.Direction
@@ -137,17 +138,25 @@ class MeetingActivity : AppCompatActivity() {
                     supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                 val navController = navHostFragment.navController
                 val topFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-                navController.setGraph(
-                    R.navigation.meeting_nav_graph, intent.extras
-                )
-                /*if (settingsStore?.showPreviewBeforeJoin == true && (topFragment is MeetingFragment).not()) navController?.setGraph(
-                    R.navigation.meeting_nav_graph, intent.extras
-                )
-                else navController?.setGraph(R.navigation.no_preview_nav_graph, intent.extras)*/
+                val navGraph = navController.navInflater.inflate(R.navigation.meeting_nav_graph)
+                if (meetingViewModel.shouldSkipPreview().not()) {
+                  navGraph.setStartDestination(R.id.PreviewFragment)
+                }
+                else {
+                  navGraph.setStartDestination(R.id.MeetingFragment)
+                }
+                navController.setGraph(navGraph, intent.extras)
             } else {
                 Toast.makeText(this@MeetingActivity, "Error while Getting Room Layout Data", Toast.LENGTH_SHORT).show()
                 finish()
             }
+        }
+
+        meetingViewModel.launchParticipantsFromHls.observe(this) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.fragment_container, ParticipantsFragment())
+                .commit()
         }
     }
 

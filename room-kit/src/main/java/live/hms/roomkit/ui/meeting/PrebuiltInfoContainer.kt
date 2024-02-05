@@ -40,8 +40,6 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
         return isChatOverlay() && isChatInitialOpen
     }
     fun isChatOverlay() =
-        roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements?.chat?.overlayView == true
-                ||
                 roleMap[localPeer.hmsRole.name]?.screens?.conferencing
                     ?.default?.elements?.chat?.overlayView == true
 
@@ -125,6 +123,10 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             ?.default?.elements?.chat?.chatTitle
 
         return confTitle ?: hlsTitle ?: "Chat"
+    }
+
+    fun shouldSkipPreview(): Boolean {
+        return hmsRoomLayout?.data?.get(0)?.screens?.preview?.skipPreview == true
     }
 }
 

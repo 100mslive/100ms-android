@@ -6,20 +6,11 @@
     android:layout_height="match_parent"
     >
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_centerInParent="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <!-- Player view -->
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/hls_view"
-        app:use_controller="false"
-        app:resize_mode="zoom"
-        android:visibility="invisible"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        />
 
     <!-- Stats for nerds -->
     <LinearLayout
@@ -81,17 +72,6 @@
 
     </LinearLayout>
 
-    <!-- Goto live and track selector -->
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/btn_track_selection"
-        android:layout_width="32dp"
-        android:padding="4dp"
-        android:layout_margin="@dimen/spacing_d2"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_height="32dp"
-        android:src="@drawable/settings"
-         />
 
     <!-- To show timed metadata -->
     <TextView

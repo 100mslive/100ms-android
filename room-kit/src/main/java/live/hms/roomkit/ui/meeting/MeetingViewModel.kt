@@ -69,6 +69,7 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    val launchParticipantsFromHls = SingleLiveEvent<Unit>()
     var recNum = 0
     // This is needed in chat for it to determine what kind of chat it is.
     val initPrebuiltChatMessageRecipient = MutableLiveData<Pair<Recipient?,Int>>()
@@ -243,7 +244,7 @@ class MeetingViewModel(
         initURL: String
     ) {
         hmsConfig = HMSConfig(
-            userName = hmsPrebuiltOptions?.userName.orEmpty(),
+            userName = hmsPrebuiltOptions?.userName ?: UUID.randomUUID().toString(),
             token,
             Gson().toJson(
                 CustomPeerMetadata(
@@ -2370,6 +2371,8 @@ class MeetingViewModel(
 
     fun chatTitle() = prebuiltInfoContainer.getChatTitle()
 
+    fun shouldSkipPreview() = prebuiltInfoContainer.shouldSkipPreview()
+
     private var playerStarted = false
     fun hlsPlayerBeganToPlay() {
         val lp = lastStartedPoll
@@ -2402,5 +2405,8 @@ class MeetingViewModel(
     private val questionTimingUseCase = QuizQuestionTimingUseCase()
     val setQuestionStartTime = questionTimingUseCase::setQuestionStartTime
     val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
+
+    fun getLogo() = getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
+    //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
 }
 
