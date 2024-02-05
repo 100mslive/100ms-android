@@ -1102,7 +1102,6 @@ class MeetingFragment : Fragment() {
     private fun hideProgressBar() {
         var isInPIPMode = false
         binding.fragmentContainer.visibility = View.VISIBLE
-        binding.bottomControls.visibility = View.VISIBLE
         if (!isInPIPMode && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
@@ -1111,7 +1110,8 @@ class MeetingFragment : Fragment() {
 
     private fun showProgressBar() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        binding.bottomControls.visibility = View.VISIBLE
+        if(meetingViewModel.meetingViewMode.value !is MeetingViewMode.HLS_VIEWER)
+            binding.bottomControls.visibility = View.VISIBLE
 
         binding.progressBar.root.visibility = View.VISIBLE
     }
