@@ -872,7 +872,7 @@ fun HlsComposable(
 
 @Composable
 fun SessionOptionsButton(onClick: () -> Unit) {
-    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_hamburger_menu),
+    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.compose_hls_hamburger_menu),
         contentDescription = "Menu",
         contentScale = ContentScale.None,
         modifier = Modifier
