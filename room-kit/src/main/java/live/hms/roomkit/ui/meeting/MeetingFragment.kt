@@ -874,7 +874,7 @@ class MeetingFragment : Fragment() {
     private fun configureWebrtcView() {
 
 
-        binding.topMenu?.visibility = View.VISIBLE
+        binding.topMenu.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
         showControlBars(false)
         cancelCallback()
