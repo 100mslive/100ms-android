@@ -237,11 +237,6 @@ private const val SECONDS_FROM_LIVE = 10
                 val progressBarVisibility by hlsViewModel.progressBarVisible.observeAsState()
                 val viewMode by meetingViewModel.state.observeAsState()
 
-                // Play the stream again after the websocket reconnects
-                LaunchedEffect(viewMode) {
-                    if(viewMode is MeetingState.Reconnected)
-                        player.play(args.hlsStreamUrl)
-                }
                 // Don't show whole view loading during the time it's disconnected or reconnecting.
                 if (progressBarVisibility == true || !(viewMode is MeetingState.Ongoing || viewMode is MeetingState.Reconnecting || viewMode is MeetingState.Reconnected || viewMode is MeetingState.Disconnecting || viewMode is MeetingState.Disconnected)) {
                     CircularProgressIndicator(
