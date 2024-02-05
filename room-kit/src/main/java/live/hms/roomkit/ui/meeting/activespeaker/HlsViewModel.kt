@@ -7,13 +7,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import live.hms.hls_player.HmsHlsCue
 import live.hms.hls_player.HmsHlsException
@@ -41,13 +38,6 @@ import live.hms.video.sdk.HMSSDK
     val player = HmsHlsPlayer(application, hmsSdk).apply {
         setListeners(this)
         play(hlsStreamUrl)
-        with(getNativePlayer()) {
-        trackSelectionParameters =
-            trackSelectionParameters
-                .buildUpon()
-                .setPreferredTextLanguage(trackSelectionParameters.preferredTextLanguages.firstOrNull())
-                .build()
-        }
     }
     private fun setListeners(player: HmsHlsPlayer) {
 //        binding.hlsView.player = player.getNativePlayer()
@@ -106,17 +96,5 @@ import live.hms.video.sdk.HMSSDK
             }
         })
 
-    }
-
-    fun allowZoom() {
-        isZoomEnabled.postValue(true)
-//        viewModelScope.launch {
-//            delay(400)
-//            resizeMode.postValue(RESIZE_MODE_ZOOM)
-//        }
-    }
-    private suspend fun checkLayers() {
-        delay(10_000)
-        player.getHmsHlsLayers()
     }
 }
