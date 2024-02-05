@@ -237,7 +237,7 @@ private const val SECONDS_FROM_LIVE = 10
                 val viewMode by meetingViewModel.state.observeAsState()
 
                 // Don't show whole view loading during the time it's disconnected or reconnecting.
-                if (progressBarVisibility == true || !(viewMode is MeetingState.Ongoing || viewMode is MeetingState.Reconnecting || viewMode is MeetingState.Reconnected || viewMode is MeetingState.Disconnecting || viewMode is MeetingState.Disconnected)) {
+                if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()
