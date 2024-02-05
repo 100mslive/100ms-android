@@ -48,7 +48,6 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
@@ -248,7 +247,24 @@ private const val SECONDS_FROM_LIVE = 10
                 } else {
                     val isChatEnabled by remember { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
+                    val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
 
+                    fun openSessionOptions() {
+                        SessionOptionBottomSheet(
+                            onScreenShareClicked = {  },
+                            onBRBClicked = {  },
+                            onPeerListClicked = {
+                                meetingViewModel.launchParticipantsFromHls.postValue(Unit)
+                            },
+                            onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
+                            onNameChange = {  },
+                            showPolls = { openPolls() },
+                            onRecordingClicked = {},
+                            disableHandRaiseDisplay = true
+                        ).show(
+                            childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+                        )
+                    }
                     OrientationSwapper({ isLandScape ->
                         Row {
 
@@ -278,7 +294,10 @@ private const val SECONDS_FROM_LIVE = 10
                                 isLive = isLive,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)},
-                                closedCaptionsEnabled = closedCaptionsEnabled
+                                closedCaptionsEnabled = closedCaptionsEnabled,
+                                isHandRaised = isHandRaised,
+                                toggleHandRaise = meetingViewModel::toggleRaiseHand,
+                                sessionOptionsButtonTapped = ::openSessionOptions
                             )
                             Column {
                                 if(chatOpen) {
@@ -321,7 +340,10 @@ private const val SECONDS_FROM_LIVE = 10
                                 isLive = isLive,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)},
-                                closedCaptionsEnabled = closedCaptionsEnabled
+                                closedCaptionsEnabled = closedCaptionsEnabled,
+                                isHandRaised = isHandRaised,
+                                toggleHandRaise = meetingViewModel::toggleRaiseHand,
+                                sessionOptionsButtonTapped = ::openSessionOptions
                             )
                             if(chatOpen) {
                                 ChatHeader(
@@ -678,7 +700,10 @@ fun HlsComposable(
     isChatEnabled : Boolean,
     goLiveClicked : () -> Unit,
     onCloseButtonClicked: () -> Unit,
-    closedCaptionsEnabled : Boolean
+    closedCaptionsEnabled : Boolean,
+    isHandRaised : Boolean,
+    toggleHandRaise : () -> Unit,
+    sessionOptionsButtonTapped : () -> Unit
 ) {
 
     lateinit var scaleGestureListener : ScaleGestureDetector
@@ -830,8 +855,42 @@ fun HlsComposable(
         ) {
             CloseButton(onCloseButtonClicked)
         }
+        if (!isChatEnabled) {
+            Box(modifier = Modifier.fillMaxSize().padding(vertical = Spacing0),
+                contentAlignment = Alignment.BottomCenter) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                // chat button
+                // settings button
+                HandRaiseButton(isHandRaised, toggleHandRaise)
+                SessionOptionsButton(sessionOptionsButtonTapped)
+            }
+            }
+        }
     }
 }
+
+@Composable
+fun SessionOptionsButton(onClick: () -> Unit) {
+    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_hamburger_menu),
+        contentDescription = "Menu",
+        contentScale = ContentScale.None,
+        modifier = Modifier
+            .clickable { onClick() }
+    )
+}
+
+@Composable
+fun HandRaiseButton(isHandRaised : Boolean, onClick: () -> Unit) {
+    Image(painter = painterResource(id = if(isHandRaised) live.hms.roomkit.R.drawable.compose_hls_hand_on else live.hms.roomkit.R.drawable.compose_hls_hand_off),
+        contentDescription = "Close",
+        contentScale = ContentScale.None,
+        modifier = Modifier
+            .clickable { onClick() }
+    )
+}
+
+
 
 @Composable
 fun CloseButton(onCloseButtonClicked: () -> Unit) {
