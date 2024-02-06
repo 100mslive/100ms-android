@@ -1,15 +1,24 @@
 package live.hms.roomkit.ui.polls.display
 
+import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -26,6 +35,7 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.polls.models.HmsPoll
 import live.hms.video.polls.models.HmsPollCategory
 import live.hms.video.polls.models.HmsPollState
+
 
 /**
  * This is shown via a toast that pops up when we receive an HmsPoll event.
@@ -66,7 +76,12 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.skipCollapsed = true
+            sheet.behavior.peekHeight = Resources.getSystem().displayMetrics.heightPixels
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
         initOnBackPress()
         lifecycleScope.launch {
             val pollId = arguments?.getString(POLL_TO_DISPLAY)
@@ -81,10 +96,17 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 meetingViewModel.peers.find { it.isLocal }!!,
                 returnedPoll,
                 meetingViewModel::saveInfoText,
-                meetingViewModel::saveInfoSingleChoice,
-                meetingViewModel::saveInfoMultiChoice,
+                { q,i,p,t ->
+                    answerSelected()
+                    meetingViewModel.saveInfoSingleChoice(q,i,p,t)
+                } ,
+                { q,i,p,t ->
+                    answerSelected()
+                    meetingViewModel.saveInfoMultiChoice(q,i,p,t)},
                 meetingViewModel::saveSkipped,
-                meetingViewModel::endPoll
+                meetingViewModel::endPoll,
+                meetingViewModel.getQuestionStartTime,
+                meetingViewModel.setQuestionStartTime
             ) { LeaderBoardBottomSheetFragment.launch(it, requireFragmentManager()) }
 
             poll = returnedPoll
@@ -95,7 +117,52 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 }
                 val startedType = if(poll.category == HmsPollCategory.QUIZ) "Quiz" else "Poll"
                 pollStarterUsername.text = getString(R.string.poll_started_by,poll.startedBy?.name?: "Participant", startedType)
-                questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+                val divider =
+                    DividerItemDecoration(
+                        binding.root.context,
+                        RecyclerView.VERTICAL
+                    ).apply {
+                        setDrawable(AppCompatResources.getDrawable(binding.root.context, R.drawable.polls_display_progress_items_divider)!!)
+                    }
+                // Remove all item decorators
+                while (questionsRecyclerView.itemDecorationCount > 0) {
+                    questionsRecyclerView.removeItemDecorationAt(0);
+                }
+                questionsRecyclerView.addItemDecoration(divider)
+                // Quizzes only scroll horizontally and snap to questions
+                if(poll.category == HmsPollCategory.QUIZ && poll.state == HmsPollState.STARTED) {
+                    val touchListener = QuizDisableSwipingConditionally(::isQuestionAnswered)
+                    questionsRecyclerView.addOnItemTouchListener(touchListener)
+                    questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context, RecyclerView.HORIZONTAL, false)
+                    /**
+                     * We have to start tracking the time the question is being taken to answer
+                     * from the time it's displayed.
+                     * This is complicated by the fact that recyclerview preloads views.
+                     * So if you just try to save the time from when it's bound, the first
+                     * view will be ok, even the second but the third will be preloaded.
+                     * Thus messing up how long it really took.
+                     * So we need two things to be able to track this correctly:
+                     * 1. On a scroll, we check the current visible item and mark it as seen.
+                     * 2. The very first view won't be saved this way since it was never scrolled to.
+                     *      So that has to be saved separately, which we will do in the onBind.
+                     */
+                    questionsRecyclerView.addOnScrollListener(object :
+                        RecyclerView.OnScrollListener() {
+
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+                            val position = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                            val question = pollsDisplayAdaptor.getItemForPosition(position)
+                            if(question is QuestionContainer.Question) {
+                                meetingViewModel.setQuestionStartTime(question)
+                                touchListener.isMoving = false
+                            }
+                        }
+                    })
+                    PagerSnapHelper().attachToRecyclerView(questionsRecyclerView)
+                } else {
+                    questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
+                }
                 questionsRecyclerView.adapter = pollsDisplayAdaptor
                 pollsDisplayAdaptor.displayPoll(poll)
                 pollsLive.pollsStatusLiveDraftEnded(poll.state)
@@ -114,6 +181,8 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                     if( it is MeetingViewModel.Event.PollEnded) {
                         if(pollsDisplayAdaptor.getPoll.pollId == it.hmsPoll.pollId) {
                             binding.pollsLive.pollsStatusLiveDraftEnded(HmsPollState.STOPPED)
+                            // reset the quiz layout to vertical after it's ended
+                            binding.questionsRecyclerView.layoutManager = LinearLayoutManager(binding.root.context)
                             pollsDisplayAdaptor.notifyDataSetChanged()
                             // Doesn't show up without the delay
                             delay(300)
@@ -142,5 +211,25 @@ class PollDisplayFragment : BottomSheetDialogFragment() {
                 }
             })
     }
+    private fun isQuestionAnswered(position: Int): Boolean {
+        if(position == NO_POSITION) return false
+        val item = pollsDisplayAdaptor.getItemForPosition(position)
+        return item is QuestionContainer.Question && item.voted
+    }
 
+    // Scroll when the answer is selected
+    private fun answerSelected() {
+        val position = (binding.questionsRecyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+        if(position != NO_POSITION &&  position + 1 < pollsDisplayAdaptor.itemCount ) {
+            binding.questionsRecyclerView.scrollToPosition(position + 1)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(300)
+            dialog?.let {
+                val sheet = it as BottomSheetDialog
+                sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+        }
+
+    }
 }

@@ -20,7 +20,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.AdapterView
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -30,6 +29,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -68,6 +68,7 @@ import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
 import live.hms.roomkit.ui.notification.HMSNotificationType
+import live.hms.roomkit.ui.polls.leaderboard.millisecondsToDisplayTime
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.*
 import live.hms.roomkit.util.*
@@ -252,18 +253,6 @@ class MeetingFragment : Fragment() {
         }.start()
     }
 
-    private fun millisecondsToTime(milliseconds: Long): String? {
-        val minutes = milliseconds / 1000 / 60
-        val seconds = milliseconds / 1000 % 60
-        val secondsStr = seconds.toString()
-        val secs: String = if (secondsStr.length >= 2) {
-            secondsStr.substring(0, 2)
-        } else {
-            "0$secondsStr"
-        }
-        return "$minutes:$secs"
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
@@ -287,8 +276,26 @@ class MeetingFragment : Fragment() {
                 }
             }
         } else {
-            initializeUI()
-            startHLSStreamingIfRequired()
+            // To handle skip_preview -> we need to call join Directly and wait for the response before showing the UI
+            meetingViewModel.roomLayoutLiveData.observe(viewLifecycleOwner) {success ->
+                if (success) {
+                    meetingViewModel.state.observe(viewLifecycleOwner) { state ->
+                        if (state is MeetingState.Disconnected)
+                            meetingViewModel.startMeeting()
+                        if (state is MeetingState.Ongoing) {
+                            hideProgressBar()
+                            isMeetingOngoing = true
+                            meetingViewModel.state.removeObservers(viewLifecycleOwner)
+                            initializeUI()
+                            startHLSStreamingIfRequired()
+                        }
+                    }
+                    meetingViewModel.roomLayoutLiveData.removeObservers(viewLifecycleOwner)
+
+                } else {
+                    this.activity?.finish()
+                }
+            }
         }
     }
 
@@ -301,7 +308,7 @@ class MeetingFragment : Fragment() {
             if (startedAt != null) {
                 binding.tvStreamingTime.visibility = View.VISIBLE
                 binding.tvStreamingTime.text =
-                    millisecondsToTime(System.currentTimeMillis().minus(startedAt))
+                    millisecondsToDisplayTime(System.currentTimeMillis().minus(startedAt))
             } else {
                 binding.tvStreamingTime.visibility = View.GONE
             }
@@ -718,7 +725,9 @@ class MeetingFragment : Fragment() {
     }
 
     private fun startHLSStreamingIfRequired() {
-        if (args.startHlsStream && meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning().not()) {
+        val canStartHlsStreamFromConfig = meetingViewModel.getHmsRoomLayout()
+            ?.getPreviewLayout(null)?.default?.elements?.joinForm?.joinBtnType == "JOIN_BTN_TYPE_JOIN_AND_GO_LIVE"
+        if (canStartHlsStreamFromConfig && meetingViewModel.isAllowedToHlsStream() && meetingViewModel.isHlsRunning().not()) {
             binding.meetingFragmentProgress.visibility = View.VISIBLE
             hasStartedHls = true
             meetingViewModel.startHls(settings.lastUsedMeetingUrl, HMSHlsRecordingConfig(true, false))
@@ -866,7 +875,7 @@ class MeetingFragment : Fragment() {
     private fun configureWebrtcView() {
 
 
-        binding.topMenu?.visibility = View.VISIBLE
+        binding.topMenu.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
         showControlBars(false)
         cancelCallback()
@@ -902,10 +911,11 @@ class MeetingFragment : Fragment() {
     }
 
     private fun configureHLSView() {
-        updateBindings()
-
-
-        delayedHide(3000)
+        // They aren't present by default when
+        //  the view starts in hls
+        // But will be present after role changes
+        //  so it's important to attempt to hide them.
+        hideControlBars()
     }
 
     private fun updateBindings() {
@@ -933,6 +943,9 @@ class MeetingFragment : Fragment() {
         binding.buttonRaiseHand.visibility = View.VISIBLE
 
         binding.fragmentContainer.setOnSingleClickListener(500L) {
+            // The bars are disabled in hls fragment view
+            if(meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER)
+                return@setOnSingleClickListener
             if (controlBarsVisible)
                 hideControlBars()
             else
@@ -1038,7 +1051,6 @@ class MeetingFragment : Fragment() {
             ?.translationY(-(topMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
-                    topMenu.visibility = View.VISIBLE
                     moveChat(up = false, bottomMenu.height.toFloat())
                 }
 
@@ -1048,7 +1060,6 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
-                    topMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
@@ -1062,7 +1073,6 @@ class MeetingFragment : Fragment() {
             ?.translationY((bottomMenu.height.toFloat()))?.setDuration(300)
             ?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
-                    bottomMenu.visibility = View.VISIBLE
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
@@ -1071,7 +1081,6 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationCancel(animation: Animator) {
-                    bottomMenu.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }
 
@@ -1090,7 +1099,6 @@ class MeetingFragment : Fragment() {
     private fun hideProgressBar() {
         var isInPIPMode = false
         binding.fragmentContainer.visibility = View.VISIBLE
-        binding.bottomControls.visibility = View.VISIBLE
         if (!isInPIPMode && (meetingViewModel.meetingViewMode.value is MeetingViewMode.HLS_VIEWER).not()){
             binding.bottomControls.visibility = View.VISIBLE
         }
@@ -1099,7 +1107,8 @@ class MeetingFragment : Fragment() {
 
     private fun showProgressBar() {
         binding.fragmentContainer.visibility = View.VISIBLE
-        binding.bottomControls.visibility = View.VISIBLE
+        if(meetingViewModel.meetingViewMode.value !is MeetingViewMode.HLS_VIEWER)
+            binding.bottomControls.visibility = View.VISIBLE
 
         binding.progressBar.root.visibility = View.VISIBLE
     }
@@ -1269,14 +1278,16 @@ class MeetingFragment : Fragment() {
                 p0: HMSAudioManager.AudioDevice,
                 p1: Set<HMSAudioManager.AudioDevice>
             ) {
-                lifecycleScope.launch {
-                    updateActionVolumeMenuIcon(p0)
-                }
+                meetingViewModel.updateAudioDeviceChange(p0)
             }
 
 
             override fun onError(p0: HMSException) {
             }
+        })
+
+        meetingViewModel.audioDeviceChange.observe(viewLifecycleOwner, Observer{
+            updateActionVolumeMenuIcon(it)
         })
 
 

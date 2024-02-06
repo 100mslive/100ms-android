@@ -1,13 +1,13 @@
 package live.hms.roomkit.ui.polls.display
 
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.LayoutEndPollButtonBinding
 import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.drawableStart
@@ -30,20 +30,49 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     private val canRoleViewVotes : Boolean,
     val poll : HmsPoll,
     val saveInfoText: (text : String, position : Int) -> Boolean,
-    val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll) -> Boolean,
-    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll) -> Boolean,
+    val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll,timeTakenMillis : Long) -> Boolean,
+    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll,timeTakenMillis : Long) -> Boolean,
     // This isn't implemented yet
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
     val endPoll : (HmsPoll) -> Unit,
     val canEndPoll : Boolean,
     val showLeaderBoard: (pollId: String) -> Unit,
+    val setQuestionStartTime : (QuestionContainer.Question) -> Unit,
+    val getQuestionStartTime : (QuestionContainer.Question) -> Long?,
+    val totalItems : Int,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val adapter = AnswerOptionsAdapter(canRoleViewVotes) { answersSelected ->
         if(binding is LayoutPollsDisplayChoicesQuesionBinding){
             binding.votebutton.isEnabled = answersSelected
+            determineEndButtonVisibility(binding)
         }
     }
+
+    private fun setEndButton(launchPollQuiz: TextView) {
+
+        launchPollQuiz.text = if (poll.category == HmsPollCategory.QUIZ) "End Quiz" else "End Poll"
+        if(poll.state == HmsPollState.STARTED &&  canEndPoll) {
+            launchPollQuiz.alertButtonEnabled()
+            launchPollQuiz.setOnClickListener {
+                endPoll(poll)
+            }
+            launchPollQuiz.visibility = View.VISIBLE
+        } else {
+            launchPollQuiz.visibility = View.GONE
+        }
+
+        if (poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
+            launchPollQuiz.visibility = View.VISIBLE
+            launchPollQuiz.text = "View Results"
+            launchPollQuiz.buttonEnabled()
+            launchPollQuiz.setOnClickListener {
+                showLeaderBoard(poll.pollId)
+            }
+            launchPollQuiz.visibility = View.VISIBLE
+        }
+    }
+
     var votingProgressAdapter : VotingProgressAdapter? = null
 
     // There are two different layouts.
@@ -57,37 +86,27 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                         }
 
                     optionsBinder(question)
+                    // The scroller way of getting positions won't ever get the first one.
+                    // Since we don't jump to last unanswered question this won't be an issue.
+                    if(absoluteAdapterPosition == 0) {
+                        setQuestionStartTime(question)
+                    }
+
+                    binding as LayoutPollsDisplayChoicesQuesionBinding
+                    determineEndButtonVisibility(binding)
                 }
 
                 HMSPollQuestionType.shortAnswer,
                 HMSPollQuestionType.longAnswer -> textBinder(question)
             }
         }
-        else {
-            //todd
-            with(binding as LayoutEndPollButtonBinding) {
-                launchPollQuiz.text = if (poll.category == HmsPollCategory.QUIZ) "End Quiz" else "End Poll"
-                if(poll.state == HmsPollState.STARTED &&  canEndPoll) {
-                    launchPollQuiz.alertButtonEnabled()
-                    launchPollQuiz.setOnClickListener {
-                        endPoll(poll)
-                    }
-                    binding.root.visibility = View.VISIBLE
-                } else {
-                    binding.root.visibility = View.GONE
-                }
+    }
 
-                if (poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
-                    binding.root.visibility = View.VISIBLE
-                    launchPollQuiz.text = "View Results"
-                    launchPollQuiz.buttonEnabled()
-                    launchPollQuiz.setOnClickListener {
-                        showLeaderBoard(poll.pollId)
-                    }
-                    binding.root.visibility = View.VISIBLE
-                }
-            }
-        }
+    private fun determineEndButtonVisibility(binding: LayoutPollsDisplayChoicesQuesionBinding) {
+        if(absoluteAdapterPosition == totalItems - 1 || (poll.state == HmsPollState.STARTED && poll.category == HmsPollCategory.QUIZ))
+            setEndButton(binding.launchPollQuiz)
+        else
+            binding.launchPollQuiz.visibility = View.GONE
     }
 
     private fun manageVisibility(question : QuestionContainer.Question, binding : LayoutPollsDisplayChoicesQuesionBinding) = with(binding ){
@@ -95,7 +114,7 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
         // For polls we see answers immediately and they are updated.
         // For quizzes, we do not see the answers.
         if(poll.state == HmsPollState.STOPPED && poll.category == HmsPollCategory.QUIZ) {
-            root.highlightCorrectAnswer(isQuestionCorrectlyAnswered(question))
+            backingCard.highlightCorrectAnswer(isQuestionCorrectlyAnswered(question))
         }
         if(question.voted || poll.state == HmsPollState.STOPPED) {
             if(!question.voted) {
@@ -226,11 +245,12 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
                 // TODO skip
 
             }
+
             votebutton.setOnSingleClickListener {
                 val voted : Boolean = if(question.question.type == HMSPollQuestionType.singleChoice){
-                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll)
+                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll, System.currentTimeMillis() - (getQuestionStartTime(question) ?:0))
                 } else if(question.question.type == HMSPollQuestionType.multiChoice) {
-                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll)
+                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll,System.currentTimeMillis() - (getQuestionStartTime(question) ?:0))
                 } else {
                     saveInfoText("What?", bindingAdapterPosition)
                 }

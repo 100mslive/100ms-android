@@ -36,6 +36,7 @@ class SessionOptionBottomSheet(
     private val onRaiseHandClicked: () -> Unit,
     private val onNameChange: () -> Unit,
     private val showPolls: () -> Unit,
+    private val disableHandRaiseDisplay : Boolean = false
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
@@ -161,7 +162,9 @@ class SessionOptionBottomSheet(
             add(brbOption)
             if (meetingViewModel.isAllowedToShareScreen())
             add(screenShareOption)
-            add(raiseHandOption)
+            if(!disableHandRaiseDisplay) {
+                add(raiseHandOption)
+            }
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
             if(!meetingViewModel.disableNameEdit()) {

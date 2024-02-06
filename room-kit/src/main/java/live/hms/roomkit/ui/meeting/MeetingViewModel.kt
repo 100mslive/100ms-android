@@ -27,6 +27,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
+import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
@@ -70,9 +71,11 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
 
+    val launchParticipantsFromHls = SingleLiveEvent<Unit>()
     var recNum = 0
     // This is needed in chat for it to determine what kind of chat it is.
     val initPrebuiltChatMessageRecipient = MutableLiveData<Pair<Recipient?,Int>>()
+    val audioDeviceChange = MutableLiveData<HMSAudioManager.AudioDevice>()
     val participantPreviousRoleChangeUseCase by lazy { ParticipantPreviousRoleChangeUseCase(hmsSDK::changeMetadata)}
     private var hasValidToken = false
     private var pendingRoleChange: HMSRoleChangeRequest? = null
@@ -265,7 +268,7 @@ class MeetingViewModel(
         initURL: String
     ) {
         hmsConfig = HMSConfig(
-            userName = hmsPrebuiltOptions?.userName.orEmpty(),
+            userName = hmsPrebuiltOptions?.userName ?: UUID.randomUUID().toString(),
             token,
             Gson().toJson(
                 CustomPeerMetadata(
@@ -1116,12 +1119,17 @@ class MeetingViewModel(
     }
 
      fun triggerPollsNotification(poll: HmsPoll) {
+
+         val res = getApplication<Application>().resources
+         val pollOrQuiz = res.getString(if (poll.category == HmsPollCategory.POLL) R.string.hms_poll else R.string.hms_quiz)
+         val actionButtonText = res.getString(if (poll.category == HmsPollCategory.POLL) R.string.hms_vote else R.string.hms_answer)
+
         hmsNotificationEvent.postValue(
             HMSNotification(
-                title = "${poll.createdBy?.name.orEmpty()} started a new ${if (poll.category == HmsPollCategory.POLL) "poll" else "quiz"}",
+                title = res.getString(R.string.hms_started_quiz_poll_notification, poll.createdBy?.name.orEmpty(), pollOrQuiz),
                 isDismissible = true,
                 icon = R.drawable.poll_vote,
-                actionButtonText = if (poll.category == HmsPollCategory.POLL) "Vote" else "Join",
+                actionButtonText = actionButtonText,
                 type = HMSNotificationType.OpenPollOrQuiz(pollId = poll.pollId)
             )
         )
@@ -2144,14 +2152,14 @@ class MeetingViewModel(
         }
         return valid
     }
-    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll) : Boolean {
+    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
         if(option == null) {
             return false
         }
         val answer = question.options?.get(option)
         if(answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
-                .addResponse(question, answer)
+                .addResponse(question, answer, timeTakenMillis)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
                     Log.d("PollAnswer","Success")
@@ -2170,14 +2178,14 @@ class MeetingViewModel(
 //
 //        localHmsInteractivityCenter.add()
     }
-    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll) : Boolean {
+    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
         val valid = options != null
         val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
             options?.contains(index) == true
         }
         if(valid && answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
-                .addResponse(question, answer)
+                .addResponse(question, answer, timeTakenMillis)
             localHmsInteractivityCenter.add(response, object : HmsTypedActionResultListener<PollAnswerResponse>{
                 override fun onSuccess(result: PollAnswerResponse) {
                     Log.d("PollAnswer","Success $result")
@@ -2388,6 +2396,8 @@ class MeetingViewModel(
 
     fun chatTitle() = prebuiltInfoContainer.getChatTitle()
 
+    fun shouldSkipPreview() = prebuiltInfoContainer.shouldSkipPreview()
+
     private var playerStarted = false
     fun hlsPlayerBeganToPlay() {
         val lp = lastStartedPoll
@@ -2412,5 +2422,16 @@ class MeetingViewModel(
     fun setCountDownTimerStartedAt(startedAt: Long?) {
         countDownTimerStartedAt.postValue(startedAt)
     }
+
+    fun updateAudioDeviceChange(p0: HMSAudioManager.AudioDevice) {
+        audioDeviceChange.postValue(p0)
+    }
+
+    private val questionTimingUseCase = QuizQuestionTimingUseCase()
+    val setQuestionStartTime = questionTimingUseCase::setQuestionStartTime
+    val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
+
+    fun getLogo() = getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
+    //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
 }
 

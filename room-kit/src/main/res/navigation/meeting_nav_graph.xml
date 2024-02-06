@@ -29,6 +29,7 @@
         tools:layout="@layout/fragment_meeting">
 
         <argument
+            android:defaultValue="false"
             android:name="startHlsStream"
             app:argType="boolean"
             app:nullable="false" />

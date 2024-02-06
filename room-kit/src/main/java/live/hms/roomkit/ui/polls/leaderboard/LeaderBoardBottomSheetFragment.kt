@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.polls.leaderboard
 
-import android.app.Dialog
 import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +16,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.GroupieAdapter
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.LayoutChatParticipantCombinedBinding
 import live.hms.roomkit.databinding.LayoutQuizLeaderboardBinding
 import live.hms.roomkit.ui.meeting.InsetItemDecoration
 import live.hms.roomkit.ui.meeting.MeetingViewModel
@@ -34,8 +32,11 @@ import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.error.HMSException
 import live.hms.video.polls.models.HmsPoll
+import live.hms.video.polls.models.network.HMSPollResponsePeerInfo
+import live.hms.video.polls.network.HMSPollLeaderboardEntry
 import live.hms.video.polls.network.PollLeaderboardResponse
 import live.hms.video.sdk.HmsTypedActionResultListener
+import live.hms.video.sdk.models.HMSPeer
 
 
 class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
@@ -138,7 +139,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         leaderBoardListadapter.clear()
 
         val isAverageTimeEmpty =
-            model.summary?.averageTime == null || model.summary?.averageTime == 0f
+            model.summary?.averageTime == null || model.summary?.averageTime == 0L
         val isAverageScoreEmpty =
             model.summary?.averageScore == null
         val isCorrectAnswerEmpty =
@@ -150,6 +151,96 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
         if (isAverageScoreEmpty.not() || isAverageTimeEmpty.not() || isCorrectAnswerEmpty.not() || isTotalPeerCountEmpty.not()) {
             leaderBoardListadapter.add(LeaderBoardHeader("Participation Summary"))
         }
+
+        val localPeer = meetingViewModel.hmsSDK.getLocalPeer()!!
+        if (localPeer.peerID == poll?.createdBy?.peerID) {
+            showPollCreatorSummary(
+                model, isTotalPeerCountEmpty,
+                isCorrectAnswerEmpty, isAverageTimeEmpty,
+                isAverageScoreEmpty
+            )
+        } else {
+            showPollParticipantSummary(model, localPeer)
+        }
+
+
+        if (model.entries.isNullOrEmpty().not()) {
+            leaderBoardListadapter.add(LeaderBoardHeader("Leaderboard"))
+
+            val rankTOColorMap = mapOf(
+                "1" to "#D69516", "2" to "#3E3E3E", "3" to "#583B0F"
+            )
+            model.entries?.forEachIndexed { index, entry ->
+                leaderBoardListadapter.add(
+                    LeaderBoardNameSection(
+                        titleStr = entry.peer?.username.orEmpty(),
+                        subtitleStr = "${entry.score}/${poll?.questions?.map { it.weight }?.toList()?.sum()?:0} points",
+                        rankStr = entry.position.toString(),
+                        isSelected = true,
+                        timetakenStr =  millisToText(entry.duration, false, "s"),
+                        correctAnswerStr = "${entry.correctResponses}/${poll?.questions?.size ?: 0}",
+                        position = if (index == 0) ApplyRadiusatVertex.TOP
+                        else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
+                        else ApplyRadiusatVertex.NONE,
+                        rankBackGroundColor = rankTOColorMap[entry.position.toString()]?:HMSPrebuiltTheme.getColours()?.secondaryDefault
+                    )
+                )
+            }
+        }
+
+    }
+
+    private fun showPollParticipantSummary(
+        model: PollLeaderboardResponse,
+        localPeer: HMSPeer
+    ) {
+        val peerData : HMSPollLeaderboardEntry? = model.entries?.filter{ it.peer != null }?.find { isSelfPeer(
+            it.peer!!,
+            localPeer
+        ) }
+        if (peerData != null) with(peerData) {
+
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "YOUR RANK",
+                    "$position/${model.entries!!.size}"
+                )
+            )
+
+
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "POINTS", score.toString()
+                )
+            )
+
+            val time = millisToText(duration, true, " secs")
+
+            // TODO add quantity string for seconds
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "TIME TAKEN", time
+                )
+            )
+
+            // TODO this may show incorrect info
+            leaderBoardListadapter.add(
+                LeaderBoardSubGrid(
+                    "CORRECT ANSWERS", "${(correctResponses ?: 0)}/${(totalResponses ?: 0)}"
+                )
+            )
+
+        }
+
+    }
+
+    private fun showPollCreatorSummary(
+        model: PollLeaderboardResponse,
+        isTotalPeerCountEmpty: Boolean,
+        isCorrectAnswerEmpty: Boolean,
+        isAverageTimeEmpty: Boolean,
+        isAverageScoreEmpty: Boolean
+    ) {
 
         if (model.summary != null) with(model.summary!!) {
             if (isTotalPeerCountEmpty.not()) {
@@ -171,7 +262,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             if (isAverageTimeEmpty.not()) {
                 leaderBoardListadapter.add(
                     LeaderBoardSubGrid(
-                        "AVG. TIME TAKEN", "${averageTime?.toInt().toString()} sec"
+                        "AVG. TIME TAKEN", millisToText(averageTime, false, " sec")
                     )
                 )
             }
@@ -184,31 +275,16 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
                 )
             }
         }
+    }
 
-
-        if (model.entries.isNullOrEmpty().not()) {
-            leaderBoardListadapter.add(LeaderBoardHeader("Leaderboard"))
-
-            val rankTOColorMap = mapOf(
-                "1" to "#D69516", "2" to "#3E3E3E", "3" to "#583B0F"
-            )
-            model.entries?.forEachIndexed { index, entry ->
-                leaderBoardListadapter.add(
-                    LeaderBoardNameSection(
-                        titleStr = entry.peer?.username.orEmpty(),
-                        subtitleStr = "${entry.score}/${poll?.questions?.map { it.weight }?.toList()?.sum()?:0} points",
-                        rankStr = entry.position.toString(),
-                        isSelected = true,
-                        timetakenStr = "${if (entry.duration == 0L) "" else entry.duration}",
-                        correctAnswerStr = "${entry.correctResponses}/${poll?.questions?.size ?: 0}",
-                        position = if (index == 0) ApplyRadiusatVertex.TOP
-                        else if (index == model.entries?.size?.minus(1)) ApplyRadiusatVertex.BOTTOM
-                        else ApplyRadiusatVertex.NONE,
-                        rankBackGroundColor = rankTOColorMap[entry.position.toString()]?:HMSPrebuiltTheme.getColours()?.secondaryDefault
-                    )
-                )
-            }
-        }
-
+    private fun isSelfPeer(peer: HMSPollResponsePeerInfo, localPeer: HMSPeer) : Boolean {
+//        poll mode is empty from the server so far and can't be relied on.
+//        when(poll?.mode) {
+//            HmsPollUserTrackingMode.USER_ID -> peer.userid == localPeer.customerUserID
+//            HmsPollUserTrackingMode.PEER_ID -> peer.peerid == localPeer.peerID
+//            HmsPollUserTrackingMode.USERNAME -> peer.username == localPeer.name
+//            null -> false
+//        }
+        return peer.userid == localPeer.customerUserID || peer.peerid == localPeer.peerID
     }
 }
