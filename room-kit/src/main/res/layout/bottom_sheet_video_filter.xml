@@ -65,12 +65,13 @@
             app:tabContentStart="72dp"
             app:tabMode="scrollable" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:paddingVertical="@dimen/spacing_d3"
+            android:paddingHorizontal="@dimen/spacing_d2"
+            android:max="100"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-             />
+            android:layout_height="wrap_content"/>
 
 
 

@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
@@ -107,44 +108,34 @@ class FilterBottomSheet(
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
         }
-        val pickerLayoutManager =
-            PickerLayoutManager(context, PickerLayoutManager.HORIZONTAL, false).apply {
-                isChangeAlpha = true;
-                scaleDownBy = 0.99f;
-                scaleDownDistance = 0.8f;
-            }
 
 
-        val adapters = PickerAdapter(requireContext(), getData(0, 100), binding.list)
-        val snapHelper: SnapHelper = LinearSnapHelper()
-        snapHelper.attachToRecyclerView(binding.list)
-        binding.list.apply {
-            layoutManager = pickerLayoutManager
-            adapter = adapters
-        }
 
 
         meetingViewModel.setupFilterVideoPlugin()
 
-
-        pickerLayoutManager.setOnScrollStopListener { view ->
-
-            val text = view.findViewById<TextView>(R.id.picker_item).text.toString()
-            if (text.isNullOrEmpty().not() && text.toIntOrNull() != null) {
-
-                val number = text.toInt()
+        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 when (currentSelectedFilter) {
-                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(number)
-                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(number)
-                    is VideoFilter.Saturation -> meetingViewModel.filterPlugin.setSaturation(number)
-                    VideoFilter.Hue -> meetingViewModel.filterPlugin.setHue(number)
-                    VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(number)
-                    VideoFilter.Exposure -> meetingViewModel.filterPlugin.setExposure(number)
+                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(progress)
+                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress)
+                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress)
                     null -> {}
+                    else -> {}
                 }
 
             }
-        }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+        })
+
 
 
 
@@ -153,62 +144,20 @@ class FilterBottomSheet(
                 when (tab?.tag) {
                     is VideoFilter.Brightness -> {
                         currentSelectedFilter = VideoFilter.Brightness
-                        binding.list.smoothScrollToPosition(
-                            (meetingViewModel.filterPlugin.getBrightnessProgress() + padding - 1).coerceIn(
-                                0, 100
-                            )
-                        )
+                        binding.seekBar.progress = meetingViewModel.filterPlugin.getBrightnessProgress()
                     }
 
                     is VideoFilter.Sharpness -> {
                         currentSelectedFilter = VideoFilter.Sharpness
-                        binding.list.smoothScrollToPosition(
-                            (meetingViewModel.filterPlugin.getSharpnessProgress() + padding - 1).coerceIn(
-                                0, 100
-                            )
-                        )
-
+                        binding.seekBar.progress = meetingViewModel.filterPlugin.getSharpnessProgress()
                     }
 
-                    is VideoFilter.Saturation -> {
-                        currentSelectedFilter = VideoFilter.Saturation
-                        binding.list.smoothScrollToPosition(
-                            (meetingViewModel.filterPlugin.getSaturationProgress() + padding - 1).coerceIn(
-                                0, 100
-                            )
-                        )
-
-                    }
-
-                    is VideoFilter.Hue -> {
-                        currentSelectedFilter = VideoFilter.Hue
-                        binding.list.smoothScrollToPosition(
-                            (meetingViewModel.filterPlugin.getHueProgress() + padding - 1).coerceIn(
-                                0, 100
-                            )
-                        )
-
-                    }
 
                     is VideoFilter.Contrast -> {
                         currentSelectedFilter = VideoFilter.Contrast
-                        binding.list.smoothScrollToPosition(
-                            (meetingViewModel.filterPlugin.getContrastProgress() + padding - 1).coerceIn(
-                                0, 100
-                            )
-                        )
-
+                        binding.seekBar.progress = meetingViewModel.filterPlugin.getContrastProgress()
                     }
 
-                    is VideoFilter.Exposure -> {
-                        currentSelectedFilter = VideoFilter.Exposure
-                        binding.list.smoothScrollToPosition(
-                            (meetingViewModel.filterPlugin.getExposureProgress() + padding - 1).coerceIn(
-                                0, 100
-                            )
-                        )
-
-                    }
 
                     else -> {
 
@@ -243,9 +192,8 @@ class FilterBottomSheet(
                 this.newTab().setText("Brightness").setTag(VideoFilter.Brightness), true
             )
             addTab(
-                this.newTab().setText("Beauty level").setTag(VideoFilter.Contrast)
+                this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
             )
-            addTab(this.newTab().setText("Tone").setTag(VideoFilter.Exposure))
             addTab(
                 this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
             )
