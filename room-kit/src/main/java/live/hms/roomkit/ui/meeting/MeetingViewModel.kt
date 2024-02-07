@@ -57,7 +57,6 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
-import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
