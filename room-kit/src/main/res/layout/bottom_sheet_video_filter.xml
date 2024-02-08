@@ -56,7 +56,7 @@
 
         <androidx.appcompat.widget.SwitchCompat
             android:layout_marginHorizontal="@dimen/spacing_d3"
-            android:text="Video Filter (Enable/Disable)"
+            android:text="Video Filter (Disable/Enable)"
             android:layout_marginTop="@dimen/spacing_d1"
             android:paddingBottom="-16dp"
             android:id="@+id/plugin_switch"
