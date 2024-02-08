@@ -135,6 +135,7 @@ class FilterBottomSheet(
 
                     is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress)
                     is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress)
+                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress)
                     null -> {}
                     else -> {}
                 }
@@ -176,6 +177,12 @@ class FilterBottomSheet(
                             meetingViewModel.filterPlugin.getContrastProgress()
                     }
 
+                    is VideoFilter.Redness -> {
+                        currentSelectedFilter = VideoFilter.Redness
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getRednessProgress()
+                    }
+
 
                     else -> {
 
@@ -214,6 +221,9 @@ class FilterBottomSheet(
             )
             addTab(
                 this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
+            )
+            addTab(
+                this.newTab().setText("Redness").setTag(VideoFilter.Redness)
             )
             setSelectedTabIndicatorColor(Color.TRANSPARENT)
         }
