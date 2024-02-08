@@ -203,7 +203,7 @@ class LeaderBoardBottomSheetFragment : BottomSheetDialogFragment() {
             leaderBoardListadapter.add(
                 LeaderBoardSubGrid(
                     "YOUR RANK",
-                    "$position/${model.entries!!.size}"
+                    "$position"
                 )
             )
 
