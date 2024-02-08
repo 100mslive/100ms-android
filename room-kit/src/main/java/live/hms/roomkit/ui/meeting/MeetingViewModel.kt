@@ -350,7 +350,7 @@ class MeetingViewModel(
     private val previewErrorData: MutableLiveData<HMSException> = MutableLiveData()
     private val previewUpdateData: MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> =
         MutableLiveData()
-    val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(false)
+    val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(settings.showStats)
     val peerCount = MutableLiveData(0)
 
     val previewRoomStateLiveData: LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
