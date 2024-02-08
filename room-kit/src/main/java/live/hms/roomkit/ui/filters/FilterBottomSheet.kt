@@ -15,6 +15,7 @@ import android.widget.FrameLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.SnapHelper
@@ -112,12 +113,26 @@ class FilterBottomSheet(
 
 
 
+        (binding.pluginSwitch as SwitchCompat).isChecked = true
         meetingViewModel.setupFilterVideoPlugin()
+        (binding.pluginSwitch as SwitchCompat).setTextColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+        (binding.pluginSwitch as SwitchCompat).setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) meetingViewModel.setupFilterVideoPlugin()
+            else meetingViewModel.removeVideoFilterPlugIn()
+        }
 
-        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 when (currentSelectedFilter) {
-                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(progress)
+                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(
+                        progress
+                    )
+
                     is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress)
                     is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress)
                     null -> {}
@@ -144,18 +159,21 @@ class FilterBottomSheet(
                 when (tab?.tag) {
                     is VideoFilter.Brightness -> {
                         currentSelectedFilter = VideoFilter.Brightness
-                        binding.seekBar.progress = meetingViewModel.filterPlugin.getBrightnessProgress()
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getBrightnessProgress()
                     }
 
                     is VideoFilter.Sharpness -> {
                         currentSelectedFilter = VideoFilter.Sharpness
-                        binding.seekBar.progress = meetingViewModel.filterPlugin.getSharpnessProgress()
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getSharpnessProgress()
                     }
 
 
                     is VideoFilter.Contrast -> {
                         currentSelectedFilter = VideoFilter.Contrast
-                        binding.seekBar.progress = meetingViewModel.filterPlugin.getContrastProgress()
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getContrastProgress()
                     }
 
 

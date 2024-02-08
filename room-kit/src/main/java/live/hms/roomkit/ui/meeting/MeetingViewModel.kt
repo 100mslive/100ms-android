@@ -219,6 +219,23 @@ class MeetingViewModel(
         }
     }
 
+    fun removeVideoFilterPlugIn() {
+
+        if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
+            hmsSDK.removePlugin(filterPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess() {
+
+                }
+
+            })
+        }
+
+    }
+
 
     fun joinRoomUsingToken(token: String, hmsPrebuiltOptions: HMSPrebuiltOptions?, onHMSActionResultListener: HMSActionResultListener?) {
 
