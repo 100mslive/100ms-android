@@ -222,6 +222,7 @@ class MeetingViewModel(
     fun removeVideoFilterPlugIn() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
+            filterPlugin.stop()
             hmsSDK.removePlugin(filterPlugin, object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
 
