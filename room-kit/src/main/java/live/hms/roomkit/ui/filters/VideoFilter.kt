@@ -5,6 +5,7 @@ sealed class VideoFilter {
     object Sharpness : VideoFilter()
     object Saturation : VideoFilter()
     object Redness : VideoFilter()
+    object Smoothness : VideoFilter()
     object Hue : VideoFilter()
     object Contrast : VideoFilter()
     object Exposure : VideoFilter()
