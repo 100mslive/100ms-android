@@ -1187,6 +1187,9 @@ class MeetingFragment : Fragment() {
                                 )
                             }
                         },
+                        onNoiseClicked = {
+                            Toast.makeText(requireContext(), "Noise cancellation: ${meetingViewModel.toggleNoiseCancellation()}", Toast.LENGTH_LONG).show()
+                        }
                     ).show(
                         childFragmentManager, AudioSwitchBottomSheetTAG
                     )

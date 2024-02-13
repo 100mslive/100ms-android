@@ -32,7 +32,8 @@ class SessionOptionBottomSheet(
     private val onRaiseHandClicked: () -> Unit,
     private val onNameChange: () -> Unit,
     private val showPolls: () -> Unit,
-    private val disableHandRaiseDisplay : Boolean = false
+    private val disableHandRaiseDisplay : Boolean = false,
+    private val onNoiseClicked : (() -> Unit)? = null
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
@@ -114,6 +115,11 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val noiseButton = GridOptionItem("Noise On/Off", R.drawable.baseline_noise_aware_24, {
+            onNoiseClicked?.invoke()
+            dismiss()
+        }, isSelected = false)
+
         val peerListOption = GridOptionItem(
             resources.getString(R.string.peer_list), R.drawable.ic_icon_people, {
                 onPeerListClicked.invoke()
@@ -143,6 +149,7 @@ class SessionOptionBottomSheet(
 
 
         val group: Group = Section().apply {
+            add(noiseButton)
             if (meetingViewModel.isParticpantListEnabled())
             add(peerListOption)
             if (meetingViewModel.isBRBEnabled())
