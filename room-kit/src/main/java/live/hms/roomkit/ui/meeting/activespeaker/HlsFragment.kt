@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageButton
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -85,6 +87,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
+import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -249,6 +252,7 @@ private const val SECONDS_FROM_LIVE = 10
                     val isChatEnabled by rememberSaveable { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
+                    val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
 
                     fun openSessionOptions() {
                         SessionOptionBottomSheet(
@@ -298,7 +302,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
-                                sessionOptionsButtonTapped = ::openSessionOptions
+                                sessionOptionsButtonTapped = ::openSessionOptions,
+                                showDvrControls = showDvrControls
                             )
                             Column {
                                 if(chatOpen) {
@@ -344,7 +349,8 @@ private const val SECONDS_FROM_LIVE = 10
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
-                                sessionOptionsButtonTapped = ::openSessionOptions
+                                sessionOptionsButtonTapped = ::openSessionOptions,
+                                showDvrControls = showDvrControls
                             )
                             if(chatOpen) {
                                 ChatHeader(
@@ -397,9 +403,6 @@ private const val SECONDS_FROM_LIVE = 10
                 1000
             )
         } s"
-    }
-    private fun streamEnded() {
-
     }
     private fun setStatsVisibility(enable: Boolean) {
         if (isStatsDisplayActive && enable) {
@@ -704,7 +707,8 @@ fun HlsComposable(
     closedCaptionsEnabled : Boolean,
     isHandRaised : Boolean,
     toggleHandRaise : () -> Unit,
-    sessionOptionsButtonTapped : () -> Unit
+    sessionOptionsButtonTapped : () -> Unit,
+    showDvrControls : Boolean
 ) {
 
     lateinit var scaleGestureListener : ScaleGestureDetector
@@ -715,20 +719,20 @@ fun HlsComposable(
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
                 .aspectRatio(ratio = 16f / 9)
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        videoTapped()
-                    })
-                }
+//                .pointerInput(Unit) {
+//                    detectTapGestures(onTap = {
+//                        videoTapped()
+//                    })
+//                }
                 .fillMaxWidth()
         } else if(chatOpen && isLandscape) {
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        videoTapped()
-                    })
-                }
+//                .pointerInput(Unit) {
+//                    detectTapGestures(onTap = {
+//                        videoTapped()
+//                    })
+//                }
                 .fillMaxHeight()
                 .fillMaxWidth(0.6f)
         }
@@ -740,11 +744,11 @@ fun HlsComposable(
 //                .pointerInteropFilter { event ->
 //                    scaleGestureListener.onTouchEvent(event)
 //                }
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        videoTapped()
-                    })
-                }
+//                .pointerInput(Unit) {
+//                    detectTapGestures(onTap = {
+//                        videoTapped()
+//                    })
+//                }
         }
 
         AndroidView(modifier = hlsModifier, factory = {
@@ -773,7 +777,6 @@ fun HlsComposable(
         }, onRelease = {
             player.getNativePlayer().setVideoSurface(null)
         })
-        // Only hide if it's landscape and fullscreen and the controls are hidden
 
 
         if (closedCaptionsEnabled) {
@@ -811,6 +814,9 @@ fun HlsComposable(
             enter = fadeIn(animationSpec = tween(250)),
             exit = fadeOut(animationSpec = tween(250))
         ) {
+            if(showDvrControls) {
+                DvrControls(hlsModifier, player)
+            }
             // Draw the items in a grid with the same size as
             // the hls video by applying hls video size with BoxWithConstraints.
             BoxWithConstraints(modifier = hlsModifier,
@@ -857,7 +863,9 @@ fun HlsComposable(
             CloseButton(onCloseButtonClicked)
         }
         if (!isChatEnabled) {
-            Box(modifier = Modifier.fillMaxSize().padding(vertical = Spacing0),
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = Spacing0),
                 contentAlignment = Alignment.BottomCenter) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -869,6 +877,24 @@ fun HlsComposable(
             }
         }
     }
+}
+
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+@Composable
+fun DvrControls(hlsModifier: Modifier, player: HmsHlsPlayer) {
+    AndroidView(modifier = hlsModifier, factory = {
+        PlayerControlView(it).apply {
+            setPlayer(player.getNativePlayer())
+            // Don't auto hide the player
+            showTimeoutMs = 0
+            isAnimationEnabled = false
+            showSubtitleButton = false
+//            findViewById<FrameLayout>(R.id.exo_bottom_bar).visibility = View.GONE
+            findViewById<ImageButton>(R.id.exo_settings).visibility = View.GONE
+        }
+    }, update = {
+//            it.showSubtitleButton = closedCaptionsEnabled
+    })
 }
 
 @Composable
@@ -1072,7 +1098,7 @@ fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
         modifier = Modifier
             .clickable { buttonClicked() }
             .size(64.dp),
-        painter = painterResource(id = if(isPlaying == true) live.hms.roomkit.R.drawable.hls_paused_btn else live.hms.roomkit.R.drawable.hls_play_btn),
+        painter = painterResource(id = if(isPlaying == true) live.hms.roomkit.R.drawable.exo_styled_controls_pause else live.hms.roomkit.R.drawable.exo_styled_controls_play),
         contentDescription = "Play",
         contentScale = ContentScale.None
     )
