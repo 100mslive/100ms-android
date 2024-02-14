@@ -198,6 +198,10 @@ class MeetingFragment : Fragment() {
     private fun updateActionVolumeMenuIcon(
         audioOutputType: HMSAudioManager.AudioDevice? = null
     ) {
+        if (meetingViewModel.isPeerAudioEnabled().not()) {
+            binding.iconOutputDevice.setIconEnabled(R.drawable.ic_volume_off_24)
+            return
+        }
         binding.iconOutputDevice.apply {
             when (audioOutputType) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
