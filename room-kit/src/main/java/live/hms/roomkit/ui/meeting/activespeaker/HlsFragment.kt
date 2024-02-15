@@ -10,9 +10,8 @@ import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageButton
 import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -20,7 +19,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -34,7 +32,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -58,7 +55,6 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -83,7 +79,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
@@ -131,6 +126,7 @@ import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.models.enums.HMSRecordingState
+import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -269,6 +265,7 @@ private const val SECONDS_FROM_LIVE = 10
                             childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                         )
                     }
+
                     OrientationSwapper({ isLandScape ->
                         Row {
 
@@ -302,7 +299,13 @@ private const val SECONDS_FROM_LIVE = 10
                                 isHandRaised = isHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
-                                showDvrControls = showDvrControls
+                                showDvrControls = showDvrControls,
+                                forwardButton = { ForwardButton {
+                                    player.seekForward(10, TimeUnit.SECONDS)
+                                } },
+                                rewindButton = {RewindButton {
+                                    player.seekBackward(10, TimeUnit.SECONDS)
+                                }},
                             )
                             Column {
                                 if(chatOpen) {
@@ -349,7 +352,13 @@ private const val SECONDS_FROM_LIVE = 10
                                 isHandRaised = isHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
-                                showDvrControls = showDvrControls
+                                showDvrControls = showDvrControls,
+                                forwardButton = { ForwardButton {
+                                    player.seekForward(10, TimeUnit.SECONDS)
+                                }},
+                                rewindButton = { RewindButton {
+                                    player.seekBackward(10, TimeUnit.SECONDS)
+                                } },
                             )
                             if(chatOpen) {
                                 ChatHeader(
@@ -707,7 +716,9 @@ fun HlsComposable(
     isHandRaised : Boolean,
     toggleHandRaise : () -> Unit,
     sessionOptionsButtonTapped : () -> Unit,
-    showDvrControls : Boolean
+    showDvrControls : Boolean,
+    forwardButton: @Composable () -> Unit,
+    rewindButton : @Composable () -> Unit,
 ) {
 
     lateinit var scaleGestureListener : ScaleGestureDetector
@@ -814,7 +825,9 @@ fun HlsComposable(
             exit = fadeOut(animationSpec = tween(250))
         ) {
             if(showDvrControls || true) {
-                DvrControls(hlsModifier, player)
+                DvrControls(hlsModifier, player, forwardButton = forwardButton,
+                    rewindButton = rewindButton,
+                    playPauseButton = pauseButton)
             }
             // Draw the items in a grid with the same size as
             // the hls video by applying hls video size with BoxWithConstraints.
@@ -880,8 +893,15 @@ fun HlsComposable(
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun DvrControls(hlsModifier: Modifier, player: HmsHlsPlayer) {
-    BoxWithConstraints(modifier = hlsModifier) {
+fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Composable () -> Unit,
+                rewindButton : @Composable () -> Unit,
+                forwardButton : @Composable () -> Unit ) {
+    BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+        Row(horizontalArrangement = Arrangement.spacedBy(24.dp)){
+            rewindButton()
+            playPauseButton()
+            forwardButton()
+        }
         Column {
             Spacer(Modifier.weight(1f))
             AndroidView(modifier = Modifier.wrapContentSize(), factory = {
@@ -1094,6 +1114,32 @@ fun OrientationSwapper(
             portrait(false)
         }
     }
+}
+
+@Composable
+fun ForwardButton(buttonClicked: () -> Unit) {
+    BaseButton(buttonClicked = buttonClicked, id = live.hms.roomkit.R.drawable.hls_forward_arrow, description = "Forward 15 seconds")
+}
+@Composable
+fun RewindButton(buttonClicked : () -> Unit) {
+    BaseButton(
+        buttonClicked = buttonClicked,
+        id = live.hms.roomkit.R.drawable.hls_backward_arrow,
+        description = "Rewind ten seconds"
+    )
+}
+
+@Composable
+fun BaseButton(buttonClicked : () -> Unit, @DrawableRes id : Int, description : String) {
+    Image(
+        modifier = Modifier
+            .clickable { buttonClicked() }
+            .size(64.dp),
+        painter = painterResource(id = id),
+        contentDescription = description,
+        contentScale = ContentScale.None
+    )
+
 }
 @Composable
 fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
