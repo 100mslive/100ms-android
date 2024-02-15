@@ -35,7 +35,7 @@ import live.hms.video.sdk.HMSSDK
     val streamEndedEvent = SingleLiveEvent<Unit>()
     val currentSubtitles = MutableLiveData<String?>()
 
-    val player = HmsHlsPlayer(application, hmsSdk).apply {
+    val player = HmsHlsPlayer(application, hmsSdk,10_000,10_000).apply {
         setListeners(this)
         play(hlsStreamUrl)
     }

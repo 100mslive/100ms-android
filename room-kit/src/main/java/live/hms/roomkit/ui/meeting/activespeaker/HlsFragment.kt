@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -86,9 +87,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
 import androidx.media3.ui.PlayerControlView
-import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -814,7 +813,7 @@ fun HlsComposable(
             enter = fadeIn(animationSpec = tween(250)),
             exit = fadeOut(animationSpec = tween(250))
         ) {
-            if(showDvrControls) {
+            if(showDvrControls || true) {
                 DvrControls(hlsModifier, player)
             }
             // Draw the items in a grid with the same size as
@@ -882,19 +881,23 @@ fun HlsComposable(
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun DvrControls(hlsModifier: Modifier, player: HmsHlsPlayer) {
-    AndroidView(modifier = hlsModifier, factory = {
-        PlayerControlView(it).apply {
-            setPlayer(player.getNativePlayer())
-            // Don't auto hide the player
-            showTimeoutMs = 0
-            isAnimationEnabled = false
-            showSubtitleButton = false
-//            findViewById<FrameLayout>(R.id.exo_bottom_bar).visibility = View.GONE
-            findViewById<ImageButton>(R.id.exo_settings).visibility = View.GONE
+    BoxWithConstraints(modifier = hlsModifier) {
+        Column {
+            Spacer(Modifier.weight(1f))
+            AndroidView(modifier = Modifier.wrapContentSize(), factory = {
+                (LayoutInflater.from(it)
+                    .inflate(live.hms.roomkit.R.layout.player_controls, null) as PlayerControlView)
+                    .apply {
+                        setPlayer(player.getNativePlayer())
+                        this.findViewById<LinearLayout>(androidx.media3.ui.R.id.exo_center_controls).visibility =
+                            View.GONE
+                        this.findViewById<View>(androidx.media3.ui.R.id.exo_controls_background).visibility =
+                            View.GONE
+                    }
+            }, update = {
+            })
         }
-    }, update = {
-//            it.showSubtitleButton = closedCaptionsEnabled
-    })
+    }
 }
 
 @Composable
