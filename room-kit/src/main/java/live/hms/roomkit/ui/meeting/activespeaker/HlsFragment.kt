@@ -207,7 +207,7 @@ private const val SECONDS_FROM_LIVE = 10
                 var controlsVisible by remember { mutableStateOf(false) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
-                val isLive by hlsViewModel.isLive.observeAsState()
+                val isLive by hlsViewModel.isLive.observeAsState(false)
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
                 var ticks by remember { mutableLongStateOf(0) }
