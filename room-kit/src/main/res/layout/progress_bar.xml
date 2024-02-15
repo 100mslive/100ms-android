@@ -36,8 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/eight_dp"
             android:fontFamily="@font/inter_semibold"
-            android:text="Your lost your network connection.
-Trying to reconnect."
+            android:text="You have lost your network connection. Attempting to reconnect."
             android:textSize="14sp" />
 
 
