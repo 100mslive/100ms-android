@@ -300,7 +300,7 @@ private const val SECONDS_FROM_LIVE = 10
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
                                 showDvrControls = showDvrControls,
-                                forwardButton = { ForwardButton {
+                                forwardButton = { ForwardButton(isLive) {
                                     player.seekForward(10, TimeUnit.SECONDS)
                                 } },
                                 rewindButton = {RewindButton {
@@ -353,11 +353,13 @@ private const val SECONDS_FROM_LIVE = 10
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
                                 showDvrControls = showDvrControls,
-                                forwardButton = { ForwardButton {
+                                forwardButton = { ForwardButton(isLive) {
                                     player.seekForward(10, TimeUnit.SECONDS)
+                                    player.getNativePlayer().play()
                                 }},
                                 rewindButton = { RewindButton {
                                     player.seekBackward(10, TimeUnit.SECONDS)
+                                    player.getNativePlayer().play()
                                 } },
                             )
                             if(chatOpen) {
@@ -1117,8 +1119,10 @@ fun OrientationSwapper(
 }
 
 @Composable
-fun ForwardButton(buttonClicked: () -> Unit) {
-    BaseButton(buttonClicked = buttonClicked, id = live.hms.roomkit.R.drawable.hls_forward_arrow, description = "Forward 15 seconds")
+fun ForwardButton(isDisabled : Boolean, buttonClicked: () -> Unit) {
+    BaseButton(buttonClicked = {if(!isDisabled) {
+        buttonClicked()
+    }}, id = if(!isDisabled) live.hms.roomkit.R.drawable.hls_forward_arrow else live.hms.roomkit.R.drawable.forward_arrow_dimmed, description = "Forward 15 seconds")
 }
 @Composable
 fun RewindButton(buttonClicked : () -> Unit) {
