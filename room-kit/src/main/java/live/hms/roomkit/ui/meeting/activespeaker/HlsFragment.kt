@@ -26,12 +26,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.captionBarPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -82,6 +84,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerControlView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -797,7 +800,7 @@ fun HlsComposable(
                     // allow touches to passthrough
                     false
                                                             },
-                contentAlignment = Alignment.BottomCenter
+                contentAlignment = Alignment.BottomCenter,
             ) {
 
                 val subtitles by hlsViewModel.currentSubtitles.observeAsState()
@@ -906,7 +909,7 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
         }
         Column {
             Spacer(Modifier.weight(1f))
-            AndroidView(modifier = Modifier.wrapContentSize(), factory = {
+            AndroidView(modifier = Modifier.fillMaxSize(), factory = {
                 (LayoutInflater.from(it)
                     .inflate(live.hms.roomkit.R.layout.player_controls, null) as PlayerControlView)
                     .apply {
@@ -914,6 +917,8 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
                         this.findViewById<LinearLayout>(androidx.media3.ui.R.id.exo_center_controls).visibility =
                             View.GONE
                         this.findViewById<View>(androidx.media3.ui.R.id.exo_controls_background).visibility =
+                            View.GONE
+                        this.findViewById<View>(androidx.media3.ui.R.id.exo_bottom_bar).visibility =
                             View.GONE
                     }
             }, update = {
