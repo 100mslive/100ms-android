@@ -1243,6 +1243,7 @@ class MeetingViewModel(
         }
     }
 
+    val showDvrControls = MutableLiveData<Boolean>()
     val showAudioIcon : MutableLiveData<Boolean> = MutableLiveData(false)
     val showHlsStreamYetToStartError = MutableLiveData<Boolean>(false)
     private fun switchToHlsViewIfRequired(role: HMSRole?, streamUrl: String?) {
@@ -1282,6 +1283,7 @@ class MeetingViewModel(
     fun switchToHlsViewIfRequired() {
         // get the hls URL from the Room, if it exists
         val hlsUrl = hmsSDK.getRoom()?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+        showDvrControls.postValue(hmsSDK.getRoom()?.hlsStreamingState?.variants?.get(0)?.playlistType == HMSHLSPlaylistType.dvr)
         switchToHlsViewIfRequired(hmsSDK.getLocalPeer()?.hmsRole, hlsUrl)
     }
 
@@ -2407,6 +2409,10 @@ class MeetingViewModel(
     val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
 
     fun getLogo() = getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
+
+    fun getLiveStreamingHeaderTitle(): String?{
+        return prebuiltInfoContainer.getLiveStreamingHeaderTitle()
+    }
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
 }
 

@@ -17,6 +17,7 @@ import live.hms.hls_player.HmsHlsException
 import live.hms.hls_player.HmsHlsPlaybackEvents
 import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
+import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.sdk.HMSSDK
 
@@ -32,6 +33,7 @@ import live.hms.video.sdk.HMSSDK
     val progressBarVisible = videoVisible.map { !it }
     val isZoomEnabled = MutableLiveData(false)
     val isLive = MutableLiveData(true)
+    val behindLiveByLiveData = MutableLiveData("0:0")
     val streamEndedEvent = SingleLiveEvent<Unit>()
     val currentSubtitles = MutableLiveData<String?>()
 

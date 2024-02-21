@@ -128,6 +128,18 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     fun shouldSkipPreview(): Boolean {
         return hmsRoomLayout?.data?.get(0)?.screens?.preview?.skipPreview == true
     }
+
+    fun getLiveStreamingHeaderTitle() : String? {
+        val localPeer = hmssdk.getLocalPeer()
+
+        return if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.hlsLiveStreaming?.elements
+                ?.hlsLiveStreamingHeader?.title
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements
+                ?.hlsLiveStreamingHeader?.title
+        }
+    }
 }
 
 data class AllowedToMessageParticipants(

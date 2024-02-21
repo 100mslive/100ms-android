@@ -8,9 +8,11 @@ import android.provider.OpenableColumns
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.media3.common.C
 import live.hms.video.utils.HMSLogger
 import java.io.IOException
 import java.io.InputStream
+import java.util.Formatter
 
 
 /**
@@ -61,6 +63,22 @@ fun Uri.getName(context: Context): String? {
   } catch (e: Exception) {
     null
   }
+}
+
+fun getStringForTime(builder: StringBuilder, formatter: Formatter, timeMs: Long): String {
+  var timeMs = timeMs
+  if (timeMs == C.TIME_UNSET) {
+    timeMs = 0
+  }
+  val prefix = if (timeMs < 0) "-" else ""
+  timeMs = Math.abs(timeMs)
+  val totalSeconds = (timeMs + 500) / 1000
+  val seconds = totalSeconds % 60
+  val minutes = totalSeconds / 60 % 60
+  val hours = totalSeconds / 3600
+  builder.setLength(0)
+  return if (hours > 0) formatter.format("%s%d:%02d:%02d", prefix, hours, minutes, seconds)
+    .toString() else formatter.format("%s%02d:%02d", prefix, minutes, seconds).toString()
 }
 
 fun Fragment.contextSafe(funCall: (context: Context, activity: FragmentActivity) -> Unit) {
