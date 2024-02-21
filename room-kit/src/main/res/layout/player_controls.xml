@@ -9,6 +9,7 @@
     app:show_subtitle_button="false"
     app:played_color="#2572ED"
     app:scrubber_drawable="@drawable/scrubber_drawable"
+    app:scrubber_dragged_size="15dp"
     app:buffered_color="#19FFFFFF"
     app:unplayed_color="#19FFFFFF"
     >

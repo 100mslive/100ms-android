@@ -2409,6 +2409,10 @@ class MeetingViewModel(
     val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
 
     fun getLogo() = getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
+
+    fun getLiveStreamingHeaderTitle(): String?{
+        return prebuiltInfoContainer.getLiveStreamingHeaderTitle()
+    }
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
 }
 

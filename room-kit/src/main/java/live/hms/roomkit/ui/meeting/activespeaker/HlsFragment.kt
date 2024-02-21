@@ -80,12 +80,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerControlView
+import androidx.media3.ui.TimeBar
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -123,12 +125,16 @@ import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.util.getStringForTime
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.models.enums.HMSRecordingState
+import java.util.Formatter
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -138,7 +144,7 @@ import kotlin.time.Duration.Companion.seconds
  * If the stream is this many seconds behind live
  *  show the live buttons.
  */
-private const val SECONDS_FROM_LIVE = 10
+private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
 @UnstableApi class HlsFragment : Fragment() {
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
@@ -161,6 +167,9 @@ private const val SECONDS_FROM_LIVE = 10
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+
+    private val builder = StringBuilder()
+    private val formatter = Formatter(builder, Locale.getDefault())
 
     private val chatAdapter by lazy {
         ChatAdapter({ message ->
@@ -196,7 +205,6 @@ private const val SECONDS_FROM_LIVE = 10
             seekToDefaultPosition()
         }
     }
-
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -211,6 +219,7 @@ private const val SECONDS_FROM_LIVE = 10
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
                 val isLive by hlsViewModel.isLive.observeAsState(false)
+                val behindLiveByState by hlsViewModel.behindLiveByLiveData.observeAsState("00:00")
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
                 var ticks by remember { mutableLongStateOf(0) }
@@ -296,6 +305,7 @@ private const val SECONDS_FROM_LIVE = 10
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
+                                behindBy = behindLiveByState,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
@@ -349,6 +359,7 @@ private const val SECONDS_FROM_LIVE = 10
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
+                                behindBy = behindLiveByState,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
@@ -367,7 +378,7 @@ private const val SECONDS_FROM_LIVE = 10
                             )
                             if(chatOpen) {
                                 ChatHeader(
-                                    "Tech talks", meetingViewModel.getLogo(),
+                                    meetingViewModel.getLiveStreamingHeaderTitle(), meetingViewModel.getLogo(),
                                     viewers ?:0,
                                     ticks,
                                     recordingState
@@ -465,8 +476,9 @@ private const val SECONDS_FROM_LIVE = 10
 
     fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
         // It's live if the distance from the live edge is less than 10 seconds.
-        val isLive = playerStats.distanceFromLive / 1000 < SECONDS_FROM_LIVE
+        val isLive = playerStats.distanceFromLive < MILLI_SECONDS_FROM_LIVE
         hlsViewModel.isLive.postValue(isLive)
+        hlsViewModel.behindLiveByLiveData.postValue(getStringForTime(builder, formatter, playerStats.distanceFromLive*-1) )
         // Show the button to go to live if it's not live.
     }
 
@@ -480,7 +492,7 @@ private const val SECONDS_FROM_LIVE = 10
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMillis: Long,
+fun ChatHeader(headingText: String?, logoUrl: String?, viewers: Int, startedMillis: Long,
                recordingState : HMSRecordingState?
 ) {
     fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
@@ -504,16 +516,19 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
             contentDescription = "Logo"
         )
         Column {
-//            Text(
-//                headingText, style = TextStyle(
-//                    fontSize = 14.sp,
-//                    lineHeight = 20.sp,
-//                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-//                    fontWeight = FontWeight(600),
-//                    color = Variables.OnSecondaryHigh,
-//                    letterSpacing = 0.1.sp,
-//                )
-//            )
+            headingText?.let {
+                Text(
+                    it, style = TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                        fontWeight = FontWeight(600),
+                        color = Variables.OnSecondaryHigh,
+                        letterSpacing = 0.1.sp,
+                    )
+                )
+            }
+
             Text(
                 "${getViewersDisplayNum(viewers)} watching · Started ${
                     getTimeDisplayNum(
@@ -619,11 +634,11 @@ fun ChatPreview() {
 }
 
 @Composable
-fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?,isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
+fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?, behindBy: String, isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically){
-        GoLiveText(isLive ?: false, goLiveClicked)
+        GoLiveText(isLive ?: false, behindBy, goLiveClicked)
         Spacer(Modifier.weight(1f))
         if(isChatEnabled) {
             MaximizeButton(maximizeClicked, isMaximized)
@@ -633,10 +648,10 @@ fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?,isMaximized: Boolean
 @Preview
 @Composable
 fun BottomBarPreview() {
-    HlsBottomBar(true,false,false,{}){}
+    HlsBottomBar(true,false,"-01:20",false,{}){}
 }
 @Composable
-fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
+fun GoLiveText(isLive : Boolean, behindBy: String, goLiveClicked : () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
 
         Image(
@@ -659,7 +674,22 @@ fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
                 letterSpacing = 0.5.sp,
             )
         )
-
+        AnimatedVisibility(visible = !isLive) {
+            Text(
+                text = behindBy,
+                modifier = Modifier
+                    .clickable { goLiveClicked() }
+                    .padding(start = Spacing1),
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                    fontWeight = FontWeight(600),
+                    color = if(isLive) Variables.OnSurfaceHigh else Variables.OnSurfaceMedium,
+                    letterSpacing = 0.5.sp,
+                )
+            )
+        }
     }
 }
 @Composable
@@ -714,6 +744,7 @@ fun HlsComposable(
     chatOpen : Boolean,
     isLandscape : Boolean,
     isLive : Boolean?,
+    behindBy : String,
     isChatEnabled : Boolean,
     goLiveClicked : () -> Unit,
     onCloseButtonClicked: () -> Unit,
@@ -829,7 +860,7 @@ fun HlsComposable(
             enter = fadeIn(animationSpec = tween(250)),
             exit = fadeOut(animationSpec = tween(250))
         ) {
-            if(showDvrControls || true) {
+            if(showDvrControls) {
                 DvrControls(hlsModifier, player, forwardButton = forwardButton,
                     rewindButton = rewindButton,
                     playPauseButton = pauseButton)
@@ -862,6 +893,7 @@ fun HlsComposable(
                     HlsBottomBar(
                         isChatEnabled = isChatEnabled,
                         isLive = isLive,
+                        behindBy = behindBy,
                         isMaximized = !chatOpen,
                         maximizeClicked = maximizeClicked,
                         goLiveClicked = goLiveClicked
@@ -909,7 +941,7 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
         }
         Column {
             Spacer(Modifier.weight(1f))
-            AndroidView(modifier = Modifier.fillMaxSize(), factory = {
+            AndroidView(modifier = Modifier.wrapContentSize().padding(top = Spacing1), factory = {
                 (LayoutInflater.from(it)
                     .inflate(live.hms.roomkit.R.layout.player_controls, null) as PlayerControlView)
                     .apply {
