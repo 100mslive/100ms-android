@@ -837,15 +837,14 @@ fun HlsComposable(
                 val subtitles by hlsViewModel.currentSubtitles.observeAsState()
                 if(!subtitles.isNullOrEmpty()) {
                     Box(modifier = Modifier.padding(horizontal = Spacing0)) {
-                        Surface(color = Color.DarkGray) {
+                        Surface(color = Color.Black) {
                             Text(
                                 text = subtitles ?: "",
                                 modifier = Modifier.padding(Spacing1),
                                 style = TextStyle(
-                                    fontSize = 14.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_bold)),
-                                    fontWeight = FontWeight(600),
+                                    fontSize = 11.sp,
+                                    lineHeight = 13.sp,
+                                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
                                     color = Color.White,
                                     letterSpacing = 0.5.sp,
                                 )
