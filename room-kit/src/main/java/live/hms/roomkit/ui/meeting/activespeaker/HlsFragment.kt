@@ -123,6 +123,7 @@ import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
@@ -455,10 +456,14 @@ private const val SECONDS_FROM_LIVE = 10
     }
 
     private fun showTrackSelection(player: HmsHlsPlayer) {
-        val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
-        trackSelectionBottomSheet.show(
-            requireActivity().supportFragmentManager, "trackSelectionBottomSheet"
-        )
+        contextSafe { context, activity ->
+            meetingViewModel.setHLSPlayer(player)
+            val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet.newInstance()
+            trackSelectionBottomSheet.show(
+                childFragmentManager, "trackSelectionBottomSheet"
+            )
+
+        }
     }
 }
 

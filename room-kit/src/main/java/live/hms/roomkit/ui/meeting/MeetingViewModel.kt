@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -2407,6 +2408,13 @@ class MeetingViewModel(
     val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
 
     fun getLogo() = getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
+
+    var hmsPlayer : HmsHlsPlayer? = null
+    fun setHLSPlayer(player: HmsHlsPlayer) {
+        hmsPlayer = player
+    }
+
+    fun getHLSPLayer() = hmsPlayer
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
 }
 
