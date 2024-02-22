@@ -29,4 +29,5 @@
     <dimen name="participant_item_icon">24dp</dimen>
     <dimen name="participant_item_icon_padding">4dp</dimen>
     <dimen name="polls_switch_padding">8dp</dimen>
+    <dimen name="exo_styled_progress_margin_bottom">0dp</dimen>
 </resources>
