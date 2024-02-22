@@ -225,14 +225,6 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                 var ticks by remember { mutableLongStateOf(0) }
                 val recordingState by meetingViewModel.recordingState.observeAsState()
 
-                // Turn off controls 3 seconds after they become visible
-                LaunchedEffect(controlsVisible) {
-                    if(controlsVisible) {
-                        delay(3.seconds)
-                        controlsVisible = false
-                    }
-                }
-
                 LaunchedEffect(elapsedTime) {
                     elapsedTime?.let {
                         ticks = System.currentTimeMillis().minus(it)
