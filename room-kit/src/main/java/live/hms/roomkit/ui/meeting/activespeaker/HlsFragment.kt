@@ -88,6 +88,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.DefaultTimeBar
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.TimeBar
+import androidx.media3.ui.TimeBar.OnScrubListener
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -224,9 +225,10 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
                 var ticks by remember { mutableLongStateOf(0) }
                 val recordingState by meetingViewModel.recordingState.observeAsState()
+                var interacted by remember { mutableStateOf(false) }
 
                 // Turn off controls 3 seconds after they become visible
-                LaunchedEffect(controlsVisible) {
+                LaunchedEffect(controlsVisible, interacted) {
                     if(controlsVisible) {
                         delay(3.seconds)
                         controlsVisible = false
@@ -299,6 +301,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 else {
                                     player.getNativePlayer().play()
                                 }
+                                interacted = !interacted
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
                                 hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
@@ -315,10 +318,13 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 showDvrControls = showDvrControls,
                                 forwardButton = { ForwardButton(isLive) {
                                     player.seekForward(10, TimeUnit.SECONDS)
+                                    interacted = !interacted
                                 } },
                                 rewindButton = {RewindButton {
                                     player.seekBackward(10, TimeUnit.SECONDS)
+                                    interacted = !interacted
                                 }},
+                                interacted = { interacted = !interacted }
                             )
                             Column {
                                 if(chatOpen) {
@@ -353,6 +359,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                     else {
                                         player.getNativePlayer().play()
                                     }
+                                        interacted = !interacted
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
                                 hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
@@ -370,11 +377,14 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 forwardButton = { ForwardButton(isLive) {
                                     player.seekForward(10, TimeUnit.SECONDS)
                                     player.getNativePlayer().play()
+                                    interacted = !interacted
                                 }},
                                 rewindButton = { RewindButton {
                                     player.seekBackward(10, TimeUnit.SECONDS)
                                     player.getNativePlayer().play()
+                                    interacted = !interacted
                                 } },
+                                interacted = { interacted = !interacted }
                             )
                             if(chatOpen) {
                                 ChatHeader(
@@ -755,6 +765,7 @@ fun HlsComposable(
     showDvrControls : Boolean,
     forwardButton: @Composable () -> Unit,
     rewindButton : @Composable () -> Unit,
+    interacted : () -> Unit
 ) {
 
     lateinit var scaleGestureListener : ScaleGestureDetector
@@ -829,14 +840,15 @@ fun HlsComposable(
             BoxWithConstraints(
                 modifier = hlsModifier.pointerInteropFilter {
                     // allow touches to passthrough
-                    false
-                                                            },
+                    false },
                 contentAlignment = Alignment.BottomCenter,
             ) {
 
                 val subtitles by hlsViewModel.currentSubtitles.observeAsState()
                 if(!subtitles.isNullOrEmpty()) {
-                    Box(modifier = Modifier.padding(horizontal = Spacing0)) {
+                    Box(modifier = Modifier
+                        .padding(horizontal = Spacing0)
+                        .padding(bottom = 32.dp)) {
                         Surface(color = Color.Black) {
                             Text(
                                 text = subtitles ?: "",
@@ -862,7 +874,8 @@ fun HlsComposable(
             if(showDvrControls) {
                 DvrControls(hlsModifier, player, forwardButton = forwardButton,
                     rewindButton = rewindButton,
-                    playPauseButton = pauseButton)
+                    playPauseButton = pauseButton,
+                    interacted = interacted)
             }
             // Draw the items in a grid with the same size as
             // the hls video by applying hls video size with BoxWithConstraints.
@@ -931,7 +944,8 @@ fun HlsComposable(
 @Composable
 fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Composable () -> Unit,
                 rewindButton : @Composable () -> Unit,
-                forwardButton : @Composable () -> Unit ) {
+                forwardButton : @Composable () -> Unit,
+                interacted : () -> Unit) {
     BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)){
             rewindButton()
@@ -940,7 +954,9 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
         }
         Column {
             Spacer(Modifier.weight(1f))
-            AndroidView(modifier = Modifier.wrapContentSize().padding(top = Spacing1), factory = {
+            AndroidView(modifier = Modifier
+                .wrapContentSize()
+                .padding(top = Spacing1), factory = {
                 (LayoutInflater.from(it)
                     .inflate(live.hms.roomkit.R.layout.player_controls, null) as PlayerControlView)
                     .apply {
@@ -951,6 +967,24 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
                             View.GONE
                         this.findViewById<View>(androidx.media3.ui.R.id.exo_bottom_bar).visibility =
                             View.GONE
+                        this.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress).addListener(object : OnScrubListener {
+                            override fun onScrubStart(timeBar: TimeBar, position: Long) {
+                                interacted()
+                            }
+
+                            override fun onScrubMove(timeBar: TimeBar, position: Long) {
+                                interacted()
+                            }
+
+                            override fun onScrubStop(
+                                timeBar: TimeBar,
+                                position: Long,
+                                canceled: Boolean
+                            ) {
+                                // ignore
+                            }
+
+                        })
                     }
             }, update = {
             })
