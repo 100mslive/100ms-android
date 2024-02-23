@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -17,7 +19,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,13 +26,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.captionBarPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -55,7 +57,6 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -79,13 +80,15 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.ParametersBuilder
-import androidx.media3.ui.PlayerView
+import androidx.media3.ui.DefaultTimeBar
+import androidx.media3.ui.PlayerControlView
+import androidx.media3.ui.TimeBar
+import androidx.media3.ui.TimeBar.OnScrubListener
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -123,12 +126,18 @@ import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.util.contextSafe
+import live.hms.roomkit.util.getStringForTime
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.models.enums.HMSRecordingState
+import java.util.Formatter
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
@@ -137,7 +146,7 @@ import kotlin.time.Duration.Companion.seconds
  * If the stream is this many seconds behind live
  *  show the live buttons.
  */
-private const val SECONDS_FROM_LIVE = 10
+private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
 @UnstableApi class HlsFragment : Fragment() {
     private var binding by viewLifecycle<HlsFragmentLayoutBinding>()
@@ -160,6 +169,9 @@ private const val SECONDS_FROM_LIVE = 10
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+
+    private val builder = StringBuilder()
+    private val formatter = Formatter(builder, Locale.getDefault())
 
     private val chatAdapter by lazy {
         ChatAdapter({ message ->
@@ -195,7 +207,6 @@ private const val SECONDS_FROM_LIVE = 10
             seekToDefaultPosition()
         }
     }
-
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -206,22 +217,16 @@ private const val SECONDS_FROM_LIVE = 10
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                var controlsVisible by remember { mutableStateOf(false) }
+                var controlsVisible by remember { mutableStateOf(true) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
-                val isLive by hlsViewModel.isLive.observeAsState()
+                val isLive by hlsViewModel.isLive.observeAsState(false)
+                val behindLiveByState by hlsViewModel.behindLiveByLiveData.observeAsState("00:00")
                 val viewers by meetingViewModel.peerCount.observeAsState()
                 val elapsedTime by meetingViewModel.countDownTimerStartedAt.observeAsState()
                 var ticks by remember { mutableLongStateOf(0) }
                 val recordingState by meetingViewModel.recordingState.observeAsState()
-
-                // Turn off controls 3 seconds after they become visible
-                LaunchedEffect(controlsVisible) {
-                    if(controlsVisible) {
-                        delay(3.seconds)
-                        controlsVisible = false
-                    }
-                }
+                var interacted by remember { mutableStateOf(false) }
 
                 LaunchedEffect(elapsedTime) {
                     elapsedTime?.let {
@@ -249,6 +254,14 @@ private const val SECONDS_FROM_LIVE = 10
                     val isChatEnabled by rememberSaveable { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
+                    val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
+                    // Turn off controls 3 seconds after they become visible
+                    LaunchedEffect(controlsVisible, interacted) {
+                        if(controlsVisible) {
+                            delay(3.seconds)
+                            controlsVisible = false
+                        }
+                    }
 
                     fun openSessionOptions() {
                         SessionOptionBottomSheet(
@@ -266,6 +279,7 @@ private const val SECONDS_FROM_LIVE = 10
                             childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                         )
                     }
+
                     OrientationSwapper({ isLandScape ->
                         Row {
 
@@ -287,18 +301,30 @@ private const val SECONDS_FROM_LIVE = 10
                                 else {
                                     player.getNativePlayer().play()
                                 }
+                                interacted = !interacted
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
                                 hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
+                                behindBy = behindLiveByState,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
-                                sessionOptionsButtonTapped = ::openSessionOptions
+                                sessionOptionsButtonTapped = ::openSessionOptions,
+                                showDvrControls = showDvrControls,
+                                forwardButton = { ForwardButton(isLive) {
+                                    player.seekForward(10, TimeUnit.SECONDS)
+                                    interacted = !interacted
+                                } },
+                                rewindButton = {RewindButton {
+                                    player.seekBackward(10, TimeUnit.SECONDS)
+                                    interacted = !interacted
+                                }},
+                                interacted = { interacted = !interacted }
                             )
                             Column {
                                 if(chatOpen) {
@@ -333,22 +359,36 @@ private const val SECONDS_FROM_LIVE = 10
                                     else {
                                         player.getNativePlayer().play()
                                     }
+                                        interacted = !interacted
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
                                 hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
+                                behindBy = behindLiveByState,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
-                                sessionOptionsButtonTapped = ::openSessionOptions
+                                sessionOptionsButtonTapped = ::openSessionOptions,
+                                showDvrControls = showDvrControls,
+                                forwardButton = { ForwardButton(isLive) {
+                                    player.seekForward(10, TimeUnit.SECONDS)
+                                    player.getNativePlayer().play()
+                                    interacted = !interacted
+                                }},
+                                rewindButton = { RewindButton {
+                                    player.seekBackward(10, TimeUnit.SECONDS)
+                                    player.getNativePlayer().play()
+                                    interacted = !interacted
+                                } },
+                                interacted = { interacted = !interacted }
                             )
                             if(chatOpen) {
                                 ChatHeader(
-                                    "Tech talks", meetingViewModel.getLogo(),
+                                    meetingViewModel.getLiveStreamingHeaderTitle(), meetingViewModel.getLogo(),
                                     viewers ?:0,
                                     ticks,
                                     recordingState
@@ -398,9 +438,6 @@ private const val SECONDS_FROM_LIVE = 10
             )
         } s"
     }
-    private fun streamEnded() {
-
-    }
     private fun setStatsVisibility(enable: Boolean) {
         if (isStatsDisplayActive && enable) {
             binding.statsViewParent.visibility = View.VISIBLE
@@ -449,22 +486,27 @@ private const val SECONDS_FROM_LIVE = 10
 
     fun updateLiveButtonVisibility(playerStats: PlayerStatsModel) {
         // It's live if the distance from the live edge is less than 10 seconds.
-        val isLive = playerStats.distanceFromLive / 1000 < SECONDS_FROM_LIVE
+        val isLive = playerStats.distanceFromLive < MILLI_SECONDS_FROM_LIVE
         hlsViewModel.isLive.postValue(isLive)
+        hlsViewModel.behindLiveByLiveData.postValue(getStringForTime(builder, formatter, playerStats.distanceFromLive*-1) )
         // Show the button to go to live if it's not live.
     }
 
     private fun showTrackSelection(player: HmsHlsPlayer) {
-        val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet(player)
-        trackSelectionBottomSheet.show(
-            requireActivity().supportFragmentManager, "trackSelectionBottomSheet"
-        )
+        contextSafe { context, activity ->
+            meetingViewModel.setHLSPlayer(player)
+            val trackSelectionBottomSheet = HlsVideoQualitySelectorBottomSheet.newInstance()
+            trackSelectionBottomSheet.show(
+                childFragmentManager, "trackSelectionBottomSheet"
+            )
+
+        }
     }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMillis: Long,
+fun ChatHeader(headingText: String?, logoUrl: String?, viewers: Int, startedMillis: Long,
                recordingState : HMSRecordingState?
 ) {
     fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
@@ -488,16 +530,19 @@ fun ChatHeader(headingText: String, logoUrl: String?, viewers: Int, startedMilli
             contentDescription = "Logo"
         )
         Column {
-//            Text(
-//                headingText, style = TextStyle(
-//                    fontSize = 14.sp,
-//                    lineHeight = 20.sp,
-//                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-//                    fontWeight = FontWeight(600),
-//                    color = Variables.OnSecondaryHigh,
-//                    letterSpacing = 0.1.sp,
-//                )
-//            )
+            headingText?.let {
+                Text(
+                    it, style = TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                        fontWeight = FontWeight(600),
+                        color = Variables.OnSecondaryHigh,
+                        letterSpacing = 0.1.sp,
+                    )
+                )
+            }
+
             Text(
                 "${getViewersDisplayNum(viewers)} watching · Started ${
                     getTimeDisplayNum(
@@ -603,11 +648,11 @@ fun ChatPreview() {
 }
 
 @Composable
-fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?,isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
+fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?, behindBy: String, isMaximized: Boolean, maximizeClicked : () -> Unit, goLiveClicked: () -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically){
-        GoLiveText(isLive ?: false, goLiveClicked)
+        GoLiveText(isLive ?: false, behindBy, goLiveClicked)
         Spacer(Modifier.weight(1f))
         if(isChatEnabled) {
             MaximizeButton(maximizeClicked, isMaximized)
@@ -617,10 +662,10 @@ fun HlsBottomBar(isChatEnabled : Boolean, isLive : Boolean?,isMaximized: Boolean
 @Preview
 @Composable
 fun BottomBarPreview() {
-    HlsBottomBar(true,false,false,{}){}
+    HlsBottomBar(true,false,"-01:20",false,{}){}
 }
 @Composable
-fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
+fun GoLiveText(isLive : Boolean, behindBy: String, goLiveClicked : () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
 
         Image(
@@ -643,7 +688,22 @@ fun GoLiveText(isLive : Boolean, goLiveClicked : () -> Unit) {
                 letterSpacing = 0.5.sp,
             )
         )
-
+        AnimatedVisibility(visible = !isLive) {
+            Text(
+                text = behindBy,
+                modifier = Modifier
+                    .clickable { goLiveClicked() }
+                    .padding(start = Spacing1),
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                    fontWeight = FontWeight(600),
+                    color = if(isLive) Variables.OnSurfaceHigh else Variables.OnSurfaceMedium,
+                    letterSpacing = 0.5.sp,
+                )
+            )
+        }
     }
 }
 @Composable
@@ -698,13 +758,18 @@ fun HlsComposable(
     chatOpen : Boolean,
     isLandscape : Boolean,
     isLive : Boolean?,
+    behindBy : String,
     isChatEnabled : Boolean,
     goLiveClicked : () -> Unit,
     onCloseButtonClicked: () -> Unit,
     closedCaptionsEnabled : Boolean,
     isHandRaised : Boolean,
     toggleHandRaise : () -> Unit,
-    sessionOptionsButtonTapped : () -> Unit
+    sessionOptionsButtonTapped : () -> Unit,
+    showDvrControls : Boolean,
+    forwardButton: @Composable () -> Unit,
+    rewindButton : @Composable () -> Unit,
+    interacted : () -> Unit
 ) {
 
     lateinit var scaleGestureListener : ScaleGestureDetector
@@ -715,20 +780,20 @@ fun HlsComposable(
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
                 .aspectRatio(ratio = 16f / 9)
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        videoTapped()
-                    })
-                }
+//                .pointerInput(Unit) {
+//                    detectTapGestures(onTap = {
+//                        videoTapped()
+//                    })
+//                }
                 .fillMaxWidth()
         } else if(chatOpen && isLandscape) {
             //hlsViewModel.resizeMode.postValue(RESIZE_MODE_FIT)
             Modifier
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        videoTapped()
-                    })
-                }
+//                .pointerInput(Unit) {
+//                    detectTapGestures(onTap = {
+//                        videoTapped()
+//                    })
+//                }
                 .fillMaxHeight()
                 .fillMaxWidth(0.6f)
         }
@@ -740,11 +805,11 @@ fun HlsComposable(
 //                .pointerInteropFilter { event ->
 //                    scaleGestureListener.onTouchEvent(event)
 //                }
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = {
-                        videoTapped()
-                    })
-                }
+//                .pointerInput(Unit) {
+//                    detectTapGestures(onTap = {
+//                        videoTapped()
+//                    })
+//                }
         }
 
         AndroidView(modifier = hlsModifier, factory = {
@@ -773,30 +838,29 @@ fun HlsComposable(
         }, onRelease = {
             player.getNativePlayer().setVideoSurface(null)
         })
-        // Only hide if it's landscape and fullscreen and the controls are hidden
 
 
         if (closedCaptionsEnabled) {
             BoxWithConstraints(
                 modifier = hlsModifier.pointerInteropFilter {
                     // allow touches to passthrough
-                    false
-                                                            },
-                contentAlignment = Alignment.BottomCenter
+                    false },
+                contentAlignment = Alignment.BottomCenter,
             ) {
 
                 val subtitles by hlsViewModel.currentSubtitles.observeAsState()
                 if(!subtitles.isNullOrEmpty()) {
-                    Box(modifier = Modifier.padding(horizontal = Spacing0)) {
-                        Surface(color = Color.DarkGray) {
+                    Box(modifier = Modifier
+                        .padding(horizontal = Spacing0)
+                        .padding(bottom = 32.dp)) {
+                        Surface(color = Color.Black) {
                             Text(
                                 text = subtitles ?: "",
                                 modifier = Modifier.padding(Spacing1),
                                 style = TextStyle(
-                                    fontSize = 14.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_bold)),
-                                    fontWeight = FontWeight(600),
+                                    fontSize = 11.sp,
+                                    lineHeight = 13.sp,
+                                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
                                     color = Color.White,
                                     letterSpacing = 0.5.sp,
                                 )
@@ -811,6 +875,12 @@ fun HlsComposable(
             enter = fadeIn(animationSpec = tween(250)),
             exit = fadeOut(animationSpec = tween(250))
         ) {
+            if(showDvrControls) {
+                DvrControls(hlsModifier, player, forwardButton = forwardButton,
+                    rewindButton = rewindButton,
+                    playPauseButton = pauseButton,
+                    interacted = interacted)
+            }
             // Draw the items in a grid with the same size as
             // the hls video by applying hls video size with BoxWithConstraints.
             BoxWithConstraints(modifier = hlsModifier,
@@ -839,6 +909,7 @@ fun HlsComposable(
                     HlsBottomBar(
                         isChatEnabled = isChatEnabled,
                         isLive = isLive,
+                        behindBy = behindBy,
                         isMaximized = !chatOpen,
                         maximizeClicked = maximizeClicked,
                         goLiveClicked = goLiveClicked
@@ -857,7 +928,9 @@ fun HlsComposable(
             CloseButton(onCloseButtonClicked)
         }
         if (!isChatEnabled) {
-            Box(modifier = Modifier.fillMaxSize().padding(vertical = Spacing0),
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = Spacing0),
                 contentAlignment = Alignment.BottomCenter) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -867,6 +940,58 @@ fun HlsComposable(
                 SessionOptionsButton(sessionOptionsButtonTapped)
             }
             }
+        }
+    }
+}
+
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+@Composable
+fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Composable () -> Unit,
+                rewindButton : @Composable () -> Unit,
+                forwardButton : @Composable () -> Unit,
+                interacted : () -> Unit) {
+    BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+        Row(horizontalArrangement = Arrangement.spacedBy(24.dp)){
+            rewindButton()
+            playPauseButton()
+            forwardButton()
+        }
+        Column {
+            Spacer(Modifier.weight(1f))
+            AndroidView(modifier = Modifier
+                .wrapContentSize()
+                .padding(top = Spacing1), factory = {
+                (LayoutInflater.from(it)
+                    .inflate(live.hms.roomkit.R.layout.player_controls, null) as PlayerControlView)
+                    .apply {
+                        setPlayer(player.getNativePlayer())
+                        this.findViewById<LinearLayout>(androidx.media3.ui.R.id.exo_center_controls).visibility =
+                            View.GONE
+                        this.findViewById<View>(androidx.media3.ui.R.id.exo_controls_background).visibility =
+                            View.GONE
+                        this.findViewById<View>(androidx.media3.ui.R.id.exo_bottom_bar).visibility =
+                            View.GONE
+                        this.findViewById<DefaultTimeBar>(androidx.media3.ui.R.id.exo_progress).addListener(object : OnScrubListener {
+                            override fun onScrubStart(timeBar: TimeBar, position: Long) {
+                                interacted()
+                            }
+
+                            override fun onScrubMove(timeBar: TimeBar, position: Long) {
+                                interacted()
+                            }
+
+                            override fun onScrubStop(
+                                timeBar: TimeBar,
+                                position: Long,
+                                canceled: Boolean
+                            ) {
+                                // ignore
+                            }
+
+                        })
+                    }
+            }, update = {
+            })
         }
     }
 }
@@ -1066,13 +1191,41 @@ fun OrientationSwapper(
         }
     }
 }
+
+@Composable
+fun ForwardButton(isDisabled : Boolean, buttonClicked: () -> Unit) {
+    BaseButton(buttonClicked = {if(!isDisabled) {
+        buttonClicked()
+    }}, id = if(!isDisabled) live.hms.roomkit.R.drawable.hls_forward_arrow else live.hms.roomkit.R.drawable.forward_arrow_dimmed, description = "Forward 15 seconds")
+}
+@Composable
+fun RewindButton(buttonClicked : () -> Unit) {
+    BaseButton(
+        buttonClicked = buttonClicked,
+        id = live.hms.roomkit.R.drawable.hls_backward_arrow,
+        description = "Rewind ten seconds"
+    )
+}
+
+@Composable
+fun BaseButton(buttonClicked : () -> Unit, @DrawableRes id : Int, description : String) {
+    Image(
+        modifier = Modifier
+            .clickable { buttonClicked() }
+            .size(64.dp),
+        painter = painterResource(id = id),
+        contentDescription = description,
+        contentScale = ContentScale.None
+    )
+
+}
 @Composable
 fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
     Image(
         modifier = Modifier
             .clickable { buttonClicked() }
             .size(64.dp),
-        painter = painterResource(id = if(isPlaying == true) live.hms.roomkit.R.drawable.hls_paused_btn else live.hms.roomkit.R.drawable.hls_play_btn),
+        painter = painterResource(id = if(isPlaying == true) live.hms.roomkit.R.drawable.exo_styled_controls_pause else live.hms.roomkit.R.drawable.exo_styled_controls_play),
         contentDescription = "Play",
         contentScale = ContentScale.None
     )
