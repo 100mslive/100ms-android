@@ -1000,7 +1000,6 @@ class MeetingFragment : Fragment() {
 
             })?.start()
 
-        val screenHeight = requireActivity().window.decorView.height
         binding.bottomControls.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1031,15 +1030,15 @@ class MeetingFragment : Fragment() {
         with(binding.chatView!!){
             if(up) {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
-                    removeRule(RelativeLayout.ALIGN_BOTTOM)
-                    addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
-                    updateMargins(bottom = bottomMenuHeight.toInt() + 8.dp())
+//                    removeRule(RelativeLayout.ALIGN_BOTTOM)
+//                    addRule(RelativeLayout.ABOVE, R.id.bottom_controls)
+//                    updateMargins(bottom = bottomMenuHeight.toInt().let { if(it == 0) 130 else it } + 8.dp())
                 }
             } else {
                 (layoutParams as RelativeLayout.LayoutParams).apply {
-                    removeRule(RelativeLayout.ABOVE)
-                    addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, R.id.meeting_container)
-                    updateMargins(bottom = 8.dp())
+//                    removeRule(RelativeLayout.ABOVE)
+//                    addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, R.id.meeting_container)
+//                    updateMargins(bottom = 8.dp())
                 }
             }
         }
