@@ -217,7 +217,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                var controlsVisible by remember { mutableStateOf(false) }
+                var controlsVisible by remember { mutableStateOf(true) }
                 var closedCaptionsEnabled by remember { mutableStateOf(true) }
                 val isPlaying by hlsViewModel.isPlaying.observeAsState()
                 val isLive by hlsViewModel.isLive.observeAsState(false)
@@ -227,14 +227,6 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                 var ticks by remember { mutableLongStateOf(0) }
                 val recordingState by meetingViewModel.recordingState.observeAsState()
                 var interacted by remember { mutableStateOf(false) }
-
-                // Turn off controls 3 seconds after they become visible
-                LaunchedEffect(controlsVisible, interacted) {
-                    if(controlsVisible) {
-                        delay(3.seconds)
-                        controlsVisible = false
-                    }
-                }
 
                 LaunchedEffect(elapsedTime) {
                     elapsedTime?.let {
@@ -263,6 +255,13 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
                     val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
+                    // Turn off controls 3 seconds after they become visible
+                    LaunchedEffect(controlsVisible, interacted) {
+                        if(controlsVisible) {
+                            delay(3.seconds)
+                            controlsVisible = false
+                        }
+                    }
 
                     fun openSessionOptions() {
                         SessionOptionBottomSheet(
