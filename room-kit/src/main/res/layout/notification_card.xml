@@ -60,10 +60,12 @@
             android:fontFamily="@font/inter_semibold"
             android:gravity="center"
             android:maxLines="1"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="8sp"
+            app:autoSizeMaxTextSize="12sp"
             android:paddingHorizontal="16dp"
             android:text="Join Now"
             android:textColor="#EFF0FA"
-            android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@id/cross_icon"
             app:layout_constraintTop_toTopOf="parent" />

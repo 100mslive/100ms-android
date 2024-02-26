@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.TextView
+import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -16,16 +18,26 @@ import live.hms.roomkit.databinding.DialogTrackSelectionBinding
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.HmsHlsPlayer
 import live.hms.hls_player.HmsHlsLayer
+import live.hms.roomkit.ui.meeting.videogrid.VideoGridPageFragment
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.trackTintList
 
 
 class HlsVideoQualitySelectorBottomSheet(
-    private val hlsPlayer: HmsHlsPlayer
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<DialogTrackSelectionBinding>()
+
+    val viewModel by  activityViewModels<MeetingViewModel>()
+    companion object {
+        fun newInstance(): HlsVideoQualitySelectorBottomSheet {
+            return HlsVideoQualitySelectorBottomSheet().apply {
+            }
+        }
+
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,19 +80,22 @@ class HlsVideoQualitySelectorBottomSheet(
             val sheet = it as BottomSheetDialog
             sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
+
+        if (viewModel.getHLSPLayer() == null)
+            dismissAllowingStateLoss()
         binding.closeBtn.setOnClickListener {
             dismiss()
         }
-        val currentLayer = hlsPlayer.getCurrentHmsHlsLayer()
-        val allLayers = hlsPlayer.getHmsHlsLayers()
+        val currentLayer = viewModel.getHLSPLayer()?.getCurrentHmsHlsLayer()
+        val allLayers = viewModel.getHLSPLayer()?.getHmsHlsLayers()
 
         addAutoView(currentLayer == HmsHlsLayer.AUTO)
-        allLayers.forEachIndexed { index, layer ->
+        allLayers?.forEachIndexed { index, layer ->
             when(layer) {
                 is HmsHlsLayer.AUTO -> {}
                 is HmsHlsLayer.LayerInfo -> {
                     addTrackView("${layer.resolution.height}", index, currentLayer == layer) {
-                        hlsPlayer.setHmsHlsLayer(layer)
+                        viewModel.getHLSPLayer()?.setHmsHlsLayer(layer)
                         dismissAllowingStateLoss()
                     }
                 }
@@ -90,7 +105,7 @@ class HlsVideoQualitySelectorBottomSheet(
 
     private fun addAutoView(isSelected : Boolean) {
         addTrackView("Auto",-1,isSelected) {
-            hlsPlayer.setHmsHlsLayer(HmsHlsLayer.AUTO)
+            viewModel.getHLSPLayer()?.setHmsHlsLayer(HmsHlsLayer.AUTO)
             dismissAllowingStateLoss()
         }
     }

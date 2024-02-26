@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -698,9 +699,7 @@ class MeetingViewModel(
             addRTCStatsObserver()
         }
 
-        if (!(state.value is MeetingState.Disconnected || state.value is MeetingState.Failure || state.value is MeetingState.NonFatalFailure)) {
-            error("Cannot start meeting in ${state.value} state")
-        }
+        
 
         cleanup()
 
@@ -1243,6 +1242,7 @@ class MeetingViewModel(
         }
     }
 
+    val showDvrControls = MutableLiveData<Boolean>()
     val showAudioIcon : MutableLiveData<Boolean> = MutableLiveData(false)
     val showHlsStreamYetToStartError = MutableLiveData<Boolean>(false)
     private fun switchToHlsViewIfRequired(role: HMSRole?, streamUrl: String?) {
@@ -1282,6 +1282,7 @@ class MeetingViewModel(
     fun switchToHlsViewIfRequired() {
         // get the hls URL from the Room, if it exists
         val hlsUrl = hmsSDK.getRoom()?.hlsStreamingState?.variants?.get(0)?.hlsStreamUrl
+        showDvrControls.postValue(hmsSDK.getRoom()?.hlsStreamingState?.variants?.get(0)?.playlistType == HMSHLSPlaylistType.dvr)
         switchToHlsViewIfRequired(hmsSDK.getLocalPeer()?.hmsRole, hlsUrl)
     }
 
@@ -2407,6 +2408,17 @@ class MeetingViewModel(
     val getQuestionStartTime = questionTimingUseCase::getQuestionStartTime
 
     fun getLogo() = getHmsRoomLayout()?.data?.getOrNull(0)?.logo?.url
+
+    var hmsPlayer : HmsHlsPlayer? = null
+    fun setHLSPlayer(player: HmsHlsPlayer) {
+        hmsPlayer = player
+    }
+
+    fun getHLSPLayer() = hmsPlayer
+
+    fun getLiveStreamingHeaderTitle(): String?{
+        return prebuiltInfoContainer.getLiveStreamingHeaderTitle()
+    }
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
     fun toggleNoiseCancellation() : Boolean {
         hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())

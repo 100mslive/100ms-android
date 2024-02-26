@@ -393,6 +393,7 @@
         tools:visibility="visible"
         android:layout_marginHorizontal="@dimen/eight_dp"
         android:layout_above="@id/bottom_controls"
+        android:layout_marginBottom="@dimen/eight_dp"
         >
 
         <androidx.appcompat.widget.LinearLayoutCompat
