@@ -34,6 +34,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
 import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.events.AgentType
+import live.hms.video.factories.noisecancellation.AvailabilityStatus
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.polls.HMSPollBuilder
@@ -80,6 +81,7 @@ class MeetingViewModel(
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null
     val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
+    val toggleNcInPreview : MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
@@ -762,6 +764,9 @@ class MeetingViewModel(
                 val runningStreamingStates = listOf(HMSStreamingState.STARTED, HMSStreamingState.STARTING)
                 val runningRecordingStates = listOf(HMSRecordingState.STARTING, HMSRecordingState.STARTED, HMSRecordingState.PAUSED, HMSRecordingState.RESUMED)
 
+                if(toggleNcInPreview.value == true) {
+                    hmsSDK.setNoiseCancellationEnabled(true)
+                }
                 if (room.hlsStreamingState.state in runningStreamingStates)
                     streamingState.postValue(room.hlsStreamingState.state)
                 if (room.rtmpHMSRtmpStreamingState.state in runningStreamingStates)
@@ -2420,5 +2425,13 @@ class MeetingViewModel(
         return prebuiltInfoContainer.getLiveStreamingHeaderTitle()
     }
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
+    fun toggleNoiseCancellation() : Boolean {
+        hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())
+        return hmsSDK.getNoiseCancellationEnabled()
+    }
+
+    fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
+    // Show the NC button if it's a webrtc peer with noise cancellation available
+    fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 }
 

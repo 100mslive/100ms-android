@@ -1190,6 +1190,7 @@ class MeetingFragment : Fragment() {
                                 )
                             }
                         },
+                        onNoiseClicked = meetingViewModel::toggleNoiseCancellation
                     ).show(
                         childFragmentManager, AudioSwitchBottomSheetTAG
                     )
