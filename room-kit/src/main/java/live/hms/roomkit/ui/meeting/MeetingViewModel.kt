@@ -102,6 +102,7 @@ class MeetingViewModel(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
                 .initialState(getAudioTrackState())
+                .enableNoiseCancellation(toggleNcInPreview.value == true)
                 .setDisableInternalAudioManager(settings.detectDominantSpeaker.not())
                 .setPhoneCallMuteState(if (settings.muteLocalAudioOnPhoneRing) PhoneCallState.ENABLE_MUTE_ON_PHONE_CALL_RING else PhoneCallState.DISABLE_MUTE_ON_VOIP_PHONE_CALL_RING)
                 .build()
@@ -764,9 +765,6 @@ class MeetingViewModel(
                 val runningStreamingStates = listOf(HMSStreamingState.STARTED, HMSStreamingState.STARTING)
                 val runningRecordingStates = listOf(HMSRecordingState.STARTING, HMSRecordingState.STARTED, HMSRecordingState.PAUSED, HMSRecordingState.RESUMED)
 
-                if(toggleNcInPreview.value == true) {
-                    hmsSDK.setNoiseCancellationEnabled(true)
-                }
                 if (room.hlsStreamingState.state in runningStreamingStates)
                     streamingState.postValue(room.hlsStreamingState.state)
                 if (room.rtmpHMSRtmpStreamingState.state in runningStreamingStates)
