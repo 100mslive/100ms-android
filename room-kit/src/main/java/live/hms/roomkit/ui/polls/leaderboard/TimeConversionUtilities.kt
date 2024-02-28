@@ -1,5 +1,7 @@
 package live.hms.roomkit.ui.polls.leaderboard
 
+import java.math.RoundingMode
+
 fun millisecondsToDisplayTime(milliseconds: Long): String {
     val minutes = milliseconds / 1000 / 60
     val seconds = milliseconds / 1000 % 60
@@ -23,7 +25,7 @@ fun millisToText(milliseconds : Long?,
 
         val hours = milliseconds / 1000 / (60*60)
         val minutes = (milliseconds / 1000 / 60) % 60
-        val seconds = (milliseconds / 1000) % 60
+        val seconds = (milliseconds % 60000 )/ 1000f
 
         val prefix = if (hasHours) {
             "$hours" + 'h' + " $minutes" + "m"
@@ -35,7 +37,7 @@ fun millisToText(milliseconds : Long?,
 
         val suffix = if(hasHours || hasMinutes) // if it has hours then don't show seconds
             ""
-            else  String.format("%d$secondsText", seconds)
+            else  " ${seconds.toBigDecimal().setScale(2, RoundingMode.FLOOR).toDouble()} seconds"
         "$prefix$suffix"
     }
 }
