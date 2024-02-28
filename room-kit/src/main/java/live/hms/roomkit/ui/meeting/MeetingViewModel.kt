@@ -429,7 +429,7 @@ class MeetingViewModel(
             // Add all tracks as they come in.
             addSource(tracks) { meetTracks: List<MeetingTrack> ->
                 //if remote peer and local peer is present inset mode
-               synchronized(tracks) {
+               synchronized(_tracks) {
                    val excludeLocalTrackIfRemotePeerIsPreset =
                        //Don't inset when local peer and local screen share track is found
                        if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(
