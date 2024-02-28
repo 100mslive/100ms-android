@@ -286,7 +286,6 @@ class VideoGridFragment : Fragment() {
 
          insetPillMaximised.forEachIndexed { index, view ->
              if (view is HMSVideoView) {
-                 view.removeTrack()
                  insetPillMaximised.removeViewAt(index)
              }
          }

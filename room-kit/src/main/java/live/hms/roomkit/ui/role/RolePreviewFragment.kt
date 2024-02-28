@@ -101,7 +101,6 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
             meetingViewModel.changeRoleAccept(onSuccess = {
                 contextSafe { context, activity ->
                     activity.runOnUiThread {
-                        binding.previewView.removeTrack()
                         meetingViewModel.lowerLocalPeerHand()
                         findNavController().navigate(
                             RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
@@ -119,7 +118,6 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
             meetingViewModel.lowerLocalPeerHand()
             localVideoTrack?.setMute(true)
             localAudioTrack?.setMute(true)
-            binding.previewView.removeTrack()
             findNavController().navigate(
                 RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
                     false
@@ -206,9 +204,7 @@ class RolePreviewFragment : BottomSheetDialogFragment() {
                 override fun handleOnBackPressed() {
                     localVideoTrack?.setMute(true)
                     localAudioTrack?.setMute(true)
-                    binding.previewView.removeTrack()
                     meetingViewModel.setStatetoOngoing()
-                    binding?.previewView?.removeTrack()
                     findNavController().navigate(
                         RolePreviewFragmentDirections.actionRolePreviewFragmentToMeetingFragment(
                             false
