@@ -115,10 +115,11 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
-        val noiseButton = GridOptionItem("Noise On/Off", R.drawable.baseline_noise_aware_24, {
+        val noiseButton = GridOptionItem("Reduce Noise", R.drawable.reduce_noise_session_option, {
             onNoiseClicked?.invoke()
             dismiss()
-        }, isSelected = false)
+        }, isSelected = meetingViewModel.isNoiseCancellationEnabled(),
+            selectedTitle = "Noise Reduced")
 
         val peerListOption = GridOptionItem(
             resources.getString(R.string.peer_list), R.drawable.ic_icon_people, {
@@ -149,13 +150,15 @@ class SessionOptionBottomSheet(
 
 
         val group: Group = Section().apply {
-            add(noiseButton)
             if (meetingViewModel.isParticpantListEnabled())
             add(peerListOption)
             if (meetingViewModel.isBRBEnabled())
             add(brbOption)
             if (meetingViewModel.isAllowedToShareScreen())
             add(screenShareOption)
+            if (meetingViewModel.displayNoiseCancellationButton()) {
+                add(noiseButton)
+            }
             if(!disableHandRaiseDisplay) {
                 add(raiseHandOption)
             }

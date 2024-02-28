@@ -19,6 +19,8 @@ class GridOptionItem(
     var isSelected: Boolean = false,
     var particpantCount: Int? = null,
     var showProgress: Boolean = false,
+    val selectedTitle : String? = null,
+
 ) : BindableItem<ItemGridOptionBinding>() {
 
     private val SELECTION_UPDATE = "SELECTION_UPDATE"
@@ -62,6 +64,11 @@ class GridOptionItem(
     }
 
     private fun setSelectedView(isSelected: Boolean, v: ItemGridOptionBinding) {
+        if(isSelected && selectedTitle != null )
+            v.subtitle.text = selectedTitle
+        else
+            v.subtitle.text = title
+
         v.rootLayout.background = if (isSelected.not()) {
              getShape().apply {
                 setTint(

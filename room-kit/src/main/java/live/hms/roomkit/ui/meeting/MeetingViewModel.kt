@@ -34,6 +34,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
 import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.events.AgentType
+import live.hms.video.factories.noisecancellation.AvailabilityStatus
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.polls.HMSPollBuilder
@@ -2424,5 +2425,9 @@ class MeetingViewModel(
         hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())
         return hmsSDK.getNoiseCancellationEnabled()
     }
+
+    fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
+    // Show the NC button if it's a webrtc peer with noise cancellation available
+    fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 }
 
