@@ -202,6 +202,8 @@ class MeetingViewModel(
             })
     }
 
+    fun showVideoFilterIcon() = settings.enableVideoFilter
+
      fun setupFilterVideoPlugin() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
@@ -374,7 +376,7 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
-    fun isGoLiveInPreBuiltEnabled() = settings.useMockAPi
+    fun isGoLiveInPreBuiltEnabled() = settings.enableVideoFilter
 
     var showAudioMuted = MutableLiveData(false)
         private set

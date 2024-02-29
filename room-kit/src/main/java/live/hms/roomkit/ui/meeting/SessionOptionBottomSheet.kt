@@ -179,7 +179,7 @@ class SessionOptionBottomSheet(
                     )
                 )
             }
-            if (meetingViewModel.isLocalVideoEnabled() == true) {
+            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
                 add(videoFilter)
             }
         }
