@@ -2803,7 +2803,7 @@ fun BottomSheetMessageOptionsBinding.applyTheme() {
         )
     )
 
-    blockFromChatIcon.drawable.setTint(
+    blockFromChatText.drawableStart?.setTint(
         getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.alertErrorDefault,
             HMSPrebuiltTheme.getDefaults().error_default
