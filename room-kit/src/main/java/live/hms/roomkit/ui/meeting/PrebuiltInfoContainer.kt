@@ -140,6 +140,18 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.hlsLiveStreamingHeader?.title
         }
     }
+
+    fun getLiveStreamingHeaderDescription() : String? {
+        val localPeer = hmssdk.getLocalPeer()
+
+        return if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.hlsLiveStreaming?.elements
+                ?.hlsLiveStreamingHeader?.description
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements
+                ?.hlsLiveStreamingHeader?.description
+        }
+    }
 }
 
 data class AllowedToMessageParticipants(

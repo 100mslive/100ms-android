@@ -2424,6 +2424,8 @@ class MeetingViewModel(
     fun getLiveStreamingHeaderTitle(): String?{
         return prebuiltInfoContainer.getLiveStreamingHeaderTitle()
     }
+
+    fun getLiveStreamingHeaderDescription() = prebuiltInfoContainer.getLiveStreamingHeaderDescription()
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
     fun toggleNoiseCancellation() : Boolean {
         hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())

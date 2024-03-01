@@ -19,6 +19,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -26,14 +27,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.captionBarPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -57,6 +56,7 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -80,7 +80,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
@@ -129,7 +128,6 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.getStringForTime
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.roomkit.util.visibility
 import live.hms.stats.PlayerStatsListener
 import live.hms.stats.Utils
 import live.hms.stats.model.PlayerStatsModel
@@ -391,7 +389,9 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                             )
                             if(chatOpen) {
                                 ChatHeader(
-                                    meetingViewModel.getLiveStreamingHeaderTitle(), meetingViewModel.getLogo(),
+                                    meetingViewModel.getLiveStreamingHeaderTitle(),
+                                    meetingViewModel.getLiveStreamingHeaderDescription(),
+                                    meetingViewModel.getLogo(),
                                     viewers ?:0,
                                     ticks,
                                     recordingState
@@ -509,8 +509,11 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatHeader(headingText: String?, logoUrl: String?, viewers: Int, startedMillis: Long,
-               recordingState : HMSRecordingState?
+fun ChatHeader(
+    heading: String?,
+    description: String?,
+    logoUrl: String?, viewers: Int, startedMillis: Long,
+    recordingState: HMSRecordingState?
 ) {
     fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
         "$viewers"
@@ -518,57 +521,92 @@ fun ChatHeader(headingText: String?, logoUrl: String?, viewers: Int, startedMill
 
     fun getTimeDisplayNum(startedMillis: Long): String = millisToText(startedMillis, false, "s")
 
+    var expand by remember { mutableStateOf(false) }
     Column {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(Spacing2),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+        Column(modifier = Modifier.padding(Spacing2)) {
+            Row(
+                Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-        GlideImage(
-            model = logoUrl,
-            loading = if (LocalInspectionMode.current) placeholder(R.drawable.exo_edit_mode_logo) else null,
-            contentDescription = "Logo"
-        )
-        Column {
-            headingText?.let {
-                Text(
-                    it, style = TextStyle(
+                GlideImage(
+                    model = logoUrl,
+                    loading = if (LocalInspectionMode.current) placeholder(R.drawable.exo_edit_mode_logo) else null,
+                    contentDescription = "Logo"
+                )
+                Column {
+                    heading?.let {
+                        Text(
+                            it, style = TextStyle(
+                                fontSize = 14.sp,
+                                lineHeight = 20.sp,
+                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                                fontWeight = FontWeight(600),
+                                color = Variables.OnSecondaryHigh,
+                                letterSpacing = 0.1.sp,
+                            )
+                        )
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)) {
+                        Text(
+                            "${getViewersDisplayNum(viewers)} watching · Started ${
+                                getTimeDisplayNum(
+                                    startedMillis
+                                )
+                            } ago${if (recordingState == HMSRecordingState.STARTED) " · Recording" else ""}",
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                                fontWeight = FontWeight(400),
+                                color = Variables.OnSurfaceMedium,
+                                letterSpacing = 0.4.sp,
+                            )
+                        )
+
+//                        if(!expand) {
+                            Text(
+                                text = if(!expand) "...more" else "...less",
+                                modifier = Modifier.pointerInput(Unit) {
+                                    detectTapGestures(onTap = {
+                                        expand = !expand
+                                    })
+                                },
+                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp,
+                                fontWeight = FontWeight(600),
+                                color = Variables.OnSurfaceHigh,
+                            )
+//                        }
+                    }
+                }
+            }
+            if(expand) {
+                description?.let {
+                    Text(
+                        modifier = Modifier.padding(top = Spacing2),
+                        text = it,
                         fontSize = 14.sp,
                         lineHeight = 20.sp,
                         fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-                        fontWeight = FontWeight(600),
-                        color = Variables.OnSecondaryHigh,
-                        letterSpacing = 0.1.sp,
+                        fontWeight = FontWeight(400),
+                        color = Variables.OnSurfaceMedium,
                     )
-                )
+                }
             }
 
-            Text(
-                "${getViewersDisplayNum(viewers)} watching · Started ${
-                    getTimeDisplayNum(
-                        startedMillis
-                    )
-                } ago${if (recordingState == HMSRecordingState.STARTED) " · Recording" else "" }", style = TextStyle(
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-                    fontWeight = FontWeight(400),
-                    color = Variables.OnSurfaceMedium,
-                    letterSpacing = 0.4.sp,
-                )
-            )
 
         }
-    }
-    Divider (
-        color = Variables.BorderBright,
-        modifier = Modifier
-            .height(1.dp)
-            .fillMaxWidth()
-    )
+        Divider(
+            color = Variables.BorderBright,
+            modifier = Modifier
+                .height(1.dp)
+                .fillMaxWidth()
+        )
     }
 }
 
@@ -576,7 +614,8 @@ fun ChatHeader(headingText: String?, logoUrl: String?, viewers: Int, startedMill
 @Composable
 fun ChatHeaderPreview() {
     ChatHeader(
-        headingText = "Tech talks",
+        heading = "Header",
+        description = "Desc something",
         "https://storage.googleapis.com/100ms-cms-prod/cms/100ms_18a29f69f2/100ms_18a29f69f2.png",
         1000,
         30 * 60 * 1000,
