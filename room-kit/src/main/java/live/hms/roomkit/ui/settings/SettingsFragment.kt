@@ -473,6 +473,12 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
+        settings.enableWebrtcNoiseSuppression,
+        switchUseWebrtcNoiseCancellation
+      ) { commitHelper.setUseWebrtcNoiseSuppression(it) }
+
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
         settings.showStats,
         showStats
       ) { commitHelper.setShowStats(it) }
