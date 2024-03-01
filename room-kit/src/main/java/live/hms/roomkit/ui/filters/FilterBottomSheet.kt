@@ -126,12 +126,87 @@ class FilterBottomSheet(
             else meetingViewModel.removeVideoFilterPlugIn()
         }
 
-        
+        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                when (currentSelectedFilter) {
+                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(
+                        progress
+                    )
+
+                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress)
+                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress)
+                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress)
+                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress)
+                    null -> {}
+                    else -> {}
+                }
+
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+        })
 
 
 
 
-        
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.tag) {
+                    is VideoFilter.Brightness -> {
+                        currentSelectedFilter = VideoFilter.Brightness
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getBrightnessProgress()
+                    }
+
+                    is VideoFilter.Sharpness -> {
+                        currentSelectedFilter = VideoFilter.Sharpness
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getSharpnessProgress()
+                    }
+
+
+                    is VideoFilter.Contrast -> {
+                        currentSelectedFilter = VideoFilter.Contrast
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getContrastProgress()
+                    }
+
+                    is VideoFilter.Redness -> {
+                        currentSelectedFilter = VideoFilter.Redness
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getRednessProgress()
+                    }
+
+                    is VideoFilter.Smoothness -> {
+                        currentSelectedFilter = VideoFilter.Smoothness
+                        binding.seekBar.progress =
+                            meetingViewModel.filterPlugin.getSmoothnessProgress()
+                    }
+
+
+                    else -> {
+
+                    }
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+
+            }
+
+        })
+
 
 
         binding.tabLayout.apply {
