@@ -130,13 +130,13 @@ class FilterBottomSheet(
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 when (currentSelectedFilter) {
                     is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(
-                        progress
+                        progress / 100f
                     )
 
-                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress)
-                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress)
-                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress)
-                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress)
+                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress / 100f)
+                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
+                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
+                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
                     null -> {}
                     else -> {}
                 }
@@ -162,32 +162,32 @@ class FilterBottomSheet(
                     is VideoFilter.Brightness -> {
                         currentSelectedFilter = VideoFilter.Brightness
                         binding.seekBar.progress =
-                            meetingViewModel.filterPlugin.getBrightnessProgress()
+                            (meetingViewModel.filterPlugin.getBrightnessProgress() * 100).toInt()
                     }
 
                     is VideoFilter.Sharpness -> {
                         currentSelectedFilter = VideoFilter.Sharpness
                         binding.seekBar.progress =
-                            meetingViewModel.filterPlugin.getSharpnessProgress()
+                            (meetingViewModel.filterPlugin.getSharpnessProgress() * 100).toInt()
                     }
 
 
                     is VideoFilter.Contrast -> {
                         currentSelectedFilter = VideoFilter.Contrast
                         binding.seekBar.progress =
-                            meetingViewModel.filterPlugin.getContrastProgress()
+                            ( meetingViewModel.filterPlugin.getContrastProgress() * 100).toInt()
                     }
 
                     is VideoFilter.Redness -> {
                         currentSelectedFilter = VideoFilter.Redness
                         binding.seekBar.progress =
-                            meetingViewModel.filterPlugin.getRednessProgress()
+                            (meetingViewModel.filterPlugin.getRednessProgress() * 100).toInt()
                     }
 
                     is VideoFilter.Smoothness -> {
                         currentSelectedFilter = VideoFilter.Smoothness
                         binding.seekBar.progress =
-                            meetingViewModel.filterPlugin.getSmoothnessProgress()
+                            ( meetingViewModel.filterPlugin.getSmoothnessProgress() * 100).toInt()
                     }
 
 
