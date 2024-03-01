@@ -151,6 +151,7 @@ class MeetingViewModel(
                         }
                         HMSPollUpdateType.stopped -> viewModelScope.launch {
                             _events.emit(Event.PollEnded(hmsPoll))
+                            hmsRemoveNotificationEvent.postValue(HMSNotificationType.OpenPollOrQuiz(pollId = hmsPoll.pollId))
                         }
                         HMSPollUpdateType.resultsupdated -> viewModelScope.launch {
                             _events.emit(Event.PollVotesUpdated(hmsPoll))
