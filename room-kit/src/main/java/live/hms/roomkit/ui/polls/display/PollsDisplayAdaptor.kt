@@ -107,7 +107,7 @@ class PollsDisplayAdaptor(
         val questionHolder = PollDisplayQuestionHolder(view!!,
             canViewResponses(getPoll, localPeer),
             getPoll, ::setTextAnswer, saveInfoSingleChoice, saveInfoMultiChoice,
-            skipped, endPoll, getPoll.createdBy?.peerID == localPeer.peerID,
+            skipped, endPoll, canEndPoll(localPeer),
             showLeaderBoard, setQuestionStartTime, getQuestionStartTime,
             itemCount)
         if(viewType == HMSPollQuestionType.multiChoice.ordinal || viewType == HMSPollQuestionType.singleChoice.ordinal) {
@@ -116,6 +116,8 @@ class PollsDisplayAdaptor(
         return questionHolder
     }
 
+    private fun canEndPoll(localPeer: HMSPeer) : Boolean =
+        localPeer.hmsRole.permission.pollWrite
     private fun canViewResponses(hmsPoll: HmsPoll, localPeer: HMSPeer): Boolean =
         hmsPoll.rolesThatCanViewResponses.contains(localPeer.hmsRole) || hmsPoll.rolesThatCanViewResponses.isEmpty()
 
