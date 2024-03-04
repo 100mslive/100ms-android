@@ -256,6 +256,9 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
                     val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
                     // Turn off controls 3 seconds after they become visible
+                    LaunchedEffect(key1 = viewMode) {
+                        hlsViewModel.restarted()
+                    }
                     LaunchedEffect(controlsVisible, interacted) {
                         if(controlsVisible) {
                             delay(3.seconds)

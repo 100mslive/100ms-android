@@ -380,8 +380,12 @@ class PreviewFragment : Fragment() {
             updateActionVolumeMenuIcon(it)
         })
 
-        binding.iconOutputDevice.apply {
-            setOnSingleClickListener(200L) {
+        binding.iconNoiseCancellation.setOnSingleClickListener(200L) {
+                meetingViewModel.toggleNcInPreview.value = meetingViewModel.toggleNcInPreview.value!!.not()
+                updateNoiseCancellationIcon()
+            }
+
+        binding.iconOutputDevice.setOnSingleClickListener(200L) {
                 Log.v(TAG, "iconOutputDevice.onClick()")
 
                 AudioOutputSwitchBottomSheet { audioDevice, isMuted ->
@@ -391,7 +395,6 @@ class PreviewFragment : Fragment() {
                     childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                 )
             }
-        }
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
             if (it.isEnabled) track?.video.switchCamera()
@@ -514,6 +517,22 @@ class PreviewFragment : Fragment() {
         }
     }
 
+    private fun updateNoiseCancellationIcon() {
+        with(binding.iconNoiseCancellation) {
+            if(meetingViewModel.toggleNcInPreview.value == true) {
+                setIconDisabled(R.drawable.reduce_noise_session_option)
+            } else
+            {
+                setIconEnabled(R.drawable.reduce_noise_session_option)
+            }
+
+            val existingVisibility = visibility
+            visibility = if(meetingViewModel.displayNoiseCancellationButton()) View.VISIBLE else View.GONE
+            if(existingVisibility == View.GONE && visibility == View.VISIBLE) {
+                startBounceAnimationUpwards()
+            }
+        }
+    }
     private fun updateActionVolumeMenuIcon() {
         binding.iconOutputDevice.visibility = View.VISIBLE
         binding.iconOutputDevice.apply {
@@ -678,6 +697,7 @@ class PreviewFragment : Fragment() {
                     }
                 }
 
+                updateNoiseCancellationIcon()
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
 
                     updateJoinButtonTextIfHlsIsEnabled(room.localPeer?.hmsRole?.name)
@@ -709,6 +729,7 @@ class PreviewFragment : Fragment() {
 
         if (publishParams.allowed.contains("audio")) {
             binding.buttonToggleAudio.visibility = View.VISIBLE
+            updateNoiseCancellationIcon()
             binding.buttonToggleAudio.startBounceAnimationUpwards()
             binding.iconOutputDevice.startBounceAnimationUpwards()
         } else {
@@ -728,6 +749,7 @@ class PreviewFragment : Fragment() {
             binding.buttonToggleVideo.visibility = View.GONE
             binding.buttonSwitchCamera.visibility = View.GONE
             binding.videoCardContainer.visibility = View.GONE
+            binding.iconNoiseCancellation.visibility = View.GONE
         }
     }
 

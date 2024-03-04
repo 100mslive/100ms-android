@@ -23,7 +23,7 @@ import live.hms.video.sdk.HMSSDK
 
 @UnstableApi class HlsViewModel(
     application: Application,
-    hlsStreamUrl : String,
+    private val hlsStreamUrl : String,
     private val hmsSdk: HMSSDK,
     private val hlsPlayerBeganToPlay : () -> Unit,
     private val displayHlsCuesUseCase : () -> DisplayHlsCuesUseCase
@@ -36,10 +36,17 @@ import live.hms.video.sdk.HMSSDK
     val behindLiveByLiveData = MutableLiveData("0:0")
     val streamEndedEvent = SingleLiveEvent<Unit>()
     val currentSubtitles = MutableLiveData<String?>()
+    private var failed = false
 
     val player = HmsHlsPlayer(application, hmsSdk).apply {
         setListeners(this)
         play(hlsStreamUrl)
+    }
+    fun restarted() {
+        if(failed) {
+            player.play(hlsStreamUrl)
+            failed = false
+        }
     }
     private fun setListeners(player: HmsHlsPlayer) {
 //        binding.hlsView.player = player.getNativePlayer()
@@ -71,6 +78,7 @@ import live.hms.video.sdk.HMSSDK
 
             override fun onPlaybackFailure(error: HmsHlsException) {
                 Log.d("HMSHLSPLAYER", "From App, error: $error")
+                failed = true
             }
 
             @SuppressLint("UnsafeOptInUsageError")

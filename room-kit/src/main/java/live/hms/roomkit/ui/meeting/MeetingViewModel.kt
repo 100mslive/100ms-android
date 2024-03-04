@@ -34,6 +34,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.interactivity.HmsInteractivityCenter
 import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.events.AgentType
+import live.hms.video.factories.noisecancellation.AvailabilityStatus
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.polls.HMSPollBuilder
@@ -58,6 +59,7 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
+import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
@@ -80,6 +82,7 @@ class MeetingViewModel(
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null
     val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
+    val toggleNcInPreview : MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val settings = SettingsStore(getApplication())
     private val hmsLogSettings: HMSLogSettings =
@@ -122,6 +125,9 @@ class MeetingViewModel(
         .setLogSettings(hmsLogSettings)
         .build()
 
+
+    val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
+
     private var lastPollStartedTime : Long = 0
 
     val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
@@ -145,6 +151,7 @@ class MeetingViewModel(
                         }
                         HMSPollUpdateType.stopped -> viewModelScope.launch {
                             _events.emit(Event.PollEnded(hmsPoll))
+                            hmsRemoveNotificationEvent.postValue(HMSNotificationType.OpenPollOrQuiz(pollId = hmsPoll.pollId))
                         }
                         HMSPollUpdateType.resultsupdated -> viewModelScope.launch {
                             _events.emit(Event.PollVotesUpdated(hmsPoll))
@@ -180,6 +187,8 @@ class MeetingViewModel(
             return
         }
 
+
+
         hmsSDK.getAuthTokenByRoomCode(
             TokenRequest(roomCode, hmsPrebuiltOptions?.userId ?: UUID.randomUUID().toString()),
             TokenRequestOptions(tokenURL),
@@ -195,6 +204,43 @@ class MeetingViewModel(
                 }
 
             })
+    }
+
+    fun showVideoFilterIcon() = settings.enableVideoFilter
+
+     fun setupFilterVideoPlugin() {
+
+        if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
+            filterPlugin.init()
+            hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess() {
+
+                }
+
+            }, 30)
+        }
+    }
+
+    fun removeVideoFilterPlugIn() {
+
+        if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
+            filterPlugin.stop()
+            hmsSDK.removePlugin(filterPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess() {
+
+                }
+
+            })
+        }
+
     }
 
 
@@ -311,7 +357,7 @@ class MeetingViewModel(
     private val previewErrorData: MutableLiveData<HMSException> = MutableLiveData()
     private val previewUpdateData: MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> =
         MutableLiveData()
-    val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(false)
+    val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(settings.showStats)
     val peerCount = MutableLiveData(0)
 
     val previewRoomStateLiveData: LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
@@ -334,7 +380,7 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
-    fun isGoLiveInPreBuiltEnabled() = settings.useMockAPi
+    fun isGoLiveInPreBuiltEnabled() = settings.enableVideoFilter
 
     var showAudioMuted = MutableLiveData(false)
         private set
@@ -427,7 +473,7 @@ class MeetingViewModel(
             // Add all tracks as they come in.
             addSource(tracks) { meetTracks: List<MeetingTrack> ->
                 //if remote peer and local peer is present inset mode
-               synchronized(tracks) {
+               synchronized(_tracks) {
                    val excludeLocalTrackIfRemotePeerIsPreset =
                        //Don't inset when local peer and local screen share track is found
                        if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(
@@ -517,6 +563,7 @@ class MeetingViewModel(
                 Log.d("Pratim", "onPreview called")
                 unMuteAllTracks(localTracks)
                 previewUpdateData.postValue(Pair(room, localTracks))
+
             }
 
             override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
@@ -762,6 +809,9 @@ class MeetingViewModel(
                 val runningStreamingStates = listOf(HMSStreamingState.STARTED, HMSStreamingState.STARTING)
                 val runningRecordingStates = listOf(HMSRecordingState.STARTING, HMSRecordingState.STARTED, HMSRecordingState.PAUSED, HMSRecordingState.RESUMED)
 
+                if(toggleNcInPreview.value == true) {
+                    hmsSDK.setNoiseCancellationEnabled(true)
+                }
                 if (room.hlsStreamingState.state in runningStreamingStates)
                     streamingState.postValue(room.hlsStreamingState.state)
                 if (room.rtmpHMSRtmpStreamingState.state in runningStreamingStates)
@@ -2420,5 +2470,13 @@ class MeetingViewModel(
         return prebuiltInfoContainer.getLiveStreamingHeaderTitle()
     }
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
+    fun toggleNoiseCancellation() : Boolean {
+        hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())
+        return hmsSDK.getNoiseCancellationEnabled()
+    }
+
+    fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
+    // Show the NC button if it's a webrtc peer with noise cancellation available
+    fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 }
 

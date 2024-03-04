@@ -127,23 +127,21 @@
                 android:id="@+id/optionBlockFromChat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="@dimen/spacing_d2"
+
                 android:orientation="horizontal"
                 >
-                <ImageView
-                    android:id="@+id/blockFromChatIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="8dp"
-                    android:src="@drawable/block_from_chat_icon"
-                    />
+            
 
                 <TextView
+                    android:drawableStart="@drawable/block_from_chat_icon"
+                    android:drawablePadding="@dimen/spacing_d2"
                     android:id="@+id/blockFromChatText"
+                    android:paddingStart="@dimen/spacing_d1"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/inter_semibold"
                     android:lineHeight="20sp"
+                    android:paddingVertical="@dimen/spacing_d2"
                     android:translationY="1.53sp"
                     android:textSize="14sp"
                     android:lineSpacingExtra="3sp"

@@ -60,6 +60,9 @@ dependencies {
 
     //100ms.live prebuilt lib
     implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
+    // TODO update the version when it's ready
+    def hmsVersion = "2.9.5"
+    implementation "live.100ms:hms-noise-cancellation-android:$hmsVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"

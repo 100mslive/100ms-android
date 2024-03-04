@@ -1,11 +1,15 @@
 package live.hms.roomkit.ui.meeting.chat
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,6 +20,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.AllowedToMessageParticipants
 import live.hms.roomkit.ui.meeting.ChatPauseState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.sdk.models.HMSPeer
 
 
@@ -90,6 +96,21 @@ class ChatUseCase {
 //        canShowIndicator : () -> Boolean = {true}
     ) {
 
+        editText.doAfterTextChanged { editable ->
+            val colour = if ((editable?.length ?: 0) > 0) {
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+
+            } else {
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceLow,
+                    HMSPrebuiltTheme.getDefaults().onsurface_low_emp
+                )
+            }
+            sendButton.drawable.setTint(colour)
+        }
         fun updateState(externalChatPauseState: ChatPauseState? = null) {
             val overallChatState =
                 getOverallChatState(

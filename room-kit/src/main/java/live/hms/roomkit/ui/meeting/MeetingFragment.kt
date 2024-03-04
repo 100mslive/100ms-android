@@ -42,6 +42,7 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.filters.FilterBottomSheet
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerFragment
 import live.hms.roomkit.ui.meeting.activespeaker.HlsFragment
 import live.hms.roomkit.ui.meeting.audiomode.AudioModeFragment
@@ -1170,7 +1171,11 @@ class MeetingFragment : Fragment() {
                             }
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
-                        onNameChange = {  },
+                        onNameChange = {                 FilterBottomSheet().show(
+                            childFragmentManager,
+                            ChangeNameDialogFragment.TAG
+                        )
+                        },
                         showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
                         onRecordingClicked = {
                             val isBrowserRecordingRunning = meetingViewModel.hmsSDK.getRoom()?.browserRecordingState?.state in listOf(
@@ -1190,6 +1195,7 @@ class MeetingFragment : Fragment() {
                                 )
                             }
                         },
+                        onNoiseClicked = meetingViewModel::toggleNoiseCancellation
                     ).show(
                         childFragmentManager, AudioSwitchBottomSheetTAG
                     )
