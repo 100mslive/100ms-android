@@ -394,12 +394,13 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                             )
                             if(chatOpen) {
                                 ChatHeader(
-                                    meetingViewModel.getLiveStreamingHeaderTitle(),
-                                    if(chatDescriptionExpanded) meetingViewModel.getLiveStreamingHeaderDescription() else null,
-                                    meetingViewModel.getLogo(),
-                                    viewers ?:0,
-                                    ticks,
-                                    recordingState
+                                    heading = meetingViewModel.getLiveStreamingHeaderTitle(),
+                                    description = meetingViewModel.getLiveStreamingHeaderDescription(),
+                                    logoUrl = meetingViewModel.getLogo(),
+                                    viewers = viewers ?:0,
+                                    startedMillis = ticks,
+                                    recordingState = recordingState,
+                                    showExpandedView = chatDescriptionExpanded,
                                 ) {chatDescriptionExpanded = !chatDescriptionExpanded}
                                 ChatUI(
                                     childFragmentManager,
@@ -519,9 +520,9 @@ fun ChatHeader(
     description: String?,
     logoUrl: String?, viewers: Int, startedMillis: Long,
     recordingState: HMSRecordingState?,
+    showExpandedView : Boolean,
     chatDescriptionMoreClicked : () -> Unit
 ) {
-    val showExpandedView = description != null
     fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
         "$viewers"
     } else "${viewers / 1000f}K"
@@ -622,10 +623,10 @@ fun ChatHeader(
                     }
                 }
             }
-            description?.let {
+            if(showExpandedView && description != null) {
                 Text(
                     modifier = Modifier.padding(horizontal = Spacing2).verticalScroll(rememberScrollState()),
-                    text = it,
+                    text = description,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
                     fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
@@ -652,7 +653,8 @@ fun ChatHeaderPreview() {
         "https://storage.googleapis.com/100ms-cms-prod/cms/100ms_18a29f69f2/100ms_18a29f69f2.png",
         1000,
         30 * 60 * 1000,
-        HMSRecordingState.STARTING)
+        HMSRecordingState.STARTING,
+        true)
         {}
 }
 
