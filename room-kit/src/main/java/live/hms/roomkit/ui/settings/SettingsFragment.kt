@@ -497,9 +497,9 @@ class SettingsFragment : Fragment() {
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
-        settings.useMockAPi,
+        settings.enableVideoFilter,
         goLiveInPrebuiltDebugEnabled
-      ) { commitHelper.setGOLiveInPrebuilt(it) }
+      ) { commitHelper.enableVideoFilter(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),

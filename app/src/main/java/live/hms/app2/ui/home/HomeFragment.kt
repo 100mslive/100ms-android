@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -32,7 +31,6 @@ import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
 import live.hms.roomkit.ui.meeting.LEAVE_INFROMATION_WAS_END_ROOM
-import live.hms.roomkit.ui.settings.SettingsMode
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.EmailUtils
 import live.hms.roomkit.util.NameUtils.isValidUserName
@@ -171,7 +169,7 @@ class HomeFragment : Fragment() {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")
                             put("init", "https://qa-init.100ms.live/init")
-                            put("layout", if (settings.useMockAPi) "https://demo8271564.mockable.io" else "https://api-nonprod.100ms.live")
+                            put("layout", "https://api-nonprod.100ms.live")
                         }
                     })
             )

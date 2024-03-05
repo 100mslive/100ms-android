@@ -58,7 +58,7 @@ class SettingsStore(context: Context) {
 
     const val MUTE_LOCAL_AUDIO_ON_PHONE_RING = "mute-local-audio-on-phone-ring"
 
-    const val GO_LIVE_IN_PREBUILT = "go-live-in-prebuilt"
+    const val ENABLE_VIDEO_FILTER_IN_PREBUILT = "go-live-in-prebuilt"
 
     val APPLY_CONSTRAINTS_KEYS = arrayOf(
       VIDEO_FRAME_RATE,
@@ -147,9 +147,9 @@ class SettingsStore(context: Context) {
     get() = sharedPreferences.getBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, true)
     set(value) = putBoolean(MUTE_LOCAL_AUDIO_ON_PHONE_RING, value)
 
-  var useMockAPi : Boolean
-    get() = sharedPreferences.getBoolean(GO_LIVE_IN_PREBUILT, false)
-    set(value) = putBoolean(GO_LIVE_IN_PREBUILT, value)
+  var enableVideoFilter : Boolean
+    get() = sharedPreferences.getBoolean(ENABLE_VIDEO_FILTER_IN_PREBUILT, true)
+    set(value) = putBoolean(ENABLE_VIDEO_FILTER_IN_PREBUILT, value)
 
   var inPreBuiltDebugMode : Boolean
     get() = sharedPreferences.getBoolean(IN_PREBUILT_DEBUG_MODE, false)
@@ -353,7 +353,7 @@ class SettingsStore(context: Context) {
     fun setDisableAutoSimulcast(value: Boolean) = apply { editor.putBoolean(DISABLE_AUTO_SIMULCAST, value) }
 
     fun setPrebuiltDebugMode(value: Boolean) = apply { editor.putBoolean(IN_PREBUILT_DEBUG_MODE, value) }
-    fun setGOLiveInPrebuilt(value: Boolean) = apply { editor.putBoolean(GO_LIVE_IN_PREBUILT, value) }
+    fun enableVideoFilter(value: Boolean) = apply { editor.putBoolean(ENABLE_VIDEO_FILTER_IN_PREBUILT, value) }
 
 
     fun commit() {

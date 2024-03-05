@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -15,9 +16,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
+import live.hms.roomkit.ui.filters.FilterBottomSheet
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
@@ -147,6 +151,15 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val videoFilter = GridOptionItem(
+            "Video Filter", R.drawable.emoji_icon, {
+                onNameChange.invoke()
+                dismissAllowingStateLoss()
+
+            }, isSelected = false
+        )
+
+
 
 
         val group: Group = Section().apply {
@@ -175,6 +188,9 @@ class SessionOptionBottomSheet(
                         }, isSelected = false
                     )
                 )
+            }
+            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
+                add(videoFilter)
             }
         }
         gridOptionAdapter.update(listOf(group))

@@ -164,7 +164,7 @@
     <string name="mute_local_audio_on_phone_ring">Mute local audio on phone ring</string>
     <string name="disable_auto_simulcast">Disable Auto Simulcast</string>
     <string name="is_prebuilt_debug_enabled">Prebuilt (NonDebug/Debug)</string>
-    <string name="go_live_in_prebuilt_debug_enabled">Use Mock API</string>
+    <string name="go_live_in_prebuilt_debug_enabled">Enable Video Filter</string>
     <string name="raise_hand">Raise Hand</string>
     <string name="raise_hands">Raise Hand</string>
     <string name="peer_list">Participant(s)</string>

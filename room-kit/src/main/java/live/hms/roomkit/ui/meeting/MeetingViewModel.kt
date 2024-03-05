@@ -59,6 +59,7 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
+import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
@@ -124,6 +125,9 @@ class MeetingViewModel(
         .setLogSettings(hmsLogSettings)
         .build()
 
+
+    val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
+
     private var lastPollStartedTime : Long = 0
 
     val localHmsInteractivityCenter : HmsInteractivityCenter = hmsSDK.getHmsInteractivityCenter()
@@ -147,6 +151,7 @@ class MeetingViewModel(
                         }
                         HMSPollUpdateType.stopped -> viewModelScope.launch {
                             _events.emit(Event.PollEnded(hmsPoll))
+                            hmsRemoveNotificationEvent.postValue(HMSNotificationType.OpenPollOrQuiz(pollId = hmsPoll.pollId))
                         }
                         HMSPollUpdateType.resultsupdated -> viewModelScope.launch {
                             _events.emit(Event.PollVotesUpdated(hmsPoll))
@@ -182,6 +187,8 @@ class MeetingViewModel(
             return
         }
 
+
+
         hmsSDK.getAuthTokenByRoomCode(
             TokenRequest(roomCode, hmsPrebuiltOptions?.userId ?: UUID.randomUUID().toString()),
             TokenRequestOptions(tokenURL),
@@ -197,6 +204,43 @@ class MeetingViewModel(
                 }
 
             })
+    }
+
+    fun showVideoFilterIcon() = settings.enableVideoFilter
+
+     fun setupFilterVideoPlugin() {
+
+        if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
+            filterPlugin.init()
+            hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess() {
+
+                }
+
+            }, 30)
+        }
+    }
+
+    fun removeVideoFilterPlugIn() {
+
+        if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
+            filterPlugin.stop()
+            hmsSDK.removePlugin(filterPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess() {
+
+                }
+
+            })
+        }
+
     }
 
 
@@ -313,7 +357,7 @@ class MeetingViewModel(
     private val previewErrorData: MutableLiveData<HMSException> = MutableLiveData()
     private val previewUpdateData: MutableLiveData<Pair<HMSRoom, Array<HMSTrack>>> =
         MutableLiveData()
-    val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(false)
+    val statsToggleData: MutableLiveData<Boolean> = MutableLiveData(settings.showStats)
     val peerCount = MutableLiveData(0)
 
     val previewRoomStateLiveData: LiveData<Pair<HMSRoomUpdate, HMSRoom>> = roomState
@@ -336,7 +380,7 @@ class MeetingViewModel(
 
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
-    fun isGoLiveInPreBuiltEnabled() = settings.useMockAPi
+    fun isGoLiveInPreBuiltEnabled() = settings.enableVideoFilter
 
     var showAudioMuted = MutableLiveData(false)
         private set
@@ -519,6 +563,7 @@ class MeetingViewModel(
                 Log.d("Pratim", "onPreview called")
                 unMuteAllTracks(localTracks)
                 previewUpdateData.postValue(Pair(room, localTracks))
+
             }
 
             override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
@@ -2133,7 +2178,7 @@ class MeetingViewModel(
         }
         return valid
     }
-    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
+    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll, timeTakenMillis : Long?) : Boolean {
         if(option == null) {
             return false
         }
@@ -2159,10 +2204,11 @@ class MeetingViewModel(
 //
 //        localHmsInteractivityCenter.add()
     }
-    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
-        val valid = options != null
+    fun saveInfoMultiChoice(question : HMSPollQuestion, selectedOptionsIndices : List<Int>?, hmsPoll: HmsPoll, timeTakenMillis : Long?) : Boolean {
+        val valid = selectedOptionsIndices != null
+        //
         val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
-            options?.contains(index) == true
+            selectedOptionsIndices?.contains(index) == true
         }
         if(valid && answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
