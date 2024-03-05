@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
@@ -36,6 +37,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
@@ -263,6 +265,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                             controlsVisible = false
                         }
                     }
+                    var chatDescriptionExpanded by remember { mutableStateOf(false) }
 
                     fun openSessionOptions() {
                         SessionOptionBottomSheet(
@@ -390,12 +393,12 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                             if(chatOpen) {
                                 ChatHeader(
                                     meetingViewModel.getLiveStreamingHeaderTitle(),
-                                    meetingViewModel.getLiveStreamingHeaderDescription(),
+                                    if(chatDescriptionExpanded) meetingViewModel.getLiveStreamingHeaderDescription() else null,
                                     meetingViewModel.getLogo(),
                                     viewers ?:0,
                                     ticks,
                                     recordingState
-                                )
+                                ) {chatDescriptionExpanded = !chatDescriptionExpanded}
                                 ChatUI(
                                     childFragmentManager,
                                     chatViewModel,
@@ -513,20 +516,54 @@ fun ChatHeader(
     heading: String?,
     description: String?,
     logoUrl: String?, viewers: Int, startedMillis: Long,
-    recordingState: HMSRecordingState?
+    recordingState: HMSRecordingState?,
+    chatDescriptionMoreClicked : () -> Unit
 ) {
+    val showExpandedView = description != null
     fun getViewersDisplayNum(viewers: Int): String = if (viewers < 1000) {
         "$viewers"
     } else "${viewers / 1000f}K"
 
     fun getTimeDisplayNum(startedMillis: Long): String = millisToText(startedMillis, false, "s")
 
-    var expand by remember { mutableStateOf(false) }
+    val contentPadding = Modifier.padding(Spacing2)
+    var chatHeaderModifier = Modifier
+        .fillMaxWidth()
+    if(showExpandedView) {
+        chatHeaderModifier = chatHeaderModifier.then(Modifier.fillMaxHeight())
+    }
     Column {
-        Column(modifier = Modifier.padding(Spacing2)) {
+        Column(modifier = chatHeaderModifier) {
+            if (showExpandedView) {
+                Row(modifier = Modifier.padding(Spacing2)) {
+                    Text(
+                        "About Session",
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
+                        fontWeight = FontWeight(600),
+                        color = Variables.OnSurfaceHigh,
+                        letterSpacing = 0.15.sp,
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Image(
+                        modifier = Modifier.pointerInput(Unit) {
+                            detectTapGestures(onTap = { chatDescriptionMoreClicked() })
+                        },
+                        painter = painterResource(id = live.hms.roomkit.R.drawable.hls_about_description_down_chevron),
+                        contentDescription = "collapse"
+                    )
+                }
+                Divider(
+                    color = Variables.BorderBright,
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillMaxWidth()
+                )
+               // Spacer(modifier = Modifier.height(Spacing2))
+            }
             Row(
-                Modifier
-                    .fillMaxWidth(),
+                modifier = contentPadding,
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -567,13 +604,11 @@ fun ChatHeader(
                             )
                         )
 
-//                        if(!expand) {
+                        if(!showExpandedView) {
                             Text(
-                                text = if(!expand) "...more" else "...less",
+                                text = "...more",
                                 modifier = Modifier.pointerInput(Unit) {
-                                    detectTapGestures(onTap = {
-                                        expand = !expand
-                                    })
+                                    detectTapGestures(onTap = {chatDescriptionMoreClicked()})
                                 },
                                 fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
                                 fontSize = 12.sp,
@@ -581,25 +616,21 @@ fun ChatHeader(
                                 fontWeight = FontWeight(600),
                                 color = Variables.OnSurfaceHigh,
                             )
-//                        }
+                        }
                     }
                 }
             }
-            if(expand) {
-                description?.let {
-                    Text(
-                        modifier = Modifier.padding(top = Spacing2),
-                        text = it,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp,
-                        fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-                        fontWeight = FontWeight(400),
-                        color = Variables.OnSurfaceMedium,
-                    )
-                }
+            description?.let {
+                Text(
+                    modifier = contentPadding,
+                    text = it,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                    fontWeight = FontWeight(400),
+                    color = Variables.OnSurfaceMedium,
+                )
             }
-
-
         }
         Divider(
             color = Variables.BorderBright,
@@ -619,8 +650,8 @@ fun ChatHeaderPreview() {
         "https://storage.googleapis.com/100ms-cms-prod/cms/100ms_18a29f69f2/100ms_18a29f69f2.png",
         1000,
         30 * 60 * 1000,
-        HMSRecordingState.STARTING
-    )
+        HMSRecordingState.STARTING)
+        {}
 }
 
 @Composable
