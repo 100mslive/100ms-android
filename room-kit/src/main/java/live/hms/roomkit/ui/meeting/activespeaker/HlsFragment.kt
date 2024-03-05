@@ -37,6 +37,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -622,7 +624,7 @@ fun ChatHeader(
             }
             description?.let {
                 Text(
-                    modifier = contentPadding,
+                    modifier = Modifier.padding(horizontal = Spacing2).verticalScroll(rememberScrollState()),
                     text = it,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
