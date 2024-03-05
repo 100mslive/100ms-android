@@ -607,7 +607,7 @@ fun ChatHeader(
                             )
                         )
 
-                        if(!showExpandedView) {
+                        if(!showExpandedView && description != null) {
                             Text(
                                 text = "...more",
                                 modifier = Modifier.pointerInput(Unit) {
