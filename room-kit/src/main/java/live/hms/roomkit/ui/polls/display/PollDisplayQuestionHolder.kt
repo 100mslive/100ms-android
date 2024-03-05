@@ -30,8 +30,8 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
     private val canRoleViewVotes : Boolean,
     val poll : HmsPoll,
     val saveInfoText: (text : String, position : Int) -> Boolean,
-    val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll,timeTakenMillis : Long) -> Boolean,
-    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll,timeTakenMillis : Long) -> Boolean,
+    val saveInfoSingleChoice: (question : HMSPollQuestion, Int?, poll : HmsPoll,timeTakenMillis : Long?) -> Boolean,
+    val saveInfoMultiChoice: (question : HMSPollQuestion, List<Int>?, poll : HmsPoll,timeTakenMillis : Long?) -> Boolean,
     // This isn't implemented yet
     val skipped : (question : HMSPollQuestion, poll : HmsPoll) -> Unit,
     val endPoll : (HmsPoll) -> Unit,
@@ -247,10 +247,15 @@ class PollDisplayQuestionHolder<T : ViewBinding>(
             }
 
             votebutton.setOnSingleClickListener {
+                val questionStartTime = getQuestionStartTime(question) ?: 0
+                val timeTaken = if(question.poll.category == HmsPollCategory.POLL)
+                    null
+                else System.currentTimeMillis() - questionStartTime
+
                 val voted : Boolean = if(question.question.type == HMSPollQuestionType.singleChoice){
-                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll, System.currentTimeMillis() - (getQuestionStartTime(question) ?:0))
+                    saveInfoSingleChoice(question.question, adapter.getSelectedOptions().firstOrNull(), poll, timeTaken)
                 } else if(question.question.type == HMSPollQuestionType.multiChoice) {
-                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll,System.currentTimeMillis() - (getQuestionStartTime(question) ?:0))
+                    saveInfoMultiChoice(question.question, adapter.getSelectedOptions(), poll, timeTaken)
                 } else {
                     saveInfoText("What?", bindingAdapterPosition)
                 }
