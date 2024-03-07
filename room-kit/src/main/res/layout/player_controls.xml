@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.media3.ui.PlayerControlView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent"
-    android:background="#00FFFFFF"
-    app:animation_enabled="false"
-    app:show_timeout="0"
-    app:show_subtitle_button="false"
-    app:played_color="#2572ED"
-    app:scrubber_drawable="@drawable/scrubber_drawable"
-    app:scrubber_dragged_size="15dp"
-    app:buffered_color="#19FFFFFF"
-    app:unplayed_color="#19FFFFFF"
-    >
+    android:layout_width="match_parent"
+    />
+<!--<androidx.media3.ui.PlayerControlView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:background="#00FFFFFF"-->
+<!--    app:animation_enabled="false"-->
+<!--    app:show_timeout="0"-->
+<!--    app:show_subtitle_button="false"-->
+<!--    app:played_color="#2572ED"-->
+<!--    app:scrubber_drawable="@drawable/scrubber_drawable"-->
+<!--    app:scrubber_dragged_size="15dp"-->
+<!--    app:buffered_color="#19FFFFFF"-->
+<!--    app:unplayed_color="#19FFFFFF"-->
+<!--    >-->
 
-</androidx.media3.ui.PlayerControlView>
+<!--</androidx.media3.ui.PlayerControlView>-->

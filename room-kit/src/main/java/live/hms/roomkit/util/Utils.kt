@@ -8,7 +8,7 @@ import android.provider.OpenableColumns
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.media3.common.C
+//import androidx.media3.common.C
 import live.hms.video.utils.HMSLogger
 import java.io.IOException
 import java.io.InputStream
@@ -67,9 +67,9 @@ fun Uri.getName(context: Context): String? {
 
 fun getStringForTime(builder: StringBuilder, formatter: Formatter, timeMs: Long): String {
   var timeMs = timeMs
-  if (timeMs == C.TIME_UNSET) {
-    timeMs = 0
-  }
+//  if (timeMs == C.TIME_UNSET) {
+//    timeMs = 0
+//  }
   val prefix = if (timeMs < 0) "-" else ""
   timeMs = Math.abs(timeMs)
   val totalSeconds = (timeMs + 500) / 1000
