@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -66,10 +67,13 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -555,7 +559,7 @@ fun ChatHeader(
                         .height(1.dp)
                         .fillMaxWidth()
                 )
-               // Spacer(modifier = Modifier.height(Spacing2))
+                // Spacer(modifier = Modifier.height(Spacing2))
             }
             Row(
                 modifier = contentPadding,
@@ -583,35 +587,41 @@ fun ChatHeader(
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)) {
-                        Text(
-                            "${getViewersDisplayNum(viewers)} watching · Started ${
+                        val textStyle = SpanStyle(
+                            fontSize = 12.sp,
+                            fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                            fontWeight = FontWeight(400),
+                            color = Variables.OnSurfaceMedium,
+                            letterSpacing = 0.4.sp,
+                        )
+                        val moreStyle = SpanStyle(
+                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight(600),
+                                color = Variables.OnSurfaceHigh,
+                        )
+
+                        ClickableText(text = buildAnnotatedString {
+                            withStyle(textStyle) {
+                            append("${getViewersDisplayNum(viewers)} watching · Started ${
                                 getTimeDisplayNum(
                                     startedMillis
                                 )
-                            } ago${if (recordingState == HMSRecordingState.STARTED) " · Recording" else ""}",
-                            style = TextStyle(
-                                fontSize = 12.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-                                fontWeight = FontWeight(400),
-                                color = Variables.OnSurfaceMedium,
-                                letterSpacing = 0.4.sp,
-                            )
-                        )
-
-                        if(!showExpandedView && description != null) {
-                            Text(
-                                text = "...more",
-                                modifier = Modifier.pointerInput(Unit) {
-                                    detectTapGestures(onTap = {chatDescriptionMoreClicked()})
-                                },
-                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
-                                fontSize = 12.sp,
-                                lineHeight = 16.sp,
-                                fontWeight = FontWeight(600),
-                                color = Variables.OnSurfaceHigh,
-                            )
-                        }
+                            } ago")
+                                if (recordingState == HMSRecordingState.STARTED) {
+                                    append(" · Recording")
+                                }
+                            }
+                            if(!showExpandedView && description != null) {
+                                // Spacing for the more
+                                append("   ")
+                                withStyle(moreStyle) {
+                                    append("...more")
+                                }
+                            }
+                        }, onClick = {
+                            chatDescriptionMoreClicked()
+                        })
                     }
                 }
             }
@@ -638,7 +648,35 @@ fun ChatHeader(
 
 @Preview
 @Composable
-fun ChatHeaderPreview() {
+fun ChatHeaderClickablePreview() {
+    var expanded by remember { mutableStateOf(false) }
+    ChatHeader(heading = "Header biggie bot",
+        description = "Desc something",
+        "https://storage.googleapis.com/100ms-cms-prod/cms/100ms_18a29f69f2/100ms_18a29f69f2.png",
+        1000,
+        120* 40 * 1100,
+        HMSRecordingState.STARTED,
+        expanded)
+    { expanded = !expanded}
+}
+
+@Preview
+@Composable
+fun ChatHeaderCollapsedPreview() {
+    ChatHeader(
+        heading = "Header biggie bot",
+        description = "Desc something",
+        "https://storage.googleapis.com/100ms-cms-prod/cms/100ms_18a29f69f2/100ms_18a29f69f2.png",
+        1000,
+        120* 40 * 1100,
+        HMSRecordingState.STARTED,
+        false)
+    {}
+}
+
+@Preview
+@Composable
+fun ChatHeaderExpandedPreview() {
     ChatHeader(
         heading = "Header",
         description = "Desc something",
@@ -649,7 +687,6 @@ fun ChatHeaderPreview() {
         true)
         {}
 }
-
 @Composable
 fun Chat(messages: List<ChatMessage>) {
     LazyColumn(
