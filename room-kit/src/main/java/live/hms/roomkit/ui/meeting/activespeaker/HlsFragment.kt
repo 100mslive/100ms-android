@@ -615,10 +615,12 @@ fun ChatHeader(
                                 )
                             } ago")
                                 if (recordingState == HMSRecordingState.STARTED) {
-                                    append(" · Recording   ")
+                                    append(" · Recording")
                                 }
                             }
                             if(!showExpandedView && description != null) {
+                                // Spacing for the more
+                                append("   ")
                                 withStyle(moreStyle) {
                                     append("...more")
                                 }
