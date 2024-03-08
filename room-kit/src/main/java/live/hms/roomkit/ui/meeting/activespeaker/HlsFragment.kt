@@ -593,18 +593,6 @@ fun ChatHeader(
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)) {
-//                        Text(
-//                            "${if (recordingState == HMSRecordingState.STARTED) " · Recording" else ""}   ${if(showExpandedView && description != null) "…more" else ""}",
-//                            style = TextStyle(
-//                                fontSize = 12.sp,
-//                                lineHeight = 16.sp,
-//                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
-//                                fontWeight = FontWeight(400),
-//                                color = Variables.OnSurfaceMedium,
-//                                letterSpacing = 0.4.sp,
-//                            )
-//                        )
-
                         val textStyle = SpanStyle(
                             fontSize = 12.sp,
                             fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
@@ -638,20 +626,6 @@ fun ChatHeader(
                         }, onClick = {
                             chatDescriptionMoreClicked()
                         })
-
-//                        if(!showExpandedView && description != null) {
-//                            Text(
-//                                text = "...more",
-//                                modifier = Modifier.pointerInput(Unit) {
-//                                    detectTapGestures(onTap = {chatDescriptionMoreClicked()})
-//                                },
-//                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
-//                                fontSize = 12.sp,
-//                                lineHeight = 16.sp,
-//                                fontWeight = FontWeight(600),
-//                                color = Variables.OnSurfaceHigh,
-//                            )
-//                        }
                     }
                 }
             }
