@@ -1,16 +1,13 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
 import android.view.LayoutInflater
-import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
@@ -39,7 +36,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
@@ -249,7 +245,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()
-                            .wrapContentSize(Alignment.Center),
+                            .wrapContentSize(Center),
                         color = PrimaryDefault
                     )
                 } else {
@@ -290,15 +286,12 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                         Row {
 
                             HlsComposable(
-                                isChatEnabled = isChatEnabled,
                                 hlsViewModel = hlsViewModel,
                                 controlsVisible = controlsVisible,
                                 videoTapped = { controlsVisible = !controlsVisible },
-                                context = context,
                                 player = player,
                                 settingsButtonTapped = { showTrackSelection(player) },
                                 maximizeClicked = {chatOpen = !chatOpen },
-                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
                                 pauseButton = {
                                     PlayPauseButton({if(player.getNativePlayer().isPlaying) {
                                     player.getNativePlayer().pause()
@@ -310,11 +303,13 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 interacted = !interacted
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
+                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
                                 hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
                                 behindBy = behindLiveByState,
+                                isChatEnabled = isChatEnabled,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
@@ -329,9 +324,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 rewindButton = {RewindButton {
                                     player.seekBackward(10, TimeUnit.SECONDS)
                                     interacted = !interacted
-                                }},
-                                interacted = { interacted = !interacted }
-                            )
+                                }}
+                            ) { interacted = !interacted }
                             Column {
                                 if(chatOpen) {
                                     ChatUI(
@@ -348,15 +342,12 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     }, { isLandscape ->
                         Column {
                             HlsComposable(
-                                isChatEnabled = isChatEnabled,
                                 hlsViewModel = hlsViewModel,
                                 controlsVisible = controlsVisible,
                                 videoTapped = { controlsVisible = !controlsVisible },
-                                context = context,
                                 player = player,
                                 settingsButtonTapped = { showTrackSelection(player) },
                                 maximizeClicked = {chatOpen = !chatOpen },
-                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
                                 pauseButton = {
                                     PlayPauseButton({if(player.getNativePlayer().isPlaying) {
                                         player.getNativePlayer().pause()
@@ -368,11 +359,13 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                         interacted = !interacted
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
+                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
                                 hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
                                 behindBy = behindLiveByState,
+                                isChatEnabled = isChatEnabled,
                                 goLiveClicked = {goLive(player)},
                                 onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
@@ -389,9 +382,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                     player.seekBackward(10, TimeUnit.SECONDS)
                                     player.getNativePlayer().play()
                                     interacted = !interacted
-                                } },
-                                interacted = { interacted = !interacted }
-                            )
+                                } }
+                            ) { interacted = !interacted }
                             if(chatOpen) {
                                 ChatHeader(
                                     heading = meetingViewModel.getLiveStreamingHeaderTitle(),
@@ -825,31 +817,29 @@ fun HlsComposable(
     hlsViewModel: HlsViewModel,
     controlsVisible: Boolean,
     videoTapped: () -> Unit,
-    context: Context,
     player: HmsHlsPlayer,
     settingsButtonTapped: () -> Unit,
     maximizeClicked: () -> Unit,
-    pauseButton : @Composable () -> Unit,
-    closedCaptionsButton : @Composable () -> Unit,
-    hlsChatIcon : @Composable () -> Unit,
-    chatOpen : Boolean,
-    isLandscape : Boolean,
-    isLive : Boolean?,
-    behindBy : String,
-    isChatEnabled : Boolean,
-    goLiveClicked : () -> Unit,
+    pauseButton: @Composable () -> Unit,
+    closedCaptionsButton: @Composable () -> Unit,
+    hlsChatIcon: @Composable () -> Unit,
+    chatOpen: Boolean,
+    isLandscape: Boolean,
+    isLive: Boolean?,
+    behindBy: String,
+    isChatEnabled: Boolean,
+    goLiveClicked: () -> Unit,
     onCloseButtonClicked: () -> Unit,
-    closedCaptionsEnabled : Boolean,
-    isHandRaised : Boolean,
-    toggleHandRaise : () -> Unit,
-    sessionOptionsButtonTapped : () -> Unit,
-    showDvrControls : Boolean,
+    closedCaptionsEnabled: Boolean,
+    isHandRaised: Boolean,
+    toggleHandRaise: () -> Unit,
+    sessionOptionsButtonTapped: () -> Unit,
+    showDvrControls: Boolean,
     forwardButton: @Composable () -> Unit,
-    rewindButton : @Composable () -> Unit,
-    interacted : () -> Unit
+    rewindButton: @Composable () -> Unit,
+    interacted: () -> Unit
 ) {
 
-    lateinit var scaleGestureListener : ScaleGestureDetector
     // Keeping it one box so rows and columns don't change the layout
     Box {
 
@@ -1027,7 +1017,7 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
                 rewindButton : @Composable () -> Unit,
                 forwardButton : @Composable () -> Unit,
                 interacted : () -> Unit) {
-    BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+    BoxWithConstraints(modifier = modifier, contentAlignment = Center) {
         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)){
             rewindButton()
             playPauseButton()
