@@ -61,7 +61,8 @@ dependencies {
     //100ms.live prebuilt lib
     implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
 
-    def hmsVersion = "2.9.6"
+    //100ms noise cancellation dep
+    def hmsVersion = "2.9.51"
     implementation "live.100ms:hms-noise-cancellation-android:$hmsVersion"
 
     // Navigation
