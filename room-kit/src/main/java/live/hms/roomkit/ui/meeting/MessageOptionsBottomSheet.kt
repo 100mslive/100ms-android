@@ -102,17 +102,17 @@ class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
         with(binding) {
             optionPinMessage.setOnSingleClickListener {
                 meetingViewModel.pinMessage(chatMessage)
-                dismiss()
+                dismissAllowingStateLoss()
             }
 
             optionBlockFromChat.setOnSingleClickListener {
                 meetingViewModel.blockUser(chatMessage)
-                dismiss()
+                dismissAllowingStateLoss()
             }
 
             optionHideMessage.setOnSingleClickListener {
                 meetingViewModel.hideMessage(chatMessage)
-                dismiss()
+                dismissAllowingStateLoss()
             }
         }
     }

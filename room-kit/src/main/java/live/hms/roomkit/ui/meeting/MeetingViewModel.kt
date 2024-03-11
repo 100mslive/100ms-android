@@ -2178,7 +2178,7 @@ class MeetingViewModel(
         }
         return valid
     }
-    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
+    fun saveInfoSingleChoice(question : HMSPollQuestion, option: Int?, hmsPoll: HmsPoll, timeTakenMillis : Long?) : Boolean {
         if(option == null) {
             return false
         }
@@ -2204,10 +2204,11 @@ class MeetingViewModel(
 //
 //        localHmsInteractivityCenter.add()
     }
-    fun saveInfoMultiChoice(question : HMSPollQuestion, options : List<Int>?, hmsPoll: HmsPoll, timeTakenMillis : Long) : Boolean {
-        val valid = options != null
+    fun saveInfoMultiChoice(question : HMSPollQuestion, selectedOptionsIndices : List<Int>?, hmsPoll: HmsPoll, timeTakenMillis : Long?) : Boolean {
+        val valid = selectedOptionsIndices != null
+        //
         val answer = question.options?.filterIndexed { index, hmsPollQuestionOption ->
-            options?.contains(index) == true
+            selectedOptionsIndices?.contains(index) == true
         }
         if(valid && answer != null) {
             val response = HMSPollResponseBuilder(hmsPoll, null)
@@ -2469,6 +2470,8 @@ class MeetingViewModel(
     fun getLiveStreamingHeaderTitle(): String?{
         return prebuiltInfoContainer.getLiveStreamingHeaderTitle()
     }
+
+    fun getLiveStreamingHeaderDescription() = prebuiltInfoContainer.getLiveStreamingHeaderDescription()
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
     fun toggleNoiseCancellation() : Boolean {
         hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())
