@@ -320,6 +320,7 @@ internal fun FragmentMeetingBinding.applyTheme() {
     userBlockedTheme(userBlocked)
     chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
     configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
+    chatUnreadMessagesTheming(unreadMessageCount)
     chatView.background = getChatBackgroundDrawable()
     iconSend.drawable.setTint(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.onSurfaceLow,
@@ -499,18 +500,6 @@ internal fun FragmentMeetingBinding.applyTheme() {
 
     buttonSettingsMenu?.setIconEnabled(R.drawable.ic_settings_btn)
 
-    unreadMessageCount.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.primaryDefault,
-        HMSPrebuiltTheme.getDefaults().primary_default,
-        R.drawable.badge_circle_20
-    )
-
-    unreadMessageCount.setTextColor(
-        getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-        )
-    )
 
     buttonSwitchCamera?.setIconEnabled(R.drawable.ic_switch_camera)
 
@@ -1706,6 +1695,21 @@ private fun configureChatControlsTheme(
     )
 }
 
+private fun chatUnreadMessagesTheming(unreadMessageCount: TextView) {
+    unreadMessageCount.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
+        R.drawable.badge_circle_20
+    )
+
+    unreadMessageCount.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+}
+
 internal fun LayoutChatParticipantCombinedTabChatBinding.applyTheme() {
     pinMessageTheme(pinCloseButton)
     userBlockedTheme(userBlocked)
@@ -1771,6 +1775,7 @@ internal fun LayoutChatMergeBinding.applyTheme() {
     userBlockedTheme(userBlocked)
     chatPausedTheme(chatPausedContainer, chatPausedTitle,chatPausedBy)
     configureChatControlsTheme(sendToBackground, sendToChipText, chatOptionsCard, chatOptions)
+
     chatViewBackground.background = getChatBackgroundDrawable()
     handRaise.background = getShape().apply {
         val color = getColorOrDefault(

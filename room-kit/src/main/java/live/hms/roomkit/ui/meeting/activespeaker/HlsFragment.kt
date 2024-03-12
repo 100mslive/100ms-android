@@ -16,6 +16,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -73,6 +76,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -257,6 +261,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
                     val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
+                    val unreadMessagesCount by chatViewModel.unreadMessagesCount.observeAsState(initial = 0)
                     // Turn off controls 3 seconds after they become visible
                     LaunchedEffect(key1 = viewMode) {
                         hlsViewModel.restarted()
@@ -308,7 +313,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled, unreadMessagesCount){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
@@ -364,7 +369,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled){chatOpen = !chatOpen}},
+                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled, unreadMessagesCount){chatOpen = !chatOpen}},
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
@@ -627,7 +632,9 @@ fun ChatHeader(
             }
             if(showExpandedView && description != null) {
                 Text(
-                    modifier = Modifier.padding(horizontal = Spacing2).verticalScroll(rememberScrollState()),
+                    modifier = Modifier
+                        .padding(horizontal = Spacing2)
+                        .verticalScroll(rememberScrollState()),
                     text = description,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
@@ -1335,16 +1342,39 @@ fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
     )
 }
 
+@Preview
 @Composable
-fun HlsChatIcon(chatEnabled : Boolean, buttonClicked: () -> Unit) {
-    if(chatEnabled) {
-        Image(painter =
-        painterResource(id = live.hms.roomkit.R.drawable.hls_chat_off),
-            contentDescription = "Chat Open",
-            contentScale = ContentScale.None,
-            modifier = Modifier
-                .clickable { buttonClicked() }
-                .height(32.dp))
+fun ShowChatIcon() {
+    HlsChatIcon(chatEnabled = true, 5) {
+    }
+}
+
+@Composable
+fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int, buttonClicked: () -> Unit) {
+    if (chatEnabled) {
+        Box {
+            Image(painter =
+            painterResource(id = live.hms.roomkit.R.drawable.hls_chat_off),
+                contentDescription = "Chat Open",
+                contentScale = ContentScale.None,
+                modifier = Modifier
+                    .clickable { buttonClicked() }
+                    .height(32.dp))
+            if(unreadMessages > 0) {
+                Text(
+                    unreadMessages.toString(),
+                    Modifier
+                        .size(20.dp)
+                        .background(
+                            color = PrimaryDefault,
+                            shape = RoundedCornerShape(50),
+                        )
+                        .padding(top = 1.dp),
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
     }
 }
 
