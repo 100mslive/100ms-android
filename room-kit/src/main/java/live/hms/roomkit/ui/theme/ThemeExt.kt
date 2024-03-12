@@ -500,8 +500,8 @@ internal fun FragmentMeetingBinding.applyTheme() {
     buttonSettingsMenu?.setIconEnabled(R.drawable.ic_settings_btn)
 
     unreadMessageCount.setBackgroundAndColor(
-        HMSPrebuiltTheme.getColours()?.surfaceDefault,
-        HMSPrebuiltTheme.getDefaults().surface_default,
+        HMSPrebuiltTheme.getColours()?.primaryDefault,
+        HMSPrebuiltTheme.getDefaults().primary_default,
         R.drawable.badge_circle_20
     )
 
