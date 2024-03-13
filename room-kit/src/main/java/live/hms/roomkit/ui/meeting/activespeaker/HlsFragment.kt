@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,6 +58,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -127,6 +129,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.roomkit.ui.meeting.compose.Variables.Companion.OnSurfaceHigh
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing0
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
@@ -1352,25 +1355,29 @@ fun ShowChatIcon() {
 @Composable
 fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int, buttonClicked: () -> Unit) {
     if (chatEnabled) {
-        Box {
+        Box(contentAlignment = TopEnd) {
             Image(painter =
             painterResource(id = live.hms.roomkit.R.drawable.hls_chat_off),
                 contentDescription = "Chat Open",
                 contentScale = ContentScale.None,
                 modifier = Modifier
                     .clickable { buttonClicked() }
-                    .height(32.dp))
+                    .size(40.dp))
             if(unreadMessages > 0) {
                 Text(
-                    unreadMessages.toString(),
+                    if(unreadMessages < 99) unreadMessages.toString() else "99+",
                     Modifier
-                        .size(20.dp)
+                        .defaultMinSize(16.dp, 12.dp)
                         .background(
                             color = PrimaryDefault,
-                            shape = RoundedCornerShape(50),
+                            shape = RoundedCornerShape(65),
                         )
-                        .padding(top = 1.dp),
-                    fontSize = 12.sp,
+                    ,
+                    lineHeight = 16.sp,
+                    color = OnSurfaceHigh,
+                    fontSize = 10.sp,
+                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                    fontWeight = FontWeight(600),
                     textAlign = TextAlign.Center,
                 )
             }
