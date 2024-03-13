@@ -215,6 +215,9 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
             seekToDefaultPosition()
         }
     }
+    private fun hideKeyboard() {
+        activity?.hideKeyboard()
+    }
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -271,6 +274,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     LaunchedEffect(key1 = chatOpen){
                         if(chatOpen)
                             chatViewModel.markAllMessagesRead()
+                        else
+                            hideKeyboard()
                     }
                     LaunchedEffect(key1 = viewMode) {
                         hlsViewModel.restarted()
