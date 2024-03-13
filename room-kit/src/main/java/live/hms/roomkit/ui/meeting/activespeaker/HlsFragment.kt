@@ -37,7 +37,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
@@ -222,6 +221,9 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
         hlsViewModel.streamEndedEvent.observe(viewLifecycleOwner) {
             StreamEnded.launch(parentFragmentManager)
         }
+        meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
+            chatViewModel.receivedMessage(it)
+        }
         binding.applyTheme()
         composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -264,8 +266,12 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
                     val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
-                    val unreadMessagesCount by chatViewModel.unreadMessagesCount.observeAsState(initial = 0)
+                    val unreadMessagesCount by chatViewModel.unreadMessagesCount.observeAsState()
                     // Turn off controls 3 seconds after they become visible
+                    LaunchedEffect(key1 = chatOpen){
+                        if(chatOpen)
+                            chatViewModel.markAllMessagesRead()
+                    }
                     LaunchedEffect(key1 = viewMode) {
                         hlsViewModel.restarted()
                     }
@@ -316,7 +322,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled, unreadMessagesCount){chatOpen = !chatOpen}},
+                                unreadMessagesCount = unreadMessagesCount,
+                                chatIconClicked = { chatOpen = !chatOpen },
                                 chatOpen = chatOpen,
                                 isLandscape = isLandScape,
                                 isLive = isLive,
@@ -372,7 +379,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
-                                hlsChatIcon = {if(!chatOpen) HlsChatIcon(isChatEnabled, unreadMessagesCount){chatOpen = !chatOpen}},
+                                unreadMessagesCount = unreadMessagesCount,
+                                chatIconClicked = { chatOpen = !chatOpen },
                                 chatOpen = chatOpen,
                                 isLandscape = isLandscape,
                                 isLive = isLive,
@@ -869,12 +877,13 @@ fun HlsComposable(
     maximizeClicked: () -> Unit,
     pauseButton: @Composable () -> Unit,
     closedCaptionsButton: @Composable () -> Unit,
-    hlsChatIcon: @Composable () -> Unit,
     chatOpen: Boolean,
     isLandscape: Boolean,
     isLive: Boolean?,
     behindBy: String,
     isChatEnabled: Boolean,
+    unreadMessagesCount : Int?,
+    chatIconClicked : () -> Unit,
     goLiveClicked: () -> Unit,
     onCloseButtonClicked: () -> Unit,
     closedCaptionsEnabled: Boolean,
@@ -1008,7 +1017,7 @@ fun HlsComposable(
 
                         Spacer(modifier = Modifier.weight(1f))
 
-                        hlsChatIcon()
+                        if(!chatOpen) { HlsChatIcon(isChatEnabled, unreadMessagesCount, chatIconClicked) }
 
                         Spacer(modifier = Modifier.padding(start = Spacing2))
 
@@ -1353,7 +1362,7 @@ fun ShowChatIcon() {
 }
 
 @Composable
-fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int, buttonClicked: () -> Unit) {
+fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int?, buttonClicked: () -> Unit) {
     if (chatEnabled) {
         Box(contentAlignment = TopEnd) {
             Image(painter =
@@ -1363,7 +1372,7 @@ fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int, buttonClicked: () -> 
                 modifier = Modifier
                     .clickable { buttonClicked() }
                     .size(40.dp))
-            if(unreadMessages > 0) {
+            if(unreadMessages != null && unreadMessages > 0) {
                 Text(
                     if(unreadMessages < 99) unreadMessages.toString() else "99+",
                     Modifier

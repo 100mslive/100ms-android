@@ -171,12 +171,16 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
     //  otherwise the chat would only have messages that were received when it opened.
     //  and lose all of them when it was closed.
     val messages = MutableLiveData<List<ChatMessage>>()
-    val unreadMessagesCount = MutableLiveData(0)
+    private val _unreadMessagesCount = MutableLiveData(0)
+    val unreadMessagesCount : LiveData<Int> = _unreadMessagesCount
 
+    fun markAllMessagesRead() {
+        _unreadMessagesCount.postValue(0)
+    }
     fun clearMessages() {
         _messages.clear()
         messages.postValue(_messages)
-        unreadMessagesCount.postValue(0)
+        _unreadMessagesCount.postValue(0)
     }
 
     private fun addMessage(message: ChatMessage) {
@@ -188,7 +192,7 @@ class ChatViewModel(private val hmssdk: HMSSDK) : ViewModel() {
 
         if (_messages.find { it.messageId == message.messageId } == null) {
             if (!message.isSentByMe) {
-                unreadMessagesCount.postValue(unreadMessagesCount.value?.plus(1))
+                _unreadMessagesCount.postValue(_unreadMessagesCount.value?.plus(1) ?: 1)
             }
             _messages.add(message)
             messages.postValue(_messages)
