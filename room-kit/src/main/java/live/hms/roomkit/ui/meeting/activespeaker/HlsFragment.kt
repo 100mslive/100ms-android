@@ -108,6 +108,7 @@ import kotlinx.coroutines.launch
 import live.hms.hls_player.*
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.databinding.LayoutChatMergeBinding
+import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingFragment
@@ -1379,14 +1380,13 @@ fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int?, buttonClicked: () ->
                     .size(40.dp))
             if(unreadMessages != null && unreadMessages > 0) {
                 Text(
-                    if(unreadMessages < 99) unreadMessages.toString() else "99+",
+                    if (unreadMessages < 99) unreadMessages.toString() else "99+",
                     Modifier
                         .defaultMinSize(16.dp, 12.dp)
                         .background(
                             color = PrimaryDefault,
                             shape = RoundedCornerShape(65),
-                        )
-                    ,
+                        ),
                     lineHeight = 16.sp,
                     color = OnSurfaceHigh,
                     fontSize = 10.sp,
