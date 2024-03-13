@@ -852,7 +852,7 @@ fun SettingsButton(
         modifier = Modifier
             .clickable { onClickAction() }
             .padding(1.dp)
-            .size(32.dp))
+            .size(40.dp))
 }
 //
 //val configuration = LocalConfiguration.current
@@ -1161,7 +1161,7 @@ fun ClosedCaptionsButton(closedCaptionsToggleClicked: () -> Unit, closedCaptions
         contentScale = ContentScale.None,
         modifier = Modifier
             .clickable { closedCaptionsToggleClicked() }
-            .height(32.dp))
+            .height(40.dp))
 }
 
 @Composable
