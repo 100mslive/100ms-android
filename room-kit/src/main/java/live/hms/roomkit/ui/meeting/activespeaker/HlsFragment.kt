@@ -8,6 +8,7 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
@@ -269,6 +270,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     val isChatEnabled by rememberSaveable { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
+                    val allowHandRaised by remember { mutableStateOf(meetingViewModel.handRaiseAvailable()) }
                     val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
                     val unreadMessagesCount by chatViewModel.unreadMessagesCount.observeAsState()
                     // Turn off controls 3 seconds after they become visible
@@ -339,6 +341,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
+                                allowHandRaise = allowHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
                                 showDvrControls = showDvrControls,
@@ -359,7 +362,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                         meetingViewModel,
                                         pinnedMessageUiUseCase,
                                         chatAdapter,
-                                        ::openPolls
+                                        ::openPolls,
+                                        allowHandRaised
                                     )
                                 }
                             }
@@ -396,6 +400,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
+                                allowHandRaise = allowHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
                                 showDvrControls = showDvrControls,
@@ -426,7 +431,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                     meetingViewModel,
                                     pinnedMessageUiUseCase,
                                     chatAdapter,
-                                    ::openPolls
+                                    ::openPolls,
+                                    allowHandRaised
                                 )
                             }
                         }
@@ -894,6 +900,7 @@ fun HlsComposable(
     onCloseButtonClicked: () -> Unit,
     closedCaptionsEnabled: Boolean,
     isHandRaised: Boolean,
+    allowHandRaise : Boolean,
     toggleHandRaise: () -> Unit,
     sessionOptionsButtonTapped: () -> Unit,
     showDvrControls: Boolean,
@@ -1065,7 +1072,9 @@ fun HlsComposable(
             ) {
                 // chat button
                 // settings button
-                HandRaiseButton(isHandRaised, toggleHandRaise)
+                if(allowHandRaise) {
+                    HandRaiseButton(isHandRaised, toggleHandRaise)
+                }
                 SessionOptionsButton(sessionOptionsButtonTapped)
             }
             }
@@ -1195,7 +1204,8 @@ fun ChatUI(
     meetingViewModel: MeetingViewModel,
     pinnedMessageUiUseCase: PinnedMessageUiUseCase,
     chatAdapter: ChatAdapter,
-    openPolls : () -> Unit
+    openPolls : () -> Unit,
+    allowHandRaise: Boolean
 ) {
 
     fun chatRelatedObservers(
@@ -1302,7 +1312,9 @@ fun ChatUI(
         view
     }, modifier = Modifier
         .fillMaxWidth()
-        .fillMaxHeight())
+        .fillMaxHeight(), update = {
+            it.findViewById<ImageView>(live.hms.roomkit.R.id.handRaise).visibility = if(allowHandRaise) View.VISIBLE else View.GONE
+    })
 }
 
 @Composable
