@@ -14,6 +14,12 @@ import android.view.accessibility.AccessibilityManager
 import android.view.animation.LinearInterpolator
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.helpers.OnSingleClickListener
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
@@ -311,4 +317,21 @@ fun CardStackLayoutManager?.init(context: Context, listener: CardStackListener) 
         }
     return layoutManager
 
+}
+
+
+fun <T> LiveData<T>.debounce(duration: Long = 1000L, coroutineScope: CoroutineScope): LiveData<T> {
+    val result = MediatorLiveData<T>()
+
+    val source = this
+    var job: Job? = null
+
+    result.addSource(source) { value ->
+        job?.cancel() // Cancel any previous job
+        job = coroutineScope.launch {
+            delay(duration)
+            result.value = value // Emit after the delay
+        }
+    }
+    return result
 }
