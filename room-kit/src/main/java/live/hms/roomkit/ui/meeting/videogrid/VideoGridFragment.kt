@@ -9,8 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import android.webkit.WebView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.forEach
 import androidx.core.view.forEachIndexed
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
@@ -18,10 +18,11 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
+import live.hms.roomkit.hide
 import live.hms.roomkit.initAnimState
+import live.hms.roomkit.show
 import live.hms.roomkit.startBounceAnimationUpwards
 import live.hms.roomkit.ui.inset.makeInset
-import live.hms.roomkit.ui.inset.resetUI
 import live.hms.roomkit.ui.meeting.ChangeNameDialogFragment
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
@@ -36,7 +37,6 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.roomkit.util.visibilityOpacity
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
-import org.webrtc.RendererCommon
 
 class VideoGridFragment : Fragment() {
     companion object {
@@ -53,6 +53,8 @@ class VideoGridFragment : Fragment() {
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
     var isMinimized = false
+    var isWhiteBoardSetupDone = false
+    var whiteboardView : WebView? = null
     var lastVideoMuteState : Boolean? = null
 
     var localMeeting : MeetingTrack? = null
@@ -72,8 +74,48 @@ class VideoGridFragment : Fragment() {
         settings = SettingsStore(requireContext())
 
         initVideoGrid()
+        initWhiteBoard()
         initViewModels()
         return binding.root
+    }
+
+    private fun intWhiteBoardOnce() {
+        if (isWhiteBoardSetupDone.not()) {
+            val viewStub = binding.webviewStub
+            val inflatedView = viewStub.inflate()
+            whiteboardView= inflatedView.findViewById(R.id.web_view)
+            whiteboardView?.visibility = View.VISIBLE
+            binding.webviewStub.visibility = View.VISIBLE
+
+            // Set up the WebView
+            whiteboardView?.settings?.javaScriptEnabled = true
+            whiteboardView?.settings?.domStorageEnabled = true
+            isWhiteBoardSetupDone = true
+        }
+    }
+
+    private fun initWhiteBoard() {
+        intWhiteBoardOnce()
+        meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
+            Log.d("XYZ", it.toString())
+            if (it.isOpen) {
+                binding.closeBtn.show()
+                whiteboardView?.show()
+                binding.webviewStub.show()
+                val url = "https://whiteboard-qa.100ms.live/" + "?endpoint=https://${it.url}&token=${it.token}"
+                whiteboardView?.loadUrl(url)
+            } else {
+                whiteboardView?.loadUrl("")
+                whiteboardView?.hide()
+                binding.webviewStub.hide()
+                binding.closeBtn.hide()
+            }
+        }
+
+        binding.closeBtn.setOnClickListener {
+            whiteboardView?.loadUrl("")
+        }
+
     }
 
     override fun onPause() {
@@ -311,24 +353,26 @@ class VideoGridFragment : Fragment() {
     var lastGuideLinePercentage = 0f
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
-        meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+        meetingViewModel.trackAndWhiteBoardObserver.observe(viewLifecycleOwner) { (whiteBoard ,tracks) ->
+            if (tracks == null)
+            return@observe
             synchronized(tracks) {
                 val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
                 var newRowCount = 0
                 var newColumnCount = 0
                 var newGuideLinePercentage = 0f
+                val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
                 //is screen share track is present then reduce the grid and column span else restore
-                if (screenShareTrackList.isEmpty()) {
-                    binding.screenShareContainer.visibility = View.GONE
-                    newRowCount = 3
-                    newColumnCount = 2
-                    newGuideLinePercentage = 0f
-
-                } else {
+                if (showDockedState) {
                     binding.screenShareContainer.visibility = View.VISIBLE
                     newRowCount = 1
                     newColumnCount = 2
                     newGuideLinePercentage = 0.75f
+                } else {
+                    binding.screenShareContainer.visibility = View.GONE
+                    newRowCount = 3
+                    newColumnCount = 2
+                    newGuideLinePercentage = 0f
                 }
 
                 //smart updates cause updating evenrything at once would call layout()

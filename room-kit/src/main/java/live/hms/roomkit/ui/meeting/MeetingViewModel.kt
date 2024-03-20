@@ -59,6 +59,9 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
+import live.hms.video.whiteboard.HMSWhiteboard
+import live.hms.video.whiteboard.HMSWhiteboardUpdate
+import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
@@ -160,7 +163,48 @@ class MeetingViewModel(
                 }
 
             }
+
         }
+
+    val showHideWhiteboardObserver by lazy { MutableLiveData<HMSWhiteboard>() }
+    private fun setupWhiteBoardListener() {
+        localHmsInteractivityCenter.addWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
+            override fun onUpdate(hmsWhiteboardUpdate: HMSWhiteboardUpdate) {
+                when(hmsWhiteboardUpdate) {
+                    is HMSWhiteboardUpdate.Start -> showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
+                }
+            }
+        })
+    }
+
+    private var isWhiteBoardEnabled = false
+    fun toggleWhiteBoard() {
+        val id = UUID.randomUUID().toString()
+        if (isWhiteBoardEnabled.not()){
+            localHmsInteractivityCenter.startWhiteboard(id= id, title =id, object : HmsTypedActionResultListener<HMSWhiteboard> {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onSuccess(result: HMSWhiteboard) {
+
+                }
+
+            })
+            isWhiteBoardEnabled = true
+        } else {
+            localHmsInteractivityCenter.stopWhiteboard(object : HMSActionResultListener{
+                override fun onError(error: HMSException) {
+                }
+
+                override fun onSuccess() {
+
+                }
+            })
+            isWhiteBoardEnabled = false
+        }
+    }
+
     fun getHmsRoomLayout() = hmsRoomLayout
 
     var prebuiltOptions : HMSPrebuiltOptions? = null
@@ -436,6 +480,10 @@ class MeetingViewModel(
 
     val updateRowAndColumnSpanForVideoPeerGrid = MutableLiveData<Pair<Int,Int>>()
 
+    val trackAndWhiteBoardObserver = MediatorLiveData<Pair<HMSWhiteboard?,List<MeetingTrack>?>>()
+
+
+
     val speakerUpdateLiveData = object : ActiveSpeakerLiveData() {
         private val speakerH = ActiveSpeakerHandler(true,settings.videoGridRows* settings.videoGridColumns
         ) { _tracks }
@@ -490,6 +538,15 @@ class MeetingViewModel(
                        speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset.filter { it.isScreen.not() })
                    setValue(result)
                }
+
+            }
+
+            trackAndWhiteBoardObserver.addSource(_liveDataTracks) { track ->
+                trackAndWhiteBoardObserver.value = (Pair(trackAndWhiteBoardObserver.value?.first,track))
+            }
+
+            trackAndWhiteBoardObserver.addSource(showHideWhiteboardObserver) { whiteBoard ->
+                trackAndWhiteBoardObserver.value = (Pair(whiteBoard,trackAndWhiteBoardObserver.value?.second))
 
             }
 
@@ -846,6 +903,7 @@ class MeetingViewModel(
                 hideMessageUseCase.addKeyChangeListener()
                 updatePolls()
                 participantPeerUpdate.postValue(Unit)
+                setupWhiteBoardListener()
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -2481,5 +2539,6 @@ class MeetingViewModel(
     fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
     // Show the NC button if it's a webrtc peer with noise cancellation available
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
+
 }
 
