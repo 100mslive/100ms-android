@@ -28,6 +28,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
+import live.hms.roomkit.util.debounce
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
@@ -167,6 +168,7 @@ class MeetingViewModel(
         }
 
     val showHideWhiteboardObserver by lazy { MutableLiveData<HMSWhiteboard>() }
+    val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
     private fun setupWhiteBoardListener() {
         localHmsInteractivityCenter.addWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
             override fun onUpdate(hmsWhiteboardUpdate: HMSWhiteboardUpdate) {
@@ -545,7 +547,7 @@ class MeetingViewModel(
                 trackAndWhiteBoardObserver.value = (Pair(trackAndWhiteBoardObserver.value?.first,track))
             }
 
-            trackAndWhiteBoardObserver.addSource(showHideWhiteboardObserver) { whiteBoard ->
+            trackAndWhiteBoardObserver.addSource(debounceWhiteBoardObserver) { whiteBoard ->
                 trackAndWhiteBoardObserver.value = (Pair(whiteBoard,trackAndWhiteBoardObserver.value?.second))
 
             }

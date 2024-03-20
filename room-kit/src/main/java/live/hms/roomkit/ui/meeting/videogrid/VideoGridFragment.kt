@@ -96,7 +96,7 @@ class VideoGridFragment : Fragment() {
 
     private fun initWhiteBoard() {
         intWhiteBoardOnce()
-        meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
+        meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
             Log.d("XYZ", it.toString())
             if (it.isOpen) {
                 binding.closeBtn.show()

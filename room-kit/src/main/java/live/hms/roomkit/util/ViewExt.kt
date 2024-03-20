@@ -320,7 +320,7 @@ fun CardStackLayoutManager?.init(context: Context, listener: CardStackListener) 
 }
 
 
-fun <T> LiveData<T>.debounce(duration: Long = 1000L, coroutineScope: CoroutineScope): LiveData<T> {
+fun <T> LiveData<T>.debounce(duration: Long = 500L, coroutineScope: CoroutineScope): LiveData<T> {
     val result = MediatorLiveData<T>()
 
     val source = this
