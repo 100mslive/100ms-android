@@ -304,6 +304,13 @@
             android:layout_height="wrap_content"
             android:text="@string/use_hardware_AEC"
             android:visibility="visible" />
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_use_krisp_noise_cancellation"
+            style="@style/MaterialSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/use_krisp_noise_cancellation"
+            android:visibility="visible" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_use_webrtc_noise_cancellation"

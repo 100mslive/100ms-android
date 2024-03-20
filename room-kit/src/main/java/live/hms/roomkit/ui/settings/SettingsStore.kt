@@ -50,6 +50,7 @@ class SettingsStore(context: Context) {
     const val RTMP_URL_LIST = "rtmp-url-list"
     const val USE_HARDWARE_AEC = "use-hardware-aec"
     const val USE_WEBRTC_NOISE_SUPPRESSION = "use-werbtc-noise-suppression"
+    const val USE_KRISP_NOISE_CANCELLATION = "use-krisp-noise-cancellation"
     const val SHOW_STATS = "show-video-stats"
     const val DISABLE_AUTO_RESIZE = "disable-auto-resize"
     const val FORCE_SOFTWARE_DECODER = "force-software-decoder"
@@ -126,6 +127,10 @@ class SettingsStore(context: Context) {
   var setInitialNameFromClient: Boolean
     get() = sharedPreferences.getBoolean(SET_INITIAL_NAME_FROM_CLIENT, true)
     set(value) = putBoolean(SET_INITIAL_NAME_FROM_CLIENT, value)
+
+  var enableKrispNoiseCancellation : Boolean
+    get() = sharedPreferences.getBoolean(USE_KRISP_NOISE_CANCELLATION, false)
+    set(value) = putBoolean(USE_KRISP_NOISE_CANCELLATION, value)
 
   var enableWebrtcNoiseSuppression : Boolean
     get() = sharedPreferences.getBoolean(USE_WEBRTC_NOISE_SUPPRESSION, true)
@@ -350,6 +355,9 @@ class SettingsStore(context: Context) {
 
     fun setInitialNameFromClient(value: Boolean) = apply { editor.putBoolean(SET_INITIAL_NAME_FROM_CLIENT, value) }
     fun setUseHardwareAEC(value: Boolean) = apply { editor.putBoolean(USE_HARDWARE_AEC, value) }
+    fun useKrispNoiseCancellation(value : Boolean) = apply { editor.putBoolean(
+      USE_KRISP_NOISE_CANCELLATION, value
+    ) }
     fun setUseWebrtcNoiseSuppression(value : Boolean) = apply { editor.putBoolean(
       USE_WEBRTC_NOISE_SUPPRESSION, value) }
     fun setShowStats(value: Boolean) = apply { editor.putBoolean(SHOW_STATS, value) }
