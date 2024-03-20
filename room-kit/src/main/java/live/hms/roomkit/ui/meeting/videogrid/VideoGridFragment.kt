@@ -98,12 +98,13 @@ class VideoGridFragment : Fragment() {
     private fun initWhiteBoard() {
         intWhiteBoardOnce()
         meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
+            Log.d("WhiteBoardXYZ", it.toString())
             if (it.isOpen) {
                 binding.closeBtn.show()
                 whiteboardView?.show()
                 binding.webviewStub.show()
                 val url = "https://whiteboard-qa.100ms.live/" + "?endpoint=https://${it.url}&token=${it.token}"
-                updateWebViewUrl(url)
+                updateWebViewUrl(url,it.id)
             } else {
                 whiteboardView?.hide()
                 binding.webviewStub.hide()
@@ -113,7 +114,7 @@ class VideoGridFragment : Fragment() {
 
         meetingViewModel.closeWhiteBoard.observe(viewLifecycleOwner, Observer {
             if (it){
-                updateWebViewUrl("")
+                updateWebViewUrl("", null)
                 meetingViewModel.closeWhiteBoard.value = false
             }
         })
@@ -121,11 +122,11 @@ class VideoGridFragment : Fragment() {
 
     }
 
-    private var lastVisitedURl : String? = null
-    fun updateWebViewUrl(url : String) {
-        if (url!=lastVisitedURl) {
+    private var lastVisitedID : String? = null
+    private fun updateWebViewUrl(url: String, id: String?) {
+        if (id!=lastVisitedID) {
             whiteboardView?.loadUrl(url)
-            lastVisitedURl = url
+            lastVisitedID = id
         }
     }
 
