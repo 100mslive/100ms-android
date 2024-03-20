@@ -271,6 +271,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
                     val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
                     val unreadMessagesCount by chatViewModel.unreadMessagesCount.observeAsState()
+                    val areCaptionsSupported by remember { mutableStateOf(hlsViewModel.areClosedCaptionsSupported()) }
                     // Turn off controls 3 seconds after they become visible
                     LaunchedEffect(key1 = chatOpen){
                         if(chatOpen)
@@ -327,6 +328,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 interacted = !interacted
                                 hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                                                }, isPlaying)},
+                                areCaptionsSupported = areCaptionsSupported,
                                 closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
                                 unreadMessagesCount = unreadMessagesCount,
                                 chatIconClicked = { chatOpen = !chatOpen },
@@ -349,7 +351,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 rewindButton = {RewindButton {
                                     player.seekBackward(10, TimeUnit.SECONDS)
                                     interacted = !interacted
-                                }}
+                                }},
                             ) { interacted = !interacted }
                             Column {
                                 if(chatOpen) {
@@ -384,7 +386,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                         interacted = !interacted
                                         hlsViewModel.isPlaying.postValue(isPlaying?.not())
                                     }, isPlaying)},
-                                closedCaptionsButton = {ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
+                                areCaptionsSupported = areCaptionsSupported,
+                                closedCaptionsButton = {if(areCaptionsSupported) ClosedCaptionsButton({ closedCaptionsEnabled = !closedCaptionsEnabled}, closedCaptionsEnabled)},
                                 unreadMessagesCount = unreadMessagesCount,
                                 chatIconClicked = { chatOpen = !chatOpen },
                                 chatOpen = chatOpen,
@@ -882,6 +885,7 @@ fun HlsComposable(
     settingsButtonTapped: () -> Unit,
     maximizeClicked: () -> Unit,
     pauseButton: @Composable () -> Unit,
+    areCaptionsSupported : Boolean,
     closedCaptionsButton: @Composable () -> Unit,
     chatOpen: Boolean,
     isLandscape: Boolean,
@@ -1025,9 +1029,10 @@ fun HlsComposable(
 
                         if(!chatOpen) { HlsChatIcon(isChatEnabled, unreadMessagesCount, chatIconClicked) }
 
-                        Spacer(modifier = Modifier.padding(start = Spacing2))
-
-                        closedCaptionsButton()
+                        if(areCaptionsSupported) {
+                            Spacer(modifier = Modifier.padding(start = Spacing2))
+                            closedCaptionsButton()
+                        }
 
                         Spacer(modifier = Modifier.padding(start = Spacing2))
 

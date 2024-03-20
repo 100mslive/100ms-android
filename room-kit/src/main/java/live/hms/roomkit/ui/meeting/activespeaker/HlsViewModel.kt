@@ -17,7 +17,6 @@ import live.hms.hls_player.HmsHlsException
 import live.hms.hls_player.HmsHlsPlaybackEvents
 import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
-import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.sdk.HMSSDK
 
@@ -42,6 +41,9 @@ import live.hms.video.sdk.HMSSDK
         setListeners(this)
         play(hlsStreamUrl)
     }
+    fun areClosedCaptionsSupported() : Boolean =
+        player.areClosedCaptionsSupported()
+
     fun restarted() {
         if(failed) {
             player.play(hlsStreamUrl)
