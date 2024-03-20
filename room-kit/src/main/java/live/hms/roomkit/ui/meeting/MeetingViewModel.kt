@@ -168,12 +168,14 @@ class MeetingViewModel(
         }
 
     val showHideWhiteboardObserver by lazy { MutableLiveData<HMSWhiteboard>() }
+    val closeWhiteBoard by lazy { MutableLiveData<Boolean>() }
     val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
     private fun setupWhiteBoardListener() {
-        localHmsInteractivityCenter.addWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
+        localHmsInteractivityCenter.setWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
             override fun onUpdate(hmsWhiteboardUpdate: HMSWhiteboardUpdate) {
                 when(hmsWhiteboardUpdate) {
                     is HMSWhiteboardUpdate.Start -> showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
+                    is HMSWhiteboardUpdate.Stop -> showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
                 }
             }
         })
@@ -195,6 +197,7 @@ class MeetingViewModel(
             })
             isWhiteBoardEnabled = true
         } else {
+
             localHmsInteractivityCenter.stopWhiteboard(object : HMSActionResultListener{
                 override fun onError(error: HMSException) {
                 }
@@ -203,6 +206,7 @@ class MeetingViewModel(
 
                 }
             })
+            closeWhiteBoard.value = true
             isWhiteBoardEnabled = false
         }
     }

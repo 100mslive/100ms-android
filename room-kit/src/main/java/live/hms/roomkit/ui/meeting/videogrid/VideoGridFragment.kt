@@ -15,6 +15,7 @@ import androidx.core.view.forEachIndexed
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
@@ -97,25 +98,35 @@ class VideoGridFragment : Fragment() {
     private fun initWhiteBoard() {
         intWhiteBoardOnce()
         meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
-            Log.d("XYZ", it.toString())
             if (it.isOpen) {
                 binding.closeBtn.show()
                 whiteboardView?.show()
                 binding.webviewStub.show()
                 val url = "https://whiteboard-qa.100ms.live/" + "?endpoint=https://${it.url}&token=${it.token}"
-                whiteboardView?.loadUrl(url)
+                updateWebViewUrl(url)
             } else {
-                whiteboardView?.loadUrl("")
                 whiteboardView?.hide()
                 binding.webviewStub.hide()
                 binding.closeBtn.hide()
             }
         }
 
-        binding.closeBtn.setOnClickListener {
-            whiteboardView?.loadUrl("")
-        }
+        meetingViewModel.closeWhiteBoard.observe(viewLifecycleOwner, Observer {
+            if (it){
+                updateWebViewUrl("")
+                meetingViewModel.closeWhiteBoard.value = false
+            }
+        })
 
+
+    }
+
+    private var lastVisitedURl : String? = null
+    fun updateWebViewUrl(url : String) {
+        if (url!=lastVisitedURl) {
+            whiteboardView?.loadUrl(url)
+            lastVisitedURl = url
+        }
     }
 
     override fun onPause() {
