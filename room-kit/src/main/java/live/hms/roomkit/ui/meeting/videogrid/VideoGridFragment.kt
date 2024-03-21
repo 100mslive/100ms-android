@@ -316,13 +316,12 @@ class VideoGridFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
+        super.onDestroy()
         super.onDestroyView()
-        whiteboardView  = null
-        lastVideoMuteState  = null
         updateWebViewUrl("",null)
-    }
 
+    }
     private fun updateVideoViewLayout(
         insetPillMaximised: ConstraintLayout,
         isVideoOff: Boolean,
