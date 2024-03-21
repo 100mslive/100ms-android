@@ -56,9 +56,15 @@ class ParticipantItem(
         } else {
             hmsPeer.name
         }
-        viewBinding.sipPeer.visibility = if(hmsPeer.type == HMSPeerType.SIP) View.VISIBLE else View.GONE
+        if(hmsPeer.type == HMSPeerType.SIP) {
+            viewBinding.sipPeer.visibility = View.VISIBLE
+            viewBinding.badNetworkIndicator.visibility = View.GONE
+        }
+        else {
+            viewBinding.sipPeer.visibility = View.GONE
+            updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
+        }
         viewBinding.name.text = name
-        updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer, viewBinding)
         updateSpeaking(hmsPeer.audioTrack, viewBinding)
         // Don't show the settings if they aren't allowed to change anything at all.
