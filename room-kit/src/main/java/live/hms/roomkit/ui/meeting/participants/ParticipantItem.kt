@@ -30,6 +30,7 @@ import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.HMSSpeaker
 import org.webrtc.ContextUtils.getApplicationContext
@@ -55,8 +56,15 @@ class ParticipantItem(
         } else {
             hmsPeer.name
         }
+        if(hmsPeer.type == HMSPeerType.SIP) {
+            viewBinding.sipPeer.visibility = View.VISIBLE
+            viewBinding.badNetworkIndicator.visibility = View.GONE
+        }
+        else {
+            viewBinding.sipPeer.visibility = View.GONE
+            updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
+        }
         viewBinding.name.text = name
-        updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer, viewBinding)
         updateSpeaking(hmsPeer.audioTrack, viewBinding)
         // Don't show the settings if they aren't allowed to change anything at all.

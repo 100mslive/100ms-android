@@ -72,7 +72,17 @@
             android:layout_marginLeft="8dp"/>
 
 
-
+        <ImageButton
+            android:id="@+id/sipPeer"
+            android:background="@android:color/transparent"
+            android:layout_width="@dimen/participant_item_icon"
+            android:layout_height="@dimen/participant_item_icon"
+            android:layout_gravity="center"
+            android:padding="@dimen/participant_item_icon_padding"
+            android:layout_marginLeft="8dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:src="@drawable/participants_sip_icon" />
 
         <ImageButton
             android:id="@+id/peerSettings"
