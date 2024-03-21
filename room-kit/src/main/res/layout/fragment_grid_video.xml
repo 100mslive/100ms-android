@@ -254,25 +254,18 @@
         app:tabIndicatorHeight="0dp"
         app:tabMode="fixed" />
 
-    <ViewStub
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/web_view_container"
         android:elevation="8dp"
-        android:layout="@layout/layout_webview"
-        android:id="@+id/webview_stub"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/divider"/>
+        app:layout_constraintBottom_toTopOf="@id/divider"
+        />
 
-    <ImageView
-        android:id="@+id/close_btn"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:elevation="16dp"
-        android:src="@drawable/ic_close_16"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
 
 

@@ -80,41 +80,26 @@ class VideoGridFragment : Fragment() {
         return binding.root
     }
 
-    private fun intWhiteBoardOnce() {
-        if (isWhiteBoardSetupDone.not()) {
-            val viewStub = binding.webviewStub
-            val inflatedView = viewStub.inflate()
-            whiteboardView= inflatedView.findViewById(R.id.web_view)
-            whiteboardView?.visibility = View.VISIBLE
-            binding.webviewStub.visibility = View.VISIBLE
-
-            // Set up the WebView
-            whiteboardView?.settings?.javaScriptEnabled = true
-            whiteboardView?.settings?.domStorageEnabled = true
-            isWhiteBoardSetupDone = true
-        }
-    }
 
     private fun initWhiteBoard() {
-        intWhiteBoardOnce()
         meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
-            Log.d("WhiteBoardXYZ", it.toString())
+            Log.d("WHITEBOARD", it.toString())
             if (it.isOpen) {
-                binding.closeBtn.show()
+                addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
-                binding.webviewStub.show()
                 val url = "https://whiteboard-qa.100ms.live/" + "?endpoint=https://${it.url}&token=${it.token}"
-                updateWebViewUrl(url,it.id)
+                updateWebViewUrl(url)
+
             } else {
+                addOrRemoveWebView(shouldAddWebView = false)
                 whiteboardView?.hide()
-                binding.webviewStub.hide()
-                binding.closeBtn.hide()
             }
         }
 
         meetingViewModel.closeWhiteBoard.observe(viewLifecycleOwner, Observer {
-            if (it){
-                updateWebViewUrl("", null)
+            if (it) {
+                whiteboardView?.hide()
+                updateWebViewUrl("")
                 meetingViewModel.closeWhiteBoard.value = false
             }
         })
@@ -122,11 +107,11 @@ class VideoGridFragment : Fragment() {
 
     }
 
-    private var lastVisitedID : String? = null
-    private fun updateWebViewUrl(url: String, id: String?) {
-        if (id!=lastVisitedID) {
+    private var lastVisitedURl : String? = null
+    private fun updateWebViewUrl(url : String) {
+        if (url!=lastVisitedURl) {
             whiteboardView?.loadUrl(url)
-            lastVisitedID = id
+            lastVisitedURl = url
         }
     }
 
@@ -359,6 +344,36 @@ class VideoGridFragment : Fragment() {
             hmsVideoView.startBounceAnimationUpwards(offset = 250, interpolator = LinearInterpolator() )
         }
 
+    }
+
+    private  var isWebViewInit : Boolean = false
+    private fun addOrRemoveWebView(shouldAddWebView : Boolean) {
+        contextSafe { context, activity ->
+            val webViewContainer = binding.webViewContainer
+
+            if (shouldAddWebView && isWebViewInit.not()) {
+                whiteboardView = WebView(activity).apply {
+                    settings?.javaScriptEnabled = true
+                    settings?.domStorageEnabled = true
+                }
+                val layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+                    ConstraintLayout.LayoutParams.MATCH_PARENT
+                )
+                webViewContainer.addView(whiteboardView,layoutParams)
+                isWebViewInit = true
+            }
+            else if (shouldAddWebView.not() && isWebViewInit) {
+                webViewContainer.forEachIndexed { index, view ->
+                    if (view is WebView) {
+                        webViewContainer.removeViewAt(index)
+                    }
+                }
+                whiteboardView?.loadUrl("")
+                whiteboardView?.destroy()
+                isWebViewInit = false
+            }
+        }
     }
 
     //Important to prevent redraws like crazy. This was causing flickering issue
