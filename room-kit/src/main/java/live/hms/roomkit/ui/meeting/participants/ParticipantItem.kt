@@ -30,6 +30,7 @@ import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.HMSSpeaker
 import org.webrtc.ContextUtils.getApplicationContext
@@ -55,6 +56,7 @@ class ParticipantItem(
         } else {
             hmsPeer.name
         }
+        viewBinding.sipPeer.visibility = if(hmsPeer.type == HMSPeerType.SIP) View.VISIBLE else View.GONE
         viewBinding.name.text = name
         updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer, viewBinding)
