@@ -87,7 +87,7 @@ class VideoGridFragment : Fragment() {
             if (it.isOpen) {
                 addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
-                val url = "https://whiteboard-qa.100ms.live/" + "?endpoint=https://${it.url}&token=${it.token}"
+                val url = meetingViewModel.getWhiteBoardBaseURL() + "?endpoint=https://${it.url}&token=${it.token}"
                 updateWebViewUrl(url)
 
             } else {
