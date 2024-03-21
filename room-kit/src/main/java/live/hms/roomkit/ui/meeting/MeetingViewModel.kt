@@ -171,7 +171,7 @@ class MeetingViewModel(
     val closeWhiteBoard by lazy { MutableLiveData<Boolean>() }
     val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
 
-    fun getWhiteBoardBaseURL() = if  (settings.environment.contains("prod")) "https://whiteboard.100ms.live/" else
+    fun getWhiteBoardBaseURL() = if  (false) "https://whiteboard.100ms.live/" else
         "https://whiteboard-qa.100ms.live/"
     private fun setupWhiteBoardListener() {
         localHmsInteractivityCenter.setWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
@@ -554,7 +554,7 @@ class MeetingViewModel(
                 trackAndWhiteBoardObserver.value = (Pair(trackAndWhiteBoardObserver.value?.first,track))
             }
 
-            trackAndWhiteBoardObserver.addSource(debounceWhiteBoardObserver) { whiteBoard ->
+            trackAndWhiteBoardObserver.addSource(showHideWhiteboardObserver) { whiteBoard ->
                 trackAndWhiteBoardObserver.value = (Pair(whiteBoard,trackAndWhiteBoardObserver.value?.second))
 
             }

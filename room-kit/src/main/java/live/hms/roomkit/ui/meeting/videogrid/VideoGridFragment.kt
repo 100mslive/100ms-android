@@ -81,7 +81,9 @@ class VideoGridFragment : Fragment() {
 
 
     private fun initWhiteBoard() {
-        meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
+
+
+        meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
             Log.d("WHITEBOARD", it.toString())
             if (it.isOpen) {
                 addOrRemoveWebView(shouldAddWebView = true)
