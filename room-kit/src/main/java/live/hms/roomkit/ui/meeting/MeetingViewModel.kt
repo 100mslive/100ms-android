@@ -102,7 +102,7 @@ class MeetingViewModel(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
                 .initialState(getAudioTrackState())
-//                .enableNoiseSupression(settings.enableWebrtcNoiseSuppression)
+                .enableNoiseSupression(settings.enableWebrtcNoiseSuppression)
                 .enableNoiseCancellation(settings.enableKrispNoiseCancellation)
                 .setDisableInternalAudioManager(settings.detectDominantSpeaker.not())
                 .setPhoneCallMuteState(if (settings.muteLocalAudioOnPhoneRing) PhoneCallState.ENABLE_MUTE_ON_PHONE_CALL_RING else PhoneCallState.DISABLE_MUTE_ON_VOIP_PHONE_CALL_RING)

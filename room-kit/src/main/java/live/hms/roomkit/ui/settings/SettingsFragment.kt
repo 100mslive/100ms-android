@@ -477,11 +477,11 @@ class SettingsFragment : Fragment() {
         switchUseKrispNoiseCancellation
       ) { commitHelper.useKrispNoiseCancellation(it) }
 
-//      initSwitch(
-//        EnumSet.of(SettingsMode.HOME),
-//        settings.enableWebrtcNoiseSuppression,
-//        switchUseWebrtcNoiseCancellation
-//      ) { commitHelper.setUseWebrtcNoiseSuppression(it) }
+      initSwitch(
+        EnumSet.of(SettingsMode.HOME),
+        settings.enableWebrtcNoiseSuppression,
+        switchUseWebrtcNoiseCancellation
+      ) { commitHelper.setUseWebrtcNoiseSuppression(it) }
 
       initSwitch(
         EnumSet.of(SettingsMode.HOME),
