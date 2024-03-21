@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting.commons
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -34,6 +33,7 @@ import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
@@ -365,8 +365,8 @@ abstract class VideoGridBaseFragment : Fragment() {
             //handling simulcast case since we are updating local reference it thinks it's an update instead of rebinding it
             renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
-          val downlinkScore = newVideo.peer.networkQuality?.downlinkQuality
-          updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
+
+          updateNetworkQualityView(newVideo.peer,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
 
           renderedViewPair.binding.videoCard.raisedHand.alpha =
             visibilityOpacity(newVideo.peer.isHandRaised)
@@ -436,9 +436,8 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
         }
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
-          val downlinkScore = peerTypePair.first.networkQuality?.downlinkQuality
           renderedViewPair.binding.videoCard.networkQuality.apply {
-            updateNetworkQualityView(downlinkScore ?: -1,requireContext(),this)
+            updateNetworkQualityView(peerTypePair.first,requireContext(),this)
           }
         }
 
@@ -452,19 +451,30 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
-    NetworkQualityHelper.getNetworkResource(downlinkScore, context).let { drawable ->
-      if (downlinkScore == 0) {
-        imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
-      } else {
-        imageView.colorFilter = null
-      }
-      if (imageView.drawable != drawable) {
-        imageView.setImageDrawable(drawable)
-        if (drawable == null) {
-          imageView.visibility = View.GONE
+  private fun updateNetworkQualityView(peer : HMSPeer, context: Context, imageView: ImageView){
+    if(peer.type == HMSPeerType.SIP){
+      imageView.visibility = View.GONE
+    }
+    else {
+      val downLinkScore = peer.networkQuality?.downlinkQuality
+      NetworkQualityHelper.getNetworkResource(downLinkScore, context).let { drawable ->
+        if (downLinkScore == 0) {
+          imageView.setColorFilter(
+            getColorOrDefault(
+              HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+              HMSPrebuiltTheme.getDefaults().error_default
+            ), android.graphics.PorterDuff.Mode.SRC_IN
+          );
         } else {
-          imageView.visibility = View.VISIBLE
+          imageView.colorFilter = null
+        }
+        if (imageView.drawable != drawable) {
+          imageView.setImageDrawable(drawable)
+          if (drawable == null) {
+            imageView.visibility = View.GONE
+          } else {
+            imageView.visibility = View.VISIBLE
+          }
         }
       }
     }

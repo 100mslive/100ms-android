@@ -8,8 +8,8 @@ import live.hms.roomkit.R
 class NetworkQualityHelper {
 
     companion object {
-        fun getNetworkResource(downlinkSpeed: Int?, context: Context): Drawable? {
-            return when (downlinkSpeed) {
+        fun getNetworkResource(downLinkSpeed: Int?, context: Context): Drawable? {
+            return when (downLinkSpeed) {
                 0 -> (ContextCompat.getDrawable(context, R.drawable.ic_baseline_wifi_0))
                 1 -> (ContextCompat.getDrawable(context, R.drawable.ic_signal_terrible))
                 2 -> (ContextCompat.getDrawable(context, R.drawable.ic_signal_weak))

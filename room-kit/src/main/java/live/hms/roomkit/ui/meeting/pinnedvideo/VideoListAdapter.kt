@@ -19,6 +19,7 @@ import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.visibility
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
 
@@ -232,7 +233,10 @@ class VideoListAdapter(
         )
       )
       HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
-        PeerUpdatePayloads.NetworkQualityChanged(changedPeer.first.networkQuality?.downlinkQuality)
+        // Don't send network quality updates for SIP peers.
+        if(changedPeer.first.type != HMSPeerType.SIP) {
+          PeerUpdatePayloads.NetworkQualityChanged(changedPeer.first.networkQuality?.downlinkQuality)
+        } else null
       }
       HMSPeerUpdate.NAME_CHANGED -> PeerUpdatePayloads.NameChanged(changedPeer.first.name)
       else -> null
