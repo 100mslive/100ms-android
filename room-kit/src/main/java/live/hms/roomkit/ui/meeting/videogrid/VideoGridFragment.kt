@@ -54,7 +54,6 @@ class VideoGridFragment : Fragment() {
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
     var isMinimized = false
-    var isWhiteBoardSetupDone = false
     var whiteboardView : WebView? = null
     var lastVideoMuteState : Boolean? = null
 
@@ -88,10 +87,11 @@ class VideoGridFragment : Fragment() {
                 addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
                 val url = meetingViewModel.getWhiteBoardBaseURL() + "?endpoint=https://${it.url}&token=${it.token}"
-                updateWebViewUrl(url)
+                updateWebViewUrl(url,it.id)
 
             } else {
                 addOrRemoveWebView(shouldAddWebView = false)
+                updateWebViewUrl("",null)
                 whiteboardView?.hide()
             }
         }
@@ -99,7 +99,7 @@ class VideoGridFragment : Fragment() {
         meetingViewModel.closeWhiteBoard.observe(viewLifecycleOwner, Observer {
             if (it) {
                 whiteboardView?.hide()
-                updateWebViewUrl("")
+                updateWebViewUrl("",null)
                 meetingViewModel.closeWhiteBoard.value = false
             }
         })
@@ -107,11 +107,12 @@ class VideoGridFragment : Fragment() {
 
     }
 
-    private var lastVisitedURl : String? = null
-    private fun updateWebViewUrl(url : String) {
-        if (url!=lastVisitedURl) {
+    private var lastVisitedId : String? = null
+    private fun updateWebViewUrl(url : String,id : String?) {
+        if (id!=lastVisitedId) {
+            Log.d("WHITEBOARD", "url loaded  \uD83C\uDF10")
             whiteboardView?.loadUrl(url)
-            lastVisitedURl = url
+            lastVisitedId = id
         }
     }
 
@@ -315,6 +316,13 @@ class VideoGridFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        whiteboardView  = null
+        lastVideoMuteState  = null
+        updateWebViewUrl("",null)
+    }
+
     private fun updateVideoViewLayout(
         insetPillMaximised: ConstraintLayout,
         isVideoOff: Boolean,
@@ -364,14 +372,6 @@ class VideoGridFragment : Fragment() {
                 isWebViewInit = true
             }
             else if (shouldAddWebView.not() && isWebViewInit) {
-                webViewContainer.forEachIndexed { index, view ->
-                    if (view is WebView) {
-                        webViewContainer.removeViewAt(index)
-                    }
-                }
-                whiteboardView?.loadUrl("")
-                whiteboardView?.destroy()
-                isWebViewInit = false
             }
         }
     }
