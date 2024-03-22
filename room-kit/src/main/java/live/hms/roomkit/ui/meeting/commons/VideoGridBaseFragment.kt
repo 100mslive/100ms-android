@@ -266,9 +266,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         isAudioMute
       )
 
-
-
-      if (isScreenshare())
+      if (isScreenshare() || item.peer.type == HMSPeerType.SIP)
         audioLevel.alpha = visibilityOpacity(false)
       else
         audioLevel.alpha = visibilityOpacity(
@@ -485,7 +483,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       val track = renderedView.meetingTrack.audio
 
       renderedView.binding.apply {
-        if (track == null || track.isMute) {
+        if (track == null || track.isMute || renderedView.meetingTrack.peer.type == HMSPeerType.SIP) {
           videoCard.audioLevel.update(null)
         } else {
           val level = speakers.find { it.hmsTrack?.trackId == track.trackId }?.level ?: 0

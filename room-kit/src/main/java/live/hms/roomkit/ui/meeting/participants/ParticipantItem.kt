@@ -56,17 +56,17 @@ class ParticipantItem(
         } else {
             hmsPeer.name
         }
-        if(hmsPeer.type == HMSPeerType.SIP) {
+        val isSipPeer = hmsPeer.type == HMSPeerType.SIP
+        if(isSipPeer) {
             viewBinding.sipPeer.visibility = View.VISIBLE
-            viewBinding.badNetworkIndicator.visibility = View.GONE
         }
         else {
             viewBinding.sipPeer.visibility = View.GONE
-            updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         }
+        updateNetworkQuality(hmsPeer.networkQuality, viewBinding, isSipPeer)
         viewBinding.name.text = name
         updateHandRaise(hmsPeer, viewBinding)
-        updateSpeaking(hmsPeer.audioTrack, viewBinding)
+        updateSpeaking(hmsPeer.audioTrack, viewBinding, isSipPeer)
         // Don't show the settings if they aren't allowed to change anything at all.
         viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
             View.GONE
@@ -206,8 +206,8 @@ class ParticipantItem(
         }
     }
 
-    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding) {
-        if (audioTrack == null) {
+    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding, isSipPeer : Boolean) {
+        if (audioTrack == null || isSipPeer) {
             viewBinding.muteUnmuteIcon.gone()
             viewBinding.audioLevelView.gone()
         }
@@ -289,22 +289,33 @@ class ParticipantItem(
 
     private fun updateNetworkQuality(
         networkQuality: HMSNetworkQuality?,
-        viewBinding: ListItemPeerListBinding
+        viewBinding: ListItemPeerListBinding,
+        isSipPeer: Boolean
     ) {
-        val downlinkSpeed = networkQuality?.downlinkQuality ?: -1
         val imageView = viewBinding.badNetworkIndicator
-        NetworkQualityHelper.getNetworkResource(downlinkSpeed, viewBinding.root.context).let { drawable ->
-            if (downlinkSpeed == 0) {
-                imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
-            } else {
-                imageView.colorFilter = null
-            }
-            imageView.setImageDrawable(drawable)
-            if (drawable == null){
-                imageView.visibility = View.GONE
-            }else{
-                imageView.visibility = View.VISIBLE
-            }
+        if(isSipPeer) {
+            imageView.visibility = View.GONE
+        } else {
+            val downlinkSpeed = networkQuality?.downlinkQuality ?: -1
+            NetworkQualityHelper.getNetworkResource(downlinkSpeed, viewBinding.root.context)
+                .let { drawable ->
+                    if (downlinkSpeed == 0) {
+                        imageView.setColorFilter(
+                            getColorOrDefault(
+                                HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+                                HMSPrebuiltTheme.getDefaults().error_default
+                            ), android.graphics.PorterDuff.Mode.SRC_IN
+                        );
+                    } else {
+                        imageView.colorFilter = null
+                    }
+                    imageView.setImageDrawable(drawable)
+                    if (drawable == null) {
+                        imageView.visibility = View.GONE
+                    } else {
+                        imageView.visibility = View.VISIBLE
+                    }
+                }
         }
     }
 
