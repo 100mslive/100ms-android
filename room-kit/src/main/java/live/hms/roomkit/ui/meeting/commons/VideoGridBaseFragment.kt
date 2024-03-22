@@ -366,7 +366,7 @@ abstract class VideoGridBaseFragment : Fragment() {
             renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
 
-          updateNetworkQualityView(newVideo.peer,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
+          updateNetworkQualityView(newVideo.peer,renderedViewPair.binding.videoCard.networkQuality)
 
           renderedViewPair.binding.videoCard.raisedHand.alpha =
             visibilityOpacity(newVideo.peer.isHandRaised)
@@ -437,7 +437,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         }
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
           renderedViewPair.binding.videoCard.networkQuality.apply {
-            updateNetworkQualityView(peerTypePair.first,requireContext(),this)
+            updateNetworkQualityView(peerTypePair.first,this)
           }
         }
 
@@ -451,13 +451,13 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  private fun updateNetworkQualityView(peer : HMSPeer, context: Context, imageView: ImageView){
+  private fun updateNetworkQualityView(peer : HMSPeer, imageView: ImageView){
     if(peer.type == HMSPeerType.SIP){
       imageView.visibility = View.GONE
     }
     else {
       val downLinkScore = peer.networkQuality?.downlinkQuality
-      NetworkQualityHelper.getNetworkResource(downLinkScore, context).let { drawable ->
+      NetworkQualityHelper.getNetworkResource(downLinkScore, imageView.context).let { drawable ->
         if (downLinkScore == 0) {
           imageView.setColorFilter(
             getColorOrDefault(
