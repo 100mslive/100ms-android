@@ -263,7 +263,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/divider"
-        />
+        >
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/icon_maximised"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="5dp"
+            app:iconSize="32dp"
+            android:elevation="@dimen/sizeteen_dp"
+            android:src="@drawable/icon_maximised"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 

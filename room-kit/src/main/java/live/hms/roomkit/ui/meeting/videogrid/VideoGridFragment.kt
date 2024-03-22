@@ -106,6 +106,10 @@ class VideoGridFragment : Fragment() {
             }
         })
 
+        binding.iconMaximised.setOnClickListener {
+            meetingViewModel.showWhiteBoardFullScreen.value = meetingViewModel.showWhiteBoardFullScreen.value?.not()
+        }
+
 
     }
 
