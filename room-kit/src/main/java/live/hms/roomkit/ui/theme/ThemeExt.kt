@@ -1505,6 +1505,11 @@ internal fun ListItemPeerListBinding.applyTheme() {
         HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
         HMSPrebuiltTheme.getDefaults().onsurface_med_emp)
     )
+    sipPeer.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
+        HMSPrebuiltTheme.getDefaults().secondary_dim,
+        R.drawable.badge_circle_20
+    )
 }
 
 internal fun LayoutViewMoreButtonBinding.applyTheme() {

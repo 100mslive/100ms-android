@@ -32,6 +32,7 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSPeerType
 
 /**
  * The chip that lets you select who to chat with opens this.
@@ -137,7 +138,7 @@ class RoleBasedChatBottomSheet(
     private suspend fun updateListWithPeers() {
         val list = if(chatRecipientSearchUseCase.isSearching()) {
             val filteredPeers = chatRecipientSearchUseCase
-                .getFilteredPeers(meetingViewModel.hmsSDK.getRemotePeers())
+                .getFilteredPeers(getRemotePeers())
             listOf(getUpdatedPeersGroup(
                 filteredPeers, getSelectedRecipient()
             ))
@@ -170,7 +171,7 @@ class RoleBasedChatBottomSheet(
 
     private fun getPeerGroup(): ExpandableGroup? {
         return if (getAllowedParticipants().peers) {
-            val peers = meetingViewModel.hmsSDK.getRemotePeers()
+            val peers = getRemotePeers()
             // Remove the "participants" option if there are no others.
             if (peers.isEmpty())
                 null
@@ -263,5 +264,8 @@ class RoleBasedChatBottomSheet(
     override fun getTheme(): Int {
         return R.style.AppBottomSheetDialogTheme
     }
+
+    private fun getRemotePeers() = meetingViewModel.hmsSDK.getRemotePeers()// Never show SIP peers in recipients for messages
+        .filter { it.type != HMSPeerType.SIP }
 
 }
