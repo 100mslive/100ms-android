@@ -169,6 +169,7 @@ class MeetingViewModel(
 
     val showHideWhiteboardObserver by lazy { MutableLiveData<HMSWhiteboard>() }
     val closeWhiteBoard by lazy { MutableLiveData<Boolean>() }
+    val showWhiteBoardFullScreen by lazy { MutableLiveData<Boolean>(true) }
     val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
 
     fun getWhiteBoardBaseURL() = if  (false) "https://whiteboard.100ms.live/" else
@@ -489,7 +490,7 @@ class MeetingViewModel(
 
     val updateRowAndColumnSpanForVideoPeerGrid = MutableLiveData<Pair<Int,Int>>()
 
-    val trackAndWhiteBoardObserver = MediatorLiveData<Pair<HMSWhiteboard?,List<MeetingTrack>?>>()
+    val trackAndWhiteBoardObserver = MediatorLiveData<Triple<HMSWhiteboard?,List<MeetingTrack>?,Boolean?>>()
 
 
 
@@ -551,13 +552,18 @@ class MeetingViewModel(
             }
 
             trackAndWhiteBoardObserver.addSource(_liveDataTracks) { track ->
-                trackAndWhiteBoardObserver.value = (Pair(trackAndWhiteBoardObserver.value?.first,track))
+                trackAndWhiteBoardObserver.value = (Triple(showHideWhiteboardObserver.value,track, showWhiteBoardFullScreen.value))
             }
 
             trackAndWhiteBoardObserver.addSource(showHideWhiteboardObserver) { whiteBoard ->
-                trackAndWhiteBoardObserver.value = (Pair(whiteBoard,trackAndWhiteBoardObserver.value?.second))
+                trackAndWhiteBoardObserver.value = (Triple(whiteBoard,_liveDataTracks.value,showWhiteBoardFullScreen.value))
 
             }
+
+            trackAndWhiteBoardObserver.addSource(showWhiteBoardFullScreen) { showWhiteBoardFullScreen ->
+                trackAndWhiteBoardObserver.value = Triple(showHideWhiteboardObserver.value,_liveDataTracks.value, showWhiteBoardFullScreen)
+            }
+
 
         }
 

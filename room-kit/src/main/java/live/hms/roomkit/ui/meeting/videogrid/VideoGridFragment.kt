@@ -381,26 +381,34 @@ class VideoGridFragment : Fragment() {
     var lastGuideLinePercentage = 0f
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
-        meetingViewModel.trackAndWhiteBoardObserver.observe(viewLifecycleOwner) { (whiteBoard ,tracks) ->
-            if (tracks == null)
-            return@observe
+        meetingViewModel.trackAndWhiteBoardObserver.observe(viewLifecycleOwner) { (whiteBoard ,tracks, isWhiteBoardFullScreen) ->
+            if (tracks == null) return@observe
+
             synchronized(tracks) {
                 val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
                 var newRowCount = 0
                 var newColumnCount = 0
                 var newGuideLinePercentage = 0f
                 val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
+
+                /**
+                 * 75% screenshare view port
+                 * 100% white board view port (fullscreen)
+                 * 75% white board view port
+                 */
+                newGuideLinePercentage = if (screenShareTrackList.isEmpty().not()) 0.75f
+                 else if (whiteBoard?.isOpen == true && isWhiteBoardFullScreen == true) 1.0f
+                 else if (whiteBoard?.isOpen == true) 0.75f
+                 else 0f
                 //is screen share track is present then reduce the grid and column span else restore
                 if (showDockedState) {
                     binding.screenShareContainer.visibility = View.VISIBLE
                     newRowCount = 1
                     newColumnCount = 2
-                    newGuideLinePercentage = 0.75f
                 } else {
                     binding.screenShareContainer.visibility = View.GONE
                     newRowCount = 3
                     newColumnCount = 2
-                    newGuideLinePercentage = 0f
                 }
 
                 //smart updates cause updating evenrything at once would call layout()
