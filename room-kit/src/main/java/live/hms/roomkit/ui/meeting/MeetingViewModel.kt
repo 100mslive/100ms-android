@@ -2554,6 +2554,18 @@ class MeetingViewModel(
     fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
     // Show the NC button if it's a webrtc peer with noise cancellation available
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
+    fun setWhiteBoardFullScreenMode(isShown : Boolean) {
+        showWhiteBoardFullScreen.value = isShown
+    }
+    fun isWhiteBoardFullScreenMode() = showWhiteBoardFullScreen.value?:false
+
+    private var isWhiteBoardRotatedm = false
+
+    fun setWhiteBoardRotated(isRotated : Boolean) {
+        isWhiteBoardRotatedm = isRotated
+    }
+    fun isWhiteBoardRotated() = isWhiteBoardRotatedm
+
 
 }
 

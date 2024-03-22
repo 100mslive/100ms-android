@@ -85,7 +85,7 @@ class VideoGridFragment : Fragment() {
     private fun initWhiteBoard() {
 
 
-        meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
+        meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
             Log.d("WHITEBOARD", it.toString())
             if (it.isOpen) {
                 addOrRemoveWebView(shouldAddWebView = true)
@@ -94,44 +94,55 @@ class VideoGridFragment : Fragment() {
                 updateWebViewUrl(url,it.id)
 
             } else {
-                addOrRemoveWebView(shouldAddWebView = false)
-                updateWebViewUrl("",null)
+                resetWhiteboardState()
                 whiteboardView?.hide()
             }
         }
 
         meetingViewModel.closeWhiteBoard.observe(viewLifecycleOwner, Observer {
             if (it) {
+                resetWhiteboardState()
                 whiteboardView?.hide()
-                updateWebViewUrl("",null)
                 meetingViewModel.closeWhiteBoard.value = false
             }
         })
 
         binding.iconMaximised.setOnClickListener {
-              // meetingViewModel.showWhiteBoardFullScreen.value = meetingViewModel.showWhiteBoardFullScreen.value?.not()
-
-
-            whiteboardView?.let {
-                val rotateby90 = it.rotation == 0f
-                meetingViewModel.showWhiteBoardFullScreen.value = rotateby90
-                it.updateLayoutParams<ViewGroup.LayoutParams> {
-                    width  = if(rotateby90) binding.rootLayout.height else ViewGroup.LayoutParams.MATCH_PARENT
-                    height  = if(rotateby90) binding.rootLayout.width else ViewGroup.LayoutParams.MATCH_PARENT
-                }
-               it.rotation = if (rotateby90) 90f else 0f
-            }
-
+            val isFullScreen = meetingViewModel.isWhiteBoardFullScreenMode()
+            //toggle mode
+            meetingViewModel.setWhiteBoardFullScreenMode(isFullScreen.not())
+            setWhiteBoardRotation(isFullScreen.not())
         }
 
 
 
     }
+    
+    private fun resetWhiteboardState() {
+        Log.d("XXX","reset whiteboard")
+        setWhiteBoardRotation(shouldRotate = false)
+        meetingViewModel.setWhiteBoardFullScreenMode(false)
+
+        updateWebViewUrl("",null)
+    }
+
+    private fun setWhiteBoardRotation(shouldRotate : Boolean) {
+        whiteboardView?.let {
+            val rotateby90 = shouldRotate && meetingViewModel.isWhiteBoardRotated().not()
+
+            it.updateLayoutParams<ViewGroup.LayoutParams> {
+                width  = if(rotateby90) binding.rootLayout.height else ViewGroup.LayoutParams.MATCH_PARENT
+                height  = if(rotateby90) binding.rootLayout.width else ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            it.rotation = if (rotateby90) 90f else 0f
+            meetingViewModel.setWhiteBoardRotated(shouldRotate)
+        }
+    }
 
     private var lastVisitedId : String? = null
     private fun updateWebViewUrl(url : String,id : String?) {
-        if (id!=lastVisitedId) {
-            Log.d("WHITEBOARD", "url loaded  \uD83C\uDF10")
+        if (url.isNullOrEmpty() || id!=lastVisitedId) {
+            Log.d("WHITEBOARD", "url loaded  \uD83C\uDF10 ${url}")
             whiteboardView?.loadUrl(url)
             lastVisitedId = id
         }
