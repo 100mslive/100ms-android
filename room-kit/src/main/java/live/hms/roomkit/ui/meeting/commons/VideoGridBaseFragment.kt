@@ -258,6 +258,11 @@ abstract class VideoGridBaseFragment : Fragment() {
         name.text = item.peer.name
         nameInitials.text = NameUtils.getInitials(item.peer.name)
       }
+      if(item.peer.type == HMSPeerType.SIP) {
+        sipImageHolder.visibility = View.VISIBLE
+      } else {
+        sipImageHolder.visibility = View.GONE
+      }
       // Using alpha instead of visibility to stop redraw of the entire view to stop flickering
       iconScreenShare.alpha = visibilityOpacity( (item.isScreen) )
       val isAudioMute = item.isScreen.not() &&
