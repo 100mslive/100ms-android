@@ -5,11 +5,13 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.webkit.WebView
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEachIndexed
 import androidx.core.view.updateLayoutParams
@@ -107,8 +109,21 @@ class VideoGridFragment : Fragment() {
         })
 
         binding.iconMaximised.setOnClickListener {
-            meetingViewModel.showWhiteBoardFullScreen.value = meetingViewModel.showWhiteBoardFullScreen.value?.not()
+              // meetingViewModel.showWhiteBoardFullScreen.value = meetingViewModel.showWhiteBoardFullScreen.value?.not()
+
+
+            whiteboardView?.let {
+                val rotateby90 = it.rotation == 0f
+                meetingViewModel.showWhiteBoardFullScreen.value = rotateby90
+                it.updateLayoutParams<ViewGroup.LayoutParams> {
+                    width  = if(rotateby90) binding.rootLayout.height else ViewGroup.LayoutParams.MATCH_PARENT
+                    height  = if(rotateby90) binding.rootLayout.width else ViewGroup.LayoutParams.MATCH_PARENT
+                }
+               it.rotation = if (rotateby90) 90f else 0f
+            }
+
         }
+
 
 
     }
@@ -369,10 +384,11 @@ class VideoGridFragment : Fragment() {
                     settings?.javaScriptEnabled = true
                     settings?.domStorageEnabled = true
                 }
-                val layoutParams = ConstraintLayout.LayoutParams(
-                    ConstraintLayout.LayoutParams.MATCH_PARENT,
-                    ConstraintLayout.LayoutParams.MATCH_PARENT
+                val layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
                 )
+                layoutParams.gravity = Gravity.CENTER
                 webViewContainer.addView(whiteboardView,layoutParams)
                 isWebViewInit = true
             }

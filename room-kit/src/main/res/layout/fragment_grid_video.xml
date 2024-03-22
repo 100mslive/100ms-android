@@ -254,11 +254,12 @@
         app:tabIndicatorHeight="0dp"
         app:tabMode="fixed" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:id="@+id/web_view_container"
         android:elevation="8dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipChildren="false"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -270,6 +271,7 @@
             android:layout_height="32dp"
             android:layout_margin="5dp"
             app:iconSize="32dp"
+            android:layout_gravity="end"
             android:elevation="@dimen/sizeteen_dp"
             android:src="@drawable/icon_maximised"
             app:layout_constraintTop_toTopOf="parent"
@@ -278,7 +280,7 @@
             android:layout_marginEnd="8dp"
             />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
 
 
