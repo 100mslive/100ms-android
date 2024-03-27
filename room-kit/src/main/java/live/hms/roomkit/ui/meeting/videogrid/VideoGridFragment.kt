@@ -90,7 +90,7 @@ class VideoGridFragment : Fragment() {
             if (it.isOpen) {
                 addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
-                val url = meetingViewModel.getWhiteBoardBaseURL() + "?endpoint=https://${it.url}&token=${it.token}"
+                val url = meetingViewModel.getWhiteBoardBaseURL() + "?endpoint=https://${it.url}&token=${it.token}&zoom_to_content=true"
                 updateWebViewUrl(url,it.id)
 
             } else {
@@ -110,8 +110,11 @@ class VideoGridFragment : Fragment() {
         binding.iconMaximised.setOnClickListener {
             val isFullScreen = meetingViewModel.isWhiteBoardFullScreenMode()
             //toggle mode
-            meetingViewModel.setWhiteBoardFullScreenMode(isFullScreen.not())
-            setWhiteBoardRotation(isFullScreen.not())
+            val toggleMode =  isFullScreen.not()
+            meetingViewModel.setWhiteBoardFullScreenMode(toggleMode)
+            setWhiteBoardRotation(toggleMode)
+            meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.value = toggleMode
+
         }
 
 

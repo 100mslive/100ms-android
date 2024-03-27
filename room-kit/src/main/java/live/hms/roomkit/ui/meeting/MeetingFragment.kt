@@ -882,6 +882,10 @@ class MeetingFragment : Fragment() {
         binding.topMenu.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
         showControlBars(false)
+        meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.observe(viewLifecycleOwner, Observer { showFullScreen ->
+            val hide = showFullScreen.not()
+            showControlBars(hide)
+        })
         cancelCallback()
 
         val fragmentContainerParam = RelativeLayout.LayoutParams(

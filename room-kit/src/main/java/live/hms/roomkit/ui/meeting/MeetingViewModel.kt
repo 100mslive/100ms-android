@@ -170,6 +170,7 @@ class MeetingViewModel(
     val showHideWhiteboardObserver by lazy { MutableLiveData<HMSWhiteboard>() }
     val closeWhiteBoard by lazy { MutableLiveData<Boolean>() }
     val showWhiteBoardFullScreen by lazy { MutableLiveData<Boolean>(false) }
+    val showWhiteBoardFullScreenSingleLiveEvent by lazy { SingleLiveEvent<Boolean>() }
     val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
 
     fun getWhiteBoardBaseURL() = if  (false) "https://whiteboard.100ms.live/" else
@@ -2565,6 +2566,9 @@ class MeetingViewModel(
         isWhiteBoardRotatedm = isRotated
     }
     fun isWhiteBoardRotated() = isWhiteBoardRotatedm
+    fun isWhiteBoardAdmin(): Boolean {
+        val whiteBoard = showHideWhiteboardObserver.value
+    }
 
 
 }
