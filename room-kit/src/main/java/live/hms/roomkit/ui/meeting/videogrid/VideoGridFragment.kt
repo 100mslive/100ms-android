@@ -5,23 +5,27 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import android.webkit.WebView
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.forEach
 import androidx.core.view.forEachIndexed
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
+import live.hms.roomkit.hide
 import live.hms.roomkit.initAnimState
+import live.hms.roomkit.show
 import live.hms.roomkit.startBounceAnimationUpwards
 import live.hms.roomkit.ui.inset.makeInset
-import live.hms.roomkit.ui.inset.resetUI
 import live.hms.roomkit.ui.meeting.ChangeNameDialogFragment
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
@@ -36,7 +40,6 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.roomkit.util.visibilityOpacity
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
-import org.webrtc.RendererCommon
 
 class VideoGridFragment : Fragment() {
     companion object {
@@ -53,6 +56,7 @@ class VideoGridFragment : Fragment() {
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
     var isMinimized = false
+    var whiteboardView : WebView? = null
     var lastVideoMuteState : Boolean? = null
 
     var localMeeting : MeetingTrack? = null
@@ -72,8 +76,79 @@ class VideoGridFragment : Fragment() {
         settings = SettingsStore(requireContext())
 
         initVideoGrid()
+        initWhiteBoard()
         initViewModels()
         return binding.root
+    }
+
+
+    private fun initWhiteBoard() {
+
+
+        meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
+            Log.d("WHITEBOARD", it.toString())
+            if (it.isOpen) {
+                addOrRemoveWebView(shouldAddWebView = true)
+                whiteboardView?.show()
+                val url = meetingViewModel.getWhiteBoardBaseURL() + "?endpoint=https://${it.url}&token=${it.token}&zoom_to_content=true"
+                updateWebViewUrl(url,it.id)
+
+            } else {
+                resetWhiteboardState()
+                whiteboardView?.hide()
+            }
+        }
+
+        meetingViewModel.closeWhiteBoard.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                resetWhiteboardState()
+                whiteboardView?.hide()
+                meetingViewModel.closeWhiteBoard.value = false
+            }
+        })
+
+        binding.iconMaximised.setOnClickListener {
+            val isFullScreen = meetingViewModel.isWhiteBoardFullScreenMode()
+            //toggle mode
+            val toggleMode =  isFullScreen.not()
+            meetingViewModel.setWhiteBoardFullScreenMode(toggleMode)
+            setWhiteBoardRotation(toggleMode)
+            meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.value = toggleMode
+
+        }
+
+
+
+    }
+    
+    private fun resetWhiteboardState() {
+        Log.d("XXX","reset whiteboard")
+        setWhiteBoardRotation(shouldRotate = false)
+        meetingViewModel.setWhiteBoardFullScreenMode(false)
+
+        updateWebViewUrl("",null)
+    }
+
+    private fun setWhiteBoardRotation(shouldRotate : Boolean) {
+        whiteboardView?.let {
+            val rotateby90 = shouldRotate && meetingViewModel.isWhiteBoardRotated().not()
+
+            it.updateLayoutParams<ViewGroup.LayoutParams> {
+                width  = if(rotateby90) binding.rootLayout.height else ViewGroup.LayoutParams.MATCH_PARENT
+                height  = if(rotateby90) binding.rootLayout.width else ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            it.rotation = if (rotateby90) 90f else 0f
+            meetingViewModel.setWhiteBoardRotated(shouldRotate)
+        }
+    }
+
+    private var lastVisitedId : String? = null
+    private fun updateWebViewUrl(url : String,id : String?) {
+        if (url.isNullOrEmpty() || id!=lastVisitedId) {
+            Log.d("WHITEBOARD", "url loaded  \uD83C\uDF10 ${url}")
+            whiteboardView?.loadUrl(url)
+            lastVisitedId = id
+        }
     }
 
     override fun onPause() {
@@ -276,6 +351,12 @@ class VideoGridFragment : Fragment() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        super.onDestroyView()
+        updateWebViewUrl("",null)
+
+    }
     private fun updateVideoViewLayout(
         insetPillMaximised: ConstraintLayout,
         isVideoOff: Boolean,
@@ -307,28 +388,61 @@ class VideoGridFragment : Fragment() {
 
     }
 
+    private  var isWebViewInit : Boolean = false
+    private fun addOrRemoveWebView(shouldAddWebView : Boolean) {
+        contextSafe { context, activity ->
+            val webViewContainer = binding.webViewContainer
+
+            if (shouldAddWebView && isWebViewInit.not()) {
+                whiteboardView = WebView(activity).apply {
+                    settings?.javaScriptEnabled = true
+                    settings?.domStorageEnabled = true
+                }
+                val layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                layoutParams.gravity = Gravity.CENTER
+                webViewContainer.addView(whiteboardView,layoutParams)
+                isWebViewInit = true
+            }
+            else if (shouldAddWebView.not() && isWebViewInit) {
+            }
+        }
+    }
+
     //Important to prevent redraws like crazy. This was causing flickering issue
     var lastGuideLinePercentage = 0f
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
-        meetingViewModel.tracks.observe(viewLifecycleOwner) { tracks ->
+        meetingViewModel.trackAndWhiteBoardObserver.observe(viewLifecycleOwner) { (whiteBoard ,tracks, isWhiteBoardFullScreen) ->
+            if (tracks == null) return@observe
+
             synchronized(tracks) {
                 val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
                 var newRowCount = 0
                 var newColumnCount = 0
                 var newGuideLinePercentage = 0f
-                //is screen share track is present then reduce the grid and column span else restore
-                if (screenShareTrackList.isEmpty()) {
-                    binding.screenShareContainer.visibility = View.GONE
-                    newRowCount = 3
-                    newColumnCount = 2
-                    newGuideLinePercentage = 0f
+                val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
 
-                } else {
+                /**
+                 * 75% screenshare view port
+                 * 100% white board view port (fullscreen)
+                 * 75% white board view port
+                 */
+                newGuideLinePercentage = if (screenShareTrackList.isEmpty().not()) 0.75f
+                 else if (whiteBoard?.isOpen == true && isWhiteBoardFullScreen == true) 1.0f
+                 else if (whiteBoard?.isOpen == true) 0.75f
+                 else 0f
+                //is screen share track is present then reduce the grid and column span else restore
+                if (showDockedState) {
                     binding.screenShareContainer.visibility = View.VISIBLE
                     newRowCount = 1
                     newColumnCount = 2
-                    newGuideLinePercentage = 0.75f
+                } else {
+                    binding.screenShareContainer.visibility = View.GONE
+                    newRowCount = 3
+                    newColumnCount = 2
                 }
 
                 //smart updates cause updating evenrything at once would call layout()

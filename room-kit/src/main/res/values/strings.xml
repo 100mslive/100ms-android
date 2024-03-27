@@ -46,9 +46,11 @@
     <string name="open_chat">Open Chat</string>
     <string name="share_screen">Share Screen</string>
     <string name="stop_share_screen">Stop Share Screen</string>
+    <string name="stop_white_board">Close Whiteboard</string>
     <string name="record_meeting">Start recording</string>
     <string name="start_record_meeting">Start recording</string>
     <string name="start_screen_share">Start Screen Share</string>
+    <string name="start_white_board">Open Whiteboard</string>
     <string name="stop_record_meeting">Record Meeting</string>
     <string name="show_participants">Show Participants</string>
     <string name="settings_fragment">Settings Fragment</string>
