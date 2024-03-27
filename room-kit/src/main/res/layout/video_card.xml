@@ -91,6 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
+            android:gravity="center"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="4dp"
             android:orientation="horizontal">
@@ -100,6 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:layout_marginRight="1dp"
                 android:src="@drawable/sip_video_tile_indicator"
                 tools:visibility="visible"
                 />
