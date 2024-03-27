@@ -251,8 +251,8 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
-    //binding.applyTheme()
     binding.apply {
+      applyTheme()
       // Donot update the text view if not needed, this causes redraw of the entire view leading to  flicker
       if (name.text.equals(item.peer.name).not()) {
         name.text = item.peer.name
