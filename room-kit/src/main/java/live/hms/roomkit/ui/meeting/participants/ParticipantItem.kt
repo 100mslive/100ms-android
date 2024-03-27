@@ -68,7 +68,7 @@ class ParticipantItem(
         updateHandRaise(hmsPeer, viewBinding)
         updateSpeaking(hmsPeer.audioTrack, viewBinding, isSipPeer)
         // Don't show the settings if they aren't allowed to change anything at all.
-        viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers) || isSipPeer && !(isAllowedToRemovePeers || isAllowedToChangeRole))
+        viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
             View.GONE
         else View.VISIBLE
 
@@ -124,7 +124,7 @@ class ParticipantItem(
                         mypopupWindow.dismiss()
                     }
                 }
-                popBinding.toggleAudio.visibility = if(audioIsOn != null && showToggleAudio && !isSipPeer) View.VISIBLE else View.GONE
+                popBinding.toggleAudio.visibility = if(audioIsOn != null && showToggleAudio) View.VISIBLE else View.GONE
                 if(audioIsOn == true)
                     popBinding.toggleAudio.text = "Mute Audio"
                 else if (audioIsOn == false){
