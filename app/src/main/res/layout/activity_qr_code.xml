@@ -25,8 +25,9 @@
         android:fontFamily="@font/inter_semibold"
         android:text="@string/scan_qr_code_str"
         android:textAllCaps="false"
-        android:textColor="@color/muted_text"
+        android:textColor="@color/surface_high"
         android:textSize="16sp"
+        android:lineHeight="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/close_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,17 +47,26 @@
         app:layout_constraintTop_toBottomOf="@id/scan_qr_code_tv" />
 
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/btn_with_link_instead"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginHorizontal="24dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/primary_disabled_round_drawable"
-        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="#444954"
+        app:strokeWidth="1dp"
+        app:cardCornerRadius="8dp"
+        >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:background="@color/background"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        >
 
         <Space
             android:layout_width="wrap_content"
@@ -67,6 +77,7 @@
             android:layout_width="18dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            app:tint="@color/surface_high"
             android:contentDescription="@string/scan_qr_code_str"
             android:src="@drawable/link_icon" />
 
@@ -80,7 +91,7 @@
             android:paddingVertical="12dp"
             android:text="@string/join_with_link_instead_str"
             android:textAllCaps="false"
-            android:textColor="@color/white" />
+            android:textColor="@color/surface_high" />
 
         <Space
             android:layout_width="wrap_content"
@@ -89,6 +100,7 @@
 
 
     </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

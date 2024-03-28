@@ -24,9 +24,12 @@
     <color name="streaming">#2832c2</color>
     <color name="streaming_recording">#FFC107</color>
     <color name="muted_text">#CCE0ECFF</color>
+    <color name="surface_high">#EFF0FA</color>
+    <color name="secondary_default">#444954</color>
     <color name="primary_bg">#14171C</color>
     <color name="btn_disabled">#242A33</color>
     <color name="gray_color">#1D2229</color>
     <color name="dark_red">#201617</color>
     <color name="gray_light">#2D3440</color>
+    <color name="background">#0b0e15</color>
 </resources>

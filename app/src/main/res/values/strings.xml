@@ -198,4 +198,5 @@
     <string name="end_stream_str">End Stream</string>
     <string name="device_stats_str">Device Info</string>
     <item name="IS_INT" type="id"/>
+    <string name="allow_camera_permission">Allow</string>
 </resources>
