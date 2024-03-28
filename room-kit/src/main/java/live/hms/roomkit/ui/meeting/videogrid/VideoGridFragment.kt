@@ -125,7 +125,7 @@ class VideoGridFragment : Fragment() {
         Log.d("XXX","reset whiteboard")
         setWhiteBoardRotation(shouldRotate = false)
         meetingViewModel.setWhiteBoardFullScreenMode(false)
-
+        meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.value = false
         updateWebViewUrl("",null)
     }
 

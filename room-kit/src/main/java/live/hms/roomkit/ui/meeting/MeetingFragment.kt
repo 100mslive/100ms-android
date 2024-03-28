@@ -883,8 +883,11 @@ class MeetingFragment : Fragment() {
         binding.bottomControls.visibility  = View.VISIBLE
         showControlBars(false)
         meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.observe(viewLifecycleOwner, Observer { showFullScreen ->
-            val hide = showFullScreen.not()
-            showControlBars(hide)
+            Log.d("Whiteboard", "hide container ${showFullScreen} \uD83D\uDD2A")
+            if (showFullScreen)
+                hideControlBars()
+            else
+                showControlBars(false)
         })
         cancelCallback()
 

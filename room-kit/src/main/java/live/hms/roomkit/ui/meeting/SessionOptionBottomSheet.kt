@@ -161,7 +161,7 @@ class SessionOptionBottomSheet(
 
 
         val whiteboard = GridOptionItem(
-            "WhiteBoard", R.drawable.whiteboard, {
+            resources.getString(R.string.start_white_board), R.drawable.whiteboard, {
                 meetingViewModel.toggleWhiteBoard()
                 dismissAllowingStateLoss()
 
@@ -174,6 +174,7 @@ class SessionOptionBottomSheet(
         val group: Group = Section().apply {
             if (meetingViewModel.isParticpantListEnabled())
             add(peerListOption)
+            if (meetingViewModel.isWhiteBoardAdmin())
             add(whiteboard)
             if (meetingViewModel.isBRBEnabled())
             add(brbOption)
@@ -224,7 +225,11 @@ class SessionOptionBottomSheet(
 
         meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
             whiteboard.setSelectedButton(it.isOpen)
-            whiteboard.setText(if (it.isOpen) resources.getString(R.string.stop_white_board) else resources.getString(R.string.start_white_board))
+            whiteboard.setText(
+                if (it.isOpen && it.isOwner) resources.getString(R.string.stop_white_board)
+                else if(it.isOpen.not()) resources.getString(R.string.start_white_board)
+                else ""
+            )
 
         }
 

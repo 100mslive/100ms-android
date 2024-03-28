@@ -186,33 +186,27 @@ class MeetingViewModel(
         })
     }
 
-    private var isWhiteBoardEnabled = false
+
     fun toggleWhiteBoard() {
         val id = UUID.randomUUID().toString()
-        if (isWhiteBoardEnabled.not()){
-            localHmsInteractivityCenter.startWhiteboard(id= id, title =id, object : HmsTypedActionResultListener<HMSWhiteboard> {
-                override fun onError(error: HMSException) {
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
 
-                }
+        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+            return
 
-                override fun onSuccess(result: HMSWhiteboard) {
-
-                }
-
-            })
-            isWhiteBoardEnabled = true
-        } else {
-
+        if (currentWhiteBoardState?.isOpen == true) {
             localHmsInteractivityCenter.stopWhiteboard(object : HMSActionResultListener{
-                override fun onError(error: HMSException) {
-                }
-
-                override fun onSuccess() {
-
-                }
+                override fun onError(error: HMSException) {}
+                override fun onSuccess() {}
             })
             closeWhiteBoard.value = true
-            isWhiteBoardEnabled = false
+        } else {
+            localHmsInteractivityCenter.startWhiteboard(id= id, title =id, object : HmsTypedActionResultListener<HMSWhiteboard> {
+                override fun onError(error: HMSException) {}
+                override fun onSuccess(result: HMSWhiteboard) {}
+            })
+
+
         }
     }
 
@@ -2567,7 +2561,7 @@ class MeetingViewModel(
     }
     fun isWhiteBoardRotated() = isWhiteBoardRotatedm
     fun isWhiteBoardAdmin(): Boolean {
-        val whiteBoard = showHideWhiteboardObserver.value
+        return  hmsSDK.getWhiteboardPermissions().admin.contains(hmsSDK.getLocalPeer()?.hmsRole?.name.orEmpty())
     }
 
 
