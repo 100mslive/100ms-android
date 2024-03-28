@@ -109,11 +109,12 @@ class VideoGridFragment : Fragment() {
 
         binding.iconMaximised.setOnClickListener {
             val isFullScreen = meetingViewModel.isWhiteBoardFullScreenMode()
-            //toggle mode
             val toggleMode =  isFullScreen.not()
+            meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.value = toggleMode
+            //toggle mode
             meetingViewModel.setWhiteBoardFullScreenMode(toggleMode)
             setWhiteBoardRotation(toggleMode)
-            meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.value = toggleMode
+
 
         }
 
@@ -405,8 +406,10 @@ class VideoGridFragment : Fragment() {
                 layoutParams.gravity = Gravity.CENTER
                 webViewContainer.addView(whiteboardView,layoutParams)
                 isWebViewInit = true
+                webViewContainer.show()
             }
-            else if (shouldAddWebView.not() && isWebViewInit) {
+            else if (shouldAddWebView.not()) {
+                webViewContainer.hide()
             }
         }
     }
