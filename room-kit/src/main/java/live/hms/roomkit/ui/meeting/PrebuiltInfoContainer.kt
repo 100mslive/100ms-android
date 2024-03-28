@@ -159,8 +159,10 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
             hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.hlsLiveStreaming?.elements
                 ?.handRaise != null
         } else {
-            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming?.elements
-                ?.handRaise != null
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+                ?.elements?.handRaise != null ||
+                    roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                        ?.default?.elements?.handRaise != null
         }
         return available
     }
