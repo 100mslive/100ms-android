@@ -1176,6 +1176,7 @@ class MeetingFragment : Fragment() {
                             ChangeNameDialogFragment.TAG
                         )
                         },
+                        disableHandRaiseDisplay = !meetingViewModel.handRaiseAvailable(),
                         showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
                         onRecordingClicked = {
                             val isBrowserRecordingRunning = meetingViewModel.hmsSDK.getRoom()?.browserRecordingState?.state in listOf(

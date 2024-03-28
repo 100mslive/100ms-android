@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -16,15 +15,11 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
-import live.hms.roomkit.ui.filters.FilterBottomSheet
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.ui.theme.getShape
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.enums.HMSRecordingState
 
@@ -172,7 +167,7 @@ class SessionOptionBottomSheet(
             if (meetingViewModel.displayNoiseCancellationButton()) {
                 add(noiseButton)
             }
-            if(!disableHandRaiseDisplay) {
+            if(!disableHandRaiseDisplay && meetingViewModel.handRaiseAvailable()) {
                 add(raiseHandOption)
             }
             if (meetingViewModel.isAllowedToBrowserRecord())
