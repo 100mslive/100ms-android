@@ -10,6 +10,7 @@ class Variables {
         val Spacing2 = 16.dp
         val Spacing1 = 8.dp
         val Spacing0 = 4.dp
+        val TwelveDp = 12.dp
         val PrimaryDefault : Color = Color(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.primaryDefault,
             HMSPrebuiltTheme.getDefaults().primary_default))
@@ -29,6 +30,11 @@ class Variables {
         val BorderBright = Color(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.borderBright,
             HMSPrebuiltTheme.getDefaults().border_bright
+        ))
+
+        val BackgroundDim = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            "#000000A3"
         ))
     }
 }

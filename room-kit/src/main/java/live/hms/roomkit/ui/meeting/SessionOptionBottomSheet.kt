@@ -114,6 +114,13 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val captionsButton = GridOptionItem("Show Captions", R.drawable.closed_captions_session_options,
+            {
+                meetingViewModel.toggleCaptions()
+                dismiss()
+        }, isSelected = meetingViewModel.captionsEnabled(),
+            selectedTitle = "Hide Captions")
+
         val noiseButton = GridOptionItem("Reduce Noise", R.drawable.reduce_noise_session_option, {
             onNoiseClicked?.invoke()
             dismiss()
@@ -172,6 +179,7 @@ class SessionOptionBottomSheet(
             }
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
+            add(captionsButton)
             if(!meetingViewModel.disableNameEdit()) {
                 add(changeName)
             }

@@ -54,6 +54,7 @@ import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.*
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
+import live.hms.video.sdk.transcripts.HmsTranscripts
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
@@ -71,6 +72,8 @@ class MeetingViewModel(
     companion object {
         private const val TAG = "MeetingViewModel"
     }
+    val areCaptionsenabled : MutableLiveData<Boolean> = MutableLiveData(true)
+    val captions : MutableLiveData<String?> = MutableLiveData(null)
 
     val launchParticipantsFromHls = SingleLiveEvent<Unit>()
     var recNum = 0
@@ -767,6 +770,16 @@ class MeetingViewModel(
         Log.v(TAG, "~~ hmsSDK.join called ~~")
         hmsSDK.join(hmsConfig!!, object : HMSUpdateListener {
 
+            override fun onTranscripts(transcripts: HmsTranscripts) {
+                var isFinal = false
+                val text = transcripts.transcripts.fold("") { acc, hmsTranscript ->
+                    isFinal = isFinal || hmsTranscript.isFinal
+                    "$acc ${hmsTranscript.transcript}"
+                }
+                if(text.isNotBlank() || isFinal){
+                    captions.postValue(text)
+                }
+            }
             override fun onError(error: HMSException) {
                 Log.e(TAG, "onError: $error")
                 // Show a different dialog if error is terminal else a dismissible dialog
@@ -2488,5 +2501,10 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
+    fun toggleCaptions() =
+        areCaptionsenabled.postValue(areCaptionsenabled.value?.not())
+
+    fun captionsEnabled(): Boolean =
+        areCaptionsenabled.value == true
 }
 
