@@ -21,6 +21,7 @@ import live.hms.app2.R
 import live.hms.app2.databinding.FragmentHomeBinding
 import live.hms.app2.util.REGEX_MEETING_URL_CODE
 import live.hms.app2.util.REGEX_PREVIEW_URL_CODE
+import live.hms.app2.util.REGEX_ROOM_CODE
 import live.hms.app2.util.REGEX_STREAMING_MEETING_URL_ROOM_CODE
 import live.hms.app2.util.getInitEndpointEnvironment
 import live.hms.app2.util.isValidMeetingUrl
@@ -138,6 +139,10 @@ class HomeFragment : Fragment() {
             REGEX_PREVIEW_URL_CODE.matches(url) -> {
                 val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
                 groups[2]
+            }
+            REGEX_ROOM_CODE.matches(url) -> {
+                val groups = REGEX_ROOM_CODE.findAll(url).toList()[0].groupValues
+                groups[0]
             }
             else -> null
         }
