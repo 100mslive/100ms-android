@@ -223,7 +223,7 @@ class SessionOptionBottomSheet(
             whiteboard.setText(
                 if (it.isOpen && it.isOwner) resources.getString(R.string.stop_white_board)
                 else if(it.isOpen.not()) resources.getString(R.string.start_white_board)
-                else ""
+                else "Stop Whiteboard"
             )
 
         }
