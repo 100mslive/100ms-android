@@ -212,7 +212,7 @@ class MeetingViewModel(
         if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
             return
 
-        if (currentWhiteBoardState?.isOpen == false) {
+        if (currentWhiteBoardState == null || currentWhiteBoardState?.isOpen == false) {
             localHmsInteractivityCenter.startWhiteboard(
                 title = UUID.randomUUID().toString(),
                 object : HMSActionResultListener {
