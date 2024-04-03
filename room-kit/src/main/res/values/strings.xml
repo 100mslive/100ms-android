@@ -273,4 +273,6 @@
     <string name="hms_poll">poll</string>
     <string name="hms_quiz">quiz</string>
     <string name="hms_started_quiz_poll_notification">%1$s started a new %2$s</string>
+    <string name="use_webrtc_noise_cancellation">Use webrtc noise suppression</string>
+    <string name="use_krisp_noise_cancellation">Use noise cancellation</string>
 </resources>

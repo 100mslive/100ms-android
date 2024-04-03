@@ -86,9 +86,13 @@ class MeetingViewModel(
     private var pendingRoleChange: HMSRoleChangeRequest? = null
     private var hmsRoomLayout : HMSRoomLayout? = null
     val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
-    val toggleNcInPreview : MutableLiveData<Boolean> = MutableLiveData(false)
 
     private val settings = SettingsStore(getApplication())
+    val noiseCancellationInPreviewUseCase = NoiseCancellationInPreviewUseCase(settings.enableKrispNoiseCancellation) { hmsSDK.setNoiseCancellationEnabled(it) }
+    fun clickNcPreview() {
+        noiseCancellationInPreviewUseCase.clickNcInPreview()
+    }
+
     private val hmsLogSettings: HMSLogSettings =
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
@@ -107,6 +111,8 @@ class MeetingViewModel(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
                 .initialState(getAudioTrackState())
+                .enableNoiseSupression(settings.enableWebrtcNoiseSuppression)
+                .enableNoiseCancellation(settings.enableKrispNoiseCancellation)
                 .setDisableInternalAudioManager(settings.detectDominantSpeaker.not())
                 .setPhoneCallMuteState(if (settings.muteLocalAudioOnPhoneRing) PhoneCallState.ENABLE_MUTE_ON_PHONE_CALL_RING else PhoneCallState.DISABLE_MUTE_ON_VOIP_PHONE_CALL_RING)
                 .build()
@@ -897,9 +903,8 @@ class MeetingViewModel(
                 val runningStreamingStates = listOf(HMSStreamingState.STARTED, HMSStreamingState.STARTING)
                 val runningRecordingStates = listOf(HMSRecordingState.STARTING, HMSRecordingState.STARTED, HMSRecordingState.PAUSED, HMSRecordingState.RESUMED)
 
-                if(toggleNcInPreview.value == true) {
-                    hmsSDK.setNoiseCancellationEnabled(true)
-                }
+                noiseCancellationInPreviewUseCase.afterJoin()
+
                 if (room.hlsStreamingState.state in runningStreamingStates)
                     streamingState.postValue(room.hlsStreamingState.state)
                 if (room.rtmpHMSRtmpStreamingState.state in runningStreamingStates)
@@ -2570,6 +2575,8 @@ class MeetingViewModel(
     fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
     // Show the NC button if it's a webrtc peer with noise cancellation available
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
+
+    fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
     fun setWhiteBoardFullScreenMode(isShown : Boolean) {
         showWhiteBoardFullScreen.value = isShown
     }

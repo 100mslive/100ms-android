@@ -1,14 +1,11 @@
 package live.hms.roomkit.ui.meeting.chat
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -168,8 +165,8 @@ class ChatUseCase {
                         }
                     smoothScroller.targetPosition = position
                     recyclerview.layoutManager!!.startSmoothScroll(smoothScroller)
-                    if (recyclerview.visibility == View.VISIBLE)
-                        chatViewModel.unreadMessagesCount.postValue(0)
+                    if (recyclerview.visibility == View.VISIBLE && recyclerview.isAttachedToWindow)
+                        chatViewModel.markAllMessagesRead()
                 }
             }
         }

@@ -1183,6 +1183,7 @@ class MeetingFragment : Fragment() {
                             ChangeNameDialogFragment.TAG
                         )
                         },
+                        disableHandRaiseDisplay = !meetingViewModel.handRaiseAvailable(),
                         showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },
                         onRecordingClicked = {
                             val isBrowserRecordingRunning = meetingViewModel.hmsSDK.getRoom()?.browserRecordingState?.state in listOf(
@@ -1352,7 +1353,7 @@ class MeetingFragment : Fragment() {
             val position = chatAdapter.itemCount - 1
             if (position >= 0) {
                 binding.chatMessages.smoothScrollToPosition(position)
-                chatViewModel.unreadMessagesCount.postValue(0)
+                chatViewModel.markAllMessagesRead()
             }
         }
 

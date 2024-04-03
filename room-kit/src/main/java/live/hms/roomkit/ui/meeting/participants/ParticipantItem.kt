@@ -30,6 +30,7 @@ import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.HMSSpeaker
 import org.webrtc.ContextUtils.getApplicationContext
@@ -55,10 +56,17 @@ class ParticipantItem(
         } else {
             hmsPeer.name
         }
+        val isSipPeer = hmsPeer.type == HMSPeerType.SIP
+        if(isSipPeer) {
+            viewBinding.sipPeer.visibility = View.VISIBLE
+        }
+        else {
+            viewBinding.sipPeer.visibility = View.GONE
+        }
+        updateNetworkQuality(hmsPeer.networkQuality, viewBinding, isSipPeer)
         viewBinding.name.text = name
-        updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         updateHandRaise(hmsPeer, viewBinding)
-        updateSpeaking(hmsPeer.audioTrack, viewBinding)
+        updateSpeaking(hmsPeer.audioTrack, viewBinding, isSipPeer)
         // Don't show the settings if they aren't allowed to change anything at all.
         viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
             View.GONE
@@ -127,7 +135,7 @@ class ParticipantItem(
                     mypopupWindow.dismiss()
                 }
 
-                popBinding.toggleVideo.visibility = if(videoIsOn != null && showToggleVideo) View.VISIBLE else View.GONE
+                popBinding.toggleVideo.visibility = if(videoIsOn != null && showToggleVideo && !isSipPeer) View.VISIBLE else View.GONE
                 if(videoIsOn == true) {
                     popBinding.toggleVideo.text = "Mute Video"
                 }
@@ -198,8 +206,8 @@ class ParticipantItem(
         }
     }
 
-    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding) {
-        if (audioTrack == null) {
+    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding, isSipPeer : Boolean) {
+        if (audioTrack == null || isSipPeer) {
             viewBinding.muteUnmuteIcon.gone()
             viewBinding.audioLevelView.gone()
         }
@@ -281,22 +289,33 @@ class ParticipantItem(
 
     private fun updateNetworkQuality(
         networkQuality: HMSNetworkQuality?,
-        viewBinding: ListItemPeerListBinding
+        viewBinding: ListItemPeerListBinding,
+        isSipPeer: Boolean
     ) {
-        val downlinkSpeed = networkQuality?.downlinkQuality ?: -1
         val imageView = viewBinding.badNetworkIndicator
-        NetworkQualityHelper.getNetworkResource(downlinkSpeed, viewBinding.root.context).let { drawable ->
-            if (downlinkSpeed == 0) {
-                imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
-            } else {
-                imageView.colorFilter = null
-            }
-            imageView.setImageDrawable(drawable)
-            if (drawable == null){
-                imageView.visibility = View.GONE
-            }else{
-                imageView.visibility = View.VISIBLE
-            }
+        if(isSipPeer) {
+            imageView.visibility = View.GONE
+        } else {
+            val downlinkSpeed = networkQuality?.downlinkQuality ?: -1
+            NetworkQualityHelper.getNetworkResource(downlinkSpeed, viewBinding.root.context)
+                .let { drawable ->
+                    if (downlinkSpeed == 0) {
+                        imageView.setColorFilter(
+                            getColorOrDefault(
+                                HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+                                HMSPrebuiltTheme.getDefaults().error_default
+                            ), android.graphics.PorterDuff.Mode.SRC_IN
+                        );
+                    } else {
+                        imageView.colorFilter = null
+                    }
+                    imageView.setImageDrawable(drawable)
+                    if (drawable == null) {
+                        imageView.visibility = View.GONE
+                    } else {
+                        imageView.visibility = View.VISIBLE
+                    }
+                }
         }
     }
 

@@ -1,7 +1,6 @@
 package live.hms.roomkit.ui.meeting.commons
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -34,6 +33,7 @@ import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
@@ -251,12 +251,17 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
-    //binding.applyTheme()
     binding.apply {
+      applyTheme()
       // Donot update the text view if not needed, this causes redraw of the entire view leading to  flicker
       if (name.text.equals(item.peer.name).not()) {
         name.text = item.peer.name
         nameInitials.text = NameUtils.getInitials(item.peer.name)
+      }
+      if(item.peer.type == HMSPeerType.SIP) {
+        sipImageHolder.visibility = View.VISIBLE
+      } else {
+        sipImageHolder.visibility = View.GONE
       }
       // Using alpha instead of visibility to stop redraw of the entire view to stop flickering
       iconScreenShare.alpha = visibilityOpacity( (item.isScreen) )
@@ -266,9 +271,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         isAudioMute
       )
 
-
-
-      if (isScreenshare())
+      if (isScreenshare() || item.peer.type == HMSPeerType.SIP)
         audioLevel.alpha = visibilityOpacity(false)
       else
         audioLevel.alpha = visibilityOpacity(
@@ -365,8 +368,8 @@ abstract class VideoGridBaseFragment : Fragment() {
             //handling simulcast case since we are updating local reference it thinks it's an update instead of rebinding it
             renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
-          val downlinkScore = newVideo.peer.networkQuality?.downlinkQuality
-          updateNetworkQualityView(downlinkScore ?: -1,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
+
+          updateNetworkQualityView(newVideo.peer,renderedViewPair.binding.videoCard.networkQuality)
 
           renderedViewPair.binding.videoCard.raisedHand.alpha =
             visibilityOpacity(newVideo.peer.isHandRaised)
@@ -436,9 +439,8 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
         }
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
-          val downlinkScore = peerTypePair.first.networkQuality?.downlinkQuality
           renderedViewPair.binding.videoCard.networkQuality.apply {
-            updateNetworkQualityView(downlinkScore ?: -1,requireContext(),this)
+            updateNetworkQualityView(peerTypePair.first,this)
           }
         }
 
@@ -452,19 +454,30 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  fun updateNetworkQualityView(downlinkScore : Int,context: Context,imageView: ImageView){
-    NetworkQualityHelper.getNetworkResource(downlinkScore, context).let { drawable ->
-      if (downlinkScore == 0) {
-        imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
-      } else {
-        imageView.colorFilter = null
-      }
-      if (imageView.drawable != drawable) {
-        imageView.setImageDrawable(drawable)
-        if (drawable == null) {
-          imageView.visibility = View.GONE
+  private fun updateNetworkQualityView(peer : HMSPeer, imageView: ImageView){
+    if(peer.type == HMSPeerType.SIP){
+      imageView.visibility = View.GONE
+    }
+    else {
+      val downLinkScore = peer.networkQuality?.downlinkQuality
+      NetworkQualityHelper.getNetworkResource(downLinkScore, imageView.context).let { drawable ->
+        if (downLinkScore == 0) {
+          imageView.setColorFilter(
+            getColorOrDefault(
+              HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+              HMSPrebuiltTheme.getDefaults().error_default
+            ), android.graphics.PorterDuff.Mode.SRC_IN
+          );
         } else {
-          imageView.visibility = View.VISIBLE
+          imageView.colorFilter = null
+        }
+        if (imageView.drawable != drawable) {
+          imageView.setImageDrawable(drawable)
+          if (drawable == null) {
+            imageView.visibility = View.GONE
+          } else {
+            imageView.visibility = View.VISIBLE
+          }
         }
       }
     }
@@ -475,7 +488,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       val track = renderedView.meetingTrack.audio
 
       renderedView.binding.apply {
-        if (track == null || track.isMute) {
+        if (track == null || track.isMute || renderedView.meetingTrack.peer.type == HMSPeerType.SIP) {
           videoCard.audioLevel.update(null)
         } else {
           val level = speakers.find { it.hmsTrack?.trackId == track.trackId }?.level ?: 0

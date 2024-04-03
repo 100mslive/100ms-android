@@ -381,7 +381,7 @@ class PreviewFragment : Fragment() {
         })
 
         binding.iconNoiseCancellation.setOnSingleClickListener(200L) {
-                meetingViewModel.toggleNcInPreview.value = meetingViewModel.toggleNcInPreview.value!!.not()
+                meetingViewModel.clickNcPreview()
                 updateNoiseCancellationIcon()
             }
 
@@ -519,7 +519,7 @@ class PreviewFragment : Fragment() {
 
     private fun updateNoiseCancellationIcon() {
         with(binding.iconNoiseCancellation) {
-            if(meetingViewModel.toggleNcInPreview.value == true) {
+            if(meetingViewModel.noiseCancellationInPreviewUseCase.isEnabled()) {
                 setIconDisabled(R.drawable.reduce_noise_session_option)
             } else
             {
