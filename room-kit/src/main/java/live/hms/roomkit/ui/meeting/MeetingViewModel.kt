@@ -72,9 +72,9 @@ class MeetingViewModel(
     companion object {
         private const val TAG = "MeetingViewModel"
     }
-    val transcriptionUseCase = TranscriptionUseCase()
+    val transcriptionUseCase = TranscriptionUseCase { hmsSDK.getPeerById(it)?.name }
     val areCaptionsenabled : MutableLiveData<Boolean> = MutableLiveData(true)
-    val captions : LiveData<String?> = transcriptionUseCase.captions
+    val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
     val launchParticipantsFromHls = SingleLiveEvent<Unit>()
     var recNum = 0
@@ -771,8 +771,9 @@ class MeetingViewModel(
         Log.v(TAG, "~~ hmsSDK.join called ~~")
         hmsSDK.join(hmsConfig!!, object : HMSUpdateListener {
 
-            override fun onTranscripts(transcripts: HmsTranscripts) =
-                transcriptionUseCase.newCaption(transcripts)
+            override fun onTranscripts(transcripts: HmsTranscripts) {
+                viewModelScope.launch { transcriptionUseCase.newCaption(transcripts) }
+            }
 
             override fun onError(error: HMSException) {
                 Log.e(TAG, "onError: $error")
