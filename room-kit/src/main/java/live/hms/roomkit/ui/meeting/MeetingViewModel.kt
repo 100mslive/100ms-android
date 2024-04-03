@@ -72,8 +72,9 @@ class MeetingViewModel(
     companion object {
         private const val TAG = "MeetingViewModel"
     }
+    val transcriptionUseCase = TranscriptionUseCase()
     val areCaptionsenabled : MutableLiveData<Boolean> = MutableLiveData(true)
-    val captions : MutableLiveData<String?> = MutableLiveData(null)
+    val captions : LiveData<String?> = transcriptionUseCase.captions
 
     val launchParticipantsFromHls = SingleLiveEvent<Unit>()
     var recNum = 0
@@ -770,16 +771,9 @@ class MeetingViewModel(
         Log.v(TAG, "~~ hmsSDK.join called ~~")
         hmsSDK.join(hmsConfig!!, object : HMSUpdateListener {
 
-            override fun onTranscripts(transcripts: HmsTranscripts) {
-                var isFinal = false
-                val text = transcripts.transcripts.fold("") { acc, hmsTranscript ->
-                    isFinal = isFinal || hmsTranscript.isFinal
-                    "$acc ${hmsTranscript.transcript}"
-                }
-                if(text.isNotBlank() || isFinal){
-                    captions.postValue(text)
-                }
-            }
+            override fun onTranscripts(transcripts: HmsTranscripts) =
+                transcriptionUseCase.newCaption(transcripts)
+
             override fun onError(error: HMSException) {
                 Log.e(TAG, "onError: $error")
                 // Show a different dialog if error is terminal else a dismissible dialog
