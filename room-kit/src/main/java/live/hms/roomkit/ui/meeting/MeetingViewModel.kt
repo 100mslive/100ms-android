@@ -2614,8 +2614,9 @@ class MeetingViewModel(
                 icon = R.drawable.whiteboard,
                 type = HMSNotificationType.Default,
             )
-            oldhasScreenShareOverriddenWhiteboard = hasScreenShareOverriddenWhiteboard
+
         }
+        oldhasScreenShareOverriddenWhiteboard = hasScreenShareOverriddenWhiteboard
     }
 
 
