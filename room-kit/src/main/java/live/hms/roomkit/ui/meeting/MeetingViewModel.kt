@@ -212,6 +212,18 @@ class MeetingViewModel(
         if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
             return
 
+        if (hmsSDK.isScreenShared()) {
+            hmsNotificationEvent.value = HMSNotification(
+                title = "Discontinue screenshare to open the whiteboard",
+                isError = true,
+                isDismissible = true,
+                icon = R.drawable.whiteboard,
+                type = HMSNotificationType.Default,
+            )
+            return
+        }
+
+
         if (currentWhiteBoardState == null || currentWhiteBoardState?.isOpen == false) {
             localHmsInteractivityCenter.startWhiteboard(
                 title = UUID.randomUUID().toString(),
@@ -2590,6 +2602,20 @@ class MeetingViewModel(
     fun isWhiteBoardRotated() = isWhiteBoardRotatedm
     fun isWhiteBoardAdmin(): Boolean {
         return  hmsSDK.getWhiteboardPermissions().admin.contains(hmsSDK.getLocalPeer()?.hmsRole?.name.orEmpty())
+    }
+
+    var oldhasScreenShareOverriddenWhiteboard = false
+    fun showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard: Boolean) {
+        if (oldhasScreenShareOverriddenWhiteboard != hasScreenShareOverriddenWhiteboard && hasScreenShareOverriddenWhiteboard) {
+            hmsNotificationEvent.value = HMSNotification(
+                title = "Whiteboard hidden due to screenshare!",
+                isError = true,
+                isDismissible = true,
+                icon = R.drawable.whiteboard,
+                type = HMSNotificationType.Default,
+            )
+            oldhasScreenShareOverriddenWhiteboard = hasScreenShareOverriddenWhiteboard
+        }
     }
 
 

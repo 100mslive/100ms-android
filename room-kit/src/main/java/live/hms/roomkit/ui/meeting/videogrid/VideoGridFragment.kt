@@ -89,12 +89,14 @@ class VideoGridFragment : Fragment() {
             if (it.isOpen) {
                 addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
+                binding.webViewContainer.show()
                 val url = it.url
                 updateWebViewUrl(url,it.id)
 
             } else {
                 resetWhiteboardState()
                 whiteboardView?.hide()
+                binding.webViewContainer.hide()
             }
         }
 
@@ -425,6 +427,8 @@ class VideoGridFragment : Fragment() {
                 var newColumnCount = 0
                 var newGuideLinePercentage = 0f
                 val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
+                val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && whiteBoard?.isOpen == true
+                meetingViewModel.showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard)
 
                 /**
                  * 75% screenshare view port
