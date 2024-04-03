@@ -173,8 +173,6 @@ class MeetingViewModel(
     val showWhiteBoardFullScreenSingleLiveEvent by lazy { SingleLiveEvent<Boolean>() }
     val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
 
-    fun getWhiteBoardBaseURL() = if  (false) "https://whiteboard.100ms.live/" else
-        "https://whiteboard-qa.100ms.live/"
     private fun setupWhiteBoardListener() {
         localHmsInteractivityCenter.setWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
             override fun onUpdate(hmsWhiteboardUpdate: HMSWhiteboardUpdate) {
@@ -188,7 +186,37 @@ class MeetingViewModel(
 
 
     fun toggleWhiteBoard() {
-        val id = UUID.randomUUID().toString()
+
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
+
+        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+            return
+
+        if (currentWhiteBoardState?.isOpen == true) {
+            stopCurrentWhiteBoardSession()
+            closeWhiteBoard.value = true
+        } else {
+            startWhiteBoardSession()
+        }
+    }
+
+    private fun startWhiteBoardSession() {
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
+        //make sure you are the owner and whiteboard is open to close the whiteboard
+        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+            return
+
+        if (currentWhiteBoardState?.isOpen == false) {
+            localHmsInteractivityCenter.startWhiteboard(
+                title = UUID.randomUUID().toString(),
+                object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {}
+                    override fun onSuccess() {}
+                })
+        }
+    }
+
+     fun stopCurrentWhiteBoardSession() {
         val currentWhiteBoardState = showHideWhiteboardObserver.value
 
         if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
@@ -200,13 +228,6 @@ class MeetingViewModel(
                 override fun onSuccess() {}
             })
             closeWhiteBoard.value = true
-        } else {
-            localHmsInteractivityCenter.startWhiteboard(id= id, title =id, object : HmsTypedActionResultListener<HMSWhiteboard> {
-                override fun onError(error: HMSException) {}
-                override fun onSuccess(result: HMSWhiteboard) {}
-            })
-
-
         }
     }
 

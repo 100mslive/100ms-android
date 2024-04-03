@@ -1368,6 +1368,7 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.isScreenShared()) {
             stopScreenShare()
         } else {
+            kotlin.runCatching { meetingViewModel.stopCurrentWhiteBoardSession() }
             startScreenShare()
         }
     }

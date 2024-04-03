@@ -86,11 +86,10 @@ class VideoGridFragment : Fragment() {
 
 
         meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
-            Log.d("WHITEBOARD", it.toString())
             if (it.isOpen) {
                 addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
-                val url = meetingViewModel.getWhiteBoardBaseURL() + "?endpoint=https://${it.url}&token=${it.token}&zoom_to_content=true"
+                val url = it.url
                 updateWebViewUrl(url,it.id)
 
             } else {
@@ -123,7 +122,6 @@ class VideoGridFragment : Fragment() {
     }
     
     private fun resetWhiteboardState() {
-        Log.d("XXX","reset whiteboard")
         setWhiteBoardRotation(shouldRotate = false)
         meetingViewModel.setWhiteBoardFullScreenMode(false)
         meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.value = false
