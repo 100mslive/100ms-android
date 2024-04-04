@@ -726,6 +726,10 @@ class MeetingFragment : Fragment() {
             updateChatButtonWhenRoleChanges()
         }
 
+        meetingViewModel.screenshareRequest.observe(viewLifecycleOwner) {
+            startScreenShare()
+        }
+
     }
 
     private fun startHLSStreamingIfRequired() {
@@ -1362,6 +1366,9 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.isScreenShared()) {
             stopScreenShare()
         } else {
+            kotlin.runCatching { meetingViewModel.stopCurrentWhiteBoardSession() }
+            //no permission required directly start screen share
+            if (meetingViewModel.preRequestingPermissionForScreenShare().not())
             startScreenShare()
         }
     }
