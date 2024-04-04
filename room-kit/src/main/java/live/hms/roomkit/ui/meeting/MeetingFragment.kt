@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.AnnotatedString
@@ -1487,7 +1488,7 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
                 max = 104.dp
             )
             .verticalScroll(scrollState)
-            .background(color = androidx.compose.ui.graphics.Color(0xA3000000)),
+            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb())),
         /*verticalArrangement = Arrangement.spacedBy(Variables.Spacing1)*/) {
         subtitles?.forEach {
             Caption(it.getSubtitle())

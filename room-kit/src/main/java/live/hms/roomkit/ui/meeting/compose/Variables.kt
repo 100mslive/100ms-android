@@ -33,8 +33,8 @@ class Variables {
         ))
 
         val BackgroundDim = Color(getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.backgroundDim,
-            "#000000A3"
+            /*HMSPrebuiltTheme.getColours()?.backgroundDim*/null,
+            "#A3000000"
         ))
     }
 }
