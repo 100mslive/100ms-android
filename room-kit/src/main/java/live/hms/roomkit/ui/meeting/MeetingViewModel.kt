@@ -2608,7 +2608,7 @@ class MeetingViewModel(
     fun showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard: Boolean) {
         if (oldhasScreenShareOverriddenWhiteboard != hasScreenShareOverriddenWhiteboard && hasScreenShareOverriddenWhiteboard) {
             hmsNotificationEvent.value = HMSNotification(
-                title = "Whiteboard hidden due to screenshare!",
+                title = "Whiteboard hidden due to screen share!",
                 isError = true,
                 isDismissible = true,
                 icon = R.drawable.whiteboard,

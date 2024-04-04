@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
+import live.hms.roomkit.gone
 import live.hms.roomkit.hide
 import live.hms.roomkit.initAnimState
 import live.hms.roomkit.show
@@ -445,11 +446,11 @@ class VideoGridFragment : Fragment() {
                  else 0f
                 //is screen share track is present then reduce the grid and column span else restore
                 if (showDockedState) {
-                    binding.screenShareContainer.visibility = View.VISIBLE
+                    binding.screenShareContainer.show()
                     newRowCount = 1
                     newColumnCount = 2
                 } else {
-                    binding.screenShareContainer.visibility = View.GONE
+                    binding.screenShareContainer.gone()
                     newRowCount = 3
                     newColumnCount = 2
                 }
@@ -480,10 +481,10 @@ class VideoGridFragment : Fragment() {
                     lastGuideLinePercentage = newGuideLinePercentage
                 }
 
-                if (screenShareTrackList.size <= 1) {
-                    binding.tabLayoutDotsRemoteScreenShare.visibility = View.GONE
+                if (screenShareTrackList.size > 1 && hasScreenShareOverriddenWhiteboard) {
+                    binding.tabLayoutDotsRemoteScreenShare.show()
                 } else {
-                    binding.tabLayoutDotsRemoteScreenShare.visibility = View.VISIBLE
+                    binding.tabLayoutDotsRemoteScreenShare.gone()
                 }
 
 
