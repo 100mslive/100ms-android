@@ -22,7 +22,7 @@ import live.hms.video.sdk.transcripts.HmsTranscripts
 import java.util.UUID
 
 class TranscriptionUseCase(
-    val getNameForPeerId : (String) -> String?
+    val getNameForPeerId : (String) -> String?,
 ) {
     private val CLEAR_AFTER_SILENCE_MILLIS = 5000L
     private val EXTRA_SUBTITLE_DELETION_TIME = 20_000L
