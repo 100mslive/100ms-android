@@ -38,6 +38,10 @@ class GridOptionItem(
 
         viewBinding.subtitle.text = title
 
+        if (title.isEmpty())
+            viewBinding.rootLayout.alpha = 0.7f
+        else
+            viewBinding.rootLayout.alpha = 1f
 
         if (particpantCount != null) {
 

@@ -53,6 +53,14 @@ fun View.show() {
         this.visibility = View.VISIBLE
 }
 
+fun ViewStub.inflate(): View {
+    val inflatedView = inflate()
+    val parent = parent as? ViewGroup
+    parent?.removeView(this)
+    parent?.addView(inflatedView)
+    return inflatedView
+}
+
 fun View.hide() {
     if (this.visibility != View.INVISIBLE)
         this.visibility = View.INVISIBLE
