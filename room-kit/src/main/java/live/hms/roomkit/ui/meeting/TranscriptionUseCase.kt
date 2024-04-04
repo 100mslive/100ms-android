@@ -44,11 +44,7 @@ class TranscriptionUseCase(
         clearAllTranscriptionAfterSilence()
 
         // update peer names into the map
-        val newPeerIds = transcripts.transcripts.map { it.peerId }.toSet() - peerToNameMap.keys
-        newPeerIds.forEach {
-            // Add missing peer names
-            peerToNameMap[it] = getNameForPeerId(it) ?: "Participant"
-        }
+        updatePeerNamesIntoTheMap(transcripts)
 
         // Whenever a new list comes in, send it to be appended to the queue.
         // The end time for older events in the queue must always be before the end time for
@@ -75,6 +71,14 @@ class TranscriptionUseCase(
         if(removeItems)
             scheduleRemovals(newItemsOriginal)
 //        Log.d(TAG,"processing complete")
+    }
+
+    private fun updatePeerNamesIntoTheMap(transcripts: HmsTranscripts) {
+        val newPeerIds = transcripts.transcripts.map { it.peerId }.toSet() - peerToNameMap.keys
+        newPeerIds.forEach {
+            // Add missing peer names
+            peerToNameMap[it] = getNameForPeerId(it) ?: "Participant"
+        }
     }
 
     private fun clearAllTranscriptionAfterSilence() {
