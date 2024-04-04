@@ -950,6 +950,7 @@ class MeetingViewModel(
                     }
 
                     HMSPeerUpdate.NAME_CHANGED -> {
+                        transcriptionUseCase.onPeerNameChanged(hmsPeer)
                         if (hmsPeer.isLocal) {
                             updateNameChange(hmsPeer as HMSLocalPeer)
                         } else {

@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import live.hms.roomkit.R
+import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.transcripts.HmsTranscript
 import live.hms.video.sdk.transcripts.HmsTranscripts
 import java.util.UUID
@@ -38,6 +39,9 @@ class TranscriptionUseCase(
 
     private val editLock = Mutex()
 
+    fun onPeerNameChanged(peer : HMSPeer) {
+        peerToNameMap[peer.peerID] = peer.name
+    }
 
     suspend fun newCaption(transcripts: HmsTranscripts) : Unit = editLock.withLock {
 //        Log.d(TAG,"processing started")
