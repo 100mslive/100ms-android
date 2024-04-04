@@ -23,20 +23,25 @@ import java.util.UUID
 class TranscriptionUseCase(
     val getNameForPeerId : (String) -> String?
 ) {
+    private val CLEAR_AFTER_SILENCE_MILLIS = 5000L
+    private val EXTRA_SUBTITLE_DELETION_TIME = 20_000L
     private val TAG = "TranscriptionUseCase"
     val captions : MutableLiveData<List<TranscriptViewHolder>> = MutableLiveData(null)
     // Actually you have to keep a per peer queue of text until the final comes in.
     // Also keep a mapping of peerid to name.
+    private val removeItems = true
 
     private val peerTranscriptList = LinkedHashMap<String, HmsTranscript>()
     private val peerToNameMap = HashMap<String,String>()
     private val cancelJobs = HashMap<String, Job>()
+    private var singleCancelJob : Job? = null
 
     private val editLock = Mutex()
 
 
     suspend fun newCaption(transcripts: HmsTranscripts) : Unit = editLock.withLock {
 //        Log.d(TAG,"processing started")
+        clearAllTranscriptionAfterSilence()
 
         // update peer names into the map
         val newPeerIds = transcripts.transcripts.map { it.peerId }.toSet() - peerToNameMap.keys
@@ -59,6 +64,31 @@ class TranscriptionUseCase(
             .associateBy { it.peerId + it.start }
 
         // filter out the cancel jobs.
+        if(removeItems)
+            filterCancelJobs(newItemsOriginal)
+
+        // Add the new transcripts to the queue (now this might move the thing)
+        peerTranscriptList.putAll(newItemsOriginal)
+
+        updateHolders(peerTranscriptList)
+        // Schedule removals
+        if(removeItems)
+            scheduleRemovals(newItemsOriginal)
+//        Log.d(TAG,"processing complete")
+    }
+
+    private fun clearAllTranscriptionAfterSilence() {
+        singleCancelJob?.cancel()
+        singleCancelJob = CoroutineScope(Dispatchers.Default).launch {
+            delay(CLEAR_AFTER_SILENCE_MILLIS)
+            editLock.withLock {
+                peerTranscriptList.clear()
+                updateHolders(peerTranscriptList)
+            }
+        }
+    }
+
+    private fun filterCancelJobs(newItemsOriginal  : Map<String, HmsTranscript>) {
         // When an a transcript is extended, such as with a longer sentence, we'll get the same key
         //  again. In this case the duration is also extended. But a cancel job has already been
         //  scheduled for the text. Which would remove the same key.
@@ -67,15 +97,12 @@ class TranscriptionUseCase(
         commonItems.forEach {
             cancelJobs[it]?.cancel()
         }
+    }
 
-        // Add the new transcripts to the queue (now this might move the thing)
-        peerTranscriptList.putAll(newItemsOriginal)
-
-        updateHolders(peerTranscriptList)
-        // Schedule removals
+    private fun scheduleRemovals(newItemsOriginal  : Map<String, HmsTranscript>) {
         newItemsOriginal.map { (id, transcript) ->
             cancelJobs[id] = CoroutineScope(Dispatchers.Default).launch {
-                val delay = (transcript.end - transcript.start).toLong()
+                val delay = (transcript.end - transcript.start).toLong() + EXTRA_SUBTITLE_DELETION_TIME
 //                Log.d("CaptionRemoval","$delay")
                 delay(delay)
                 editLock.withLock {
@@ -84,7 +111,6 @@ class TranscriptionUseCase(
                 }
             }
         }
-//        Log.d(TAG,"processing complete")
     }
 
     private fun updateHolders(peerTranscriptList: LinkedHashMap<String, HmsTranscript>) {
@@ -103,7 +129,7 @@ class TranscriptionUseCase(
                     peerId = hmsTranscript.peerId
                 ))
             } else {
-                previousPeerTranscript._text += '\n'+hmsTranscript.transcript
+                previousPeerTranscript._text += ' '+hmsTranscript.transcript
             }
         }
         this.captions.postValue(captions)

@@ -30,10 +30,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -1470,7 +1473,14 @@ fun DisplayCaptions() {
 
 @Composable
 fun Captions(subtitles: List<TranscriptViewHolder>?) {
-    Column(Modifier.background(Variables.BackgroundDim),
+    val scrollState = rememberScrollState()
+    LaunchedEffect(subtitles) {
+        scrollState.scrollTo(scrollState.maxValue)
+    }
+    Column(Modifier.background(Variables.BackgroundDim).requiredHeightIn(
+        min = 27.dp,
+        max = 108.dp
+    ).verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(Variables.Spacing1)) {
         subtitles?.forEach {
             Caption(it.getSubtitle())
@@ -1484,7 +1494,7 @@ fun Caption(subtitles : AnnotatedString) {
         .clip(RoundedCornerShape(8.dp))) {
             Text(
                 text = subtitles,
-                modifier = Modifier.padding(Variables.Spacing1),
+//                modifier = Modifier.padding(Variables.Spacing1),
                 style = TextStyle(
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
