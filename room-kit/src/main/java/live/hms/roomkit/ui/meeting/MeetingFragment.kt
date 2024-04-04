@@ -40,9 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -1474,22 +1473,21 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
     Column(Modifier.background(Variables.BackgroundDim),
         verticalArrangement = Arrangement.spacedBy(Variables.Spacing1)) {
         subtitles?.forEach {
-            Caption("${it.peerName}: ${it.text}")
+            Caption(it.getSubtitle())
         }
     }
 }
 @Composable
-fun Caption(subtitles : String?) {
+fun Caption(subtitles : AnnotatedString) {
     Box(modifier = Modifier
         .padding(horizontal = Variables.TwelveDp)
         .clip(RoundedCornerShape(8.dp))) {
             Text(
-                text = subtitles ?: "",
+                text = subtitles,
                 modifier = Modifier.padding(Variables.Spacing1),
                 style = TextStyle(
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_regular)),
                     color = androidx.compose.ui.graphics.Color.White,
                     letterSpacing = 0.25.sp,
                 )

@@ -1,5 +1,12 @@
 package live.hms.roomkit.ui.meeting
 
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.withStyle
+
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import live.hms.roomkit.R
 import live.hms.video.sdk.transcripts.HmsTranscript
 import live.hms.video.sdk.transcripts.HmsTranscripts
 import java.util.UUID
@@ -112,4 +120,15 @@ data class TranscriptViewHolder(
         get() {
             return _text
         }
+    fun getSubtitle() : AnnotatedString {
+        return buildAnnotatedString {
+            withStyle(style = SpanStyle(fontFamily = FontFamily(Font(R.font.inter_bold)))) {
+                append(peerName)
+                append(": ")
+            }
+            withStyle(style = SpanStyle(fontFamily = FontFamily(Font(R.font.inter_regular)))) {
+                append(text)
+            }
+        }
+    }
 }
