@@ -1479,9 +1479,9 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
     }
     Column(Modifier.background(Variables.BackgroundDim).requiredHeightIn(
         min = 27.dp,
-        max = 108.dp
+        max = 104.dp
     ).verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(Variables.Spacing1)) {
+        /*verticalArrangement = Arrangement.spacedBy(Variables.Spacing1)*/) {
         subtitles?.forEach {
             Caption(it.getSubtitle())
         }
