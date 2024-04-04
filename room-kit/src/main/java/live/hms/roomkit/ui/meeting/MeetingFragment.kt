@@ -882,6 +882,12 @@ class MeetingFragment : Fragment() {
         binding.topMenu.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
         showControlBars(false)
+        meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.observe(viewLifecycleOwner, Observer { showFullScreen ->
+            if (showFullScreen)
+                hideControlBars()
+            else
+                showControlBars(false)
+        })
         cancelCallback()
 
         val fragmentContainerParam = RelativeLayout.LayoutParams(
@@ -1362,6 +1368,7 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.isScreenShared()) {
             stopScreenShare()
         } else {
+            kotlin.runCatching { meetingViewModel.stopCurrentWhiteBoardSession() }
             startScreenShare()
         }
     }

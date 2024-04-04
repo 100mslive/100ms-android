@@ -186,6 +186,8 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0" />
 
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/screen_share_container"
         android:layout_width="match_parent"
@@ -251,6 +253,35 @@
         app:tabGravity="center"
         app:tabIndicatorHeight="0dp"
         app:tabMode="fixed" />
+
+    <FrameLayout
+        android:id="@+id/web_view_container"
+        android:elevation="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipChildren="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/divider"
+        >
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/icon_maximised"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:layout_margin="10dp"
+            android:background="@drawable/gray_round_btn"
+            android:elevation="@dimen/sizeteen_dp"
+            android:src="@drawable/icon_maximised"
+            app:iconSize="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </FrameLayout>
+
+
 
 
 

@@ -28,6 +28,7 @@ import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
+import live.hms.roomkit.util.debounce
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
@@ -59,6 +60,9 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
+import live.hms.video.whiteboard.HMSWhiteboard
+import live.hms.video.whiteboard.HMSWhiteboardUpdate
+import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
@@ -166,7 +170,85 @@ class MeetingViewModel(
                 }
 
             }
+
         }
+
+    val showHideWhiteboardObserver by lazy { MutableLiveData<HMSWhiteboard>() }
+    val closeWhiteBoard by lazy { MutableLiveData<Boolean>() }
+    val showWhiteBoardFullScreen by lazy { MutableLiveData<Boolean>(false) }
+    val showWhiteBoardFullScreenSingleLiveEvent by lazy { SingleLiveEvent<Boolean>() }
+    val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
+
+    private fun setupWhiteBoardListener() {
+        localHmsInteractivityCenter.setWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
+            override fun onUpdate(hmsWhiteboardUpdate: HMSWhiteboardUpdate) {
+                when(hmsWhiteboardUpdate) {
+                    is HMSWhiteboardUpdate.Start -> showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
+                    is HMSWhiteboardUpdate.Stop -> showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
+                }
+            }
+        })
+    }
+
+
+    fun toggleWhiteBoard() {
+
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
+
+        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+            return
+
+        if (currentWhiteBoardState?.isOpen == true) {
+            stopCurrentWhiteBoardSession()
+            closeWhiteBoard.value = true
+        } else {
+            startWhiteBoardSession()
+        }
+    }
+
+    private fun startWhiteBoardSession() {
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
+        //make sure you are the owner and whiteboard is open to close the whiteboard
+        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+            return
+
+        if (hmsSDK.isScreenShared()) {
+            hmsNotificationEvent.value = HMSNotification(
+                title = "Discontinue screenshare to open the whiteboard",
+                isError = true,
+                isDismissible = true,
+                icon = R.drawable.whiteboard,
+                type = HMSNotificationType.Default,
+            )
+            return
+        }
+
+
+        if (currentWhiteBoardState == null || currentWhiteBoardState?.isOpen == false) {
+            localHmsInteractivityCenter.startWhiteboard(
+                title = UUID.randomUUID().toString(),
+                object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {}
+                    override fun onSuccess() {}
+                })
+        }
+    }
+
+     fun stopCurrentWhiteBoardSession() {
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
+
+        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+            return
+
+        if (currentWhiteBoardState?.isOpen == true) {
+            localHmsInteractivityCenter.stopWhiteboard(object : HMSActionResultListener{
+                override fun onError(error: HMSException) {}
+                override fun onSuccess() {}
+            })
+            closeWhiteBoard.value = true
+        }
+    }
+
     fun getHmsRoomLayout() = hmsRoomLayout
 
     var prebuiltOptions : HMSPrebuiltOptions? = null
@@ -442,6 +524,10 @@ class MeetingViewModel(
 
     val updateRowAndColumnSpanForVideoPeerGrid = MutableLiveData<Pair<Int,Int>>()
 
+    val trackAndWhiteBoardObserver = MediatorLiveData<Triple<HMSWhiteboard?,List<MeetingTrack>?,Boolean?>>()
+
+
+
     val speakerUpdateLiveData = object : ActiveSpeakerLiveData() {
         private val speakerH = ActiveSpeakerHandler(true,settings.videoGridRows* settings.videoGridColumns
         ) { _tracks }
@@ -498,6 +584,20 @@ class MeetingViewModel(
                }
 
             }
+
+            trackAndWhiteBoardObserver.addSource(_liveDataTracks) { track ->
+                trackAndWhiteBoardObserver.value = (Triple(showHideWhiteboardObserver.value,track, showWhiteBoardFullScreen.value))
+            }
+
+            trackAndWhiteBoardObserver.addSource(showHideWhiteboardObserver) { whiteBoard ->
+                trackAndWhiteBoardObserver.value = (Triple(whiteBoard,_liveDataTracks.value,showWhiteBoardFullScreen.value))
+
+            }
+
+            trackAndWhiteBoardObserver.addSource(showWhiteBoardFullScreen) { showWhiteBoardFullScreen ->
+                trackAndWhiteBoardObserver.value = Triple(showHideWhiteboardObserver.value,_liveDataTracks.value, showWhiteBoardFullScreen)
+            }
+
 
         }
 
@@ -851,6 +951,7 @@ class MeetingViewModel(
                 hideMessageUseCase.addKeyChangeListener()
                 updatePolls()
                 participantPeerUpdate.postValue(Unit)
+                setupWhiteBoardListener()
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -2488,5 +2589,36 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
+    fun setWhiteBoardFullScreenMode(isShown : Boolean) {
+        showWhiteBoardFullScreen.value = isShown
+    }
+    fun isWhiteBoardFullScreenMode() = showWhiteBoardFullScreen.value?:false
+
+    private var isWhiteBoardRotatedm = false
+
+    fun setWhiteBoardRotated(isRotated : Boolean) {
+        isWhiteBoardRotatedm = isRotated
+    }
+    fun isWhiteBoardRotated() = isWhiteBoardRotatedm
+    fun isWhiteBoardAdmin(): Boolean {
+        return  hmsSDK.getWhiteboardPermissions().admin.contains(hmsSDK.getLocalPeer()?.hmsRole?.name.orEmpty())
+    }
+
+    var oldhasScreenShareOverriddenWhiteboard = false
+    fun showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard: Boolean) {
+        if (oldhasScreenShareOverriddenWhiteboard != hasScreenShareOverriddenWhiteboard && hasScreenShareOverriddenWhiteboard) {
+            hmsNotificationEvent.value = HMSNotification(
+                title = "Whiteboard hidden due to screen share!",
+                isError = true,
+                isDismissible = true,
+                icon = R.drawable.whiteboard,
+                type = HMSNotificationType.Default,
+            )
+
+        }
+        oldhasScreenShareOverriddenWhiteboard = hasScreenShareOverriddenWhiteboard
+    }
+
+
 }
 
