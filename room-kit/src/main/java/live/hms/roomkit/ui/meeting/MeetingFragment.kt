@@ -1477,15 +1477,23 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
     LaunchedEffect(subtitles) {
         scrollState.scrollTo(scrollState.maxValue)
     }
-    Column(Modifier.background(Variables.BackgroundDim).requiredHeightIn(
-        min = 27.dp,
-        max = 104.dp
-    ).verticalScroll(scrollState),
+
+
+
+    Column(
+        Modifier
+            .requiredHeightIn(
+                min = 27.dp,
+                max = 104.dp
+            )
+            .verticalScroll(scrollState)
+            .background(color = androidx.compose.ui.graphics.Color(0xA3000000)),
         /*verticalArrangement = Arrangement.spacedBy(Variables.Spacing1)*/) {
         subtitles?.forEach {
             Caption(it.getSubtitle())
         }
     }
+
 }
 @Composable
 fun Caption(subtitles : AnnotatedString) {
