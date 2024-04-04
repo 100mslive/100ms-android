@@ -430,7 +430,7 @@ class VideoGridFragment : Fragment() {
                 val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
                 val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && whiteBoard?.isOpen == true
                 if (hasScreenShareOverriddenWhiteboard.not())
-                    binding.screenShareContainer.elevation = 0f
+                    binding.screenShareContainer.elevation = resources.getDimension(R.dimen.eight_dp)
                 else
                     binding.screenShareContainer.elevation = resources.getDimension(R.dimen.sizeteen_dp)
                 meetingViewModel.showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard)
