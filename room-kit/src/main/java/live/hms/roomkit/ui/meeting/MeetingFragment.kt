@@ -1465,8 +1465,8 @@ class MeetingFragment : Fragment() {
 @Preview
 @Composable
 fun DisplayCaptions() {
-    Captions(subtitles = listOf(TranscriptViewHolder("Cat", "Dinner time"),
-        TranscriptViewHolder("Dog","Time for a walk")))
+    Captions(subtitles = listOf(TranscriptViewHolder("Cat", "Dinner time", peerId = "a"),
+        TranscriptViewHolder("Dog","Time for a walk", peerId = "b")))
 }
 
 @Composable
