@@ -429,10 +429,7 @@ class VideoGridFragment : Fragment() {
                 var newGuideLinePercentage = 0f
                 val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
                 val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && whiteBoard?.isOpen == true
-                if (hasScreenShareOverriddenWhiteboard.not())
-                    binding.screenShareContainer.elevation = resources.getDimension(R.dimen.eight_dp)
-                else
-                    binding.screenShareContainer.elevation = resources.getDimension(R.dimen.sizeteen_dp)
+
                 meetingViewModel.showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard)
 
                 /**
@@ -444,6 +441,7 @@ class VideoGridFragment : Fragment() {
                  else if (whiteBoard?.isOpen == true && isWhiteBoardFullScreen == true) 1.0f
                  else if (whiteBoard?.isOpen == true) 0.75f
                  else 0f
+
                 //is screen share track is present then reduce the grid and column span else restore
                 if (showDockedState) {
                     binding.screenShareContainer.show()
@@ -454,6 +452,8 @@ class VideoGridFragment : Fragment() {
                     newRowCount = 3
                     newColumnCount = 2
                 }
+
+
 
                 //smart updates cause updating evenrything at once would call layout()
                 if (lastGuideLinePercentage != newGuideLinePercentage) {
