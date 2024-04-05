@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting
 
 import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -284,8 +285,11 @@ class MeetingActivity : AppCompatActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
+        if (it.containsKey(POST_NOTIFICATIONS)) {
+            meetingViewModel.screenshareRequest.value = Unit
+        }
         // Do not prevent joining if bluetooth connect is denied.
-        if (it.filterKeys { key -> key != BLUETOOTH_CONNECT }.values.all { granted -> granted }) meetingViewModel.permissionGranted()
+        else if (it.values.all { granted -> granted }) meetingViewModel.permissionGranted()
         else {
             // Leave the meeting
             meetingViewModel.leaveMeeting(null)
