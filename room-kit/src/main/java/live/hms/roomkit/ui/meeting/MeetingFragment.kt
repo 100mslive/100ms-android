@@ -763,6 +763,10 @@ class MeetingFragment : Fragment() {
             updateChatButtonWhenRoleChanges()
         }
 
+        meetingViewModel.screenshareRequest.observe(viewLifecycleOwner) {
+            startScreenShare()
+        }
+
     }
 
     private fun startHLSStreamingIfRequired() {
@@ -919,6 +923,12 @@ class MeetingFragment : Fragment() {
         binding.topMenu.visibility = View.VISIBLE
         binding.bottomControls.visibility  = View.VISIBLE
         showControlBars(false)
+        meetingViewModel.showWhiteBoardFullScreenSingleLiveEvent.observe(viewLifecycleOwner, Observer { showFullScreen ->
+            if (showFullScreen)
+                hideControlBars()
+            else
+                showControlBars(false)
+        })
         cancelCallback()
 
         val fragmentContainerParam = RelativeLayout.LayoutParams(
@@ -1399,6 +1409,9 @@ class MeetingFragment : Fragment() {
         if (meetingViewModel.isScreenShared()) {
             stopScreenShare()
         } else {
+            kotlin.runCatching { meetingViewModel.stopCurrentWhiteBoardSession() }
+            //no permission required directly start screen share
+            if (meetingViewModel.preRequestingPermissionForScreenShare().not())
             startScreenShare()
         }
     }
