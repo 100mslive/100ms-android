@@ -33,8 +33,8 @@ class Variables {
         ))
 
         val BackgroundDim = Color(getColorOrDefault(
-            /*HMSPrebuiltTheme.getColours()?.backgroundDim*/null,
-            "#A3000000"
-        ))
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_dim
+        )).copy(alpha = 0.64f) // backrground dim is always 64% transparent.
     }
 }
