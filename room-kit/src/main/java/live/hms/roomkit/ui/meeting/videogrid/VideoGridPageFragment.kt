@@ -109,7 +109,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     } else {
       meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
         val screenShareTrack = track.filter { it.isScreen  }.toList()
-        renderCurrentPage(screenShareTrack)
+        renderCurrentPage(screenShareTrack, isForceUpdate = true)
       }
     }
 
@@ -130,8 +130,8 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     return isScreenShare
   }
 
-  private fun renderCurrentPage(tracks: List<MeetingTrack>) {
+  private fun renderCurrentPage(tracks: List<MeetingTrack>, isForceUpdate : Boolean = false) {
     val videos = getCurrentPageVideos(tracks)
-    updateVideos(binding.container, videos, false)
+    updateVideos(binding.container, videos, false, isForceUpdate = isForceUpdate)
   }
 }

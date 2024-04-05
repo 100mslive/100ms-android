@@ -152,6 +152,20 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.hlsLiveStreamingHeader?.description
         }
     }
+
+    fun handRaiseAvailable() : Boolean {
+        val localPeer = hmssdk.getLocalPeer()
+        val available =  if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.hlsLiveStreaming?.elements
+                ?.handRaise != null
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+                ?.elements?.handRaise != null ||
+                    roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                        ?.default?.elements?.handRaise != null
+        }
+        return available
+    }
 }
 
 data class AllowedToMessageParticipants(

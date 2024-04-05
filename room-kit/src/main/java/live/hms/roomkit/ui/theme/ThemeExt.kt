@@ -703,13 +703,12 @@ internal fun BottomSheetStopRecordingBinding.applyTheme() {
 
 }
 internal fun VideoCardBinding.applyTheme() {
-    nameInitials.setTextColor(
+    sipImageHolder.drawable.setTint(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryHigh,
-            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+        HMSPrebuiltTheme.getDefaults().onsurface_med_emp
         )
     )
-
 
     degradedHeader.setTextColor(
         getColorOrDefault(
@@ -1297,6 +1296,19 @@ fun FragmentGridVideoBinding.applyTheme() {
         )
     )
 
+    iconMaximised.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.secondaryDim,
+        HMSPrebuiltTheme.getDefaults().secondary_default,
+        R.drawable.blue_round_drawable
+    )
+
+    iconMaximised.drawable.setTint(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
     iconAudioOff.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
         HMSPrebuiltTheme.getDefaults().secondary_default,
@@ -1471,6 +1483,7 @@ internal fun ParticipantHeaderItemBinding.applyTheme() {
         HMSPrebuiltTheme.getDefaults().border_bright
     ))
 }
+
 // ParticipantItem binding
 internal fun ListItemPeerListBinding.applyTheme() {
     audioLevelView.setBackgroundAndColor(
