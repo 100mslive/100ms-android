@@ -328,7 +328,8 @@ abstract class VideoGridBaseFragment : Fragment() {
     layout: GridLayout,
     newVideos: List<MeetingTrack?>,
     isVideoGrid: Boolean,
-    isScreenShare: Boolean = false
+    isScreenShare: Boolean = false,
+    isForceUpdate : Boolean = false,
   ) {
     gridLayout = layout
     var requiresGridLayoutUpdate = false
@@ -343,7 +344,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
         layout.apply {
           // Unbind only when view is visible to user
-          if (isFragmentVisible) unbindSurfaceView(
+          if (isFragmentVisible|| isForceUpdate) unbindSurfaceView(
             currentRenderedView.binding.videoCard,
             currentRenderedView.meetingTrack
           )
@@ -361,7 +362,8 @@ abstract class VideoGridBaseFragment : Fragment() {
         if (renderedViewPair != null) {
           newRenderedViews.add(renderedViewPair)
 
-          if (isFragmentVisible) {
+          if (isFragmentVisible ||isForceUpdate) {
+
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo, if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
@@ -387,7 +389,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
 
           // Bind surfaceView when view is visible to user
-          if (isFragmentVisible) {
+          if (isFragmentVisible || isForceUpdate) {
             bindSurfaceView(videoBinding.videoCard, newVideo, if (isScreenShare) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
           }
 

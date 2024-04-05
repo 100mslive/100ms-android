@@ -1,8 +1,10 @@
 package live.hms.roomkit.ui.meeting
 
+import android.Manifest
 import android.app.Application
 import android.content.Intent
 import android.media.AudioManager
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.*
@@ -97,6 +99,7 @@ class MeetingViewModel(
         HMSLogSettings(LogAlarmManager.DEFAULT_DIR_SIZE, true)
     private var isPrebuiltDebug by Delegates.notNull<Boolean>()
     val roleChange = MutableLiveData<HMSPeer>()
+    val screenshareRequest = SingleLiveEvent<Unit>()
 
     var roleOnJoining : HMSRole? = null
         private set
@@ -1847,12 +1850,11 @@ class MeetingViewModel(
         mediaProjectionPermissionResultData: Intent?,
         actionListener: HMSActionResultListener
     ) {
-        // Without custom notification
-//    hmsSDK.startScreenshare(actionListener ,mediaProjectionPermissionResultData)
 
-        // With custom notification
+
+
         val notification = NotificationCompat.Builder(getApplication(), "ScreenCapture channel")
-            .setContentText("Screenshare running for roomId: ${hmsRoom?.roomId}")
+            .setContentText("Screen share running for room Name: ${hmsRoom?.name}")
             .setSmallIcon(android.R.drawable.arrow_up_float)
             .addAction(
                 android.R.drawable.ic_menu_close_clear_cancel,
@@ -2617,6 +2619,16 @@ class MeetingViewModel(
 
         }
         oldhasScreenShareOverriddenWhiteboard = hasScreenShareOverriddenWhiteboard
+    }
+
+    fun preRequestingPermissionForScreenShare() : Boolean {
+        viewModelScope.launch {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                _events.emit(Event.RequestPermission(arrayOf(Manifest.permission.POST_NOTIFICATIONS)))
+            }
+        }
+
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     }
 
 
