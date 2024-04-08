@@ -3,7 +3,7 @@ package live.hms.roomkit.ui.meeting
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.init.HMSRoomLayout
-
+import live.hms.video.sdk.models.TranscriptionState
 class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     private var hmsRoomLayout : HMSRoomLayout? = null
     private val roleMap : MutableMap<String, HMSRoomLayout.HMSRoomLayoutData> = mutableMapOf()
@@ -168,7 +168,7 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     }
 
     fun areCaptionsEnabled() : Boolean =
-        hmssdk.getRoom()?.transcriptions?.find { it.enabled } != null
+        hmssdk.getRoom()?.transcriptions?.find { it.state == TranscriptionState.STARTED } != null
 
 }
 
