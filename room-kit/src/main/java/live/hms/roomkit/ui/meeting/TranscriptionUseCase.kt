@@ -22,12 +22,10 @@ import live.hms.video.sdk.transcripts.HmsTranscripts
 import java.util.UUID
 
 class TranscriptionUseCase(
-    val getNameForPeerId : (String) -> String?
+    val getNameForPeerId : (String) -> String?,
 ) {
     private val TAG = "TranscriptionUseCase"
     val captions : MutableLiveData<List<TranscriptViewHolder>> = MutableLiveData(null)
-    // Actually you have to keep a per peer queue of text until the final comes in.
-    // Also keep a mapping of peerid to name.
 
     private val peerTranscriptList = LinkedHashMap<String, HmsTranscript>()
     private val peerToNameMap = HashMap<String,String>()

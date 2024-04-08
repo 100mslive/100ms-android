@@ -167,7 +167,7 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
         return available
     }
 
-    fun areCaptionsEnabled() : Boolean =
+    fun areCaptionsEnabled() : Boolean = true || // TODO temporary until they migrate
         hmssdk.getRoom()?.transcriptions?.find { it.state == TranscriptionState.STARTED } != null
 
 }
