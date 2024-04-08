@@ -332,7 +332,7 @@ class MeetingFragment : Fragment() {
     private fun addComposable(composeView: ComposeView) = composeView.apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
-            val captionsEnabled by meetingViewModel.areCaptionsenabled.observeAsState(false)
+            val captionsEnabled by meetingViewModel.areCaptionsEnabledByUser.observeAsState(false)
             val subtitles by meetingViewModel.captions.observeAsState()
             if( !subtitles.isNullOrEmpty() && captionsEnabled) {
                 Captions(subtitles)

@@ -118,7 +118,7 @@ class SessionOptionBottomSheet(
             {
                 meetingViewModel.toggleCaptions()
                 dismiss()
-        }, isSelected = meetingViewModel.captionsEnabled(),
+        }, isSelected = meetingViewModel.captionsEnabledByUser(),
             selectedTitle = "Hide Captions")
 
         val noiseButton = GridOptionItem("Reduce Noise", R.drawable.reduce_noise_session_option, {

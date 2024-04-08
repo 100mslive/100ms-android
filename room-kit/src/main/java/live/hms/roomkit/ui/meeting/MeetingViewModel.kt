@@ -79,7 +79,7 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
     val transcriptionUseCase = TranscriptionUseCase { hmsSDK.getPeerById(it)?.name }
-    val areCaptionsenabled : MutableLiveData<Boolean> = MutableLiveData(true)
+    val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(true)
     val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
     val launchParticipantsFromHls = SingleLiveEvent<Unit>()
@@ -2642,9 +2642,9 @@ class MeetingViewModel(
 
 
     fun toggleCaptions() =
-        areCaptionsenabled.postValue(areCaptionsenabled.value?.not())
+        areCaptionsEnabledByUser.postValue(areCaptionsEnabledByUser.value?.not())
 
-    fun captionsEnabled(): Boolean =
-        areCaptionsenabled.value == true
+    fun captionsEnabledByUser(): Boolean =
+        areCaptionsEnabledByUser.value == true
 }
 
