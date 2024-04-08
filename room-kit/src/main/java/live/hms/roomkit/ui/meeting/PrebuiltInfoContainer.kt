@@ -166,6 +166,10 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
         }
         return available
     }
+
+    fun areCaptionsEnabled() : Boolean =
+        hmssdk.getRoom()?.transcriptions?.find { it.enabled } != null
+
 }
 
 data class AllowedToMessageParticipants(

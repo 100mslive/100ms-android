@@ -190,7 +190,8 @@ class SessionOptionBottomSheet(
             }
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
-            add(captionsButton)
+            if(meetingViewModel.areCaptionsAvailable())
+                add(captionsButton)
             if(!meetingViewModel.disableNameEdit()) {
                 add(changeName)
             }
