@@ -1491,8 +1491,6 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
         scrollState.scrollTo(scrollState.maxValue)
     }
 
-
-
     Column(
         Modifier
             .requiredHeightIn(
