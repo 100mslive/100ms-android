@@ -1499,7 +1499,7 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
             )
             .verticalScroll(scrollState)
             .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb())),
-        /*verticalArrangement = Arrangement.spacedBy(Variables.Spacing1)*/) {
+        ) {
         subtitles?.forEach {
             Caption(it.getSubtitle())
         }
