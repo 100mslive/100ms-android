@@ -2,11 +2,13 @@
 buildscript {
     ext.kotlin_version = '1.8.22'
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
@@ -26,14 +28,13 @@ buildscript {
 
 allprojects {
     repositories {
-
-
+        mavenLocal()
         google()
         mavenCentral()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
-
+        maven { url 'https://jitpack.io' }
     }
 }
 
