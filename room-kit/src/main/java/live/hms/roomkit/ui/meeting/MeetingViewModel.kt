@@ -3,6 +3,7 @@ package live.hms.roomkit.ui.meeting
 import android.Manifest
 import android.app.Application
 import android.content.Intent
+import android.graphics.Bitmap
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
@@ -62,6 +63,7 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
@@ -140,6 +142,13 @@ class MeetingViewModel(
 
 
     val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
+    val bitmap =         Bitmap.createBitmap(
+        1,
+        1,
+        Bitmap.Config.ARGB_8888,
+    )
+
+    val blurPlugin by lazy { HMSVirtualBackground(hmsSDK, bitmap) }
 
     private var lastPollStartedTime : Long = 0
 
@@ -302,8 +311,8 @@ class MeetingViewModel(
      fun setupFilterVideoPlugin() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            filterPlugin.init()
-            hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
+            blurPlugin.init()
+            hmsSDK.addPlugin(blurPlugin, object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
 
                 }
@@ -319,8 +328,8 @@ class MeetingViewModel(
     fun removeVideoFilterPlugIn() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
-            filterPlugin.stop()
-            hmsSDK.removePlugin(filterPlugin, object : HMSActionResultListener {
+            blurPlugin.stop()
+            hmsSDK.removePlugin(blurPlugin, object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
 
                 }
