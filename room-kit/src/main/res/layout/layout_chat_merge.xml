@@ -49,15 +49,10 @@
                 tools:listitem="@layout/layout_pinned_message" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
-            android:id="@+id/chatMessages"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/list_item_chat" />
-
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/emptyIndicator"
             android:layout_width="wrap_content"
+            tools:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:orientation="vertical"
@@ -91,6 +86,15 @@
                 android:text="There are no messages here yet. Start a conversation by sending a message."
                 android:textSize="14sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+        <live.hms.roomkit.ui.meeting.chat.SingleSideFadeRecyclerview
+            android:id="@+id/chatMessages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/list_item_chat" />
+
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 
