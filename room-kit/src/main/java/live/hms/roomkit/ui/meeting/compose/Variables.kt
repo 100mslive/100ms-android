@@ -10,6 +10,7 @@ class Variables {
         val Spacing2 = 16.dp
         val Spacing1 = 8.dp
         val Spacing0 = 4.dp
+        val TwelveDp = 12.dp
         val PrimaryDefault : Color = Color(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.primaryDefault,
             HMSPrebuiltTheme.getDefaults().primary_default))
@@ -30,5 +31,10 @@ class Variables {
             HMSPrebuiltTheme.getColours()?.borderBright,
             HMSPrebuiltTheme.getDefaults().border_bright
         ))
+
+        val BackgroundDim = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_dim
+        )).copy(alpha = 0.64f) // backrground dim is always 64% transparent.
     }
 }

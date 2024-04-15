@@ -25,6 +25,29 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
@@ -64,6 +87,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
@@ -260,6 +284,7 @@ class MeetingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
+        addComposable(binding.composeView)
 
         if (savedInstanceState != null) {
             // Recreated Fragment
@@ -299,6 +324,17 @@ class MeetingFragment : Fragment() {
                 } else {
                     this.activity?.finish()
                 }
+            }
+        }
+    }
+
+    private fun addComposable(composeView: ComposeView) = composeView.apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            val captionsEnabled by meetingViewModel.areCaptionsEnabledByUser.observeAsState(false)
+            val subtitles by meetingViewModel.captions.observeAsState()
+            if( !subtitles.isNullOrEmpty() && captionsEnabled) {
+                Captions(subtitles)
             }
         }
     }
@@ -1438,5 +1474,52 @@ class MeetingFragment : Fragment() {
         } else {
             LeaveCallBottomSheet().show(parentFragmentManager, null)
         }
+    }
+}
+
+@Preview
+@Composable
+fun DisplayCaptions() {
+    Captions(subtitles = listOf(TranscriptViewHolder("Cat", "Dinner time", peerId = "a"),
+        TranscriptViewHolder("Dog","Time for a walk", peerId = "b")))
+}
+
+@Composable
+fun Captions(subtitles: List<TranscriptViewHolder>?) {
+    val scrollState = rememberScrollState()
+    LaunchedEffect(subtitles) {
+        scrollState.scrollTo(scrollState.maxValue)
+    }
+
+    Column(
+        Modifier
+            .requiredHeightIn(
+                min = 27.dp,
+                max = 104.dp
+            )
+            .verticalScroll(scrollState)
+            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb())),
+        ) {
+        subtitles?.forEach {
+            Caption(it.getSubtitle())
+        }
+    }
+
+}
+@Composable
+fun Caption(subtitles : AnnotatedString) {
+    Box(modifier = Modifier
+        .padding(horizontal = Variables.TwelveDp)
+        .clip(RoundedCornerShape(8.dp))) {
+            Text(
+                text = subtitles,
+//                modifier = Modifier.padding(Variables.Spacing1),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    color = androidx.compose.ui.graphics.Color.White,
+                    letterSpacing = 0.25.sp,
+                )
+            )
     }
 }
