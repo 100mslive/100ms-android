@@ -211,14 +211,16 @@ class ParticipantItem(
             muteUnmuteIcon.gone()
             audioLevelView.gone()
         }
-        else if (audioTrack?.isMute == true || audioTrack?.isMute == null) {
+        else if (audioTrack.isMute) {
             // Mute
             muteUnmuteIcon.show()
+            muteUnmuteIcon.contentDescription = root.resources.getString(R.string.content_description_muted)
             audioLevelView.gone()
             muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(root.resources, R.drawable.ic_audio_toggle_off, null))
         }
         else {
             muteUnmuteIcon.gone()
+            muteUnmuteIcon.contentDescription = root.resources.getString(R.string.content_description_unmuted)
             audioLevelView.show()
             audioLevelView.requestLayout()
 //            activeSpeakers.removeObservers(viewBinding.root.context as LifecycleOwner)
