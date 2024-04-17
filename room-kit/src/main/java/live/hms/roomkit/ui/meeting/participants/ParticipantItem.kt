@@ -206,27 +206,27 @@ class ParticipantItem(
         }
     }
 
-    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding, isSipPeer : Boolean) {
+    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding, isSipPeer : Boolean) = with(viewBinding){
         if (audioTrack == null || isSipPeer) {
-            viewBinding.muteUnmuteIcon.gone()
-            viewBinding.audioLevelView.gone()
+            muteUnmuteIcon.gone()
+            audioLevelView.gone()
         }
         else if (audioTrack?.isMute == true || audioTrack?.isMute == null) {
             // Mute
-            viewBinding.muteUnmuteIcon.show()
-            viewBinding.audioLevelView.gone()
-            viewBinding.muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(viewBinding.root.resources, R.drawable.ic_audio_toggle_off, null))
+            muteUnmuteIcon.show()
+            audioLevelView.gone()
+            muteUnmuteIcon.setImageDrawable(ResourcesCompat.getDrawable(root.resources, R.drawable.ic_audio_toggle_off, null))
         }
         else {
-            viewBinding.muteUnmuteIcon.gone()
-            viewBinding.audioLevelView.show()
-            viewBinding.audioLevelView.requestLayout()
+            muteUnmuteIcon.gone()
+            audioLevelView.show()
+            audioLevelView.requestLayout()
 //            activeSpeakers.removeObservers(viewBinding.root.context as LifecycleOwner)
             kotlin.runCatching {
-                activeSpeakers.observe(viewBinding.root.context as LifecycleOwner) { (t, speakers) ->
+                activeSpeakers.observe(root.context as LifecycleOwner) { (t, speakers) ->
                     Log.d("HMSANIM", "${audioTrack.trackId} speakers ${speakers}")
                     val level = speakers.find { it.hmsTrack?.trackId == audioTrack.trackId }?.level ?: 0
-                    viewBinding.audioLevelView.update(level)
+                    audioLevelView.update(level)
                 }
             }
         }
