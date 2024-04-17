@@ -137,6 +137,8 @@ class FilterBottomSheet(
                     is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
                     is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
                     is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
+                    is VideoFilter.Blur -> meetingViewModel.blurPlugin.setBlurPercentage(progress / 100f)
+                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
                     null -> {}
                     else -> {}
                 }
@@ -190,6 +192,21 @@ class FilterBottomSheet(
                             ( meetingViewModel.filterPlugin.getSmoothnessProgress() * 100f).toInt()
                     }
 
+                    is VideoFilter.Blur -> {
+                        currentSelectedFilter = VideoFilter.Blur
+                        binding.seekBar.progress =
+                            ( meetingViewModel.blurPlugin.getBlurPercentage() * 100f).toInt()
+
+                    }
+
+                    is VideoFilter.Quality -> {
+                        currentSelectedFilter = VideoFilter.Quality
+                        binding.seekBar.progress =
+                            ( meetingViewModel.blurPlugin.getVideoQualityPercentage()).toInt()
+
+                    }
+
+
 
                     else -> {
 
@@ -221,7 +238,13 @@ class FilterBottomSheet(
 
             )
             addTab(
-                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness), true
+                this.newTab().setText("Blur").setTag(VideoFilter.Blur), true
+            )
+            addTab(
+                this.newTab().setText("Quality").setTag(VideoFilter.Quality)
+            )
+            addTab(
+                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness)
             )
             addTab(
                 this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
