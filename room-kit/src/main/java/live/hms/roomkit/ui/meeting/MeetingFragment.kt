@@ -29,10 +29,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -1503,12 +1503,13 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
 
     Column(
         Modifier
+            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb()))
+            .fillMaxWidth()
             .requiredHeightIn(
                 min = 27.dp,
-                max = 104.dp
+                max = 110.dp
             )
             .verticalScroll(scrollState)
-            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb()))
             .padding(12.dp),
         ) {
         subtitles?.forEach {
@@ -1519,8 +1520,7 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
 }
 @Composable
 fun Caption(subtitles : AnnotatedString) {
-    Box(modifier = Modifier
-        .clip(RoundedCornerShape(8.dp))) {
+    Box(modifier = Modifier) {
             Text(
                 text = subtitles,
 //                modifier = Modifier.padding(Variables.Spacing1),
