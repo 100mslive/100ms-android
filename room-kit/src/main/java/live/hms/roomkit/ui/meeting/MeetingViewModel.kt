@@ -2605,7 +2605,7 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
-    fun areCaptionsAvailable() = true || // TODO temporary until they migrate
+    fun areCaptionsAvailable() = transcriptionUseCase.receivedOneCaption || // temporary until they migrate
             hmsSDK.getRoom()?.transcriptions?.find { it.state == TranscriptionState.STARTED } != null
     fun setWhiteBoardFullScreenMode(isShown : Boolean) {
         showWhiteBoardFullScreen.value = isShown
