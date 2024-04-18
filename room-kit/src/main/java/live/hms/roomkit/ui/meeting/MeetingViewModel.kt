@@ -79,6 +79,11 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
     val transcriptionUseCase = TranscriptionUseCase { hmsSDK.getPeerById(it)?.name }
+    enum class TranscriptionsPosition {
+        TOP,
+        BOTTOM
+    }
+    val transcriptionsPosition = MutableLiveData(TranscriptionsPosition.BOTTOM)
     val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(true)
     val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
