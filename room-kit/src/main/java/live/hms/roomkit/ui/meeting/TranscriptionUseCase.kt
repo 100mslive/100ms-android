@@ -26,7 +26,10 @@ class TranscriptionUseCase(
 ) {
     private val TAG = "TranscriptionUseCase"
     val captions : MutableLiveData<List<TranscriptViewHolder>> = MutableLiveData(null)
-
+    private val CLEAR_AFTER_SILENCE_MILLIS = 5000L
+    private val EXTRA_SUBTITLE_DELETION_TIME = 20_000L
+    private val removeItems = true
+    private var singleCancelJob : Job? = null
     private val peerTranscriptList = LinkedHashMap<String, HmsTranscript>()
     private val peerToNameMap = HashMap<String,String>()
     private val cancelJobs = HashMap<String, Job>()
@@ -39,7 +42,7 @@ class TranscriptionUseCase(
 
     suspend fun newCaption(transcripts: HmsTranscripts) : Unit = editLock.withLock {
 //        Log.d(TAG,"processing started")
-
+        clearAllTranscriptionAfterSilence()
         // update peer names into the map
         updatePeerNamesIntoTheMap(transcripts)
 
@@ -57,22 +60,35 @@ class TranscriptionUseCase(
             .associateBy { it.peerId + it.start }
 
         // filter out the cancel jobs.
-        filterCancelJobs(newItemsOriginal)
+        if(removeItems)
+            filterCancelJobs(newItemsOriginal)
 
         // Add the new transcripts to the queue (now this might move the thing)
         peerTranscriptList.putAll(newItemsOriginal)
 
         updateHolders(peerTranscriptList)
         // Schedule removals
-        scheduleRemovals(newItemsOriginal)
+        if(removeItems)
+            scheduleRemovals(newItemsOriginal)
 
 //        Log.d(TAG,"processing complete")
+    }
+
+    private fun clearAllTranscriptionAfterSilence() {
+        singleCancelJob?.cancel()
+        singleCancelJob = CoroutineScope(Dispatchers.Default).launch {
+            delay(CLEAR_AFTER_SILENCE_MILLIS)
+            editLock.withLock {
+                peerTranscriptList.clear()
+                updateHolders(peerTranscriptList)
+            }
+        }
     }
 
     private fun scheduleRemovals(newItemsOriginal: Map<String, HmsTranscript>) {
         newItemsOriginal.map { (id, transcript) ->
             cancelJobs[id] = CoroutineScope(Dispatchers.Default).launch {
-                val delay = (transcript.end - transcript.start).toLong()
+                val delay = (transcript.end - transcript.start).toLong() + EXTRA_SUBTITLE_DELETION_TIME
 //                Log.d("CaptionRemoval","$delay")
                 delay(delay)
                 editLock.withLock {
@@ -119,7 +135,7 @@ class TranscriptionUseCase(
                     peerId = hmsTranscript.peerId
                 ))
             } else {
-                previousPeerTranscript._text += '\n'+hmsTranscript.transcript
+                previousPeerTranscript._text += ' '+hmsTranscript.transcript
             }
         }
         this.captions.postValue(captions)
