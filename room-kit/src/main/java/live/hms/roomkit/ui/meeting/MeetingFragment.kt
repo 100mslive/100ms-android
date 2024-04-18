@@ -26,6 +26,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -333,8 +334,12 @@ class MeetingFragment : Fragment() {
         setContent {
             val captionsEnabled by meetingViewModel.areCaptionsEnabledByUser.observeAsState(false)
             val subtitles by meetingViewModel.captions.observeAsState()
+            val topBottom by meetingViewModel.transcriptionsPosition.observeAsState()
             if( !subtitles.isNullOrEmpty() && captionsEnabled) {
-                Captions(subtitles)
+                Column(modifier = Modifier.padding(8.dp),
+                    verticalArrangement = if(topBottom == MeetingViewModel.TranscriptionsPosition.TOP) Arrangement.Top else Arrangement.Bottom) {
+                    Captions(subtitles)
+                }
             }
         }
     }
@@ -384,10 +389,16 @@ class MeetingFragment : Fragment() {
         meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
             chatViewModel.updatePeerLeave(it)
         }
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
+        chatButtonEnabled(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen())
+    }
+
+    private fun chatButtonEnabled(enable : Boolean) {
+        if(enable) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+            meetingViewModel.transcriptionsPosition.postValue(MeetingViewModel.TranscriptionsPosition.TOP)
         } else {
             binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
+            meetingViewModel.transcriptionsPosition.postValue(MeetingViewModel.TranscriptionsPosition.BOTTOM)
         }
     }
 
@@ -901,11 +912,7 @@ class MeetingFragment : Fragment() {
         } else {
             binding.messageMenu.visibility = View.GONE
         }
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
-            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
-        } else {
-            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
-        }
+        chatButtonEnabled(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen())
     }
     var controlBarsVisible = true
     private fun setupConfiguration(mode: MeetingViewMode) {
@@ -1396,12 +1403,7 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if(binding.chatView.visibility == View.VISIBLE) {
-
-            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
-        } else {
-            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
-        }
+        chatButtonEnabled(binding.chatView.visibility == View.VISIBLE)
     }
 
     private fun startOrStopScreenShare() {
