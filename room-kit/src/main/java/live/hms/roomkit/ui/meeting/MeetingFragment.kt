@@ -337,7 +337,7 @@ class MeetingFragment : Fragment() {
             val subtitles by meetingViewModel.captions.observeAsState()
             val topBottom by meetingViewModel.transcriptionsPosition.observeAsState()
             if( !subtitles.isNullOrEmpty() && captionsEnabled) {
-                Column(modifier = Modifier.padding(8.dp),
+                Column(modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 16.dp),
                     verticalArrangement = if(topBottom == MeetingViewModel.TranscriptionsPosition.TOP) Arrangement.Top else Arrangement.Bottom) {
                     Captions(subtitles)
                 }
