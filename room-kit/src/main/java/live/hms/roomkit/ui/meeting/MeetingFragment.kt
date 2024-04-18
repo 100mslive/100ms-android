@@ -26,6 +26,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -333,8 +334,12 @@ class MeetingFragment : Fragment() {
         setContent {
             val captionsEnabled by meetingViewModel.areCaptionsEnabledByUser.observeAsState(false)
             val subtitles by meetingViewModel.captions.observeAsState()
+            val topBottom by meetingViewModel.transcriptionsPosition.observeAsState()
             if( !subtitles.isNullOrEmpty() && captionsEnabled) {
-                Captions(subtitles)
+                Column(modifier = Modifier.padding(8.dp),
+                    verticalArrangement = if(topBottom == MeetingViewModel.TranscriptionsPosition.TOP) Arrangement.Top else Arrangement.Bottom) {
+                    Captions(subtitles)
+                }
             }
         }
     }
