@@ -27,6 +27,7 @@ class TranscriptionUseCase(
     private val TAG = "TranscriptionUseCase"
     val captions : MutableLiveData<List<TranscriptViewHolder>> = MutableLiveData(null)
     var receivedOneCaption = false
+        private set
     private val CLEAR_AFTER_SILENCE_MILLIS = 5000L
     private val EXTRA_SUBTITLE_DELETION_TIME = 20_000L
     private val removeItems = true
