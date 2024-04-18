@@ -1500,7 +1500,8 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
                 max = 104.dp
             )
             .verticalScroll(scrollState)
-            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb())),
+            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb()))
+            .padding(12.dp),
         ) {
         subtitles?.forEach {
             Caption(it.getSubtitle())
@@ -1511,7 +1512,6 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
 @Composable
 fun Caption(subtitles : AnnotatedString) {
     Box(modifier = Modifier
-        .padding(horizontal = Variables.TwelveDp)
         .clip(RoundedCornerShape(8.dp))) {
             Text(
                 text = subtitles,
