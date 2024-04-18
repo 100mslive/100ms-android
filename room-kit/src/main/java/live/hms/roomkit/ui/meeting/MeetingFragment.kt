@@ -89,6 +89,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.roomkit.ui.meeting.participants.DIRECTLY_OPENED
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
@@ -336,7 +337,7 @@ class MeetingFragment : Fragment() {
             val subtitles by meetingViewModel.captions.observeAsState()
             val topBottom by meetingViewModel.transcriptionsPosition.observeAsState()
             if( !subtitles.isNullOrEmpty() && captionsEnabled) {
-                Column(modifier = Modifier.padding(8.dp),
+                Column(modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 16.dp),
                     verticalArrangement = if(topBottom == MeetingViewModel.TranscriptionsPosition.TOP) Arrangement.Top else Arrangement.Bottom) {
                     Captions(subtitles)
                 }
@@ -1198,15 +1199,21 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
+                            meetingViewModel.tempHideCaptions()
                             if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
                                     !meetingViewModel.prebuiltInfoContainer.isChatEnabled()
                             ) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
+                                val args = Bundle()
+                                    .apply {
+                                        putBoolean(DIRECTLY_OPENED, true)
+                                    }
+
                                 childFragmentManager
                                     .beginTransaction()
-                                    .add(R.id.fragment_container, ParticipantsFragment())
+                                    .add(R.id.fragment_container, ParticipantsFragment().apply { arguments = args })
                                     .commit()
                             } else {
                                 val args = Bundle()
@@ -1263,6 +1270,7 @@ class MeetingFragment : Fragment() {
                         {
                             findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
                         })
+                    meetingViewModel.tempHideCaptions()
                     settingsBottomSheet.show(
                         requireActivity().supportFragmentManager,
                         "settingsBottomSheet"
@@ -1500,7 +1508,8 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
                 max = 104.dp
             )
             .verticalScroll(scrollState)
-            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb())),
+            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb()))
+            .padding(12.dp),
         ) {
         subtitles?.forEach {
             Caption(it.getSubtitle())
@@ -1511,7 +1520,6 @@ fun Captions(subtitles: List<TranscriptViewHolder>?) {
 @Composable
 fun Caption(subtitles : AnnotatedString) {
     Box(modifier = Modifier
-        .padding(horizontal = Variables.TwelveDp)
         .clip(RoundedCornerShape(8.dp))) {
             Text(
                 text = subtitles,

@@ -2653,5 +2653,20 @@ class MeetingViewModel(
 
     fun captionsEnabledByUser(): Boolean =
         areCaptionsEnabledByUser.value == true
+
+    private var reEnableCaptions = false
+    fun tempHideCaptions() {
+        if(captionsEnabledByUser()) {
+            reEnableCaptions = true
+        }
+        areCaptionsEnabledByUser.postValue(false)
+    }
+
+    fun restoreTempHiddenCaptions() {
+        if(reEnableCaptions) {
+            areCaptionsEnabledByUser.postValue(true)
+            reEnableCaptions = false
+        }
+    }
 }
 
