@@ -89,6 +89,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.roomkit.ui.meeting.participants.DIRECTLY_OPENED
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
@@ -1198,15 +1199,21 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
+                            meetingViewModel.tempHideCaptions()
                             if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
                                     !meetingViewModel.prebuiltInfoContainer.isChatEnabled()
                             ) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
+                                val args = Bundle()
+                                    .apply {
+                                        putBoolean(DIRECTLY_OPENED, true)
+                                    }
+
                                 childFragmentManager
                                     .beginTransaction()
-                                    .add(R.id.fragment_container, ParticipantsFragment())
+                                    .add(R.id.fragment_container, ParticipantsFragment().apply { arguments = args })
                                     .commit()
                             } else {
                                 val args = Bundle()
@@ -1263,6 +1270,7 @@ class MeetingFragment : Fragment() {
                         {
                             findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
                         })
+                    meetingViewModel.tempHideCaptions()
                     settingsBottomSheet.show(
                         requireActivity().supportFragmentManager,
                         "settingsBottomSheet"

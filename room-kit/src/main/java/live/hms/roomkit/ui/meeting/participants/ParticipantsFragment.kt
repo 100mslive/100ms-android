@@ -29,7 +29,7 @@ import live.hms.video.error.HMSException
 import live.hms.video.sdk.listeners.PeerListResultListener
 import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.PeerListIterator
-
+const val DIRECTLY_OPENED: String= "PARTICIPANTS_DIRECTLY_OPENED"
 class ParticipantsFragment : Fragment() {
 
     private val TAG = "ParticipantsFragment"
@@ -41,12 +41,16 @@ class ParticipantsFragment : Fragment() {
     ) { binding.participantsBack.visibility = View.VISIBLE }
     }
 
-
-
     private val paginatedPeerList = arrayListOf<HMSPeer>()
     private var isLargeRoom = false
     private var iteratorsInitated = false
 
+    override fun onDetach() {
+        super.onDetach()
+        if(arguments?.getBoolean(DIRECTLY_OPENED) == true) {
+            meetingViewModel.restoreTempHiddenCaptions()
+        }
+    }
 
 //    private suspend fun getPeerList(resetIterators : Boolean = false): List<HMSPeer> {
 //        return if (isLargeRoom) {
