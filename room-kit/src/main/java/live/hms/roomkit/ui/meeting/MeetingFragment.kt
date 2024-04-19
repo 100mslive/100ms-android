@@ -40,7 +40,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -337,8 +336,8 @@ class MeetingFragment : Fragment() {
             val subtitles by meetingViewModel.captions.observeAsState()
             val topBottom by meetingViewModel.transcriptionsPosition.observeAsState()
             if( !subtitles.isNullOrEmpty() && captionsEnabled) {
-                Column(modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 16.dp),
-                    verticalArrangement = if(topBottom == MeetingViewModel.TranscriptionsPosition.TOP) Arrangement.Top else Arrangement.Bottom) {
+                Column(modifier = Modifier.padding(start = 8.dp, top = if(topBottom == MeetingViewModel.TranscriptionsPosition.SCREENSHARE_TOP) 57.dp else 8.dp, end = 8.dp, bottom = 16.dp),
+                    verticalArrangement = if(topBottom == MeetingViewModel.TranscriptionsPosition.BOTTOM) Arrangement.Bottom else Arrangement.Top) {
                     Captions(subtitles)
                 }
             }
@@ -394,12 +393,11 @@ class MeetingFragment : Fragment() {
     }
 
     private fun chatButtonEnabled(enable : Boolean) {
+        meetingViewModel.transcriptionsPositionUseCase.chatStateChanged(enable)
         if(enable) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
-            meetingViewModel.transcriptionsPosition.postValue(MeetingViewModel.TranscriptionsPosition.TOP)
         } else {
             binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
-            meetingViewModel.transcriptionsPosition.postValue(MeetingViewModel.TranscriptionsPosition.BOTTOM)
         }
     }
 
