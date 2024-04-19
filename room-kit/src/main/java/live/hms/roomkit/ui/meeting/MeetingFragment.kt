@@ -1025,6 +1025,8 @@ class MeetingFragment : Fragment() {
 
     private fun showControlBars(shouldHideAfterDelay : Boolean) {
         controlBarsVisible = true
+        binding.bottomControls.maxHeight = Int.MAX_VALUE
+
         binding.topMenu.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1133,7 +1135,8 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
-                    bottomMenu.visibility = View.GONE
+                    bottomMenu.visibility = View.INVISIBLE
+                    bottomMenu.maxHeight = 0
                     controlBarsVisible = false
                 }
 
