@@ -30,7 +30,6 @@ class TranscriptionUseCase(
         private set
     private val CLEAR_AFTER_SILENCE_MILLIS = 5000L
     private val EXTRA_SUBTITLE_DELETION_TIME = 20_000L
-    private val removeItems = true
     private var singleCancelJob : Job? = null
     private val peerTranscriptList = LinkedHashMap<String, HmsTranscript>()
     private val peerToNameMap = HashMap<String,String>()
@@ -65,16 +64,15 @@ class TranscriptionUseCase(
             .associateBy { it.peerId + it.start }
 
         // filter out the cancel jobs.
-        if(removeItems)
-            filterCancelJobs(newItemsOriginal)
+        filterCancelJobs(newItemsOriginal)
 
         // Add the new transcripts to the queue (now this might move the thing)
         peerTranscriptList.putAll(newItemsOriginal)
 
         updateHolders(peerTranscriptList)
         // Schedule removals
-        if(removeItems)
-            scheduleRemovals(newItemsOriginal)
+//        if(removeItems)
+        scheduleRemovals(newItemsOriginal)
 
 //        Log.d(TAG,"processing complete")
     }
