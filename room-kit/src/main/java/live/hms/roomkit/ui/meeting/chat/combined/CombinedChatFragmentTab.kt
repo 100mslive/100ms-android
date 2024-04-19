@@ -30,6 +30,10 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
     }
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
 
+    override fun onDetach() {
+        super.onDetach()
+        meetingViewModel.restoreTempHiddenCaptions()
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

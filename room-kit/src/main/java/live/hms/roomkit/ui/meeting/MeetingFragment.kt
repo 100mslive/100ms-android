@@ -25,6 +25,30 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.core.view.*
 import androidx.fragment.app.Fragment
@@ -64,6 +88,8 @@ import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
+import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.roomkit.ui.meeting.participants.DIRECTLY_OPENED
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridFragment
@@ -260,6 +286,7 @@ class MeetingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
+        addComposable(binding.composeView)
 
         if (savedInstanceState != null) {
             // Recreated Fragment
@@ -298,6 +325,21 @@ class MeetingFragment : Fragment() {
 
                 } else {
                     this.activity?.finish()
+                }
+            }
+        }
+    }
+
+    private fun addComposable(composeView: ComposeView) = composeView.apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            val captionsEnabled by meetingViewModel.areCaptionsEnabledByUser.observeAsState(false)
+            val subtitles by meetingViewModel.captions.observeAsState()
+            val topBottom by meetingViewModel.transcriptionsPosition.observeAsState()
+            if( !subtitles.isNullOrEmpty() && captionsEnabled) {
+                Column(modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 16.dp),
+                    verticalArrangement = if(topBottom == MeetingViewModel.TranscriptionsPosition.TOP) Arrangement.Top else Arrangement.Bottom) {
+                    Captions(subtitles)
                 }
             }
         }
@@ -348,10 +390,16 @@ class MeetingFragment : Fragment() {
         meetingViewModel.peerLeaveUpdate.observe(viewLifecycleOwner) {
             chatViewModel.updatePeerLeave(it)
         }
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
+        chatButtonEnabled(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen())
+    }
+
+    private fun chatButtonEnabled(enable : Boolean) {
+        if(enable) {
             binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
+            meetingViewModel.transcriptionsPosition.postValue(MeetingViewModel.TranscriptionsPosition.TOP)
         } else {
             binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
+            meetingViewModel.transcriptionsPosition.postValue(MeetingViewModel.TranscriptionsPosition.BOTTOM)
         }
     }
 
@@ -865,11 +913,7 @@ class MeetingFragment : Fragment() {
         } else {
             binding.messageMenu.visibility = View.GONE
         }
-        if(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen()) {
-            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
-        } else {
-            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
-        }
+        chatButtonEnabled(meetingViewModel.prebuiltInfoContainer.chatInitialStateOpen())
     }
     var controlBarsVisible = true
     private fun setupConfiguration(mode: MeetingViewMode) {
@@ -981,6 +1025,8 @@ class MeetingFragment : Fragment() {
 
     private fun showControlBars(shouldHideAfterDelay : Boolean) {
         controlBarsVisible = true
+        binding.bottomControls.maxHeight = Int.MAX_VALUE
+
         binding.topMenu.animate()
             ?.translationY(0f)?.setDuration(300)?.setListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator) {
@@ -1089,7 +1135,8 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
-                    bottomMenu.visibility = View.GONE
+                    bottomMenu.visibility = View.INVISIBLE
+                    bottomMenu.maxHeight = 0
                     controlBarsVisible = false
                 }
 
@@ -1155,15 +1202,21 @@ class MeetingFragment : Fragment() {
                         onScreenShareClicked = { startOrStopScreenShare() },
                         onBRBClicked = { meetingViewModel.toggleBRB() },
                         onPeerListClicked = {
+                            meetingViewModel.tempHideCaptions()
                             if( meetingViewModel.prebuiltInfoContainer.isChatOverlay() ||
                                     !meetingViewModel.prebuiltInfoContainer.isChatEnabled()
                             ) {
                                 if(isOverlayChatVisible()){
                                     toggleChatVisibility()
                                 }
+                                val args = Bundle()
+                                    .apply {
+                                        putBoolean(DIRECTLY_OPENED, true)
+                                    }
+
                                 childFragmentManager
                                     .beginTransaction()
-                                    .add(R.id.fragment_container, ParticipantsFragment())
+                                    .add(R.id.fragment_container, ParticipantsFragment().apply { arguments = args })
                                     .commit()
                             } else {
                                 val args = Bundle()
@@ -1220,6 +1273,7 @@ class MeetingFragment : Fragment() {
                         {
                             findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
                         })
+                    meetingViewModel.tempHideCaptions()
                     settingsBottomSheet.show(
                         requireActivity().supportFragmentManager,
                         "settingsBottomSheet"
@@ -1360,12 +1414,7 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        if(binding.chatView.visibility == View.VISIBLE) {
-
-            binding.buttonOpenChat.setIconDisabled(R.drawable.ic_chat_message)
-        } else {
-            binding.buttonOpenChat.setIconEnabled(R.drawable.ic_chat_message)
-        }
+        chatButtonEnabled(binding.chatView.visibility == View.VISIBLE)
     }
 
     private fun startOrStopScreenShare() {
@@ -1438,5 +1487,52 @@ class MeetingFragment : Fragment() {
         } else {
             LeaveCallBottomSheet().show(parentFragmentManager, null)
         }
+    }
+}
+
+@Preview
+@Composable
+fun DisplayCaptions() {
+    Captions(subtitles = listOf(TranscriptViewHolder("Cat", "Dinner time", peerId = "a"),
+        TranscriptViewHolder("Dog","Time for a walk", peerId = "b")))
+}
+
+@Composable
+fun Captions(subtitles: List<TranscriptViewHolder>?) {
+    val scrollState = rememberScrollState()
+    LaunchedEffect(subtitles) {
+        scrollState.scrollTo(scrollState.maxValue)
+    }
+
+    Column(
+        Modifier
+            .background(color = androidx.compose.ui.graphics.Color(Variables.BackgroundDim.toArgb()))
+            .fillMaxWidth()
+            .requiredHeightIn(
+                min = 27.dp,
+                max = 110.dp
+            )
+            .verticalScroll(scrollState)
+            .padding(12.dp),
+        ) {
+        subtitles?.forEach {
+            Caption(it.getSubtitle())
+        }
+    }
+
+}
+@Composable
+fun Caption(subtitles : AnnotatedString) {
+    Box(modifier = Modifier) {
+            Text(
+                text = subtitles,
+//                modifier = Modifier.padding(Variables.Spacing1),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    color = androidx.compose.ui.graphics.Color.White,
+                    letterSpacing = 0.25.sp,
+                )
+            )
     }
 }

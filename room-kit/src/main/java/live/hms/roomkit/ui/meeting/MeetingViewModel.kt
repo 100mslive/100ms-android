@@ -57,6 +57,7 @@ import live.hms.video.sdk.models.*
 import live.hms.video.sdk.models.enums.*
 import live.hms.video.sdk.models.role.HMSRole
 import live.hms.video.sdk.models.trackchangerequest.HMSChangeTrackStateRequest
+import live.hms.video.sdk.transcripts.HmsTranscripts
 import live.hms.video.services.HMSScreenCaptureService
 import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
@@ -77,6 +78,14 @@ class MeetingViewModel(
     companion object {
         private const val TAG = "MeetingViewModel"
     }
+    val transcriptionUseCase = TranscriptionUseCase { hmsSDK.getPeerById(it)?.name }
+    enum class TranscriptionsPosition {
+        TOP,
+        BOTTOM
+    }
+    val transcriptionsPosition = MutableLiveData(TranscriptionsPosition.BOTTOM)
+    val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(true)
+    val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
     val launchParticipantsFromHls = SingleLiveEvent<Unit>()
     var recNum = 0
@@ -870,6 +879,10 @@ class MeetingViewModel(
         Log.v(TAG, "~~ hmsSDK.join called ~~")
         hmsSDK.join(hmsConfig!!, object : HMSUpdateListener {
 
+            override fun onTranscripts(transcripts: HmsTranscripts) {
+                viewModelScope.launch { transcriptionUseCase.newCaption(transcripts) }
+            }
+
             override fun onError(error: HMSException) {
                 Log.e(TAG, "onError: $error")
                 // Show a different dialog if error is terminal else a dismissible dialog
@@ -1046,6 +1059,7 @@ class MeetingViewModel(
                     }
 
                     HMSPeerUpdate.NAME_CHANGED -> {
+                        transcriptionUseCase.onPeerNameChanged(hmsPeer)
                         if (hmsPeer.isLocal) {
                             updateNameChange(hmsPeer as HMSLocalPeer)
                         } else {
@@ -2591,6 +2605,8 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
+    fun areCaptionsAvailable() = transcriptionUseCase.receivedOneCaption || // temporary until they migrate
+            hmsSDK.getRoom()?.transcriptions?.find { it.state == TranscriptionState.STARTED } != null
     fun setWhiteBoardFullScreenMode(isShown : Boolean) {
         showWhiteBoardFullScreen.value = isShown
     }
@@ -2632,5 +2648,25 @@ class MeetingViewModel(
     }
 
 
+    fun toggleCaptions() =
+        areCaptionsEnabledByUser.postValue(areCaptionsEnabledByUser.value?.not())
+
+    fun captionsEnabledByUser(): Boolean =
+        areCaptionsEnabledByUser.value == true
+
+    private var reEnableCaptions = false
+    fun tempHideCaptions() {
+        if(captionsEnabledByUser()) {
+            reEnableCaptions = true
+        }
+        areCaptionsEnabledByUser.postValue(false)
+    }
+
+    fun restoreTempHiddenCaptions() {
+        if(reEnableCaptions) {
+            areCaptionsEnabledByUser.postValue(true)
+            reEnableCaptions = false
+        }
+    }
 }
 
