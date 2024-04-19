@@ -35,7 +35,7 @@ class TranscriptionsPositionUseCase(private val scope : CoroutineScope) {
         }
     }
 
-    private suspend fun recalculate() : MeetingViewModel.TranscriptionsPosition {
+    private fun recalculate() : MeetingViewModel.TranscriptionsPosition {
         return if(!isChatEnabled)
             MeetingViewModel.TranscriptionsPosition.BOTTOM
         else if(isScreenShare)
