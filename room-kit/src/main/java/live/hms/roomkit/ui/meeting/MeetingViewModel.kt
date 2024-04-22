@@ -80,10 +80,12 @@ class MeetingViewModel(
     }
     val transcriptionUseCase = TranscriptionUseCase { hmsSDK.getPeerById(it)?.name }
     enum class TranscriptionsPosition {
+        SCREENSHARE_TOP,
         TOP,
         BOTTOM
     }
-    val transcriptionsPosition = MutableLiveData(TranscriptionsPosition.BOTTOM)
+    val transcriptionsPositionUseCase = TranscriptionsPositionUseCase(viewModelScope)
+    val transcriptionsPosition : LiveData<TranscriptionsPosition> = transcriptionsPositionUseCase.transcriptionsPosition.distinctUntilChanged()
     val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(true)
     val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
