@@ -532,8 +532,8 @@ class MeetingViewModel(
     val tracks: LiveData<List<MeetingTrack>> = _liveDataTracks
 
     // Live data containing the current Speaker in the meeting
-    val speakers = MutableLiveData<Array<HMSSpeaker>>()
-    val speakerLock =  Object()
+    val speakersLiveData = MutableLiveData<Array<HMSSpeaker>>()
+
 
     private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
 
@@ -548,15 +548,15 @@ class MeetingViewModel(
         ) { _tracks }
 
         override fun addSpeakerSource() {
-            addSource(speakers) { speakers : Array<HMSSpeaker> ->
+            addSource(speakersLiveData) { speakerList : Array<HMSSpeaker> ->
 
-                synchronized(speakerLock) {
+                synchronized(speakersLiveData) {
 
                     val excludeLocalTrackIfRemotePeerIsPreset: Array<HMSSpeaker> =
                         if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
-                            speakers.filter { it.peer?.isLocal == false }.toTypedArray()
+                            speakerList.filter { it.peer?.isLocal == false }.toTypedArray()
                         } else {
-                            speakers
+                            speakerList
                         }
 
                     val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
@@ -566,7 +566,7 @@ class MeetingViewModel(
         }
 
         override fun removeSpeakerSource() {
-            removeSource(speakers)
+            removeSource(speakersLiveData)
         }
 
         //TODO can't be null
@@ -625,9 +625,8 @@ class MeetingViewModel(
     }
 
     val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
-        synchronized(speakerLock) {
-            speakers.map(activeSpeakerHandler::speakerUpdate)
-        }
+            speakersLiveData.map(activeSpeakerHandler::speakerUpdate)
+
 
     val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
@@ -1249,8 +1248,8 @@ class MeetingViewModel(
                     TAG,
                     "onAudioLevelUpdate: speakers=${speakers.map { Pair(it.peer?.name, it.level) }}"
                 )
-                synchronized(speakerLock) {
-                    this@MeetingViewModel.speakers.postValue(speakers)
+                synchronized(speakersLiveData) {
+                    this@MeetingViewModel.speakersLiveData.postValue(speakers)
                 }
             }
         })
