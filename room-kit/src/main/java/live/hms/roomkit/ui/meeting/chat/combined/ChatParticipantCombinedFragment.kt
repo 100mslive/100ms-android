@@ -24,18 +24,24 @@ class ChatOnlyAdapter(val fragment: BottomSheetDialogFragment) : FragmentStateAd
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int).
 
-        return CombinedChatFragmentTab(fragment::dismissAllowingStateLoss)
+        return CombinedChatFragmentTab().apply {
+            this.dismissAllowingStateLoss = fragment::dismissAllowingStateLoss
+        }
     }
 }
 class ChatParticipantAdapter(val fragment: BottomSheetDialogFragment) : FragmentStateAdapter(fragment) {
-    val partFragment = ParticipantsTabFragment(fragment::dismiss)
+    val partFragment = ParticipantsTabFragment().apply {
+        this.dismissFragment = fragment::dismiss
+    }
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         // Return a NEW fragment instance in createFragment(int).
 
         return if (position == 0)
-            CombinedChatFragmentTab(fragment::dismissAllowingStateLoss)
+            CombinedChatFragmentTab().apply {
+                this.dismissAllowingStateLoss = fragment::dismissAllowingStateLoss
+            }
         else
             partFragment
     }

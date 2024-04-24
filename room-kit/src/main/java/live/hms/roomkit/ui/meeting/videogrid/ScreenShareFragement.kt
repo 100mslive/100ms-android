@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +25,8 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.videoview.VideoViewStateChangeListener
 import org.webrtc.RendererCommon
 
-
-class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFragment() {
+const val SCREEN_SHARE_TRACK_ID = "screensharetrackId"
+class ScreenShareFragement : BottomSheetDialogFragment() {
 
     companion object {
         private const val TAG = "ScreenShareFragement"
@@ -62,7 +63,7 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         return bottomSheetDialog
     }
 
-
+    private var inited = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (dialog as? BottomSheetDialog)?.behavior?.state =
@@ -98,6 +99,15 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
         }
+        meetingViewModel.joined.observe(viewLifecycleOwner) { joined ->
+            if (!inited && joined) {
+                inited = true
+                afterJoinAndViewCreated()
+            }
+        }
+    }
+
+    fun afterJoinAndViewCreated() {
 
         binding.root.setBackgroundColor(
             getColorOrDefault(
@@ -121,9 +131,10 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
                 }
             }
         })
-        meetingViewModel.tracks.observe(viewLifecycleOwner) { it ->
+        meetingViewModel.tracks.observe(viewLifecycleOwner) { meetingTrack ->
 
-            val track = it.find { it.video?.trackId == screenShareTrackId }?.video
+            Log.d(TAG,"Looking for trackId: ${arguments?.getString(SCREEN_SHARE_TRACK_ID)}")
+            val track = meetingTrack.find { it.video?.trackId == arguments?.getString(SCREEN_SHARE_TRACK_ID) }?.video
             if (track != null) {
                 binding.localVideoView.addTrack(track)
             } else {

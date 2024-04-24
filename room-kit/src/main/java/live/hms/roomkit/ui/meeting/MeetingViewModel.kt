@@ -75,6 +75,7 @@ import kotlin.properties.Delegates
 class MeetingViewModel(
     application: Application
 ) : AndroidViewModel(application) {
+    val joined = MutableLiveData(false)
     companion object {
         private const val TAG = "MeetingViewModel"
     }
@@ -977,6 +978,7 @@ class MeetingViewModel(
                 updatePolls()
                 participantPeerUpdate.postValue(Unit)
                 setupWhiteBoardListener()
+                joined.postValue(true)
             }
 
             override fun onPeerUpdate(type: HMSPeerUpdate, hmsPeer: HMSPeer) {
@@ -1507,6 +1509,7 @@ class MeetingViewModel(
         }
         cleanup()
         state.postValue(MeetingState.Disconnected(true, details))
+        joined.postValue(false)
     }
 
     private fun addAudioTrack(track: HMSAudioTrack, peer: HMSPeer) {

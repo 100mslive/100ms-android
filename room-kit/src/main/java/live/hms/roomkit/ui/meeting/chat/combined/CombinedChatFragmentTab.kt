@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import live.hms.roomkit.databinding.LayoutChatParticipantCombinedTabChatBinding
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.ChatViewModelFactory
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.meeting.MessageOptionsBottomSheet
 import live.hms.roomkit.ui.meeting.PauseChatUIUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatAdapter
@@ -19,17 +21,23 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 import kotlin.reflect.KFunction0
 
-class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : Fragment() {
+class CombinedChatFragmentTab : Fragment() {
     private var binding by viewLifecycle<LayoutChatParticipantCombinedTabChatBinding>()
-    val meetingViewModel : MeetingViewModel by activityViewModels()
-    private val chatViewModel : ChatViewModel by activityViewModels()
+    val meetingViewModel : MeetingViewModel by activityViewModels {
+        MeetingViewModelFactory(
+            requireActivity().application
+        )
+    }
+    private val chatViewModel : ChatViewModel by activityViewModels {
+        ChatViewModelFactory(meetingViewModel.hmsSDK)
+    }
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
     private val chatAdapter by lazy { ChatAdapter({ message ->
         launchMessageOptionsDialog.launch(meetingViewModel,
         childFragmentManager, message) },{}, { message -> MessageOptionsBottomSheet.showMessageOptions(meetingViewModel, message)})
     }
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
-
+    lateinit var dismissAllowingStateLoss: () -> Unit
     override fun onDetach() {
         super.onDetach()
         meetingViewModel.restoreTempHiddenCaptions()
@@ -56,8 +64,17 @@ class CombinedChatFragmentTab(val dismissAllowingStateLoss: KFunction0<Unit>) : 
         return binding.root
     }
 
-
+    var inited = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        meetingViewModel.joined.observe(viewLifecycleOwner) {joined ->
+            if(!inited && joined) {
+                inited = true
+                afterViewCreatedAndJoined()
+            }
+        }
+    }
+
+    fun afterViewCreatedAndJoined() {
 
         binding.sendToBackground.setOnSingleClickListener {
             RoleBasedChatBottomSheet.launch(childFragmentManager, chatViewModel)
