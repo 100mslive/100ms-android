@@ -443,7 +443,7 @@ class MeetingViewModel(
         }
     }
 
-    private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
+    val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
     // When we get stats, a flow will be updated with the saved stats.
     private val statsFlow = MutableSharedFlow<Map<String, Any>>()
@@ -532,7 +532,8 @@ class MeetingViewModel(
     val tracks: LiveData<List<MeetingTrack>> = _liveDataTracks
 
     // Live data containing the current Speaker in the meeting
-    val speakers = MutableLiveData<Array<HMSSpeaker>>()
+    val speakersLiveData = MutableLiveData<Array<HMSSpeaker>>()
+
 
     private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
 
@@ -547,21 +548,25 @@ class MeetingViewModel(
         ) { _tracks }
 
         override fun addSpeakerSource() {
-            addSource(speakers) { speakers : Array<HMSSpeaker> ->
+            addSource(speakersLiveData) { speakerList : Array<HMSSpeaker> ->
 
-                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> = if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
-                    speakers.filter { it.peer?.isLocal == false }.toTypedArray()
-                } else {
-                    speakers
+                synchronized(speakersLiveData) {
+
+                    val excludeLocalTrackIfRemotePeerIsPreset: Array<HMSSpeaker> =
+                        if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
+                            speakerList.filter { it.peer?.isLocal == false }.toTypedArray()
+                        } else {
+                            speakerList
+                        }
+
+                    val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
+                    setValue(result.first)
                 }
-
-                val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
-                setValue(result.first)
             }
         }
 
         override fun removeSpeakerSource() {
-            removeSource(speakers)
+            removeSource(speakersLiveData)
         }
 
         //TODO can't be null
@@ -620,7 +625,9 @@ class MeetingViewModel(
     }
 
     val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
-        speakers.map(activeSpeakerHandler::speakerUpdate)
+            speakersLiveData.map(activeSpeakerHandler::speakerUpdate)
+
+
     val activeSpeakersUpdatedTracks = _liveDataTracks.map(activeSpeakerHandler::trackUpdateTrigger)
 
     // We need all the active speakers, but the very first time it should be filled.
@@ -1241,7 +1248,9 @@ class MeetingViewModel(
                     TAG,
                     "onAudioLevelUpdate: speakers=${speakers.map { Pair(it.peer?.name, it.level) }}"
                 )
-                this@MeetingViewModel.speakers.postValue(speakers)
+                synchronized(speakersLiveData) {
+                    this@MeetingViewModel.speakersLiveData.postValue(speakers)
+                }
             }
         })
     }
