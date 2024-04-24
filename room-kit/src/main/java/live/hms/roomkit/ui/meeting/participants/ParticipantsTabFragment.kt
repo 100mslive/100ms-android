@@ -46,17 +46,14 @@ class ParticipantsTabFragment : Fragment() {
         return binding.root
     }
 
-    private var inited = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        meetingViewModel.joined.observe(viewLifecycleOwner) {joined ->
-            if(!inited && joined) {
-                inited = true
-                initViewModels()
-                initOnBackPress()
-                initViews()
-            }
+
+        LoadAfterJoin(meetingViewModel, viewLifecycleOwner) {
+            initViewModels()
+            initOnBackPress()
+            initViews()
         }
     }
 

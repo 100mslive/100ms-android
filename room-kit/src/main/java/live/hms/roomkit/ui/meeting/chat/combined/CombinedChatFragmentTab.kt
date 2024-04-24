@@ -17,6 +17,7 @@ import live.hms.roomkit.ui.meeting.chat.ChatAdapter
 import live.hms.roomkit.ui.meeting.chat.ChatUseCase
 import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
+import live.hms.roomkit.ui.meeting.participants.LoadAfterJoin
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 import kotlin.reflect.KFunction0
@@ -64,13 +65,9 @@ class CombinedChatFragmentTab : Fragment() {
         return binding.root
     }
 
-    var inited = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        meetingViewModel.joined.observe(viewLifecycleOwner) {joined ->
-            if(!inited && joined) {
-                inited = true
-                afterViewCreatedAndJoined()
-            }
+        LoadAfterJoin(meetingViewModel, viewLifecycleOwner) {
+            afterViewCreatedAndJoined()
         }
     }
 
