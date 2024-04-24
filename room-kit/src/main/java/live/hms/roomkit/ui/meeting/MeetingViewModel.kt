@@ -531,6 +531,8 @@ class MeetingViewModel(
 
     // Live data containing the current Speaker in the meeting
     val speakers = MutableLiveData<Array<HMSSpeaker>>()
+    // Live data for activeSpeakerSorting
+    val activeSpeakerLiveData = MutableLiveData<Array<HMSSpeaker>>()
 
     private val activeSpeakerHandler = ActiveSpeakerHandler(false) { _tracks }
 
@@ -545,13 +547,7 @@ class MeetingViewModel(
         ) { _tracks }
 
         override fun addSpeakerSource() {
-            addSource(speakers) { speakers : Array<HMSSpeaker> ->
-
-                val excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> = if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
-                    speakers.filter { it.peer?.isLocal == false }.toTypedArray()
-                } else {
-                    speakers
-                }
+            addSource(activeSpeakerLiveData) { excludeLocalTrackIfRemotePeerIsPreset : Array<HMSSpeaker> ->
 
                 val result = speakerH.speakerUpdate(excludeLocalTrackIfRemotePeerIsPreset)
                 setValue(result.first)
@@ -1240,6 +1236,13 @@ class MeetingViewModel(
                     "onAudioLevelUpdate: speakers=${speakers.map { Pair(it.peer?.name, it.level) }}"
                 )
                 this@MeetingViewModel.speakers.postValue(speakers)
+
+                if (hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
+                    this@MeetingViewModel.activeSpeakerLiveData.postValue(speakers.filter { it.peer?.isLocal == false }.toTypedArray())
+                } else {
+                    this@MeetingViewModel.activeSpeakerLiveData.postValue(speakers)
+                }
+
             }
         })
     }
