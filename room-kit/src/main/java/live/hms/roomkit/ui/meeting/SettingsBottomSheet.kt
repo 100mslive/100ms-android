@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +25,10 @@ class SettingsBottomSheet(
 
     private var binding by viewLifecycle<SettingsBottomSheetDialogBinding>()
 
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        meetingViewModel.restoreTempHiddenCaptions()
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

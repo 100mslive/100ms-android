@@ -79,6 +79,13 @@ class MeetingViewModel(
         private const val TAG = "MeetingViewModel"
     }
     val transcriptionUseCase = TranscriptionUseCase { hmsSDK.getPeerById(it)?.name }
+    enum class TranscriptionsPosition {
+        SCREENSHARE_TOP,
+        TOP,
+        BOTTOM
+    }
+    val transcriptionsPositionUseCase = TranscriptionsPositionUseCase(viewModelScope)
+    val transcriptionsPosition : LiveData<TranscriptionsPosition> = transcriptionsPositionUseCase.transcriptionsPosition.distinctUntilChanged()
     val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(true)
     val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
@@ -2600,7 +2607,7 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
-    fun areCaptionsAvailable() = true || // TODO temporary until they migrate
+    fun areCaptionsAvailable() = transcriptionUseCase.receivedOneCaption || // temporary until they migrate
             hmsSDK.getRoom()?.transcriptions?.find { it.state == TranscriptionState.STARTED } != null
     fun setWhiteBoardFullScreenMode(isShown : Boolean) {
         showWhiteBoardFullScreen.value = isShown
@@ -2648,5 +2655,20 @@ class MeetingViewModel(
 
     fun captionsEnabledByUser(): Boolean =
         areCaptionsEnabledByUser.value == true
+
+    private var reEnableCaptions = false
+    fun tempHideCaptions() {
+        if(captionsEnabledByUser()) {
+            reEnableCaptions = true
+        }
+        areCaptionsEnabledByUser.postValue(false)
+    }
+
+    fun restoreTempHiddenCaptions() {
+        if(reEnableCaptions) {
+            areCaptionsEnabledByUser.postValue(true)
+            reEnableCaptions = false
+        }
+    }
 }
 

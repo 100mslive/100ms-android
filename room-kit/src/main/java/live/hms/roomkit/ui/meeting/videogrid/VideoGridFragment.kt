@@ -507,6 +507,7 @@ class VideoGridFragment : Fragment() {
                 val expectedPages =
                     Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
                 screenShareAdapter.totalPages = remoteScreenShareTilesCount
+                meetingViewModel.transcriptionsPositionUseCase.setScreenShare(remoteScreenShareTilesCount + localScreenShareTileCount != 0)
                 peerGridVideoAdapter.totalPages = expectedPages
 
                 binding.tabLayoutDots.visibility =

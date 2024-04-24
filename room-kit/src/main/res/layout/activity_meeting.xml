@@ -41,6 +41,7 @@
             android:paddingHorizontal="@dimen/eight_dp"
             android:paddingVertical="@dimen/sizeteen_dp"
             android:visibility="gone"
+            tools:visibility="visible"
             android:clipToPadding="false"
             android:layout_height="85dp"/>
 
