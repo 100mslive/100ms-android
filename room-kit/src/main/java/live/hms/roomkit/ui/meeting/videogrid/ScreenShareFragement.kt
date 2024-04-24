@@ -11,13 +11,12 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetScreenShareBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
+import live.hms.roomkit.ui.meeting.participants.LoadAfterJoin
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.contextSafe
@@ -63,7 +62,6 @@ class ScreenShareFragement : BottomSheetDialogFragment() {
         return bottomSheetDialog
     }
 
-    private var inited = false
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (dialog as? BottomSheetDialog)?.behavior?.state =
@@ -99,15 +97,12 @@ class ScreenShareFragement : BottomSheetDialogFragment() {
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
         }
-        meetingViewModel.joined.observe(viewLifecycleOwner) { joined ->
-            if (!inited && joined) {
-                inited = true
-                afterJoinAndViewCreated()
-            }
+        LoadAfterJoin(meetingViewModel, viewLifecycleOwner) {
+            afterJoinAndViewCreated()
         }
     }
 
-    fun afterJoinAndViewCreated() {
+    private fun afterJoinAndViewCreated() {
 
         binding.root.setBackgroundColor(
             getColorOrDefault(
