@@ -443,7 +443,7 @@ class MeetingViewModel(
         }
     }
 
-    private val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
+    val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
 
     // When we get stats, a flow will be updated with the saved stats.
     private val statsFlow = MutableSharedFlow<Map<String, Any>>()
