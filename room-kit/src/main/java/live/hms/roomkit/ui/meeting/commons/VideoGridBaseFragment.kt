@@ -266,10 +266,15 @@ abstract class VideoGridBaseFragment : Fragment() {
       // Using alpha instead of visibility to stop redraw of the entire view to stop flickering
       iconScreenShare.alpha = visibilityOpacity( (item.isScreen) )
       val isAudioMute = item.isScreen.not() &&
-              (item.audio == null || item.audio!!.isMute)
+              (item.audio == null || item.audio?.isMute == true)
       iconAudioOff.alpha = visibilityOpacity(
         isAudioMute
       )
+      when(item.audio?.isMute) {
+        true -> iconAudioOff.contentDescription = root.resources.getString(R.string.content_description_muted)
+        false -> iconAudioOff.contentDescription = root.resources.getString(R.string.content_description_unmuted)
+        null -> iconAudioOff.contentDescription = root.resources.getString(R.string.content_description_audio_disabled)
+      }
 
       if (isScreenshare() || item.peer.type == HMSPeerType.SIP)
         audioLevel.alpha = visibilityOpacity(false)

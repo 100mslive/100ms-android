@@ -209,7 +209,16 @@ class VideoListAdapter(
                 }
               }
             }
-           is PeerUpdatePayloads.SpeakerMuteUnmute -> holder.binding.iconAudioOff.visibility = visibility(payload.isMute)
+           is PeerUpdatePayloads.SpeakerMuteUnmute -> {
+             holder.binding.iconAudioOff.visibility = visibility(payload.isMute)
+             holder.binding.iconAudioOff.contentDescription = with(holder.binding.root.resources) {
+               if(payload.isMute) {
+                 getString(live.hms.roomkit.R.string.content_description_muted)
+               } else {
+                 getString(live.hms.roomkit.R.string.content_description_unmuted)
+               }
+
+             }}
           }
         }
       }
