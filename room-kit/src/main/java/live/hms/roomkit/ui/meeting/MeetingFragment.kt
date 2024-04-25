@@ -762,8 +762,10 @@ class MeetingFragment : Fragment() {
 
                 if (enabled) {
                     setIconEnabled(R.drawable.avd_mic_off_to_on)
+                    contentDescription = "Turn audio Off"
                 } else {
                     setIconDisabled(R.drawable.avd_mic_on_to_off)
+                    contentDescription = "Turn audio On"
                 }
             }
         }
