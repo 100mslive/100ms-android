@@ -13,7 +13,7 @@ class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private
             // Update lru just to keep it as much filled as possible
 
             val all = tracks
-                .filter { !it.isScreen || (removeLocal && it.isLocal) }
+                .filter { !it.isScreen && !(removeLocal && it.isLocal) }
                 .sortedByDescending {
                     if (it.audio == null || it.audio?.isMute == true || it.isScreen) {
                         it.peer.name.hashCode() * -1 // Drop these ids really low.
