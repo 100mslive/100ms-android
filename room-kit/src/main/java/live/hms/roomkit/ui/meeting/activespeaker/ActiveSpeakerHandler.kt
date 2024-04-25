@@ -5,7 +5,7 @@ import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.utils.HMSLogger
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val numActiveSpeakerVideos : Int = 4, private val getTracks: () -> ConcurrentLinkedDeque<MeetingTrack>) {
+class ActiveSpeakerHandler(appendUnsorted : Boolean = false, numActiveSpeakerVideos : Int = 4, private val getTracks: () -> ConcurrentLinkedDeque<MeetingTrack>) {
     private val TAG = ActiveSpeakerHandler::class.java.simpleName
     private val speakerCache = ActiveSpeakerCache<SpeakerItem>(numActiveSpeakerVideos, appendUnsorted)
 
