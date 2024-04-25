@@ -989,16 +989,14 @@ class MeetingViewModel(
 
                 when (type) {
                     HMSPeerUpdate.PEER_LEFT -> {
-                        synchronized(_tracks) {
-                            for (track in _tracks) {
-                                if (track.peer.peerID == hmsPeer.peerID) {
-                                    _tracks.remove(track)
-                                    break
-                                }
+                        for (track in _tracks) {
+                            if (track.peer.peerID == hmsPeer.peerID) {
+                                _tracks.remove(track)
+                                break
                             }
-                            _liveDataTracks.postValue(_tracks)
-                            peerLiveData.postValue(hmsPeer)
                         }
+                        _liveDataTracks.postValue(_tracks)
+                        peerLiveData.postValue(hmsPeer)
                         participantPeerUpdate.postValue(Unit)
                         peerLeaveUpdate.postValue(hmsPeer.peerID)
                     }
@@ -1009,13 +1007,13 @@ class MeetingViewModel(
                     }
 
                     HMSPeerUpdate.BECAME_DOMINANT_SPEAKER -> {
-                        synchronized(_tracks) {
-                            val track = getMeetingTrack(hmsPeer.videoTrack?.trackId)
-                            if (track != null) {
-                                Log.d(TAG, "Getting local dominant speaker ${track.peer.name}")
-                                dominantSpeaker.postValue(track)
-                            }
+
+                        val track = getMeetingTrack(hmsPeer.videoTrack?.trackId)
+                        if (track != null) {
+                            Log.d(TAG, "Getting local dominant speaker ${track.peer.name}")
+                            dominantSpeaker.postValue(track)
                         }
+
                     }
 
                     HMSPeerUpdate.NO_DOMINANT_SPEAKER -> {
