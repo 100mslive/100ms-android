@@ -516,7 +516,12 @@ class VideoGridFragment : Fragment() {
         }
 
         meetingViewModel.hmsScreenShareBottomSheetEvent.observe(viewLifecycleOwner) {
-            ScreenShareFragement(it).show(
+            val args = Bundle()
+                .apply {
+                    putString(SCREEN_SHARE_TRACK_ID, it)
+                }
+
+            ScreenShareFragement().apply { this.arguments = args }.show(
                 childFragmentManager, VideoGridFragment.TAG
             )
         }
