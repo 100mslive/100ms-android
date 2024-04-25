@@ -748,10 +748,12 @@ class MeetingFragment : Fragment() {
                     setIconEnabled(R.drawable.avd_video_off_to_on)
                     binding.buttonSwitchCamera?.alpha = 1.0f
                     binding.buttonSwitchCamera?.isEnabled = true
+                    contentDescription = "Turn video Off"
                 } else {
                     setIconDisabled(R.drawable.avd_video_on_to_off)
                     binding.buttonSwitchCamera?.alpha = 0.5f
                     binding.buttonSwitchCamera?.isEnabled = false
+                    contentDescription = "Turn video On"
                 }
             }
         }
