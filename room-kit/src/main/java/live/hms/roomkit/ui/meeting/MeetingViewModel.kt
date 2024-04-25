@@ -68,6 +68,7 @@ import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
+import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
@@ -444,7 +445,7 @@ class MeetingViewModel(
         }
     }
 
-    val _tracks = Collections.synchronizedList(ArrayList<MeetingTrack>())
+    val _tracks : ConcurrentLinkedDeque<MeetingTrack> = ConcurrentLinkedDeque()
 
     // When we get stats, a flow will be updated with the saved stats.
     private val statsFlow = MutableSharedFlow<Map<String, Any>>()
@@ -530,7 +531,7 @@ class MeetingViewModel(
 
     // Live data containing all the current tracks in a meeting
     private val _liveDataTracks = MutableLiveData(_tracks)
-    val tracks: LiveData<List<MeetingTrack>> = _liveDataTracks
+    val tracks: LiveData<ConcurrentLinkedDeque<MeetingTrack>> = _liveDataTracks
 
     // Live data containing the current Speaker in the meeting
     val speakersLiveData = MutableLiveData<Array<HMSSpeaker>>()
@@ -540,7 +541,7 @@ class MeetingViewModel(
 
     val updateRowAndColumnSpanForVideoPeerGrid = MutableLiveData<Pair<Int,Int>>()
 
-    val trackAndWhiteBoardObserver = MediatorLiveData<Triple<HMSWhiteboard?,List<MeetingTrack>?,Boolean?>>()
+    val trackAndWhiteBoardObserver = MediatorLiveData<Triple<HMSWhiteboard?,ConcurrentLinkedDeque<MeetingTrack>?,Boolean?>>()
 
 
 
@@ -583,25 +584,27 @@ class MeetingViewModel(
             addSpeakerSource()
 
             // Add all tracks as they come in.
-            addSource(tracks) { meetTracks: List<MeetingTrack> ->
+            addSource(tracks) { meetTracks: ConcurrentLinkedDeque<MeetingTrack> ->
                 //if remote peer and local peer is present inset mode
-               synchronized(_tracks) {
-                   val excludeLocalTrackIfRemotePeerIsPreset =
+
+                   var removeLocal = false
+                   val excludeLocalTrackIfRemotePeerIsPreset : ConcurrentLinkedDeque<MeetingTrack> =
                        //Don't inset when local peer and local screen share track is found
                        if (meetTracks.size == 2 && meetTracks.filter { it.isLocal }.size == 2 && hasInsetEnabled(
                                hmsSDK.getLocalPeer()?.hmsRole
                            )
                        )
                            meetTracks
-                       else if (meetTracks.size > 1 && hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole))
-                           meetTracks.filter { !it.isLocal }.toList()
+                       else if (meetTracks.size > 1 && hasInsetEnabled(hmsSDK.getLocalPeer()?.hmsRole)) {
+                           removeLocal = true
+                           meetTracks
+                       }
                        else
                            meetTracks
 
                    val result =
-                       speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset.filter { it.isScreen.not() })
+                       speakerH.trackUpdateTrigger(excludeLocalTrackIfRemotePeerIsPreset, removeLocal)
                    setValue(result)
-               }
 
             }
 
@@ -625,7 +628,7 @@ class MeetingViewModel(
 
     }
 
-    val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>> =
+    val activeSpeakers: LiveData<Pair<ConcurrentLinkedDeque<MeetingTrack>, Array<HMSSpeaker>>> =
             speakersLiveData.map(activeSpeakerHandler::speakerUpdate)
 
 
@@ -1531,7 +1534,7 @@ class MeetingViewModel(
             if (_track == null) {
                 // No existing MeetingTrack found, add a new tile
                 if (peer.isLocal) {
-                    _tracks.add(0, MeetingTrack(peer, null, track))
+                    _tracks.addFirst(MeetingTrack(peer, null, track))
                 } else {
                     _tracks.add(MeetingTrack(peer, null, track))
                 }
@@ -1557,7 +1560,7 @@ class MeetingViewModel(
                 if (_track == null) {
                     // No existing MeetingTrack found, add a new tile
                     if (peer.isLocal) {
-                        _tracks.add(0, MeetingTrack(peer, track, null))
+                        _tracks.addFirst(MeetingTrack(peer, track, null))
                     } else {
                         _tracks.add(MeetingTrack(peer, track, null))
                     }
@@ -1615,7 +1618,8 @@ class MeetingViewModel(
                 ((track.source == HMSTrackSource.SCREEN || track.source == "videoplaylist")
                         && track.type == HMSTrackType.VIDEO)
             ) {
-                _tracks.remove(meetingTrack)
+                if(meetingTrack!= null)
+                    _tracks.remove(meetingTrack)
             }
 
             // Update the view as some track has been removed

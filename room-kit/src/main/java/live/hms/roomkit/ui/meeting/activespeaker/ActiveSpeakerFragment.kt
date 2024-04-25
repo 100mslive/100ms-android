@@ -21,6 +21,7 @@ import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.video.utils.HMSLogger
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
+import java.util.concurrent.ConcurrentLinkedDeque
 
 class ActiveSpeakerFragment : VideoGridBaseFragment() {
 
@@ -196,7 +197,7 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
   }
 
   private var screenShareStats : StatsInterpreter? = null
-  private fun updateScreenshareTracks(tracks: List<MeetingTrack>) {
+  private fun updateScreenshareTracks(tracks: ConcurrentLinkedDeque<MeetingTrack>) {
 
     // Check if the currently shared screen-share track is removed
     screenShareTrack?.let { screen ->

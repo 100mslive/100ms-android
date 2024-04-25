@@ -22,6 +22,7 @@ import live.hms.video.sdk.models.HMSPeer
 import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import org.webrtc.RendererCommon
+import java.util.concurrent.ConcurrentLinkedDeque
 
 class VideoListAdapter(
   private val onVideoItemClick: (item: MeetingTrack) -> Unit,
@@ -130,10 +131,11 @@ class VideoListAdapter(
   }
 
   private val currentTrackItem = ArrayList<VideoListItem>()
-  private val currentTrackSource = mutableListOf<MeetingTrack>()
+  private val currentTrackSource = ConcurrentLinkedDeque<MeetingTrack>()
 
-  fun updateTotalSource(newItems: List<MeetingTrack>) {
+  fun updateTotalSource(newItems: ConcurrentLinkedDeque<MeetingTrack>) {
     currentTrackSource.clear()
+    // TODO Looks sus, do we really want all old videos and new ones that might contain duplicates
     currentTrackSource+= newItems
   }
 

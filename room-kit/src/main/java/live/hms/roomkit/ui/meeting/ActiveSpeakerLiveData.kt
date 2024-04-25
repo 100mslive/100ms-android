@@ -1,8 +1,9 @@
 package live.hms.roomkit.ui.meeting
 
 import androidx.lifecycle.MediatorLiveData
+import java.util.concurrent.ConcurrentLinkedDeque
 
-abstract class ActiveSpeakerLiveData : MediatorLiveData<List<MeetingTrack>>() {
+abstract class ActiveSpeakerLiveData : MediatorLiveData<ConcurrentLinkedDeque<MeetingTrack>>() {
 
     private var enableSorting = true
 

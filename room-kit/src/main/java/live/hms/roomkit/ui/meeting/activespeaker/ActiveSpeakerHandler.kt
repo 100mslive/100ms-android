@@ -3,15 +3,17 @@ package live.hms.roomkit.ui.meeting.activespeaker
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.video.sdk.models.HMSSpeaker
 import live.hms.video.utils.HMSLogger
-class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val numActiveSpeakerVideos : Int = 4, private val getTracks: () -> List<MeetingTrack>) {
+import java.util.concurrent.ConcurrentLinkedDeque
+
+class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private val numActiveSpeakerVideos : Int = 4, private val getTracks: () -> ConcurrentLinkedDeque<MeetingTrack>) {
     private val TAG = ActiveSpeakerHandler::class.java.simpleName
     private val speakerCache = ActiveSpeakerCache<SpeakerItem>(numActiveSpeakerVideos, appendUnsorted)
 
-    fun trackUpdateTrigger(tracks: List<MeetingTrack>): List<MeetingTrack> {
-        synchronized(tracks) {
+    fun trackUpdateTrigger(tracks: ConcurrentLinkedDeque<MeetingTrack>, removeLocal : Boolean = false): ConcurrentLinkedDeque<MeetingTrack> {
             // Update lru just to keep it as much filled as possible
 
             val all = tracks
+                .filter { !it.isScreen || (removeLocal && it.isLocal) }
                 .sortedByDescending {
                     if (it.audio == null || it.audio?.isMute == true || it.isScreen) {
                         it.peer.name.hashCode() * -1 // Drop these ids really low.
@@ -25,10 +27,9 @@ class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private
             speakerCache.update(all, false)
 
             return update()
-        }
     }
 
-    fun speakerUpdate(speakers: Array<HMSSpeaker>): Pair<List<MeetingTrack>, Array<HMSSpeaker>> {
+    fun speakerUpdate(speakers: Array<HMSSpeaker>): Pair<ConcurrentLinkedDeque<MeetingTrack>, Array<HMSSpeaker>> {
         HMSLogger.v(
             TAG,
             "speakers update received 🎙 [size=${speakers.size}, names=${speakers.map { it.peer?.name }}] "
@@ -42,21 +43,13 @@ class ActiveSpeakerHandler(private val appendUnsorted : Boolean = false, private
         return Pair(update(), speakers)
     }
 
-    private fun update(): List<MeetingTrack> {
+    private fun update(): ConcurrentLinkedDeque<MeetingTrack> {
         // Update all the videos which aren't screenshares
 
-        synchronized(getTracks()){
-            val order = speakerCache.getAllItems()
-            return  order.mapNotNull { orderedItem ->
-                getTracks().find { givenTrack ->
-                    givenTrack.peer.peerID == orderedItem.peerId && givenTrack.isScreen.not()
-                }
-            }
-        }
-
-
-        // Always bind videos after this function is called
-        // updateVideos(binding.container, videos)
+        val order : ConcurrentLinkedDeque<SpeakerItem> = speakerCache.getAllItems()
+        // Find the speaker in the list of tracks, filtering out those tracks which are screens.
+        val trackMap = getTracks().filter { !it.isScreen }.associateBy { it.peer.peerID }
+        return order.mapNotNull { trackMap[it.peerId] }.toCollection(ConcurrentLinkedDeque<MeetingTrack>())
     }
 
     fun updateMaxActiveSpeaker(maxActiveSpeaker: Int) {

@@ -39,6 +39,7 @@ import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
+import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -326,7 +327,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   protected fun updateVideos(
     layout: GridLayout,
-    newVideos: List<MeetingTrack?>,
+    newVideos: ConcurrentLinkedDeque<MeetingTrack>,
     isVideoGrid: Boolean,
     isScreenShare: Boolean = false,
     isForceUpdate : Boolean = false,

@@ -34,6 +34,7 @@ import live.hms.video.sdk.models.HMSPeerType
 import live.hms.video.sdk.models.HMSRemotePeer
 import live.hms.video.sdk.models.HMSSpeaker
 import org.webrtc.ContextUtils.getApplicationContext
+import java.util.concurrent.ConcurrentLinkedDeque
 
 class ParticipantItem(
     private val hmsPeer: HMSPeer,
@@ -46,7 +47,7 @@ class ParticipantItem(
     private val prebuiltInfoContainer: PrebuiltInfoContainer,
     private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
     private val requestPeerLeave: (hmsPeer: HMSRemotePeer, reason: String) -> Unit,
-    private val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>>,
+    private val activeSpeakers: LiveData<Pair<ConcurrentLinkedDeque<MeetingTrack>, Array<HMSSpeaker>>>,
     private val lowerRemotePeerHand : (HMSPeer, HMSActionResultListener) -> Unit
 ) : BindableItem<ListItemPeerListBinding>(hmsPeer.peerID.hashCode().toLong()){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {

@@ -12,6 +12,7 @@ import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.setBackgroundAndColor
 import live.hms.roomkit.util.viewLifecycle
+import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.math.min
 
 class VideoGridPageFragment : VideoGridBaseFragment() {
@@ -52,16 +53,18 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     // Turn of sorting when we leave the first page
     meetingViewModel.speakerUpdateLiveData.enableSorting(pageIndex == 0)
   }
-  private fun getCurrentPageVideos(tracks: List<MeetingTrack>): List<MeetingTrack?> {
-    val pageVideos = ArrayList<MeetingTrack?>()
+  private fun getCurrentPageVideos(tracks: ConcurrentLinkedDeque<MeetingTrack>): ConcurrentLinkedDeque<MeetingTrack> {
+    val pageVideos = ConcurrentLinkedDeque<MeetingTrack>()
 
     // Range is [fromIndex, toIndex] -- Notice the bounds
     val itemsCount = maxItems
     val fromIndex = pageIndex * itemsCount
     val toIndex = min(tracks.size, (pageIndex + 1) * itemsCount) - 1
 
-    for (idx in fromIndex..toIndex step 1) {
-      pageVideos.add(tracks[idx])
+    tracks.withIndex().forEach {
+      if(it.index in fromIndex..toIndex) {
+        pageVideos.add(it.value)
+      }
     }
 
     return pageVideos
@@ -75,7 +78,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       //don't update if row and column are same
       if (shouldUpdate.not()) return
       setVideoGridRowsAndColumns(rowCount, columnCount)
-    renderCurrentPage(emptyList())
+    renderCurrentPage(ConcurrentLinkedDeque())
     meetingViewModel.speakerUpdateLiveData.refresh(rowCount, columnCount)
   }
 
@@ -109,8 +112,8 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     } else {
       meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
         synchronized(meetingViewModel._tracks) {
-          val screenShareTrack = track.filter { it.isScreen  }.toList()
-          renderCurrentPage(screenShareTrack, isForceUpdate = true)
+          val screenShareTracks = track.filter { it.isScreen  }.toCollection(ConcurrentLinkedDeque())
+          renderCurrentPage(screenShareTracks, isForceUpdate = true)
 
         }
       }
@@ -133,7 +136,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     return isScreenShare
   }
 
-  private fun renderCurrentPage(tracks: List<MeetingTrack>, isForceUpdate : Boolean = false) {
+  private fun renderCurrentPage(tracks: ConcurrentLinkedDeque<MeetingTrack>, isForceUpdate : Boolean = false) {
     val videos = getCurrentPageVideos(tracks)
     updateVideos(binding.container, videos, false, isForceUpdate = isForceUpdate)
   }

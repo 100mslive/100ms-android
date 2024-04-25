@@ -1,10 +1,10 @@
 package live.hms.roomkit.ui.meeting.activespeaker
 
-import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.ConcurrentLinkedDeque
 
 class ActiveSpeakerCache<T>(private var capacity: Int, private val appendUnsorted : Boolean = false) {
     private val TAG = ActiveSpeakerCache::class.java.simpleName
-    private val speakers = ConcurrentLinkedQueue<T>()
+    private val speakers = ConcurrentLinkedDeque<T>()
 
     fun update(items: List<T>, isActiveSpeakerUpdate: Boolean): Unit = synchronized(speakers) {
         // These are all the items that should be in here.
@@ -27,7 +27,7 @@ class ActiveSpeakerCache<T>(private var capacity: Int, private val appendUnsorte
         speakers.addAll(finalList)
     }
 
-    fun getAllItems(): List<T> = synchronized(speakers) { speakers.toList() }
+    fun getAllItems(): ConcurrentLinkedDeque<T> = synchronized(speakers) { speakers }
     fun updateMaxActiveSpeaker(maxActiveSpeaker: Int) {
         capacity = maxActiveSpeaker
     }

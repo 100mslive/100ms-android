@@ -181,7 +181,7 @@ class PinnedVideoFragment : Fragment() {
       var toPin : MeetingTrack? = null
       if (tracks.isNotEmpty()) {
         // Pin a screen if possible else pin user's video
-         toPin = tracks.find { it.isScreen } ?: tracks[0]
+         toPin = tracks.find { it.isScreen } ?: tracks.firstOrNull()
 
       }
         toPin?.let {
