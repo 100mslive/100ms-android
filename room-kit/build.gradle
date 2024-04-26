@@ -72,13 +72,14 @@ dependencies {
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
-    def hmsVersion = "2.9.52"
+    def hmsVersion = "2.9.53"
     implementation "com.otaliastudios:zoomlayout:1.9.0"
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
     implementation "live.100ms:hls-player:$hmsVersion"
     implementation "live.100ms:video-filters:$hmsVersion"
+    implementation "live.100ms:virtual-background:$hmsVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.7.4"

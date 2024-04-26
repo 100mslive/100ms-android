@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "live.hms.app2"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdk 34
         versionCode project.findProperty('100MS_APP_VERSION_CODE') as int
         versionName project.findProperty('100MS_APP_VERSION_NAME')
@@ -59,11 +59,16 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     //100ms.live prebuilt lib
-    implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
+//    implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
 
+    implementation files('libs/Effects_SDK_v.2.8.1.aar')
+    implementation "com.google.flogger:flogger:0.8"
+    implementation "com.google.flogger:flogger-system-backend:0.8"
+    implementation 'com.google.guava:guava:33.1.0-android'
     //100ms noise cancellation dep
-    def hmsVersion = "2.9.52"
-    implementation "live.100ms:hms-noise-cancellation-android:$hmsVersion"
+//    def hmsVersion = "2.9.52"
+//    implementation "live.100ms:hms-noise-cancellation-android:$hmsVersion"
+    implementation project(':room-kit')
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.4.0"
