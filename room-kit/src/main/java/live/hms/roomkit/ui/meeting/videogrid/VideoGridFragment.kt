@@ -507,6 +507,7 @@ class VideoGridFragment : Fragment() {
                 val expectedPages =
                     Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
                 screenShareAdapter.totalPages = remoteScreenShareTilesCount
+                meetingViewModel.transcriptionsPositionUseCase.setScreenShare(remoteScreenShareTilesCount + localScreenShareTileCount != 0)
                 peerGridVideoAdapter.totalPages = expectedPages
 
                 binding.tabLayoutDots.visibility =
@@ -515,7 +516,12 @@ class VideoGridFragment : Fragment() {
         }
 
         meetingViewModel.hmsScreenShareBottomSheetEvent.observe(viewLifecycleOwner) {
-            ScreenShareFragement(it).show(
+            val args = Bundle()
+                .apply {
+                    putString(SCREEN_SHARE_TRACK_ID, it)
+                }
+
+            ScreenShareFragement().apply { this.arguments = args }.show(
                 childFragmentManager, VideoGridFragment.TAG
             )
         }
