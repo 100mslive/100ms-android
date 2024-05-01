@@ -311,7 +311,6 @@ class MeetingViewModel(
      fun setupFilterVideoPlugin() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            blurPlugin.init()
             hmsSDK.addPlugin(blurPlugin, object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
 
