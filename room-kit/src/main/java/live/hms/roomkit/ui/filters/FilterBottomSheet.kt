@@ -137,8 +137,8 @@ class FilterBottomSheet(
                     is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
                     is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
                     is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
-                    is VideoFilter.Blur -> meetingViewModel.blurPlugin.setBlurPercentage(progress / 100f)
-                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
+//                    is VideoFilter.Blur -> meetingViewModel.blurPlugin.setBlurPercentage(progress / 100f)
+//                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
                     null -> {}
                     else -> {}
                 }
@@ -193,16 +193,16 @@ class FilterBottomSheet(
                     }
 
                     is VideoFilter.Blur -> {
-                        currentSelectedFilter = VideoFilter.Blur
-                        binding.seekBar.progress =
-                            ( meetingViewModel.blurPlugin.getBlurPercentage() * 100f).toInt()
+//                        currentSelectedFilter = VideoFilter.Blur
+//                        binding.seekBar.progress =
+//                            ( meetingViewModel.blurPlugin.getBlurPercentage() * 100f).toInt()
 
                     }
 
                     is VideoFilter.Quality -> {
-                        currentSelectedFilter = VideoFilter.Quality
-                        binding.seekBar.progress =
-                            ( meetingViewModel.blurPlugin.getVideoQualityPercentage()).toInt()
+//                        currentSelectedFilter = VideoFilter.Quality
+//                        binding.seekBar.progress =
+//                            ( meetingViewModel.blurPlugin.getVideoQualityPercentage()).toInt()
 
                     }
 
