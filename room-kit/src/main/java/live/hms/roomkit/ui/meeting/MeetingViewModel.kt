@@ -189,7 +189,7 @@ class MeetingViewModel(
         }
 
     val showHideWhiteboardObserver by lazy { MutableLiveData<HMSWhiteboard>() }
-    val closeWhiteBoard by lazy { MutableLiveData<Boolean>() }
+    val isWhiteboardOpen by lazy { MutableLiveData<Boolean>(false) }
     val showWhiteBoardFullScreen by lazy { MutableLiveData<Boolean>(false) }
     val showWhiteBoardFullScreenSingleLiveEvent by lazy { SingleLiveEvent<Boolean>() }
     val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
@@ -205,17 +205,28 @@ class MeetingViewModel(
         })
     }
 
+    fun isOwner():Boolean{
+
+        localPeerId?.let{peerId ->
+            val localPeer = getPeerForId(peerId)
+            localPeer?.let {peer ->
+                if(peer.customerUserID == showHideWhiteboardObserver.value?.owner?.customerUserID){
+                    return true
+                }
+            }
+            return false
+        }
+        return false
+    }
 
     fun toggleWhiteBoard() {
 
-        val currentWhiteBoardState = showHideWhiteboardObserver.value
-
-        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+        if (isWhiteboardOpen.value == true && !isOwner())
             return
 
-        if (currentWhiteBoardState?.isOpen == true) {
+        if (isWhiteboardOpen.value == true) {
             stopCurrentWhiteBoardSession()
-            closeWhiteBoard.value = true
+            isWhiteboardOpen.value = false
         } else {
             startWhiteBoardSession()
         }
@@ -224,7 +235,7 @@ class MeetingViewModel(
     private fun startWhiteBoardSession() {
         val currentWhiteBoardState = showHideWhiteboardObserver.value
         //make sure you are the owner and whiteboard is open to close the whiteboard
-        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+        if (isWhiteboardOpen.value == true && isOwner().not())
             return
 
         if (hmsSDK.isScreenShared()) {
@@ -239,7 +250,7 @@ class MeetingViewModel(
         }
 
 
-        if (currentWhiteBoardState == null || currentWhiteBoardState?.isOpen == false) {
+        if (currentWhiteBoardState == null || isWhiteboardOpen.value == false) {
             localHmsInteractivityCenter.startWhiteboard(
                 title = UUID.randomUUID().toString(),
                 object : HMSActionResultListener {
@@ -250,17 +261,16 @@ class MeetingViewModel(
     }
 
      fun stopCurrentWhiteBoardSession() {
-        val currentWhiteBoardState = showHideWhiteboardObserver.value
 
-        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+        if (isWhiteboardOpen.value == true && isOwner().not())
             return
 
-        if (currentWhiteBoardState?.isOpen == true) {
+        if (isWhiteboardOpen.value == true) {
             localHmsInteractivityCenter.stopWhiteboard(object : HMSActionResultListener{
                 override fun onError(error: HMSException) {}
                 override fun onSuccess() {}
             })
-            closeWhiteBoard.value = true
+            isWhiteboardOpen.value = false
         }
     }
 

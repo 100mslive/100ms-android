@@ -87,25 +87,27 @@ class VideoGridFragment : Fragment() {
 
 
         meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
-            if (it.isOpen) {
-                addOrRemoveWebView(shouldAddWebView = true)
-                whiteboardView?.show()
-                binding.webViewContainer.show()
-                val url = it.url
-                updateWebViewUrl(url,it.id)
+            meetingViewModel.isWhiteboardOpen.observe(viewLifecycleOwner){_isWhiteboardOpen ->
+                if (_isWhiteboardOpen) {
+                    addOrRemoveWebView(shouldAddWebView = true)
+                    whiteboardView?.show()
+                    binding.webViewContainer.show()
+                    val url = it.url
+                    updateWebViewUrl(url,it.id)
 
-            } else {
-                resetWhiteboardState()
-                whiteboardView?.hide()
-                binding.webViewContainer.hide()
+                } else {
+                    resetWhiteboardState()
+                    whiteboardView?.hide()
+                    binding.webViewContainer.hide()
+                }
             }
         }
 
-        meetingViewModel.closeWhiteBoard.observe(viewLifecycleOwner, Observer {
+        meetingViewModel.isWhiteboardOpen.observe(viewLifecycleOwner, Observer {
             if (it) {
                 resetWhiteboardState()
                 whiteboardView?.hide()
-                meetingViewModel.closeWhiteBoard.value = false
+                meetingViewModel.isWhiteboardOpen.value = true
             }
         })
 
@@ -422,98 +424,102 @@ class VideoGridFragment : Fragment() {
         meetingViewModel.trackAndWhiteBoardObserver.observe(viewLifecycleOwner) { (whiteBoard ,tracks, isWhiteBoardFullScreen) ->
             if (tracks == null) return@observe
 
-            synchronized(tracks) {
-                val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
-                var newRowCount = 0
-                var newColumnCount = 0
-                var newGuideLinePercentage = 0f
-                val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
-                val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && whiteBoard?.isOpen == true
+            meetingViewModel.isWhiteboardOpen.observe(viewLifecycleOwner){ isWhiteboardOpen ->
+                synchronized(tracks) {
+                    val screenShareTrackList = tracks.filter { it.isScreen && it.isLocal.not() }
+                    var newRowCount = 0
+                    var newColumnCount = 0
+                    var newGuideLinePercentage = 0f
+                    val showDockedState = screenShareTrackList.isEmpty().not() || isWhiteboardOpen
+                    val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && isWhiteboardOpen
 
-                meetingViewModel.showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard)
+                    meetingViewModel.showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard)
 
-                /**
-                 * 75% screenshare view port
-                 * 100% white board view port (fullscreen)
-                 * 75% white board view port
-                 */
-                newGuideLinePercentage = if (screenShareTrackList.isEmpty().not()) 0.75f
-                 else if (whiteBoard?.isOpen == true && isWhiteBoardFullScreen == true) 1.0f
-                 else if (whiteBoard?.isOpen == true) 0.75f
-                 else 0f
+                    /**
+                     * 75% screenshare view port
+                     * 100% white board view port (fullscreen)
+                     * 75% white board view port
+                     */
+                    newGuideLinePercentage = if (screenShareTrackList.isEmpty().not()) 0.75f
+                    else if (isWhiteboardOpen && isWhiteBoardFullScreen == true) 1.0f
+                    else if (isWhiteboardOpen) 0.75f
+                    else 0f
 
-                //is screen share track is present then reduce the grid and column span else restore
-                if (showDockedState) {
-                    binding.screenShareContainer.show()
-                    newRowCount = 1
-                    newColumnCount = 2
-                } else {
-                    binding.screenShareContainer.gone()
-                    newRowCount = 3
-                    newColumnCount = 2
-                }
-
-
-
-                //smart updates cause updating evenrything at once would call layout()
-                if (lastGuideLinePercentage != newGuideLinePercentage) {
-                    if (newGuideLinePercentage == 0.0f) {
-                        //un docked state
-                        binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            height = ViewGroup.LayoutParams.MATCH_PARENT
-                        }
-
-                        binding.rootLayout.applyConstraint {
-                            binding.viewPagerVideoGrid.clearTop()
-                        }
-
+                    //is screen share track is present then reduce the grid and column span else restore
+                    if (showDockedState) {
+                        binding.screenShareContainer.show()
+                        newRowCount = 1
+                        newColumnCount = 2
                     } else {
-                        //docked state
-                        binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                            height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
-                        }
-                        binding.rootLayout.applyConstraint {
-                            binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
-                        }
+                        binding.screenShareContainer.gone()
+                        newRowCount = 3
+                        newColumnCount = 2
                     }
 
-                    binding.divider.setGuidelinePercent(newGuideLinePercentage)
-                    lastGuideLinePercentage = newGuideLinePercentage
+
+
+                    //smart updates cause updating evenrything at once would call layout()
+                    if (lastGuideLinePercentage != newGuideLinePercentage) {
+                        if (newGuideLinePercentage == 0.0f) {
+                            //un docked state
+                            binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                height = ViewGroup.LayoutParams.MATCH_PARENT
+                            }
+
+                            binding.rootLayout.applyConstraint {
+                                binding.viewPagerVideoGrid.clearTop()
+                            }
+
+                        } else {
+                            //docked state
+                            binding.viewPagerVideoGrid.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                                height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+                            }
+                            binding.rootLayout.applyConstraint {
+                                binding.viewPagerVideoGrid.top_toTopOf(binding.divider.id)
+                            }
+                        }
+
+                        binding.divider.setGuidelinePercent(newGuideLinePercentage)
+                        lastGuideLinePercentage = newGuideLinePercentage
+                    }
+
+                    if (screenShareTrackList.size > 1 && hasScreenShareOverriddenWhiteboard) {
+                        binding.tabLayoutDotsRemoteScreenShare.show()
+                    } else {
+                        binding.tabLayoutDotsRemoteScreenShare.gone()
+                    }
+
+
+                    meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
+                        Pair(newRowCount, newColumnCount)
+
+                    val itemsPerPage = newRowCount * newColumnCount
+
+
+                    val remoteScreenShareTilesCount = screenShareTrackList.size
+                    val localScreenShareTileCount = tracks.filter { it.isLocal && it.isScreen }.size
+                    val hasLocalTile = tracks.filter { it.isLocal && it.isScreen.not() }.size == 1
+                    val bothLocalTile = (tracks.size == 2 && tracks.filter { it.isLocal }.size == 2)
+                    val hasRemotePeers = tracks.filter { it.isLocal.not() }.isNotEmpty()
+                    val hasInsetTileVisible =
+                        meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole) && hasLocalTile && bothLocalTile.not() && hasRemotePeers
+                    val onthePeerGridTileCount =
+                        tracks.size - remoteScreenShareTilesCount - localScreenShareTileCount + (1 * if (hasInsetTileVisible) -1 else 0)
+                    // Without this, the extra inset adds one more tile than they should
+                    val expectedPages =
+                        Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
+                    screenShareAdapter.totalPages = remoteScreenShareTilesCount
+                    meetingViewModel.transcriptionsPositionUseCase.setScreenShare(remoteScreenShareTilesCount + localScreenShareTileCount != 0)
+                    peerGridVideoAdapter.totalPages = expectedPages
+
+                    binding.tabLayoutDots.visibility =
+                        if (peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
                 }
 
-                if (screenShareTrackList.size > 1 && hasScreenShareOverriddenWhiteboard) {
-                    binding.tabLayoutDotsRemoteScreenShare.show()
-                } else {
-                    binding.tabLayoutDotsRemoteScreenShare.gone()
-                }
-
-
-                meetingViewModel.updateRowAndColumnSpanForVideoPeerGrid.value =
-                    Pair(newRowCount, newColumnCount)
-
-                val itemsPerPage = newRowCount * newColumnCount
-
-
-                val remoteScreenShareTilesCount = screenShareTrackList.size
-                val localScreenShareTileCount = tracks.filter { it.isLocal && it.isScreen }.size
-                val hasLocalTile = tracks.filter { it.isLocal && it.isScreen.not() }.size == 1
-                val bothLocalTile = (tracks.size == 2 && tracks.filter { it.isLocal }.size == 2)
-                val hasRemotePeers = tracks.filter { it.isLocal.not() }.isNotEmpty()
-                val hasInsetTileVisible =
-                    meetingViewModel.hasInsetEnabled(meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole) && hasLocalTile && bothLocalTile.not() && hasRemotePeers
-                val onthePeerGridTileCount =
-                    tracks.size - remoteScreenShareTilesCount - localScreenShareTileCount + (1 * if (hasInsetTileVisible) -1 else 0)
-                // Without this, the extra inset adds one more tile than they should
-                val expectedPages =
-                    Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
-                screenShareAdapter.totalPages = remoteScreenShareTilesCount
-                meetingViewModel.transcriptionsPositionUseCase.setScreenShare(remoteScreenShareTilesCount + localScreenShareTileCount != 0)
-                peerGridVideoAdapter.totalPages = expectedPages
-
-                binding.tabLayoutDots.visibility =
-                    if (peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
             }
-        }
+
+            }
 
         meetingViewModel.hmsScreenShareBottomSheetEvent.observe(viewLifecycleOwner) {
             val args = Bundle()

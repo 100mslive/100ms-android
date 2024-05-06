@@ -227,11 +227,11 @@ class SessionOptionBottomSheet(
             screenShareOption.setText(if (it) resources.getString(R.string.stop_share_screen) else resources.getString(R.string.start_screen_share))
         }
 
-        meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
-            whiteboard.setSelectedButton(it.isOpen)
+        meetingViewModel.isWhiteboardOpen.observe(viewLifecycleOwner) {
+            whiteboard.setSelectedButton(it)
             whiteboard.setText(
-                if (it.isOpen && it.isOwner) resources.getString(R.string.stop_white_board)
-                else if(it.isOpen.not()) resources.getString(R.string.start_white_board)
+                if (it && meetingViewModel.isOwner()) resources.getString(R.string.stop_white_board)
+                else if(it.not()) resources.getString(R.string.start_white_board)
                 else resources.getString(R.string.stop_white_board)
             )
 
