@@ -129,15 +129,15 @@ class FilterBottomSheet(
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 when (currentSelectedFilter) {
-                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(
-                        progress / 100f
-                    )
-
-                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress / 100f)
-                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
-                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
-                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
-//                    is VideoFilter.Blur -> meetingViewModel.blurPlugin.setBlurPercentage(progress / 100f)
+//                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(
+//                        progress / 100f
+//                    )
+//
+//                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress / 100f)
+//                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
+//                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
+//                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
+                    is VideoFilter.Blur -> meetingViewModel.blurPlugin.setBlurPercentage(progress)
 //                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
                     null -> {}
                     else -> {}
@@ -161,41 +161,41 @@ class FilterBottomSheet(
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.tag) {
-                    is VideoFilter.Brightness -> {
-                        currentSelectedFilter = VideoFilter.Brightness
-                        binding.seekBar.progress =
-                            (meetingViewModel.filterPlugin.getBrightnessProgress() * 100f).toInt()
-                    }
-
-                    is VideoFilter.Sharpness -> {
-                        currentSelectedFilter = VideoFilter.Sharpness
-                        binding.seekBar.progress =
-                            (meetingViewModel.filterPlugin.getSharpnessProgress() * 100f).toInt()
-                    }
-
-
-                    is VideoFilter.Contrast -> {
-                        currentSelectedFilter = VideoFilter.Contrast
-                        binding.seekBar.progress =
-                            ( meetingViewModel.filterPlugin.getContrastProgress() * 100f).toInt()
-                    }
-
-                    is VideoFilter.Redness -> {
-                        currentSelectedFilter = VideoFilter.Redness
-                        binding.seekBar.progress =
-                            (meetingViewModel.filterPlugin.getRednessProgress() * 100f).toInt()
-                    }
-
-                    is VideoFilter.Smoothness -> {
-                        currentSelectedFilter = VideoFilter.Smoothness
-                        binding.seekBar.progress =
-                            ( meetingViewModel.filterPlugin.getSmoothnessProgress() * 100f).toInt()
-                    }
+//                    is VideoFilter.Brightness -> {
+//                        currentSelectedFilter = VideoFilter.Brightness
+//                        binding.seekBar.progress =
+//                            (meetingViewModel.filterPlugin.getBrightnessProgress() * 100f).toInt()
+//                    }
+//
+//                    is VideoFilter.Sharpness -> {
+//                        currentSelectedFilter = VideoFilter.Sharpness
+//                        binding.seekBar.progress =
+//                            (meetingViewModel.filterPlugin.getSharpnessProgress() * 100f).toInt()
+//                    }
+//
+//
+//                    is VideoFilter.Contrast -> {
+//                        currentSelectedFilter = VideoFilter.Contrast
+//                        binding.seekBar.progress =
+//                            ( meetingViewModel.filterPlugin.getContrastProgress() * 100f).toInt()
+//                    }
+//
+//                    is VideoFilter.Redness -> {
+//                        currentSelectedFilter = VideoFilter.Redness
+//                        binding.seekBar.progress =
+//                            (meetingViewModel.filterPlugin.getRednessProgress() * 100f).toInt()
+//                    }
+//
+//                    is VideoFilter.Smoothness -> {
+//                        currentSelectedFilter = VideoFilter.Smoothness
+//                        binding.seekBar.progress =
+//                            ( meetingViewModel.filterPlugin.getSmoothnessProgress() * 100f).toInt()
+//                    }
 
                     is VideoFilter.Blur -> {
-//                        currentSelectedFilter = VideoFilter.Blur
-//                        binding.seekBar.progress =
-//                            ( meetingViewModel.blurPlugin.getBlurPercentage() * 100f).toInt()
+                        currentSelectedFilter = VideoFilter.Blur
+                        binding.seekBar.progress =
+                            ( meetingViewModel.blurPlugin.getCurrentBlurPercentage()).toInt()
 
                     }
 
@@ -235,29 +235,28 @@ class FilterBottomSheet(
                     HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
                     HMSPrebuiltTheme.getDefaults().onsurface_high_emp
                 )
-
             )
             addTab(
                 this.newTab().setText("Blur").setTag(VideoFilter.Blur), true
             )
-            addTab(
-                this.newTab().setText("Quality").setTag(VideoFilter.Quality)
-            )
-            addTab(
-                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness)
-            )
-            addTab(
-                this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
-            )
-            addTab(
-                this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
-            )
-            addTab(
-                this.newTab().setText("Redness").setTag(VideoFilter.Redness)
-            )
-            addTab(
-                this.newTab().setText("Smoothness").setTag(VideoFilter.Smoothness)
-            )
+//            addTab(
+//                this.newTab().setText("Quality").setTag(VideoFilter.Quality)
+//            )
+//            addTab(
+//                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness)
+//            )
+//            addTab(
+//                this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
+//            )
+//            addTab(
+//                this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
+//            )
+//            addTab(
+//                this.newTab().setText("Redness").setTag(VideoFilter.Redness)
+//            )
+//            addTab(
+//                this.newTab().setText("Smoothness").setTag(VideoFilter.Smoothness)
+//            )
             setSelectedTabIndicatorColor(Color.TRANSPARENT)
         }
 
