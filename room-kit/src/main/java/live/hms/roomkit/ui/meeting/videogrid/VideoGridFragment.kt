@@ -87,7 +87,7 @@ class VideoGridFragment : Fragment() {
 
 
         meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
-            if (it.isOpen) {
+            if (meetingViewModel.isWhiteboardOpen()) {
                 addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
                 binding.webViewContainer.show()
@@ -427,8 +427,8 @@ class VideoGridFragment : Fragment() {
                 var newRowCount = 0
                 var newColumnCount = 0
                 var newGuideLinePercentage = 0f
-                val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
-                val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && whiteBoard?.isOpen == true
+                val showDockedState = screenShareTrackList.isEmpty().not() || meetingViewModel.isWhiteboardOpen()
+                val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && meetingViewModel.isWhiteboardOpen()
 
                 meetingViewModel.showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard)
 
@@ -438,8 +438,8 @@ class VideoGridFragment : Fragment() {
                  * 75% white board view port
                  */
                 newGuideLinePercentage = if (screenShareTrackList.isEmpty().not()) 0.75f
-                 else if (whiteBoard?.isOpen == true && isWhiteBoardFullScreen == true) 1.0f
-                 else if (whiteBoard?.isOpen == true) 0.75f
+                 else if (meetingViewModel.isWhiteboardOpen() && isWhiteBoardFullScreen == true) 1.0f
+                 else if (meetingViewModel.isWhiteboardOpen()) 0.75f
                  else 0f
 
                 //is screen share track is present then reduce the grid and column span else restore
