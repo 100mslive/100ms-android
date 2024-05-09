@@ -91,10 +91,10 @@ import live.hms.video.sdk.HMSSDK
                         if (state == HmsHlsPlaybackState.playing) {
                             hlsPlayerBeganToPlay()
                             isPlaying.postValue(true)
-                            streamStartedEndedObserver.postValue(Stream.STARTED)
+                            streamStartedEndedObserver.postValue(Stream.Started)
                         } else if (state == HmsHlsPlaybackState.stopped) {
                             // Open end stream fragment.
-                            streamStartedEndedObserver.postValue(Stream.STOPPED)
+                            streamStartedEndedObserver.postValue(Stream.Stopped)
                             isPlaying.postValue(false)
                         } else isPlaying.postValue(true)
 //                    }
