@@ -19,7 +19,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 
-class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
+class ParticipantsTabFragment : Fragment() {
 
     private val TAG = "ParticipantsFragment"
     private var binding by viewLifecycle<LayoutParticipantsMergeBinding>()
@@ -29,6 +29,8 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
             requireActivity().application
         )
     }
+    lateinit var dismissFragment: () -> Unit
+
     private val participantsUseCase by lazy {
         ParticipantsUseCase(meetingViewModel, lifecycleScope, viewLifecycleOwner)
         { /*binding.participantsBack.visibility = View.VISIBLE*/ }
@@ -47,13 +49,12 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
-        initViewModels()
-        initOnBackPress()
-        initViews()
-    }
 
-    private fun updateParticipantCount(count : Int) {
-//        binding.participantCount.text = resources.getString(R.string.participants_heading, count)
+        LoadAfterJoin(meetingViewModel, viewLifecycleOwner) {
+            initViewModels()
+            initOnBackPress()
+            initViews()
+        }
     }
 
     private fun initViews() {
@@ -72,8 +73,6 @@ class ParticipantsTabFragment(val dismissFragment: () -> Unit) : Fragment() {
                 participantsUseCase.updateParticipantsAdapter(meetingViewModel.peers)
             }
         }
-        meetingViewModel.peerCount.observe(viewLifecycleOwner,::updateParticipantCount)
-
         meetingViewModel.state.observe(viewLifecycleOwner) { state ->
             if (state is MeetingState.NonFatalFailure) {
 
