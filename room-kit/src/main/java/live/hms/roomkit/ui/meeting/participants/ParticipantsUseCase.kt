@@ -148,7 +148,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         //  ideally this should be replaced with just updating the
         //  peers but still with the search query.
         val peerList = getSearchFilteredPeersIfNeeded(getGroupFilteredPeersIfNeeded(allPeers))
-        // TODO how can this be null?
+        // This can be null during fragment recreation, where the peer hasn't really joined yet.
         val localPeerRoleName = meetingViewModel.hmsSDK.getLocalPeer()!!.hmsRole.name
 
         // Group people by roles.

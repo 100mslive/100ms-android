@@ -47,6 +47,12 @@ class RoleBasedChatBottomSheet(
     private val recipientSelected: (Recipient) -> Unit
 ) : BottomSheetDialogFragment() {
 
+    private var close = false
+    constructor() : this({null}, {}) {
+        // Close the fragment if it's recreated by android after a restart
+        close = true
+    }
+
     private var initialRecipients : List<Group> = emptyList()
     private var allowedParticipants : AllowedToMessageParticipants? = null
     private val chatRecipientSearchUseCase : ChatRecipientSearchUseCase = ChatRecipientSearchUseCase(::updateListWithPeers)
@@ -72,6 +78,8 @@ class RoleBasedChatBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
+        if(close)
+            dismissAllowingStateLoss()
     }
 
 

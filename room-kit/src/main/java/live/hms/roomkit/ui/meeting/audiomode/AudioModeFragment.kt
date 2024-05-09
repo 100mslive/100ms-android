@@ -46,8 +46,11 @@ class AudioModeFragment : Fragment() {
       adapter.setItems(meetingViewModel.peers)
     }
 
-    meetingViewModel.speakers.observe(viewLifecycleOwner) {
-      adapter.applySpeakerUpdates(it)
+    meetingViewModel.speakersLiveData.observe(viewLifecycleOwner) {
+      synchronized(meetingViewModel.speakersLiveData) {
+        adapter.applySpeakerUpdates(it)
+      }
+
     }
 
     if (meetingViewModel.isLocalVideoEnabled.value != false) {
