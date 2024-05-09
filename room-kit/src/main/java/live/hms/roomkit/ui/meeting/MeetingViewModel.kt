@@ -63,7 +63,7 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
-import live.hms.video.virtualbackground.HMSVirtualBlurFilter
+import live.hms.video.virtualbackground.HMSBlurFilter
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
@@ -148,7 +148,7 @@ class MeetingViewModel(
         Bitmap.Config.ARGB_8888,
     )
 
-    val blurPlugin by lazy { HMSVirtualBlurFilter(hmsSDK) }
+    val blurPlugin by lazy { HMSBlurFilter(hmsSDK) }
 
     private var lastPollStartedTime : Long = 0
 
