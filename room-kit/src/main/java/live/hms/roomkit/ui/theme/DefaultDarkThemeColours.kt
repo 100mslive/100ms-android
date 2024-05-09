@@ -7,6 +7,7 @@ data class DefaultDarkThemeColours(
     @SerializedName("primary_default") val primary_default: String = "#2572ED",
     @SerializedName("primary_bright") val primary_bright: String = "#538DFF",
     @SerializedName("primary_dim") val primary_dim: String = "#002D6D",
+    @SerializedName("background_dim") val background_dim : String = "#000000",
     @SerializedName("primary_disabled") val primary_disabled: String = "#004299",
     @SerializedName("secondary_default") val secondary_default: String = "#444954",
     @SerializedName("secondary_bright") val secondary_bright: String = "#70778B",

@@ -101,6 +101,15 @@
         android:layout_below="@id/top_menu"
         android:layout_above="@id/bottom_controls" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/compose_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/top_menu"
+        android:layout_above="@id/bottom_controls"
+        />
+
+
     <!-- Header menu -->
     <LinearLayout
         android:id="@+id/top_menu"

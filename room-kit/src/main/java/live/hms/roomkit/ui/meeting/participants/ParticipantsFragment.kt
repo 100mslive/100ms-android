@@ -2,7 +2,6 @@ package live.hms.roomkit.ui.meeting.participants
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,25 +10,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.video.error.HMSException
-import live.hms.video.sdk.listeners.PeerListResultListener
 import live.hms.video.sdk.models.HMSPeer
-import live.hms.video.sdk.models.PeerListIterator
-
+const val DIRECTLY_OPENED: String= "PARTICIPANTS_DIRECTLY_OPENED"
 class ParticipantsFragment : Fragment() {
 
     private val TAG = "ParticipantsFragment"
@@ -41,38 +31,17 @@ class ParticipantsFragment : Fragment() {
     ) { binding.participantsBack.visibility = View.VISIBLE }
     }
 
-
-
     private val paginatedPeerList = arrayListOf<HMSPeer>()
     private var isLargeRoom = false
     private var iteratorsInitated = false
 
+    override fun onDetach() {
+        super.onDetach()
+        if(arguments?.getBoolean(DIRECTLY_OPENED) == true) {
+            meetingViewModel.restoreTempHiddenCaptions()
+        }
+    }
 
-//    private suspend fun getPeerList(resetIterators : Boolean = false): List<HMSPeer> {
-//        return if (isLargeRoom) {
-//            if (!iteratorsInitated || resetIterators) {
-//                // Init before we begin
-//                iteratorsInitated = true
-//                try {
-//                    if(resetIterators) {
-//                        paginatedPeerList.clear()
-//                    }
-//                    paginatedPeerList.addAll(initPaginatedPeerListAndIterators())
-//                } catch (exception : HMSException) {
-//                    iteratorsInitated = false
-//                    Log.e("PaginatedPeerListError","$exception")
-//                }
-//            }
-//            // Return  the combined list of real time and non real time peers
-//            val realtimePeers = meetingViewModel.peers
-//            val filteredPaginatedPeers = paginatedPeerList.filter { !realtimePeers.contains(it) }
-//
-//            meetingViewModel.peers.plus(filteredPaginatedPeers)
-//        } else {
-//            // Return only Real time peers
-//            meetingViewModel.peers
-//        }
-//    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

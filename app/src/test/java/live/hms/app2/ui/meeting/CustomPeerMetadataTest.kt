@@ -1,5 +1,6 @@
 package live.hms.app2.ui.meeting
 
+import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -9,7 +10,7 @@ class CustomPeerMetadataTest{
     @Test
     fun correct_json_values_are_parsed() {
         val result = CustomPeerMetadata.fromJson("{\"isHandRaised\":true, \"name\":\"Aniket\"}")
-        assertThat(result, equalTo(CustomPeerMetadata(true, "Aniket")))
+        assertThat(result, equalTo(CustomPeerMetadata(true, false, "Aniket")))
     }
 
     @Test
