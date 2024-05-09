@@ -180,6 +180,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
     private val chatViewModel: ChatViewModel by activityViewModels()
     private val pinnedMessageUiUseCase = PinnedMessageUiUseCase()
     private val launchMessageOptionsDialog = LaunchMessageOptionsDialog()
+    val streamEndedBottom by lazy { StreamEnded() }
 
     private val builder = StringBuilder()
     private val formatter = Formatter(builder, Locale.getDefault())
@@ -224,8 +225,11 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        hlsViewModel.streamEndedEvent.observe(viewLifecycleOwner) {
-            StreamEnded.launch(parentFragmentManager)
+        hlsViewModel.streamStartedEndedObserver.observe(viewLifecycleOwner) { state ->
+            when(state){
+                Stream.Started -> streamEndedBottom.show(childFragmentManager,"")
+                Stream.Stopped -> streamEndedBottom.dismissAllowingStateLoss()
+            }
         }
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
             chatViewModel.receivedMessage(it)

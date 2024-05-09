@@ -33,9 +33,10 @@ import live.hms.video.sdk.HMSSDK
     val isZoomEnabled = MutableLiveData(false)
     val isLive = MutableLiveData(true)
     val behindLiveByLiveData = MutableLiveData("0:0")
-    val streamEndedEvent = SingleLiveEvent<Unit>()
+    val streamStartedEndedObserver = SingleLiveEvent<Stream>()
     val currentSubtitles = MutableLiveData<String?>()
     private var failed = false
+
 
     val player = HmsHlsPlayer(application, hmsSdk).apply {
         setListeners(this)
@@ -90,9 +91,10 @@ import live.hms.video.sdk.HMSSDK
                         if (state == HmsHlsPlaybackState.playing) {
                             hlsPlayerBeganToPlay()
                             isPlaying.postValue(true)
+                            streamStartedEndedObserver.postValue(Stream.STARTED)
                         } else if (state == HmsHlsPlaybackState.stopped) {
                             // Open end stream fragment.
-                            streamEndedEvent.postValue(Unit)
+                            streamStartedEndedObserver.postValue(Stream.STOPPED)
                             isPlaying.postValue(false)
                         } else isPlaying.postValue(true)
 //                    }
