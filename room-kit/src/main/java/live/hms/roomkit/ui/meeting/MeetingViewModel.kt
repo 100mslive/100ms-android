@@ -68,6 +68,7 @@ import live.hms.video.virtualbackground.HMSBlurFilter
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
+import live.hms.video.whiteboard.State
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
@@ -203,28 +204,11 @@ class MeetingViewModel(
     val showWhiteBoardFullScreenSingleLiveEvent by lazy { SingleLiveEvent<Boolean>() }
     val debounceWhiteBoardObserver = showHideWhiteboardObserver.debounce(coroutineScope = viewModelScope)
 
-    fun isWhiteboardOpen(): Boolean{
-        closeWhiteBoard.value?.let {isWhiteboardClosed ->
-            return isWhiteboardClosed.not()
-        }
-        return false
-    }
-
-    fun isOwner():Boolean{
-        val localPeer = hmsSDK.getLocalPeer()
-        localPeer?.let {_localPeer ->
-            if(_localPeer.customerUserID == showHideWhiteboardObserver.value?.owner?.customerUserID){
-                return true
-            }
-        }
-        return false
-    }
-
     private fun setupWhiteBoardListener() {
         localHmsInteractivityCenter.setWhiteboardUpdateListener(object : HMSWhiteboardUpdateListener {
             override fun onUpdate(hmsWhiteboardUpdate: HMSWhiteboardUpdate) {
                 when(hmsWhiteboardUpdate) {
-                    is HMSWhiteboardUpdate.Start -> if(isWhiteboardOpen().not())showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
+                    is HMSWhiteboardUpdate.Start -> showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
                     is HMSWhiteboardUpdate.Stop -> showHideWhiteboardObserver.postValue(hmsWhiteboardUpdate.hmsWhiteboard)
                 }
             }
@@ -234,10 +218,12 @@ class MeetingViewModel(
 
     fun toggleWhiteBoard() {
 
-        if (isWhiteboardOpen() && isOwner().not())
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
+
+        if (currentWhiteBoardState?.state == State.Started && currentWhiteBoardState.isOwner.not())
             return
 
-        if (isWhiteboardOpen()) {
+        if (currentWhiteBoardState?.state == State.Started) {
             stopCurrentWhiteBoardSession()
             closeWhiteBoard.value = true
         } else {
@@ -248,7 +234,7 @@ class MeetingViewModel(
     private fun startWhiteBoardSession() {
         val currentWhiteBoardState = showHideWhiteboardObserver.value
         //make sure you are the owner and whiteboard is open to close the whiteboard
-        if (isWhiteboardOpen() && isOwner().not())
+        if (currentWhiteBoardState?.state == State.Started && currentWhiteBoardState.isOwner.not())
             return
 
         if (hmsSDK.isScreenShared()) {
@@ -263,24 +249,23 @@ class MeetingViewModel(
         }
 
 
-        if (currentWhiteBoardState == null || !isWhiteboardOpen()) {
+        if (currentWhiteBoardState == null || currentWhiteBoardState?.state == State.Stopped) {
             localHmsInteractivityCenter.startWhiteboard(
                 title = UUID.randomUUID().toString(),
                 object : HMSActionResultListener {
                     override fun onError(error: HMSException) {}
-                    override fun onSuccess() {
-                        closeWhiteBoard.value = false
-                    }
+                    override fun onSuccess() {}
                 })
         }
     }
 
      fun stopCurrentWhiteBoardSession() {
+        val currentWhiteBoardState = showHideWhiteboardObserver.value
 
-        if (isWhiteboardOpen() && isOwner().not())
+        if (currentWhiteBoardState?.state == State.Started && currentWhiteBoardState.isOwner.not())
             return
 
-        if (isWhiteboardOpen()) {
+        if (currentWhiteBoardState?.state == State.Started) {
             localHmsInteractivityCenter.stopWhiteboard(object : HMSActionResultListener{
                 override fun onError(error: HMSException) {}
                 override fun onSuccess() {}
