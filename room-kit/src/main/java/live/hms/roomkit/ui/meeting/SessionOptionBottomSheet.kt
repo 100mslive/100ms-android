@@ -228,10 +228,10 @@ class SessionOptionBottomSheet(
         }
 
         meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
-            whiteboard.setSelectedButton(meetingViewModel.isWhiteboardOpen())
+            whiteboard.setSelectedButton(it.isOpen)
             whiteboard.setText(
-                if (meetingViewModel.isWhiteboardOpen() && meetingViewModel.isOwner()) resources.getString(R.string.stop_white_board)
-                else if(meetingViewModel.isWhiteboardOpen().not()) resources.getString(R.string.start_white_board)
+                if (it.isOpen && it.isOwner) resources.getString(R.string.stop_white_board)
+                else if(it.isOpen.not()) resources.getString(R.string.start_white_board)
                 else resources.getString(R.string.stop_white_board)
             )
 
