@@ -314,7 +314,6 @@ class MeetingViewModel(
      fun setupFilterVideoPlugin() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            filterPlugin.init()
             hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
 
