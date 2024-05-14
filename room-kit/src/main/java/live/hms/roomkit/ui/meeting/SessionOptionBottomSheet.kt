@@ -22,6 +22,7 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.enums.HMSRecordingState
+import live.hms.video.whiteboard.State
 
 class SessionOptionBottomSheet(
     private val onScreenShareClicked: () -> Unit,
@@ -228,10 +229,10 @@ class SessionOptionBottomSheet(
         }
 
         meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
-            whiteboard.setSelectedButton(meetingViewModel.isWhiteboardOpen())
+            whiteboard.setSelectedButton(it.state == State.Started)
             whiteboard.setText(
-                if (meetingViewModel.isWhiteboardOpen() && meetingViewModel.isOwner()) resources.getString(R.string.stop_white_board)
-                else if(meetingViewModel.isWhiteboardOpen().not()) resources.getString(R.string.start_white_board)
+                if (it.state == State.Started && it.isOwner) resources.getString(R.string.stop_white_board)
+                else if(it.state == State.Stopped) resources.getString(R.string.start_white_board)
                 else resources.getString(R.string.stop_white_board)
             )
 
