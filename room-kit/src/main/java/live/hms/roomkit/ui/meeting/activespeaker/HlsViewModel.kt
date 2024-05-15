@@ -24,7 +24,7 @@ import live.hms.video.sdk.HMSSDK
     application: Application,
     private val hlsStreamUrl : String,
     private val hmsSdk: HMSSDK,
-    private val hlsPlayerBeganToPlay : () -> Unit,
+    private val hlsPlayerBeganToPlay : (HmsHlsPlaybackState) -> Unit,
     private val displayHlsCuesUseCase : () -> DisplayHlsCuesUseCase
 ) : AndroidViewModel(application) {
     val isPlaying = MutableLiveData(true)
@@ -88,13 +88,14 @@ import live.hms.video.sdk.HMSSDK
 //                contextSafe { context, activity ->
 //                    activity.runOnUiThread {
                         if (state == HmsHlsPlaybackState.playing) {
-                            hlsPlayerBeganToPlay()
+                            hlsPlayerBeganToPlay(state)
                             isPlaying.postValue(true)
                         } else if (state == HmsHlsPlaybackState.stopped) {
                             // Open end stream fragment.
+                            hlsPlayerBeganToPlay(state)
                             streamEndedEvent.postValue(Unit)
                             isPlaying.postValue(false)
-                        } else isPlaying.postValue(true)
+                        }
 //                    }
 //                }
 //                Log.d("HMSHLSPLAYER", "From App, playback state: $state")

@@ -173,7 +173,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
     }
     private val hlsViewModel: HlsViewModel by activityViewModels {
         HlsViewModelFactory(requireActivity().application,args.hlsStreamUrl, meetingViewModel.hmsSDK,
-            meetingViewModel::hlsPlayerBeganToPlay
+            { state : HmsHlsPlaybackState -> meetingViewModel.hlsPlayerBeganToPlay(state) }
         ) { displayHlsCuesUseCase }
     }
     private val player by lazy { hlsViewModel.player }

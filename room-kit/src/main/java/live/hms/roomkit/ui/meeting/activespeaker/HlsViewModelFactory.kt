@@ -4,13 +4,14 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.util.UnstableApi
+import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.video.sdk.HMSSDK
 
 @UnstableApi class HlsViewModelFactory(
     private val application: Application,
     private val hlsStreamUrl: String,
     private val hmsSdk: HMSSDK,
-    private val hlsPlayerBeganToPlay: () -> Unit,
+    private val hlsPlayerBeganToPlay: (HmsHlsPlaybackState) -> Unit,
     private val displayHlsCuesUseCase: () -> DisplayHlsCuesUseCase
 ) : ViewModelProvider.NewInstanceFactory() {
 
