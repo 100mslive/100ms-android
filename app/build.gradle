@@ -59,10 +59,10 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     //100ms.live prebuilt lib
-    implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
+    implementation project(":room-kit")
 
     //100ms noise cancellation dep
-    def hmsVersion = "2.9.55"
+    def hmsVersion = "2.9.55-df"
     implementation "live.100ms:hms-noise-cancellation-android:$hmsVersion"
 
     // Navigation

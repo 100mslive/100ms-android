@@ -202,6 +202,9 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
     private lateinit var composeView: ComposeView
 
+    fun playInstead() {
+        player.play(args.hlsStreamUrl)
+    }
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -225,6 +228,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         hlsViewModel.streamEndedEvent.observe(viewLifecycleOwner) {
+            player.stop()
             StreamEnded.launch(parentFragmentManager)
         }
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
@@ -258,9 +262,10 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
                 val progressBarVisibility by hlsViewModel.progressBarVisible.observeAsState()
                 val viewMode by meetingViewModel.state.observeAsState()
+                val hlsPlayerReady by hlsViewModel.playerReady.observeAsState()
 
                 // Don't show whole view loading during the time it's disconnected or reconnecting.
-                if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing) {
+                if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing || hlsPlayerReady != true) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()
@@ -444,7 +449,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
                 }
 
-                PauseWhenLeaving(player)
+                PauseWhenLeaving(player, ::playInstead)
                 RemoveStatsWhenPaused(::setPlayerStatsListener, player)
 
             }
@@ -1418,7 +1423,7 @@ fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int?, buttonClicked: () ->
 }
 
 @Composable
-fun PauseWhenLeaving(player : HmsHlsPlayer) {
+fun PauseWhenLeaving(player : HmsHlsPlayer, playInstead :() -> Unit) {
     OnLifecycleEvent { _, event ->
         when(event)
         {
@@ -1427,8 +1432,12 @@ fun PauseWhenLeaving(player : HmsHlsPlayer) {
             }
 
             Lifecycle.Event.ON_RESUME -> {
-                player.resume()
-                player.seekToLivePosition()
+                if(player.getNativePlayer().playbackState == Player.STATE_IDLE) {
+                    playInstead()
+                } else {
+                    player.resume()
+                    player.seekToLivePosition()
+                }
             }
 
             else -> {}

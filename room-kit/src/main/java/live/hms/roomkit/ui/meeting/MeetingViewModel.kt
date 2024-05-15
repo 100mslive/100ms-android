@@ -2581,7 +2581,6 @@ class MeetingViewModel(
                 }
             }
             playerStarted = true
-            logS("Set player started true")
             viewModelScope.launch {
                 _hlsStreamEndedFlow.emit(StreamState.STARTED)
             }
@@ -2590,7 +2589,6 @@ class MeetingViewModel(
             viewModelScope.launch {
                 _hlsStreamEndedFlow.emit(StreamState.ENDED)
             }
-            logS("Set player started false")
         }
     }
 

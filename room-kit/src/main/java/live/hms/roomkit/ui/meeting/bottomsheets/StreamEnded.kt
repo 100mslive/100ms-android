@@ -15,7 +15,6 @@ import live.hms.roomkit.databinding.StreamEndedBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.util.logS
 import live.hms.roomkit.util.viewLifecycle
 
 enum class StreamState {
@@ -33,7 +32,8 @@ class StreamEnded: Fragment()  {
         fun launch(fm: FragmentManager) {
             fm
                 .beginTransaction()
-                .add(R.id.fragment_container, StreamEnded())
+                // We want the hlsfragment to be stopped entirely so this fragment needs to be replaced not added.
+                .replace(R.id.fragment_container, StreamEnded())
                 .commit()
         }
     }
@@ -54,8 +54,7 @@ class StreamEnded: Fragment()  {
         // now we watch something to dismiss the fragment if it needs to be.
         lifecycleScope.launch {
             meetingViewModel.hlsStreamEndedFlow.collect {
-                if(it == StreamState.ENDED) {
-                    logS("Removing the fragment")
+                if(it == StreamState.STARTED) {
                     parentFragmentManager
                         .beginTransaction()
                         .remove(this@StreamEnded)
