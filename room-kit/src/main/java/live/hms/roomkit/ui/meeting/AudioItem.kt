@@ -1,0 +1,97 @@
+package live.hms.roomkit.ui.meeting
+
+import android.graphics.PorterDuff
+import android.view.View
+import androidx.annotation.DrawableRes
+import androidx.core.text.bold
+import androidx.core.text.buildSpannedString
+import com.xwray.groupie.viewbinding.BindableItem
+import live.hms.roomkit.R
+import live.hms.roomkit.databinding.ItemDeviceDetailBinding
+import live.hms.roomkit.drawableEnd
+import live.hms.roomkit.drawableStart
+import live.hms.roomkit.setDrawables
+import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.video.audio.HMSAudioManager
+import kotlin.math.roundToInt
+
+class AudioItem(
+    private var title: String,
+    private var subTitle: String? = null,
+    private val isSelected: Boolean,
+    @DrawableRes private val drawableRes: Int,
+    val type: HMSAudioManager.AudioDevice = HMSAudioManager.AudioDevice.AUTOMATIC,
+    val id: Int? = null,
+    private val onClick: (HMSAudioManager.AudioDevice, Int?) -> Unit,
+
+    ) : BindableItem<ItemDeviceDetailBinding>() {
+
+
+    override fun bind(binding: ItemDeviceDetailBinding, position: Int) {
+        if (isSelected) binding.audioText.setDrawables(
+            end = binding.audioText.context?.getDrawable(
+                R.drawable.tick
+            )
+        )
+        else binding.audioText.setDrawables(end = null)
+
+        binding.audioText.setDrawables(
+            start = binding.audioText.context?.getDrawable(
+                drawableRes
+            )
+        )
+
+
+        binding.audioText.text = buildSpannedString {
+            append(title)
+            if (subTitle.isNullOrEmpty().not()) {
+                bold { append(" (${subTitle.orEmpty()})") }
+            }
+        }
+
+        binding.root.setOnSingleClickListener {
+            onClick.invoke(type, id)
+        }
+
+
+        binding.audioText.setTextColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+
+        binding.audioText.drawableEnd?.setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+
+        binding.audioText.drawableStart?.setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+
+
+
+
+        binding.border4.setBackgroundColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.borderDefault,
+                HMSPrebuiltTheme.getDefaults().border_bright
+            )
+        )
+    }
+
+
+    override fun getLayout(): Int = R.layout.item_device_detail
+
+
+    override fun initializeViewBinding(view: View) = ItemDeviceDetailBinding.bind(view)
+
+}

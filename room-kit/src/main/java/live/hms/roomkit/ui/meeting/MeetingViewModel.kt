@@ -324,7 +324,7 @@ class MeetingViewModel(
 
                 }
 
-            }, 30)
+            })
         }
     }
 
