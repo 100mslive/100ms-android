@@ -101,9 +101,10 @@ class PollQuestionViewHolder<T : ViewBinding>(
     private fun bind(questionUi: QuestionUi.QuestionCreator) {
         with(binding as LayoutPollQuestionCreationItemBinding) {
             binding.applyTheme()
-            notRequiredToAnswer.setOnCheckedChangeListener { _, b ->
-                getItem(bindingAdapterPosition).currentQuestion.requiredToAnswer = b
-            }
+//            <-- Removed `notRequiredToAnswer` switch for platform parity -->
+//            notRequiredToAnswer.setOnCheckedChangeListener { _, b ->
+//                getItem(bindingAdapterPosition).currentQuestion.requiredToAnswer = b
+//            }
             binding.askAQuestionEditText.setText(questionUi.currentQuestion.withTitle)
             binding.askAQuestionEditText.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {

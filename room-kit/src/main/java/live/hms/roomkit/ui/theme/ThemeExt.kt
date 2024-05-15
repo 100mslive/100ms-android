@@ -2528,7 +2528,8 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
     )
     )
 
-    setSwitchThemes(notRequiredToAnswer)
+//    <-- Removed "Not Required To Answer" switch for platform parity -->
+//    setSwitchThemes(notRequiredToAnswer)
 
     saveButton.saveButtonEnabled()
 
