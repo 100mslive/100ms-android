@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting
 
 import android.graphics.PorterDuff
+import android.os.Build
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.text.bold
@@ -15,6 +16,7 @@ import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.video.audio.HMSAudioManager
+import live.hms.video.audio.manager.AudioManagerUtil
 import kotlin.math.roundToInt
 
 class AudioItem(
@@ -46,8 +48,8 @@ class AudioItem(
 
         binding.audioText.text = buildSpannedString {
             append(title)
-            if (subTitle.isNullOrEmpty().not()) {
-                bold { append(" (${subTitle.orEmpty()})") }
+            if (subTitle.isNullOrEmpty().not() && type.toString() == AudioManagerUtil.AudioDevice.BLUETOOTH.toString()) {
+                bold { append(" ( ${subTitle.orEmpty()} )") }
             }
         }
 

@@ -65,6 +65,13 @@ class AudioOutputSwitchBottomSheet(
             )
         )
 
+        binding.audioOt.setTextColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+
 
 
 
