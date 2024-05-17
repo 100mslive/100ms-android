@@ -103,56 +103,37 @@ class AudioOutputSwitchBottomSheet(
         }
 
         audioDeviceAdapter.clear()
-        val devicesList = meetingViewModel.hmsSDK.getAudioDevicesListWithNames()
+        val devicesList = meetingViewModel.hmsSDK.getAudioDevicesInfoList()
 
         //skips for HLS playback
         val showAudioOption = meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer()
         var isMute: Boolean = false
-        var currentSelectedDeviceId: Int? = null
         var selectedDeviceType: AudioDevice? = null
 
         if (meetingViewModel.isPeerAudioEnabled().not()) {
             isMute = true
         } else {
-            val currentSelectedDevice = meetingViewModel.hmsSDK.getAudioOutputRouteTypeWithId()
-            currentSelectedDeviceId = currentSelectedDevice.second
-            selectedDeviceType = currentSelectedDevice.first
+            selectedDeviceType = meetingViewModel.hmsSDK.getAudioOutputRouteType()
         }
 
         if (showAudioOption == true) {
-            for ((deviceType, subDeviceTypeList) in devicesList) {
+            for (deviceInfo in devicesList) {
 
-                if (subDeviceTypeList.isEmpty()) {
-                    //backward compatibility handling
-                    val isSelected = (selectedDeviceType == deviceType)
-                    audioDeviceAdapter.add(
-                        AudioItem(title = capitalizeAndReplaceUnderscore(deviceType.name),
-                            isSelected = isSelected,
-                            type = deviceType,
-                            drawableRes = getDrawableBasedOnDeviceType(deviceType),
-                            onClick = { type, id ->
-                                setAudioType(type, id)
-                            })
-                    )
+                //backward compatibility handling
+                val isSelected = (selectedDeviceType == deviceInfo.type)
+                audioDeviceAdapter.add(
+                    AudioItem(
+                        title = capitalizeAndReplaceUnderscore(deviceInfo.type.name),
+                        subTitle= deviceInfo.name.orEmpty(),
+                        isSelected = isSelected,
+                        type = deviceInfo.type,
+                        drawableRes = getDrawableBasedOnDeviceType(deviceInfo.type),
+                        onClick = { type, id ->
+                            setAudioType(type)
+                        })
+                )
 
-                } else {
-                    subDeviceTypeList.forEach {
 
-                        val isSelected = (it.id == currentSelectedDeviceId)
-                        audioDeviceAdapter.add(
-                            AudioItem(title = capitalizeAndReplaceUnderscore(deviceType.name),
-                                subTitle= it.name.orEmpty(),
-                                type = it.type,
-                                id = it.id,
-                                isSelected = isSelected,
-                                drawableRes = getDrawableBasedOnDeviceType(deviceType),
-                                onClick = { type, id ->
-                                    setAudioType(type, id)
-                                })
-
-                        )
-                    }
-                }
             }
         }
 
@@ -216,9 +197,9 @@ class AudioOutputSwitchBottomSheet(
         return R.style.AppBottomSheetDialogTheme
     }
 
-    private fun setAudioType(audioDevice: AudioDevice, selectedDeviceID: Int?) {
+    private fun setAudioType(audioDevice: AudioDevice) {
         meetingViewModel.setPeerAudioEnabled(true)
-        meetingViewModel.hmsSDK.switchAudioOutput(audioDevice, selectedDeviceID)
+        meetingViewModel.hmsSDK.switchAudioOutput(audioDevice)
         onOptionItemClicked?.invoke(meetingViewModel.hmsSDK.getAudioOutputRouteType(), true)
         dismiss()
     }
