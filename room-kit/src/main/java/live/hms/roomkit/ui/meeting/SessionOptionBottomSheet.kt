@@ -162,6 +162,14 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val blurFilter = GridOptionItem(
+            "Blur Filter", R.drawable.emoji_icon, {
+                onNameChange.invoke()
+                dismissAllowingStateLoss()
+
+            }, isSelected = false
+        )
+
 
         val whiteboard = GridOptionItem(
             resources.getString(R.string.start_white_board), R.drawable.whiteboard, {
@@ -205,8 +213,11 @@ class SessionOptionBottomSheet(
                     )
                 )
             }
+//            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
+//                add(videoFilter)
+//            }
             if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
-                add(videoFilter)
+                add(blurFilter)
             }
         }
         gridOptionAdapter.update(listOf(group))
