@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
@@ -65,6 +66,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSBlurFilter
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
@@ -161,7 +163,8 @@ class MeetingViewModel(
         Bitmap.Config.ARGB_8888,
     )
 
-    val blurPlugin by lazy { HMSBlurFilter(hmsSDK) }
+
+    val blurPlugin by lazy { HMSVirtualBackground(hmsSDK, BitmapFactory.decodeResource(application.resources, R.drawable.info_icon_white)) }
 
     private var lastPollStartedTime : Long = 0
 

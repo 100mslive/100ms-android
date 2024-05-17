@@ -12,3 +12,4 @@ sealed class VideoFilter {
     object Contrast : VideoFilter()
     object Exposure : VideoFilter()
 }
+
