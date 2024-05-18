@@ -129,18 +129,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/optionsListRadioGroupVG" />
 
-<!--        Removed `notRequiredToAnswer` switch for platform parity -->
-<!--        <com.google.android.material.switchmaterial.SwitchMaterial-->
-<!--            android:id="@+id/notRequiredToAnswer"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="Not required to answer"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/border"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/addAnOptionTextView"-->
-<!--            tools:visibility="visible" />-->
-
         <View
             android:id="@+id/border"
             android:layout_width="match_parent"
