@@ -14,10 +14,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
+import live.hms.roomkit.ui.meeting.bottomsheets.StreamState
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
@@ -66,6 +68,7 @@ import live.hms.video.utils.HMSLogger
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
+import live.hms.video.whiteboard.State
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
@@ -210,10 +213,10 @@ class MeetingViewModel(
 
         val currentWhiteBoardState = showHideWhiteboardObserver.value
 
-        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+        if (currentWhiteBoardState?.state == State.Started && currentWhiteBoardState.isOwner.not())
             return
 
-        if (currentWhiteBoardState?.isOpen == true) {
+        if (currentWhiteBoardState?.state == State.Started) {
             stopCurrentWhiteBoardSession()
             closeWhiteBoard.value = true
         } else {
@@ -224,7 +227,7 @@ class MeetingViewModel(
     private fun startWhiteBoardSession() {
         val currentWhiteBoardState = showHideWhiteboardObserver.value
         //make sure you are the owner and whiteboard is open to close the whiteboard
-        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+        if (currentWhiteBoardState?.state == State.Started && currentWhiteBoardState.isOwner.not())
             return
 
         if (hmsSDK.isScreenShared()) {
@@ -239,7 +242,7 @@ class MeetingViewModel(
         }
 
 
-        if (currentWhiteBoardState == null || currentWhiteBoardState?.isOpen == false) {
+        if (currentWhiteBoardState == null || currentWhiteBoardState?.state == State.Stopped) {
             localHmsInteractivityCenter.startWhiteboard(
                 title = UUID.randomUUID().toString(),
                 object : HMSActionResultListener {
@@ -252,10 +255,10 @@ class MeetingViewModel(
      fun stopCurrentWhiteBoardSession() {
         val currentWhiteBoardState = showHideWhiteboardObserver.value
 
-        if (currentWhiteBoardState?.isOpen == true && currentWhiteBoardState.isOwner.not())
+        if (currentWhiteBoardState?.state == State.Started && currentWhiteBoardState.isOwner.not())
             return
 
-        if (currentWhiteBoardState?.isOpen == true) {
+        if (currentWhiteBoardState?.state == State.Started) {
             localHmsInteractivityCenter.stopWhiteboard(object : HMSActionResultListener{
                 override fun onError(error: HMSException) {}
                 override fun onSuccess() {}
@@ -314,7 +317,6 @@ class MeetingViewModel(
      fun setupFilterVideoPlugin() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            filterPlugin.init()
             hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
                 override fun onError(error: HMSException) {
 
@@ -324,7 +326,7 @@ class MeetingViewModel(
 
                 }
 
-            }, 30)
+            })
         }
     }
 
@@ -2562,21 +2564,32 @@ class MeetingViewModel(
     fun shouldSkipPreview() = prebuiltInfoContainer.shouldSkipPreview()
 
     private var playerStarted = false
-    fun hlsPlayerBeganToPlay() {
-        val lp = lastStartedPoll
-        if(lp == null) {
-            playerStarted = true
-            return
-        }
+    fun hlsPlayerBeganToPlay(hmsHlsPlaybackState: HmsHlsPlaybackState) {
+        if(hmsHlsPlaybackState == HmsHlsPlaybackState.playing) {
+            val lp = lastStartedPoll
+            if (lp == null) {
+                playerStarted = true
+                return
+            }
 
-        val currentUnixTimestampInSeconds = (System.currentTimeMillis()/1000L)
-        val isPollLaunchedGreaterThan20SecondsAgo = currentUnixTimestampInSeconds - lp.startedAt > 20
-        if(!playerStarted && isPollLaunchedGreaterThan20SecondsAgo) {
+            val currentUnixTimestampInSeconds = (System.currentTimeMillis() / 1000L)
+            val isPollLaunchedGreaterThan20SecondsAgo =
+                currentUnixTimestampInSeconds - lp.startedAt > 20
+            if (!playerStarted && isPollLaunchedGreaterThan20SecondsAgo) {
+                viewModelScope.launch {
+                    triggerPollsNotification(lp)
+                }
+            }
+            playerStarted = true
             viewModelScope.launch {
-                triggerPollsNotification(lp)
+                _hlsStreamEndedFlow.emit(StreamState.STARTED)
+            }
+        } else if (hmsHlsPlaybackState == HmsHlsPlaybackState.stopped) {
+            playerStarted = false
+            viewModelScope.launch {
+                _hlsStreamEndedFlow.emit(StreamState.ENDED)
             }
         }
-        playerStarted = true
     }
 
     fun disableNameEdit() = prebuiltOptions?.userName != null
@@ -2682,5 +2695,9 @@ class MeetingViewModel(
             reEnableCaptions = false
         }
     }
+
+    private val _hlsStreamEndedFlow = MutableSharedFlow<StreamState>(replay = 0)
+    val hlsStreamEndedFlow : Flow<StreamState> = _hlsStreamEndedFlow
+
 }
 

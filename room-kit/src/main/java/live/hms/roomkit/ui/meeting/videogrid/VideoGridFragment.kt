@@ -40,6 +40,7 @@ import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.roomkit.util.visibilityOpacity
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
+import live.hms.video.whiteboard.State
 import live.hms.videoview.HMSVideoView
 
 class VideoGridFragment : Fragment() {
@@ -86,8 +87,8 @@ class VideoGridFragment : Fragment() {
     private fun initWhiteBoard() {
 
 
-        meetingViewModel.debounceWhiteBoardObserver.observe(viewLifecycleOwner) {
-            if (it.isOpen) {
+        meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
+            if (it.state == State.Started) {
                 addOrRemoveWebView(shouldAddWebView = true)
                 whiteboardView?.show()
                 binding.webViewContainer.show()
@@ -427,8 +428,8 @@ class VideoGridFragment : Fragment() {
                 var newRowCount = 0
                 var newColumnCount = 0
                 var newGuideLinePercentage = 0f
-                val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.isOpen == true
-                val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && whiteBoard?.isOpen == true
+                val showDockedState = screenShareTrackList.isEmpty().not() || whiteBoard?.state == State.Started
+                val hasScreenShareOverriddenWhiteboard = screenShareTrackList.isEmpty().not() && whiteBoard?.state == State.Started
 
                 meetingViewModel.showhasScreenShareOverriddenWhiteboardError(hasScreenShareOverriddenWhiteboard)
 
@@ -438,8 +439,8 @@ class VideoGridFragment : Fragment() {
                  * 75% white board view port
                  */
                 newGuideLinePercentage = if (screenShareTrackList.isEmpty().not()) 0.75f
-                 else if (whiteBoard?.isOpen == true && isWhiteBoardFullScreen == true) 1.0f
-                 else if (whiteBoard?.isOpen == true) 0.75f
+                 else if (whiteBoard?.state == State.Started && isWhiteBoardFullScreen == true) 1.0f
+                 else if (whiteBoard?.state == State.Started) 0.75f
                  else 0f
 
                 //is screen share track is present then reduce the grid and column span else restore
