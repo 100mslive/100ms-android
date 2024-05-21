@@ -209,6 +209,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/chatPausedContainer"
                 android:fontFamily="@font/inter_regular"
+                android:layout_alignRight="@id/icon_send"
                 android:gravity="center"
                 android:lineHeight="20sp"
                 android:padding="@dimen/spacing_d1"
