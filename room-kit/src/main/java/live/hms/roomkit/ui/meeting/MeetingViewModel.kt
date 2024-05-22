@@ -13,12 +13,18 @@ import androidx.core.graphics.drawable.toBitmapOrNull
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import live.hms.hls_player.HmsHlsPlayer
+import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
+import live.hms.roomkit.addPlugin
+import live.hms.roomkit.removePlugin
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
@@ -325,38 +331,26 @@ class MeetingViewModel(
     }
 
     fun showVideoFilterIcon() = settings.enableVideoFilter
-
+    val pluginMutex = Mutex()
      fun setupFilterVideoPlugin() {
-
-        if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            Log.d("EffectsSDKBlur","vb plugind ${isVbPlugin}")
-            hmsSDK.addPlugin(if (isVbPlugin) virtualBackGroundPlugin else blurPlugin, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {}
-
-                override fun onSuccess() { }
-
-            }, 30)
-        }
+         val selectedPlugin = if (isVbPlugin) virtualBackGroundPlugin else blurPlugin
+         HMSPluginScope.launch {
+             pluginMutex.withLock {
+                 Log.d("XYZ","add plugin start")
+                 hmsSDK.addPlugin(selectedPlugin)
+                 Log.d("XYZ","add plugin end")
+             }
+         }
     }
 
     fun removeVideoFilterPlugIn() {
-
-        if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
-            hmsSDK.getPlugins()?.forEach {
-                hmsSDK.removePlugin(it, object : HMSActionResultListener {
-                    override fun onError(error: HMSException) {
-
-                    }
-
-                    override fun onSuccess() {
-
-                    }
-
-                })
-
+        HMSPluginScope.launch {
+            pluginMutex.withLock {
+                Log.d("XYZ","remove plugin start")
+                hmsSDK.removePlugin()
+                Log.d("XYZ","remove plugin end")
             }
         }
-
     }
 
 

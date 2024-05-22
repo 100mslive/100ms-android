@@ -113,7 +113,7 @@ class FilterBottomSheet(
 
 
 
-        (binding.pluginSwitch as SwitchCompat).isChecked = meetingViewModel.hmsSDK.getPlugins().isNullOrEmpty().not()
+        (binding.pluginSwitch as SwitchCompat).isChecked = true
         meetingViewModel.setupFilterVideoPlugin()
         (binding.pluginSwitch as SwitchCompat).setTextColor(
             getColorOrDefault(
