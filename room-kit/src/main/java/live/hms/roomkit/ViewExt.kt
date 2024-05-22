@@ -427,6 +427,10 @@ object HMSPluginScope : CoroutineScope {
 }
 internal suspend fun HMSSDK.addPlugin(plugin : HMSVideoPlugin): Unit {
     return suspendCancellableCoroutine { continuation ->
+        if (getPlugins().orEmpty().isEmpty().not()){
+            continuation.resume(Unit, {})
+            return@suspendCancellableCoroutine
+        }
         addPlugin(plugin, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
                 continuation.resume(Unit, {})
