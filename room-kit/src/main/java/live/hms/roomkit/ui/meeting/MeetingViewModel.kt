@@ -8,6 +8,8 @@ import android.media.AudioManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toBitmapOrNull
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
@@ -65,6 +67,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSBlurFilter
+import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
@@ -161,7 +164,9 @@ class MeetingViewModel(
         Bitmap.Config.ARGB_8888,
     )
 
+    var isVbPlugin = true
     val blurPlugin by lazy { HMSBlurFilter(hmsSDK) }
+    val virtualBackGroundPlugin by lazy { HMSVirtualBackground(hmsSDK, application.resources.getDrawable(R.drawable.un_logo).toBitmap()) }
 
     private var lastPollStartedTime : Long = 0
 
@@ -324,14 +329,11 @@ class MeetingViewModel(
      fun setupFilterVideoPlugin() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            hmsSDK.addPlugin(blurPlugin, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
+            Log.d("EffectsSDKBlur","vb plugind ${isVbPlugin}")
+            hmsSDK.addPlugin(if (isVbPlugin) virtualBackGroundPlugin else blurPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {}
 
-                }
-
-                override fun onSuccess() {
-
-                }
+                override fun onSuccess() { }
 
             }, 30)
         }
@@ -340,17 +342,19 @@ class MeetingViewModel(
     fun removeVideoFilterPlugIn() {
 
         if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
-            blurPlugin.stop()
-            hmsSDK.removePlugin(blurPlugin, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
+            hmsSDK.getPlugins()?.forEach {
+                hmsSDK.removePlugin(it, object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {
 
-                }
+                    }
 
-                override fun onSuccess() {
+                    override fun onSuccess() {
 
-                }
+                    }
 
-            })
+                })
+
+            }
         }
 
     }

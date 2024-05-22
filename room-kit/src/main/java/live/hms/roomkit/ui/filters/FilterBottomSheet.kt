@@ -113,7 +113,7 @@ class FilterBottomSheet(
 
 
 
-        (binding.pluginSwitch as SwitchCompat).isChecked = true
+        (binding.pluginSwitch as SwitchCompat).isChecked = meetingViewModel.hmsSDK.getPlugins().isNullOrEmpty().not()
         meetingViewModel.setupFilterVideoPlugin()
         (binding.pluginSwitch as SwitchCompat).setTextColor(
             getColorOrDefault(
@@ -122,8 +122,10 @@ class FilterBottomSheet(
             )
         )
         (binding.pluginSwitch as SwitchCompat).setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked) meetingViewModel.setupFilterVideoPlugin()
-            else meetingViewModel.removeVideoFilterPlugIn()
+            if (isChecked)
+                meetingViewModel.setupFilterVideoPlugin()
+            else
+                meetingViewModel.removeVideoFilterPlugIn()
         }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
