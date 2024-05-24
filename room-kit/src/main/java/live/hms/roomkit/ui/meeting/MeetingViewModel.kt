@@ -74,7 +74,6 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
-import live.hms.video.virtualbackground.HMSBlurFilter
 import live.hms.video.virtualbackground.HMSVirtualBackground
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
@@ -335,7 +334,7 @@ class MeetingViewModel(
     val pluginMutex = Mutex()
      fun setupFilterVideoPlugin() {
          if (isVbPlugin) {
-             virtualBackGroundPlugin.enableBackground(application.resources.getDrawable(R.drawable.un_logo).toBitmap())
+             virtualBackGroundPlugin.enableBackground(getApplication<Application>().resources.getDrawable(R.drawable.un_logo).toBitmap())
          } else {
              virtualBackGroundPlugin.enableBlur()
          }
