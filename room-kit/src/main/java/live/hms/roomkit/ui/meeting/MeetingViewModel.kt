@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
 import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
@@ -27,6 +28,7 @@ import live.hms.roomkit.addPlugin
 import live.hms.roomkit.removePlugin
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
+import live.hms.roomkit.ui.meeting.bottomsheets.StreamState
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
@@ -2569,21 +2571,32 @@ class MeetingViewModel(
     fun shouldSkipPreview() = prebuiltInfoContainer.shouldSkipPreview()
 
     private var playerStarted = false
-    fun hlsPlayerBeganToPlay() {
-        val lp = lastStartedPoll
-        if(lp == null) {
-            playerStarted = true
-            return
-        }
+    fun hlsPlayerBeganToPlay(hmsHlsPlaybackState: HmsHlsPlaybackState) {
+        if(hmsHlsPlaybackState == HmsHlsPlaybackState.playing) {
+            val lp = lastStartedPoll
+            if (lp == null) {
+                playerStarted = true
+                return
+            }
 
-        val currentUnixTimestampInSeconds = (System.currentTimeMillis()/1000L)
-        val isPollLaunchedGreaterThan20SecondsAgo = currentUnixTimestampInSeconds - lp.startedAt > 20
-        if(!playerStarted && isPollLaunchedGreaterThan20SecondsAgo) {
+            val currentUnixTimestampInSeconds = (System.currentTimeMillis() / 1000L)
+            val isPollLaunchedGreaterThan20SecondsAgo =
+                currentUnixTimestampInSeconds - lp.startedAt > 20
+            if (!playerStarted && isPollLaunchedGreaterThan20SecondsAgo) {
+                viewModelScope.launch {
+                    triggerPollsNotification(lp)
+                }
+            }
+            playerStarted = true
             viewModelScope.launch {
-                triggerPollsNotification(lp)
+                _hlsStreamEndedFlow.emit(StreamState.STARTED)
+            }
+        } else if (hmsHlsPlaybackState == HmsHlsPlaybackState.stopped) {
+            playerStarted = false
+            viewModelScope.launch {
+                _hlsStreamEndedFlow.emit(StreamState.ENDED)
             }
         }
-        playerStarted = true
     }
 
     fun disableNameEdit() = prebuiltOptions?.userName != null
@@ -2689,5 +2702,9 @@ class MeetingViewModel(
             reEnableCaptions = false
         }
     }
+
+    private val _hlsStreamEndedFlow = MutableSharedFlow<StreamState>(replay = 0)
+    val hlsStreamEndedFlow : Flow<StreamState> = _hlsStreamEndedFlow
+
 }
 

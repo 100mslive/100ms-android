@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <TextView
+        android:id="@+id/audio_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawablePadding="8dp"
+        android:fontFamily="@font/inter_semibold"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="20dp"
+        tools:text="Earpiece" />
+
+
+    <View
+        android:id="@+id/border4"
+        android:layout_width="match_parent"
+        android:layout_height="0.5px"
+        android:layout_marginHorizontal="16dp"
+        android:background="@drawable/gray_line_vertical_divider" />
+
+
+</LinearLayout>
