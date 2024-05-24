@@ -53,110 +53,11 @@
             android:layout_marginHorizontal="16dp"
             android:background="@drawable/gray_line_vertical_divider" />
 
-        <TextView
-            android:id="@+id/earpiece_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/phone"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/inter_semibold"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="20dp"
-            android:text="Earpiece"
-            android:visibility="gone" />
-
-
-        <View
-            android:id="@+id/border4"
-            android:layout_width="match_parent"
-            android:layout_height="0.5px"
-            android:layout_marginHorizontal="16dp"
-            android:background="@drawable/gray_line_vertical_divider" />
-
-
-        <TextView
-            android:id="@+id/speaker_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_icon_speaker"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/inter_semibold"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="20dp"
-            android:text="Speaker"
-            android:visibility="gone" />
-
-
-        <View
-            android:id="@+id/border3"
-            android:layout_width="match_parent"
-            android:layout_height="0.5px"
-            android:layout_marginHorizontal="16dp"
-            android:background="@drawable/gray_line_vertical_divider"
-            android:fontFamily="@font/inter_semibold" />
-
-
-        <TextView
-            android:id="@+id/bluetooth_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/bt"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/inter_semibold"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="20dp"
-            android:text="Bluetooth Device"
-            android:visibility="gone" />
-
-
-        <View
-            android:id="@+id/border2"
-            android:layout_width="match_parent"
-            android:layout_height="0.5px"
-            android:layout_marginHorizontal="16dp"
-            android:background="@drawable/gray_line_vertical_divider"
-            android:visibility="gone" />
-
-
-        <TextView
-            android:id="@+id/wired_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/wired"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/inter_semibold"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="20dp"
-            android:text="Earphone"
-            android:visibility="gone" />
-
-
-        <View
-            android:id="@+id/border1"
-            android:layout_width="match_parent"
-            android:layout_height="0.5px"
-            android:layout_marginHorizontal="16dp"
-            android:background="@drawable/gray_line_vertical_divider" />
-
-
-        <TextView
-            android:id="@+id/mute_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_volume_off_24"
-            android:drawablePadding="8dp"
-            android:fontFamily="@font/inter_semibold"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="20dp"
-            android:text="Mute"
-            android:visibility="gone" />
-
-
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/deviceList"
+             android:nestedScrollingEnabled="false"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"/>
     </LinearLayout>
 
 </FrameLayout>
