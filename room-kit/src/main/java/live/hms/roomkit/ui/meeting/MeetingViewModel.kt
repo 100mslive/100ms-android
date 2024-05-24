@@ -334,6 +334,7 @@ class MeetingViewModel(
     val pluginMutex = Mutex()
      fun setupFilterVideoPlugin() {
          if (isVbPlugin) {
+             virtualBackGroundPlugin.enableBackground(getApplication<Application>().resources.getDrawable(R.drawable.un_logo).toBitmap())
          } else {
              virtualBackGroundPlugin.enableBlur()
          }
