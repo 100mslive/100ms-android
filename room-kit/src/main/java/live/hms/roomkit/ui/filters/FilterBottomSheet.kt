@@ -209,7 +209,7 @@ class FilterBottomSheet(
                     is VideoFilter.Blur -> {
                         currentSelectedFilter = VideoFilter.Blur
                         binding.seekBar.progress =
-                            ( meetingViewModel.blurPlugin.getCurrentBlurPercentage()).toInt()
+                            ( meetingViewModel.virtualBackGroundPlugin.getCurrentBlurPercentage()).toInt()
 
                     }
 
