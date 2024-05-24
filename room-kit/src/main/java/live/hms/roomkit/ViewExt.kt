@@ -433,6 +433,7 @@ internal suspend fun HMSSDK.addPlugin(plugin : HMSVideoPlugin): Unit {
         }
         addPlugin(plugin, object : HMSActionResultListener {
             override fun onError(error: HMSException) {
+                Log.d("HmsPluginError","$error")
                 continuation.resume(Unit, {})
             }
             override fun onSuccess() {
