@@ -141,9 +141,14 @@ class FilterBottomSheet(
 //                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
 //                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
                     is VideoFilter.Blur -> {
-                        val dr = arrayOf(R.drawable.un_logo, R.drawable.img).randomOrNull()!!
-                        meetingViewModel.virtualBackGroundPlugin.setBackground(context!!.resources.getDrawable(dr).toBitmap())
-                        meetingViewModel.blurPlugin.setBlurPercentage(progress)
+                        if  (meetingViewModel.isVbPlugin) {
+                            val dr = arrayOf(R.drawable.un_logo, R.drawable.img).randomOrNull()!!
+                            meetingViewModel.virtualBackGroundPlugin.enableBackground(context!!.resources.getDrawable(dr).toBitmap())
+                        } else {
+                            meetingViewModel.virtualBackGroundPlugin.enableBlur()
+                        }
+
+
                     }
 //                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
                     else -> {

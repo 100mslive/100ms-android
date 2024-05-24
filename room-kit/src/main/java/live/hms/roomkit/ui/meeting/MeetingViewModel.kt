@@ -173,8 +173,7 @@ class MeetingViewModel(
     )
 
     var isVbPlugin = true
-    val blurPlugin by lazy { HMSBlurFilter(hmsSDK) }
-    val virtualBackGroundPlugin by lazy { HMSVirtualBackground(hmsSDK, application.resources.getDrawable(R.drawable.un_logo).toBitmap()) }
+    val virtualBackGroundPlugin by lazy { HMSVirtualBackground(hmsSDK) }
 
     private var lastPollStartedTime : Long = 0
 
@@ -335,11 +334,15 @@ class MeetingViewModel(
     fun showVideoFilterIcon() = settings.enableVideoFilter
     val pluginMutex = Mutex()
      fun setupFilterVideoPlugin() {
-         val selectedPlugin = if (isVbPlugin) virtualBackGroundPlugin else blurPlugin
+         if (isVbPlugin) {
+             virtualBackGroundPlugin.enableBackground(application.resources.getDrawable(R.drawable.un_logo).toBitmap())
+         } else {
+             virtualBackGroundPlugin.enableBlur()
+         }
          HMSPluginScope.launch {
              pluginMutex.withLock {
                  Log.d("XYZ","add plugin start")
-                 hmsSDK.addPlugin(selectedPlugin)
+                 hmsSDK.addPlugin(virtualBackGroundPlugin)
                  Log.d("XYZ","add plugin end")
              }
          }
