@@ -16,6 +16,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.SnapHelper
@@ -139,10 +140,16 @@ class FilterBottomSheet(
 //                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
 //                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
 //                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
-                    is VideoFilter.Blur -> meetingViewModel.blurPlugin.setBlurPercentage(progress)
+                    is VideoFilter.Blur -> {
+                        val dr = arrayOf(R.drawable.un_logo, R.drawable.img).randomOrNull()!!
+                        meetingViewModel.virtualBackGroundPlugin.setBackground(context!!.resources.getDrawable(dr).toBitmap())
+                        meetingViewModel.blurPlugin.setBlurPercentage(progress)
+                    }
 //                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
-                    null -> {}
-                    else -> {}
+                    else -> {
+
+
+                    }
                 }
 
             }
