@@ -162,3 +162,5 @@
 -keep class com.google.apphosting.api.ApiProxy {
   static *** getCurrentEnvironment (...);
 }
+-keep class com.google.common.flogger.**
+-keep class com.google.mediapipe.components.**
