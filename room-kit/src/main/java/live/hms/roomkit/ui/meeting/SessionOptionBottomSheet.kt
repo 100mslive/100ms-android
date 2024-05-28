@@ -205,7 +205,7 @@ class SessionOptionBottomSheet(
             }
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
-            if(meetingViewModel.areCaptionsAvailable())
+            if(meetingViewModel.areCaptionsAvailable() && ( meetingViewModel.canToggleCaptions() || captionServerStarted))
                 add(captionsButton)
             if(!meetingViewModel.disableNameEdit()) {
                 add(changeName)
