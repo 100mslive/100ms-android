@@ -25,6 +25,7 @@ import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationType
+import live.hms.roomkit.ui.notification.TranscriptionNotifications
 import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
@@ -1097,6 +1098,10 @@ class MeetingViewModel(
                         Log.d("RealTimeTranscription", "$type ${hmsRoom.transcriptions.map { "${it.mode}/${it.state}" }}")
                         val started = hmsRoom.transcriptions.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
                         areCaptionsEnabledByUser.postValue(started)
+                        if(started)
+                            hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStarted())
+                        else
+                            hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStopped())
                     }
                     HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> {
                         peerCount.postValue(hmsRoom.peerCount)
@@ -2692,11 +2697,11 @@ class MeetingViewModel(
                 TranscriptionsMode.CAPTION,
                 object : HMSActionResultListener {
                     override fun onError(error: HMSException) {
-                        Log.d("RealTimeTranscriptions", "$error")
+                        hmsNotificationEvent.postValue(TranscriptionNotifications().unableToStartTranscriptions())
                     }
 
                     override fun onSuccess() {
-                        Log.d("RealTimeTranscriptions", "Done: $enable")
+                        hmsNotificationEvent.postValue(TranscriptionNotifications().startingTranscriptionsForEveryone())
                     }
 
                 })
@@ -2705,11 +2710,11 @@ class MeetingViewModel(
                 TranscriptionsMode.CAPTION,
                 object : HMSActionResultListener {
                     override fun onError(error: HMSException) {
-                        Log.d("RealTimeTranscriptions", "$error")
+                        hmsNotificationEvent.postValue(TranscriptionNotifications().unableToStopTranscription())
                     }
 
                     override fun onSuccess() {
-                        Log.d("RealTimeTranscriptions", "Done: $enable")
+                        hmsNotificationEvent.postValue(TranscriptionNotifications().stoppingTranscriptionsForEveryone())
                     }
 
                 })
