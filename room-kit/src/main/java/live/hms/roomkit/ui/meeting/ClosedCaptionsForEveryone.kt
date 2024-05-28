@@ -42,7 +42,11 @@ import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.video.sdk.models.TranscriptionState
 import live.hms.video.sdk.models.TranscriptionsMode
 
-class ClosedCaptionsForEveryone(val dismissPrevious: (() -> Unit)? = null ) : BottomSheetDialogFragment() {
+class ClosedCaptionsForEveryone(private val dismissPrevious: (() -> Unit)? = null ) : BottomSheetDialogFragment() {
+
+    // For when the app is killed and the app comes back,
+    // it needs an empty constructor to not crash
+    // when that happens, it will just be dismissed.
     constructor() : this(null) {
         dismissAllowingStateLoss()
     }
