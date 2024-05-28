@@ -123,7 +123,7 @@ class SessionOptionBottomSheet(
             {
                 // If you have the admin rights only
                 if(  meetingViewModel.canToggleCaptions() && (meetingViewModel.captionsEnabledByUser() || !captionServerStarted)) {
-                    ClosedCaptionsForEveryone({dismissAllowingStateLoss()}).show(
+                    ClosedCaptionsForEveryone { dismissAllowingStateLoss() }.show(
                         childFragmentManager,
                         ClosedCaptionsForEveryone.TAG
                     )
