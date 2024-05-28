@@ -21,6 +21,8 @@ import live.hms.roomkit.ui.GridOptionItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.sdk.models.TranscriptionState
+import live.hms.video.sdk.models.TranscriptionsMode
 import live.hms.video.sdk.models.enums.HMSRecordingState
 import live.hms.video.whiteboard.State
 
@@ -115,11 +117,24 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val captionServerStarted = meetingViewModel.hmsSDK.getRoom()?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
         val captionsButton = GridOptionItem("Show Captions", R.drawable.closed_captions_session_options,
             {
-                meetingViewModel.toggleCaptions()
-                dismiss()
-        }, isSelected = meetingViewModel.captionsEnabledByUser(),
+                // If you have the admin rights only
+                if(  meetingViewModel.canToggleCaptions() && (meetingViewModel.captionsEnabledByUser() || !captionServerStarted)) {
+                    ClosedCaptionsForEveryone().show(
+                        childFragmentManager,
+                        ClosedCaptionsForEveryone.TAG
+                    )
+                    // Kind of hide the bottomsheet behind this one
+                    gridOptionAdapter.update(emptyList())
+                } else {
+                    meetingViewModel.toggleCaptions()
+                    dismissAllowingStateLoss()
+                }
+
+                /*dismiss()*/
+        }, isSelected = meetingViewModel.captionsEnabledByUser() && captionServerStarted,
             selectedTitle = "Hide Captions")
 
         val noiseButton = GridOptionItem("Reduce Noise", R.drawable.reduce_noise_session_option, {

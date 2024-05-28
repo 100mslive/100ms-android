@@ -30,13 +30,14 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.video.sdk.models.TranscriptionState
+import live.hms.video.sdk.models.TranscriptionsMode
 
 class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
     companion object {
@@ -49,8 +50,10 @@ class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
         )
     }
 
-    private fun getCurrentScreen() : ScreenInfo =
-        getScreen((meetingViewModel.areCaptionsEnabledByUser.value == true).not())
+    private fun getCurrentScreen() : ScreenInfo {
+        val transcriptionStarted = meetingViewModel.hmsSDK.getRoom()?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION && it.state == TranscriptionState.STARTED } != null
+        return getScreen(transcriptionStarted)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -86,8 +89,8 @@ class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
         return R.style.AppBottomSheetDialogTheme
     }
 
-    private fun getScreen(isEnable: Boolean) : ScreenInfo =
-        if(!isEnable) {
+    private fun getScreen(isEnabled: Boolean) : ScreenInfo =
+        if(isEnabled) {
             ScreenInfo(
                 title = "Closed Captions (CC) ",
                 description = "This will disable Closed Captions for everyone in this room. You can enable it again.",

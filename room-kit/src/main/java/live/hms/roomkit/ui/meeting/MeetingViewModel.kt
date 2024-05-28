@@ -1093,6 +1093,11 @@ class MeetingViewModel(
                 Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
 
                 when (type) {
+                    HMSRoomUpdate.TRANSCRIPTIONS_UPDATED -> {
+                        Log.d("RealTimeTranscription", "$type ${hmsRoom.transcriptions.map { "${it.mode}/${it.state}" }}")
+                        val started = hmsRoom.transcriptions.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
+                        areCaptionsEnabledByUser.postValue(started)
+                    }
                     HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> {
                         peerCount.postValue(hmsRoom.peerCount)
                     }
@@ -2539,6 +2544,7 @@ class MeetingViewModel(
 
     fun isAllowedToHideMessages() : Boolean = prebuiltInfoContainer.isAllowedToHideMessages()
 
+    fun canToggleCaptions() = hmsSDK.hasRealTimeTranscriptionTogglePermissions(TranscriptionsMode.CAPTION)
     fun togglePauseChat() {
         val newState = chatPauseState.value!!
         val localPeer = hmsSDK.getLocalPeer()
@@ -2632,8 +2638,7 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
-    fun areCaptionsAvailable() = transcriptionUseCase.receivedOneCaption || // temporary until they migrate
-            hmsSDK.getRoom()?.transcriptions?.find { it.state == TranscriptionState.STARTED } != null
+    fun areCaptionsAvailable() = !hmsSDK.getEnabledTranscriptions().isNullOrEmpty()
     fun setWhiteBoardFullScreenMode(isShown : Boolean) {
         showWhiteBoardFullScreen.value = isShown
     }
@@ -2681,17 +2686,34 @@ class MeetingViewModel(
     fun captionsEnabledByUser(): Boolean =
         areCaptionsEnabledByUser.value == true
 
-    fun toggleCaptionsForEveryone(enable : Boolean) {
-        hmsSDK.startRealTimeTranscription(TranscriptionsMode.CAPTION, object : HMSActionResultListener {
-            override fun onError(error: HMSException) {
-                Log.d("RealTimeTranscriptions","$error")
-            }
+    fun toggleCaptionsForEveryone(enable: Boolean) {
+        if (enable) {
+            hmsSDK.startRealTimeTranscription(
+                TranscriptionsMode.CAPTION,
+                object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {
+                        Log.d("RealTimeTranscriptions", "$error")
+                    }
 
-            override fun onSuccess() {
-                Log.d("RealTimeTranscriptions","Done: $enable")
-            }
+                    override fun onSuccess() {
+                        Log.d("RealTimeTranscriptions", "Done: $enable")
+                    }
 
-        })
+                })
+        } else {
+            hmsSDK.stopRealTimeTranscription(
+                TranscriptionsMode.CAPTION,
+                object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {
+                        Log.d("RealTimeTranscriptions", "$error")
+                    }
+
+                    override fun onSuccess() {
+                        Log.d("RealTimeTranscriptions", "Done: $enable")
+                    }
+
+                })
+        }
     }
 
     private var reEnableCaptions = false
