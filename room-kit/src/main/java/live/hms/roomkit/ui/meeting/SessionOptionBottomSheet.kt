@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -15,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
@@ -40,7 +42,6 @@ class SessionOptionBottomSheet(
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
     val gridOptionAdapter = GroupieAdapter()
-
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -122,12 +123,10 @@ class SessionOptionBottomSheet(
             {
                 // If you have the admin rights only
                 if(  meetingViewModel.canToggleCaptions() && (meetingViewModel.captionsEnabledByUser() || !captionServerStarted)) {
-                    ClosedCaptionsForEveryone().show(
+                    ClosedCaptionsForEveryone({dismissAllowingStateLoss()}).show(
                         childFragmentManager,
                         ClosedCaptionsForEveryone.TAG
                     )
-                    // Kind of hide the bottomsheet behind this one
-                    gridOptionAdapter.update(emptyList())
                 } else {
                     meetingViewModel.toggleCaptions()
                     dismissAllowingStateLoss()

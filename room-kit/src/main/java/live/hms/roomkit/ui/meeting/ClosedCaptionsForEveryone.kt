@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,17 +34,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.video.sdk.models.TranscriptionState
 import live.hms.video.sdk.models.TranscriptionsMode
 
-class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
+class ClosedCaptionsForEveryone(val dismissPrevious: (() -> Unit)? = null ) : BottomSheetDialogFragment() {
+    constructor() : this(null) {
+        dismissAllowingStateLoss()
+    }
     companion object {
         val TAG = "ClosedCaptionsForEveryoneBottomFragment"
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        dismissPrevious?.invoke()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
             requireActivity().application
@@ -68,17 +86,22 @@ class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
                 EnableCaptionsDisplay(
                     onEnableForEveryoneClicked = {
                         meetingViewModel.toggleCaptionsForEveryone(true)
+                        dismissPrevious?.invoke()
                         dismissAllowingStateLoss()
                     },
                     hideForMeClicked = {
                         meetingViewModel.toggleCaptions()
+                        dismissPrevious?.invoke()
                         dismissAllowingStateLoss()
                     },
                     disableForEveryoneClicked = {
                         meetingViewModel.toggleCaptionsForEveryone(false)
+                        dismissPrevious?.invoke()
                         dismissAllowingStateLoss()
                     },
-                    close = { dismissAllowingStateLoss() },
+                    close = {
+                        dismissPrevious?.invoke()
+                        dismissAllowingStateLoss() },
                     screen = getCurrentScreen()
                 )
             }
