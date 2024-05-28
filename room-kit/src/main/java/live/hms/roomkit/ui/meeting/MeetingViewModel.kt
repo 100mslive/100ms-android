@@ -1095,13 +1095,16 @@ class MeetingViewModel(
 
                 when (type) {
                     HMSRoomUpdate.TRANSCRIPTIONS_UPDATED -> {
-                        Log.d("RealTimeTranscription", "$type ${hmsRoom.transcriptions.map { "${it.mode}/${it.state}" }}")
+                        Log.d("RealTimeTranscription", "In updated: $type ${hmsRoom.transcriptions.map { "${it.mode}/${it.state}" }}")
                         val started = hmsRoom.transcriptions.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
                         areCaptionsEnabledByUser.postValue(started)
-                        if(started)
-                            hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStarted())
-                        else
-                            hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStopped())
+                        when(hmsRoom.transcriptions.find { it.mode == TranscriptionsMode.CAPTION }?.state) {
+                            TranscriptionState.STARTED -> hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStarted())
+                            TranscriptionState.STOPPED -> hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStopped())
+                            TranscriptionState.INITIALIZED,
+                            TranscriptionState.FAILED,
+                            null -> {} // no notification to send
+                        }
                     }
                     HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> {
                         peerCount.postValue(hmsRoom.peerCount)
@@ -2693,6 +2696,7 @@ class MeetingViewModel(
 
     fun toggleCaptionsForEveryone(enable: Boolean) {
         if (enable) {
+            hmsNotificationEvent.postValue(TranscriptionNotifications().startingTranscriptionsForEveryone())
             hmsSDK.startRealTimeTranscription(
                 TranscriptionsMode.CAPTION,
                 object : HMSActionResultListener {
@@ -2701,11 +2705,12 @@ class MeetingViewModel(
                     }
 
                     override fun onSuccess() {
-                        hmsNotificationEvent.postValue(TranscriptionNotifications().startingTranscriptionsForEveryone())
+
                     }
 
                 })
         } else {
+            hmsNotificationEvent.postValue(TranscriptionNotifications().stoppingTranscriptionsForEveryone())
             hmsSDK.stopRealTimeTranscription(
                 TranscriptionsMode.CAPTION,
                 object : HMSActionResultListener {
@@ -2714,7 +2719,7 @@ class MeetingViewModel(
                     }
 
                     override fun onSuccess() {
-                        hmsNotificationEvent.postValue(TranscriptionNotifications().stoppingTranscriptionsForEveryone())
+
                     }
 
                 })
