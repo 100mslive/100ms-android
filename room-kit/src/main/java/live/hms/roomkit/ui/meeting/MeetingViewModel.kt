@@ -2681,6 +2681,19 @@ class MeetingViewModel(
     fun captionsEnabledByUser(): Boolean =
         areCaptionsEnabledByUser.value == true
 
+    fun toggleCaptionsForEveryone(enable : Boolean) {
+        hmsSDK.startRealTimeTranscription(TranscriptionsMode.CAPTION, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d("RealTimeTranscriptions","$error")
+            }
+
+            override fun onSuccess() {
+                Log.d("RealTimeTranscriptions","Done: $enable")
+            }
+
+        })
+    }
+
     private var reEnableCaptions = false
     fun tempHideCaptions() {
         if(captionsEnabledByUser()) {

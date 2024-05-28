@@ -18,6 +18,14 @@ class Variables {
             HMSPrebuiltTheme.getColours()?.primaryDefault,
             HMSPrebuiltTheme.getDefaults().primary_default))
 
+        val SecondaryDefault : Color = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.secondaryDefault,
+            HMSPrebuiltTheme.getDefaults().secondary_default))
+
+        val AlertErrorDefault : Color = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+            "0xFFC74E5B"))
+
         val OnPrimaryHigh : Color = Color(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
             HMSPrebuiltTheme.getDefaults().onprimary_high_emp

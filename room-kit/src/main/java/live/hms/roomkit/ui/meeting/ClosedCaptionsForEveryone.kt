@@ -10,19 +10,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -41,11 +39,18 @@ import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.compose.Variables
 
 class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
+    companion object {
+        val TAG = "ClosedCaptionsForEveryoneBottomFragment"
+    }
+
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
             requireActivity().application
         )
     }
+
+    private fun getCurrentScreen() : ScreenInfo =
+        getScreen((meetingViewModel.areCaptionsEnabledByUser.value == true).not())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -57,8 +62,22 @@ class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
             )
 
             setContent {
-                EnableCaptionsDisplay { meetingViewModel.toggleCaptionsForEveryone(true)
-                dismissAllowingStateLoss()}
+                EnableCaptionsDisplay(
+                    onEnableForEveryoneClicked = {
+                        meetingViewModel.toggleCaptionsForEveryone(true)
+                        dismissAllowingStateLoss()
+                    },
+                    hideForMeClicked = {
+                        meetingViewModel.toggleCaptions()
+                        dismissAllowingStateLoss()
+                    },
+                    disableForEveryoneClicked = {
+                        meetingViewModel.toggleCaptionsForEveryone(false)
+                        dismissAllowingStateLoss()
+                    },
+                    close = { dismissAllowingStateLoss() },
+                    screen = getCurrentScreen()
+                )
             }
         }
     }
@@ -67,25 +86,42 @@ class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
         return R.style.AppBottomSheetDialogTheme
     }
 
+    private fun getScreen(isEnable: Boolean) : ScreenInfo =
+        if(!isEnable) {
+            ScreenInfo(
+                title = "Closed Captions (CC) ",
+                description = "This will disable Closed Captions for everyone in this room. You can enable it again.",
+                isEnable = false
+            )
+        } else {
+            ScreenInfo(
+                title = "Enable Closed Captions (CC) for this session?",
+                description = "This will enable Closed Captions for everyone in this room. You can disable it later.",
+                isEnable = true
+            )
+        }
 }
 
-@Preview
 @Composable
-fun DisplayFirst() {
-    EnableCaptionsDisplay(){}
-}
-
-@Composable
-fun EnableCaptionsDisplay(onEnableClicked : () -> Unit) {
+fun EnableCaptionsDisplay(onEnableForEveryoneClicked : () -> Unit,
+                          hideForMeClicked : () -> Unit,
+                          disableForEveryoneClicked : () -> Unit,
+                          close : () -> Unit,
+                          screen : ScreenInfo) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(color = Variables.SurfaceDim, shape = RoundedCornerShape(topStart = 16.dp,topEnd = 16.dp))
-            .padding(start = Variables.Spacing3,
-        end = Variables.Spacing3,
-        top = Variables.Spacing3,
-        bottom = Variables.Spacing4)
+            .background(
+                color = Variables.SurfaceDim,
+                shape = RoundedCornerShape(topStart = Variables.Spacing2, topEnd = Variables.Spacing2)
+            )
+            .padding(
+                start = Variables.Spacing3,
+                end = Variables.Spacing3,
+                top = Variables.Spacing3,
+                bottom = Variables.Spacing4
+            )
         ,
         verticalArrangement = Arrangement.spacedBy(Variables.Spacing2, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,7 +134,7 @@ fun EnableCaptionsDisplay(onEnableClicked : () -> Unit) {
 
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Enable Closed Captions (CC) for this session?", style = TextStyle(
+                text = screen.title, style = TextStyle(
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
                     fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_bold)),
@@ -110,31 +146,47 @@ fun EnableCaptionsDisplay(onEnableClicked : () -> Unit) {
             Image(
                 modifier = Modifier
                     .padding(1.dp)
-                    .size(24.dp),
+                    .size(24.dp)
+                    .clickable { close() },
                 painter = painterResource(id = live.hms.roomkit.R.drawable.outline_cross),
-                contentDescription = "image description",
+                contentDescription = "Close",
                 contentScale = ContentScale.None
             )
         }
-        EnableButton(onEnableClicked)
-        DescriptionText()
+        if(screen.isEnable) {
+            EnableButton("Enable for Everyone", Variables.PrimaryDefault, onEnableForEveryoneClicked)
+        } else {
+            EnableButton(
+                text = "Hide For Me",
+                backgroundColor = Variables.SecondaryDefault,
+                onEnableClicked = hideForMeClicked)
+            EnableButton(
+                text = "Disable For Everyone",
+                backgroundColor = Variables.AlertErrorDefault,
+                onEnableClicked = disableForEveryoneClicked)
+        }
+        DescriptionText(text = screen.description)
     }
 }
 
 @Composable
-fun EnableButton(onEnableClicked : () -> Unit) {
+fun EnableButton(
+    text: String,
+    backgroundColor: Color,
+    onEnableClicked: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(color = Variables.PrimaryDefault, shape = RoundedCornerShape(size = 8.dp))
+            .background(color = backgroundColor, shape = RoundedCornerShape(size = 8.dp))
             .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.clickable { onEnableClicked.invoke() },
-            text = "Enable for Everyone",
+            text = text,
             // Desktop/Button-Semibold-16px
             style = TextStyle(
                 fontSize = 16.sp,
@@ -150,9 +202,9 @@ fun EnableButton(onEnableClicked : () -> Unit) {
 
 }
 @Composable
-fun DescriptionText() {
+fun DescriptionText(text : String) {
     Text(
-        text = "This will enable Closed Captions for everyone in this room. You can disable it later.",
+        text = text,
 
         // Desktop/Body 2-Regular-14px
         style = TextStyle(
@@ -165,3 +217,9 @@ fun DescriptionText() {
         )
     )
 }
+
+data class ScreenInfo(
+    val title : String,
+    val description : String,
+    val isEnable : Boolean
+)
