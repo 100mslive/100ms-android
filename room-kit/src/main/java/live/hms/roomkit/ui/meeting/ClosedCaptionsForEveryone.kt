@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,11 +35,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.compose.Variables
 
 class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
+    private val meetingViewModel: MeetingViewModel by activityViewModels {
+        MeetingViewModelFactory(
+            requireActivity().application
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -51,7 +57,8 @@ class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
             )
 
             setContent {
-                Display()
+                EnableCaptionsDisplay { meetingViewModel.toggleCaptionsForEveryone(true)
+                dismissAllowingStateLoss()}
             }
         }
     }
@@ -65,11 +72,11 @@ class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
 @Preview
 @Composable
 fun DisplayFirst() {
-    Display()
+    EnableCaptionsDisplay(){}
 }
 
 @Composable
-fun Display() {
+fun EnableCaptionsDisplay(onEnableClicked : () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,14 +91,13 @@ fun Display() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             verticalAlignment = Alignment.Top,
         ) {
 
             Text(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .wrapContentHeight(),
+                modifier = Modifier.weight(1f),
                 text = "Enable Closed Captions (CC) for this session?", style = TextStyle(
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
@@ -101,7 +107,6 @@ fun Display() {
                     letterSpacing = 0.15.sp,
                 )
             )
-            Spacer(modifier = Modifier.width(8.dp))
             Image(
                 modifier = Modifier
                     .padding(1.dp)
@@ -111,13 +116,13 @@ fun Display() {
                 contentScale = ContentScale.None
             )
         }
-        EnableButton()
+        EnableButton(onEnableClicked)
         DescriptionText()
     }
 }
 
 @Composable
-fun EnableButton() {
+fun EnableButton(onEnableClicked : () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -128,8 +133,8 @@ fun EnableButton() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
+            modifier = Modifier.clickable { onEnableClicked.invoke() },
             text = "Enable for Everyone",
-
             // Desktop/Button-Semibold-16px
             style = TextStyle(
                 fontSize = 16.sp,
