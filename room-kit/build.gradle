@@ -19,8 +19,6 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdk 34
-        versionCode 1
-        versionName getVersionName()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -48,10 +46,8 @@ android {
 
     buildFeatures {
         viewBinding true
-        dataBinding {
-            enabled true
-        }
         compose true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.8"
