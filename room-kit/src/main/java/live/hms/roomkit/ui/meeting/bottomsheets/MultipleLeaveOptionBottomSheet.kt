@@ -78,12 +78,7 @@ class MultipleLeaveOptionBottomSheet() : BottomSheetDialogFragment() {
             dismissAllowingStateLoss()
         }
 
-        binding.endSessionLayout.visibility = if(meetingViewModel.streamingState.value != HMSStreamingState.STARTED ) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-    }
+        binding.endSessionLayout.visibility = View.VISIBLE    }
 
     private fun updateLayout() {
         if (meetingViewModel.hmsSDK.getLocalPeer()?.hmsRole?.permission?.endRoom == true) {
