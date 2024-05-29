@@ -75,6 +75,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
+import live.hms.video.virtualbackground.VideoPluginMode
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
@@ -171,7 +172,7 @@ class MeetingViewModel(
         Bitmap.Config.ARGB_8888,
     )
 
-    var isVbPlugin = true
+    var isVbPlugin : VideoPluginMode = VideoPluginMode.NONE
     val virtualBackGroundPlugin by lazy { HMSVirtualBackground(hmsSDK) }
 
     private var lastPollStartedTime : Long = 0
@@ -333,11 +334,12 @@ class MeetingViewModel(
     fun showVideoFilterIcon() = settings.enableVideoFilter
     val pluginMutex = Mutex()
      fun setupFilterVideoPlugin() {
-         if (isVbPlugin) {
-             virtualBackGroundPlugin.enableBackground(getApplication<Application>().resources.getDrawable(R.drawable.un_logo).toBitmap())
-         } else {
-             virtualBackGroundPlugin.enableBlur()
+         when(isVbPlugin) {
+             VideoPluginMode.REPLACE_BACKGROUND -> virtualBackGroundPlugin.enableBackground(getApplication<Application>().resources.getDrawable(R.drawable.un_logo).toBitmap())
+             VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
+             VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
          }
+
          HMSPluginScope.launch {
              pluginMutex.withLock {
                  Log.d("XYZ","add plugin start")

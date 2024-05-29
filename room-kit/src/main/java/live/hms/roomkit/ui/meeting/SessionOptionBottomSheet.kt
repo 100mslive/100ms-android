@@ -22,6 +22,7 @@ import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.enums.HMSRecordingState
+import live.hms.video.virtualbackground.VideoPluginMode
 import live.hms.video.whiteboard.State
 
 class SessionOptionBottomSheet(
@@ -156,7 +157,7 @@ class SessionOptionBottomSheet(
 
         val videoFilter = GridOptionItem(
             "Virtual Background", R.drawable.emoji_icon, {
-                meetingViewModel.isVbPlugin = true
+                meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
                 onNameChange.invoke()
                 dismissAllowingStateLoss()
 
@@ -165,7 +166,7 @@ class SessionOptionBottomSheet(
 
         val blurFilter = GridOptionItem(
             "Blur Filter", R.drawable.emoji_icon, {
-                meetingViewModel.isVbPlugin = false
+                meetingViewModel.isVbPlugin = VideoPluginMode.BLUR_BACKGROUND
                 onNameChange.invoke()
                 dismissAllowingStateLoss()
 

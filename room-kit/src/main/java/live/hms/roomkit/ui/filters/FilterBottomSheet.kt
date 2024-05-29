@@ -31,6 +31,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.virtualbackground.VideoPluginMode
 
 
 class FilterBottomSheet(
@@ -49,6 +50,7 @@ class FilterBottomSheet(
     var currentSelectedFilter: VideoFilter? = null
 
     val padding = 8
+    var lastPluginMode : VideoPluginMode ? = null
 
     override fun onStart() {
         super.onStart()
@@ -123,10 +125,8 @@ class FilterBottomSheet(
             )
         )
         (binding.pluginSwitch as SwitchCompat).setOnCheckedChangeListener { buttonView, isChecked ->
-            if (isChecked)
-                meetingViewModel.setupFilterVideoPlugin()
-            else
-                meetingViewModel.removeVideoFilterPlugIn()
+            if (isChecked) meetingViewModel.setupFilterVideoPlugin()
+            else meetingViewModel.removeVideoFilterPlugIn()
         }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -141,13 +141,8 @@ class FilterBottomSheet(
 //                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
 //                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
                     is VideoFilter.Blur -> {
-                        if  (meetingViewModel.isVbPlugin) {
-                            val dr = arrayOf(R.drawable.un_logo, R.drawable.img).randomOrNull()!!
-                            meetingViewModel.virtualBackGroundPlugin.enableBackground(context!!.resources.getDrawable(dr).toBitmap())
-                        } else {
-                            meetingViewModel.virtualBackGroundPlugin.enableBlur()
-                        }
 
+                      update()
 
                     }
 //                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
@@ -209,17 +204,21 @@ class FilterBottomSheet(
                     is VideoFilter.Blur -> {
                         currentSelectedFilter = VideoFilter.Blur
                         binding.seekBar.progress =
-                            ( meetingViewModel.virtualBackGroundPlugin.getCurrentBlurPercentage()).toInt()
-
+                            (meetingViewModel.virtualBackGroundPlugin.getCurrentBlurPercentage()).toInt()
+                        if (lastPluginMode != null){
+                            meetingViewModel.isVbPlugin =  lastPluginMode!!
+                        }
+                        update()
                     }
 
                     is VideoFilter.Quality -> {
-//                        currentSelectedFilter = VideoFilter.Quality
-//                        binding.seekBar.progress =
-//                            ( meetingViewModel.blurPlugin.getVideoQualityPercentage()).toInt()
+                        if (lastPluginMode == null){
+                            lastPluginMode = meetingViewModel.isVbPlugin
+                        }
+                        meetingViewModel.isVbPlugin = VideoPluginMode.NONE
+                        update()
 
                     }
-
 
 
                     else -> {
@@ -251,11 +250,11 @@ class FilterBottomSheet(
                 )
             )
             addTab(
-                this.newTab().setText("Blur").setTag(VideoFilter.Blur), true
+                this.newTab().setText(meetingViewModel.isVbPlugin.toString()).setTag(VideoFilter.Blur), true
             )
-//            addTab(
-//                this.newTab().setText("Quality").setTag(VideoFilter.Quality)
-//            )
+            addTab(
+                this.newTab().setText("Disable Effects").setTag(VideoFilter.Quality)
+            )
 //            addTab(
 //                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness)
 //            )
@@ -301,6 +300,27 @@ class FilterBottomSheet(
                     HMSPrebuiltTheme.getDefaults().onsurface_high_emp
                 )
             )
+        }
+
+    }
+
+    private fun update() {
+        when (meetingViewModel.isVbPlugin) {
+            VideoPluginMode.REPLACE_BACKGROUND -> {
+                val dr =
+                    arrayOf(R.drawable.un_logo, R.drawable.img).randomOrNull()!!
+                meetingViewModel.virtualBackGroundPlugin.enableBackground(
+                    context!!.resources.getDrawable(
+                        dr
+                    ).toBitmap()
+                )
+            }
+
+            VideoPluginMode.BLUR_BACKGROUND -> {
+                meetingViewModel.virtualBackGroundPlugin.enableBlur()
+            }
+
+            VideoPluginMode.NONE -> meetingViewModel.virtualBackGroundPlugin.disableEffects()
         }
 
     }
