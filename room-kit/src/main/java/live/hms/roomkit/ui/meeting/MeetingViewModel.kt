@@ -2705,7 +2705,7 @@ class MeetingViewModel(
                     }
 
                     override fun onSuccess() {
-
+                        Log.d("RealTimeTranscription","Start succeeded")
                     }
 
                 })
@@ -2719,7 +2719,7 @@ class MeetingViewModel(
                     }
 
                     override fun onSuccess() {
-
+                        Log.d("RealTimeTranscription","Stop succeeded")
                     }
 
                 })
