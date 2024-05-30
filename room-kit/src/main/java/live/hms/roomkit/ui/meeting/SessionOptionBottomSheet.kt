@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -15,12 +16,15 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.sdk.models.TranscriptionState
+import live.hms.video.sdk.models.TranscriptionsMode
 import live.hms.video.sdk.models.enums.HMSRecordingState
 import live.hms.video.whiteboard.State
 
@@ -33,12 +37,12 @@ class SessionOptionBottomSheet(
     private val onNameChange: () -> Unit,
     private val showPolls: () -> Unit,
     private val disableHandRaiseDisplay : Boolean = false,
-    private val onNoiseClicked : (() -> Unit)? = null
+    private val onNoiseClicked : (() -> Unit)? = null,
+    private val openRealTimeClosedCaptions : () -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
     val gridOptionAdapter = GroupieAdapter()
-
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -115,11 +119,20 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val captionServerStarted = meetingViewModel.hmsSDK.getRoom()?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
         val captionsButton = GridOptionItem("Show Captions", R.drawable.closed_captions_session_options,
             {
-                meetingViewModel.toggleCaptions()
-                dismiss()
-        }, isSelected = meetingViewModel.captionsEnabledByUser(),
+                // If you have the admin rights only
+                if(  meetingViewModel.canToggleCaptions() && (meetingViewModel.captionsEnabledByUser() || !captionServerStarted)) {
+                    openRealTimeClosedCaptions()
+                    dismissAllowingStateLoss()
+                } else {
+                    meetingViewModel.toggleCaptions()
+                    dismissAllowingStateLoss()
+                }
+
+                /*dismiss()*/
+        }, isSelected = meetingViewModel.captionsEnabledByUser() && captionServerStarted,
             selectedTitle = "Hide Captions")
 
         val noiseButton = GridOptionItem("Reduce Noise", R.drawable.reduce_noise_session_option, {
@@ -191,7 +204,7 @@ class SessionOptionBottomSheet(
             }
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
-            if(meetingViewModel.areCaptionsAvailable())
+            if(meetingViewModel.areCaptionsAvailable() && ( meetingViewModel.canToggleCaptions() || captionServerStarted))
                 add(captionsButton)
             if(!meetingViewModel.disableNameEdit()) {
                 add(changeName)
