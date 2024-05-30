@@ -37,7 +37,8 @@ class SessionOptionBottomSheet(
     private val onNameChange: () -> Unit,
     private val showPolls: () -> Unit,
     private val disableHandRaiseDisplay : Boolean = false,
-    private val onNoiseClicked : (() -> Unit)? = null
+    private val onNoiseClicked : (() -> Unit)? = null,
+    private val openRealTimeClosedCaptions : () -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
@@ -123,10 +124,8 @@ class SessionOptionBottomSheet(
             {
                 // If you have the admin rights only
                 if(  meetingViewModel.canToggleCaptions() && (meetingViewModel.captionsEnabledByUser() || !captionServerStarted)) {
-                    ClosedCaptionsForEveryone { dismissAllowingStateLoss() }.show(
-                        childFragmentManager,
-                        ClosedCaptionsForEveryone.TAG
-                    )
+                    openRealTimeClosedCaptions()
+                    dismissAllowingStateLoss()
                 } else {
                     meetingViewModel.toggleCaptions()
                     dismissAllowingStateLoss()
