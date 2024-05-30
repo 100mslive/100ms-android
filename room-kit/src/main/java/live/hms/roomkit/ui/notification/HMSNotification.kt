@@ -3,7 +3,6 @@ package live.hms.roomkit.ui.notification
 import androidx.annotation.DrawableRes
 import live.hms.roomkit.R
 import live.hms.video.sdk.models.HMSPeer
-import org.w3c.dom.Text
 
 data class HMSNotification(
     val id: String = System.currentTimeMillis().toString(),
@@ -13,6 +12,7 @@ data class HMSNotification(
     @DrawableRes val icon: Int = R.drawable.person_icon,
     val type: HMSNotificationType = HMSNotificationType.Default,
     val actionButtonText: String = "",
+    val autoRemoveTypeAfterMillis : Long? = null
 )
 
 sealed class HMSNotificationType {
@@ -23,4 +23,6 @@ sealed class HMSNotificationType {
     object RecordingFailedToStart : HMSNotificationType()
     data class BringOnStage(val handRaisePeer: HMSPeer,val  onStageRole: String) : HMSNotificationType()
     data class OpenPollOrQuiz(val pollId: String) : HMSNotificationType()
+
+    object RealTimeTranscription : HMSNotificationType()
 }
