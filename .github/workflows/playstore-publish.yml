@@ -1,0 +1,29 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "release-v2" ]
+  pull_request:
+    branches: [ "release-v2" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Decrypt the artefact signing key
+      run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ANDROID_PLAYSTORE_PROPERTIES_KEY_DECRYPT_PASSWORD }}" --output secrets/key.properties secrets/key.properties.gpg
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew bundleRelease
