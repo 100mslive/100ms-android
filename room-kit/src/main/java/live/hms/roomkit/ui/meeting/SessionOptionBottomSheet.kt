@@ -120,7 +120,7 @@ class SessionOptionBottomSheet(
         )
 
         val captionServerStarted = meetingViewModel.hmsSDK.getRoom()?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
-        val captionsButton = GridOptionItem("Show Captions", R.drawable.closed_captions_session_options,
+        val captionsButton = GridOptionItem("Closed Captions", R.drawable.closed_captions_session_options,
             {
                 // If you have the admin rights only
                 if(  meetingViewModel.canToggleCaptions() && (meetingViewModel.captionsEnabledByUser() || !captionServerStarted)) {
@@ -133,7 +133,7 @@ class SessionOptionBottomSheet(
 
                 /*dismiss()*/
         }, isSelected = meetingViewModel.captionsEnabledByUser() && captionServerStarted,
-            selectedTitle = "Hide Captions")
+            selectedTitle = "Closed Captions")
 
         val noiseButton = GridOptionItem("Reduce Noise", R.drawable.reduce_noise_session_option, {
             onNoiseClicked?.invoke()
