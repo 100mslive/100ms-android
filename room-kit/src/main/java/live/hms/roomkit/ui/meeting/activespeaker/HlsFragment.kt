@@ -112,6 +112,7 @@ import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.databinding.LayoutChatMergeBinding
 import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.ClosedCaptionsForEveryone
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
@@ -309,7 +310,13 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                             onNameChange = {  },
                             showPolls = { openPolls() },
                             onRecordingClicked = {},
-                            disableHandRaiseDisplay = true
+                            disableHandRaiseDisplay = true,
+                            openRealTimeClosedCaptions = {
+                                ClosedCaptionsForEveryone().show(
+                                    childFragmentManager,
+                                    ClosedCaptionsForEveryone.TAG
+                                )
+                            }
                         ).show(
                             childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                         )
@@ -1233,7 +1240,13 @@ fun ChatUI(
                 onNameChange = {  },
                 showPolls = { openPolls() },
                 onRecordingClicked = {},
-                disableHandRaiseDisplay = true
+                disableHandRaiseDisplay = true,
+                openRealTimeClosedCaptions = {
+                    ClosedCaptionsForEveryone().show(
+                        childFragmentManager,
+                        ClosedCaptionsForEveryone.TAG
+                    )
+                }
             ).show(
                 childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
             )

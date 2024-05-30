@@ -1257,7 +1257,13 @@ class MeetingFragment : Fragment() {
                                 )
                             }
                         },
-                        onNoiseClicked = meetingViewModel::toggleNoiseCancellation
+                        onNoiseClicked = meetingViewModel::toggleNoiseCancellation,
+                        openRealTimeClosedCaptions = {
+                            ClosedCaptionsForEveryone().show(
+                                childFragmentManager,
+                                ClosedCaptionsForEveryone.TAG
+                            )
+                        }
                     ).show(
                         childFragmentManager, AudioSwitchBottomSheetTAG
                     )
