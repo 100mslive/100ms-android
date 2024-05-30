@@ -108,7 +108,7 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       }
     } else {
       meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
-        synchronized(meetingViewModel._tracks) {
+        synchronized(track) {
           val screenShareTrack = track.filter { it.isScreen  }.toList()
           renderCurrentPage(screenShareTrack, isForceUpdate = true)
 
