@@ -20,7 +20,7 @@ class TranscriptionNotifications {
         )
     }
     fun startingTranscriptionsForEveryone() : HMSNotification{
-        val message = "Enabling Closed Captioning for everyone\n" + "By continuing to be in this meeting, you consent to being recorded."
+        val message = "Enabling Closed Captioning for everyone."
 
         return HMSNotification(
             title = message,
