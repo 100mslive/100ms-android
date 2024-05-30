@@ -2552,7 +2552,7 @@ class MeetingViewModel(
 
     fun isAllowedToHideMessages() : Boolean = prebuiltInfoContainer.isAllowedToHideMessages()
 
-    fun canToggleCaptions() = hmsSDK.hasRealTimeTranscriptionTogglePermissions(TranscriptionsMode.CAPTION)
+    fun canToggleCaptions() = hmsSDK.getLocalPeer()?.hmsRole?.permission?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.admin == true
     fun togglePauseChat() {
         val newState = chatPauseState.value!!
         val localPeer = hmsSDK.getLocalPeer()
@@ -2646,7 +2646,7 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
-    fun areCaptionsAvailable() = !hmsSDK.getEnabledTranscriptions().isNullOrEmpty()
+    fun areCaptionsAvailable() = hmsSDK.getLocalPeer()?.hmsRole?.permission?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.read == true
     fun setWhiteBoardFullScreenMode(isShown : Boolean) {
         showWhiteBoardFullScreen.value = isShown
     }
