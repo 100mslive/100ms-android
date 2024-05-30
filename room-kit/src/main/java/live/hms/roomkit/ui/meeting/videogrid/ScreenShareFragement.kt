@@ -40,7 +40,7 @@ class ScreenShareFragement : BottomSheetDialogFragment() {
             requireActivity().application
         )
     }
-    
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -129,12 +129,16 @@ class ScreenShareFragement : BottomSheetDialogFragment() {
         meetingViewModel.tracks.observe(viewLifecycleOwner) { meetingTrack ->
 
             Log.d(TAG,"Looking for trackId: ${arguments?.getString(SCREEN_SHARE_TRACK_ID)}")
-            val track = meetingTrack.find { it.video?.trackId == arguments?.getString(SCREEN_SHARE_TRACK_ID) }?.video
-            if (track != null) {
-                binding.localVideoView.addTrack(track)
-            } else {
-                dismissAllowingStateLoss()
+            synchronized(meetingTrack) {
+                val track = meetingTrack.find { it.video?.trackId == arguments?.getString(SCREEN_SHARE_TRACK_ID) }?.video
+                if (track != null) {
+                    binding.localVideoView.addTrack(track)
+                } else {
+                    dismissAllowingStateLoss()
+                }
             }
+
+
         }
 
     }
