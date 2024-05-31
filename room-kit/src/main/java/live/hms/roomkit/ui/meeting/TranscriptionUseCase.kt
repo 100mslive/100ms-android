@@ -26,8 +26,6 @@ class TranscriptionUseCase(
 ) {
     private val TAG = "TranscriptionUseCase"
     val captions : MutableLiveData<List<TranscriptViewHolder>> = MutableLiveData(null)
-    var receivedOneCaption = false
-        private set
     private val CLEAR_AFTER_SILENCE_MILLIS = 5000L
     private val EXTRA_SUBTITLE_DELETION_TIME = 20_000L
     private var singleCancelJob : Job? = null
@@ -42,9 +40,6 @@ class TranscriptionUseCase(
     }
 
     suspend fun newCaption(transcripts: HmsTranscripts) : Unit = editLock.withLock {
-        if(!receivedOneCaption) {
-            receivedOneCaption = true
-        }
 //        Log.d(TAG,"processing started")
         clearAllTranscriptionAfterSilence()
         // update peer names into the map

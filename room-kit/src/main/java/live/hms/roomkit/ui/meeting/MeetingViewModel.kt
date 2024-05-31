@@ -25,6 +25,7 @@ import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.participants.ParticipantPreviousRoleChangeUseCase
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationType
+import live.hms.roomkit.ui.notification.TranscriptionNotifications
 import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
@@ -90,7 +91,7 @@ class MeetingViewModel(
     }
     val transcriptionsPositionUseCase = TranscriptionsPositionUseCase(viewModelScope)
     val transcriptionsPosition : LiveData<TranscriptionsPosition> = transcriptionsPositionUseCase.transcriptionsPosition.distinctUntilChanged()
-    val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(true)
+    val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(false)
     val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
     val launchParticipantsFromHls = SingleLiveEvent<Unit>()
@@ -1093,6 +1094,19 @@ class MeetingViewModel(
                 Log.d(TAG, "join:onRoomUpdate type=$type, room=$hmsRoom")
 
                 when (type) {
+                    HMSRoomUpdate.TRANSCRIPTIONS_UPDATED -> {
+                        when(hmsRoom.transcriptions.find { it.mode == TranscriptionsMode.CAPTION }?.state) {
+                            TranscriptionState.STARTED -> hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStarted())
+                            TranscriptionState.STOPPED -> {
+                                hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStopped())
+                                // Captions are always stopped for everyone when turned off.
+                                areCaptionsEnabledByUser.postValue(false)
+                            }
+                            TranscriptionState.INITIALIZED,
+                            TranscriptionState.FAILED,
+                            null -> {} // no notification to send
+                        }
+                    }
                     HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED -> {
                         peerCount.postValue(hmsRoom.peerCount)
                     }
@@ -2539,6 +2553,7 @@ class MeetingViewModel(
 
     fun isAllowedToHideMessages() : Boolean = prebuiltInfoContainer.isAllowedToHideMessages()
 
+    fun canToggleCaptions() = hmsSDK.getLocalPeer()?.hmsRole?.permission?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.admin == true
     fun togglePauseChat() {
         val newState = chatPauseState.value!!
         val localPeer = hmsSDK.getLocalPeer()
@@ -2632,8 +2647,7 @@ class MeetingViewModel(
     fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
-    fun areCaptionsAvailable() = transcriptionUseCase.receivedOneCaption || // temporary until they migrate
-            hmsSDK.getRoom()?.transcriptions?.find { it.state == TranscriptionState.STARTED } != null
+    fun areCaptionsAvailable() = hmsSDK.getLocalPeer()?.hmsRole?.permission?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.read == true
     fun setWhiteBoardFullScreenMode(isShown : Boolean) {
         showWhiteBoardFullScreen.value = isShown
     }
@@ -2680,6 +2694,39 @@ class MeetingViewModel(
 
     fun captionsEnabledByUser(): Boolean =
         areCaptionsEnabledByUser.value == true
+
+    fun toggleCaptionsForEveryone(enable: Boolean) {
+        if (enable) {
+            hmsNotificationEvent.postValue(TranscriptionNotifications().startingTranscriptionsForEveryone())
+            hmsSDK.startRealTimeTranscription(
+                TranscriptionsMode.CAPTION,
+                object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {
+                        hmsNotificationEvent.postValue(TranscriptionNotifications().unableToStartTranscriptions())
+                    }
+
+                    override fun onSuccess() {
+                        // Always enable transcriptions for the one who started them.
+                        areCaptionsEnabledByUser.postValue(true)
+                    }
+
+                })
+        } else {
+            hmsNotificationEvent.postValue(TranscriptionNotifications().stoppingTranscriptionsForEveryone())
+            hmsSDK.stopRealTimeTranscription(
+                TranscriptionsMode.CAPTION,
+                object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {
+                        hmsNotificationEvent.postValue(TranscriptionNotifications().unableToStopTranscription())
+                    }
+
+                    override fun onSuccess() {
+
+                    }
+
+                })
+        }
+    }
 
     private var reEnableCaptions = false
     fun tempHideCaptions() {

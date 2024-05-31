@@ -52,11 +52,11 @@
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/emptyIndicator"
             android:layout_width="wrap_content"
-            tools:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp">
+            android:paddingHorizontal="24dp"
+            tools:visibility="gone">
 
             <ImageView
                 android:id="@+id/messageEmptyImage"
@@ -166,103 +166,101 @@
         android:layout_marginBottom="@dimen/spacing_d2"
         android:gravity="center_vertical"
         android:orientation="horizontal">
+
         <RelativeLayout
             android:id="@+id/chatViewBackground"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            >
+            android:layout_weight="1">
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/chatPausedContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/spacing_d2"
-            android:paddingVertical="@dimen/spacing_d1">
-
-            <TextView
-                android:id="@+id/chatPausedTitle"
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/chatPausedContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:letterSpacing="0.01"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/spacing_d2"
+                android:paddingVertical="@dimen/spacing_d1">
+
+                <TextView
+                    android:id="@+id/chatPausedTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_semibold"
+                    android:letterSpacing="0.01"
+                    android:lineHeight="20sp"
+                    android:text="@string/chat_paused"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/chatPausedBy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/inter_regular"
+                    android:letterSpacing="0.03"
+                    android:lineHeight="16sp"
+                    android:textSize="12sp"
+                    tools:text="Chat paused by" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <TextView
+                android:id="@+id/userBlocked"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/chatPausedContainer"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="center"
                 android:lineHeight="20sp"
-                android:text="@string/chat_paused"
+                android:padding="@dimen/spacing_d1"
+                android:text="@string/blocked_from_sending_messages"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+
+            <EditText
+                android:id="@+id/edit_text_message"
+                style="@style/TextInputLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="8dp"
+                android:layout_toStartOf="@id/icon_send"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="center_vertical"
+                android:hint="@string/send_messages_to_everyone"
+                android:minHeight="24dp"
+                android:paddingHorizontal="@dimen/spacing_d1"
                 android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/chatPausedBy"
+
+            <ImageView
+                android:id="@+id/icon_send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:fontFamily="@font/inter_regular"
-                android:letterSpacing="0.03"
-                android:lineHeight="16sp"
-                android:textSize="12sp"
-                tools:text="Chat paused by" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <TextView
-            android:id="@+id/userBlocked"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/chatPausedContainer"
-            android:fontFamily="@font/inter_regular"
-            android:gravity="center"
-            android:lineHeight="20sp"
-            android:padding="@dimen/spacing_d1"
-            android:text="@string/blocked_from_sending_messages"
-            android:textSize="14sp"
-            android:visibility="gone" />
-
-
-        <EditText
-            android:id="@+id/edit_text_message"
-            style="@style/TextInputLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="8dp"
-            android:layout_toStartOf="@id/icon_send"
-            android:fontFamily="@font/inter_regular"
-            android:gravity="center_vertical"
-            android:hint="@string/send_messages_to_everyone"
-            android:minHeight="24dp"
-            android:paddingHorizontal="@dimen/spacing_d1"
-            android:textSize="14sp" />
-
-
-        <ImageView
-            android:id="@+id/icon_send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/edit_text_message"
-            android:layout_alignBottom="@id/edit_text_message"
-            android:layout_alignParentEnd="true"
-            android:layout_gravity="center"
-            android:padding="8dp"
-            android:src="@drawable/send_icon" />
+                android:layout_alignTop="@id/edit_text_message"
+                android:layout_alignBottom="@id/edit_text_message"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                android:src="@drawable/send_icon" />
         </RelativeLayout>
 
 
         <ImageView
             android:id="@+id/handRaise"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/twelve_dp"
             android:padding="@dimen/twelve_dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/hand_on"
-            />
+            android:src="@drawable/hand_on" />
 
         <ImageView
             android:id="@+id/chatHamburgerMenu"
             android:layout_width="wrap_content"
-            android:padding="@dimen/twelve_dp"
-            android:layout_marginLeft="@dimen/twelve_dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/hls_hamburger_menu"
-            />
+            android:layout_marginLeft="@dimen/twelve_dp"
+            android:padding="@dimen/twelve_dp"
+            android:src="@drawable/hls_hamburger_menu" />
     </LinearLayout>
 
 
