@@ -102,7 +102,7 @@ class MeetingViewModel(
     }
     val transcriptionsPositionUseCase = TranscriptionsPositionUseCase(viewModelScope)
     val transcriptionsPosition : LiveData<TranscriptionsPosition> = transcriptionsPositionUseCase.transcriptionsPosition.distinctUntilChanged()
-    val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(true)
+    val areCaptionsEnabledByUser : MutableLiveData<Boolean> = MutableLiveData(false)
     val captions : LiveData<List<TranscriptViewHolder>> = transcriptionUseCase.captions
 
     val launchParticipantsFromHls = SingleLiveEvent<Unit>()
@@ -1106,12 +1106,13 @@ class MeetingViewModel(
 
                 when (type) {
                     HMSRoomUpdate.TRANSCRIPTIONS_UPDATED -> {
-                        Log.d("RealTimeTranscription", "In updated: $type ${hmsRoom.transcriptions.map { "${it.mode}/${it.state}" }}")
-                        val started = hmsRoom.transcriptions.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
-                        areCaptionsEnabledByUser.postValue(started)
                         when(hmsRoom.transcriptions.find { it.mode == TranscriptionsMode.CAPTION }?.state) {
                             TranscriptionState.STARTED -> hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStarted())
-                            TranscriptionState.STOPPED -> hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStopped())
+                            TranscriptionState.STOPPED -> {
+                                hmsNotificationEvent.postValue(TranscriptionNotifications().transcriptionStopped())
+                                // Captions are always stopped for everyone when turned off.
+                                areCaptionsEnabledByUser.postValue(false)
+                            }
                             TranscriptionState.INITIALIZED,
                             TranscriptionState.FAILED,
                             null -> {} // no notification to send
@@ -2716,7 +2717,8 @@ class MeetingViewModel(
                     }
 
                     override fun onSuccess() {
-                        Log.d("RealTimeTranscription","Start succeeded")
+                        // Always enable transcriptions for the one who started them.
+                        areCaptionsEnabledByUser.postValue(true)
                     }
 
                 })
@@ -2730,7 +2732,7 @@ class MeetingViewModel(
                     }
 
                     override fun onSuccess() {
-                        Log.d("RealTimeTranscription","Stop succeeded")
+
                     }
 
                 })
