@@ -308,7 +308,7 @@ class FilterBottomSheet(
         when (meetingViewModel.isVbPlugin) {
             VideoPluginMode.REPLACE_BACKGROUND -> {
                 val dr =
-                    arrayOf(R.drawable.un_logo, R.drawable.img).randomOrNull()!!
+                    arrayOf(R.drawable.potrait_bg, R.drawable.bg).randomOrNull()!!
                 meetingViewModel.virtualBackGroundPlugin.enableBackground(
                     context!!.resources.getDrawable(
                         dr
