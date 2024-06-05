@@ -76,6 +76,7 @@ import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
 import live.hms.video.virtualbackground.HMSVirtualBackground
+import live.hms.video.virtualbackground.VideoFrameInfoListener
 import live.hms.video.virtualbackground.VideoPluginMode
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
@@ -340,6 +341,12 @@ class MeetingViewModel(
              VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
              VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
          }
+
+         virtualBackGroundPlugin.setVideoFrameInfoListener(object : VideoFrameInfoListener{
+             override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
+                 Log.d("VideoFrameInfoListener", "${rotatedWidth}rotatedWidth: Int,${rotatedHeight} rotatedHeight: Int,${rotation} rotation: Int")
+             }
+         })
 
          HMSPluginScope.launch {
              pluginMutex.withLock {
