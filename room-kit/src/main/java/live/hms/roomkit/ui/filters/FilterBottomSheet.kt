@@ -115,32 +115,6 @@ class FilterBottomSheet(
             dismissAllowingStateLoss()
         }
 
-        var isLandscapeSet = false
-        var isPotraitSet = false
-        meetingViewModel.virtualBackGroundPlugin.setVideoFrameInfoListener(object :
-            VideoFrameInfoListener {
-            override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
-                if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
-                    isLandscapeSet = true
-                    isPotraitSet = false
-                    meetingViewModel.virtualBackGroundPlugin.enableBackground(context!!.resources.getDrawable(
-                        R.drawable.bg
-                    ).toBitmap()
-                    )
-                } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
-                    isLandscapeSet = false
-                    isPotraitSet = true
-                    meetingViewModel.virtualBackGroundPlugin.enableBackground(
-                        context!!.resources.getDrawable(
-                            R.drawable.potrait_bg
-                        ).toBitmap()
-                    )
-                }
-
-            }
-        }
-        )
-
 
 
         (binding.pluginSwitch as SwitchCompat).isChecked = true

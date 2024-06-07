@@ -85,6 +85,7 @@ import live.hms.video.whiteboard.State
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.abs
 import kotlin.properties.Delegates
 
 
@@ -337,16 +338,40 @@ class MeetingViewModel(
     val pluginMutex = Mutex()
      fun setupFilterVideoPlugin() {
          when(isVbPlugin) {
-             VideoPluginMode.REPLACE_BACKGROUND -> {}
+             VideoPluginMode.REPLACE_BACKGROUND -> {
+                 if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
+                     var isLandscapeSet = false
+                     var isPotraitSet = false
+                     virtualBackGroundPlugin.setVideoFrameInfoListener(object :
+                         VideoFrameInfoListener {
+                         override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
+                            if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
+                                if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
+                                    isLandscapeSet = true
+                                    isPotraitSet = false
+                                    virtualBackGroundPlugin.enableBackground(getApplication<Application>().resources.getDrawable(
+                                        R.drawable.bg
+                                    ).toBitmap()
+                                    )
+                                } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
+                                    isLandscapeSet = false
+                                    isPotraitSet = true
+                                    virtualBackGroundPlugin.enableBackground(
+                                        getApplication<Application>().resources.getDrawable(
+                                            R.drawable.potrait_bg
+                                        ).toBitmap()
+                                    )
+                                }
+                            }
+                         }
+                     }
+                     )
+                 }
+             }
              VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
              VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
          }
 
-         virtualBackGroundPlugin.setVideoFrameInfoListener(object : VideoFrameInfoListener{
-             override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
-                 Log.d("VideoFrameInfoListener", "${rotatedWidth}rotatedWidth: Int,${rotatedHeight} rotatedHeight: Int,${rotation} rotation: Int")
-             }
-         })
 
          HMSPluginScope.launch {
              pluginMutex.withLock {
