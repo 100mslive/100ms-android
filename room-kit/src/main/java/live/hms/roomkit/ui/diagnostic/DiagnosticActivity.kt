@@ -10,8 +10,9 @@ import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 
 class DiagnosticActivity : AppCompatActivity() {
 
-    private val meetingViewModel: DiagnosticViewModelFactory =
+    private val meetingViewModel: DiagnosticViewModelFactory by lazy {
         DiagnosticViewModelFactory(application)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
