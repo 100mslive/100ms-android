@@ -43,6 +43,7 @@
     <string name="more_options">More Options</string>
     <string name="meeting_options">Meeting Options</string>
     <string name="meeting">Meeting</string>
+    <string name="diagnostic">Diagnostic</string>
     <string name="open_chat">Open Chat</string>
     <string name="share_screen">Share Screen</string>
     <string name="stop_share_screen">Stop Share Screen</string>

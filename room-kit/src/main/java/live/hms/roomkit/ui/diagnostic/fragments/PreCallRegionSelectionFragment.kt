@@ -36,6 +36,11 @@ class PreCallRegionSelectionFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_pre_call_region_selection, container, false)
+
+        //add code to create chip group and programmatically add chips
+
+
+
     }
 
     companion object {
