@@ -173,7 +173,6 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="37dp"
                 android:fontFamily="@font/inter_bold"
-                android:gravity="center"
                 android:paddingHorizontal="16dp"
                 android:paddingVertical="8dp"
                 android:singleLine="true"

@@ -108,7 +108,7 @@ class PreCallMicFragment : Fragment() {
         binding.btnRecord.setOnSingleClickListener {
             if (vm.isRecording) {
                 vm.stopMicCheck()
-                binding.btnRecord.text = "Start recording"
+                binding.btnRecord.text = "Record"
                 return@setOnSingleClickListener
             }
             vm.startMicRecording()
@@ -136,11 +136,11 @@ class PreCallMicFragment : Fragment() {
 
 
     private fun updateActionVolumeMenuIcon(
-        audioOutputType: HMSAudioManager.AudioDevice? = null
+
     ) {
 
         binding.btnSpeakerSelection.apply {
-            when (audioOutputType) {
+            when (vm.getAudioOutputRouteType()) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
                     text = "Ear Piece"
                     setIconEnabled(R.drawable.phone)
