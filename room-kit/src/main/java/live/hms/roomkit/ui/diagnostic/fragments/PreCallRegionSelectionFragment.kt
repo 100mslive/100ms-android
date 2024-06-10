@@ -1,5 +1,7 @@
 package live.hms.roomkit.ui.diagnostic.fragments
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -17,7 +19,10 @@ import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModelFactory
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 
 // TODO: Rename parameter arguments, choose names that match
@@ -51,7 +56,7 @@ class PreCallRegionSelectionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.applyTheme()
         binding.regionChipGroup.setOnCheckedStateChangeListener(ChipGroup.OnCheckedStateChangeListener { group, checkedIds ->
             if (checkedIds.isEmpty()) return@OnCheckedStateChangeListener
             val chip = group.findViewById<Chip>(checkedIds.first())
@@ -63,6 +68,12 @@ class PreCallRegionSelectionFragment : Fragment() {
         vm.getRegionList().forEachIndexed { index, pair ->
             val chip = Chip(requireContext())
             chip.text = pair.second
+            chip.setTextColor(
+                getColorOrDefault(
+                    HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+                )
+            )
             chip.isCheckable = true
             if (index == 0) chip.isChecked = true
             binding.regionChipGroup.addView(chip)

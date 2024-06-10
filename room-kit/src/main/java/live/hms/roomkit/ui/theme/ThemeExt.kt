@@ -940,6 +940,42 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
 //internal fun FragmentRolePreview.applyTheme() {
 //
 //}
+
+internal fun FragmentPreCallRegionSelectionBinding.applyTheme() {
+    root.setGradient(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.backgroundDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+        , Color.TRANSPARENT)
+
+
+
+
+    nameTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    descriptionTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    selectRegionTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+
+}
 internal fun FragmentPreviewBinding.applyTheme() {
 
     previewGradient.setGradient(getColorOrDefault(
