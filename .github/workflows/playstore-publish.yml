@@ -21,10 +21,10 @@ jobs:
         cache: gradle
 
     - name: Decrypt the artefact signing key
-      run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ANDROID_PLAYSTORE_PROPERTIES_KEY_DECRYPT_PASSWORD }}" --output app/key.properties secrets/key.properties.gpg
+      run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.KEY_PROPERTIES_DECRYPT }}" --output app/key.properties secrets/key.properties.gpg
 
     - name: Decrypt the key store
-      run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.ANDROID_PLAYSTORE_KEYSTORE_DECRYPT_PASSWORD }}" --output app/100ms-android.jks secrets/100ms-android.jks.gpg
+      run: gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.HMS_ANDROID_JKS }}" --output ./100ms-android/app/100ms-android.jks secrets/100ms-android.jks.gpg
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
