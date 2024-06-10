@@ -275,4 +275,6 @@
     <string name="hms_started_quiz_poll_notification">%1$s started a new %2$s</string>
     <string name="use_webrtc_noise_cancellation">Use webrtc noise suppression</string>
     <string name="use_krisp_noise_cancellation">Use noise cancellation</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
