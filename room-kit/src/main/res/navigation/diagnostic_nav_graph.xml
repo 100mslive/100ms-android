@@ -2,183 +2,39 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    app:startDestination="@id/PreviewFragment"
-    android:id="@+id/diagnostic_nav_graph">
+    android:id="@+id/diagnostic_nav_graph"
+    app:startDestination="@id/preCallRegionSelectionFragment">
 
     <fragment
-        android:id="@+id/PreviewFragment"
-        android:name="live.hms.roomkit.ui.meeting.PreviewFragment"
-        android:label="@string/preview_fragment"
-        tools:layout="@layout/fragment_preview">
-
+        android:id="@+id/preCallRegionSelectionFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallRegionSelectionFragment"
+        android:label="fragment_pre_call_region_selection"
+        tools:layout="@layout/fragment_pre_call_region_selection">
         <action
-            android:id="@+id/action_PreviewFragment_to_MeetingFragment"
-            app:destination="@id/MeetingFragment"
-            />
-
-        <action
-            android:id="@+id/action_PreviewFragment_to_ParticipantsFragment"
-            app:destination="@id/ParticipantsFragment" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/MeetingFragment"
-        android:name="live.hms.roomkit.ui.meeting.MeetingFragment"
-        android:label="@string/meeting_fragment"
-        tools:layout="@layout/fragment_meeting">
-
-        <argument
-            android:defaultValue="false"
-            android:name="startHlsStream"
-            app:argType="boolean"
-            app:nullable="false" />
-
-        <action
-            android:id="@+id/action_MeetingFragment_to_RolePreviewFragment"
-            app:destination="@id/RolePreviewFragment" />
-
-        <action
-            android:id="@+id/action_MeetingFragment_to_ParticipantsFragment"
-            app:destination="@id/ParticipantsFragment" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_changeNameDialogFragment"
-            app:destination="@id/changeNameDialogFragment" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_hlsViewFragment"
-            app:destination="@id/hlsViewFragment" />
-
-        <action
-            android:id="@+id/action_MeetingFragment_to_MusicModeChooser"
-            app:destination="@id/musicChooserSheet" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_roomMetadataAlphaFragment"
-            app:destination="@id/roomMetadataAlphaFragment" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_roleChangeFragment"
-            app:destination="@id/roleChangeFragment" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_pollsCreationFragment"
-            app:destination="@id/pollsCreationFragment" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_pollDisplayFragment"
-            app:destination="@id/pollDisplayFragment" />
-        <action
-            android:id="@+id/action_MeetingFragment_to_participantsTabFragment"
-            app:destination="@id/participantsTabFragment" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/ParticipantsFragment"
-        android:name="live.hms.roomkit.ui.meeting.participants.ParticipantsFragment"
-        android:label="@string/participants_fragment"
-        tools:layout="@layout/fragment_participants">
-
-        <action
-            android:id="@+id/action_ParticipantsFragment_to_BottomSheetRoleChange"
-            app:destination="@id/BottomSheetRoleChange" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/RolePreviewFragment"
-        android:name="live.hms.roomkit.ui.role.RolePreviewFragment"
-        android:label="@string/role_preview_fragment"
-        tools:layout="@layout/fragment_participants">
-
-        <action
-            android:id="@+id/action_RolePreviewFragment_to_MeetingFragment"
-            app:destination="@id/MeetingFragment" />
-
-    </fragment>
-
-    <dialog
-        android:id="@+id/BottomSheetRoleChange"
-        android:name="live.hms.roomkit.ui.meeting.participants.BottomSheetRoleChangeFragment"
-        tools:layout="@layout/layout_fragment_bottom_sheet_change_role" >
-        <argument
-            android:name="remotePeerId"
-            app:argType="string" />
-        <argument
-            android:name="availableRoles"
-            app:argType="string[]" />
-        <argument
-            android:name="remotePeerName"
-            app:argType="string"
-            android:defaultValue='""' />
-    </dialog>
-    <fragment
-        android:id="@+id/rtmpRecordFragment"
-        android:name="live.hms.roomkit.ui.meeting.participants.RtmpRecordBottomSheet"
-        android:label="RtmpRecordFragment"
-        tools:layout="@layout/layout_rtmp_recording" >
-        <argument
-            android:name="meetingUrl"
-            app:argType="string" />
+            android:id="@+id/action_preCallRegionSelectionFragment_to_preCallCameraFragment"
+            app:destination="@id/preCallCameraFragment" />
     </fragment>
     <fragment
-        android:id="@+id/changeNameDialogFragment"
-        android:name="live.hms.roomkit.ui.meeting.ChangeNameDialogFragment"
-        android:label="ChangeNameDialogFragment"
-        tools:layout="@layout/change_name_fragment" />
-
-    <fragment
-        android:id="@+id/hlsViewFragment"
-        android:name="live.hms.roomkit.ui.meeting.activespeaker.HlsFragment"
-        android:label="HlsFragment"
-        tools:layout="@layout/hls_fragment_layout"
-        >
-        <argument
-            android:name="hlsStreamUrl"
-            app:argType="string" />
-    </fragment>
-    <dialog
-        android:id="@+id/musicChooserSheet"
-        android:name="live.hms.roomkit.ui.meeting.participants.MusicSelectionSheet"
-        android:label="MusicChooserSheet" />
-    <fragment
-        android:id="@+id/roomMetadataAlphaFragment"
-        android:name="live.hms.roomkit.ui.meeting.activespeaker.RoomMetadataAlphaFragment"
-        android:label="RoomMetadataAlphaFragment" />
-    <fragment
-        android:id="@+id/roleChangeFragment"
-        android:name="live.hms.roomkit.ui.meeting.chat.RoleChangeFragment"
-        android:label="RoleChangeFragment" >
+        android:id="@+id/preCallCameraFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallCameraFragment"
+        android:label="fragment_pre_call_camera"
+        tools:layout="@layout/fragment_pre_call_camera">
         <action
-            android:id="@+id/action_roleChangeFragment_to_MeetingFragment"
-            app:destination="@id/MeetingFragment" />
+            android:id="@+id/action_preCallCameraFragment_to_preCallMicFragment"
+            app:destination="@id/preCallMicFragment" />
     </fragment>
     <fragment
-        android:id="@+id/pollsCreationFragment"
-        android:name="live.hms.roomkit.ui.polls.PollsCreationFragment"
-        android:label="PollsCreationFragment" >
+        android:id="@+id/preCallMicFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallMicFragment"
+        android:label="fragment_pre_call_mic"
+        tools:layout="@layout/fragment_pre_call_mic">
         <action
-            android:id="@+id/action_pollsCreationFragment_to_pollQuestionCreation"
-            app:destination="@id/pollQuestionCreation" />
-        <action
-            android:id="@+id/action_pollsCreationFragment_to_pollDisplayFragment"
-            app:destination="@id/pollDisplayFragment" />
+            android:id="@+id/action_preCallMicFragment_to_preCallConnectivityTestFragment"
+            app:destination="@id/preCallConnectivityTestFragment" />
     </fragment>
     <fragment
-        android:id="@+id/pollQuestionCreation"
-        android:name="live.hms.roomkit.ui.polls.PollQuestionCreation"
-        android:label="PollQuestionCreation" >
-        <argument
-            app:nullable="false"
-            android:defaultValue="false"
-            android:name="isPoll"
-            app:argType="boolean" />
-    </fragment>
-    <fragment
-        android:id="@+id/pollDisplayFragment"
-        android:name="live.hms.roomkit.ui.polls.display.PollDisplayFragment"
-        android:label="PollDisplayFragment" >
-        <argument
-            android:name="pollId"
-            app:argType="string" />
-    </fragment>
-    <fragment
-        android:id="@+id/participantsTabFragment"
-        android:name="live.hms.roomkit.ui.meeting.participants.ParticipantsTabFragment"
-        android:label="ParticipantsTabFragment" /><action android:id="@+id/action_global_pollDisplayFragment" app:destination="@id/pollDisplayFragment"/>
-
+        android:id="@+id/preCallConnectivityTestFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallConnectivityTestFragment"
+        android:label="fragment_pre_call_connectivity_test"
+        tools:layout="@layout/fragment_pre_call_connectivity_test" />
 </navigation>
