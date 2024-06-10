@@ -14,22 +14,9 @@ import java.util.UUID
 
 class DiagnosticViewModel(application: Application) : AndroidViewModel(application) {
     // First create a new sdk instance
-    val hmsSDK = HMSSDK.Builder(application).build()
+    val hmsSDK by lazy { HMSSDK.Builder(application).build() }
     var regionCode = "in"
-
-
     val diagnosticSDK by lazy { hmsSDK.getDiagnosticSDK(getConsistentUserIdOverSessions()) }
-
-    fun getRegionList() = listOf(Pair("in", "India"), Pair("eu", "Europe"), Pair("us", "US"))
-    fun setRegionPreference(regionName: String) {
-        // Set the region preference
-        getRegionList().forEach {
-            if (it.second == regionName) {
-                regionCode = it.first
-            }
-        }
-    }
-
 
     val cameraTrackLiveData = MutableLiveData<HMSVideoTrack?>()
     fun cameraPermssionGranted() {
@@ -45,6 +32,19 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
                 }
             })
     }
+
+    fun getRegionList() = listOf(Pair("in", "India"), Pair("eu", "Europe"), Pair("us", "US"))
+    fun setRegionPreference(regionName: String) {
+        // Set the region preference
+        getRegionList().forEach {
+            if (it.second == regionName) {
+                regionCode = it.first
+            }
+        }
+    }
+
+
+
 
     private fun getConsistentUserIdOverSessions(): String {
         val sharedPreferences = getApplication<Application>().getSharedPreferences(
