@@ -107,7 +107,24 @@ class MeetingViewModel(
     val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
 
     private val settings = SettingsStore(getApplication())
-    val noiseCancellationInPreviewUseCase = NoiseCancellationInPreviewUseCase(settings.enableKrispNoiseCancellation) { hmsSDK.setNoiseCancellationEnabled(it) }
+    val noiseCancellationInPreviewUseCase = NoiseCancellationInPreviewUseCase(settings.enableKrispNoiseCancellation) {
+        hmsSDK.enableNoiseCancellation(
+            it,
+            object :
+                HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    hmsNotificationEvent.postValue(
+                        HMSNotification(
+                            title = error.message,
+                            icon = R.drawable.transcription_error_triangle
+                        )
+                    )
+                }
+                override fun onSuccess() {
+
+                }
+            })
+    }
     fun clickNcPreview() {
         noiseCancellationInPreviewUseCase.clickNcInPreview()
     }
@@ -2667,13 +2684,28 @@ class MeetingViewModel(
     fun getLiveStreamingHeaderDescription() = prebuiltInfoContainer.getLiveStreamingHeaderDescription()
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
     fun toggleNoiseCancellation() : Boolean {
-        hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())
-        return hmsSDK.getNoiseCancellationEnabled()
+        hmsSDK.enableNoiseCancellation(
+            !hmsSDK.isNoiseCancellationEnabled(),
+            object :
+                HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    hmsNotificationEvent.postValue(
+                        HMSNotification(
+                            title = error.message,
+                            icon = R.drawable.transcription_error_triangle
+                        )
+                    )
+                }
+                override fun onSuccess() {
+
+                }
+            })
+        return hmsSDK.isNoiseCancellationEnabled()
     }
 
-    fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
+    fun isNoiseCancellationEnabled() : Boolean = hmsSDK.isNoiseCancellationEnabled()
     // Show the NC button if it's a webrtc peer with noise cancellation available
-    fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
+    fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationSupported() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
     fun areCaptionsAvailable() = hmsSDK.getLocalPeer()?.hmsRole?.permission?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.read == true
