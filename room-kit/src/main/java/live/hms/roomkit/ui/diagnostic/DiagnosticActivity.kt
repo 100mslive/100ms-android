@@ -1,23 +1,29 @@
 package live.hms.roomkit.ui.diagnostic
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import live.hms.roomkit.R
+import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 
 class DiagnosticActivity : AppCompatActivity() {
 
-    private val diagnosticViewModel: DiagnosticViewModelFactory by lazy {
-        DiagnosticViewModelFactory(application)
+    private val viewModel: DiagnosticViewModel by viewModels {
+        DiagnosticViewModelFactory(
+            application,
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diagnostic)
+        viewModel.setupDiagnosticSDK()
         setupNavGraph()
+
     }
 
     private fun setupNavGraph() {
