@@ -941,6 +941,87 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
 //
 //}
 
+
+internal fun FragmentPreCallMicBinding.applyTheme() {
+    root.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.backgroundDim,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+    )
+
+    cardContainer.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.backgroundDim,
+            HMSPrebuiltTheme.getDefaults().background_default
+        )
+    )
+    nameTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    cardContainer.strokeColor =  getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.borderBright,
+        HMSPrebuiltTheme.getDefaults().border_bright
+    )
+
+    testTitleTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    dividerTop.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+    dividerBottom.setBackgroundColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.borderBright,
+            HMSPrebuiltTheme.getDefaults().border_bright
+        )
+    )
+
+    bottomHeaderText.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    audioDescpTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    micLabelTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    speakerLabelTv.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    btnRecord.saveButtonEnabled()
+    btnSpeakerSelection.saveButtonEnabled()
+    btnPlayback.saveButtonDisabled()
+
+
+}
 internal fun FragmentPreCallCameraBinding.applyTheme() {
 
     root.setBackgroundColor(getColorOrDefault(

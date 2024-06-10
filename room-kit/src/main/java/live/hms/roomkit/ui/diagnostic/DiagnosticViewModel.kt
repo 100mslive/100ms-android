@@ -5,11 +5,14 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import live.hms.video.diagnostics.HMSAudioDeviceCheckListener
 import live.hms.video.diagnostics.HMSCameraCheckListener
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSVideoTrackSettings
 import live.hms.video.media.tracks.HMSVideoTrack
+import live.hms.video.sdk.HMSAudioListener
 import live.hms.video.sdk.HMSSDK
+import live.hms.video.sdk.models.HMSSpeaker
 import java.util.UUID
 
 class DiagnosticViewModel(application: Application) : AndroidViewModel(application) {
@@ -20,17 +23,17 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
 
     val cameraTrackLiveData = MutableLiveData<HMSVideoTrack?>()
     fun cameraPermssionGranted() {
-        diagnosticSDK.startCameraCheck(
-            HMSVideoTrackSettings.CameraFacing.FRONT,
-            object : HMSCameraCheckListener {
-                override fun onError(error: HMSException) {
-
-                }
-
-                override fun onVideoTrack(localVideoTrack: HMSVideoTrack) {
-                    cameraTrackLiveData.postValue(localVideoTrack)
-                }
-            })
+//        diagnosticSDK.startCameraCheck(
+//            HMSVideoTrackSettings.CameraFacing.FRONT,
+//            object : HMSCameraCheckListener {
+//                override fun onError(error: HMSException) {
+//
+//                }
+//
+//                override fun onVideoTrack(localVideoTrack: HMSVideoTrack) {
+//                    cameraTrackLiveData.postValue(localVideoTrack)
+//                }
+//            })
     }
 
     fun getRegionList() = listOf(Pair("in", "India"), Pair("eu", "Europe"), Pair("us", "US"))
@@ -42,8 +45,6 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
             }
         }
     }
-
-
 
 
     private fun getConsistentUserIdOverSessions(): String {
@@ -67,6 +68,33 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
 
     fun initSDK() {
 
+    }
+
+    fun stopMicCheck() {
+        diagnosticSDK.stopMicCheck()
+    }
+
+    var isRecording = false
+    fun startMicRecording() {
+        isRecording = true
+        diagnosticSDK.startMicCheck(getApplication<Application>(), object :
+            HMSAudioDeviceCheckListener {
+            override fun onError(error: HMSException) {
+
+            }
+
+            override fun onSuccess() {
+
+            }
+
+        })
+
+    }
+
+
+    fun stopRecording() {
+        isRecording = false
+        diagnosticSDK.stopMicCheck()
     }
 
 
