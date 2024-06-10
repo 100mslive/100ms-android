@@ -3,6 +3,7 @@ package live.hms.roomkit.ui.diagnostic.fragments
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -16,13 +17,21 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreCallCameraBinding
 import live.hms.roomkit.databinding.FragmentPreCallMicBinding
 import live.hms.roomkit.databinding.FragmentPreCallRegionSelectionBinding
+import live.hms.roomkit.drawableStart
+import live.hms.roomkit.setDrawables
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModelFactory
+import live.hms.roomkit.ui.meeting.AudioOutputSwitchBottomSheet
+import live.hms.roomkit.ui.meeting.MeetingFragment
+import live.hms.roomkit.ui.meeting.PreviewFragment
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.roomkit.ui.theme.setIconEnabled
+import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.switchCamera
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.audio.HMSAudioManager
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -84,6 +93,16 @@ class PreCallMicFragment : Fragment() {
         }
 
         binding.yesButton.buttonEnabled()
+        updateActionVolumeMenuIcon()
+
+        binding.btnSpeakerSelection.setOnSingleClickListener {
+            PreCallAudioSwitchDialog { audioDevice, isMuted ->
+                    updateActionVolumeMenuIcon()
+            }.show(
+                childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
+            )
+
+        }
 
 
         binding.btnRecord.setOnSingleClickListener {
@@ -116,6 +135,48 @@ class PreCallMicFragment : Fragment() {
     }
 
 
+    private fun updateActionVolumeMenuIcon(
+        audioOutputType: HMSAudioManager.AudioDevice? = null
+    ) {
+
+        binding.btnSpeakerSelection.apply {
+            when (audioOutputType) {
+                HMSAudioManager.AudioDevice.EARPIECE -> {
+                    text = "Ear Piece"
+                    setIconEnabled(R.drawable.phone)
+                }
+
+                HMSAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                    text = "Speaker"
+                    setIconEnabled(R.drawable.ic_icon_speaker)
+                }
+
+                HMSAudioManager.AudioDevice.AUTOMATIC -> {
+                    text = "Speaker"
+                    setIconEnabled(R.drawable.ic_icon_speaker)
+                }
+
+                HMSAudioManager.AudioDevice.BLUETOOTH -> {
+                    text = "Bluetooth"
+                    setIconEnabled(R.drawable.bt)
+                }
+
+                HMSAudioManager.AudioDevice.WIRED_HEADSET -> {
+                    text = "Wired Headset"
+                    setIconEnabled(R.drawable.wired)
+                }
+
+                null -> {
+                    text = "Unknown Device"
+                    setIconEnabled(R.drawable.ic_icon_speaker)
+                }
+            }
+        }
+    }
+
+    private fun setIconEnabled(drawableId: Int) {
+        binding.btnSpeakerSelection.setDrawables(start = resources.getDrawable(drawableId))
+    }
 
 
 }
