@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import live.hms.video.audio.HMSAudioManager
 import live.hms.video.diagnostics.HMSAudioDeviceCheckListener
 import live.hms.video.diagnostics.HMSCameraCheckListener
 import live.hms.video.error.HMSException
@@ -95,6 +96,15 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     fun stopRecording() {
         isRecording = false
         diagnosticSDK.stopMicCheck()
+    }
+
+    fun switchAudioOutput(audioDevice: HMSAudioManager.AudioDevice) {
+        hmsSDK.switchAudioOutput(audioDevice)
+    }
+
+    fun getAudioDevicesInfoList() = hmsSDK.getAudioDevicesInfoList()
+    fun getAudioOutputRouteType(): HMSAudioManager.AudioDevice {
+        return hmsSDK.getAudioOutputRouteType()
     }
 
 

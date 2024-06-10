@@ -103,36 +103,31 @@ class PreCallAudioSwitchDialog(
         }
 
         audioDeviceAdapter.clear()
-        val devicesList = vm.hmsSDK.getAudioDevicesInfoList()
+        val devicesList = vm.getAudioDevicesInfoList()
 
         //skips for HLS playback
-        val showAudioOption = vm.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer()
+
         var isMute: Boolean = false
         var selectedDeviceType: HMSAudioManager.AudioDevice? = null
 
 
-        selectedDeviceType = vm.hmsSDK.getAudioOutputRouteType()
+        selectedDeviceType = vm.getAudioOutputRouteType()
 
 
-        if (showAudioOption == true) {
-            for (deviceInfo in devicesList) {
+        for (deviceInfo in devicesList) {
 
-                //backward compatibility handling
-                val isSelected = (selectedDeviceType == deviceInfo.type)
-                audioDeviceAdapter.add(
-                    AudioItem(
-                        title = capitalizeAndReplaceUnderscore(deviceInfo.type.name),
-                        subTitle = deviceInfo.name.orEmpty(),
-                        isSelected = isSelected,
-                        type = deviceInfo.type,
-                        drawableRes = getDrawableBasedOnDeviceType(deviceInfo.type),
-                        onClick = { type, id ->
-                            setAudioType(type)
-                        })
-                )
-
-
-            }
+            //backward compatibility handling
+            val isSelected = (selectedDeviceType == deviceInfo.type)
+            audioDeviceAdapter.add(
+                AudioItem(title = capitalizeAndReplaceUnderscore(deviceInfo.type.name),
+                    subTitle = deviceInfo.name.orEmpty(),
+                    isSelected = isSelected,
+                    type = deviceInfo.type,
+                    drawableRes = getDrawableBasedOnDeviceType(deviceInfo.type),
+                    onClick = { type, id ->
+                        setAudioType(type)
+                    })
+            )
         }
 
 
@@ -186,7 +181,7 @@ class PreCallAudioSwitchDialog(
     }
 
     private fun setAudioType(audioDevice: HMSAudioManager.AudioDevice) {
-        vm.hmsSDK.switchAudioOutput(audioDevice)
+        vm.switchAudioOutput(audioDevice)
         onOptionItemClicked?.invoke(vm.hmsSDK.getAudioOutputRouteType(), true)
         dismiss()
     }
