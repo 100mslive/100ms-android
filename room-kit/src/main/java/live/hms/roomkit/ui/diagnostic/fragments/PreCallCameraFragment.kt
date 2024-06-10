@@ -19,6 +19,7 @@ import live.hms.roomkit.databinding.FragmentPreCallRegionSelectionBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModelFactory
+import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.ui.theme.buttonStrokeEnabled
 import live.hms.roomkit.util.switchCamera
@@ -65,7 +66,7 @@ class PreCallCameraFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        binding.applyTheme()
         binding.yesButton.setOnSingleClickListener {
             vm.stopCameraCheck()
             findNavController().navigate(PreCallCameraFragmentDirections.actionPreCallCameraFragmentToPreCallMicFragment())
