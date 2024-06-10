@@ -104,6 +104,11 @@ class PreCallMicFragment : Fragment() {
 
         }
 
+        vm.audioLevelLiveData.observe(viewLifecycleOwner, {
+            binding.progressBar.progress = it
+
+        })
+
 
         binding.btnRecord.setOnSingleClickListener {
             if (vm.isRecording) {

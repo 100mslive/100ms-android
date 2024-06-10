@@ -76,6 +76,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     var isRecording = false
+    val audioLevelLiveData = MutableLiveData<Int>()
     fun startMicRecording() {
         isRecording = true
         diagnosticSDK.startMicCheck(getApplication<Application>(), object :
@@ -85,6 +86,12 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
             }
 
             override fun onSuccess() {
+
+            }
+
+            override fun onAudioLevelChanged(decibel: Int) {
+                super.onAudioLevelChanged(decibel)
+                audioLevelLiveData.postValue(decibel)
 
             }
 

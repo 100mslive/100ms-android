@@ -12,16 +12,27 @@
         tools:layout="@layout/fragment_pre_call_region_selection">
         <action
             android:id="@+id/action_preCallRegionSelectionFragment_to_preCallCameraFragment"
-            app:destination="@id/preCallCameraFragment" />
+            app:destination="@id/preCallCameraFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right"
+
+            />
     </fragment>
     <fragment
+
         android:id="@+id/preCallCameraFragment"
         android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallCameraFragment"
         android:label="fragment_pre_call_camera"
         tools:layout="@layout/fragment_pre_call_camera">
         <action
             android:id="@+id/action_preCallCameraFragment_to_preCallMicFragment"
-            app:destination="@id/preCallMicFragment" />
+            app:destination="@id/preCallMicFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right" />
     </fragment>
     <fragment
         android:id="@+id/preCallMicFragment"
@@ -30,7 +41,11 @@
         tools:layout="@layout/fragment_pre_call_mic">
         <action
             android:id="@+id/action_preCallMicFragment_to_preCallConnectivityTestFragment"
-            app:destination="@id/preCallConnectivityTestFragment" />
+            app:destination="@id/preCallConnectivityTestFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right" />
     </fragment>
     <fragment
         android:id="@+id/preCallConnectivityTestFragment"
