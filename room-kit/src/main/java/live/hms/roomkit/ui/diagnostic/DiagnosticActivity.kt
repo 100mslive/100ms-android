@@ -10,7 +10,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 
 class DiagnosticActivity : AppCompatActivity() {
 
-    private val meetingViewModel: DiagnosticViewModelFactory by lazy {
+    private val diagnosticViewModel: DiagnosticViewModelFactory by lazy {
         DiagnosticViewModelFactory(application)
     }
 

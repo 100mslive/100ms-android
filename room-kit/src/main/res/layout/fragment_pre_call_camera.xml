@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:padding="24dp"
+    android:paddingHorizontal="24dp"
+    android:paddingVertical="16dp"
     tools:context=".ui.diagnostic.fragments.PreCallCameraFragment">
 
     <TextView
@@ -13,37 +14,28 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="16dp"
         android:elevation="4dp"
         android:fontFamily="@font/inter_semibold"
-        android:gravity="center"
         android:lineHeight="32sp"
         android:text="Pre-call Test"
-        android:textAlignment="center"
         android:textSize="24sp"
         app:fontFamily="@font/inter_bold"
-        app:layout_constraintBottom_toTopOf="@id/card_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:textColor="@android:color/white" />
-
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/name_tv"
-        android:layout_alignParentStart="true"
-        android:layout_gravity="center"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
         app:cardCornerRadius="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/name_tv"
-        app:strokeWidth="2dp">
+        app:strokeWidth="1dp"
+        tools:layout_editor_absoluteX="24dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -55,13 +47,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="24dp"
-                android:layout_marginVertical="16dp"
                 android:drawableLeft="@drawable/video_on"
                 android:drawablePadding="14dp"
                 android:fontFamily="@font/inter_semibold"
                 android:lineHeight="24sp"
-                android:text="Pre-call Test"
-                android:textAlignment="center"
+                android:paddingVertical="16dp"
+                android:text="Test Video"
+
                 android:textSize="19sp"
                 app:fontFamily="@font/inter_bold"
                 app:layout_constraintBottom_toTopOf="@id/divider_top"
@@ -78,12 +70,40 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/test_title_tv" />
 
+            <live.hms.videoview.HMSVideoView
+                android:id="@+id/video_view"
+                android:layout_width="146dp"
+                android:layout_height="260dp"
+                android:layout_marginTop="24dp"
+                app:layout_constraintBottom_toTopOf="@id/camera_descp_tv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider_top" />
+
+            <TextView
+                android:id="@+id/camera_descp_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginVertical="24dp"
+                android:layout_marginBottom="16dp"
+                android:elevation="4dp"
+                android:fontFamily="@font/inter_regular"
+                android:lineHeight="20sp"
+                android:text="Move in front of your camera to make sure it's working. If you don't see your video, try changing the selected camera. If the camera isn't part of your computer, check your settings to make sure your system recognizes it."
+                android:textSize="14sp"
+                app:fontFamily="@font/inter_regular"
+                app:layout_constraintBottom_toTopOf="@id/divider_bottom"
+                app:layout_constraintTop_toBottomOf="@id/video_view"
+                tools:textColor="@android:color/white" />
+
 
             <com.google.android.material.divider.MaterialDivider
                 android:id="@+id/divider_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/divider_top" />
+                app:layout_constraintBottom_toTopOf="@id/bottom_header_text"
+                app:layout_constraintTop_toBottomOf="@id/camera_descp_tv" />
 
             <TextView
                 android:id="@+id/bottom_header_text"

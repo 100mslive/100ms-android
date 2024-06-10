@@ -33,6 +33,7 @@ import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.initAnimState
 import live.hms.roomkit.setDrawables
 import live.hms.roomkit.startBounceAnimationUpwards
+import live.hms.roomkit.ui.HMSRoomKit
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -449,6 +450,10 @@ class PreviewFragment : Fragment() {
 
         binding.buttonJoinMeeting.apply {
             setOnSingleClickListener(200L) {
+
+                HMSRoomKit.launchPreCallDiagnostic(requireActivity())
+                return@setOnSingleClickListener
+
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
                 if (this.isEnabled) {
                     hideKeyboard()
