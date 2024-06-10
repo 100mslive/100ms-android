@@ -6,6 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import live.hms.roomkit.R
+import live.hms.roomkit.databinding.FragmentPreCallCameraBinding
+import live.hms.roomkit.databinding.FragmentPreCallMicBinding
+import live.hms.roomkit.databinding.FragmentPreCallRegionSelectionBinding
+import live.hms.roomkit.util.viewLifecycle
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -22,6 +26,8 @@ class PreCallMicFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private var binding by viewLifecycle<FragmentPreCallMicBinding>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -34,8 +40,9 @@ class PreCallMicFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding = FragmentPreCallMicBinding.inflate(inflater, container, false)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_pre_call_mic, container, false)
+        return binding.root
     }
 
     companion object {

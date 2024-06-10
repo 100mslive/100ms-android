@@ -9,11 +9,7 @@
     android:paddingVertical="16dp"
     tools:context=".ui.diagnostic.fragments.PreCallCameraFragment">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Default - Apple Airpods Pro (Bluetooth)" />
+
 
     <TextView
         android:id="@+id/name_tv"
@@ -139,6 +135,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="@id/mic_indicator"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/mic_indicator"
@@ -187,6 +184,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
                 android:fontFamily="@font/inter_bold"
                 android:gravity="center"
                 android:paddingHorizontal="16dp"
@@ -195,6 +193,7 @@
                 android:textColor="#EFF0FA"
                 android:textSize="14sp"
                 android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/divider_bottom"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/btn_speaker_selection" />
 
