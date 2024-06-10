@@ -58,7 +58,7 @@ class PreCallMicFragment : Fragment() {
         binding.applyTheme()
         binding.yesButton.setOnSingleClickListener {
             vm.stopCameraCheck()
-            findNavController().navigate(PreCallCameraFragmentDirections.actionPreCallCameraFragmentToPreCallMicFragment())
+            findNavController().navigate(PreCallMicFragmentDirections.actionPreCallMicFragmentToPreCallConnectivityTestFragment())
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
