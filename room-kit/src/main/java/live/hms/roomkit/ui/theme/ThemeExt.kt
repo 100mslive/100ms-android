@@ -259,6 +259,23 @@ internal fun TextView.alertButtonEnabled() {
         )
     )
 }
+
+internal fun TextView.buttonStrokeEnabled() {
+    this.isEnabled = true
+    this.setBackgroundAndColor(
+        HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+        HMSPrebuiltTheme.getDefaults().error_default,
+        R.drawable.gray_round_stroked_drawable
+    )
+
+    this.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onPrimaryHigh,
+            HMSPrebuiltTheme.getDefaults().onprimary_high_emp
+        )
+    )
+
+}
 internal fun TextView.buttonEnabled() {
     this.isEnabled = true
 

@@ -122,20 +122,36 @@
                 app:layout_constraintTop_toBottomOf="@id/divider_bottom"
                 tools:textColor="@android:color/white" />
 
-            <com.google.android.material.button.MaterialButton
+            <TextView
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="Yes"
+                android:textColor="#EFF0FA"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:id="@+id/yes_button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginBottom="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bottom_header_text" />
 
-            <com.google.android.material.button.MaterialButton
+            <TextView
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:text="No"
+                android:textColor="#EFF0FA"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:id="@+id/no_button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="@+id/yes_button"
