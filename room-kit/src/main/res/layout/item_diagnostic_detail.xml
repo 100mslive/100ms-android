@@ -4,12 +4,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:id="@+id/root"
-    android:padding="24dp">
+    android:paddingVertical="@dimen/eight_dp"
+    android:paddingHorizontal="16dp"
+    >
 
     <TextView
         android:fontFamily="@font/inter_semibold"
         android:id="@+id/header"
         android:textSize="19sp"
+        android:layout_marginBottom="@dimen/eight_dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lineSpacingExtra="3sp" />
@@ -18,10 +21,10 @@
         android:id="@+id/subheader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/eight_dp"
         android:lineSpacingExtra="3sp" />
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/view_detail"
         android:layout_width="154dp"
         android:layout_height="16dp"

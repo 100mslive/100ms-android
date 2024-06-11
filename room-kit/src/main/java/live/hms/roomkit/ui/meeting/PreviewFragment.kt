@@ -356,6 +356,11 @@ class PreviewFragment : Fragment() {
 
     private fun initButtons() {
 
+        binding.iconDiagnostic.setOnSingleClickListener(200L) {
+           contextSafe { context, activity ->
+                HMSRoomKit.launchPreCallDiagnostic(activity)
+            }
+        }
         binding.closeBtn.setOnSingleClickListener(300L) {
             contextSafe { context, activity ->
                 meetingViewModel.leaveMeeting()

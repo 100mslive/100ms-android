@@ -937,6 +937,38 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
 
 }
 
+internal fun ItemDiagnosticDetailBinding.applyTheme() {
+
+    root.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+    )
+
+    header.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryLow,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    subheader.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSecondaryMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    viewDetail.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+}
+
 internal fun ItemDiagnosticHeaderBinding.applyTheme() {
     root.setBackgroundColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.secondaryDefault,
@@ -1420,6 +1452,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
     buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
     buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
     buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
+    iconDiagnostic.setIconDisabled(R.drawable.icon)
 
 }
 

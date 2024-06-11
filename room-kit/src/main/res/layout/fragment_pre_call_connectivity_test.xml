@@ -178,22 +178,18 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/connectivty_list"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:nestedScrollingEnabled="false"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp"
+                    android:paddingBottom="16dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
                     android:fontFamily="@font/inter_bold"
                     android:gravity="center"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="8dp"
-                    android:text="Record"
-                    android:textColor="#EFF0FA"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toTopOf="@+id/divider_bottom"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toTopOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/failed_layout" />
 
 
