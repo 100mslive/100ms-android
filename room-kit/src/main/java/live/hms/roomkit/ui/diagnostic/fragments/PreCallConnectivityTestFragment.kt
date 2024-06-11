@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.diagnostic.fragments
 
-import android.content.res.Resources.Theme
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -72,7 +71,7 @@ class PreCallConnectivityTestFragment : Fragment() {
 
             //success
             if (it.connectivityState == ConnectivityState.COMPLETED) {
-                maptoUi(it)
+                mapToUi(it)
                 binding.uiFailedGroup.gone()
                 binding.uiLoadingGroup.gone()
                 binding.uiSuccessGroup.show()
@@ -84,7 +83,8 @@ class PreCallConnectivityTestFragment : Fragment() {
             }
         })
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     vm.stopConnectivityTest()
@@ -94,7 +94,8 @@ class PreCallConnectivityTestFragment : Fragment() {
 
     }
 
-    private fun maptoUi(it: ConnectivityCheckResult) {
+    private fun mapToUi(it: ConnectivityCheckResult) {
+
         val signalingHeader = ExpandableGroup(
             ExpandableHeader(
                 "Signalling server connection test",
@@ -116,6 +117,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         }
 
+       
 
 
         connectivityListAdapter.apply {
