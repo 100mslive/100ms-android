@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.GroupieAdapter
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreCallConnectivityTestBinding
 import live.hms.roomkit.gone
 import live.hms.roomkit.show
@@ -83,8 +84,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             }
         })
 
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     vm.stopConnectivityTest()
@@ -95,17 +95,32 @@ class PreCallConnectivityTestFragment : Fragment() {
     }
 
     private fun maptoUi(it: ConnectivityCheckResult) {
-        val exp = ExpandableGroup(
+        val signalingHeader = ExpandableGroup(
             ExpandableHeader(
-                "Signalling", "Signalling Report", 0, false
+                "Signalling server connection test",
+                if (it.signallingReport.isConnected) "Connected" else "Not Connected",
+                if (it.signallingReport.isConnected) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big
             )
         ).apply {
-            add(DiagnosticDetail("Is Connected", it.signallingReport.isConnected.toString(), 0, false))
-            add(DiagnosticDetail("Is InitConnected", it.signallingReport.isConnected.toString(), 0, false))
-            add(DiagnosticDetail("Is WebsocketUrl", it.signallingReport.websocketUrl.toString(), 0, false))
+            add(
+                DiagnosticDetail(
+                    "Signalling Gateway",
+                    if (it.signallingReport.isInitConnected) "Reachable" else "Not Reachable",
+                    if (it.signallingReport.isInitConnected) R.drawable.ic_correct_tick_small else R.drawable.ic_cross_small
+                )
+            )
+            if (it.signallingReport.websocketUrl.isNullOrEmpty().not()) add(
+                DiagnosticDetail(
+                    "Websocket URL", it.signallingReport.websocketUrl.toString(), R.drawable.link_2
+                )
+            )
         }
 
-        connectivityListAdapter.add(exp)
+
+
+        connectivityListAdapter.apply {
+            add(signalingHeader)
+        }
     }
 
 }

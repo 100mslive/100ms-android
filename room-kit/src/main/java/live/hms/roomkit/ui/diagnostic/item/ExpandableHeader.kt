@@ -7,13 +7,13 @@ import com.xwray.groupie.ExpandableItem
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ItemDiagnosticHeaderBinding
+import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.theme.applyTheme
 
 class ExpandableHeader(
     private val title: String,
     private val subTitle: String? = null,
     @DrawableRes private val subtitleIcon: Int,
-    private val isSelected: Boolean,
 
     ) : BindableItem<ItemDiagnosticHeaderBinding>(), ExpandableItem {
 
@@ -27,6 +27,7 @@ class ExpandableHeader(
         }
 
         binding.header.text = title
+        binding.header.setDrawables(start = binding.header.context.resources.getDrawable(subtitleIcon, null))
         binding.subheader.text = subTitle
         binding.viewDetail.text = "View detailed information"
     }

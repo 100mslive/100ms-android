@@ -6,26 +6,24 @@ import com.xwray.groupie.ExpandableGroup
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ItemDiagnosticDetailBinding
+import live.hms.roomkit.setDrawables
 import live.hms.roomkit.ui.theme.applyTheme
 
 class DiagnosticDetail(
     private val title: String,
     private val subTitle: String? = null,
-    @DrawableRes private val subtitleIcon: Int,
-    private val isSelected: Boolean,
-
+    @DrawableRes private val subtitleIcon: Int
     ) : BindableItem<ItemDiagnosticDetailBinding>() {
 
-    private lateinit var expand: ExpandableGroup
+
 
     override fun bind(binding: ItemDiagnosticDetailBinding, position: Int) {
 
-        binding.root.setOnClickListener {
-            expand.onToggleExpanded()
-        }
-
         binding.header.text = title
         binding.subheader.text = subTitle
+
+        binding.subheader.setDrawables(start = binding.subheader.context.resources.getDrawable(subtitleIcon, null))
+
     }
 
 
