@@ -60,6 +60,10 @@ class PreCallConnectivityTestFragment : Fragment() {
             adapter = connectivityListAdapter
         }
 
+        vm.connectivityStateLiveData.observe(viewLifecycleOwner, Observer {
+            binding.subHeaderConnection.text = it?.name.orEmpty()
+        })
+
         vm.connectivityLiveData.observe(viewLifecycleOwner, Observer {
             //in progress
             if (it == null || it.connectivityState == ConnectivityState.STARTING) {
@@ -148,7 +152,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         }
 
-
+        
 
 
 

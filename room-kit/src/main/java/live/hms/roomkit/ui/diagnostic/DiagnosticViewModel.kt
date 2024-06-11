@@ -118,6 +118,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     val connectivityLiveData = MutableLiveData<ConnectivityCheckResult?>(null)
+    val connectivityStateLiveData = MutableLiveData<ConnectivityState?>(null)
 
     var isMediaCaptured : Boolean = false
     var isMediaPublished : Boolean = false
@@ -130,6 +131,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
                     connectivityLiveData.postValue(result)
                 }
                 override fun onConnectivityStateChanged(state: ConnectivityState) {
+                    connectivityStateLiveData.postValue(state)
                     if (state == ConnectivityState.MEDIA_CAPTURED) {
                         isMediaCaptured = true
                     }
