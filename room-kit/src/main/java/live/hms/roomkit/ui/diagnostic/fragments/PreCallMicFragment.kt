@@ -27,6 +27,7 @@ import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.PreviewFragment
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.roomkit.ui.theme.saveButtonEnabled
 import live.hms.roomkit.ui.theme.setIconEnabled
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.switchCamera
@@ -119,7 +120,7 @@ class PreCallMicFragment : Fragment() {
             vm.startMicRecording()
             binding.btnRecord.text = "Stop recording"
         }
-
+        binding.btnPlayback.saveButtonEnabled()
 
         binding.btnPlayback.setOnSingleClickListener {
             vm.startSpeakerTest()
