@@ -946,7 +946,7 @@ internal fun ItemDiagnosticHeaderBinding.applyTheme() {
 
     header.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getColours()?.onSecondaryLow,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -954,7 +954,7 @@ internal fun ItemDiagnosticHeaderBinding.applyTheme() {
 
     subheader.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getColours()?.onSecondaryMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )

@@ -27,7 +27,7 @@ class ExpandableHeader(
         }
 
         binding.header.text = title
-        binding.header.setDrawables(start = binding.header.context.resources.getDrawable(subtitleIcon, null))
+        binding.subheader.setDrawables(start = binding.subheader.context.resources.getDrawable(subtitleIcon, null))
         binding.subheader.text = subTitle
         binding.viewDetail.text = "View detailed information"
     }

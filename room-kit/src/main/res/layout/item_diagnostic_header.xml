@@ -4,10 +4,10 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:id="@+id/root"
-    android:padding="24dp">
+   >
 
     <TextView
-        android:fontFamily="@font/inter_semibold"
+        android:fontFamily="@font/inter_regular"
         android:id="@+id/header"
         android:textSize="19sp"
         android:layout_width="match_parent"
@@ -15,7 +15,9 @@
         android:lineSpacingExtra="3sp" />
 
     <TextView
+        android:fontFamily="@font/inter_semibold"
         android:id="@+id/subheader"
+        android:drawablePadding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/eight_dp"

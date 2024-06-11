@@ -117,7 +117,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         }
 
-       
+
 
 
         connectivityListAdapter.apply {
