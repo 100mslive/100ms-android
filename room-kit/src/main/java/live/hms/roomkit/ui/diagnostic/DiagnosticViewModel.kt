@@ -8,6 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.diagnostics.HMSAudioDeviceCheckListener
 import live.hms.video.diagnostics.HMSCameraCheckListener
+import live.hms.video.diagnostics.models.ConnectivityCheckResult
+import live.hms.video.diagnostics.models.ConnectivityState
 import live.hms.video.error.HMSException
 import live.hms.video.media.settings.HMSVideoTrackSettings
 import live.hms.video.media.tracks.HMSVideoTrack
@@ -103,6 +105,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     fun stopRecording() {
         isRecording = false
         diagnosticSDK.stopMicCheck()
+        diagnosticSDK.stopSpeakerCheck()
     }
 
     fun switchAudioOutput(audioDevice: HMSAudioManager.AudioDevice) {
@@ -112,6 +115,27 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     fun getAudioDevicesInfoList() = hmsSDK.getAudioDevicesInfoList()
     fun getAudioOutputRouteType(): HMSAudioManager.AudioDevice {
         return hmsSDK.getAudioOutputRouteType()
+    }
+
+    val connectivityLiveData = MutableLiveData<ConnectivityCheckResult?>(null)
+    fun startConnectivityTest() {
+        diagnosticSDK.checkConnectivity(regionCode,
+            object : live.hms.video.diagnostics.ConnectivityCheckListener {
+                override fun onCompleted(result: ConnectivityCheckResult) {
+                    connectivityLiveData.postValue(result)
+                }
+                override fun onConnectivityStateChanged(state: ConnectivityState) {
+
+                }
+            })
+    }
+
+    fun stopConnectivityTest() {
+        connectivityLiveData.postValue(null)
+    }
+
+    fun startSpeakerTest() {
+        diagnosticSDK.startSpeakerCheck()
     }
 
 

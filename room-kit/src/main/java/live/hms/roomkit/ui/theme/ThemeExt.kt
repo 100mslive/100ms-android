@@ -937,9 +937,37 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
 
 }
 
-//internal fun FragmentRolePreview.applyTheme() {
-//
-//}
+internal fun ItemDiagnosticHeaderBinding.applyTheme() {
+    root.setBackgroundColor(getColorOrDefault(
+        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getDefaults().background_default
+    )
+    )
+
+    header.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+
+    subheader.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+    )
+
+    viewDetail.setTextColor(
+        getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDefault,
+            HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+        )
+
+    )
+
+}
 
 internal fun FragmentPreCallConnectivityTestBinding.applyTheme() {
     root.setBackgroundColor(getColorOrDefault(

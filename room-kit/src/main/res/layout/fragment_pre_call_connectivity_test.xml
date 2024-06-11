@@ -157,7 +157,6 @@
                         android:text="Connectivity Test Failed"
                         android:textAlignment="center"
                         android:textSize="19sp"
-                        app:fontFamily="@font/inter_bold"
                         tools:textColor="@android:color/white" />
 
                     <TextView
@@ -180,6 +179,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/connectivty_list"
                     android:layout_width="0dp"
+                    android:nestedScrollingEnabled="false"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="16dp"

@@ -121,6 +121,10 @@ class PreCallMicFragment : Fragment() {
         }
 
 
+        binding.btnPlayback.setOnSingleClickListener {
+            vm.startSpeakerTest()
+        }
+
 
 
     }
@@ -135,6 +139,8 @@ class PreCallMicFragment : Fragment() {
             // Show a dialog explaining why the permission is needed
             // and how the user can grant the permission
             Toast.makeText(requireContext(), "Mic Permission denied", Toast.LENGTH_SHORT).show()
+            vm.stopRecording()
+            vm.stopMicCheck()
             findNavController().popBackStack()
         }
     }
