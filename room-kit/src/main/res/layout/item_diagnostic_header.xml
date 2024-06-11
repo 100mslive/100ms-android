@@ -21,4 +21,11 @@
         android:layout_marginVertical="@dimen/eight_dp"
         android:lineSpacingExtra="3sp" />
 
+    <TextView
+        android:id="@+id/view_detail"
+        android:layout_width="154dp"
+        android:layout_height="16dp"
+        android:layout_marginTop="@dimen/eight_dp"
+        android:lineSpacingExtra="1sp" />
+
 </LinearLayout>

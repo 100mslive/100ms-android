@@ -19,7 +19,7 @@ class DiagnosticDetail(
     private lateinit var expand: ExpandableGroup
 
     override fun bind(binding: ItemDiagnosticDetailBinding, position: Int) {
-        
+
         binding.root.setOnClickListener {
             expand.onToggleExpanded()
         }
