@@ -24,17 +24,17 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
 
     val cameraTrackLiveData = MutableLiveData<HMSVideoTrack?>()
     fun cameraPermssionGranted() {
-//        diagnosticSDK.startCameraCheck(
-//            HMSVideoTrackSettings.CameraFacing.FRONT,
-//            object : HMSCameraCheckListener {
-//                override fun onError(error: HMSException) {
-//
-//                }
-//
-//                override fun onVideoTrack(localVideoTrack: HMSVideoTrack) {
-//                    cameraTrackLiveData.postValue(localVideoTrack)
-//                }
-//            })
+        diagnosticSDK.startCameraCheck(
+            HMSVideoTrackSettings.CameraFacing.FRONT,
+            object : HMSCameraCheckListener {
+                override fun onError(error: HMSException) {
+
+                }
+
+                override fun onVideoTrack(localVideoTrack: HMSVideoTrack) {
+                    cameraTrackLiveData.postValue(localVideoTrack)
+                }
+            })
     }
 
     fun getRegionList() = listOf(Pair("in", "India"), Pair("eu", "Europe"), Pair("us", "US"))
