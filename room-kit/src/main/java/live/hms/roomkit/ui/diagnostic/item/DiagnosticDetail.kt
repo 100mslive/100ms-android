@@ -3,10 +3,9 @@ package live.hms.roomkit.ui.diagnostic.item
 import android.view.View
 import androidx.annotation.DrawableRes
 import com.xwray.groupie.ExpandableGroup
-import com.xwray.groupie.ExpandableItem
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
-import live.hms.roomkit.databinding.ItemDiagnosticHeaderBinding
+import live.hms.roomkit.databinding.ItemDiagnosticDetailBinding
 import live.hms.roomkit.ui.theme.applyTheme
 
 class DiagnosticDetail(
@@ -15,13 +14,12 @@ class DiagnosticDetail(
     @DrawableRes private val subtitleIcon: Int,
     private val isSelected: Boolean,
 
-    ) : BindableItem<ItemDiagnosticHeaderBinding>() {
+    ) : BindableItem<ItemDiagnosticDetailBinding>() {
 
     private lateinit var expand: ExpandableGroup
 
-    override fun bind(binding: ItemDiagnosticHeaderBinding, position: Int) {
-
-        binding.applyTheme()
+    override fun bind(binding: ItemDiagnosticDetailBinding, position: Int) {
+        
         binding.root.setOnClickListener {
             expand.onToggleExpanded()
         }
@@ -32,7 +30,7 @@ class DiagnosticDetail(
 
 
     override fun getLayout(): Int = R.layout.item_diagnostic_detail
-    override fun initializeViewBinding(view: View) = ItemDiagnosticHeaderBinding.bind(view)
+    override fun initializeViewBinding(view: View) = ItemDiagnosticDetailBinding.bind(view)
 
 
 }
