@@ -4,11 +4,12 @@ class NoiseCancellationInPreviewUseCase(
     private val krispEnabledInSettings : Boolean,
     private val setNoiseCancellation : (enable : Boolean) -> Unit) {
     private var state : NcInPreview = NcInPreview.UNSET
-    private enum class NcInPreview {
+    enum class NcInPreview {
         UNSET,
         ON,
         OFF
     }
+    fun getNcState() = state
     fun isEnabled() : Boolean =
         // Either it's just on
         state == NcInPreview.ON ||
@@ -34,5 +35,14 @@ class NoiseCancellationInPreviewUseCase(
             NcInPreview.OFF
             -> NcInPreview.ON
         }
+    }
+
+    fun setNcStateForPreview(value : Boolean?) {
+        state = when(value) {
+            true -> NcInPreview.ON
+            false -> NcInPreview.ON
+            null -> NcInPreview.UNSET
+        }
+
     }
 }

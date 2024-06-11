@@ -3,7 +3,7 @@ package live.hms.roomkit.ui.meeting
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.init.HMSRoomLayout
-import live.hms.video.sdk.models.TranscriptionState
+
 class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     private var hmsRoomLayout : HMSRoomLayout? = null
     private val roleMap : MutableMap<String, HMSRoomLayout.HMSRoomLayoutData> = mutableMapOf()
@@ -163,6 +163,19 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.elements?.handRaise != null ||
                     roleMap[localPeer.hmsRole.name]?.screens?.conferencing
                         ?.default?.elements?.handRaise != null
+        }
+        return available
+    }
+
+    fun ncInPreviewState(): Boolean? {
+        hmsRoomLayout?.data?.mapNotNull {
+            it?.screens?.preview?.default?.elements?.noiseCancellationElement?.enabled
+        }
+        val localPeer = hmssdk.getLocalPeer()
+        val available =  if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.preview?.default?.elements?.noiseCancellationElement?.enabled
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.preview?.default?.elements?.noiseCancellationElement?.enabled
         }
         return available
     }
