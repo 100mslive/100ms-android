@@ -104,7 +104,7 @@
                         android:layout_marginTop="24dp"
                         android:fontFamily="@font/inter_semibold"
                         android:lineHeight="24sp"
-                        android:paddingHorizontal="16dp"
+                        android:gravity="center"
                         android:text="Checking your connection..."
                         android:textAlignment="center"
                         android:textSize="19sp"
@@ -178,7 +178,7 @@
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/btn_record"
+                    android:id="@+id/connectivty_list"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="24dp"
@@ -202,7 +202,28 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     app:layout_constraintBottom_toTopOf="@id/yes_button"
-                    app:layout_constraintTop_toBottomOf="@id/btn_record" />
+                    app:layout_constraintTop_toBottomOf="@id/connectivty_list" />
+                
+                <androidx.constraintlayout.widget.Group
+
+                    android:id="@+id/ui_failed_group"
+                    app:constraint_referenced_ids="failed_layout,yes_button,divider_bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <androidx.constraintlayout.widget.Group
+                    android:visibility="gone"
+                    android:id="@+id/ui_loading_group"
+                    app:constraint_referenced_ids="connecting_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <androidx.constraintlayout.widget.Group
+                    android:visibility="gone"
+                    android:id="@+id/ui_success_group"
+                    app:constraint_referenced_ids="connectivty_list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
 
                 <TextView
@@ -210,6 +231,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
                     android:fontFamily="@font/inter_bold"
                     android:gravity="center"
@@ -234,6 +256,7 @@
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="8dp"
                     android:text="No"
+                    android:visibility="gone"
                     android:textColor="#EFF0FA"
                     android:textSize="14sp"
                     android:textStyle="bold"

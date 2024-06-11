@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import live.hms.roomkit.databinding.FragmentPreCallConnectivityTestBinding
 import live.hms.roomkit.ui.theme.applyTheme
+import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.util.viewLifecycle
 
 
@@ -28,6 +29,7 @@ class PreCallConnectivityTestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
+        binding.yesButton.buttonEnabled()
     }
 
 }
