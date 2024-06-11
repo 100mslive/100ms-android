@@ -189,7 +189,7 @@
                     android:gravity="center"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/divider_bottom"
                     app:layout_constraintTop_toBottomOf="@id/failed_layout" />
 
 
