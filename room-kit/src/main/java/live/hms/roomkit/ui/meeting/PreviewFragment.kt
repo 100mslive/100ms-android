@@ -702,6 +702,7 @@ class PreviewFragment : Fragment() {
                     }
                 }
 
+                meetingViewModel.setNcInPreview(meetingViewModel.ncPreviewNoiseCancellationInLayout())
                 updateNoiseCancellationIcon()
                 if (settings.lastUsedMeetingUrl.contains("/streaming/").not()) {
 
