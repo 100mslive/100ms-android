@@ -118,14 +118,24 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     val connectivityLiveData = MutableLiveData<ConnectivityCheckResult?>(null)
+
+    var isMediaCaptured : Boolean = false
+    var isMediaPublished : Boolean = false
     fun startConnectivityTest() {
+        isMediaPublished= false
+        isMediaCaptured = false
         diagnosticSDK.checkConnectivity(regionCode,
             object : live.hms.video.diagnostics.ConnectivityCheckListener {
                 override fun onCompleted(result: ConnectivityCheckResult) {
                     connectivityLiveData.postValue(result)
                 }
                 override fun onConnectivityStateChanged(state: ConnectivityState) {
-
+                    if (state == ConnectivityState.MEDIA_CAPTURED) {
+                        isMediaCaptured = true
+                    }
+                    if (state == ConnectivityState.MEDIA_PUBLISHED) {
+                        isMediaPublished = true
+                    }
                 }
             })
     }

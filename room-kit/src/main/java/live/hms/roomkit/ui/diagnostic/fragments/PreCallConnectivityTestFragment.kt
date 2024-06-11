@@ -94,25 +94,56 @@ class PreCallConnectivityTestFragment : Fragment() {
 
     }
 
-    private fun mapToUi(it: ConnectivityCheckResult) {
+    private fun mapToUi(model: ConnectivityCheckResult) {
 
         val signalingHeader = ExpandableGroup(
             ExpandableHeader(
                 "Signalling server connection test",
-                if (it.signallingReport.isConnected) "Connected" else "Not Connected",
-                if (it.signallingReport.isConnected) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big
+                if (model.signallingReport.isConnected) "Connected" else "Not Connected",
+                if (model.signallingReport.isConnected) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big
             )
         ).apply {
             add(
                 DiagnosticDetail(
                     "Signalling Gateway",
-                    if (it.signallingReport.isInitConnected) "Reachable" else "Not Reachable",
-                    if (it.signallingReport.isInitConnected) R.drawable.ic_correct_tick_small else R.drawable.ic_cross_small
+                    if (model.signallingReport.isInitConnected) "Reachable" else "Not Reachable",
+                    if (model.signallingReport.isInitConnected) R.drawable.ic_correct_tick_small else R.drawable.ic_cross_small
                 )
             )
-            if (it.signallingReport.websocketUrl.isNullOrEmpty().not()) add(
+            if (model.signallingReport.websocketUrl.isNullOrEmpty().not()) add(
                 DiagnosticDetail(
-                    "Websocket URL", it.signallingReport.websocketUrl.toString(), R.drawable.link_2
+                    "Websocket URL",
+                    model.signallingReport.websocketUrl.toString(),
+                    R.drawable.link_2
+                )
+            )
+        }
+
+
+        val mediaReportHeader = ExpandableGroup(
+            ExpandableHeader(
+                "Media server connection test", "Connected", R.drawable.ic_correct_tick_big
+            )
+        ).apply {
+            add(
+                DiagnosticDetail(
+                    "Media Captured",
+                    if (vm.isMediaCaptured) "Yes" else "No",
+                    if (vm.isMediaCaptured) R.drawable.ic_correct_tick_small else R.drawable.ic_cross_small
+                )
+            )
+            add(
+                DiagnosticDetail(
+                    "Media Published",
+                    if (vm.isMediaPublished) "Yes" else "No",
+                    if (vm.isMediaPublished) R.drawable.ic_correct_tick_small else R.drawable.ic_cross_small
+                )
+            )
+            add(
+                DiagnosticDetail(
+                    "CQS",
+                    model.mediaServerReport.connectionQualityScore.toString(),
+                    R.drawable.ic_correct_tick_small
                 )
             )
         }
@@ -120,8 +151,11 @@ class PreCallConnectivityTestFragment : Fragment() {
 
 
 
+
+
         connectivityListAdapter.apply {
             add(signalingHeader)
+            add(mediaReportHeader)
         }
     }
 

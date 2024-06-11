@@ -18,13 +18,13 @@ class ExpandableHeader(
 
     ) : BindableItem<ItemDiagnosticHeaderBinding>(), ExpandableItem {
 
-    private lateinit var expand: ExpandableGroup
+    private  var expand: ExpandableGroup? = null
 
     override fun bind(binding: ItemDiagnosticHeaderBinding, position: Int) {
 
         binding.applyTheme()
         binding.root.setOnClickListener {
-            expand.onToggleExpanded()
+            expand?.onToggleExpanded()
         }
 
         binding.header.text = title
