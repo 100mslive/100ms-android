@@ -18,6 +18,7 @@ import com.xwray.groupie.GroupieAdapter
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreCallConnectivityTestBinding
 import live.hms.roomkit.gone
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.show
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModelFactory
@@ -62,6 +63,7 @@ class PreCallConnectivityTestFragment : Fragment() {
         binding.connectivtyList.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = connectivityListAdapter
+            setHasFixedSize(false)
         }
 
         vm.connectivityStateLiveData.observe(viewLifecycleOwner, Observer {
@@ -90,6 +92,10 @@ class PreCallConnectivityTestFragment : Fragment() {
                 binding.uiSuccessGroup.gone()
             }
         })
+
+        binding.yesButton.setOnSingleClickListener {
+            vm.startConnectivityTest()
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -307,8 +313,9 @@ class PreCallConnectivityTestFragment : Fragment() {
     val mainHandler by lazy { Handler(Looper.getMainLooper()) }
     private fun onExpand() {
         mainHandler.postDelayed({
-            binding.connectivtyList.invalidate()
-        }, 200)
+            binding?.root?.invalidate()
+            binding?.connectivtyList?.invalidate()
+        }, 500)
     }
 
 }

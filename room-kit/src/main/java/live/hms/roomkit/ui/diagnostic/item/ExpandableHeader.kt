@@ -22,6 +22,7 @@ class ExpandableHeader(
 
     private  var expand: ExpandableGroup? = null
 
+
     override fun bind(binding: ItemDiagnosticHeaderBinding, position: Int) {
 
         binding.applyTheme()
