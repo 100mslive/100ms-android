@@ -1301,13 +1301,13 @@ class MeetingViewModel(
             when (getHmsRoomLayout()
                 ?.getPreviewLayout(roleName)?.default?.elements?.noiseCancellationElement?.enabled) {
                 true -> {
-                    if (!noiseCancellationInPreviewUseCase.isEnabled()) {
+                    if (!hmsSDK.isNoiseCancellationEnabled()) { // other ways of enabling exist
                         noiseCancellationInPreviewUseCase.clickNcInPreview()
                     }
                 }
 
                 false -> {
-                    if (noiseCancellationInPreviewUseCase.isEnabled()) {
+                    if (hmsSDK.isNoiseCancellationEnabled()) {
                         noiseCancellationInPreviewUseCase.clickNcInPreview()
                     }
                 }
