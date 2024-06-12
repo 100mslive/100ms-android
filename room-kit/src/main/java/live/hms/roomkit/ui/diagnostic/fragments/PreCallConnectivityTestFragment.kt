@@ -21,6 +21,7 @@ import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModelFactory
 import live.hms.roomkit.ui.diagnostic.item.DiagnosticDetail
 import live.hms.roomkit.ui.diagnostic.item.ExpandableHeader
+import live.hms.roomkit.ui.diagnostic.item.Padding
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.util.viewLifecycle
@@ -88,8 +89,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             }
         })
 
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     vm.stopConnectivityTest()
@@ -284,9 +284,13 @@ class PreCallConnectivityTestFragment : Fragment() {
 
         connectivityListAdapter.apply {
             add(signalingReport)
+            add(Padding())
             add(mediaReport)
+            add(Padding())
             add(videoReport)
+            add(Padding())
             add(audioReport)
+            add(Padding())
         }
     }
 

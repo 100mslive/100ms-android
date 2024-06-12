@@ -5,13 +5,14 @@
     android:orientation="vertical"
     android:paddingHorizontal="24dp"
     android:paddingTop="24dp"
+    android:paddingBottom="24dp"
     android:id="@+id/root"
    >
 
     <TextView
         android:fontFamily="@font/inter_regular"
         android:id="@+id/header"
-        android:textSize="14sp"
+        android:textSize="19sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lineSpacingExtra="3sp" />
@@ -31,8 +32,7 @@
         android:id="@+id/view_detail"
         android:layout_width="match_parent"
         android:layout_height="16dp"
-        android:layout_marginBottom="8dp"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:layout_marginTop="@dimen/eight_dp"
         android:lineSpacingExtra="1sp" />
 

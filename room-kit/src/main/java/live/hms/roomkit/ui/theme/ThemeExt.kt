@@ -940,14 +940,14 @@ internal fun FragmentRolePreviewBinding.applyTheme() {
 internal fun ItemDiagnosticDetailBinding.applyTheme() {
 
     root.setBackgroundColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().background_default
     )
     )
 
     header.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryLow,
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -955,7 +955,7 @@ internal fun ItemDiagnosticDetailBinding.applyTheme() {
 
     subheader.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryMedium,
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -971,14 +971,14 @@ internal fun ItemDiagnosticDetailBinding.applyTheme() {
 
 internal fun ItemDiagnosticHeaderBinding.applyTheme() {
     root.setBackgroundColor(getColorOrDefault(
-        HMSPrebuiltTheme.getColours()?.secondaryDefault,
+        HMSPrebuiltTheme.getColours()?.surfaceDefault,
         HMSPrebuiltTheme.getDefaults().background_default
     )
     )
 
     header.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryLow,
+            HMSPrebuiltTheme.getColours()?.onSurfaceLow,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
@@ -986,7 +986,7 @@ internal fun ItemDiagnosticHeaderBinding.applyTheme() {
 
     subheader.setTextColor(
         getColorOrDefault(
-            HMSPrebuiltTheme.getColours()?.onSecondaryMedium,
+            HMSPrebuiltTheme.getColours()?.onSurfaceMedium,
             HMSPrebuiltTheme.getDefaults().onsurface_high_emp
         )
     )
