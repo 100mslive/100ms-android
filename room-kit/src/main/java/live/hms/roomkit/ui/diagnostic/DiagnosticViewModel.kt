@@ -148,6 +148,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     fun stopConnectivityTest() {
         diagnosticSDK.stopConnectivityCheck()
         connectivityLiveData.postValue(null)
+        connectivityStateLiveData.postValue(null)
     }
 
     fun startSpeakerTest() {
