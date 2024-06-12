@@ -134,13 +134,15 @@ class PreCallConnectivityTestFragment : Fragment() {
                 )
             )
         }
+        val isVideoAudioPublished =
+            model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null
 
 
         val mediaReport = ExpandableGroup(
             ExpandableHeader(
                 "Media server connection test",
                 "Connected",
-                R.drawable.ic_correct_tick_big,
+                if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
                 onExpand = ::onExpand
             )
 
@@ -168,8 +170,6 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         }
 
-        val isVideoAudioPublished =
-            model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null
 
 
         val videoStats = model.mediaServerReport.stats?.video
