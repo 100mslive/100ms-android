@@ -111,6 +111,7 @@ class PreCallConnectivityTestFragment : Fragment() {
 
     private fun mapToUi(model: ConnectivityCheckResult) {
 
+        connectivityListAdapter.clear()
         val signalingReport = ExpandableGroup(
             ExpandableHeader(
                 "Signalling server connection test",
