@@ -74,7 +74,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             //in progress
             Log.d(
                 "PreCallConnectivityTest",
-                "isVideoAudioPublished:  ${it?.connectivityState} ${it?.mediaServerReport?.stats?.video} ${it?.mediaServerReport?.stats?.audio}"
+                "isVideoAudioPublished:  ${it?.mediaServerReport?.stats} ${it?.mediaServerReport?.stats?.video} ${it?.mediaServerReport?.stats?.audio}"
             )
 
             if (it == null || it.connectivityState == ConnectivityState.STARTING) {
@@ -90,7 +90,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                 binding.uiFailedGroup.gone()
                 binding.uiLoadingGroup.gone()
                 binding.uiSuccessGroup.show()
-            } else {
+            } else if (it.errors.isEmpty().not()) {
                 //failed
                 binding.uiFailedGroup.show()
                 binding.uiLoadingGroup.gone()
@@ -166,7 +166,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             add(
                 DiagnosticDetail(
                     "CQS",
-                    model.mediaServerReport.connectionQualityScore.toString(),
+                    "${model.mediaServerReport.connectionQualityScore.toString()} / 5",
                     R.drawable.ic_correct_tick_small
                 )
             )
