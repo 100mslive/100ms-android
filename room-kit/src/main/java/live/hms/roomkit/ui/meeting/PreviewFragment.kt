@@ -455,10 +455,6 @@ class PreviewFragment : Fragment() {
 
         binding.buttonJoinMeeting.apply {
             setOnSingleClickListener(200L) {
-
-                HMSRoomKit.launchPreCallDiagnostic(requireActivity())
-                return@setOnSingleClickListener
-
                 Log.v(TAG, "buttonJoinMeeting.onClick()")
                 if (this.isEnabled) {
                     hideKeyboard()
