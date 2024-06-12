@@ -72,6 +72,11 @@ class PreCallConnectivityTestFragment : Fragment() {
 
         vm.connectivityLiveData.observe(viewLifecycleOwner, Observer {
             //in progress
+            Log.d(
+                "PreCallConnectivityTest",
+                "isVideoAudioPublished:  ${it?.connectivityState} ${it?.mediaServerReport?.stats?.video} ${it?.mediaServerReport?.stats?.audio}"
+            )
+
             if (it == null || it.connectivityState == ConnectivityState.STARTING) {
                 binding.uiFailedGroup.gone()
                 binding.uiLoadingGroup.show()
@@ -85,7 +90,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                 binding.uiFailedGroup.gone()
                 binding.uiLoadingGroup.gone()
                 binding.uiSuccessGroup.show()
-            } else if (it.errors.isEmpty().not()) {
+            } else {
                 //failed
                 binding.uiFailedGroup.show()
                 binding.uiLoadingGroup.gone()
@@ -170,10 +175,6 @@ class PreCallConnectivityTestFragment : Fragment() {
         val isVideoAudioPublished =
             model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null
 
-        Log.d(
-            "PreCallConnectivityTest",
-            "isVideoAudioPublished: $isVideoAudioPublished ${model.mediaServerReport.stats} ${model.mediaServerReport.stats?.video} ${model.mediaServerReport.stats?.audio}"
-        )
 
         val videoStats = model.mediaServerReport.stats?.video
         val audioStats = model.mediaServerReport.stats?.audio
