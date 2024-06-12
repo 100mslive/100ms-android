@@ -90,12 +90,8 @@ class PreCallConnectivityTestFragment : Fragment() {
                 binding.uiFailedGroup.gone()
                 binding.uiLoadingGroup.gone()
                 binding.uiSuccessGroup.show()
-            } else if (it.errors.isEmpty().not()) {
-                //failed
-                binding.uiFailedGroup.show()
-                binding.uiLoadingGroup.gone()
-                binding.uiSuccessGroup.gone()
             }
+
         })
 
         binding.yesButton.setOnSingleClickListener {
