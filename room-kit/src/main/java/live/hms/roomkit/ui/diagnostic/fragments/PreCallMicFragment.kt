@@ -67,7 +67,12 @@ class PreCallMicFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.applyTheme()
         binding.yesButton.setOnSingleClickListener {
-            vm.stopCameraCheck()
+            vm.stopRecording()
+            findNavController().navigate(PreCallMicFragmentDirections.actionPreCallMicFragmentToPreCallConnectivityTestFragment())
+        }
+
+        binding.noButton.setOnSingleClickListener {
+            vm.stopRecording()
             findNavController().navigate(PreCallMicFragmentDirections.actionPreCallMicFragmentToPreCallConnectivityTestFragment())
         }
 
@@ -115,10 +120,11 @@ class PreCallMicFragment : Fragment() {
             if (vm.isRecording) {
                 vm.stopMicCheck()
                 binding.btnRecord.text = "Record"
-                return@setOnSingleClickListener
+            } else{
+                vm.startMicRecording()
+                binding.btnRecord.text = "Stop recording"
             }
-            vm.startMicRecording()
-            binding.btnRecord.text = "Stop recording"
+
         }
         binding.btnPlayback.saveButtonEnabled()
 

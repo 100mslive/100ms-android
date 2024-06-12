@@ -74,6 +74,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun stopMicCheck() {
+        isRecording = false
         kotlin.runCatching { diagnosticSDK.stopMicCheck() }
     }
 

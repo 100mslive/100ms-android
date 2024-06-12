@@ -57,6 +57,11 @@ class PreCallCameraFragment : Fragment() {
             findNavController().navigate(PreCallCameraFragmentDirections.actionPreCallCameraFragmentToPreCallMicFragment())
         }
 
+        binding.noButton.setOnSingleClickListener {
+            vm.stopCameraCheck()
+            findNavController().navigate(PreCallCameraFragmentDirections.actionPreCallCameraFragmentToPreCallMicFragment())
+        }
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
