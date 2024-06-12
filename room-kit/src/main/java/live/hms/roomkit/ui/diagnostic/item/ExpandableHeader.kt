@@ -15,7 +15,7 @@ class ExpandableHeader(
     private val title: String,
     private val subTitle: String? = null,
     @DrawableRes private val subtitleIcon: Int,
-
+    private val hideViewMoreUI : Boolean = false
     ) : BindableItem<ItemDiagnosticHeaderBinding>(), ExpandableItem {
 
     private  var expand: ExpandableGroup? = null
@@ -31,6 +31,13 @@ class ExpandableHeader(
         binding.header.horizontalscroll()
         binding.subheader.setDrawables(start = binding.subheader.context.resources.getDrawable(subtitleIcon, null))
         binding.subheader.text = subTitle
+
+        binding.viewDetail.visibility = if (hideViewMoreUI) {
+            View.GONE
+        } else {
+            View.VISIBLE
+
+        }
         binding.viewDetail.text = "View detailed information"
     }
 

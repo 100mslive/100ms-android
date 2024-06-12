@@ -147,7 +147,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun startSpeakerTest() {
-        diagnosticSDK.startSpeakerCheck()
+       kotlin.runCatching {  diagnosticSDK.startSpeakerCheck() }
     }
 
 

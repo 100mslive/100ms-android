@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.diagnostic.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,7 +101,7 @@ class PreCallConnectivityTestFragment : Fragment() {
 
     private fun mapToUi(model: ConnectivityCheckResult) {
 
-        val signalingHeader = ExpandableGroup(
+        val signalingReport = ExpandableGroup(
             ExpandableHeader(
                 "Signalling server connection test",
                 if (model.signallingReport.isConnected) "Connected" else "Not Connected",
@@ -124,7 +125,7 @@ class PreCallConnectivityTestFragment : Fragment() {
         }
 
 
-        val mediaReportHeader = ExpandableGroup(
+        val mediaReport = ExpandableGroup(
             ExpandableHeader(
                 "Media server connection test", "Connected", R.drawable.ic_correct_tick_big
             )
@@ -152,14 +153,140 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         }
 
+        val isVideoAudioPublished =
+            model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null
+
+        Log.d(
+            "PreCallConnectivityTest",
+            "isVideoAudioPublished: $isVideoAudioPublished ${model.mediaServerReport.stats} ${model.mediaServerReport.stats?.video} ${model.mediaServerReport.stats?.audio}"
+        )
+
+        val videoStats = model.mediaServerReport.stats?.video
+        val audioStats = model.mediaServerReport.stats?.audio
+        val videoReport = ExpandableGroup(
+            ExpandableHeader(
+                "Video",
+                if (isVideoAudioPublished) "Received/Sent" else "Not Received/Sent",
+                if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
+                hideViewMoreUI = isVideoAudioPublished.not()
+            )
+        ).apply {
+            if (isVideoAudioPublished) {
+                add(
+                    DiagnosticDetail(
+                        "Bytes Received",
+                        "${videoStats?.bytesReceived ?: 0}",
+                        R.drawable.ic_correct_tick_small
+                    )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Packets Lost",
+                        "${videoStats?.packetsLost ?: 0}",
+                        R.drawable.ic_correct_tick_small
+                    )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Packets Received",
+                        "${videoStats?.packetsReceived ?: 0}",
+                        R.drawable.ic_correct_tick_small
+                    )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Bitrate Sent",
+                        "${videoStats?.bitrateSent ?: 0}",
+                        R.drawable.ic_correct_tick_small
+                    )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Bitrate Received",
+                        "${videoStats?.bitrateReceived ?: 0}",
+                        R.drawable.ic_correct_tick_small
+                    )
+                )
+
+                add(
+                    DiagnosticDetail(
+                        "Round-Trip Time (RTT)",
+                        "${videoStats?.roundTripTime ?: 0}",
+                        R.drawable.ic_correct_tick_small
+                    )
+                )
+            }
+        }
+
+
+        val audioReport = ExpandableGroup(
+            ExpandableHeader(
+                "Audio",
+                if (isVideoAudioPublished) "Received/Sent" else "Not Received/Sent",
+                if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
+                hideViewMoreUI = isVideoAudioPublished.not()
+            )
+        ).apply {
+            if (isVideoAudioPublished) {
+                if (isVideoAudioPublished) {
+                    add(
+                        DiagnosticDetail(
+                            "Bytes Received",
+                            "${audioStats?.bytesReceived ?: 0}",
+                            R.drawable.ic_correct_tick_small
+                        )
+                    )
+                    add(
+                        DiagnosticDetail(
+                            "Packets Lost",
+                            "${audioStats?.packetsLost ?: 0}",
+                            R.drawable.ic_correct_tick_small
+                        )
+                    )
+                    add(
+                        DiagnosticDetail(
+                            "Packets Received",
+                            "${audioStats?.packetsReceived ?: 0}",
+                            R.drawable.ic_correct_tick_small
+                        )
+                    )
+                    add(
+                        DiagnosticDetail(
+                            "Bitrate Sent",
+                            "${audioStats?.bitrateSent ?: 0}",
+                            R.drawable.ic_correct_tick_small
+                        )
+                    )
+                    add(
+                        DiagnosticDetail(
+                            "Bitrate Received",
+                            "${audioStats?.bitrateReceived ?: 0}",
+                            R.drawable.ic_correct_tick_small
+                        )
+                    )
+                    add(
+                        DiagnosticDetail(
+                            "Round-Trip Time (RTT)",
+                            "${audioStats?.roundTripTime ?: 0}",
+                            R.drawable.ic_correct_tick_small
+                        )
+                    )
+                }
+
+            }
+        }
+
+
 
 
 
 
 
         connectivityListAdapter.apply {
-            add(signalingHeader)
-            add(mediaReportHeader)
+            add(signalingReport)
+            add(mediaReport)
+            add(videoReport)
+            add(audioReport)
         }
     }
 
