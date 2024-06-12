@@ -1,6 +1,8 @@
 package live.hms.roomkit.ui.diagnostic.fragments
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -89,7 +91,8 @@ class PreCallConnectivityTestFragment : Fragment() {
             }
         })
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     vm.stopConnectivityTest()
@@ -105,7 +108,8 @@ class PreCallConnectivityTestFragment : Fragment() {
             ExpandableHeader(
                 "Signalling server connection test",
                 if (model.signallingReport.isConnected) "Connected" else "Not Connected",
-                if (model.signallingReport.isConnected) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big
+                if (model.signallingReport.isConnected) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
+                onExpand = ::onExpand
             )
         ).apply {
             add(
@@ -127,8 +131,12 @@ class PreCallConnectivityTestFragment : Fragment() {
 
         val mediaReport = ExpandableGroup(
             ExpandableHeader(
-                "Media server connection test", "Connected", R.drawable.ic_correct_tick_big
+                "Media server connection test",
+                "Connected",
+                R.drawable.ic_correct_tick_big,
+                onExpand = ::onExpand
             )
+
         ).apply {
             add(
                 DiagnosticDetail(
@@ -168,7 +176,8 @@ class PreCallConnectivityTestFragment : Fragment() {
                 "Video",
                 if (isVideoAudioPublished) "Received/Sent" else "Not Received/Sent",
                 if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
-                hideViewMoreUI = isVideoAudioPublished.not()
+                hideViewMoreUI = isVideoAudioPublished.not(),
+                onExpand = ::onExpand
             )
         ).apply {
             if (isVideoAudioPublished) {
@@ -224,7 +233,8 @@ class PreCallConnectivityTestFragment : Fragment() {
                 "Audio",
                 if (isVideoAudioPublished) "Received/Sent" else "Not Received/Sent",
                 if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
-                hideViewMoreUI = isVideoAudioPublished.not()
+                hideViewMoreUI = isVideoAudioPublished.not(),
+                onExpand = ::onExpand
             )
         ).apply {
             if (isVideoAudioPublished) {
@@ -292,6 +302,13 @@ class PreCallConnectivityTestFragment : Fragment() {
             add(audioReport)
             add(Padding())
         }
+    }
+
+    val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+    private fun onExpand() {
+        mainHandler.postDelayed({
+            binding.connectivtyList.invalidate()
+        }, 200)
     }
 
 }

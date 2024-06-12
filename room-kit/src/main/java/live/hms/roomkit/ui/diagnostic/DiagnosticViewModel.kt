@@ -105,8 +105,10 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
 
     fun stopRecording() {
         isRecording = false
-        diagnosticSDK.stopMicCheck()
-        diagnosticSDK.stopSpeakerCheck()
+        kotlin.runCatching {
+            diagnosticSDK.stopMicCheck()
+            diagnosticSDK.stopSpeakerCheck()
+        }
     }
 
     fun switchAudioOutput(audioDevice: HMSAudioManager.AudioDevice) {

@@ -15,7 +15,9 @@ class ExpandableHeader(
     private val title: String,
     private val subTitle: String? = null,
     @DrawableRes private val subtitleIcon: Int,
-    private val hideViewMoreUI : Boolean = false
+    private val hideViewMoreUI : Boolean = false,
+    private val onExpand : () -> Unit
+
     ) : BindableItem<ItemDiagnosticHeaderBinding>(), ExpandableItem {
 
     private  var expand: ExpandableGroup? = null
@@ -25,6 +27,7 @@ class ExpandableHeader(
         binding.applyTheme()
         binding.root.setOnClickListener {
             expand?.onToggleExpanded()
+            onExpand.invoke()
         }
 
         binding.header.text = title
