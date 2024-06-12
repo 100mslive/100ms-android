@@ -77,7 +77,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                 "isVideoAudioPublished:  ${it?.connectivityState} ${it?.mediaServerReport?.stats?.video} ${it?.mediaServerReport?.stats?.audio}"
             )
 
-            if (it == null || it.connectivityState == ConnectivityState.STARTING) {
+            if (it == null) {
                 binding.uiFailedGroup.gone()
                 binding.uiLoadingGroup.show()
                 binding.uiSuccessGroup.gone()
