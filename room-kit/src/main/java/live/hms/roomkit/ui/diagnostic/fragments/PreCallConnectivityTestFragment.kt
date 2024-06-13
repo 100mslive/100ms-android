@@ -72,10 +72,6 @@ class PreCallConnectivityTestFragment : Fragment() {
 
         vm.connectivityLiveData.observe(viewLifecycleOwner, Observer {
             //in progress
-            Log.d(
-                "PreCallConnectivityTest",
-                "isVideoAudioPublished:  ${it?.mediaServerReport?.stats} ${it?.mediaServerReport?.stats?.video} ${it?.mediaServerReport?.stats?.audio}"
-            )
 
             if (it == null || it.connectivityState == ConnectivityState.STARTING) {
                 binding.uiFailedGroup.gone()
