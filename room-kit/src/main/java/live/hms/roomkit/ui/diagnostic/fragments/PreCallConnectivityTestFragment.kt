@@ -142,7 +142,7 @@ class PreCallConnectivityTestFragment : Fragment() {
         val mediaReport = ExpandableGroup(
             ExpandableHeader(
                 "Media server connection test",
-                "Connected",
+                if (isVideoAudioPublished) "Connected" else "Not Connected",
                 if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
                 onExpand = ::onExpand
             )
