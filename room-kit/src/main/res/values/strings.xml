@@ -43,6 +43,7 @@
     <string name="more_options">More Options</string>
     <string name="meeting_options">Meeting Options</string>
     <string name="meeting">Meeting</string>
+    <string name="diagnostic">Diagnostic</string>
     <string name="open_chat">Open Chat</string>
     <string name="share_screen">Share Screen</string>
     <string name="stop_share_screen">Stop Share Screen</string>
@@ -275,4 +276,6 @@
     <string name="hms_started_quiz_poll_notification">%1$s started a new %2$s</string>
     <string name="use_webrtc_noise_cancellation">Use webrtc noise suppression</string>
     <string name="use_krisp_noise_cancellation">Use noise cancellation</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

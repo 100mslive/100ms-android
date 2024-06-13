@@ -33,6 +33,7 @@ import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.initAnimState
 import live.hms.roomkit.setDrawables
 import live.hms.roomkit.startBounceAnimationUpwards
+import live.hms.roomkit.ui.HMSRoomKit
 import live.hms.roomkit.ui.meeting.participants.ParticipantsAdapter
 import live.hms.roomkit.ui.meeting.participants.ParticipantsDialog
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -355,6 +356,11 @@ class PreviewFragment : Fragment() {
 
     private fun initButtons() {
 
+        binding.iconDiagnostic.setOnSingleClickListener(200L) {
+           contextSafe { context, activity ->
+                HMSRoomKit.launchPreCallDiagnostic(activity)
+            }
+        }
         binding.closeBtn.setOnSingleClickListener(300L) {
             contextSafe { context, activity ->
                 meetingViewModel.leaveMeeting()

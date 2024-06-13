@@ -26,6 +26,15 @@
             android:theme="@style/Theme.Roomkit.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
+        <activity
+            android:name=".ui.diagnostic.DiagnosticActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:exported="true"
+            android:label="@string/diagnostic"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Roomkit.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+
     </application>
 
 </manifest>
