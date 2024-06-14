@@ -72,10 +72,6 @@ class PreCallConnectivityTestFragment : Fragment() {
 
         vm.connectivityLiveData.observe(viewLifecycleOwner, Observer {
             //in progress
-            Log.d(
-                "PreCallConnectivityTest",
-                "isVideoAudioPublished:  ${it?.mediaServerReport?.stats} ${it?.mediaServerReport?.stats?.video} ${it?.mediaServerReport?.stats?.audio}"
-            )
 
             if (it == null || it.connectivityState == ConnectivityState.STARTING) {
                 binding.uiFailedGroup.gone()
@@ -142,7 +138,7 @@ class PreCallConnectivityTestFragment : Fragment() {
         val mediaReport = ExpandableGroup(
             ExpandableHeader(
                 "Media server connection test",
-                "Connected",
+                if (isVideoAudioPublished) "Connected" else "Not Connected",
                 if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
                 onExpand = ::onExpand
             )
