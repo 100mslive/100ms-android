@@ -31,6 +31,7 @@ import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.roomkit.ui.theme.getPreviewLayout
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.roomkit.util.debounce
@@ -106,9 +107,30 @@ class MeetingViewModel(
     val prebuiltInfoContainer by lazy { PrebuiltInfoContainer(hmsSDK) }
 
     private val settings = SettingsStore(getApplication())
-    val noiseCancellationInPreviewUseCase = NoiseCancellationInPreviewUseCase(settings.enableKrispNoiseCancellation) { hmsSDK.setNoiseCancellationEnabled(it) }
+    val noiseCancellationInPreviewUseCase = NoiseCancellationInPreviewUseCase(settings.enableKrispNoiseCancellation) {
+        hmsSDK.enableNoiseCancellation(
+            it,
+            object :
+                HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    hmsNotificationEvent.postValue(
+                        HMSNotification(
+                            title = error.message,
+                            icon = R.drawable.transcription_error_triangle
+                        )
+                    )
+                }
+                override fun onSuccess() {
+
+                }
+            })
+    }
     fun clickNcPreview() {
         noiseCancellationInPreviewUseCase.clickNcInPreview()
+    }
+
+    fun setNcInPreview(value : Boolean?) {
+        noiseCancellationInPreviewUseCase.setNcStateForPreview(value)
     }
 
     private val hmsLogSettings: HMSLogSettings =
@@ -372,7 +394,6 @@ class MeetingViewModel(
                 override fun onLayoutSuccess(layoutConfig: HMSRoomLayout) {
                     hmsRoomLayout = layoutConfig
                     prebuiltInfoContainer.setParticipantLabelInfo(hmsRoomLayout)
-                    Log.d("Pratim", "Setting HMS Config")
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                     onHMSActionResultListener?.onSuccess()
@@ -944,6 +965,7 @@ class MeetingViewModel(
                 val runningStreamingStates = listOf(HMSStreamingState.STARTED, HMSStreamingState.STARTING)
                 val runningRecordingStates = listOf(HMSRecordingState.STARTING, HMSRecordingState.STARTED, HMSRecordingState.PAUSED, HMSRecordingState.RESUMED)
 
+                setNoiseCancellationAccordingToTemplateIfPreviewUnset(room.localPeer?.hmsRole?.name)
                 noiseCancellationInPreviewUseCase.afterJoin()
 
                 if (room.hlsStreamingState.state in runningStreamingStates)
@@ -1271,6 +1293,30 @@ class MeetingViewModel(
                 }
             }
         })
+    }
+
+    fun setNoiseCancellationAccordingToTemplateIfPreviewUnset(roleName: String?) {
+        // If preview sets a value, don't change anything
+        if(noiseCancellationInPreviewUseCase.getNcState() == NoiseCancellationInPreviewUseCase.NcInPreview.UNSET) {
+            when (getHmsRoomLayout()
+                ?.getPreviewLayout(roleName)?.default?.elements?.noiseCancellationElement?.enabled) {
+                true -> {
+                    if (!hmsSDK.isNoiseCancellationEnabled()) { // other ways of enabling exist
+                        noiseCancellationInPreviewUseCase.clickNcInPreview()
+                    }
+                }
+
+                false -> {
+                    if (hmsSDK.isNoiseCancellationEnabled()) {
+                        noiseCancellationInPreviewUseCase.clickNcInPreview()
+                    }
+                }
+
+                null -> { /* Nothing to do */
+                }
+            }
+        }
+
     }
 
     private fun triggerBringOnStageNotificationIfHandRaised(handRaisedPeer: HMSPeer) {
@@ -2638,13 +2684,28 @@ class MeetingViewModel(
     fun getLiveStreamingHeaderDescription() = prebuiltInfoContainer.getLiveStreamingHeaderDescription()
     //fun getHeader() = getHmsRoomLayout()?.data?.getOrNull(0)?.screens?.conferencing?.hlsLiveStreaming?.elements?.participantList
     fun toggleNoiseCancellation() : Boolean {
-        hmsSDK.setNoiseCancellationEnabled(!hmsSDK.getNoiseCancellationEnabled())
-        return hmsSDK.getNoiseCancellationEnabled()
+        hmsSDK.enableNoiseCancellation(
+            !hmsSDK.isNoiseCancellationEnabled(),
+            object :
+                HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    hmsNotificationEvent.postValue(
+                        HMSNotification(
+                            title = error.message,
+                            icon = R.drawable.transcription_error_triangle
+                        )
+                    )
+                }
+                override fun onSuccess() {
+
+                }
+            })
+        return hmsSDK.isNoiseCancellationEnabled()
     }
 
-    fun isNoiseCancellationEnabled() : Boolean = hmsSDK.getNoiseCancellationEnabled()
+    fun isNoiseCancellationEnabled() : Boolean = hmsSDK.isNoiseCancellationEnabled()
     // Show the NC button if it's a webrtc peer with noise cancellation available
-    fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationAvailable() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
+    fun displayNoiseCancellationButton() : Boolean = hmsSDK.isNoiseCancellationSupported() == AvailabilityStatus.Available && ( hmsSDK.getLocalPeer()?.let { !isHlsPeer(it.hmsRole) } ?: false )
 
     fun handRaiseAvailable() = prebuiltInfoContainer.handRaiseAvailable()
     fun areCaptionsAvailable() = hmsSDK.getLocalPeer()?.hmsRole?.permission?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.read == true
@@ -2746,5 +2807,6 @@ class MeetingViewModel(
     private val _hlsStreamEndedFlow = MutableSharedFlow<StreamState>(replay = 0)
     val hlsStreamEndedFlow : Flow<StreamState> = _hlsStreamEndedFlow
 
+    fun ncPreviewNoiseCancellationInLayout() = prebuiltInfoContainer.ncInPreviewState()
 }
 
