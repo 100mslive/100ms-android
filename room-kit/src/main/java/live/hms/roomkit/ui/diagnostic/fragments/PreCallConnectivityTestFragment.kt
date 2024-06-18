@@ -27,6 +27,7 @@ import live.hms.roomkit.ui.diagnostic.item.Padding
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.stats.Utils
 import live.hms.video.diagnostics.models.ConnectivityCheckResult
 import live.hms.video.diagnostics.models.ConnectivityState
 import kotlin.math.round
@@ -184,7 +185,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Bytes Received",
-                        "${videoStats?.bytesReceived ?: 0}",
+                        Utils.humanReadableByteCount(videoStats?.bytesReceived ?: 0, true, false),
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -242,7 +243,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                     add(
                         DiagnosticDetail(
                             "Bytes Received",
-                            "${audioStats?.bytesReceived ?: 0}",
+                            Utils.humanReadableByteCount(audioStats?.bytesReceived ?: 0, true, false),
                             R.drawable.ic_correct_tick_small
                         )
                     )
