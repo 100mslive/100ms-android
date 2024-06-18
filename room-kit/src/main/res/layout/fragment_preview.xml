@@ -95,6 +95,7 @@
             android:elevation="@dimen/eight_dp"
             app:contentPadding="@dimen/eight_dp"
             android:src="@drawable/icon"
+            android:visibility="invisible"
             android:padding="0.5dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"

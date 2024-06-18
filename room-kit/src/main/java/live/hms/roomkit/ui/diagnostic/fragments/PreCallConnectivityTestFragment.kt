@@ -3,7 +3,6 @@ package live.hms.roomkit.ui.diagnostic.fragments
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,6 +30,7 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.stats.Utils
 import live.hms.video.diagnostics.models.ConnectivityCheckResult
 import live.hms.video.diagnostics.models.ConnectivityState
+import kotlin.math.round
 
 
 /**
@@ -73,10 +73,6 @@ class PreCallConnectivityTestFragment : Fragment() {
 
         vm.connectivityLiveData.observe(viewLifecycleOwner, Observer {
             //in progress
-            Log.d(
-                "PreCallConnectivityTest",
-                "isVideoAudioPublished:  ${it?.mediaServerReport?.stats} ${it?.mediaServerReport?.stats?.video} ${it?.mediaServerReport?.stats?.audio}"
-            )
 
             if (it == null || it.connectivityState == ConnectivityState.STARTING) {
                 binding.uiFailedGroup.gone()
@@ -143,7 +139,7 @@ class PreCallConnectivityTestFragment : Fragment() {
         val mediaReport = ExpandableGroup(
             ExpandableHeader(
                 "Media server connection test",
-                "Connected",
+                if (isVideoAudioPublished) "Connected" else "Not Connected",
                 if (isVideoAudioPublished) R.drawable.ic_correct_tick_big else R.drawable.ic_cross_big,
                 onExpand = ::onExpand
             )
@@ -166,7 +162,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             add(
                 DiagnosticDetail(
                     "CQS",
-                    "${model.mediaServerReport.connectionQualityScore.toString()} / 5",
+                    "${if (model.mediaServerReport.connectionQualityScore == null) 0 else model.mediaServerReport.connectionQualityScore} / 5",
                     R.drawable.ic_correct_tick_small
                 )
             )
@@ -210,14 +206,14 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Bitrate Sent",
-                        "${videoStats?.bitrateSent ?: 0}",
+                        "${round(videoStats?.bitrateSent ?: 0.0)}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Bitrate Received",
-                        "${videoStats?.bitrateReceived ?: 0}",
+                        "${round(videoStats?.bitrateReceived ?: 0.0)}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -268,14 +264,14 @@ class PreCallConnectivityTestFragment : Fragment() {
                     add(
                         DiagnosticDetail(
                             "Bitrate Sent",
-                            "${audioStats?.bitrateSent ?: 0}",
+                            "${round(audioStats?.bitrateSent ?: 0.0)}",
                             R.drawable.ic_correct_tick_small
                         )
                     )
                     add(
                         DiagnosticDetail(
                             "Bitrate Received",
-                            "${audioStats?.bitrateReceived ?: 0}",
+                            "${round(audioStats?.bitrateReceived ?: 0.0)}",
                             R.drawable.ic_correct_tick_small
                         )
                     )
