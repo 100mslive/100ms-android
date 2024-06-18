@@ -129,6 +129,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
         isMediaPublished= false
         isMediaCaptured = false
         connectivityLiveData.postValue(null)
+        connectivityStateLiveData.postValue(null)
         diagnosticSDK.startConnectivityCheck(regionCode,
             object : live.hms.video.diagnostics.ConnectivityCheckListener {
                 override fun onCompleted(result: ConnectivityCheckResult) {

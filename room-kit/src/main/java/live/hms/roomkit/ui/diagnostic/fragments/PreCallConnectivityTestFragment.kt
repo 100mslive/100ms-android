@@ -162,8 +162,8 @@ class PreCallConnectivityTestFragment : Fragment() {
             add(
                 DiagnosticDetail(
                     "CQS",
-                    "${if (model.mediaServerReport.connectionQualityScore == null) 0 else model.mediaServerReport.connectionQualityScore} / 5",
-                    R.drawable.ic_correct_tick_small
+                    "${model.mediaServerReport.connectionQualityScore ?: 0} / 5",
+                    if((model.mediaServerReport.connectionQualityScore ?: 0) == 0) R.drawable.ic_cross_small else R.drawable.ic_correct_tick_small
                 )
             )
         }
