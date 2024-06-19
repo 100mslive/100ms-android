@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
+import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 
 class DiagnosticActivity : AppCompatActivity() {
 
@@ -21,6 +22,9 @@ class DiagnosticActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diagnostic)
+        if (HMSPrebuiltTheme.getColours() == null) {
+            HMSPrebuiltTheme.setTheme(HMSPrebuiltTheme.getDefaultHmsColorPalette())
+        }
         viewModel.initSDK()
         setupNavGraph()
 
