@@ -17,6 +17,7 @@ import com.xwray.groupie.GroupieAdapter
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreCallConnectivityTestBinding
 import live.hms.roomkit.gone
+import live.hms.roomkit.orZeroIfNullOrNaN
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.show
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
@@ -192,28 +193,28 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Packets Lost",
-                        "${videoStats?.packetsLost ?: 0}",
+                        "${videoStats?.packetsLost.orZeroIfNullOrNaN()}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Packets Received",
-                        "${videoStats?.packetsReceived ?: 0}",
+                        "${videoStats?.packetsReceived.orZeroIfNullOrNaN()}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Bitrate Sent",
-                        "${round(videoStats?.bitrateSent ?: 0.0)}",
+                        "${round(videoStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Bitrate Received",
-                        "${round(videoStats?.bitrateReceived ?: 0.0)}",
+                        "${round(videoStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -221,7 +222,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Round-Trip Time (RTT)",
-                        "${videoStats?.roundTripTime ?: 0}",
+                        "${videoStats?.roundTripTime.orZeroIfNullOrNaN().toDouble()}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -243,42 +244,42 @@ class PreCallConnectivityTestFragment : Fragment() {
                     add(
                         DiagnosticDetail(
                             "Bytes Received",
-                            Utils.humanReadableByteCount(audioStats?.bytesReceived ?: 0, true, false),
+                            Utils.humanReadableByteCount(audioStats?.bytesReceived.orZeroIfNullOrNaN().toLong(), true, false),
                             R.drawable.ic_correct_tick_small
                         )
                     )
                     add(
                         DiagnosticDetail(
                             "Packets Lost",
-                            "${audioStats?.packetsLost ?: 0}",
+                            "${audioStats?.packetsLost.orZeroIfNullOrNaN()}",
                             R.drawable.ic_correct_tick_small
                         )
                     )
                     add(
                         DiagnosticDetail(
                             "Packets Received",
-                            "${audioStats?.packetsReceived ?: 0}",
+                            "${audioStats?.packetsReceived.orZeroIfNullOrNaN()}",
                             R.drawable.ic_correct_tick_small
                         )
                     )
                     add(
                         DiagnosticDetail(
                             "Bitrate Sent",
-                            "${round(audioStats?.bitrateSent ?: 0.0)}",
+                            "${round(audioStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())}",
                             R.drawable.ic_correct_tick_small
                         )
                     )
                     add(
                         DiagnosticDetail(
                             "Bitrate Received",
-                            "${round(audioStats?.bitrateReceived ?: 0.0)}",
+                            "${round(audioStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())}",
                             R.drawable.ic_correct_tick_small
                         )
                     )
                     add(
                         DiagnosticDetail(
                             "Round-Trip Time (RTT)",
-                            "${audioStats?.roundTripTime ?: 0}",
+                            "${audioStats?.roundTripTime.orZeroIfNullOrNaN()}",
                             R.drawable.ic_correct_tick_small
                         )
                     )
