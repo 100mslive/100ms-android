@@ -222,7 +222,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Round-Trip Time (RTT)",
-                        "${videoStats?.roundTripTime.orZeroIfNullOrNaN().toDouble()}",
+                        "${(videoStats?.roundTripTime.orZeroIfNullOrNaN().toDouble() * 1000).toInt()} ms",
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -240,50 +240,48 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         ).apply {
             if (isVideoAudioPublished) {
-                if (isVideoAudioPublished) {
-                    add(
-                        DiagnosticDetail(
-                            "Bytes Received",
-                            Utils.humanReadableByteCount(audioStats?.bytesReceived.orZeroIfNullOrNaN().toLong(), true, false),
-                            R.drawable.ic_correct_tick_small
-                        )
+                add(
+                    DiagnosticDetail(
+                        "Bytes Received",
+                        Utils.humanReadableByteCount(audioStats?.bytesReceived.orZeroIfNullOrNaN().toLong(), true, false),
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Packets Lost",
-                            "${audioStats?.packetsLost.orZeroIfNullOrNaN()}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Packets Lost",
+                        "${audioStats?.packetsLost.orZeroIfNullOrNaN()}",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Packets Received",
-                            "${audioStats?.packetsReceived.orZeroIfNullOrNaN()}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Packets Received",
+                        "${audioStats?.packetsReceived.orZeroIfNullOrNaN()}",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Bitrate Sent",
-                            "${round(audioStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())} kbps",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Bitrate Sent",
+                        "${round(audioStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())} kbps",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Bitrate Received",
-                            "${round(audioStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())} kbps",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Bitrate Received",
+                        "${round(audioStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())} kbps",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Round-Trip Time (RTT)",
-                            "${audioStats?.roundTripTime.orZeroIfNullOrNaN()}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Round-Trip Time (RTT)",
+                        "${(audioStats?.roundTripTime.orZeroIfNullOrNaN().toDouble() * 1000).toInt()} ms",
+                        R.drawable.ic_correct_tick_small
                     )
-                }
+                )
 
             }
         }
