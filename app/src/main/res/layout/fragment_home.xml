@@ -43,7 +43,7 @@ android:orientation="vertical">
         android:layout_gravity="center"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="8dp"
+     
         android:gravity="center"
         android:text="@string/meeting_link_header_description"
         android:textColor="#E0ECFF"
@@ -55,7 +55,6 @@ android:orientation="vertical">
         android:layout_gravity="center"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="8dp"
         android:maxLines="1"
         android:id="@+id/troubleshoot"
         android:drawableLeft="@drawable/ic_diagnostic_blue"
