@@ -2289,6 +2289,7 @@ fun CustomMenuLayoutBinding.applyTheme(options : EnabledMenuOptions) {
         HMSPrebuiltTheme.getDefaults().onsurface_high_emp
     )
     onStage.setTextColor(textColors)
+    switchRole.setTextColor(textColors)
     raiseHand.setTextColor(textColors)
     removeParticipant.setTextColor(getColorOrDefault(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,

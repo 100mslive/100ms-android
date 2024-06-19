@@ -16,6 +16,7 @@ import live.hms.roomkit.databinding.LayoutParticipantsMergeBinding
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
+import live.hms.roomkit.ui.meeting.SwitchRoleBottomSheet
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 
@@ -32,7 +33,8 @@ class ParticipantsTabFragment : Fragment() {
     lateinit var dismissFragment: () -> Unit
 
     private val participantsUseCase by lazy {
-        ParticipantsUseCase(meetingViewModel, lifecycleScope, viewLifecycleOwner)
+        ParticipantsUseCase(meetingViewModel, lifecycleScope, viewLifecycleOwner,
+            { hmsPeer -> SwitchRoleBottomSheet.launch(childFragmentManager, hmsPeer, meetingViewModel::changeRole) })
         { /*binding.participantsBack.visibility = View.VISIBLE*/ }
     }
 

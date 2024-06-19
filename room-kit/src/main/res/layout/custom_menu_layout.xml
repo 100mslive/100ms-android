@@ -59,6 +59,18 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/switchRole"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:fontFamily="@font/inter_semibold"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="@dimen/spacing_d2"
+            android:text="Switch Role"
+            android:textSize="14sp" />
+
+
+        <TextView
             android:id="@+id/removeParticipant"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

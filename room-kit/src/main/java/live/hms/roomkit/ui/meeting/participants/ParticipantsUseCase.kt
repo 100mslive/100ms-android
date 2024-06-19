@@ -32,7 +32,8 @@ const val handRaisedKey = "Hand Raised"
 class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                           private val scope : LifecycleCoroutineScope,
                           viewLifecycleOwner : LifecycleOwner,
-                          val enterGroupFiltering : () -> Unit
+                          val showSwitchRoleBottomSheet : (HMSPeer) -> Unit,
+                          val enterGroupFiltering : () -> Unit,
     ) {
     // When
     val adapter = GroupieAdapter()
@@ -249,7 +250,8 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                             meetingViewModel.participantPreviousRoleChangeUseCase,
                             meetingViewModel::requestPeerLeave,
                             meetingViewModel.activeSpeakers,
-                            meetingViewModel::lowerRemotePeerHand
+                            meetingViewModel::lowerRemotePeerHand,
+                            showSwitchRoleBottomSheet
                         )
                     }!!)
                 }
