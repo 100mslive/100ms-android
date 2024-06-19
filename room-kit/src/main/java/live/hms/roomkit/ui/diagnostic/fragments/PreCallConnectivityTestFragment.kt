@@ -207,14 +207,14 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Bitrate Sent",
-                        "${round(videoStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())}",
+                        "${round(videoStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())} kbps",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Bitrate Received",
-                        "${round(videoStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())}",
+                        "${round(videoStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())} kbps",
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -265,14 +265,14 @@ class PreCallConnectivityTestFragment : Fragment() {
                     add(
                         DiagnosticDetail(
                             "Bitrate Sent",
-                            "${round(audioStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())}",
+                            "${round(audioStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())} kbps",
                             R.drawable.ic_correct_tick_small
                         )
                     )
                     add(
                         DiagnosticDetail(
                             "Bitrate Received",
-                            "${round(audioStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())}",
+                            "${round(audioStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())} kbps",
                             R.drawable.ic_correct_tick_small
                         )
                     )
