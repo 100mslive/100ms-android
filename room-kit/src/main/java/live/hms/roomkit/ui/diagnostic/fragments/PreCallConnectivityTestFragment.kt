@@ -134,7 +134,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         }
         val isVideoAudioPublished =
-            model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null
+            model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null && vm.isMediaPublished
 
 
         val mediaReport = ExpandableGroup(

@@ -16,7 +16,9 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreCallCameraBinding
 import live.hms.roomkit.databinding.FragmentPreCallMicBinding
 import live.hms.roomkit.databinding.FragmentPreCallRegionSelectionBinding
+import live.hms.roomkit.gone
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.show
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
@@ -70,13 +72,15 @@ class PreCallCameraFragment : Fragment() {
                 }
             })
 
+        binding.buttonSwitchCamera.gone()
         vm.cameraTrackLiveData.observe(viewLifecycleOwner) { cameraTrack ->
             cameraTrack?.let {
+                binding.buttonSwitchCamera.show()
                 binding.videoView.addTrack(it)
             }
         }
 
-        binding.videoView.setOnSingleClickListener {
+        binding.buttonSwitchCamera.setOnSingleClickListener {
             vm.cameraTrackLiveData.value?.switchCamera()
         }
         //check if camera permission is granted

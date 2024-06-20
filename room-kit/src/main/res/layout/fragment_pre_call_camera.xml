@@ -143,6 +143,25 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/bottom_header_text" />
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/button_switch_camera"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@string/toggle_video"
+                android:enabled="false"
+                android:src="@drawable/ic_switch_camera"
+                app:contentPadding="@dimen/eight_dp"
+                app:iconSize="24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/video_view"
+                app:layout_constraintEnd_toEndOf="@+id/video_view"
+                app:layout_constraintTop_toTopOf="@+id/video_view"
+                app:layout_constraintVertical_bias="0.0" />
+
+
             <TextView
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter_bold"
