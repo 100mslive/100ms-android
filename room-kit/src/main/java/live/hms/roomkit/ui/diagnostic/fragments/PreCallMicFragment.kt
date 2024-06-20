@@ -115,8 +115,8 @@ class PreCallMicFragment : Fragment() {
             binding.progressBar.progress = it
 
         })
-        binding.btnPlayback.saveButtonDisabled()
 
+        binding.btnPlayback.saveButtonDisabled()
         binding.btnRecord.setOnSingleClickListener {
             if (vm.isRecording) {
                 vm.stopMicCheck()
@@ -129,7 +129,7 @@ class PreCallMicFragment : Fragment() {
             }
 
         }
-        binding.btnPlayback.saveButtonEnabled()
+
 
         binding.btnPlayback.setOnSingleClickListener {
             vm.startSpeakerTest()
