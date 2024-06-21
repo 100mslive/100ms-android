@@ -120,10 +120,12 @@ class PreCallMicFragment : Fragment() {
         binding.btnRecord.setOnSingleClickListener {
             if (vm.isRecording) {
                 vm.stopMicCheck()
+                updateActionVolumeMenuIcon()
                 binding.btnRecord.text = "Record"
                 binding.btnPlayback.saveButtonEnabled()
             } else{
                 vm.startMicRecording()
+                updateActionVolumeMenuIcon()
                 binding.btnRecord.text = "Stop recording"
                 binding.btnPlayback.saveButtonDisabled()
             }
@@ -159,7 +161,7 @@ class PreCallMicFragment : Fragment() {
     private fun updateActionVolumeMenuIcon(
 
     ) {
-
+        vm.startHMSAudioManager()
         binding.btnSpeakerSelection.apply {
             when (vm.getAudioOutputRouteType()) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
