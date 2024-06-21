@@ -157,5 +157,9 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
        kotlin.runCatching {  diagnosticSDK.startSpeakerCheck() }
     }
 
+    fun startHMSAudioManager() {
+        hmsSDK.startAudioManager()
+    }
+
 
 }
