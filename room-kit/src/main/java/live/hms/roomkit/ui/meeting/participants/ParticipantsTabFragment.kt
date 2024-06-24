@@ -34,7 +34,10 @@ class ParticipantsTabFragment : Fragment() {
 
     private val participantsUseCase by lazy {
         ParticipantsUseCase(meetingViewModel, lifecycleScope, viewLifecycleOwner,
-            { hmsPeer -> SwitchRoleBottomSheet.launch(childFragmentManager, hmsPeer, meetingViewModel::changeRole) })
+            { hmsPeer -> SwitchRoleBottomSheet.launch(childFragmentManager,
+                hmsPeer,
+                meetingViewModel.getAvailableRoles(),
+                meetingViewModel::changeRole) })
         { /*binding.participantsBack.visibility = View.VISIBLE*/ }
     }
 

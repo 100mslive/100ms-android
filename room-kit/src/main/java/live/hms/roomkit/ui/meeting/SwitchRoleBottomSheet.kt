@@ -1,5 +1,5 @@
 package live.hms.roomkit.ui.meeting
-//import androidx.compose.material3.HorizontalDivider
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +10,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -36,10 +41,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -47,8 +55,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.video.sdk.models.HMSPeer
+import live.hms.video.sdk.models.role.HMSRole
 
-private const val PEER: String = "SwitchRoleForPeer"
+private const val PEER: String = "SwitchRoleForPeerInfo"
 
 class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
 
@@ -60,19 +69,30 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
         fun launch(
             childFragmentManager: FragmentManager,
             hmsPeer: HMSPeer,
+            allRoles : List<HMSRole>,
             changeRole: ((remotePeerId: String, toRoleName: String, force: Boolean) -> Unit)
         ) {
+
+            val args = bundleOf(
+                "name" to hmsPeer.name,
+                 "allRoles" to   allRoles.map { it.name },
+               "currentRole" to hmsPeer.hmsRole.name,
+                "peerId" to hmsPeer.peerID
+            )
             SwitchRoleBottomSheet().apply {
-                    this.changeRole = changeRole
-                }.show(
-                    childFragmentManager, TAG
-                )
+                this.changeRole = changeRole
+                arguments = args
+            }.show(
+                childFragmentManager, TAG
+            )
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
+        // If the fragment is recreated after the activity is killed, close it.
+        if (changeRole == null) dismissAllowingStateLoss()
     }
 
 
@@ -84,7 +104,28 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    fun getPeer() = arguments?.getString(PEER)
+    private fun getPeerInfo() : PeerInfo? {
+        val name = arguments?.getString("name")
+        val allRoles = arguments?.getStringArrayList("allRoles")
+        val currentRole = arguments?.getString("currentRole")
+        val peerId = arguments?.getString("peerId")
+        return if(name != null && allRoles != null && currentRole != null && peerId != null) {
+            PeerInfo(
+                name,
+                allRoles,
+                currentRole,
+                peerId
+            )
+        } else {
+            null
+        }
+    }
+    data class PeerInfo(
+        val name : String,
+        val roles : List<String>,
+        val currentRole : String,
+        val peerId : String
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -96,7 +137,19 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
             )
 
             setContent {
-                SwitchComponent()
+                val peerInfo by remember { mutableStateOf<PeerInfo?>(getPeerInfo()) }
+                if(peerInfo == null) {
+                    dismissAllowingStateLoss()
+                } else {
+                    SwitchComponent(name = peerInfo?.name ?: "",
+                        currentRoleName = peerInfo?.currentRole ?: "",
+                        availableRoleNames = peerInfo?.roles ?: emptyList(),
+                    {
+                        changeRole?.invoke(peerInfo?.peerId ?: "", it, true)
+                    }) {
+                        dismissAllowingStateLoss()
+                    }
+                }
             }
         }
     }
@@ -109,18 +162,22 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
 @Preview
 @Composable
 fun PreviewSwitch() {
-    SwitchComponent()
+    val list = listOf(
+        "broadcaster", "viewer-on-stage", "guest"
+    )
+    SwitchComponent(
+        name = "args",
+        currentRoleName = list[0],
+        availableRoleNames = list,{}) {}
 }
 
 @Composable
 fun SwitchComponent(
-    name: String = "Aniket",
-    currentRoleName: String = "guest",
-    availableRoleNames: List<String> = listOf(
-        "broadcaster",
-        "viewer-on-stage",
-        "guest"
-    )
+    name: String,
+    currentRoleName: String,
+    availableRoleNames: List<String>,
+    changeRole : (String) -> Unit,
+    dismiss : () -> Unit
 ) {
     fun getDescriptionText(): AnnotatedString {
         val nameStyle = SpanStyle(
@@ -158,7 +215,7 @@ fun SwitchComponent(
                 top = Variables.Spacing3,
                 bottom = Variables.Spacing4
             ),
-        verticalArrangement = Arrangement.spacedBy(Variables.Spacing2, Alignment.Top),
+        verticalArrangement = Arrangement.spacedBy(Variables.Spacing3, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
@@ -198,43 +255,130 @@ fun SwitchComponent(
             )
         )
 
-        Spacer(modifier = Modifier.height(Variables.Spacing3))
         var selected by remember { mutableStateOf(currentRoleName) }
         Spinner(items = availableRoleNames, selected) { selected = it }
-        Spacer(modifier = Modifier.height(Variables.Spacing3))
-        EnableButton("Switch Role", Variables.PrimaryDefault, {})
+        ChangeRoleButton("Switch Role", Variables.PrimaryDefault) {
+            changeRole(selected)
+            dismiss()
+        }
     }
 }
 
 @Composable
 fun Spinner(items: List<String>, selectedItem: String, itemSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    if (expanded) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items.filter { it != selectedItem }.map {
-            Text(
-                text = it, Modifier.clickable {
-                    itemSelected(it)
-                    expanded = false
-                }, style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 24.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_regular)),
-                    fontWeight = FontWeight(400),
-                    color = Variables.OnSurfaceHigh
-                )
-            )
+
+    if (expanded) {
+        MinimalDialog(items = items.filter { it != selectedItem }, onItemClick = {
+            itemSelected(it)
+            expanded = false
+        }) {
+            expanded = false
         }
     }
-    else {
-        Text(
-            selectedItem, Modifier.clickable { expanded = !expanded }, style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 24.sp,
-                fontFamily = FontFamily(Font(R.font.inter_regular)),
-                fontWeight = FontWeight(400),
-                color = Variables.OnSurfaceHigh
-            )
+    SpinnerHeader(selectedItem) { expanded = true }
+}
+
+@Composable
+fun SpinnerHeader(selectedItem: String, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(color = Variables.SurfaceDefault, shape = RoundedCornerShape(8.dp))
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SpinnerText(it = selectedItem,
+            Modifier
+                .clickable { onClick() }
+                .weight(1f))
+        Image(
+            painter = painterResource(id = R.drawable.chevron_down),
+            contentDescription = "expand",
+            contentScale = ContentScale.None
         )
     }
 }
 
+@Composable
+fun SpinnerText(it: String, modifier: Modifier) {
+    Text(
+        text = it, modifier, style = TextStyle(
+            fontSize = 16.sp,
+            lineHeight = 24.sp,
+            fontFamily = FontFamily(Font(R.font.inter_regular)),
+            fontWeight = FontWeight(400),
+            color = Variables.OnSurfaceHigh
+        )
+    )
+}
+
+@Preview
+@Composable
+fun d() {
+    MinimalDialog(listOf("host", "broadcaster", "viewer"), {}, {})
+}
+
+@Composable
+fun MinimalDialog(
+    items: List<String>, onItemClick: (String) -> Unit, onDismissRequest: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            colors = CardDefaults.cardColors(Variables.SurfaceDefault),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                items.forEachIndexed { index, text ->
+                    Button({}, colors = ButtonDefaults.buttonColors(Variables.SurfaceDefault)) {
+                        SpinnerText(text,
+                            Modifier
+                                .padding(12.dp)
+                                .clickable { onItemClick(text) })
+                    }
+                    if (index < items.size - 1) {
+                        Divider()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChangeRoleButton(
+    text: String,
+    backgroundColor: Color,
+    onEnableClicked: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .background(color = backgroundColor, shape = RoundedCornerShape(size = 8.dp))
+            .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.clickable { onEnableClicked.invoke(text) },
+            text = text,
+
+            style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(R.font.inter_bold)),
+                fontWeight = FontWeight(600),
+                color = Variables.OnPrimaryHigh,
+                textAlign = TextAlign.Center,
+                letterSpacing = 0.5.sp,
+            )
+        )
+    }
+
+}
