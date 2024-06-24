@@ -161,7 +161,6 @@ class PreCallMicFragment : Fragment() {
     private fun updateActionVolumeMenuIcon(
 
     ) {
-        vm.startHMSAudioManager()
         binding.btnSpeakerSelection.apply {
             when (vm.getAudioOutputRouteType()) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
