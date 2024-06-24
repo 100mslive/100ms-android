@@ -10,7 +10,10 @@ import java.util.UUID
 class DiagnosticProvider(private val application: Application) {
     private var hms : Pair<HMSSDK,HMSDiagnostic>? = null
     private val consistentUserId = getConsistentUserIdOverSessions()
-    fun disposeOfDiagnostic() { hms = null }
+    fun disposeOfDiagnostic() {
+        hms?.second?.stopConnectivityCheck()
+        hms = null
+    }
     fun getSdk() = hms?.first ?: createInstance(application).first
     fun getDiagnosticSdk() : HMSDiagnostic = hms?.second ?: createInstance(application).second
     private fun createInstance(application: Application) : Pair<HMSSDK, HMSDiagnostic> {
