@@ -182,7 +182,7 @@ class PreCallAudioSwitchDialog(
 
     private fun setAudioType(audioDevice: HMSAudioManager.AudioDevice) {
         vm.switchAudioOutput(audioDevice)
-        onOptionItemClicked?.invoke(vm.hmsSDK.getAudioOutputRouteType(), true)
+        onOptionItemClicked?.invoke(vm.getAudioOutputRouteType(), true)
         dismiss()
     }
 }
