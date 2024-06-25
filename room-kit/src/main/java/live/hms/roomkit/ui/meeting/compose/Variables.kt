@@ -18,6 +18,11 @@ class Variables {
             HMSPrebuiltTheme.getColours()?.primaryDefault,
             HMSPrebuiltTheme.getDefaults().primary_default))
 
+        val PrimaryDisabled : Color = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.primaryDisabled,
+            HMSPrebuiltTheme.getDefaults().primary_disabled,
+        ))
+
         val SurfaceDefault : Color = Color(getColorOrDefault(
             HMSPrebuiltTheme.getColours()?.surfaceDefault,
             HMSPrebuiltTheme.getDefaults().surface_default

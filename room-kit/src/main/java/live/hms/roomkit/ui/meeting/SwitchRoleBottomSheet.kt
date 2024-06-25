@@ -250,8 +250,12 @@ fun SwitchComponent(
         )
 
         var selected by remember { mutableStateOf(currentRoleName) }
-        Spinner(items = availableRoleNames, selected) { selected = it }
-        ChangeRoleButton("Switch Role", Variables.PrimaryDefault) {
+        var enabled by remember { mutableStateOf(currentRoleName != selected) }
+        Spinner(items = availableRoleNames, selected) {
+            selected = it
+            enabled = currentRoleName != selected
+        }
+        ChangeRoleButton(enabled, "Switch Role") {
             changeRole(selected)
             dismiss()
         }
@@ -360,13 +364,14 @@ fun MinimalDialog(
 
 @Composable
 fun ChangeRoleButton(
-    text: String, backgroundColor: Color, onEnableClicked: (String) -> Unit
+    enabled : Boolean,
+    text: String, onEnableClicked: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(color = backgroundColor, shape = RoundedCornerShape(size = 8.dp))
+            .background(color = if(enabled) Variables.PrimaryDefault else Variables.SecondaryDefault, shape = RoundedCornerShape(size = 8.dp))
             .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
