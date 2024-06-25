@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.os.bundleOf
@@ -69,14 +71,14 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
         fun launch(
             childFragmentManager: FragmentManager,
             hmsPeer: HMSPeer,
-            allRoles : List<HMSRole>,
+            allRoles: List<HMSRole>,
             changeRole: ((remotePeerId: String, toRoleName: String, force: Boolean) -> Unit)
         ) {
 
             val args = bundleOf(
                 "name" to hmsPeer.name,
-                 "allRoles" to   allRoles.map { it.name },
-               "currentRole" to hmsPeer.hmsRole.name,
+                "allRoles" to allRoles.map { it.name },
+                "currentRole" to hmsPeer.hmsRole.name,
                 "peerId" to hmsPeer.peerID
             )
             SwitchRoleBottomSheet().apply {
@@ -104,27 +106,22 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun getPeerInfo() : PeerInfo? {
+    private fun getPeerInfo(): PeerInfo? {
         val name = arguments?.getString("name")
         val allRoles = arguments?.getStringArrayList("allRoles")
         val currentRole = arguments?.getString("currentRole")
         val peerId = arguments?.getString("peerId")
-        return if(name != null && allRoles != null && currentRole != null && peerId != null) {
+        return if (name != null && allRoles != null && currentRole != null && peerId != null) {
             PeerInfo(
-                name,
-                allRoles,
-                currentRole,
-                peerId
+                name, allRoles, currentRole, peerId
             )
         } else {
             null
         }
     }
+
     data class PeerInfo(
-        val name : String,
-        val roles : List<String>,
-        val currentRole : String,
-        val peerId : String
+        val name: String, val roles: List<String>, val currentRole: String, val peerId: String
     )
 
     override fun onCreateView(
@@ -138,15 +135,15 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
 
             setContent {
                 val peerInfo by remember { mutableStateOf<PeerInfo?>(getPeerInfo()) }
-                if(peerInfo == null) {
+                if (peerInfo == null) {
                     dismissAllowingStateLoss()
                 } else {
                     SwitchComponent(name = peerInfo?.name ?: "",
                         currentRoleName = peerInfo?.currentRole ?: "",
                         availableRoleNames = peerInfo?.roles ?: emptyList(),
-                    {
-                        changeRole?.invoke(peerInfo?.peerId ?: "", it, true)
-                    }) {
+                        {
+                            changeRole?.invoke(peerInfo?.peerId ?: "", it, true)
+                        }) {
                         dismissAllowingStateLoss()
                     }
                 }
@@ -165,10 +162,7 @@ fun PreviewSwitch() {
     val list = listOf(
         "broadcaster", "viewer-on-stage", "guest"
     )
-    SwitchComponent(
-        name = "args",
-        currentRoleName = list[0],
-        availableRoleNames = list,{}) {}
+    SwitchComponent(name = "args", currentRoleName = list[0], availableRoleNames = list, {}) {}
 }
 
 @Composable
@@ -176,8 +170,8 @@ fun SwitchComponent(
     name: String,
     currentRoleName: String,
     availableRoleNames: List<String>,
-    changeRole : (String) -> Unit,
-    dismiss : () -> Unit
+    changeRole: (String) -> Unit,
+    dismiss: () -> Unit
 ) {
     fun getDescriptionText(): AnnotatedString {
         val nameStyle = SpanStyle(
@@ -316,8 +310,14 @@ fun SpinnerText(it: String, modifier: Modifier) {
 
 @Preview
 @Composable
-fun d() {
-    MinimalDialog(listOf("host", "broadcaster", "viewer"), {}, {})
+fun SingleOptionDialog() {
+    MinimalDialog(listOf("host"), {}, {})
+}
+
+@Preview
+@Composable
+fun FourOptionDialog() {
+    MinimalDialog(listOf("host","broadcaster","carts","beans"), {}, {})
 }
 
 @Composable
@@ -328,22 +328,30 @@ fun MinimalDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .wrapContentHeight()
                 .padding(16.dp),
             colors = CardDefaults.cardColors(Variables.SurfaceDefault),
             shape = RoundedCornerShape(16.dp),
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                Modifier.fillMaxWidth().heightIn(min= 200.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
 
                 items.forEachIndexed { index, text ->
-                    Button({}, colors = ButtonDefaults.buttonColors(Variables.SurfaceDefault)) {
+                    if (index > 0) {
+                        Divider()
+                    }
+                    Button({},
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(Variables.SurfaceDefault)) {
                         SpinnerText(text,
                             Modifier
                                 .padding(12.dp)
                                 .clickable { onItemClick(text) })
                     }
-                    if (index < items.size - 1) {
-                        Divider()
-                    }
+
                 }
             }
         }
@@ -352,9 +360,7 @@ fun MinimalDialog(
 
 @Composable
 fun ChangeRoleButton(
-    text: String,
-    backgroundColor: Color,
-    onEnableClicked: (String) -> Unit
+    text: String, backgroundColor: Color, onEnableClicked: (String) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -366,8 +372,7 @@ fun ChangeRoleButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            modifier = Modifier.clickable { onEnableClicked.invoke(text) },
-            text = text,
+            modifier = Modifier.clickable { onEnableClicked.invoke(text) }, text = text,
 
             style = TextStyle(
                 fontSize = 16.sp,
