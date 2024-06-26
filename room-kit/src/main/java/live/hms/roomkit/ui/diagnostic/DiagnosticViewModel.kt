@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.diagnostics.HMSAudioDeviceCheckListener
 import live.hms.video.diagnostics.HMSCameraCheckListener
+import live.hms.video.diagnostics.HMSDiagnostic
 import live.hms.video.diagnostics.models.ConnectivityCheckResult
 import live.hms.video.diagnostics.models.ConnectivityState
 import live.hms.video.error.HMSException
@@ -20,10 +21,12 @@ import java.util.UUID
 
 class DiagnosticViewModel(application: Application) : AndroidViewModel(application) {
     // First create a new sdk instance
-    val hmsSDK by lazy { HMSSDK.Builder(application).build() }
-    var regionCode = "in"
-    val diagnosticSDK by lazy { hmsSDK.getDiagnosticSDK(getConsistentUserIdOverSessions()) }
-
+    private var regionCode = "in"
+    private val diagnosticProvider = DiagnosticProvider(application)
+    private val diagnosticSDK  : HMSDiagnostic
+        get() {return diagnosticProvider.getDiagnosticSdk()}
+    private val hmsSDK : HMSSDK
+        get() { return diagnosticProvider.getSdk()}
     val cameraTrackLiveData = MutableLiveData<HMSVideoTrack?>()
     fun cameraPermssionGranted() {
         diagnosticSDK.startCameraCheck(
@@ -47,21 +50,6 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
                 regionCode = it.first
             }
         }
-    }
-
-
-    private fun getConsistentUserIdOverSessions(): String {
-        val sharedPreferences = getApplication<Application>().getSharedPreferences(
-            "your-activity-preference", Context.MODE_PRIVATE
-        )
-        if (sharedPreferences.getString("saved_user_id_blocklist", null) == null) {
-            sharedPreferences.edit {
-                putString(
-                    "saved_user_id_blocklist", UUID.randomUUID().toString()
-                )
-            }
-        }
-        return sharedPreferences.getString("saved_user_id_blocklist", null).orEmpty()
     }
 
     fun stopCameraCheck() {
@@ -126,9 +114,11 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     var isMediaCaptured : Boolean = false
     var isMediaPublished : Boolean = false
     fun startConnectivityTest() {
+        diagnosticProvider.disposeOfDiagnostic()
         isMediaPublished= false
         isMediaCaptured = false
         connectivityLiveData.postValue(null)
+        connectivityStateLiveData.postValue(null)
         diagnosticSDK.startConnectivityCheck(regionCode,
             object : live.hms.video.diagnostics.ConnectivityCheckListener {
                 override fun onCompleted(result: ConnectivityCheckResult) {
@@ -156,5 +146,6 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
        kotlin.runCatching {  diagnosticSDK.startSpeakerCheck() }
     }
 
+   
 
 }

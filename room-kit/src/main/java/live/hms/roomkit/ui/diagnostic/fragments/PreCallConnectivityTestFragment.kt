@@ -17,6 +17,7 @@ import com.xwray.groupie.GroupieAdapter
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPreCallConnectivityTestBinding
 import live.hms.roomkit.gone
+import live.hms.roomkit.orZeroIfNullOrNaN
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.show
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
@@ -27,6 +28,7 @@ import live.hms.roomkit.ui.diagnostic.item.Padding
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.stats.Utils
 import live.hms.video.diagnostics.models.ConnectivityCheckResult
 import live.hms.video.diagnostics.models.ConnectivityState
 import kotlin.math.round
@@ -132,7 +134,7 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         }
         val isVideoAudioPublished =
-            model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null
+            model.mediaServerReport.isSubcribeICEConnected && model.mediaServerReport.isPublishICEConnected && model.mediaServerReport.stats != null && model.mediaServerReport.stats?.video != null && model.mediaServerReport.stats?.audio != null && vm.isMediaPublished
 
 
         val mediaReport = ExpandableGroup(
@@ -161,8 +163,8 @@ class PreCallConnectivityTestFragment : Fragment() {
             add(
                 DiagnosticDetail(
                     "CQS",
-                    "${if (model.mediaServerReport.connectionQualityScore == null) 0 else model.mediaServerReport.connectionQualityScore} / 5",
-                    R.drawable.ic_correct_tick_small
+                    "${model.mediaServerReport.connectionQualityScore ?: 0} / 5",
+                    if((model.mediaServerReport.connectionQualityScore ?: 0) == 0) R.drawable.ic_cross_small else R.drawable.ic_correct_tick_small
                 )
             )
         }
@@ -184,35 +186,35 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Bytes Received",
-                        "${videoStats?.bytesReceived ?: 0}",
+                        Utils.humanReadableByteCount(videoStats?.bytesReceived ?: 0, true, false),
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Packets Lost",
-                        "${videoStats?.packetsLost ?: 0}",
+                        "${videoStats?.packetsLost.orZeroIfNullOrNaN()}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Packets Received",
-                        "${videoStats?.packetsReceived ?: 0}",
+                        "${videoStats?.packetsReceived.orZeroIfNullOrNaN()}",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Bitrate Sent",
-                        "${round(videoStats?.bitrateSent ?: 0.0)}",
+                        "${round(videoStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())} kbps",
                         R.drawable.ic_correct_tick_small
                     )
                 )
                 add(
                     DiagnosticDetail(
                         "Bitrate Received",
-                        "${round(videoStats?.bitrateReceived ?: 0.0)}",
+                        "${round(videoStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())} kbps",
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -220,7 +222,7 @@ class PreCallConnectivityTestFragment : Fragment() {
                 add(
                     DiagnosticDetail(
                         "Round-Trip Time (RTT)",
-                        "${videoStats?.roundTripTime ?: 0}",
+                        "${(videoStats?.roundTripTime.orZeroIfNullOrNaN().toDouble() * 1000).toInt()} ms",
                         R.drawable.ic_correct_tick_small
                     )
                 )
@@ -238,50 +240,48 @@ class PreCallConnectivityTestFragment : Fragment() {
             )
         ).apply {
             if (isVideoAudioPublished) {
-                if (isVideoAudioPublished) {
-                    add(
-                        DiagnosticDetail(
-                            "Bytes Received",
-                            "${audioStats?.bytesReceived ?: 0}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                add(
+                    DiagnosticDetail(
+                        "Bytes Received",
+                        Utils.humanReadableByteCount(audioStats?.bytesReceived.orZeroIfNullOrNaN().toLong(), true, false),
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Packets Lost",
-                            "${audioStats?.packetsLost ?: 0}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Packets Lost",
+                        "${audioStats?.packetsLost.orZeroIfNullOrNaN()}",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Packets Received",
-                            "${audioStats?.packetsReceived ?: 0}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Packets Received",
+                        "${audioStats?.packetsReceived.orZeroIfNullOrNaN()}",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Bitrate Sent",
-                            "${round(audioStats?.bitrateSent ?: 0.0)}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Bitrate Sent",
+                        "${round(audioStats?.bitrateSent.orZeroIfNullOrNaN().toDouble())} kbps",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Bitrate Received",
-                            "${round(audioStats?.bitrateReceived ?: 0.0)}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Bitrate Received",
+                        "${round(audioStats?.bitrateReceived.orZeroIfNullOrNaN().toDouble())} kbps",
+                        R.drawable.ic_correct_tick_small
                     )
-                    add(
-                        DiagnosticDetail(
-                            "Round-Trip Time (RTT)",
-                            "${audioStats?.roundTripTime ?: 0}",
-                            R.drawable.ic_correct_tick_small
-                        )
+                )
+                add(
+                    DiagnosticDetail(
+                        "Round-Trip Time (RTT)",
+                        "${(audioStats?.roundTripTime.orZeroIfNullOrNaN().toDouble() * 1000).toInt()} ms",
+                        R.drawable.ic_correct_tick_small
                     )
-                }
+                )
 
             }
         }

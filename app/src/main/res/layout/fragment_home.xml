@@ -43,10 +43,23 @@ android:orientation="vertical">
         android:layout_gravity="center"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="8dp"
         android:gravity="center"
         android:text="@string/meeting_link_header_description"
         android:textColor="#E0ECFF"
+        android:textSize="16sp" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="15dp"
+        android:maxLines="1"
+        android:id="@+id/troubleshoot"
+        android:drawableLeft="@drawable/ic_diagnostic_blue"
+        android:textColorLink="#538DFF"
+        android:text="@string/troubles_joining_str"
+        android:textColor="#538DFF"
         android:textSize="16sp" />
 
     <EditText
@@ -54,7 +67,7 @@ android:orientation="vertical">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="24dp"
         android:autofillHints=""
         android:background="@drawable/gray_round_btn"
         android:fontFamily="@font/inter_regular"

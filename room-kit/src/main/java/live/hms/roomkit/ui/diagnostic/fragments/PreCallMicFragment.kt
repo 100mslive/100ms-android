@@ -27,6 +27,7 @@ import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.PreviewFragment
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.roomkit.ui.theme.saveButtonDisabled
 import live.hms.roomkit.ui.theme.saveButtonEnabled
 import live.hms.roomkit.ui.theme.setIconEnabled
 import live.hms.roomkit.util.setOnSingleClickListener
@@ -115,18 +116,22 @@ class PreCallMicFragment : Fragment() {
 
         })
 
-
+        binding.btnPlayback.saveButtonDisabled()
         binding.btnRecord.setOnSingleClickListener {
             if (vm.isRecording) {
                 vm.stopMicCheck()
+                updateActionVolumeMenuIcon()
                 binding.btnRecord.text = "Record"
+                binding.btnPlayback.saveButtonEnabled()
             } else{
                 vm.startMicRecording()
+                updateActionVolumeMenuIcon()
                 binding.btnRecord.text = "Stop recording"
+                binding.btnPlayback.saveButtonDisabled()
             }
 
         }
-        binding.btnPlayback.saveButtonEnabled()
+
 
         binding.btnPlayback.setOnSingleClickListener {
             vm.startSpeakerTest()
@@ -156,7 +161,6 @@ class PreCallMicFragment : Fragment() {
     private fun updateActionVolumeMenuIcon(
 
     ) {
-
         binding.btnSpeakerSelection.apply {
             when (vm.getAudioOutputRouteType()) {
                 HMSAudioManager.AudioDevice.EARPIECE -> {
