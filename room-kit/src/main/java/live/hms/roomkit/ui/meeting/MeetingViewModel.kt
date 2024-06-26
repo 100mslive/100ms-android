@@ -2808,5 +2808,6 @@ class MeetingViewModel(
     val hlsStreamEndedFlow : Flow<StreamState> = _hlsStreamEndedFlow
 
     fun ncPreviewNoiseCancellationInLayout() = prebuiltInfoContainer.ncInPreviewState()
+    fun getAllWhitelistedRolesForChangeRole() = prebuiltInfoContainer.getAllWhitelistedRolesForChangeRole()
 }
 

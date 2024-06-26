@@ -36,7 +36,7 @@ class ParticipantsTabFragment : Fragment() {
         ParticipantsUseCase(meetingViewModel, lifecycleScope, viewLifecycleOwner,
             { hmsPeer -> SwitchRoleBottomSheet.launch(childFragmentManager,
                 hmsPeer,
-                meetingViewModel.getAvailableRoles(),
+                meetingViewModel.getAllWhitelistedRolesForChangeRole(),
                 meetingViewModel::changeRole) })
         { /*binding.participantsBack.visibility = View.VISIBLE*/ }
     }

@@ -71,13 +71,13 @@ class SwitchRoleBottomSheet : BottomSheetDialogFragment() {
         fun launch(
             childFragmentManager: FragmentManager,
             hmsPeer: HMSPeer,
-            allRoles: List<HMSRole>,
+            allRoles: List<String>,
             changeRole: ((remotePeerId: String, toRoleName: String, force: Boolean) -> Unit)
         ) {
 
             val args = bundleOf(
                 "name" to hmsPeer.name,
-                "allRoles" to allRoles.map { it.name },
+                "allRoles" to allRoles,
                 "currentRole" to hmsPeer.hmsRole.name,
                 "peerId" to hmsPeer.peerID
             )

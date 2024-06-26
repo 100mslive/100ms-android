@@ -31,7 +31,7 @@ class ParticipantsFragment : Fragment() {
         viewLifecycleOwner,
         { hmsPeer -> SwitchRoleBottomSheet.launch(childFragmentManager,
             hmsPeer,
-            meetingViewModel.getAvailableRoles(),
+            meetingViewModel.getAllWhitelistedRolesForChangeRole(),
             meetingViewModel::changeRole) }
     ) { binding.participantsBack.visibility = View.VISIBLE }
     }
