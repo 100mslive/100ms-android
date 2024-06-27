@@ -16,6 +16,7 @@ import live.hms.roomkit.databinding.FragmentParticipantsBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.MeetingState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
+import live.hms.roomkit.ui.meeting.SwitchRoleBottomSheet
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.HMSPeer
@@ -27,7 +28,11 @@ class ParticipantsFragment : Fragment() {
     private var alertDialog: AlertDialog? = null
     private val meetingViewModel: MeetingViewModel by activityViewModels()
     private val participantsUseCase by lazy { ParticipantsUseCase(meetingViewModel, lifecycleScope,
-        viewLifecycleOwner
+        viewLifecycleOwner,
+        { hmsPeer -> SwitchRoleBottomSheet.launch(childFragmentManager,
+            hmsPeer,
+            meetingViewModel.getAllWhitelistedRolesForChangeRole(),
+            meetingViewModel::changeRole) }
     ) { binding.participantsBack.visibility = View.VISIBLE }
     }
 

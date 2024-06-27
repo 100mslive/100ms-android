@@ -180,6 +180,9 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
         return available
     }
 
+    fun getAllWhitelistedRolesForChangeRole() = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+            ?.default?.elements?.chat?.rolesWhiteList ?: emptyList()
+
 }
 
 data class AllowedToMessageParticipants(

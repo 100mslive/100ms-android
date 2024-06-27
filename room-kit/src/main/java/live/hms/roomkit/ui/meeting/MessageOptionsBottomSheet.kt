@@ -46,7 +46,6 @@ class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
     }
 
     private var binding by viewLifecycle<BottomSheetMessageOptionsBinding>()
-//    private val chatMessage: ChatMessage? = arguments?.getParcelable(CHAT_MESSAGE_OPTIONS_EXTRA) as ChatMessage?
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
