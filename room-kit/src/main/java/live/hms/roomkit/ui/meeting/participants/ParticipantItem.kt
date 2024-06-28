@@ -135,6 +135,7 @@ class ParticipantItem(
                     setOnSingleClickListener {
                         // opens another bottomsheet fragment
                         showSwitchRoleBottomSheet(hmsPeer)
+                        mypopupWindow.dismiss()
                     }
                 }
                 popBinding.toggleAudio.visibility = if(audioIsOn != null && showToggleAudio) View.VISIBLE else View.GONE
