@@ -249,7 +249,7 @@ fun SwitchComponent(
             )
         )
 
-        var selected by remember { mutableStateOf(currentRoleName) }
+        var selected by remember { mutableStateOf(startingSelectedRole(availableRoleNames, currentRoleName)) }
         var enabled by remember { mutableStateOf(currentRoleName != selected) }
         Spinner(items = availableRoleNames, selected) {
             selected = it
@@ -261,6 +261,12 @@ fun SwitchComponent(
         }
     }
 }
+
+fun startingSelectedRole(availableRoleNames: List<String>, currentRoleName: String): String =
+    if(availableRoleNames.size == 2)
+        availableRoleNames.firstOrNull { it != currentRoleName } ?: currentRoleName
+    else
+        currentRoleName
 
 @Composable
 fun Spinner(items: List<String>, selectedItem: String, itemSelected: (String) -> Unit) {
