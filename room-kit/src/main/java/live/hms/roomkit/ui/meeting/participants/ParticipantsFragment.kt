@@ -19,7 +19,7 @@ import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.SwitchRoleBottomSheet
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.viewLifecycle
-import live.hms.video.sdk.models.HMSPeer
+
 const val DIRECTLY_OPENED: String= "PARTICIPANTS_DIRECTLY_OPENED"
 class ParticipantsFragment : Fragment() {
 
@@ -36,9 +36,7 @@ class ParticipantsFragment : Fragment() {
     ) { binding.participantsBack.visibility = View.VISIBLE }
     }
 
-    private val paginatedPeerList = arrayListOf<HMSPeer>()
     private var isLargeRoom = false
-    private var iteratorsInitated = false
 
     override fun onDetach() {
         super.onDetach()
@@ -114,10 +112,10 @@ class ParticipantsFragment : Fragment() {
 
                 val builder = AlertDialog.Builder(requireContext())
                     .setMessage(message)
-                    .setTitle(live.hms.roomkit.R.string.non_fatal_error_dialog_title)
+                    .setTitle(R.string.non_fatal_error_dialog_title)
                     .setCancelable(true)
 
-                builder.setPositiveButton(live.hms.roomkit.R.string.ok) { dialog, _ ->
+                builder.setPositiveButton(R.string.ok) { dialog, _ ->
                     dialog.dismiss()
                     alertDialog = null
                     meetingViewModel.setStatetoOngoing() // hack, so that the liveData represents the correct state. Use SingleLiveEvent instead
