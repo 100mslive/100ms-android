@@ -751,10 +751,10 @@ class MeetingViewModel(
     }
 
     private fun getAudioTrackState() =
-        if (settings.isAudioTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+        HMSTrackSettings.InitState.UNMUTED
 
     private fun getVideoTrackState() =
-        if (settings.isVideoTrackInitStateEnabled.not()) HMSTrackSettings.InitState.MUTED else HMSTrackSettings.InitState.UNMUTED
+        HMSTrackSettings.InitState.UNMUTED
 
     private fun getVideoCameraFacing() =
         if (settings.camera.contains(REAR_FACING_CAMERA)) HMSVideoTrackSettings.CameraFacing.BACK else HMSVideoTrackSettings.CameraFacing.FRONT
