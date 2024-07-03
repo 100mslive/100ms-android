@@ -91,15 +91,7 @@ class ParticipantsFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun initViewModels() {
         binding.recyclerView.adapter = participantsUseCase.adapter
-        // Initial updating of views
-        // Using HMSCoroutine scope here since we want the next call to get queued
-//        initPaginatedPeerlist()
-//            meetingViewModel.participantPeerUpdate.observe(viewLifecycleOwner) {
-//            lifecycleScope.launch {
-//                periodicallyUpdatePeerListForLargeRoom() // WARING: This clears the peerlist
-//                participantsUseCase.updateParticipantsAdapter(getPeerList(), true)
-//            }
-//        }
+
         meetingViewModel.peerCount.observe(viewLifecycleOwner,::updateParticipantCount)
 
         meetingViewModel.state.observe(viewLifecycleOwner) { state ->
