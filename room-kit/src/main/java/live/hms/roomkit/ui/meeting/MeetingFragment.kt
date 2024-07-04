@@ -875,7 +875,7 @@ class MeetingFragment : Fragment() {
                     contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR }
             }
             else -> {
-                contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT }
+                contextSafe { context, activity -> activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR }
             }
         }
 

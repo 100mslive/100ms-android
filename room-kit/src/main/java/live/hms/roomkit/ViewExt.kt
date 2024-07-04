@@ -22,18 +22,31 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import live.hms.roomkit.helpers.OnSingleClickListener
+import live.hms.video.error.HMSException
 import live.hms.video.media.capturers.camera.CameraControl
 import live.hms.video.media.settings.HMSSimulcastLayerDefinition
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
+import live.hms.video.plugin.video.HMSVideoPlugin
+import live.hms.video.sdk.HMSActionResultListener
+import live.hms.video.sdk.HMSSDK
 import live.hms.videoview.HMSVideoView
 import org.w3c.dom.Text
 import org.webrtc.EglRenderer
 import org.webrtc.SurfaceViewRenderer
 import java.io.File
 import java.io.FileOutputStream
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resumeWithException
 
 
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
@@ -413,3 +426,45 @@ fun HMSVideoView.setCameraGestureListener(track : HMSVideoTrack?,onImageCapture 
 
 
 }
+
+object HMSPluginScope : CoroutineScope {
+    private val executor = Executors.newSingleThreadScheduledExecutor()
+    private val dispatcher = executor.asCoroutineDispatcher()
+    override val coroutineContext: CoroutineContext
+        get() = dispatcher
+}
+internal suspend fun HMSSDK.addPlugin(plugin : HMSVideoPlugin): Unit {
+    return suspendCancellableCoroutine { continuation ->
+        if (getPlugins().orEmpty().isEmpty().not()){
+            continuation.resume(Unit, {})
+            return@suspendCancellableCoroutine
+        }
+        addPlugin(plugin, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d("HmsPluginError","$error")
+                continuation.resume(Unit, {})
+            }
+            override fun onSuccess() {
+                continuation.resume(Unit, {})
+            }
+        })
+    }
+}
+
+internal suspend fun HMSSDK.removePlugin(): Unit {
+    return suspendCancellableCoroutine { continuation ->
+        for (plugin in this.getPlugins().orEmpty()) {
+            removePlugin(plugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    continuation.resume(Unit, {})
+                }
+                override fun onSuccess() {
+                    continuation.resume(Unit, {})
+                }
+            })
+        }
+    }
+}
+
+
+

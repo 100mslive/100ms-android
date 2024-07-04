@@ -26,6 +26,7 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.models.TranscriptionState
 import live.hms.video.sdk.models.TranscriptionsMode
 import live.hms.video.sdk.models.enums.HMSRecordingState
+import live.hms.video.virtualbackground.VideoPluginMode
 import live.hms.video.whiteboard.State
 
 class SessionOptionBottomSheet(
@@ -168,7 +169,17 @@ class SessionOptionBottomSheet(
         )
 
         val videoFilter = GridOptionItem(
-            "Video Filter", R.drawable.emoji_icon, {
+            "Virtual Background", R.drawable.emoji_icon, {
+                meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
+                onNameChange.invoke()
+                dismissAllowingStateLoss()
+
+            }, isSelected = false
+        )
+
+        val blurFilter = GridOptionItem(
+            "Blur Filter", R.drawable.emoji_icon, {
+                meetingViewModel.isVbPlugin = VideoPluginMode.BLUR_BACKGROUND
                 onNameChange.invoke()
                 dismissAllowingStateLoss()
 
@@ -217,6 +228,12 @@ class SessionOptionBottomSheet(
                         }, isSelected = false
                     )
                 )
+            }
+//            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
+//                add(videoFilter)
+//            }
+            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
+                add(blurFilter)
             }
             if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
                 add(videoFilter)

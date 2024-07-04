@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "live.hms.app2"
-        minSdkVersion 21
+        minSdkVersion 26
         targetSdk 34
         versionCode project.findProperty('100MS_APP_VERSION_CODE') as int
         versionName project.findProperty('100MS_APP_VERSION_NAME')
@@ -60,7 +60,6 @@ dependencies {
 
     //100ms.live prebuilt lib
     implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
-
     //100ms noise cancellation dep
     def hmsVersion = "2.9.62"
     implementation "live.100ms:hms-noise-cancellation-android:$hmsVersion"

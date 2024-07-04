@@ -33,10 +33,7 @@ android {
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -79,6 +76,7 @@ dependencies {
     implementation "live.100ms:video-view:$hmsVersion"
     implementation "live.100ms:hls-player:$hmsVersion"
     implementation "live.100ms:video-filters:$hmsVersion"
+    implementation "live.100ms:virtual-background:$hmsVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.7.4"

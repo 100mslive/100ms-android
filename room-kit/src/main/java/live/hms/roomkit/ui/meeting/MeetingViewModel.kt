@@ -3,20 +3,29 @@ package live.hms.roomkit.ui.meeting
 import android.Manifest
 import android.app.Application
 import android.content.Intent
+import android.graphics.Bitmap
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toBitmapOrNull
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
+import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
+import live.hms.roomkit.addPlugin
+import live.hms.roomkit.removePlugin
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.bottomsheets.StreamState
@@ -67,6 +76,9 @@ import live.hms.video.services.LogAlarmManager
 import live.hms.video.sessionstore.HmsSessionStore
 import live.hms.video.signal.init.*
 import live.hms.video.utils.HMSLogger
+import live.hms.video.virtualbackground.HMSVirtualBackground
+import live.hms.video.virtualbackground.VideoFrameInfoListener
+import live.hms.video.virtualbackground.VideoPluginMode
 import live.hms.video.whiteboard.HMSWhiteboard
 import live.hms.video.whiteboard.HMSWhiteboardUpdate
 import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
@@ -74,6 +86,7 @@ import live.hms.video.whiteboard.State
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.abs
 import kotlin.properties.Delegates
 
 
@@ -178,6 +191,14 @@ class MeetingViewModel(
 
 
     val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
+    val bitmap =         Bitmap.createBitmap(
+        1,
+        1,
+        Bitmap.Config.ARGB_8888,
+    )
+
+    var isVbPlugin : VideoPluginMode = VideoPluginMode.NONE
+    val virtualBackGroundPlugin by lazy { HMSVirtualBackground(hmsSDK) }
 
     private var lastPollStartedTime : Long = 0
 
@@ -336,39 +357,61 @@ class MeetingViewModel(
     }
 
     fun showVideoFilterIcon() = settings.enableVideoFilter
-
+    val pluginMutex = Mutex()
      fun setupFilterVideoPlugin() {
+         when(isVbPlugin) {
+             VideoPluginMode.REPLACE_BACKGROUND -> {
+                 if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
+                     var isLandscapeSet = false
+                     var isPotraitSet = false
+                     virtualBackGroundPlugin.setVideoFrameInfoListener(object :
+                         VideoFrameInfoListener {
+                         override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
+                            if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
+                                if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
+                                    isLandscapeSet = true
+                                    isPotraitSet = false
+                                    virtualBackGroundPlugin.enableBackground(getApplication<Application>().resources.getDrawable(
+                                        R.drawable.bg
+                                    ).toBitmap()
+                                    )
+                                } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
+                                    isLandscapeSet = false
+                                    isPotraitSet = true
+                                    virtualBackGroundPlugin.enableBackground(
+                                        getApplication<Application>().resources.getDrawable(
+                                            R.drawable.potrait_bg
+                                        ).toBitmap()
+                                    )
+                                }
+                            }
+                         }
+                     }
+                     )
+                 }
+             }
+             VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
+             VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
+         }
 
-        if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
 
-                }
-
-                override fun onSuccess() {
-
-                }
-
-            })
-        }
+         HMSPluginScope.launch {
+             pluginMutex.withLock {
+                 Log.d("XYZ","add plugin start")
+                 hmsSDK.addPlugin(virtualBackGroundPlugin)
+                 Log.d("XYZ","add plugin end")
+             }
+         }
     }
 
     fun removeVideoFilterPlugIn() {
-
-        if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
-            filterPlugin.stop()
-            hmsSDK.removePlugin(filterPlugin, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
-
-                }
-
-                override fun onSuccess() {
-
-                }
-
-            })
+        HMSPluginScope.launch {
+            pluginMutex.withLock {
+                Log.d("XYZ","remove plugin start")
+                hmsSDK.removePlugin()
+                Log.d("XYZ","remove plugin end")
+            }
         }
-
     }
 
 

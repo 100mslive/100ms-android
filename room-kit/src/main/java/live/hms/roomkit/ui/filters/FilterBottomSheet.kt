@@ -16,6 +16,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.SnapHelper
@@ -30,6 +31,9 @@ import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.virtualbackground.VideoFrameInfoListener
+import live.hms.video.virtualbackground.VideoPluginMode
+import kotlin.math.abs
 
 
 class FilterBottomSheet(
@@ -48,6 +52,7 @@ class FilterBottomSheet(
     var currentSelectedFilter: VideoFilter? = null
 
     val padding = 8
+    var lastPluginMode: VideoPluginMode? = null
 
     override fun onStart() {
         super.onStart()
@@ -112,7 +117,6 @@ class FilterBottomSheet(
 
 
 
-
         (binding.pluginSwitch as SwitchCompat).isChecked = true
         meetingViewModel.setupFilterVideoPlugin()
         (binding.pluginSwitch as SwitchCompat).setTextColor(
@@ -126,19 +130,29 @@ class FilterBottomSheet(
             else meetingViewModel.removeVideoFilterPlugIn()
         }
 
+
+
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 when (currentSelectedFilter) {
-                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(
-                        progress / 100f
-                    )
+//                    is VideoFilter.Brightness -> meetingViewModel.filterPlugin.setBrightness(
+//                        progress / 100f
+//                    )
+//
+//                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress / 100f)
+//                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
+//                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
+//                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
+                    is VideoFilter.Blur -> {
 
-                    is VideoFilter.Sharpness -> meetingViewModel.filterPlugin.setSharpness(progress / 100f)
-                    is VideoFilter.Contrast -> meetingViewModel.filterPlugin.setContrast(progress / 100f)
-                    is VideoFilter.Redness -> meetingViewModel.filterPlugin.setRedness(progress / 100f)
-                    is VideoFilter.Smoothness -> meetingViewModel.filterPlugin.setSmoothness(progress / 100f)
-                    null -> {}
-                    else -> {}
+                        update()
+
+                    }
+//                    is VideoFilter.Quality -> meetingViewModel.blurPlugin.setVideoQualityPercentage(progress)
+                    else -> {
+
+
+                    }
                 }
 
             }
@@ -159,35 +173,54 @@ class FilterBottomSheet(
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 when (tab?.tag) {
-                    is VideoFilter.Brightness -> {
-                        currentSelectedFilter = VideoFilter.Brightness
+//                    is VideoFilter.Brightness -> {
+//                        currentSelectedFilter = VideoFilter.Brightness
+//                        binding.seekBar.progress =
+//                            (meetingViewModel.filterPlugin.getBrightnessProgress() * 100f).toInt()
+//                    }
+//
+//                    is VideoFilter.Sharpness -> {
+//                        currentSelectedFilter = VideoFilter.Sharpness
+//                        binding.seekBar.progress =
+//                            (meetingViewModel.filterPlugin.getSharpnessProgress() * 100f).toInt()
+//                    }
+//
+//
+//                    is VideoFilter.Contrast -> {
+//                        currentSelectedFilter = VideoFilter.Contrast
+//                        binding.seekBar.progress =
+//                            ( meetingViewModel.filterPlugin.getContrastProgress() * 100f).toInt()
+//                    }
+//
+//                    is VideoFilter.Redness -> {
+//                        currentSelectedFilter = VideoFilter.Redness
+//                        binding.seekBar.progress =
+//                            (meetingViewModel.filterPlugin.getRednessProgress() * 100f).toInt()
+//                    }
+//
+//                    is VideoFilter.Smoothness -> {
+//                        currentSelectedFilter = VideoFilter.Smoothness
+//                        binding.seekBar.progress =
+//                            ( meetingViewModel.filterPlugin.getSmoothnessProgress() * 100f).toInt()
+//                    }
+
+                    is VideoFilter.Blur -> {
+                        currentSelectedFilter = VideoFilter.Blur
                         binding.seekBar.progress =
-                            (meetingViewModel.filterPlugin.getBrightnessProgress() * 100f).toInt()
+                            (meetingViewModel.virtualBackGroundPlugin.getCurrentBlurPercentage()).toInt()
+                        if (lastPluginMode != null) {
+                            meetingViewModel.isVbPlugin = lastPluginMode!!
+                        }
+                        update()
                     }
 
-                    is VideoFilter.Sharpness -> {
-                        currentSelectedFilter = VideoFilter.Sharpness
-                        binding.seekBar.progress =
-                            (meetingViewModel.filterPlugin.getSharpnessProgress() * 100f).toInt()
-                    }
+                    is VideoFilter.Quality -> {
+                        if (lastPluginMode == null) {
+                            lastPluginMode = meetingViewModel.isVbPlugin
+                        }
+                        meetingViewModel.isVbPlugin = VideoPluginMode.NONE
+                        update()
 
-
-                    is VideoFilter.Contrast -> {
-                        currentSelectedFilter = VideoFilter.Contrast
-                        binding.seekBar.progress =
-                            ( meetingViewModel.filterPlugin.getContrastProgress() * 100f).toInt()
-                    }
-
-                    is VideoFilter.Redness -> {
-                        currentSelectedFilter = VideoFilter.Redness
-                        binding.seekBar.progress =
-                            (meetingViewModel.filterPlugin.getRednessProgress() * 100f).toInt()
-                    }
-
-                    is VideoFilter.Smoothness -> {
-                        currentSelectedFilter = VideoFilter.Smoothness
-                        binding.seekBar.progress =
-                            ( meetingViewModel.filterPlugin.getSmoothnessProgress() * 100f).toInt()
                     }
 
 
@@ -218,23 +251,29 @@ class FilterBottomSheet(
                     HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
                     HMSPrebuiltTheme.getDefaults().onsurface_high_emp
                 )
-
             )
             addTab(
-                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness), true
+                this.newTab().setText(meetingViewModel.isVbPlugin.toString())
+                    .setTag(VideoFilter.Blur), true
             )
             addTab(
-                this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
+                this.newTab().setText("Disable Effects").setTag(VideoFilter.Quality)
             )
-            addTab(
-                this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
-            )
-            addTab(
-                this.newTab().setText("Redness").setTag(VideoFilter.Redness)
-            )
-            addTab(
-                this.newTab().setText("Smoothness").setTag(VideoFilter.Smoothness)
-            )
+//            addTab(
+//                this.newTab().setText("Brightness").setTag(VideoFilter.Brightness)
+//            )
+//            addTab(
+//                this.newTab().setText("Contrast").setTag(VideoFilter.Contrast)
+//            )
+//            addTab(
+//                this.newTab().setText("Sharpness").setTag(VideoFilter.Sharpness)
+//            )
+//            addTab(
+//                this.newTab().setText("Redness").setTag(VideoFilter.Redness)
+//            )
+//            addTab(
+//                this.newTab().setText("Smoothness").setTag(VideoFilter.Smoothness)
+//            )
             setSelectedTabIndicatorColor(Color.TRANSPARENT)
         }
 
@@ -265,6 +304,27 @@ class FilterBottomSheet(
                     HMSPrebuiltTheme.getDefaults().onsurface_high_emp
                 )
             )
+        }
+
+    }
+
+    private fun update() {
+        when (meetingViewModel.isVbPlugin) {
+            VideoPluginMode.REPLACE_BACKGROUND -> {
+//                val dr =
+//                    arrayOf(R.drawable.potrait_bg, R.drawable.bg).randomOrNull()!!
+//                meetingViewModel.virtualBackGroundPlugin.enableBackground(
+//                    context!!.resources.getDrawable(
+//                        dr
+//                    ).toBitmap()
+//                )
+            }
+
+            VideoPluginMode.BLUR_BACKGROUND -> {
+                meetingViewModel.virtualBackGroundPlugin.enableBlur()
+            }
+
+            VideoPluginMode.NONE -> meetingViewModel.virtualBackGroundPlugin.disableEffects()
         }
 
     }

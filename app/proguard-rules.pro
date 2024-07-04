@@ -25,8 +25,6 @@
 -keep public class * extends java.lang.Exception  # Optional: Keep custom exceptions.
 
 # https://developer.android.com/guide/navigation/navigation-pass-data#proguard_considerations
--keepnames class live.hms.app2.model.RoomDetails
--keepnames class live.hms.app2.ui.settings.SettingsMode
 -keep class * extends androidx.fragment.app.Fragment{}
 
 # Previously required proguard rules for sdk, now included in the library.
