@@ -2821,7 +2821,10 @@ class MeetingViewModel(
 
             override fun onError(error: HMSException) {
                 // Send an error here
-                peers.completeExceptionally(error)
+                peers.complete(emptyList())
+                triggerErrorNotification(
+                    error.message
+                )
             }
 
         })
