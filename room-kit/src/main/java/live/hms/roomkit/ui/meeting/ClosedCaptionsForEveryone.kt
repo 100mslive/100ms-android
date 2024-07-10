@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.meeting
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -45,7 +44,7 @@ import live.hms.video.sdk.models.TranscriptionsMode
 class ClosedCaptionsForEveryone : BottomSheetDialogFragment() {
 
     companion object {
-        val TAG = "ClosedCaptionsForEveryoneBottomFragment"
+        const val TAG = "ClosedCaptionsForEveryoneBottomFragment"
     }
 
 
@@ -153,7 +152,7 @@ fun EnableCaptionsDisplay(onEnableForEveryoneClicked : () -> Unit,
                 text = screen.title, style = TextStyle(
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
-                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_bold)),
+                    fontFamily = FontFamily(Font(R.font.inter_bold)),
                     fontWeight = FontWeight(600),
                     color = Variables.OnSecondaryHigh,
                     letterSpacing = 0.15.sp,
@@ -164,7 +163,7 @@ fun EnableCaptionsDisplay(onEnableForEveryoneClicked : () -> Unit,
                     .padding(1.dp)
                     .size(24.dp)
                     .clickable { close() },
-                painter = painterResource(id = live.hms.roomkit.R.drawable.outline_cross),
+                painter = painterResource(id = R.drawable.outline_cross),
                 contentDescription = "Close",
                 contentScale = ContentScale.None
             )
@@ -203,11 +202,11 @@ fun EnableButton(
         Text(
             modifier = Modifier.clickable { onEnableClicked.invoke() },
             text = text,
-            // Desktop/Button-Semibold-16px
+
             style = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_bold)),
+                fontFamily = FontFamily(Font(R.font.inter_bold)),
                 fontWeight = FontWeight(600),
                 color = Variables.OnPrimaryHigh,
                 textAlign = TextAlign.Center,
@@ -226,7 +225,7 @@ fun DescriptionText(text : String) {
         style = TextStyle(
             fontSize = 14.sp,
             lineHeight = 20.sp,
-            fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+            fontFamily = FontFamily(Font(R.font.inter_regular)),
             fontWeight = FontWeight(400),
             color = Variables.OnSurfaceMedium,
             letterSpacing = 0.25.sp,

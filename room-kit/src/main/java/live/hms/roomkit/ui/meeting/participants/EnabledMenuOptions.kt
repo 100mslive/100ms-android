@@ -10,4 +10,5 @@ data class EnabledMenuOptions(
     val videoIsOn : Boolean? = null,
     val showToggleAudio : Boolean,
     val showToggleVideo : Boolean,
+    val changeRole :Boolean,
 )

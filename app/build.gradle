@@ -62,7 +62,7 @@ dependencies {
     implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
 
     //100ms noise cancellation dep
-    def hmsVersion = "2.9.59"
+    def hmsVersion = "2.9.62"
     implementation "live.100ms:hms-noise-cancellation-android:$hmsVersion"
 
     // Navigation
@@ -84,7 +84,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
 
     // Get Permissions easily
-    implementation 'pub.devrel:easypermissions:1.1.3'
+    implementation 'pub.devrel:easypermissions:3.0.0'
 
     // Firebase Crashlytics
     // Import the BoM for the Firebase platform

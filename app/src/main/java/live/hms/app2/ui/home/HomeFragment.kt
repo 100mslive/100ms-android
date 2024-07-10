@@ -192,6 +192,12 @@ class HomeFragment : Fragment() {
             validate()
         }
 
+        binding.troubleshoot.setOnClickListener {
+            contextSafe { context, activity ->
+                HMSRoomKit.launchPreCallDiagnostic(activity)
+            }
+        }
+
         binding.edtMeetingUrl.doOnTextChanged { text, _, _, _ ->
             if (text.isNullOrEmpty()) {
                 binding.tvMeetingUrlInputLayout.hint =

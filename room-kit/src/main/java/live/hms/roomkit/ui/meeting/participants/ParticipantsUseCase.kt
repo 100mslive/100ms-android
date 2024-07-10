@@ -32,7 +32,8 @@ const val handRaisedKey = "Hand Raised"
 class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                           private val scope : LifecycleCoroutineScope,
                           viewLifecycleOwner : LifecycleOwner,
-                          val enterGroupFiltering : () -> Unit
+                          val showSwitchRoleBottomSheet : (HMSPeer) -> Unit,
+                          val enterGroupFiltering : () -> Unit,
     ) {
     // When
     val adapter = GroupieAdapter()
@@ -114,7 +115,12 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
             addTextChangedListener { text ->
                 scope.launch {
                     filterText = text.toString()
-                    updateParticipantsAdapter(getAllPeers())
+                    if(isLargeRoom) {
+                        val peers = meetingViewModel.searchPeerNameInLargeRoom(text.toString(), 0)
+                        updateParticipantsAdapter(peers)
+                    } else {
+                        updateParticipantsAdapter(getAllPeers())
+                    }
                 }
             }
         }
@@ -249,7 +255,8 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                             meetingViewModel.participantPreviousRoleChangeUseCase,
                             meetingViewModel::requestPeerLeave,
                             meetingViewModel.activeSpeakers,
-                            meetingViewModel::lowerRemotePeerHand
+                            meetingViewModel::lowerRemotePeerHand,
+                            showSwitchRoleBottomSheet
                         )
                     }!!)
                 }

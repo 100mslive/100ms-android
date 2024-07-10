@@ -44,6 +44,14 @@ fun View.setOnSingleClickListener(l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l))
 }
 
+fun Number?.orZeroIfNullOrNaN(): Number {
+    return if (this == null || (this is Double && this.isNaN()) || (this is Float && this.isNaN())) {
+        0
+    } else {
+        this
+    }
+}
+
 fun View.gone() {
     if (this.visibility != View.GONE)
         this.visibility = View.GONE
