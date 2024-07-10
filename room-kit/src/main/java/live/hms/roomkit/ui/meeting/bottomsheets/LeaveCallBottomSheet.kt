@@ -63,6 +63,7 @@ class LeaveCallBottomSheet : BottomSheetDialogFragment() {
                 meetingViewModel.stopHls()
             }
             meetingViewModel.leaveMeeting()
+            dismissAllowingStateLoss()
         }
 
 

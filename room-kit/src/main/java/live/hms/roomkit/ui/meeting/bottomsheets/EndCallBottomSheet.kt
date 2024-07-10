@@ -61,6 +61,7 @@ class EndCallBottomSheet : BottomSheetDialogFragment() {
             if (canEndRoom) {
                 meetingViewModel.stopHls()
                 meetingViewModel.endRoom(false)
+                dismissAllowingStateLoss()
             } else {
                 meetingViewModel.stopHls()
                 dismissAllowingStateLoss()
