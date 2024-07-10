@@ -115,7 +115,12 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
             addTextChangedListener { text ->
                 scope.launch {
                     filterText = text.toString()
-                    updateParticipantsAdapter(getAllPeers())
+                    if(isLargeRoom) {
+                        val peers = meetingViewModel.searchPeerNameInLargeRoom(text.toString(), 0)
+                        updateParticipantsAdapter(peers)
+                    } else {
+                        updateParticipantsAdapter(getAllPeers())
+                    }
                 }
             }
         }

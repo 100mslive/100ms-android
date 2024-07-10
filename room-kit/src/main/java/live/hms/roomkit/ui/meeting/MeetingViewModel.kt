@@ -2809,5 +2809,27 @@ class MeetingViewModel(
 
     fun ncPreviewNoiseCancellationInLayout() = prebuiltInfoContainer.ncInPreviewState()
     fun getAllWhitelistedRolesForChangeRole() = prebuiltInfoContainer.getAllWhitelistedRolesForChangeRole()
+    suspend fun searchPeerNameInLargeRoom(query: String,
+                                          offset : Long,
+                                          limit: Int = 10,
+                                          ): List<HMSPeer> {
+        val peers = CompletableDeferred<List<HMSPeer>>()
+        hmsSDK.searchPeerNameInLargeRoom(query,limit, offset, object : HmsTypedActionResultListener<PeerSearchResponse> {
+            override fun onSuccess(result: PeerSearchResponse) {
+                peers.complete(result.peers)
+            }
+
+            override fun onError(error: HMSException) {
+                // Send an error here
+                peers.complete(emptyList())
+                triggerErrorNotification(
+                    error.message
+                )
+            }
+
+        })
+        return peers.await()
+    }
+
 }
 
