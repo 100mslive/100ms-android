@@ -3,3 +3,4 @@ include ':app'
 rootProject.name = "Android 100ms"
 include ':room-kit'
 include ':vb-prebuilt'
+include ':prebuilt-themes'

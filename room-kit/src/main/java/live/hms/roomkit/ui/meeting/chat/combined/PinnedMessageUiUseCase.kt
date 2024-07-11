@@ -21,7 +21,7 @@ import live.hms.roomkit.ui.meeting.participants.PinnedMessageItem
 import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
-import live.hms.roomkit.util.dp
+import live.hms.prebuilt_themes.dp
 
 class PinnedMessageUiUseCase {
     private val pinnedMessagesAdapter = GroupieAdapter()

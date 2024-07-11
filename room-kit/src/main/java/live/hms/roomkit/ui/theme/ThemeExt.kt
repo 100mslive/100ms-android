@@ -31,6 +31,9 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
+import live.hms.prebuilt_themes.ApplyRadiusatVertex
+import live.hms.prebuilt_themes.DefaultDarkThemeColours
+import live.hms.prebuilt_themes.addAlpha
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.*
 import live.hms.roomkit.drawableEnd
@@ -38,10 +41,7 @@ import live.hms.roomkit.drawableLeft
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setGradient
 import live.hms.roomkit.ui.meeting.participants.EnabledMenuOptions
-import live.hms.roomkit.ui.polls.leaderboard.item.ApplyRadiusatVertex
-import live.hms.roomkit.util.EmailUtils
-import live.hms.roomkit.util.EmailUtils.addAlpha
-import live.hms.roomkit.util.dp
+import live.hms.prebuilt_themes.dp
 import live.hms.video.polls.models.HmsPollState
 import live.hms.video.signal.init.HMSRoomLayout
 import live.hms.video.utils.GsonUtils.gson
@@ -1608,7 +1608,7 @@ fun FragmentGridVideoBinding.applyTheme() {
     HMSPrebuiltTheme.getColours()?.surfaceDefault?.let {
         iconOption.setBackgroundColor(
             getColorOrDefault(
-                EmailUtils.addAlpha(it, 0.6),
+                addAlpha(it, 0.6),
                 HMSPrebuiltTheme.getDefaults().surface_default
             )
         )
