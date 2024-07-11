@@ -29,6 +29,7 @@ data class DefaultDarkThemeColours(
     @SerializedName("error_default") val error_default: String = "#C74E5B",
     @SerializedName("error_container") val error_container: String = "#FFB2B6",
     @SerializedName("background_default") val background_default: String = "#0B0E15",
-    @SerializedName("border_bright") val border_bright: String = "#272A31"
+    @SerializedName("border_bright") val border_bright: String = "#272A31",
+    @SerializedName("border_default") val border_default: String = "#1D1F27"
 )
 

@@ -419,7 +419,11 @@ class MeetingFragment : Fragment() {
             }
         }
 
-        requireActivity().finish()
+        // Navigate to Meeting Feedback Fragment
+        findNavController().navigate(
+            MeetingFragmentDirections.actionMeetingFragmentToMeetingEndedFragment()
+        )
+//        requireActivity().finish()
     }
 
     private fun updateRecordingViews(state: HMSRecordingState) {
@@ -1530,7 +1534,7 @@ fun Caption(subtitles : AnnotatedString) {
     Box(modifier = Modifier) {
             Text(
                 text = subtitles,
-//                modifier = Modifier.padding(Variables.Spacing1),
+//                modifier = Modifier.padding(Variables.Spacing2),
                 style = TextStyle(
                     fontSize = 14.sp,
                     lineHeight = 20.sp,

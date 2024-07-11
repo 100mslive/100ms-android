@@ -66,7 +66,18 @@
         <action
             android:id="@+id/action_MeetingFragment_to_participantsTabFragment"
             app:destination="@id/participantsTabFragment" />
+
+        <action
+            android:id="@+id/action_MeetingFragment_to_MeetingEndedFragment"
+            app:destination="@id/MeetingEndedFragment"
+            />
     </fragment>
+
+    <fragment
+        android:id="@+id/MeetingEndedFragment"
+        android:name="live.hms.roomkit.ui.meeting.MeetingEndedFragment"
+        android:label="Meeting Ended Fragment"
+        tools:layout="@layout/fragment_meeting_ended" />
 
     <fragment
         android:id="@+id/ParticipantsFragment"

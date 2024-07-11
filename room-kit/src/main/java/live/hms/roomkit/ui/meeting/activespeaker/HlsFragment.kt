@@ -134,9 +134,9 @@ import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.compose.Variables
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.OnSurfaceHigh
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
-import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing0
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
 import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
+import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing4
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
@@ -569,7 +569,7 @@ fun ChatHeader(
 
     fun getTimeDisplayNum(startedMillis: Long): String = millisToText(startedMillis, false, "s")
 
-    val contentPadding = Modifier.padding(Spacing2)
+    val contentPadding = Modifier.padding(Spacing4)
     var chatHeaderModifier = Modifier
         .fillMaxWidth()
     if(showExpandedView) {
@@ -578,7 +578,7 @@ fun ChatHeader(
     Column {
         Column(modifier = chatHeaderModifier) {
             if (showExpandedView) {
-                Row(modifier = Modifier.padding(Spacing2)) {
+                Row(modifier = Modifier.padding(Spacing4)) {
                     Text(
                         "About Session",
                         fontSize = 16.sp,
@@ -603,7 +603,7 @@ fun ChatHeader(
                         .height(1.dp)
                         .fillMaxWidth()
                 )
-                // Spacer(modifier = Modifier.height(Spacing2))
+                // Spacer(modifier = Modifier.height(Spacing4))
             }
             Row(
                 modifier = contentPadding,
@@ -672,7 +672,7 @@ fun ChatHeader(
             if(showExpandedView && description != null) {
                 Text(
                     modifier = Modifier
-                        .padding(horizontal = Spacing2)
+                        .padding(horizontal = Spacing4)
                         .verticalScroll(rememberScrollState()),
                     text = description,
                     fontSize = 14.sp,
@@ -737,7 +737,7 @@ fun ChatHeaderExpandedPreview() {
 fun Chat(messages: List<ChatMessage>) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(Spacing1),
+        verticalArrangement = Arrangement.spacedBy(Spacing2),
         horizontalAlignment = Alignment.Start,
     ) {
         items(messages) {
@@ -826,7 +826,7 @@ fun GoLiveText(isLive : Boolean, behindBy: String, goLiveClicked : () -> Unit) {
             contentDescription = "Gray",
             modifier = Modifier
                 // Margin right
-                .padding(end = Spacing1)
+                .padding(end = Spacing2)
         )
         Text(
             text = if(isLive) "LIVE" else "GO LIVE",
@@ -845,7 +845,7 @@ fun GoLiveText(isLive : Boolean, behindBy: String, goLiveClicked : () -> Unit) {
                 text = behindBy,
                 modifier = Modifier
                     .clickable { goLiveClicked() }
-                    .padding(start = Spacing1),
+                    .padding(start = Spacing2),
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 24.sp,
@@ -1004,12 +1004,12 @@ fun HlsComposable(
                 val subtitles by hlsViewModel.currentSubtitles.observeAsState()
                 if(!subtitles.isNullOrEmpty()) {
                     Box(modifier = Modifier
-                        .padding(horizontal = Spacing0)
+                        .padding(horizontal = Spacing1)
                         .padding(bottom = 32.dp)) {
                         Surface(color = Color.Black) {
                             Text(
                                 text = subtitles ?: "",
-                                modifier = Modifier.padding(Spacing1),
+                                modifier = Modifier.padding(Spacing2),
                                 style = TextStyle(
                                     fontSize = 11.sp,
                                     lineHeight = 13.sp,
@@ -1041,7 +1041,7 @@ fun HlsComposable(
 
                 // There's one column, with two rows.
                 // A spacer puts a gap between items on any one row.
-                Column(Modifier.padding(Spacing1)) {
+                Column(Modifier.padding(Spacing2)) {
                     // Top Row
                     Row {
 
@@ -1050,11 +1050,11 @@ fun HlsComposable(
                         if(!chatOpen) { HlsChatIcon(isChatEnabled, unreadMessagesCount, chatIconClicked) }
 
                         if(areCaptionsSupported) {
-                            Spacer(modifier = Modifier.padding(start = Spacing2))
+                            Spacer(modifier = Modifier.padding(start = Spacing4))
                             closedCaptionsButton()
                         }
 
-                        Spacer(modifier = Modifier.padding(start = Spacing2))
+                        Spacer(modifier = Modifier.padding(start = Spacing4))
 
                         SettingsButton(settingsButtonTapped)
                     }
@@ -1084,7 +1084,7 @@ fun HlsComposable(
         if (!isChatEnabled) {
             Box(modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = Spacing0),
+                .padding(vertical = Spacing1),
                 contentAlignment = Alignment.BottomCenter) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
@@ -1116,7 +1116,7 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
             Spacer(Modifier.weight(1f))
             AndroidView(modifier = Modifier
                 .wrapContentSize()
-                .padding(top = Spacing1), factory = {
+                .padding(top = Spacing2), factory = {
                 (LayoutInflater.from(it)
                     .inflate(R.layout.player_controls, null) as PlayerControlView)
                     .apply {
@@ -1181,8 +1181,8 @@ fun CloseButton(onCloseButtonClicked: () -> Unit) {
         contentScale = ContentScale.None,
         modifier = Modifier
             .clickable { onCloseButtonClicked() }
-            .padding(Spacing0)
             .padding(Spacing1)
+            .padding(Spacing2)
         )
 }
 

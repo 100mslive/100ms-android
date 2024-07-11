@@ -129,16 +129,16 @@ fun EnableCaptionsDisplay(onEnableForEveryoneClicked : () -> Unit,
             .wrapContentHeight()
             .background(
                 color = Variables.SurfaceDim,
-                shape = RoundedCornerShape(topStart = Variables.Spacing2, topEnd = Variables.Spacing2)
+                shape = RoundedCornerShape(topStart = Variables.Spacing4, topEnd = Variables.Spacing4)
             )
             .padding(
-                start = Variables.Spacing3,
-                end = Variables.Spacing3,
-                top = Variables.Spacing3,
-                bottom = Variables.Spacing4
+                start = Variables.Spacing6,
+                end = Variables.Spacing6,
+                top = Variables.Spacing6,
+                bottom = Variables.Spacing8
             )
         ,
-        verticalArrangement = Arrangement.spacedBy(Variables.Spacing2, Alignment.Top),
+        verticalArrangement = Arrangement.spacedBy(Variables.Spacing4, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
