@@ -40,7 +40,7 @@ class NoiseCancellationInPreviewUseCase(
     fun setNcStateForPreview(value : Boolean?) {
         state = when(value) {
             true -> NcInPreview.ON
-            false -> NcInPreview.ON
+            false -> NcInPreview.OFF
             null -> NcInPreview.UNSET
         }
 
