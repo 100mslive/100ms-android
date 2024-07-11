@@ -17,8 +17,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.AllowedToMessageParticipants
 import live.hms.roomkit.ui.meeting.ChatPauseState
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.video.sdk.models.HMSPeer
 
 

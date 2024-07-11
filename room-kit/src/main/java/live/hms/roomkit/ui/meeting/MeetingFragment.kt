@@ -61,6 +61,11 @@ import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
+import live.hms.prebuilt_themes.getPreviewLayout
+import live.hms.prebuilt_themes.setIconEnabled
+import live.hms.prebuilt_themes.setIconDisabled
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.setGradient

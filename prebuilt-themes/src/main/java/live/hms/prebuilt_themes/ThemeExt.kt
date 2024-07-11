@@ -38,9 +38,6 @@ import live.hms.video.utils.GsonUtils.gson
 object HMSPrebuiltTheme {
     var theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette? = null
     fun getColours() = theme
-    internal fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
-        this.theme = theme
-    }
 
     fun getDefaults() = DefaultDarkThemeColours()
 
@@ -55,25 +52,25 @@ object HMSPrebuiltTheme {
     }
 }
 
-internal fun HMSRoomLayout.getPreviewLayout(roleName: String?): HMSRoomLayout.HMSRoomLayoutData.Screens.Preview? {
+fun HMSRoomLayout.getPreviewLayout(roleName: String?): HMSRoomLayout.HMSRoomLayoutData.Screens.Preview? {
     return if (roleName.isNullOrEmpty()) this.data?.getOrNull(0)?.screens?.preview
     else this.data?.find { it?.role == roleName }?.screens?.preview
 }
 
-internal fun HMSRoomLayout.getCurrentRoleData(roleName: String?): HMSRoomLayout.HMSRoomLayoutData? {
+fun HMSRoomLayout.getCurrentRoleData(roleName: String?): HMSRoomLayout.HMSRoomLayoutData? {
     return if (roleName.isNullOrEmpty()) this.data?.getOrNull(0)
     else this.data?.find { it?.role == roleName }
 }
 
 
-internal fun CardView.setBackgroundColor(
+fun CardView.setBackgroundColor(
     backgroundColorStr: String?,
     defaultBackgroundColor: String,
 ) {
     this.setCardBackgroundColor(getColorOrDefault(backgroundColorStr, defaultBackgroundColor))
 }
 
-internal fun View.setBackgroundAndColor(
+fun View.setBackgroundAndColor(
     backgroundColorStr: String?,
     defaultBackgroundColor: String,
 ) {
@@ -82,7 +79,7 @@ internal fun View.setBackgroundAndColor(
 
 
 //AppCompatImageView tint
-internal fun androidx.appcompat.widget.AppCompatImageView.setIconTintColor(
+fun androidx.appcompat.widget.AppCompatImageView.setIconTintColor(
     iconTintColorStr: String?,
     defaultIconTintColor: String,
 ) {
@@ -90,7 +87,7 @@ internal fun androidx.appcompat.widget.AppCompatImageView.setIconTintColor(
         ColorStateList.valueOf(getColorOrDefault(iconTintColorStr, defaultIconTintColor))
 }
 
-internal fun View.setBackgroundAndColor(
+fun View.setBackgroundAndColor(
     backgroundColorStr: String?,
     defaultBackgroundColor: String,
     @DrawableRes backGroundDrawableRes: Int?
@@ -131,7 +128,7 @@ fun View.backgroundGradientDrawable(@ColorInt startColor: Int, @ColorInt endColo
 }
 
 
-internal fun ShapeableImageView.setIconEnabled(
+fun ShapeableImageView.setIconEnabled(
     @DrawableRes enabledIconDrawableRes: Int
 ) {
     val radius = resources.getDimension(R.dimen.eight_dp).toInt()
@@ -164,7 +161,7 @@ internal fun ShapeableImageView.setIconEnabled(
 }
 
 
-internal fun ImageView.setIconDisabled(
+fun ImageView.setIconDisabled(
     @DrawableRes disabledIconDrawableRes: Int,
     @DrawableRes backgroundRes: Int = R.drawable.gray_round_solid_drawable
 ) {
@@ -189,7 +186,7 @@ internal fun ImageView.setIconDisabled(
 
 }
 
-internal fun ShapeableImageView.setIconDisabled(
+fun ShapeableImageView.setIconDisabled(
     @DrawableRes disabledIconDrawableRes: Int,
     @DimenRes radiusREs: Int = R.dimen.eight_dp,
 ) {
@@ -221,7 +218,7 @@ internal fun ShapeableImageView.setIconDisabled(
 
 }
 
-internal fun TextView.alertButtonEnabled() {
+fun TextView.alertButtonEnabled() {
     this.isEnabled = true
 
     this.setTextColor(
@@ -245,7 +242,7 @@ internal fun TextView.alertButtonEnabled() {
     )
 }
 
-internal fun TextView.buttonStrokeEnabled() {
+fun TextView.buttonStrokeEnabled() {
     this.isEnabled = true
     this.setBackgroundAndColor(
         HMSPrebuiltTheme.getColours()?.alertErrorDefault,
@@ -262,7 +259,7 @@ internal fun TextView.buttonStrokeEnabled() {
 
 }
 
-internal fun TextView.buttonEnabled() {
+fun TextView.buttonEnabled() {
     this.isEnabled = true
 
     this.setTextColor(
@@ -288,7 +285,7 @@ internal fun TextView.buttonEnabled() {
 
 private fun getBackgroundForColor(color: Int) = getShape().apply { setTint(color) }
 
-internal fun TextView.buttonDisabled() {
+fun TextView.buttonDisabled() {
     this.isEnabled = false
 
 
@@ -645,7 +642,7 @@ fun MaterialCardView.isSelectedStroke(isSelected: Boolean) {
 }
 
 
-internal fun TextView.saveButtonEnabled() {
+fun TextView.saveButtonEnabled() {
     this.isEnabled = true
 
     this.setTextColor(
@@ -664,7 +661,7 @@ internal fun TextView.saveButtonEnabled() {
 }
 
 
-internal fun TextView.saveButtonDisabled() {
+fun TextView.saveButtonDisabled() {
     this.isEnabled = false
 
 

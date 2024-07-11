@@ -12,10 +12,10 @@ import live.hms.roomkit.databinding.LayoutPollsDisplayChoicesQuesionBinding
 import live.hms.roomkit.databinding.LayoutQuizDisplayShortAnswerBinding
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.ui.polls.display.voting.VotingProgressAdapter
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.alertButtonEnabled
-import live.hms.roomkit.ui.theme.buttonEnabled
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.alertButtonEnabled
+import live.hms.prebuilt_themes.buttonEnabled
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.ui.theme.highlightCorrectAnswer
 import live.hms.roomkit.ui.theme.voteButtons
 import live.hms.roomkit.util.setOnSingleClickListener

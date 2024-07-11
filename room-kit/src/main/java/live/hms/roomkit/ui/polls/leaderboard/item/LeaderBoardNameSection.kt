@@ -5,11 +5,11 @@ import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.prebuilt_themes.ApplyRadiusatVertex
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ItemNameSectionBinding
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.prebuilt_themes.setBackgroundAndColor
 
 class LeaderBoardNameSection(
     private val titleStr: String,

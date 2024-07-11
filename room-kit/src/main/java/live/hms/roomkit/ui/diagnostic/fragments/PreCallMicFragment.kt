@@ -26,10 +26,10 @@ import live.hms.roomkit.ui.meeting.AudioOutputSwitchBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.PreviewFragment
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.prebuilt_themes.buttonEnabled
 import live.hms.roomkit.ui.theme.saveButtonDisabled
 import live.hms.roomkit.ui.theme.saveButtonEnabled
-import live.hms.roomkit.ui.theme.setIconEnabled
+import live.hms.prebuilt_themes.setIconEnabled
 import live.hms.roomkit.util.setOnSingleClickListener
 import live.hms.roomkit.util.switchCamera
 import live.hms.roomkit.util.viewLifecycle

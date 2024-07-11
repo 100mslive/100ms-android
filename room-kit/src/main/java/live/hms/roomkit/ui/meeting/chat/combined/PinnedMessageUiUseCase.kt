@@ -18,8 +18,8 @@ import live.hms.roomkit.R
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.SessionMetadataUseCase
 import live.hms.roomkit.ui.meeting.participants.PinnedMessageItem
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
 import live.hms.prebuilt_themes.dp
 
