@@ -37,7 +37,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
-import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.prebuilt_themes.Variables
 import live.hms.video.sdk.models.TranscriptionState
 import live.hms.video.sdk.models.TranscriptionsMode
 
