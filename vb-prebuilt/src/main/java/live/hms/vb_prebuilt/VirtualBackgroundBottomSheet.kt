@@ -88,7 +88,8 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
             )
 
             setContent {
-                VirtualBackgroundOptions(close = {
+                VirtualBackgroundOptions(
+                    close = {
                     dismissAllowingStateLoss() },
                     removeEffects = {},
                     blur = {},
@@ -103,6 +104,8 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
 @Composable
 private fun Preview() {
     VirtualBackgroundOptions(close = {},
+        allBackgrounds = listOf("a","b","c","d","d"),
+        defaultBackground = "a",
         removeEffects = {},
         blur = {},
         backgroundSelected = {},)
@@ -206,8 +209,7 @@ fun VirtualBackgroundOptions(
             )
         )
         var currentBackground by remember { mutableStateOf<String?>(defaultBackground) }
-//        var allBackgrounds by remember { mutableStateOf<List<String>>(emptyList()) }
-        BackgroundListing(allBackgrounds, currentBackground, ) { selectedBackground ->
+        BackgroundListing(allBackgrounds, currentBackground) { selectedBackground ->
             currentBackground = selectedBackground
             backgroundSelected(selectedBackground)
         }
@@ -234,7 +236,7 @@ private fun BackgroundGallery() {
 @Composable
 fun BackgroundListing(backgrounds : List<String>,
     currentBackground : String?,
-                      onBackgroundSelected : (String) -> Unit) {
+    onBackgroundSelected : (String) -> Unit) {
     LazyVerticalGrid(
         horizontalArrangement = Arrangement.spacedBy(Spacing2),
         verticalArrangement = Arrangement.spacedBy(Spacing2),
