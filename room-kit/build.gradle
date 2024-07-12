@@ -74,6 +74,7 @@ dependencies {
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
     def hmsVersion = "2.9.61"
     implementation "com.otaliastudios:zoomlayout:1.9.0"
+    implementation project(":prebuilt-themes")
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
