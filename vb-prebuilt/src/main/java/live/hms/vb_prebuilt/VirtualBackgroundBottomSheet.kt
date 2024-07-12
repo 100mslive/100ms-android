@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -55,6 +57,7 @@ import live.hms.prebuilt_themes.Variables
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import live.hms.prebuilt_themes.Variables.Companion.Spacing1
 import live.hms.prebuilt_themes.Variables.Companion.Spacing2
 import live.hms.roomkit.R
 
@@ -88,7 +91,8 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
                 VirtualBackgroundOptions(close = {
                     dismissAllowingStateLoss() },
                     removeEffects = {},
-                    blur = {}
+                    blur = {},
+                    backgroundSelected = {},
                 )
             }
         }
@@ -100,7 +104,8 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
 private fun Preview() {
     VirtualBackgroundOptions(close = {},
         removeEffects = {},
-        blur = {})
+        blur = {},
+        backgroundSelected = {},)
 }
 
 @Composable
@@ -115,7 +120,8 @@ fun VirtualBackgroundOptions(
     defaultBackground: String? = null,
     close : () -> Unit,
     removeEffects :() -> Unit,
-    blur : () -> Unit) {
+    blur : () -> Unit,
+    backgroundSelected : (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -154,18 +160,26 @@ fun VirtualBackgroundOptions(
             )
         )
 
+        var selectedEffect by remember { mutableStateOf(SelectedEffect.NO_EFFECT) }
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing2)) {
             VbOptionButton(drawable = live.hms.vb_prebuilt.R.drawable.vb_cross_circle,
-                "No effect",removeEffects)
+                "No effect", selectedEffect == SelectedEffect.NO_EFFECT) {
+                selectedEffect = SelectedEffect.NO_EFFECT
+                removeEffects()
+            }
             VbOptionButton(drawable = live.hms.vb_prebuilt.R.drawable.vb_blur_background,
-                "Blur",blur)
+                "Blur",selectedEffect == SelectedEffect.BLUR) {
+                selectedEffect = SelectedEffect.BLUR
+                blur()
+            }
         }
         var sliderPosition by remember { mutableFloatStateOf(30f) }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing1)) {
             Image(painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people),
                 contentDescription = "effect slider")
-            Spacer(modifier = Modifier.width(8.dp))
             Slider(
+                modifier = Modifier.weight(1f),
                 value = sliderPosition,
                 onValueChange = { sliderPosition = it },
                 valueRange = 0f..100f,
@@ -176,6 +190,8 @@ fun VirtualBackgroundOptions(
                     inactiveTrackColor = Variables.SecondaryDefault,
                 )
             )
+            Image(painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people_max),
+                contentDescription = "effect slider")
         }
         Spacer(modifier = Modifier.height(Variables.Spacing3))
         Text(
@@ -191,7 +207,10 @@ fun VirtualBackgroundOptions(
         )
         var currentBackground by remember { mutableStateOf<String?>(defaultBackground) }
 //        var allBackgrounds by remember { mutableStateOf<List<String>>(emptyList()) }
-        BackgroundListing(allBackgrounds, currentBackground, ) {}
+        BackgroundListing(allBackgrounds, currentBackground, ) { selectedBackground ->
+            currentBackground = selectedBackground
+            backgroundSelected(selectedBackground)
+        }
     }
 }
 
@@ -261,22 +280,30 @@ fun BottomSheetHeader(close : () -> Unit,) {
         )
     }
 }
-
+enum class SelectedEffect {
+    NO_EFFECT,
+    BLUR
+}
 @Composable
 fun VbOptionButton(@DrawableRes drawable :  Int,
                    description : String,
+                   selected : Boolean,
                    onClick : () -> Unit) {
     Column(
         Modifier
             .width(103.33334.dp)
             .height(86.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(color = Variables.SurfaceBright)
+            .clickable { onClick() }
+            .background(shape = RoundedCornerShape(16.dp),
+                color = Variables.SurfaceBright)
+            // todo possibly improve
+            .border(2.dp, if(selected) Variables.PrimaryDefault else (Variables.SurfaceBright),
+                shape = RoundedCornerShape(16.dp))
             .padding(start = 10.dp, top = 10.dp, end = 10.dp, bottom = 10.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(painter = painterResource(id = drawable), contentDescription = "s")
+        Image(painter = painterResource(id = drawable), contentDescription = "background")
         Text(description,
             style = TextStyle(
                 fontSize = 12.sp,
