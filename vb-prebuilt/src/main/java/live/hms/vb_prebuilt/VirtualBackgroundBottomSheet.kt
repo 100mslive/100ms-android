@@ -15,18 +15,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -41,27 +37,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentManager
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import live.hms.prebuilt_themes.Variables
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -122,6 +111,8 @@ fun VirtualBackgroundOptions(
             .clip(RectangleShape)
             .background(Color.Gray)
     )},
+    allBackgrounds : List<String> = emptyList(),
+    defaultBackground: String? = null,
     close : () -> Unit,
     removeEffects :() -> Unit,
     blur : () -> Unit) {
@@ -186,6 +177,57 @@ fun VirtualBackgroundOptions(
                 )
             )
         }
+        Spacer(modifier = Modifier.height(Variables.Spacing3))
+        Text(
+            text = "Backgrounds",
+            style = TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                fontFamily = FontFamily(Font(R.font.inter_bold)),
+                fontWeight = FontWeight(600),
+                color = Variables.OnSurfaceHigh,
+                letterSpacing = 0.1.sp,
+            )
+        )
+        var currentBackground by remember { mutableStateOf<String?>(defaultBackground) }
+//        var allBackgrounds by remember { mutableStateOf<List<String>>(emptyList()) }
+        BackgroundListing(allBackgrounds, currentBackground, ) {}
+    }
+}
+
+@Preview
+@Composable
+private fun BackgroundGallery() {
+    BackgroundListing(
+        backgrounds = listOf("https://img-vb.100ms.live/layouts/defaults/vb-1.jpg",
+            "https://img-vb.100ms.live/layouts/defaults/vb-2.jpg"),
+        currentBackground = "https://img-vb.100ms.live/layouts/defaults/vb-1.jpg"
+    ) {
+
+    }
+}
+
+/**
+ * Takes a list of background images
+ * Notifies when one of them is selected.
+ */
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun BackgroundListing(backgrounds : List<String>,
+    currentBackground : String?,
+                      onBackgroundSelected : (String) -> Unit) {
+    LazyVerticalGrid(
+        horizontalArrangement = Arrangement.spacedBy(Spacing2),
+        verticalArrangement = Arrangement.spacedBy(Spacing2),
+        columns = GridCells.Fixed(3)
+    ) {
+        itemsIndexed(backgrounds) { photo, _ ->
+            GlideImage(
+                model = photo,
+                contentDescription = "background",
+                loading = placeholder(R.drawable.broken_camera)
+            )
+        }
     }
 }
 
@@ -202,7 +244,7 @@ fun BottomSheetHeader(close : () -> Unit,) {
             text = "Virtual Background", style = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                fontFamily = FontFamily(Font(R.font.inter_regular)),
+                fontFamily = FontFamily(Font(R.font.inter_bold)),
                 fontWeight = FontWeight(600),
                 color = Variables.OnSecondaryHigh,
                 letterSpacing = 0.15.sp,
