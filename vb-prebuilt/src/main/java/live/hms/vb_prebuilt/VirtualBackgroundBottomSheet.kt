@@ -61,6 +61,18 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
 //        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
     }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        dialog?.let {
+            val sheet = it as BottomSheetDialog
+            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
+
+    override fun getTheme(): Int {
+        return R.style.AppBottomSheetDialogTheme
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -71,7 +83,8 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
             )
 
             setContent {
-                Text("hi")
+                VirtualBackgroundOptions(close = {
+                    dismissAllowingStateLoss() })
             }
         }
     }
@@ -79,6 +92,65 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
 
 @Preview
 @Composable
-fun what() {
-    Text("ahi")
+private fun Preview() {
+    VirtualBackgroundOptions(close = {})
+}
+
+@Composable
+fun VirtualBackgroundOptions(close : () -> Unit,) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(
+                color = Variables.SurfaceDim,
+                shape = RoundedCornerShape(
+                    topStart = Variables.Spacing2,
+                    topEnd = Variables.Spacing2
+                )
+            )
+            .padding(
+                start = Variables.Spacing3,
+                end = Variables.Spacing3,
+                top = Variables.Spacing3,
+                bottom = Variables.Spacing4
+            )
+        ,
+        verticalArrangement = Arrangement.spacedBy(Variables.Spacing2, Alignment.Top),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        BottomSheetHeader(close)
+
+    }
+}
+
+@Composable
+fun BottomSheetHeader(close : () -> Unit,) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+        verticalAlignment = Alignment.Top,
+    ) {
+
+        Text(
+            modifier = Modifier.weight(1f),
+            text = "Virtual Background", style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(R.font.inter_regular)),
+                fontWeight = FontWeight(600),
+                color = Variables.OnSecondaryHigh,
+                letterSpacing = 0.15.sp,
+            )
+        )
+        Image(
+            modifier = Modifier
+                .padding(1.dp)
+                .size(24.dp)
+                .clickable { close() },
+            painter = painterResource(id = R.drawable.outline_cross),
+            contentDescription = "Close",
+            contentScale = ContentScale.None
+        )
+    }
 }
