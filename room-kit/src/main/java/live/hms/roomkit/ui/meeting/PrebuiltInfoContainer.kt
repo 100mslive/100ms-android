@@ -183,6 +183,30 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
     fun getAllWhitelistedRolesForChangeRole() = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
             ?.default?.elements?.chat?.rolesWhiteList ?: emptyList()
 
+    /**
+     * Returns a pair of the default url and the list of backgrounds.
+     * Can both be null.
+     */
+    fun allVbBackgrounds() : Pair<String?, List<String>?> {
+        val localPeer = hmssdk.getLocalPeer()
+        val defaultVbUrl =if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.find { it.default == true }?.url
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.find { it.default == true }?.url
+        }
+
+        val vbList = if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.mapNotNull { it.url }
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.mapNotNull { it.url }
+        }
+
+        return Pair(defaultVbUrl, vbList)
+    }
 }
 
 data class AllowedToMessageParticipants(

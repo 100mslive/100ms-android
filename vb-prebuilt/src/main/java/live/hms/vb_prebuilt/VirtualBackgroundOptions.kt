@@ -1,9 +1,6 @@
 package live.hms.vb_prebuilt
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -39,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -55,51 +52,9 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import live.hms.prebuilt_themes.Variables
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.prebuilt_themes.Variables.Companion.Spacing1
 import live.hms.prebuilt_themes.Variables.Companion.Spacing2
 
-class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
-    }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        dialog?.let {
-            val sheet = it as BottomSheetDialog
-            sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-    }
-
-//    override fun getTheme(): Int {
-//        return R.style.AppBottomSheetDialogTheme
-//    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            // Dispose the Composition when viewLifecycleOwner is destroyed
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
-            )
-
-            setContent {
-                VirtualBackgroundOptions(
-                    close = {
-                    dismissAllowingStateLoss() },
-                    removeEffects = {},
-                    blur = {},
-                    backgroundSelected = {},
-                    onSliderValueChanged = {}
-                )
-            }
-        }
-    }
-}
 
 @Preview
 @Composable
@@ -115,11 +70,9 @@ private fun Preview() {
 
 @Composable
 fun VirtualBackgroundOptions(
-    videoView : @Composable () -> Unit = { Box(
-        modifier = Modifier
-            .size(100.dp)
-            .clip(RectangleShape)
-            .background(Color.Gray)
+    videoView : @Composable (modifier : Modifier) -> Unit = { modifier -> Box(
+        modifier = modifier.then(Modifier.clip(RectangleShape)
+            .background(Color.Gray))
     )},
     allBackgrounds : List<String> = emptyList(),
     defaultBackground: String? = null,
@@ -131,8 +84,7 @@ fun VirtualBackgroundOptions(
     ) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
+            .fillMaxSize()
             .background(
                 color = Variables.SurfaceDim,
                 shape = RoundedCornerShape(
@@ -151,10 +103,10 @@ fun VirtualBackgroundOptions(
 //        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         BottomSheetHeader(close)
-        // the video item somehow
         Box(modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center) {
-            videoView()
+            videoView(Modifier.width(166.dp)
+                .height(280.dp))
         }
         Text(
             text = "Effects", style = TextStyle(
@@ -191,7 +143,7 @@ fun VirtualBackgroundOptions(
                 onValueChange = { sliderPosition = it
                     onSliderValueChanged.invoke(it)},
                 valueRange = 0f..100f,
-                steps = 1,
+                steps = 100,
                 colors = SliderDefaults.colors(
                     thumbColor = Variables.PrimaryDefault,
                     activeTrackColor = Variables.PrimaryDefault,
@@ -247,12 +199,13 @@ fun BackgroundListing(backgrounds : List<String>,
         verticalArrangement = Arrangement.spacedBy(Spacing2),
         columns = GridCells.Fixed(3)
     ) {
-        itemsIndexed(backgrounds) { photo, _ ->
+        itemsIndexed(backgrounds) { _, photo ->
 
             GlideImage(
                 model = photo,
                 contentDescription = "background",
-                loading = placeholder { CircularProgressIndicator() }
+                // using the composable placeholder causes a lot of re-rendering
+//                loading = placeholder { CircularProgressIndicator() }
             )
         }
     }

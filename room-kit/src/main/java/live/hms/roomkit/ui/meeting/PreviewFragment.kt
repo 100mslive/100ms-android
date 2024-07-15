@@ -75,6 +75,11 @@ class PreviewFragment : Fragment() {
 
     private lateinit var settings: SettingsStore
 
+    private val previewViewModel : PreviewViewModel by activityViewModels {
+        PreviewViewModelFactory(
+            requireActivity().application
+        )
+    }
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
             requireActivity().application
@@ -82,8 +87,6 @@ class PreviewFragment : Fragment() {
     }
 
     private var alertDialog: AlertDialog? = null
-
-    private var track: MeetingTrack? = null
 
     private var isViewVisible = false
 
@@ -142,8 +145,8 @@ class PreviewFragment : Fragment() {
     }
 
     private fun bindVideo(isFirstRender: Boolean = false) {
-        if (track?.video?.isMute == false) {
-            track?.video?.let {
+        if (previewViewModel.track?.video?.isMute == false) {
+            previewViewModel.track?.video?.let {
                 binding.previewView.addTrack(it)
                 binding.previewView.setCameraGestureListener(it, {
                     activity?.openShareIntent(it)
@@ -253,6 +256,7 @@ class PreviewFragment : Fragment() {
             buttonToggleAudio.initAnimState(littleLessTranslate = true)
             buttonToggleVideo.initAnimState(littleLessTranslate = true)
             buttonSwitchCamera.initAnimState(littleLessTranslate = true)
+            previewVirtualBackground.initAnimState(littleLessTranslate = true)
             buttonNetworkQuality.initAnimState(littleLessTranslate = true)
             iconOutputDevice.initAnimState(littleLessTranslate = true)
             editContainerName.initAnimState()
@@ -403,7 +407,16 @@ class PreviewFragment : Fragment() {
             }
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
-            if (it.isEnabled) track?.video.switchCamera()
+            if (it.isEnabled) previewViewModel.track?.video.switchCamera()
+        }
+
+        binding.previewVirtualBackground.setOnSingleClickListener(200L) {
+            if (it.isEnabled) {
+                VirtualBackgroundBottomSheet().show(
+                    childFragmentManager,
+                    VirtualBackgroundBottomSheet.TAG
+                )
+            }
         }
 
 
@@ -411,7 +424,7 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleVideo.onClick()")
 
-                (track?.video as HMSLocalVideoTrack?)?.let {
+                (previewViewModel.track?.video as HMSLocalVideoTrack?)?.let {
                     if (it.isMute) {
                         // Un-mute this track
                         it.setMute(false)
@@ -441,7 +454,7 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleAudio.onClick()")
 
-                (track?.audio as HMSLocalAudioTrack?)?.let {
+                (previewViewModel.track?.audio as HMSLocalAudioTrack?)?.let {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
@@ -655,15 +668,15 @@ class PreviewFragment : Fragment() {
                 enableDisableJoinNowButton()
 
                 updateUiBasedOnPublishParams(room.localPeer?.hmsRole?.publishParams)
-                track = MeetingTrack(room.localPeer!!, null, null)
+                previewViewModel.track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {
                     when (it) {
                         is HMSLocalAudioTrack -> {
-                            track?.audio = it
+                            previewViewModel.track?.audio = it
                         }
 
                         is HMSLocalVideoTrack -> {
-                            track?.video = it
+                            previewViewModel.track?.video = it
 
                             if (isViewVisible) {
                                 bindVideo(isFirstRender = isFirstRender)
@@ -687,17 +700,22 @@ class PreviewFragment : Fragment() {
                 }
 
                 // Disable buttons
-                track?.video?.let {
+                previewViewModel.track?.video?.let {
                     binding.buttonToggleVideo.apply {
-                        isEnabled = (track?.video != null)
+                        isEnabled = (previewViewModel.track?.video != null)
 
                         if (it.isMute) {
                             binding.buttonSwitchCamera.alpha = 0.5f
                             binding.buttonSwitchCamera.isEnabled = false
+                            binding.previewVirtualBackground.alpha = 0.5f
+                            binding.previewVirtualBackground.isEnabled = false
                             setIconDisabled(R.drawable.avd_video_on_to_off)
                         } else {
                             binding.buttonSwitchCamera.alpha = 1f
                             binding.buttonSwitchCamera.isEnabled = true
+                            binding.previewVirtualBackground.alpha = 1f
+                            binding.previewVirtualBackground.isEnabled = true
+
                             setIconEnabled(R.drawable.avd_video_off_to_on)
                         }
                     }
@@ -716,9 +734,9 @@ class PreviewFragment : Fragment() {
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                 }
 
-                track?.audio?.let {
+                previewViewModel.track?.audio?.let {
                     binding.buttonToggleAudio.apply {
-                        isEnabled = (track?.audio != null)
+                        isEnabled = (previewViewModel.track?.audio != null)
 
                         if (it.isMute) {
                             binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
@@ -746,9 +764,11 @@ class PreviewFragment : Fragment() {
         if (publishParams.allowed.contains("video")) {
             binding.buttonToggleVideo.visibility = View.VISIBLE
             binding.buttonSwitchCamera.visibility = View.VISIBLE
+            binding.previewVirtualBackground.visibility = View.VISIBLE
 
             binding.buttonToggleVideo.startBounceAnimationUpwards()
             binding.buttonSwitchCamera.startBounceAnimationUpwards()
+            binding.previewVirtualBackground.startBounceAnimationUpwards()
 
             binding.videoCardContainer.visibility = View.VISIBLE
         } else {
@@ -757,6 +777,7 @@ class PreviewFragment : Fragment() {
             binding.buttonSwitchCamera.visibility = View.GONE
             binding.videoCardContainer.visibility = View.GONE
             binding.iconNoiseCancellation.visibility = View.GONE
+            binding.previewVirtualBackground.visibility = View.GONE
         }
     }
 

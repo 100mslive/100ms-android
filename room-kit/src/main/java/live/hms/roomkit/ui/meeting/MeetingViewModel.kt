@@ -2831,5 +2831,8 @@ class MeetingViewModel(
         return peers.await()
     }
 
+    fun allVbBackgrounds(): Pair<String?, List<String>?> =
+        prebuiltInfoContainer.allVbBackgrounds()
+
 }
 
