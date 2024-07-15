@@ -75,11 +75,13 @@ dependencies {
     def hmsVersion = "2.9.61"
     implementation "com.otaliastudios:zoomlayout:1.9.0"
     implementation project(":prebuilt-themes")
+    implementation project(":vb-prebuilt")
     // To add dependencies of specific module
     implementation "live.100ms:android-sdk:$hmsVersion"
     implementation "live.100ms:video-view:$hmsVersion"
     implementation "live.100ms:hls-player:$hmsVersion"
     implementation "live.100ms:video-filters:$hmsVersion"
+    compileOnly "live.100ms:virtual-background:$hmsVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.7.4"

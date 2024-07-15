@@ -20,6 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
 import live.hms.vb_prebuilt.VirtualBackgroundOptions
+import live.hms.video.plugin.video.virtualbackground.VideoPluginMode
 import live.hms.videoview.HMSVideoView
 
 class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
@@ -62,10 +63,15 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
                     allBackgrounds = allVbBackgrounds.second ?: emptyList(),
                     defaultBackground = allVbBackgrounds.first,
                     close = { dismissAllowingStateLoss() },
-                    removeEffects = {},
-                    blur = {},
-                    backgroundSelected = {},
-                    onSliderValueChanged = {}
+                    removeEffects = {meetingViewModel.isVbPlugin = VideoPluginMode.NONE
+                        meetingViewModel.setupFilterVideoPlugin()},
+                    blur = {meetingViewModel.isVbPlugin = VideoPluginMode.BLUR_BACKGROUND
+                        meetingViewModel.setupFilterVideoPlugin()
+                        meetingViewModel.setBlurPercentage(50)
+                           },
+                    backgroundSelected = {meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
+                        meetingViewModel.setupFilterVideoPlugin()},
+                    onSliderValueChanged = {meetingViewModel.setBlurPercentage(it.toInt())}
                 )
             }
         }

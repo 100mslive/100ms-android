@@ -764,7 +764,7 @@ class PreviewFragment : Fragment() {
         if (publishParams.allowed.contains("video")) {
             binding.buttonToggleVideo.visibility = View.VISIBLE
             binding.buttonSwitchCamera.visibility = View.VISIBLE
-            binding.previewVirtualBackground.visibility = View.VISIBLE
+            binding.previewVirtualBackground.visibility = if(meetingViewModel.vbEnabled()) View.VISIBLE else View.GONE
 
             binding.buttonToggleVideo.startBounceAnimationUpwards()
             binding.buttonSwitchCamera.startBounceAnimationUpwards()
