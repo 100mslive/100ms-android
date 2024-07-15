@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -59,7 +60,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.prebuilt_themes.Variables.Companion.Spacing1
 import live.hms.prebuilt_themes.Variables.Companion.Spacing2
-import live.hms.roomkit.R
 
 class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,9 +74,9 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    override fun getTheme(): Int {
-        return R.style.AppBottomSheetDialogTheme
-    }
+//    override fun getTheme(): Int {
+//        return R.style.AppBottomSheetDialogTheme
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -94,6 +94,7 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
                     removeEffects = {},
                     blur = {},
                     backgroundSelected = {},
+                    onSliderValueChanged = {}
                 )
             }
         }
@@ -108,7 +109,8 @@ private fun Preview() {
         defaultBackground = "a",
         removeEffects = {},
         blur = {},
-        backgroundSelected = {},)
+        backgroundSelected = {},
+        onSliderValueChanged = {})
 }
 
 @Composable
@@ -124,7 +126,9 @@ fun VirtualBackgroundOptions(
     close : () -> Unit,
     removeEffects :() -> Unit,
     blur : () -> Unit,
-    backgroundSelected : (String) -> Unit) {
+    backgroundSelected : (String) -> Unit,
+    onSliderValueChanged : (Float) -> Unit,
+    ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,7 +188,8 @@ fun VirtualBackgroundOptions(
             Slider(
                 modifier = Modifier.weight(1f),
                 value = sliderPosition,
-                onValueChange = { sliderPosition = it },
+                onValueChange = { sliderPosition = it
+                    onSliderValueChanged.invoke(it)},
                 valueRange = 0f..100f,
                 steps = 1,
                 colors = SliderDefaults.colors(
@@ -243,10 +248,11 @@ fun BackgroundListing(backgrounds : List<String>,
         columns = GridCells.Fixed(3)
     ) {
         itemsIndexed(backgrounds) { photo, _ ->
+
             GlideImage(
                 model = photo,
                 contentDescription = "background",
-                loading = placeholder(R.drawable.broken_camera)
+                loading = placeholder { CircularProgressIndicator() }
             )
         }
     }
