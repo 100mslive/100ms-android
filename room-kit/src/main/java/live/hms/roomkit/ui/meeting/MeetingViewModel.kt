@@ -3,7 +3,6 @@ package live.hms.roomkit.ui.meeting
 import android.Manifest
 import android.app.Application
 import android.content.Intent
-import android.graphics.Bitmap
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
@@ -2889,9 +2888,9 @@ class MeetingViewModel(
         return peers.await()
     }
 
-    fun vbEnabled() = prebuiltInfoContainer.allVbBackgrounds().second != null
-    fun allVbBackgrounds(): Pair<String?, List<String>?> =
-        prebuiltInfoContainer.allVbBackgrounds()
+    fun vbEnabled() = prebuiltInfoContainer.vbEnabledState().vbEnabled
+    fun vbBackgrounds(): VbBackgrounds =
+        prebuiltInfoContainer.vbEnabledState().backgroundVbBackgrounds
 
 }
 

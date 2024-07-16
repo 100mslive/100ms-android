@@ -187,8 +187,16 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
      * Returns a pair of the default url and the list of backgrounds.
      * Can both be null.
      */
-    fun allVbBackgrounds() : Pair<String?, List<String>?> {
+    fun vbEnabledState() : VbState {
         val localPeer = hmssdk.getLocalPeer()
+        val isVbEnabled = if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
+                ?.virtualBackground != null
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.default?.elements
+                ?.virtualBackground != null
+        }
+
         val defaultVbUrl =if (localPeer == null) {
             hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
                 ?.virtualBackground?.backgroundMedia?.find { it.default == true }?.url
@@ -197,7 +205,7 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.virtualBackground?.backgroundMedia?.find { it.default == true }?.url
         }
 
-        val vbList = if (localPeer == null) {
+        val vbBackgroundImagesList = if (localPeer == null) {
             hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
                 ?.virtualBackground?.backgroundMedia?.mapNotNull { it.url }
         } else {
@@ -205,9 +213,19 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.virtualBackground?.backgroundMedia?.mapNotNull { it.url }
         }
 
-        return Pair(defaultVbUrl, vbList)
+
+        return VbState(isVbEnabled, VbBackgrounds(defaultVbUrl, vbBackgroundImagesList ?: emptyList()))
     }
 }
+
+data class VbState(
+    val vbEnabled : Boolean,
+    val backgroundVbBackgrounds: VbBackgrounds
+)
+data class VbBackgrounds(
+    val default : String?,
+    val backgroundUrls : List<String>
+)
 
 data class AllowedToMessageParticipants(
     val everyone : Boolean,

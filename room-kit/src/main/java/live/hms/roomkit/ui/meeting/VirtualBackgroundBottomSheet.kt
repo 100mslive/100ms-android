@@ -4,15 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -52,7 +48,7 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
             )
 
             setContent {
-                val allVbBackgrounds by remember { mutableStateOf(meetingViewModel.allVbBackgrounds()) }
+                val allVbBackgrounds by remember { mutableStateOf(meetingViewModel.vbBackgrounds()) }
                 VirtualBackgroundOptions(
                     videoView = { modifier -> AndroidView(modifier = modifier,factory ={
                             HMSVideoView(it).apply {
@@ -60,8 +56,8 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
                                     addTrack(track)
                                 }
                     }} ) },
-                    allBackgrounds = allVbBackgrounds.second ?: emptyList(),
-                    defaultBackground = allVbBackgrounds.first,
+                    allBackgrounds = allVbBackgrounds.backgroundUrls,
+                    defaultBackground = allVbBackgrounds.default,
                     close = { dismissAllowingStateLoss() },
                     removeEffects = {meetingViewModel.isVbPlugin = VideoPluginMode.NONE
                         meetingViewModel.setupFilterVideoPlugin()},
