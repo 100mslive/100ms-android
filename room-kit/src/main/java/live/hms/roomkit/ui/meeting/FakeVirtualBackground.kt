@@ -32,7 +32,7 @@ class FakeVirtualBackground : HmsVirtualBackgroundInterface {
     override fun getName(): String =
         "@100mslive/placeholder-hms-virtual-background"
 
-    override fun getPluginType(): HMSVideoPluginType = HMSVideoPluginType.PLACEHOLDER
+    override fun getPluginType(): HMSVideoPluginType = HMSVideoPluginType.TRANSFORM
 
     override suspend fun init() {
         loggingIgnore("init")
