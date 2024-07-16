@@ -2884,5 +2884,13 @@ class MeetingViewModel(
     fun vbBackgrounds(): VbBackgrounds =
         prebuiltInfoContainer.vbEnabledState().backgroundVbBackgrounds
 
+    fun getLocalPeerMeetingTracks() : MeetingTrack? {
+        val localPeer = hmsSDK.getLocalPeer() ?: return null
+        return with(localPeer) {
+            MeetingTrack(this,
+                videoTrack,
+                audioTrack)
+        }
+    }
 }
 

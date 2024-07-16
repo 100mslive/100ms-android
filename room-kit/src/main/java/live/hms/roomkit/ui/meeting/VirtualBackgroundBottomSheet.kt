@@ -21,7 +21,6 @@ import live.hms.videoview.HMSVideoView
 
 class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val previewViewModel : VbViewmodel by activityViewModels()
 
     companion object {
         const val TAG = "VirtualBackgroundBottomSheet"
@@ -49,10 +48,12 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
 
             setContent {
                 val allVbBackgrounds by remember { mutableStateOf(meetingViewModel.vbBackgrounds()) }
+                val localPeerMeetingTrack by remember { mutableStateOf(meetingViewModel.getLocalPeerMeetingTracks()) }
+
                 VirtualBackgroundOptions(
                     videoView = { modifier -> AndroidView(modifier = modifier,factory ={
                             HMSVideoView(it).apply {
-                                previewViewModel.track?.video?.let { track ->
+                                localPeerMeetingTrack?.video?.let { track ->
                                     addTrack(track)
                                 }
                     }} ) },

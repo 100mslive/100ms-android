@@ -75,12 +75,12 @@ class PreviewFragment : Fragment() {
 
     private lateinit var settings: SettingsStore
 
-    private val vbViewModel : VbViewmodel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
             requireActivity().application
         )
     }
+    private var track : MeetingTrack? = null
 
     private var alertDialog: AlertDialog? = null
 
@@ -141,8 +141,8 @@ class PreviewFragment : Fragment() {
     }
 
     private fun bindVideo(isFirstRender: Boolean = false) {
-        if (vbViewModel.track?.video?.isMute == false) {
-            vbViewModel.track?.video?.let {
+        if (track?.video?.isMute == false) {
+            track?.video?.let {
                 binding.previewView.addTrack(it)
                 binding.previewView.setCameraGestureListener(it, {
                     activity?.openShareIntent(it)
@@ -403,7 +403,7 @@ class PreviewFragment : Fragment() {
             }
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
-            if (it.isEnabled) vbViewModel.track?.video.switchCamera()
+            if (it.isEnabled) track?.video.switchCamera()
         }
 
         binding.previewVirtualBackground.setOnSingleClickListener(200L) {
@@ -420,7 +420,7 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleVideo.onClick()")
 
-                (vbViewModel.track?.video as HMSLocalVideoTrack?)?.let {
+                (track?.video as HMSLocalVideoTrack?)?.let {
                     if (it.isMute) {
                         // Un-mute this track
                         it.setMute(false)
@@ -450,7 +450,7 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleAudio.onClick()")
 
-                (vbViewModel.track?.audio as HMSLocalAudioTrack?)?.let {
+                (track?.audio as HMSLocalAudioTrack?)?.let {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
@@ -664,15 +664,15 @@ class PreviewFragment : Fragment() {
                 enableDisableJoinNowButton()
 
                     updateUiBasedOnPublishParams(room.localPeer?.hmsRole?.publishParams)
-                vbViewModel.track = MeetingTrack(room.localPeer!!, null, null)
+                track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {
                     when (it) {
                         is HMSLocalAudioTrack -> {
-                            vbViewModel.track?.audio = it
+                            track?.audio = it
                         }
 
                         is HMSLocalVideoTrack -> {
-                            vbViewModel.track?.video = it
+                            track?.video = it
 
                             if (isViewVisible) {
                                 bindVideo(isFirstRender = isFirstRender)
@@ -696,9 +696,9 @@ class PreviewFragment : Fragment() {
                 }
 
                 // Disable buttons
-                vbViewModel.track?.video?.let {
+                track?.video?.let {
                     binding.buttonToggleVideo.apply {
-                        isEnabled = (vbViewModel.track?.video != null)
+                        isEnabled = (track?.video != null)
 
                         if (it.isMute) {
                             binding.buttonSwitchCamera.alpha = 0.5f
@@ -730,9 +730,9 @@ class PreviewFragment : Fragment() {
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                 }
 
-                vbViewModel.track?.audio?.let {
+                track?.audio?.let {
                     binding.buttonToggleAudio.apply {
-                        isEnabled = (vbViewModel.track?.audio != null)
+                        isEnabled = (track?.audio != null)
 
                         if (it.isMute) {
                             binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)

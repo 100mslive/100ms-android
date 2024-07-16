@@ -1239,16 +1239,7 @@ class MeetingFragment : Fragment() {
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
                         onNameChange = {
-                            val vbViewModel : VbViewmodel by activityViewModels()
                             // Get the local peer but if it's null, return
-                            val localPeer : HMSLocalPeer = meetingViewModel.hmsSDK.getLocalPeer()
-                                ?: return@SessionOptionBottomSheet
-
-                            vbViewModel.track = with(localPeer) {
-                                MeetingTrack(this,
-                                    videoTrack,
-                                    audioTrack)
-                            }
                             VirtualBackgroundBottomSheet().show(
                                 childFragmentManager,
                                 VirtualBackgroundBottomSheet.TAG
