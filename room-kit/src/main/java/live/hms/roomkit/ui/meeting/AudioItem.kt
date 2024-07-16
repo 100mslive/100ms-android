@@ -13,8 +13,8 @@ import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setDrawables
 import live.hms.roomkit.setOnSingleClickListener
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.audio.manager.AudioManagerUtil
 import kotlin.math.roundToInt

@@ -19,8 +19,8 @@ import live.hms.roomkit.util.viewLifecycle
 import live.hms.hls_player.HmsHlsPlayer
 import live.hms.hls_player.HmsHlsLayer
 import live.hms.roomkit.ui.meeting.videogrid.VideoGridPageFragment
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.ui.theme.trackTintList
 
 

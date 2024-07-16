@@ -40,14 +40,9 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.roundToInt
 
-
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
   setOnClickListener(OnSingleClickListener(l))
 }
-
-private fun getDip(): Float = Resources.getSystem().displayMetrics.density
-fun Float.dp() = this * getDip()
-fun Int.dp() = (this * getDip()).roundToInt()
 
 // Keep the listener at last such that we can use kotlin lambda
 fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {

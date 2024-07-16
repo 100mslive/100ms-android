@@ -30,8 +30,8 @@ import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getPreviewLayout
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getPreviewLayout
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.roomkit.util.debounce
@@ -405,7 +405,7 @@ class MeetingViewModel(
     }
 
     private fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
-        HMSPrebuiltTheme.setTheme(theme)
+        HMSPrebuiltTheme.theme = theme
     }
 
     fun updateNameInPreview(nameStr: String) {

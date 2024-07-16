@@ -14,15 +14,6 @@ object EmailUtils {
 
   const val TAG = "EmailUtils"
 
-  fun addAlpha(originalColor: String, alpha: Double): String {
-
-    val alphaFixed = (alpha * 255)
-    var alphaHex = toHexString(alphaFixed)
-    if (alphaHex.length == 1) {
-      alphaHex = "0$alphaHex"
-    }
-    return originalColor.replace("#", "#$alphaHex")
-  }
   fun getNonFatalLogIntent(context: Context, throwable: Throwable? = null): Intent {
     val logFile = LogUtils.saveLogsToFile(context, "nonfatal-log")
     val logUri = FileProvider.getUriForFile(context, "live.hms.roomkit.provider", logFile)

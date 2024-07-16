@@ -61,6 +61,11 @@ import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
+import live.hms.prebuilt_themes.getPreviewLayout
+import live.hms.prebuilt_themes.setIconEnabled
+import live.hms.prebuilt_themes.setIconDisabled
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.setGradient
@@ -87,7 +92,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
-import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.prebuilt_themes.Variables
 import live.hms.roomkit.ui.meeting.participants.DIRECTLY_OPENED
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment

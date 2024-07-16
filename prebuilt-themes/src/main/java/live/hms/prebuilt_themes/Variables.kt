@@ -1,10 +1,7 @@
-package live.hms.roomkit.ui.meeting.compose
-
+package live.hms.prebuilt_themes
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
 
 class Variables {
     companion object {
@@ -63,5 +60,10 @@ class Variables {
         )).copy(alpha = 0.64f) // backrground dim is always 64% transparent.
 
         val SurfaceDim: Color = Color(0xFF11131A)
+
+        val SurfaceBright : Color = Color(getColorOrDefault(
+            HMSPrebuiltTheme.getColours()?.surfaceBright,
+            HMSPrebuiltTheme.getDefaults().surface_bright
+        ))
     }
 }

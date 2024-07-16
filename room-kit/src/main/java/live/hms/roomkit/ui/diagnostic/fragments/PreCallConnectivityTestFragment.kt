@@ -26,7 +26,7 @@ import live.hms.roomkit.ui.diagnostic.item.DiagnosticDetail
 import live.hms.roomkit.ui.diagnostic.item.ExpandableHeader
 import live.hms.roomkit.ui.diagnostic.item.Padding
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.buttonEnabled
+import live.hms.prebuilt_themes.buttonEnabled
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.stats.Utils
 import live.hms.video.diagnostics.models.ConnectivityCheckResult

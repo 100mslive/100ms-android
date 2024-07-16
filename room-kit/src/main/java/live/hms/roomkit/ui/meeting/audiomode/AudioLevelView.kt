@@ -7,11 +7,9 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.util.Log
-import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
-import live.hms.roomkit.util.dp
+import live.hms.prebuilt_themes.dp
 
 class AudioLevelView(context: Context, attrs: AttributeSet) : FrameLayout(context, attrs) {
 
