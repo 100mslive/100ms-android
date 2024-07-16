@@ -33,8 +33,8 @@ android {
 }
 
 dependencies {
-
-    implementation("live.100ms:android-sdk:2.6.5-df")
+    val HMS_SDK_VERSION: String by project
+    implementation("live.100ms:android-sdk:$HMS_SDK_VERSION")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
