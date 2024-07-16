@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import live.hms.prebuilt_themes.Variables
@@ -74,7 +75,8 @@ fun VirtualBackgroundOptions(
     videoView: @Composable (modifier: Modifier) -> Unit = { modifier ->
         Box(
             modifier = modifier.then(
-                Modifier.Companion.clip(RectangleShape)
+                Modifier.Companion
+                    .clip(RectangleShape)
                     .background(Color.Gray)
             )
         )
@@ -111,8 +113,10 @@ fun VirtualBackgroundOptions(
         BottomSheetHeader(close)
         Box(modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center) {
-            videoView(Modifier.width(166.dp)
-                .height(280.dp))
+            videoView(
+                Modifier
+                    .width(166.dp)
+                    .height(280.dp))
         }
         Text(
             text = "Effects", style = TextStyle(
@@ -124,17 +128,22 @@ fun VirtualBackgroundOptions(
                 letterSpacing = 0.15.sp,
             )
         )
+        // no use of defaultBackground
+        var currentBackground by remember { mutableStateOf<String?>(null) }
+
         var currentBlurPercentage by remember { mutableFloatStateOf(initialBlurPercentage) }
         var selectedEffect by remember { mutableStateOf(SelectedEffect.NO_EFFECT) }
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing2)) {
             VbOptionButton(drawable = live.hms.vb_prebuilt.R.drawable.vb_cross_circle,
                 "No effect", selectedEffect == SelectedEffect.NO_EFFECT) {
                 selectedEffect = SelectedEffect.NO_EFFECT
+                currentBackground = null
                 removeEffects()
             }
             VbOptionButton(drawable = live.hms.vb_prebuilt.R.drawable.vb_blur_background,
                 "Blur",selectedEffect == SelectedEffect.BLUR) {
                 selectedEffect = SelectedEffect.BLUR
+                currentBackground = null
                 blur(currentBlurPercentage)
             }
         }
@@ -174,9 +183,9 @@ fun VirtualBackgroundOptions(
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
 
-        var currentBackground by remember { mutableStateOf<String?>(defaultBackground) }
         BackgroundListing(allBackgrounds, currentBackground) { selectedBackground ->
             currentBackground = selectedBackground
+            selectedEffect = SelectedEffect.BACKGROUND
             // Running here instead of launched effect because it shouldn't run
             // the very first time we set current background to something.
             coroutineScope.launch {
@@ -217,13 +226,23 @@ fun BackgroundListing(backgrounds : List<String>,
         columns = GridCells.Fixed(3)
     ) {
         itemsIndexed(backgrounds) { _, photoUrl ->
+            val m = Modifier.clickable { onBackgroundSelected(photoUrl) }
+                .clip(RoundedCornerShape(8.dp))
 
+            val modifier = if(currentBackground == photoUrl) {
+                m.then(Modifier.border(
+                        2.dp, Variables.PrimaryDefault,
+                shape = RoundedCornerShape(8.dp)
+                ))
+            } else {
+                m
+            }
             GlideImage(
-                modifier = Modifier.clickable { onBackgroundSelected(photoUrl) },
+                modifier = modifier,
                 model = photoUrl,
                 contentDescription = "background",
                 // using the composable placeholder causes a lot of re-rendering
-//                loading = placeholder { CircularProgressIndicator() }
+//                loading = placeholder(R.drawable.gray_round_stroked_drawable)
             )
         }
     }
@@ -261,7 +280,8 @@ fun BottomSheetHeader(close : () -> Unit,) {
 }
 enum class SelectedEffect {
     NO_EFFECT,
-    BLUR
+    BLUR,
+    BACKGROUND
 }
 @Composable
 fun VbOptionButton(@DrawableRes drawable :  Int,
@@ -273,11 +293,14 @@ fun VbOptionButton(@DrawableRes drawable :  Int,
             .width(103.33334.dp)
             .height(86.dp)
             .clickable { onClick() }
-            .background(shape = RoundedCornerShape(16.dp),
-                color = Variables.SurfaceBright)
-            // todo possibly improve
-            .border(2.dp, if(selected) Variables.PrimaryDefault else (Variables.SurfaceBright),
-                shape = RoundedCornerShape(16.dp))
+            .background(
+                shape = RoundedCornerShape(16.dp),
+                color = Variables.SurfaceBright
+            )
+            .border(
+                2.dp, if (selected) Variables.PrimaryDefault else (Variables.SurfaceBright),
+                shape = RoundedCornerShape(16.dp)
+            )
             .padding(start = 10.dp, top = 10.dp, end = 10.dp, bottom = 10.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally,

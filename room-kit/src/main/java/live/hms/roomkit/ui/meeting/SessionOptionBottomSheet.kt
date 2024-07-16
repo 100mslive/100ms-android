@@ -169,17 +169,8 @@ class SessionOptionBottomSheet(
         )
 
         val videoFilter = GridOptionItem(
-            "Virtual Background", R.drawable.emoji_icon, {
+            "Virtual Background", R.drawable.vb_session_option_icon, {
                 meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
-                onNameChange.invoke()
-                dismissAllowingStateLoss()
-
-            }, isSelected = false
-        )
-
-        val blurFilter = GridOptionItem(
-            "Blur Filter", R.drawable.emoji_icon, {
-                meetingViewModel.isVbPlugin = VideoPluginMode.BLUR_BACKGROUND
                 onNameChange.invoke()
                 dismissAllowingStateLoss()
 
@@ -229,7 +220,6 @@ class SessionOptionBottomSheet(
                 )
             }
             if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.vbEnabled()) {
-                add(blurFilter)
                 add(videoFilter)
             }
         }
