@@ -108,6 +108,7 @@ import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSHlsRecordingConfig
+import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 import live.hms.video.sdk.models.enums.HMSRecordingState
 import live.hms.video.sdk.models.enums.HMSStreamingState
@@ -1237,10 +1238,21 @@ class MeetingFragment : Fragment() {
                             }
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
-                        onNameChange = {                 FilterBottomSheet().show(
-                            childFragmentManager,
-                            ChangeNameDialogFragment.TAG
-                        )
+                        onNameChange = {
+                            val vbViewModel : VbViewmodel by activityViewModels()
+                            // Get the local peer but if it's null, return
+                            val localPeer : HMSLocalPeer = meetingViewModel.hmsSDK.getLocalPeer()
+                                ?: return@SessionOptionBottomSheet
+
+                            vbViewModel.track = with(localPeer) {
+                                MeetingTrack(this,
+                                    videoTrack,
+                                    audioTrack)
+                            }
+                            VirtualBackgroundBottomSheet().show(
+                                childFragmentManager,
+                                VirtualBackgroundBottomSheet.TAG
+                            )
                         },
                         disableHandRaiseDisplay = !meetingViewModel.handRaiseAvailable(),
                         showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },

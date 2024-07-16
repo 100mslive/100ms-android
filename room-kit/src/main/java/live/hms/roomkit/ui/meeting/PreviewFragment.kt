@@ -75,11 +75,7 @@ class PreviewFragment : Fragment() {
 
     private lateinit var settings: SettingsStore
 
-    private val previewViewModel : PreviewViewModel by activityViewModels {
-        PreviewViewModelFactory(
-            requireActivity().application
-        )
-    }
+    private val vbViewModel : VbViewmodel by activityViewModels()
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
             requireActivity().application
@@ -145,8 +141,8 @@ class PreviewFragment : Fragment() {
     }
 
     private fun bindVideo(isFirstRender: Boolean = false) {
-        if (previewViewModel.track?.video?.isMute == false) {
-            previewViewModel.track?.video?.let {
+        if (vbViewModel.track?.video?.isMute == false) {
+            vbViewModel.track?.video?.let {
                 binding.previewView.addTrack(it)
                 binding.previewView.setCameraGestureListener(it, {
                     activity?.openShareIntent(it)
@@ -407,7 +403,7 @@ class PreviewFragment : Fragment() {
             }
 
         binding.buttonSwitchCamera.setOnSingleClickListener(200L) {
-            if (it.isEnabled) previewViewModel.track?.video.switchCamera()
+            if (it.isEnabled) vbViewModel.track?.video.switchCamera()
         }
 
         binding.previewVirtualBackground.setOnSingleClickListener(200L) {
@@ -424,7 +420,7 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleVideo.onClick()")
 
-                (previewViewModel.track?.video as HMSLocalVideoTrack?)?.let {
+                (vbViewModel.track?.video as HMSLocalVideoTrack?)?.let {
                     if (it.isMute) {
                         // Un-mute this track
                         it.setMute(false)
@@ -454,7 +450,7 @@ class PreviewFragment : Fragment() {
             setOnSingleClickListener(200L) {
                 Log.v(TAG, "buttonToggleAudio.onClick()")
 
-                (previewViewModel.track?.audio as HMSLocalAudioTrack?)?.let {
+                (vbViewModel.track?.audio as HMSLocalAudioTrack?)?.let {
                     it.setMute(!it.isMute)
 
                     if (it.isMute) {
@@ -667,16 +663,16 @@ class PreviewFragment : Fragment() {
                 isPreviewLoaded = true
                 enableDisableJoinNowButton()
 
-                updateUiBasedOnPublishParams(room.localPeer?.hmsRole?.publishParams)
-                previewViewModel.track = MeetingTrack(room.localPeer!!, null, null)
+                    updateUiBasedOnPublishParams(room.localPeer?.hmsRole?.publishParams)
+                vbViewModel.track = MeetingTrack(room.localPeer!!, null, null)
                 localTracks.forEach {
                     when (it) {
                         is HMSLocalAudioTrack -> {
-                            previewViewModel.track?.audio = it
+                            vbViewModel.track?.audio = it
                         }
 
                         is HMSLocalVideoTrack -> {
-                            previewViewModel.track?.video = it
+                            vbViewModel.track?.video = it
 
                             if (isViewVisible) {
                                 bindVideo(isFirstRender = isFirstRender)
@@ -700,9 +696,9 @@ class PreviewFragment : Fragment() {
                 }
 
                 // Disable buttons
-                previewViewModel.track?.video?.let {
+                vbViewModel.track?.video?.let {
                     binding.buttonToggleVideo.apply {
-                        isEnabled = (previewViewModel.track?.video != null)
+                        isEnabled = (vbViewModel.track?.video != null)
 
                         if (it.isMute) {
                             binding.buttonSwitchCamera.alpha = 0.5f
@@ -734,9 +730,9 @@ class PreviewFragment : Fragment() {
                     binding.buttonJoinMeeting.visibility = View.VISIBLE
                 }
 
-                previewViewModel.track?.audio?.let {
+                vbViewModel.track?.audio?.let {
                     binding.buttonToggleAudio.apply {
-                        isEnabled = (previewViewModel.track?.audio != null)
+                        isEnabled = (vbViewModel.track?.audio != null)
 
                         if (it.isMute) {
                             binding.buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)

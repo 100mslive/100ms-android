@@ -21,7 +21,7 @@ import live.hms.videoview.HMSVideoView
 
 class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
     private val meetingViewModel: MeetingViewModel by activityViewModels()
-    private val previewViewModel : PreviewViewModel by activityViewModels()
+    private val previewViewModel : VbViewmodel by activityViewModels()
 
     companion object {
         const val TAG = "VirtualBackgroundBottomSheet"
