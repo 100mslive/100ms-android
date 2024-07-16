@@ -187,11 +187,6 @@ class MeetingViewModel(
 
 
     val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
-//    val bitmap =         Bitmap.createBitmap(
-//        1,
-//        1,
-//        Bitmap.Config.ARGB_8888,
-//    )
 
     var isVbPlugin : VideoPluginMode = VideoPluginMode.NONE
     val virtualBackGroundPlugin by lazy { HmsVirtualBackgroundInjector(hmsSDK).vbPlugin }
