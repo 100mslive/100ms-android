@@ -65,9 +65,10 @@ private fun Preview() {
         defaultBackground = "a",
         removeEffects = {},
         blur = {},
-        backgroundSelected = {},
+        backgroundSelected = {a,b ->},
         onBlurPercentageChanged = {},
-        initialBlurPercentage = 30f)
+        initialBlurPercentage = 30f,
+        currentlySelectedVbMode = SelectedEffect.NO_EFFECT)
 }
 
 @Composable
@@ -83,9 +84,10 @@ fun VirtualBackgroundOptions(
     },
     allBackgrounds: List<String> = emptyList(),
     defaultBackground: String? = null,
+    currentlySelectedVbMode : SelectedEffect,
     close: () -> Unit,
     removeEffects: () -> Unit,
-    backgroundSelected: (Bitmap) -> Unit,
+    backgroundSelected: (String, Bitmap) -> Unit,
     blur: (Float) -> Unit,
     onBlurPercentageChanged: (Float) -> Unit,
     initialBlurPercentage: Float,
@@ -128,11 +130,11 @@ fun VirtualBackgroundOptions(
                 letterSpacing = 0.15.sp,
             )
         )
-        // no use of defaultBackground
-        var currentBackground by remember { mutableStateOf<String?>(null) }
+
+        var currentBackground by remember { mutableStateOf(defaultBackground) }
 
         var currentBlurPercentage by remember { mutableFloatStateOf(initialBlurPercentage) }
-        var selectedEffect by remember { mutableStateOf(SelectedEffect.NO_EFFECT) }
+        var selectedEffect by remember { mutableStateOf(currentlySelectedVbMode) }
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing2)) {
             VbOptionButton(drawable = live.hms.vb_prebuilt.R.drawable.vb_cross_circle,
                 "No effect", selectedEffect == SelectedEffect.NO_EFFECT) {
@@ -190,7 +192,7 @@ fun VirtualBackgroundOptions(
             // the very first time we set current background to something.
             coroutineScope.launch {
                 launch(Dispatchers.IO) {
-                    backgroundSelected(
+                    backgroundSelected(selectedBackground,
                         Glide.with(context).asBitmap().load(selectedBackground).submit().get()
                     )
                 }

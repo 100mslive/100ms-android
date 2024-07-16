@@ -189,6 +189,7 @@ class MeetingViewModel(
     val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
 
     var isVbPlugin : VideoPluginMode = VideoPluginMode.NONE
+    var selectedVbBackgroundUrl : String? = null
     val virtualBackGroundPlugin by lazy { HmsVirtualBackgroundInjector(hmsSDK).vbPlugin }
     fun setBlurPercentage(percentage : Int) {
         virtualBackGroundPlugin.enableBlur(percentage)

@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import live.hms.roomkit.R
+import live.hms.vb_prebuilt.SelectedEffect
 import live.hms.vb_prebuilt.VirtualBackgroundOptions
 import live.hms.video.plugin.video.virtualbackground.VideoPluginMode
 import live.hms.videoview.HMSVideoView
@@ -58,18 +59,25 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
                                 }
                     }} ) },
                     allBackgrounds = allVbBackgrounds.backgroundUrls,
-                    defaultBackground = allVbBackgrounds.default,
+                    defaultBackground = meetingViewModel.selectedVbBackgroundUrl,
+                    currentlySelectedVbMode = when(meetingViewModel.isVbPlugin) {
+                        VideoPluginMode.REPLACE_BACKGROUND -> SelectedEffect.BACKGROUND
+                        VideoPluginMode.NONE -> SelectedEffect.NO_EFFECT
+                        VideoPluginMode.BLUR_BACKGROUND -> SelectedEffect.BLUR
+                    },
                     close = { dismissAllowingStateLoss() },
-                    removeEffects = {meetingViewModel.isVbPlugin = VideoPluginMode.NONE
+                    removeEffects = {
+                        meetingViewModel.isVbPlugin = VideoPluginMode.NONE
                         meetingViewModel.setupFilterVideoPlugin()},
                     blur = { blurPercentage ->
                         meetingViewModel.isVbPlugin = VideoPluginMode.BLUR_BACKGROUND
                         meetingViewModel.setupFilterVideoPlugin()
                         meetingViewModel.setBlurPercentage(blurPercentage.toInt())
                        },
-                    backgroundSelected = {
+                    backgroundSelected = { url, bitmap ->
+                        meetingViewModel.selectedVbBackgroundUrl = url
                         meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
-                        meetingViewModel.setupFilterVideoPlugin(it)
+                        meetingViewModel.setupFilterVideoPlugin(bitmap)
                      },
                     onBlurPercentageChanged = {meetingViewModel.setBlurPercentage(it.toInt())},
                     initialBlurPercentage = 30f
