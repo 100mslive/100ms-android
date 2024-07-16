@@ -61,10 +61,11 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
                     close = { dismissAllowingStateLoss() },
                     removeEffects = {meetingViewModel.isVbPlugin = VideoPluginMode.NONE
                         meetingViewModel.setupFilterVideoPlugin()},
-                    blur = {meetingViewModel.isVbPlugin = VideoPluginMode.BLUR_BACKGROUND
+                    blur = { blurPercentage ->
+                        meetingViewModel.isVbPlugin = VideoPluginMode.BLUR_BACKGROUND
                         meetingViewModel.setupFilterVideoPlugin()
-                        meetingViewModel.setBlurPercentage(50)
-                           },
+                        meetingViewModel.setBlurPercentage(blurPercentage.toInt())
+                       },
                     backgroundSelected = {
                         meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
                         meetingViewModel.setupFilterVideoPlugin(it)

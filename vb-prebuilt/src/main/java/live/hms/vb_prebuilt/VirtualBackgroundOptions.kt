@@ -84,7 +84,7 @@ fun VirtualBackgroundOptions(
     close: () -> Unit,
     removeEffects: () -> Unit,
     backgroundSelected: (Bitmap) -> Unit,
-    blur: () -> Unit,
+    blur: (Float) -> Unit,
     onBlurPercentageChanged: (Float) -> Unit,
     initialBlurPercentage: Float,
     ) {
@@ -124,7 +124,7 @@ fun VirtualBackgroundOptions(
                 letterSpacing = 0.15.sp,
             )
         )
-
+        var currentBlurPercentage by remember { mutableFloatStateOf(initialBlurPercentage) }
         var selectedEffect by remember { mutableStateOf(SelectedEffect.NO_EFFECT) }
         Row(horizontalArrangement = Arrangement.spacedBy(Spacing2)) {
             VbOptionButton(drawable = live.hms.vb_prebuilt.R.drawable.vb_cross_circle,
@@ -135,18 +135,18 @@ fun VirtualBackgroundOptions(
             VbOptionButton(drawable = live.hms.vb_prebuilt.R.drawable.vb_blur_background,
                 "Blur",selectedEffect == SelectedEffect.BLUR) {
                 selectedEffect = SelectedEffect.BLUR
-                blur()
+                blur(currentBlurPercentage)
             }
         }
-        var sliderPosition by remember { mutableFloatStateOf(initialBlurPercentage) }
+
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Spacing1)) {
             Image(painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people),
                 contentDescription = "effect slider")
             Slider(
                 modifier = Modifier.weight(1f),
-                value = sliderPosition,
-                onValueChange = { sliderPosition = it
+                value = currentBlurPercentage,
+                onValueChange = { currentBlurPercentage = it
                     onBlurPercentageChanged.invoke(it)},
                 valueRange = 0f..100f,
                 steps = 100,
