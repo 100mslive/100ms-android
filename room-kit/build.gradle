@@ -81,6 +81,9 @@ dependencies {
     implementation "live.100ms:video-view:$hmsVersion"
     implementation "live.100ms:hls-player:$hmsVersion"
     implementation "live.100ms:video-filters:$hmsVersion"
+    // allows the api to be present so the [HMsVirtualBackgroundInjector] can add the real
+    // class when it is included but also allows the fake one to be injected when
+    // the import is not added. This saves 26Mb from being added to every prebuilt user.
     compileOnly "live.100ms:virtual-background:$hmsVersion"
 
     // Navigation
