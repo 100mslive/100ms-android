@@ -43,7 +43,7 @@ android {
 dependencies {
 
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
-
+    implementation(project(":prebuilt-themes"))
     implementation("androidx.compose.ui:ui-android:1.6.8")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.foundation:foundation")
@@ -55,7 +55,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-viewbinding:1.3.2")
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
-    compileOnly(project(":room-kit"))
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")

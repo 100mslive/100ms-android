@@ -23,6 +23,7 @@ import live.hms.roomkit.ui.GridOptionItem
 import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.plugin.video.virtualbackground.VideoPluginMode
 import live.hms.video.sdk.models.TranscriptionState
 import live.hms.video.sdk.models.TranscriptionsMode
 import live.hms.video.sdk.models.enums.HMSRecordingState
@@ -168,13 +169,13 @@ class SessionOptionBottomSheet(
         )
 
         val videoFilter = GridOptionItem(
-            "Video Filter", R.drawable.emoji_icon, {
+            "Virtual Background", R.drawable.vb_session_option_icon, {
+                meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
                 onNameChange.invoke()
                 dismissAllowingStateLoss()
 
             }, isSelected = false
         )
-
 
         val whiteboard = GridOptionItem(
             resources.getString(R.string.start_white_board), R.drawable.whiteboard, {
@@ -218,7 +219,7 @@ class SessionOptionBottomSheet(
                     )
                 )
             }
-            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
+            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.vbEnabled()) {
                 add(videoFilter)
             }
         }

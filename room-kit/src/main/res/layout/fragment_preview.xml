@@ -348,6 +348,22 @@
                 app:iconSize="24dp"
                 app:layout_constraintStart_toEndOf="@+id/button_toggle_video"
                 app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/preview_virtual_background"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:contentPadding="@dimen/eight_dp"
+                android:padding="0.5dp"
+                android:contentDescription="@string/toggle_vb"
+                android:enabled="false"
+                android:src="@drawable/preview_vb_button"
+                app:iconSize="24dp"
+                app:layout_constraintStart_toEndOf="@+id/button_switch_camera"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/icon_output_device"

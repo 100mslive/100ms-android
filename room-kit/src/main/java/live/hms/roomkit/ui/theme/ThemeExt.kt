@@ -1187,6 +1187,7 @@ internal fun FragmentPreviewBinding.applyTheme() {
     buttonToggleVideo.setIconDisabled(R.drawable.avd_video_on_to_off)
     buttonToggleAudio.setIconDisabled(R.drawable.avd_mic_on_to_off)
     buttonSwitchCamera.setIconEnabled(R.drawable.ic_switch_camera)
+    previewVirtualBackground.setIconEnabled(R.drawable.preview_vb_button)
     iconDiagnostic.setIconDisabled(R.drawable.icon)
 
 }
