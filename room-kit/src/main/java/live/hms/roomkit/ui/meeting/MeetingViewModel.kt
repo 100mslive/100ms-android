@@ -3,6 +3,7 @@ package live.hms.roomkit.ui.meeting
 import android.Manifest
 import android.app.Application
 import android.content.Intent
+import android.graphics.Bitmap
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
@@ -355,9 +356,17 @@ class MeetingViewModel(
     }
 
     private val pluginMutex = Mutex()
-    fun setupFilterVideoPlugin() {
+    fun setupFilterVideoPlugin(bitmap : Bitmap? = null) {
         when(isVbPlugin) {
             VideoPluginMode.REPLACE_BACKGROUND -> {
+                if(bitmap == null) {
+                    Log.d(
+                        TAG,
+                        "Ignoring replace background call because no bitmap to replace with was provided"
+                    )
+                    return
+                }
+
                 if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
                     var isLandscapeSet = false
                     var isPotraitSet = false
@@ -368,23 +377,11 @@ class MeetingViewModel(
                                 if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
                                     isLandscapeSet = true
                                     isPotraitSet = false
-                                    virtualBackGroundPlugin.enableBackground(ResourcesCompat.getDrawable(
-                                        getApplication<Application>().resources,
-                                        // landscape
-                                        R.drawable.preview_vb_button,
-                                        null
-                                    )!!.toBitmap()
-                                    )
+                                    virtualBackGroundPlugin.enableBackground(bitmap)
                                 } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
                                     isLandscapeSet = false
                                     isPotraitSet = true
-                                    virtualBackGroundPlugin.enableBackground(ResourcesCompat.getDrawable(
-                                        getApplication<Application>().resources,
-                                        // portrait
-                                            R.drawable.preview_vb_button,
-                                        null
-                                        )!!.toBitmap()
-                                    )
+                                    virtualBackGroundPlugin.enableBackground(bitmap)
                                 }
                             }
                         }

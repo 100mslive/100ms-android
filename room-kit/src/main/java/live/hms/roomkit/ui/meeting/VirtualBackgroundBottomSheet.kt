@@ -65,9 +65,12 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
                         meetingViewModel.setupFilterVideoPlugin()
                         meetingViewModel.setBlurPercentage(50)
                            },
-                    backgroundSelected = {meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
-                        meetingViewModel.setupFilterVideoPlugin()},
-                    onSliderValueChanged = {meetingViewModel.setBlurPercentage(it.toInt())}
+                    backgroundSelected = {
+                        meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
+                        meetingViewModel.setupFilterVideoPlugin(it)
+                     },
+                    onBlurPercentageChanged = {meetingViewModel.setBlurPercentage(it.toInt())},
+                    initialBlurPercentage = 30f
                 )
             }
         }

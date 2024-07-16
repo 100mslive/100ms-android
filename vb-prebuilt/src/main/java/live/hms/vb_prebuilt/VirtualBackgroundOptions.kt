@@ -1,6 +1,6 @@
 package live.hms.vb_prebuilt
 
-import android.util.Log
+import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,12 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -31,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,8 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -48,9 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import live.hms.prebuilt_themes.Variables
 import live.hms.prebuilt_themes.Variables.Companion.Spacing1
 import live.hms.prebuilt_themes.Variables.Companion.Spacing2
@@ -65,22 +65,28 @@ private fun Preview() {
         removeEffects = {},
         blur = {},
         backgroundSelected = {},
-        onSliderValueChanged = {})
+        onBlurPercentageChanged = {},
+        initialBlurPercentage = 30f)
 }
 
 @Composable
 fun VirtualBackgroundOptions(
-    videoView : @Composable (modifier : Modifier) -> Unit = { modifier -> Box(
-        modifier = modifier.then(Modifier.clip(RectangleShape)
-            .background(Color.Gray))
-    )},
-    allBackgrounds : List<String> = emptyList(),
+    videoView: @Composable (modifier: Modifier) -> Unit = { modifier ->
+        Box(
+            modifier = modifier.then(
+                Modifier.Companion.clip(RectangleShape)
+                    .background(Color.Gray)
+            )
+        )
+    },
+    allBackgrounds: List<String> = emptyList(),
     defaultBackground: String? = null,
-    close : () -> Unit,
-    removeEffects :() -> Unit,
-    blur : () -> Unit,
-    backgroundSelected : (String) -> Unit,
-    onSliderValueChanged : (Float) -> Unit,
+    close: () -> Unit,
+    removeEffects: () -> Unit,
+    backgroundSelected: (Bitmap) -> Unit,
+    blur: () -> Unit,
+    onBlurPercentageChanged: (Float) -> Unit,
+    initialBlurPercentage: Float,
     ) {
     Column(
         modifier = Modifier
@@ -132,7 +138,7 @@ fun VirtualBackgroundOptions(
                 blur()
             }
         }
-        var sliderPosition by remember { mutableFloatStateOf(30f) }
+        var sliderPosition by remember { mutableFloatStateOf(initialBlurPercentage) }
         Row(verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(Spacing1)) {
             Image(painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people),
@@ -141,7 +147,7 @@ fun VirtualBackgroundOptions(
                 modifier = Modifier.weight(1f),
                 value = sliderPosition,
                 onValueChange = { sliderPosition = it
-                    onSliderValueChanged.invoke(it)},
+                    onBlurPercentageChanged.invoke(it)},
                 valueRange = 0f..100f,
                 steps = 100,
                 colors = SliderDefaults.colors(
@@ -165,10 +171,21 @@ fun VirtualBackgroundOptions(
                 letterSpacing = 0.1.sp,
             )
         )
+        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
+
         var currentBackground by remember { mutableStateOf<String?>(defaultBackground) }
         BackgroundListing(allBackgrounds, currentBackground) { selectedBackground ->
             currentBackground = selectedBackground
-            backgroundSelected(selectedBackground)
+            // Running here instead of launched effect because it shouldn't run
+            // the very first time we set current background to something.
+            coroutineScope.launch {
+                launch(Dispatchers.IO) {
+                    backgroundSelected(
+                        Glide.with(context).asBitmap().load(selectedBackground).submit().get()
+                    )
+                }
+            }
         }
     }
 }
@@ -199,10 +216,11 @@ fun BackgroundListing(backgrounds : List<String>,
         verticalArrangement = Arrangement.spacedBy(Spacing2),
         columns = GridCells.Fixed(3)
     ) {
-        itemsIndexed(backgrounds) { _, photo ->
+        itemsIndexed(backgrounds) { _, photoUrl ->
 
             GlideImage(
-                model = photo,
+                modifier = Modifier.clickable { onBackgroundSelected(photoUrl) },
+                model = photoUrl,
                 contentDescription = "background",
                 // using the composable placeholder causes a lot of re-rendering
 //                loading = placeholder { CircularProgressIndicator() }
