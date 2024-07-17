@@ -24,6 +24,7 @@ import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.prebuilt_themes.getPreviewLayout
 import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
+import live.hms.roomkit.addPlugin
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.bottomsheets.StreamState
@@ -386,20 +387,6 @@ class MeetingViewModel(
             VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
             VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
         }
-        HMSPluginScope.launch {
-            pluginMutex.withLock {
-                hmsSDK.addPlugin(virtualBackGroundPlugin, object  : HMSActionResultListener {
-                    override fun onSuccess() {
-
-                    }
-
-                    override fun onError(error: HMSException) {
-                        triggerErrorNotification(error.message)
-                    }
-                    }
-                )
-            }
-        }
     }
 
     fun removeVideoFilterPlugIn() {
@@ -445,7 +432,14 @@ class MeetingViewModel(
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                     onHMSActionResultListener?.onSuccess()
-                    roomLayoutLiveData.postValue(true)
+                    if(vbEnabled()) {
+                        viewModelScope.launch {
+                            hmsSDK.addPlugin(virtualBackGroundPlugin)
+                            roomLayoutLiveData.postValue(true)
+                        }
+                    } else {
+                        roomLayoutLiveData.postValue(true)
+                    }
                 }
 
             })
