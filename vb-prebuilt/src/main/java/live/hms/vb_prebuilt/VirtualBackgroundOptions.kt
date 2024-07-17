@@ -150,27 +150,37 @@ fun VirtualBackgroundOptions(
             }
         }
 
-        Row(verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing1)) {
-            Image(painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people),
-                contentDescription = "effect slider")
-            Slider(
-                modifier = Modifier.weight(1f),
-                value = currentBlurPercentage,
-                onValueChange = { currentBlurPercentage = it
-                    onBlurPercentageChanged.invoke(it)},
-                valueRange = 0f..100f,
-                steps = 100,
-                colors = SliderDefaults.colors(
-                    thumbColor = Variables.PrimaryDefault,
-                    activeTrackColor = Variables.PrimaryDefault,
-                    inactiveTrackColor = Variables.SecondaryDefault,
+        if(selectedEffect == SelectedEffect.BLUR) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing1)
+            ) {
+                Image(
+                    painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people),
+                    contentDescription = "effect slider"
                 )
-            )
-            Image(painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people_max),
-                contentDescription = "effect slider")
+                Slider(
+                    modifier = Modifier.weight(1f),
+                    value = currentBlurPercentage,
+                    onValueChange = {
+                        currentBlurPercentage = it
+                        onBlurPercentageChanged.invoke(it)
+                    },
+                    valueRange = 0f..100f,
+                    steps = 100,
+                    colors = SliderDefaults.colors(
+                        thumbColor = Variables.PrimaryDefault,
+                        activeTrackColor = Variables.PrimaryDefault,
+                        inactiveTrackColor = Variables.SecondaryDefault,
+                    )
+                )
+                Image(
+                    painter = painterResource(id = live.hms.vb_prebuilt.R.drawable.vb_slider_blur_people_max),
+                    contentDescription = "effect slider"
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(Variables.Spacing3))
+        Spacer(modifier = Modifier.height(Variables.Spacing2))
         Text(
             text = "Backgrounds",
             style = TextStyle(
