@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.diagnostics.HMSAudioDeviceCheckListener
 import live.hms.video.diagnostics.HMSCameraCheckListener
-import live.hms.video.diagnostics.HMSDiagnostic
+import live.hms.video.diagnostics.HMSDiagnostics
 import live.hms.video.diagnostics.models.ConnectivityCheckResult
 import live.hms.video.diagnostics.models.ConnectivityState
 import live.hms.video.error.HMSException
@@ -23,7 +23,7 @@ class DiagnosticViewModel(application: Application) : AndroidViewModel(applicati
     // First create a new sdk instance
     private var regionCode = "in"
     private val diagnosticProvider = DiagnosticProvider(application)
-    private val diagnosticSDK  : HMSDiagnostic
+    private val diagnosticSDK  : HMSDiagnostics
         get() {return diagnosticProvider.getDiagnosticSdk()}
     private val hmsSDK : HMSSDK
         get() { return diagnosticProvider.getSdk()}

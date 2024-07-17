@@ -3,22 +3,22 @@ package live.hms.roomkit.ui.diagnostic
 import android.app.Application
 import android.content.Context
 import androidx.core.content.edit
-import live.hms.video.diagnostics.HMSDiagnostic
+import live.hms.video.diagnostics.HMSDiagnostics
 import live.hms.video.sdk.HMSSDK
 import java.util.UUID
 
 class DiagnosticProvider(private val application: Application) {
-    private var hms : Pair<HMSSDK,HMSDiagnostic>? = null
+    private var hms : Pair<HMSSDK,HMSDiagnostics>? = null
     private val consistentUserId = getConsistentUserIdOverSessions()
     fun disposeOfDiagnostic() {
         hms?.second?.stopConnectivityCheck()
         hms = null
     }
     fun getSdk() = hms?.first ?: createInstance(application).first
-    fun getDiagnosticSdk() : HMSDiagnostic = hms?.second ?: createInstance(application).second
-    private fun createInstance(application: Application) : Pair<HMSSDK, HMSDiagnostic> {
+    fun getDiagnosticSdk() : HMSDiagnostics = hms?.second ?: createInstance(application).second
+    private fun createInstance(application: Application) : Pair<HMSSDK, HMSDiagnostics> {
         val hmsSDK = HMSSDK.Builder(application).build()
-        val diag = hmsSDK.getDiagnosticSDK(consistentUserId)
+        val diag = hmsSDK.getDiagnosticsSDK(consistentUserId)
         return Pair(hmsSDK, diag).apply { hms = this }
     }
 
