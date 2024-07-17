@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
@@ -366,19 +367,15 @@ class MeetingViewModel(
                     virtualBackGroundPlugin.setVideoFrameInfoListener(object :
                         VideoFrameInfoListener {
                         override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
-                            Log.d("CroppingBitmap","b h/w: ${bitmap.height}/${bitmap.width} - rotated h/w: $rotatedHeight/$rotatedWidth")
                             if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
                                 if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
                                     isLandscapeSet = true
                                     isPotraitSet = false
-                                    Log.d("CroppingBitmap","If Cropped")
-                                    virtualBackGroundPlugin.enableBackground(getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight))
+                                    virtualBackGroundPlugin.enableBackground(getCenterCroppedBitmap(bitmap, rotatedWidth, rotatedHeight))
                                 } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
                                     isLandscapeSet = false
                                     isPotraitSet = true
-                                    Log.d("CroppingBitmap","Else cropped")
-
-                                    virtualBackGroundPlugin.enableBackground(getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight))
+                                    virtualBackGroundPlugin.enableBackground(getCenterCroppedBitmap(bitmap, rotatedWidth, rotatedHeight))
                                 }
                             }
                         }
@@ -2893,6 +2890,45 @@ class MeetingViewModel(
                 videoTrack,
                 audioTrack)
         }
+    }
+
+    fun getCenterCroppedBitmap(
+        src: Bitmap,
+        expectedWidth: Int,
+        expectedHeight: Int
+    ): Bitmap {
+        // Check if the image is big enough
+        val widthDelta = src.width - expectedWidth
+        val heightDelta = src.height - expectedHeight
+        val scaleFactor : Float = if(widthDelta < 0 || heightDelta < 0){
+            // Find the biggest stretch that might be required.
+            val isHeightLess = heightDelta < widthDelta
+            if(isHeightLess) {
+                //scale factor depends on height
+                expectedHeight.toFloat()/src.height
+            } else {
+                expectedWidth.toFloat() / src.width
+            }
+        } else {
+            1.0f
+        }
+        val matrix = Matrix()
+        if(scaleFactor != 1.0f) {
+            matrix.postScale(scaleFactor, scaleFactor)
+        }
+
+        // We've got to crop the image to the expected size.
+        // We either scale up first or scale down first.
+
+        val newW = ((src.width * scaleFactor - expectedWidth)/2).toInt()
+        val newH = ((src.height * scaleFactor - expectedHeight)/2).toInt()
+        return Bitmap.createBitmap(
+            Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true),
+            newW,
+            newH,
+            expectedWidth,
+            expectedHeight
+        )
     }
 }
 
