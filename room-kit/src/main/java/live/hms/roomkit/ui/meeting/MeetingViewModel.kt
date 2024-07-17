@@ -8,8 +8,6 @@ import android.media.AudioManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
@@ -21,6 +19,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getPreviewLayout
+import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -35,19 +36,16 @@ import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.prebuilt_themes.HMSPrebuiltTheme
-import live.hms.prebuilt_themes.getPreviewLayout
-import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.roomkit.util.debounce
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
-import live.hms.video.interactivity.HmsInteractivityCenter
-import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.events.AgentType
 import live.hms.video.factories.noisecancellation.AvailabilityStatus
+import live.hms.video.interactivity.HmsInteractivityCenter
+import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.plugin.video.virtualbackground.VideoFrameInfoListener
@@ -81,7 +79,6 @@ import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
 import live.hms.video.whiteboard.State
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.properties.Delegates
 
@@ -369,15 +366,40 @@ class MeetingViewModel(
                     virtualBackGroundPlugin.setVideoFrameInfoListener(object :
                         VideoFrameInfoListener {
                         override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
+                            Log.d("CroppingBitmap","b h/w: ${bitmap.height}/${bitmap.width} - rotated h/w: $rotatedHeight/$rotatedWidth")
                             if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
                                 if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
                                     isLandscapeSet = true
                                     isPotraitSet = false
-                                    virtualBackGroundPlugin.enableBackground(bitmap)
+                                    val zoomed = getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight)
+                                    val totalHeight = zoomed.height
+                                    val totalWidth = zoomed.width
+
+                                    val croppedBitmap: Bitmap = Bitmap.createBitmap(
+                                        zoomed,
+                                        (totalWidth - rotatedWidth)/2,
+                                        (totalHeight - rotatedHeight)/2,
+                                        rotatedWidth,
+                                        rotatedHeight,
+                                    )
+                                    Log.d("CroppingBitmap","If Cropped")
+                                    virtualBackGroundPlugin.enableBackground(croppedBitmap)
                                 } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
                                     isLandscapeSet = false
                                     isPotraitSet = true
-                                    virtualBackGroundPlugin.enableBackground(bitmap)
+                                    Log.d("CroppingBitmap","Else cropped")
+                                    val zoomed = getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight)
+                                    val totalHeight = zoomed.height
+                                    val totalWidth = zoomed.width
+
+                                    val croppedBitmap: Bitmap = Bitmap.createBitmap(
+                                        zoomed,
+                                        (totalWidth - rotatedWidth)/2,
+                                        (totalHeight - rotatedHeight)/2,
+                                        rotatedWidth,
+                                        rotatedHeight,
+                                    )
+                                    virtualBackGroundPlugin.enableBackground(croppedBitmap)
                                 }
                             }
                         }
