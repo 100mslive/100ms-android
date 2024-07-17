@@ -371,35 +371,14 @@ class MeetingViewModel(
                                 if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
                                     isLandscapeSet = true
                                     isPotraitSet = false
-                                    val zoomed = getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight)
-                                    val totalHeight = zoomed.height
-                                    val totalWidth = zoomed.width
-
-                                    val croppedBitmap: Bitmap = Bitmap.createBitmap(
-                                        zoomed,
-                                        (totalWidth - rotatedWidth)/2,
-                                        (totalHeight - rotatedHeight)/2,
-                                        rotatedWidth,
-                                        rotatedHeight,
-                                    )
                                     Log.d("CroppingBitmap","If Cropped")
-                                    virtualBackGroundPlugin.enableBackground(croppedBitmap)
+                                    virtualBackGroundPlugin.enableBackground(getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight))
                                 } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
                                     isLandscapeSet = false
                                     isPotraitSet = true
                                     Log.d("CroppingBitmap","Else cropped")
-                                    val zoomed = getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight)
-                                    val totalHeight = zoomed.height
-                                    val totalWidth = zoomed.width
 
-                                    val croppedBitmap: Bitmap = Bitmap.createBitmap(
-                                        zoomed,
-                                        (totalWidth - rotatedWidth)/2,
-                                        (totalHeight - rotatedHeight)/2,
-                                        rotatedWidth,
-                                        rotatedHeight,
-                                    )
-                                    virtualBackGroundPlugin.enableBackground(croppedBitmap)
+                                    virtualBackGroundPlugin.enableBackground(getZoomedBitmap(bitmap, rotatedWidth, rotatedHeight))
                                 }
                             }
                         }

@@ -42,5 +42,12 @@ fun getZoomedBitmap(
     // We've got to crop the image to the expected size.
     // We either scale up first or scale down first.
 
-    return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
+    val zoomed = Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true);
+    return Bitmap.createBitmap(
+        zoomed,
+        (zoomed.width - expectedWidth)/2,
+        (zoomed.height - expectedHeight)/2,
+        expectedWidth,
+        expectedHeight,
+    )
 }
