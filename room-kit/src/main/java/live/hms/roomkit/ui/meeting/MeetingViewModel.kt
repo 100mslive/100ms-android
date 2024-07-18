@@ -2103,6 +2103,7 @@ class MeetingViewModel(
             }
 
             override fun onSuccess() {
+                setHandRaisedAtTime(true)
                 Log.d(TAG, "Successfully raised hand")
             }
         })
@@ -2116,6 +2117,7 @@ class MeetingViewModel(
 
             override fun onSuccess() {
                 Log.d(TAG, "Successfully lowered hand")
+                setHandRaisedAtTime(false)
             }
         })
     }
@@ -2140,6 +2142,23 @@ class MeetingViewModel(
         return currentMetadata?.isBRBOn?:false
     }
 
+    fun setHandRaisedAtTime(raised : Boolean) {
+        val raisedAt = if(raised) System.currentTimeMillis() else null
+        val localPeer = hmsSDK.getLocalPeer()
+        val currentMetadata = CustomPeerMetadata.fromJson(localPeer?.metadata)
+        val newMetadataJson = currentMetadata?.copy(handRaisedAt = raisedAt) ?: CustomPeerMetadata(false, false, handRaisedAt = raisedAt)
+
+        hmsSDK.changeMetadata(newMetadataJson.toJson(), object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                triggerErrorNotification(error.message)
+            }
+
+            override fun onSuccess() {
+
+            }
+
+        })
+    }
     fun toggleBRB() {
         val localPeer = hmsSDK.getLocalPeer()!!
         val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
