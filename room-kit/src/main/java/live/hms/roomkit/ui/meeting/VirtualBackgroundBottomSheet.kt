@@ -30,6 +30,8 @@ class VirtualBackgroundBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         dialog?.let {
             val sheet = it as BottomSheetDialog
+            //Don't let the sheet be draggable so that the items will be able to scroll
+            sheet.behavior.isDraggable = false
             sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
