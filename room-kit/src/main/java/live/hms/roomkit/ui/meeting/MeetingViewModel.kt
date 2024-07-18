@@ -471,7 +471,6 @@ class MeetingViewModel(
             token,
             Gson().toJson(
                 CustomPeerMetadata(
-                    isHandRaised = false,
                     name = hmsPrebuiltOptions?.userName.orEmpty(),
                     isBRBOn = false
                 )
@@ -2146,7 +2145,7 @@ class MeetingViewModel(
         val raisedAt = if(raised) System.currentTimeMillis() else null
         val localPeer = hmsSDK.getLocalPeer()
         val currentMetadata = CustomPeerMetadata.fromJson(localPeer?.metadata)
-        val newMetadataJson = currentMetadata?.copy(handRaisedAt = raisedAt) ?: CustomPeerMetadata(false, false, handRaisedAt = raisedAt)
+        val newMetadataJson = currentMetadata?.copy(handRaisedAt = raisedAt) ?: CustomPeerMetadata(false, handRaisedAt = raisedAt)
 
         hmsSDK.changeMetadata(newMetadataJson.toJson(), object : HMSActionResultListener {
             override fun onError(error: HMSException) {
