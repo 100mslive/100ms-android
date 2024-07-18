@@ -4,12 +4,11 @@ import android.Manifest
 import android.app.Application
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.*
 import com.google.gson.Gson
 import kotlinx.coroutines.CompletableDeferred
@@ -21,6 +20,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getPreviewLayout
+import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -35,19 +37,16 @@ import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.prebuilt_themes.HMSPrebuiltTheme
-import live.hms.prebuilt_themes.getPreviewLayout
-import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.roomkit.util.debounce
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
-import live.hms.video.interactivity.HmsInteractivityCenter
-import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.events.AgentType
 import live.hms.video.factories.noisecancellation.AvailabilityStatus
+import live.hms.video.interactivity.HmsInteractivityCenter
+import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
 import live.hms.video.plugin.video.virtualbackground.VideoFrameInfoListener
@@ -81,7 +80,6 @@ import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
 import live.hms.video.whiteboard.State
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.properties.Delegates
 
@@ -373,11 +371,11 @@ class MeetingViewModel(
                                 if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
                                     isLandscapeSet = true
                                     isPotraitSet = false
-                                    virtualBackGroundPlugin.enableBackground(bitmap)
+                                    virtualBackGroundPlugin.enableBackground(getCenterCroppedBitmap(bitmap, rotatedWidth, rotatedHeight))
                                 } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
                                     isLandscapeSet = false
                                     isPotraitSet = true
-                                    virtualBackGroundPlugin.enableBackground(bitmap)
+                                    virtualBackGroundPlugin.enableBackground(getCenterCroppedBitmap(bitmap, rotatedWidth, rotatedHeight))
                                 }
                             }
                         }
@@ -2892,6 +2890,45 @@ class MeetingViewModel(
                 videoTrack,
                 audioTrack)
         }
+    }
+
+    fun getCenterCroppedBitmap(
+        src: Bitmap,
+        expectedWidth: Int,
+        expectedHeight: Int
+    ): Bitmap {
+        // Check if the image is big enough
+        val widthDelta = src.width - expectedWidth
+        val heightDelta = src.height - expectedHeight
+        val scaleFactor : Float = if(widthDelta < 0 || heightDelta < 0){
+            // Find the biggest stretch that might be required.
+            val isHeightLess = heightDelta < widthDelta
+            if(isHeightLess) {
+                //scale factor depends on height
+                expectedHeight.toFloat()/src.height
+            } else {
+                expectedWidth.toFloat() / src.width
+            }
+        } else {
+            1.0f
+        }
+        val matrix = Matrix()
+        if(scaleFactor != 1.0f) {
+            matrix.postScale(scaleFactor, scaleFactor)
+        }
+
+        // We've got to crop the image to the expected size.
+        // We either scale up first or scale down first.
+
+        val newW = ((src.width * scaleFactor - expectedWidth)/2).toInt()
+        val newH = ((src.height * scaleFactor - expectedHeight)/2).toInt()
+        return Bitmap.createBitmap(
+            Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true),
+            newW,
+            newH,
+            expectedWidth,
+            expectedHeight
+        )
     }
 }
 
