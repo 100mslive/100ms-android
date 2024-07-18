@@ -386,20 +386,6 @@ class MeetingViewModel(
             VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
             VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
         }
-        HMSPluginScope.launch {
-            pluginMutex.withLock {
-                hmsSDK.addPlugin(virtualBackGroundPlugin, object  : HMSActionResultListener {
-                    override fun onSuccess() {
-
-                    }
-
-                    override fun onError(error: HMSException) {
-                        triggerErrorNotification(error.message)
-                    }
-                    }
-                )
-            }
-        }
     }
 
     fun removeVideoFilterPlugIn() {
@@ -445,7 +431,22 @@ class MeetingViewModel(
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                     onHMSActionResultListener?.onSuccess()
-                    roomLayoutLiveData.postValue(true)
+                    if(vbEnabled()) {
+                        viewModelScope.launch {
+                            hmsSDK.addPlugin(virtualBackGroundPlugin, object : HMSActionResultListener {
+                                override fun onError(error: HMSException) {
+                                    triggerErrorNotification(error.message)
+                                }
+
+                                override fun onSuccess() {
+                                }
+
+                            })
+                            roomLayoutLiveData.postValue(true)
+                        }
+                    } else {
+                        roomLayoutLiveData.postValue(true)
+                    }
                 }
 
             })
