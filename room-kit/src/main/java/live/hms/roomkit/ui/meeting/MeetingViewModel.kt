@@ -24,7 +24,6 @@ import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.prebuilt_themes.getPreviewLayout
 import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
-import live.hms.roomkit.addPlugin
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
 import live.hms.roomkit.ui.meeting.bottomsheets.StreamState
@@ -434,7 +433,15 @@ class MeetingViewModel(
                     onHMSActionResultListener?.onSuccess()
                     if(vbEnabled()) {
                         viewModelScope.launch {
-                            hmsSDK.addPlugin(virtualBackGroundPlugin)
+                            hmsSDK.addPlugin(virtualBackGroundPlugin, object : HMSActionResultListener {
+                                override fun onError(error: HMSException) {
+                                    triggerErrorNotification(error.message)
+                                }
+
+                                override fun onSuccess() {
+                                }
+
+                            })
                             roomLayoutLiveData.postValue(true)
                         }
                     } else {
