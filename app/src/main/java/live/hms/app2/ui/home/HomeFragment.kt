@@ -128,17 +128,17 @@ class HomeFragment : Fragment() {
         return when {
             REGEX_MEETING_URL_CODE.matches(url) -> {
                 val groups = REGEX_MEETING_URL_CODE.findAll(url).toList()[0].groupValues
-                groups[2]
+                groups[groups.size - 1]
             }
             REGEX_STREAMING_MEETING_URL_ROOM_CODE.matches(url) -> {
                 val groups =
                     REGEX_STREAMING_MEETING_URL_ROOM_CODE.findAll(url).toList()[0].groupValues
-                groups[2]
+                groups[groups.size - 1]
 
             }
             REGEX_PREVIEW_URL_CODE.matches(url) -> {
                 val groups = REGEX_PREVIEW_URL_CODE.findAll(url).toList()[0].groupValues
-                groups[2]
+                groups[groups.size - 1]
             }
             REGEX_ROOM_CODE.matches(url) -> {
                 val groups = REGEX_ROOM_CODE.findAll(url).toList()[0].groupValues
@@ -195,6 +195,12 @@ class HomeFragment : Fragment() {
     private fun initEditTextViews() {
         binding.editTextName.doOnTextChanged { _, _, _, _ ->
             validate()
+        }
+
+        binding.troubleshoot.setOnClickListener {
+            contextSafe { context, activity ->
+                HMSRoomKit.launchPreCallDiagnostic(activity)
+            }
         }
 
         binding.edtMeetingUrl.doOnTextChanged { text, _, _, _ ->

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/diagnostic_nav_graph"
+    app:startDestination="@id/preCallRegionSelectionFragment">
+
+    <fragment
+        android:id="@+id/preCallRegionSelectionFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallRegionSelectionFragment"
+        android:label="fragment_pre_call_region_selection"
+        tools:layout="@layout/fragment_pre_call_region_selection">
+        <action
+            android:id="@+id/action_preCallRegionSelectionFragment_to_preCallCameraFragment"
+            app:destination="@id/preCallCameraFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right"
+
+            />
+    </fragment>
+    <fragment
+
+        android:id="@+id/preCallCameraFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallCameraFragment"
+        android:label="fragment_pre_call_camera"
+        tools:layout="@layout/fragment_pre_call_camera">
+        <action
+            android:id="@+id/action_preCallCameraFragment_to_preCallMicFragment"
+            app:destination="@id/preCallMicFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/preCallMicFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallMicFragment"
+        android:label="fragment_pre_call_mic"
+        tools:layout="@layout/fragment_pre_call_mic">
+        <action
+            android:id="@+id/action_preCallMicFragment_to_preCallConnectivityTestFragment"
+            app:destination="@id/preCallConnectivityTestFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/preCallConnectivityTestFragment"
+        android:name="live.hms.roomkit.ui.diagnostic.fragments.PreCallConnectivityTestFragment"
+        android:label="fragment_pre_call_connectivity_test"
+        tools:layout="@layout/fragment_pre_call_connectivity_test" />
+</navigation>

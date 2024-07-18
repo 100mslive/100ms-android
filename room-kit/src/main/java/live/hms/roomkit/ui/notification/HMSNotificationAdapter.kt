@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.NotificationCardBinding
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.prebuilt_themes.getColorOrDefault
+import live.hms.prebuilt_themes.setBackgroundAndColor
 
 class HMSNotificationAdapter(
     private var notifications: List<HMSNotification> = emptyList(),

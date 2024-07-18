@@ -22,9 +22,9 @@ import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.GridOptionItem
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.ui.theme.getShape
 import live.hms.roomkit.util.ROOM_PREBUILT
 import live.hms.roomkit.util.viewLifecycle
@@ -46,7 +46,6 @@ class MessageOptionsBottomSheet(private val chatMessage: ChatMessage,
     }
 
     private var binding by viewLifecycle<BottomSheetMessageOptionsBinding>()
-//    private val chatMessage: ChatMessage? = arguments?.getParcelable(CHAT_MESSAGE_OPTIONS_EXTRA) as ChatMessage?
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(

@@ -152,7 +152,80 @@ class PrebuiltInfoContainer(private val hmssdk: HMSSDK) {
                 ?.hlsLiveStreamingHeader?.description
         }
     }
+
+    fun handRaiseAvailable() : Boolean {
+        val localPeer = hmssdk.getLocalPeer()
+        val available =  if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.hlsLiveStreaming?.elements
+                ?.handRaise != null
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.hlsLiveStreaming
+                ?.elements?.handRaise != null ||
+                    roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+                        ?.default?.elements?.handRaise != null
+        }
+        return available
+    }
+
+    fun ncInPreviewState(): Boolean? {
+        hmsRoomLayout?.data?.mapNotNull {
+            it?.screens?.preview?.default?.elements?.noiseCancellationElement?.enabled
+        }
+        val localPeer = hmssdk.getLocalPeer()
+        val available =  if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.preview?.default?.elements?.noiseCancellationElement?.enabled
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.preview?.default?.elements?.noiseCancellationElement?.enabled
+        }
+        return available
+    }
+
+    fun getAllWhitelistedRolesForChangeRole() = roleMap[localPeer.hmsRole.name]?.screens?.conferencing
+            ?.default?.elements?.chat?.rolesWhiteList ?: emptyList()
+
+    /**
+     * Returns a pair of the default url and the list of backgrounds.
+     * Can both be null.
+     */
+    fun vbEnabledState() : VbState {
+        val localPeer = hmssdk.getLocalPeer()
+        val isVbEnabled = if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
+                ?.virtualBackground != null
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.default?.elements
+                ?.virtualBackground != null
+        }
+
+        val defaultVbUrl =if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.find { it.default == true }?.url
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.find { it.default == true }?.url
+        }
+
+        val vbBackgroundImagesList = if (localPeer == null) {
+            hmsRoomLayout?.data?.get(0)?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.mapNotNull { it.url }
+        } else {
+            roleMap[localPeer.hmsRole.name]?.screens?.conferencing?.default?.elements
+                ?.virtualBackground?.backgroundMedia?.mapNotNull { it.url }
+        }
+
+
+        return VbState(isVbEnabled, VbBackgrounds(defaultVbUrl, vbBackgroundImagesList ?: emptyList()))
+    }
 }
+
+data class VbState(
+    val vbEnabled : Boolean,
+    val backgroundVbBackgrounds: VbBackgrounds
+)
+data class VbBackgrounds(
+    val default : String?,
+    val backgroundUrls : List<String>
+)
 
 data class AllowedToMessageParticipants(
     val everyone : Boolean,

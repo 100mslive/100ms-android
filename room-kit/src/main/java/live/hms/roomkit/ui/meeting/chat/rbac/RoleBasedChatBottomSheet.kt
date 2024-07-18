@@ -25,9 +25,9 @@ import live.hms.roomkit.ui.meeting.chat.ChatViewModel
 import live.hms.roomkit.ui.meeting.chat.Recipient
 import live.hms.roomkit.ui.meeting.participants.ChatRecipientSearchUseCase
 import live.hms.roomkit.ui.meeting.participants.MessageHeaderItemDecoration
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.signal.init.HMSRoomLayout
@@ -46,6 +46,12 @@ class RoleBasedChatBottomSheet(
     private val getSelectedRecipient: () -> Recipient?,
     private val recipientSelected: (Recipient) -> Unit
 ) : BottomSheetDialogFragment() {
+
+    private var close = false
+    constructor() : this({null}, {}) {
+        // Close the fragment if it's recreated by android after a restart
+        close = true
+    }
 
     private var initialRecipients : List<Group> = emptyList()
     private var allowedParticipants : AllowedToMessageParticipants? = null
@@ -72,6 +78,8 @@ class RoleBasedChatBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
+        if(close)
+            dismissAllowingStateLoss()
     }
 
 

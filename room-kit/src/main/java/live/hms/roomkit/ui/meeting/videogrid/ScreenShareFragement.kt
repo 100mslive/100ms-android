@@ -4,28 +4,28 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetScreenShareBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.roomkit.ui.meeting.participants.LoadAfterJoin
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.util.contextSafe
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.videoview.VideoViewStateChangeListener
 import org.webrtc.RendererCommon
 
-
-class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFragment() {
+const val SCREEN_SHARE_TRACK_ID = "screensharetrackId"
+class ScreenShareFragement : BottomSheetDialogFragment() {
 
     companion object {
         private const val TAG = "ScreenShareFragement"
@@ -40,7 +40,7 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
             requireActivity().application
         )
     }
-    
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -61,7 +61,6 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         }
         return bottomSheetDialog
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -98,6 +97,12 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
         }
+        LoadAfterJoin(meetingViewModel, viewLifecycleOwner) {
+            afterJoinAndViewCreated()
+        }
+    }
+
+    private fun afterJoinAndViewCreated() {
 
         binding.root.setBackgroundColor(
             getColorOrDefault(
@@ -121,14 +126,19 @@ class ScreenShareFragement(val screenShareTrackId: String) : BottomSheetDialogFr
                 }
             }
         })
-        meetingViewModel.tracks.observe(viewLifecycleOwner) { it ->
+        meetingViewModel.tracks.observe(viewLifecycleOwner) { meetingTrack ->
 
-            val track = it.find { it.video?.trackId == screenShareTrackId }?.video
-            if (track != null) {
-                binding.localVideoView.addTrack(track)
-            } else {
-                dismissAllowingStateLoss()
+            Log.d(TAG,"Looking for trackId: ${arguments?.getString(SCREEN_SHARE_TRACK_ID)}")
+            synchronized(meetingTrack) {
+                val track = meetingTrack.find { it.video?.trackId == arguments?.getString(SCREEN_SHARE_TRACK_ID) }?.video
+                if (track != null) {
+                    binding.localVideoView.addTrack(track)
+                } else {
+                    dismissAllowingStateLoss()
+                }
             }
+
+
         }
 
     }

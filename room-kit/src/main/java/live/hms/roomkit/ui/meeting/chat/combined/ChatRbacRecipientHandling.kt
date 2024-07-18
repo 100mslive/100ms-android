@@ -5,8 +5,8 @@ import com.google.android.material.textview.MaterialTextView
 import live.hms.roomkit.R
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.ui.meeting.chat.Recipient
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 
 class ChatRbacRecipientHandling {
     fun updateChipRecipientUI(

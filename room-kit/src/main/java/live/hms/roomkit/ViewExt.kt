@@ -44,6 +44,14 @@ fun View.setOnSingleClickListener(l: (View) -> Unit) {
   setOnClickListener(OnSingleClickListener(l))
 }
 
+fun Number?.orZeroIfNullOrNaN(): Number {
+    return if (this == null || (this is Double && this.isNaN()) || (this is Float && this.isNaN())) {
+        0
+    } else {
+        this
+    }
+}
+
 fun View.gone() {
     if (this.visibility != View.GONE)
         this.visibility = View.GONE
@@ -51,6 +59,14 @@ fun View.gone() {
 fun View.show() {
     if (this.visibility != View.VISIBLE)
         this.visibility = View.VISIBLE
+}
+
+fun ViewStub.inflate(): View {
+    val inflatedView = inflate()
+    val parent = parent as? ViewGroup
+    parent?.removeView(this)
+    parent?.addView(inflatedView)
+    return inflatedView
 }
 
 fun View.hide() {

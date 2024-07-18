@@ -14,6 +14,12 @@ import android.view.accessibility.AccessibilityManager
 import android.view.animation.LinearInterpolator
 import androidx.core.content.FileProvider
 import androidx.core.view.GestureDetectorCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.helpers.OnSingleClickListener
 import live.hms.roomkit.ui.notification.CardStackLayoutManager
@@ -34,14 +40,9 @@ import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.roundToInt
 
-
 fun View.setOnSingleClickListener(l: View.OnClickListener) {
   setOnClickListener(OnSingleClickListener(l))
 }
-
-private fun getDip(): Float = Resources.getSystem().displayMetrics.density
-fun Float.dp() = this * getDip()
-fun Int.dp() = (this * getDip()).roundToInt()
 
 // Keep the listener at last such that we can use kotlin lambda
 fun View.setOnSingleClickListener(waitDelay: Long, l: View.OnClickListener) {
@@ -311,4 +312,21 @@ fun CardStackLayoutManager?.init(context: Context, listener: CardStackListener) 
         }
     return layoutManager
 
+}
+
+
+fun <T> LiveData<T>.debounce(duration: Long = 500L, coroutineScope: CoroutineScope): LiveData<T> {
+    val result = MediatorLiveData<T>()
+
+    val source = this
+    var job: Job? = null
+
+    result.addSource(source) { value ->
+        job?.cancel() // Cancel any previous job
+        job = coroutineScope.launch {
+            delay(duration)
+            result.value = value // Emit after the delay
+        }
+    }
+    return result
 }

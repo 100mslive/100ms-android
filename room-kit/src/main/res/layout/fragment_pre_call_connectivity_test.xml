@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:scrollIndicators="none"
+    tools:context=".ui.diagnostic.fragments.PreCallCameraFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp">
+
+
+        <TextView
+            android:id="@+id/name_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:elevation="4dp"
+            android:fontFamily="@font/inter_semibold"
+            android:lineHeight="32sp"
+            android:text="Pre-call Test"
+            android:textSize="24sp"
+            app:fontFamily="@font/inter_bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:textColor="@android:color/white" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/name_tv"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:layout_constraintTop_toBottomOf="@id/name_tv"
+            app:strokeWidth="1dp"
+            tools:layout_editor_absoluteX="24dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/test_title_tv"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="24dp"
+                    android:drawableLeft="@drawable/wifi_on"
+                    android:drawablePadding="14dp"
+                    android:fontFamily="@font/inter_semibold"
+                    android:lineHeight="24sp"
+                    android:paddingVertical="16dp"
+                    android:text="Connectivity Test"
+                    android:textSize="19sp"
+                    app:fontFamily="@font/inter_bold"
+                    app:layout_constraintBottom_toTopOf="@id/divider_top"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    tools:textColor="@android:color/white" />
+
+                <View
+                    android:id="@+id/divider_top"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    app:layout_constraintTop_toBottomOf="@id/test_title_tv" />
+
+                <LinearLayout
+                    android:id="@+id/connecting_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginVertical="24dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="4dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:textSize="14sp"
+                    app:fontFamily="@font/inter_regular"
+                    app:layout_constraintBottom_toTopOf="@+id/failed_layout"
+                    app:layout_constraintTop_toBottomOf="@id/divider_top"
+                    tools:textColor="@android:color/white"
+                    tools:visibility="visible">
+
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/header_connection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:lineHeight="24sp"
+                        android:gravity="center"
+                        android:text="Checking your connection..."
+                        android:textAlignment="center"
+                        android:textSize="19sp"
+                        app:fontFamily="@font/inter_bold"
+                        tools:textColor="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/sub_header_connection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="@font/inter_regular"
+                        android:lineHeight="24sp"
+                        android:paddingHorizontal="16dp"
+                        android:text="Starting..."
+                        android:textSize="16sp"
+                        app:fontFamily="@font/inter_regular"
+                        tools:textColor="@android:color/white" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/failed_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="24dp"
+                    android:layout_marginVertical="24dp"
+                    android:layout_marginBottom="16dp"
+                    android:elevation="4dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@id/connecting_layout">
+
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/cross_circle" />
+
+                    <TextView
+                        android:id="@+id/header_connection_failed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:lineHeight="24sp"
+                        android:paddingHorizontal="16dp"
+                        android:text="Connectivity Test Failed"
+                        android:textAlignment="center"
+                        android:textSize="19sp"
+                        tools:textColor="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/sub_header_connection_failed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"
+                        android:fontFamily="@font/inter_semibold"
+                        android:lineHeight="24sp"
+                        android:paddingHorizontal="16dp"
+                        android:text="You can try again."
+                        android:textSize="16sp"
+                        app:fontFamily="@font/inter_regular"
+                        tools:textColor="@android:color/white" />
+
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/connectivty_list"
+                    android:layout_width="match_parent"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:paddingBottom="500dp"
+                    android:clipToPadding="false"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:fontFamily="@font/inter_bold"
+                    android:gravity="center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/divider_bottom"
+                    app:layout_constraintTop_toBottomOf="@id/failed_layout" />
+
+
+                <View
+                    android:id="@+id/divider_bottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    app:layout_constraintBottom_toTopOf="@id/yes_button"
+                    app:layout_constraintTop_toBottomOf="@id/connectivty_list" />
+                
+                <androidx.constraintlayout.widget.Group
+
+                    android:id="@+id/ui_failed_group"
+                    app:constraint_referenced_ids="failed_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <androidx.constraintlayout.widget.Group
+                    android:visibility="gone"
+                    android:id="@+id/ui_loading_group"
+                    app:constraint_referenced_ids="connecting_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <androidx.constraintlayout.widget.Group
+                    android:visibility="gone"
+                    android:id="@+id/ui_success_group"
+                    app:constraint_referenced_ids="connectivty_list,yes_button,divider_bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+
+                <TextView
+                    android:id="@+id/yes_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:fontFamily="@font/inter_bold"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:text="Retry"
+                    android:textColor="#EFF0FA"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider_bottom" />
+
+                <TextView
+                    android:id="@+id/no_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@font/inter_bold"
+                    android:gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:text="No"
+                    android:visibility="gone"
+                    android:textColor="#EFF0FA"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/yes_button"
+                    app:layout_constraintStart_toEndOf="@+id/yes_button"
+                    app:layout_constraintTop_toTopOf="@+id/yes_button"
+                    app:strokeColor="@android:color/darker_gray"
+                    app:strokeWidth="2dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

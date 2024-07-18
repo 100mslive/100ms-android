@@ -9,9 +9,9 @@ import live.hms.roomkit.R
 import live.hms.roomkit.databinding.LayoutRoleBasedChatMessageBottomSheetItemHeaderBinding
 import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.ui.meeting.chat.Recipient
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.getColorOrDefault
 const val RECIPIENT_PEERS = "PARTICIPANTS"
 const val RECIPIENT_ROLES = "ROLES"
 class RecipientHeader(private val recipientHeaderName: String) :

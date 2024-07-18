@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.listeners.PeerListResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
@@ -32,7 +32,8 @@ const val handRaisedKey = "Hand Raised"
 class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                           private val scope : LifecycleCoroutineScope,
                           viewLifecycleOwner : LifecycleOwner,
-                          val enterGroupFiltering : () -> Unit
+                          val showSwitchRoleBottomSheet : (HMSPeer) -> Unit,
+                          val enterGroupFiltering : () -> Unit,
     ) {
     // When
     val adapter = GroupieAdapter()
@@ -114,7 +115,12 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
             addTextChangedListener { text ->
                 scope.launch {
                     filterText = text.toString()
-                    updateParticipantsAdapter(getAllPeers())
+                    if(isLargeRoom) {
+                        val peers = meetingViewModel.searchPeerNameInLargeRoom(text.toString(), 0)
+                        updateParticipantsAdapter(peers)
+                    } else {
+                        updateParticipantsAdapter(getAllPeers())
+                    }
                 }
             }
         }
@@ -148,7 +154,7 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
         //  ideally this should be replaced with just updating the
         //  peers but still with the search query.
         val peerList = getSearchFilteredPeersIfNeeded(getGroupFilteredPeersIfNeeded(allPeers))
-        // TODO how can this be null?
+        // This can be null during fragment recreation, where the peer hasn't really joined yet.
         val localPeerRoleName = meetingViewModel.hmsSDK.getLocalPeer()!!.hmsRole.name
 
         // Group people by roles.
@@ -249,7 +255,8 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
                             meetingViewModel.participantPreviousRoleChangeUseCase,
                             meetingViewModel::requestPeerLeave,
                             meetingViewModel.activeSpeakers,
-                            meetingViewModel::lowerRemotePeerHand
+                            meetingViewModel::lowerRemotePeerHand,
+                            showSwitchRoleBottomSheet
                         )
                     }!!)
                 }

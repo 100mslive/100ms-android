@@ -16,17 +16,18 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.xwray.groupie.Group
 import com.xwray.groupie.GroupieAdapter
 import com.xwray.groupie.Section
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetOptionBinding
 import live.hms.roomkit.ui.GridOptionItem
-import live.hms.roomkit.ui.filters.FilterBottomSheet
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.ui.theme.getShape
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
+import live.hms.video.plugin.video.virtualbackground.VideoPluginMode
+import live.hms.video.sdk.models.TranscriptionState
+import live.hms.video.sdk.models.TranscriptionsMode
 import live.hms.video.sdk.models.enums.HMSRecordingState
+import live.hms.video.whiteboard.State
 
 class SessionOptionBottomSheet(
     private val onScreenShareClicked: () -> Unit,
@@ -37,12 +38,12 @@ class SessionOptionBottomSheet(
     private val onNameChange: () -> Unit,
     private val showPolls: () -> Unit,
     private val disableHandRaiseDisplay : Boolean = false,
-    private val onNoiseClicked : (() -> Unit)? = null
+    private val onNoiseClicked : (() -> Unit)? = null,
+    private val openRealTimeClosedCaptions : () -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetOptionBinding>()
     val gridOptionAdapter = GroupieAdapter()
-
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
         MeetingViewModelFactory(
@@ -119,6 +120,22 @@ class SessionOptionBottomSheet(
             }, isSelected = false
         )
 
+        val captionServerStarted = meetingViewModel.hmsSDK.getRoom()?.transcriptions?.find { it.mode == TranscriptionsMode.CAPTION }?.state == TranscriptionState.STARTED
+        val captionsButton = GridOptionItem("Closed Captions", R.drawable.closed_captions_session_options,
+            {
+                // If you have the admin rights only
+                if(  meetingViewModel.canToggleCaptions() && (meetingViewModel.captionsEnabledByUser() || !captionServerStarted)) {
+                    openRealTimeClosedCaptions()
+                    dismissAllowingStateLoss()
+                } else {
+                    meetingViewModel.toggleCaptions()
+                    dismissAllowingStateLoss()
+                }
+
+                /*dismiss()*/
+        }, isSelected = meetingViewModel.captionsEnabledByUser() && captionServerStarted,
+            selectedTitle = "Closed Captions")
+
         val noiseButton = GridOptionItem("Reduce Noise", R.drawable.reduce_noise_session_option, {
             onNoiseClicked?.invoke()
             dismiss()
@@ -152,8 +169,17 @@ class SessionOptionBottomSheet(
         )
 
         val videoFilter = GridOptionItem(
-            "Video Filter", R.drawable.emoji_icon, {
+            "Virtual Background", R.drawable.vb_session_option_icon, {
+                meetingViewModel.isVbPlugin = VideoPluginMode.REPLACE_BACKGROUND
                 onNameChange.invoke()
+                dismissAllowingStateLoss()
+
+            }, isSelected = false
+        )
+
+        val whiteboard = GridOptionItem(
+            resources.getString(R.string.start_white_board), R.drawable.whiteboard, {
+                meetingViewModel.toggleWhiteBoard()
                 dismissAllowingStateLoss()
 
             }, isSelected = false
@@ -165,6 +191,8 @@ class SessionOptionBottomSheet(
         val group: Group = Section().apply {
             if (meetingViewModel.isParticpantListEnabled())
             add(peerListOption)
+            if (meetingViewModel.isWhiteBoardAdmin())
+            add(whiteboard)
             if (meetingViewModel.isBRBEnabled())
             add(brbOption)
             if (meetingViewModel.isAllowedToShareScreen())
@@ -172,11 +200,13 @@ class SessionOptionBottomSheet(
             if (meetingViewModel.displayNoiseCancellationButton()) {
                 add(noiseButton)
             }
-            if(!disableHandRaiseDisplay) {
+            if(!disableHandRaiseDisplay && meetingViewModel.handRaiseAvailable()) {
                 add(raiseHandOption)
             }
             if (meetingViewModel.isAllowedToBrowserRecord())
             add(recordingOption)
+            if(meetingViewModel.areCaptionsAvailable() && ( meetingViewModel.canToggleCaptions() || captionServerStarted))
+                add(captionsButton)
             if(!meetingViewModel.disableNameEdit()) {
                 add(changeName)
             }
@@ -189,7 +219,7 @@ class SessionOptionBottomSheet(
                     )
                 )
             }
-            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.showVideoFilterIcon()) {
+            if (meetingViewModel.isLocalVideoEnabled() == true && meetingViewModel.vbEnabled()) {
                 add(videoFilter)
             }
         }
@@ -210,6 +240,16 @@ class SessionOptionBottomSheet(
             screenShareOption.setSelectedButton(it)
             peerListOption.setParticpantCountUpdate(meetingViewModel.peerCount.value)
             screenShareOption.setText(if (it) resources.getString(R.string.stop_share_screen) else resources.getString(R.string.start_screen_share))
+        }
+
+        meetingViewModel.showHideWhiteboardObserver.observe(viewLifecycleOwner) {
+            whiteboard.setSelectedButton(it.state == State.Started)
+            whiteboard.setText(
+                if (it.state == State.Started && it.isOwner) resources.getString(R.string.stop_white_board)
+                else if(it.state == State.Stopped) resources.getString(R.string.start_white_board)
+                else resources.getString(R.string.stop_white_board)
+            )
+
         }
 
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) {

@@ -14,8 +14,8 @@ import live.hms.roomkit.databinding.FragmentRolePreviewBinding
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.setIconDisabled
-import live.hms.roomkit.ui.theme.setIconEnabled
+import live.hms.prebuilt_themes.setIconDisabled
+import live.hms.prebuilt_themes.setIconEnabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.contextSafe
 

@@ -24,10 +24,10 @@ import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.prebuilt_themes.getColorOrDefault
+import live.hms.prebuilt_themes.setBackgroundAndColor
 import live.hms.roomkit.util.*
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
@@ -251,12 +251,17 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected fun bindVideo(binding: VideoCardBinding, item: MeetingTrack) {
     // FIXME: Add a shared VM with activity scope to subscribe to events
     // binding.container.setOnClickListener { viewModel.onVideoItemClick?.invoke(item) }
-    //binding.applyTheme()
     binding.apply {
+      applyTheme()
       // Donot update the text view if not needed, this causes redraw of the entire view leading to  flicker
       if (name.text.equals(item.peer.name).not()) {
         name.text = item.peer.name
         nameInitials.text = NameUtils.getInitials(item.peer.name)
+      }
+      if(item.peer.type == HMSPeerType.SIP) {
+        sipImageHolder.visibility = View.VISIBLE
+      } else {
+        sipImageHolder.visibility = View.GONE
       }
       // Using alpha instead of visibility to stop redraw of the entire view to stop flickering
       iconScreenShare.alpha = visibilityOpacity( (item.isScreen) )
@@ -266,9 +271,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         isAudioMute
       )
 
-
-
-      if (isScreenshare())
+      if (isScreenshare() || item.peer.type == HMSPeerType.SIP)
         audioLevel.alpha = visibilityOpacity(false)
       else
         audioLevel.alpha = visibilityOpacity(
@@ -325,7 +328,8 @@ abstract class VideoGridBaseFragment : Fragment() {
     layout: GridLayout,
     newVideos: List<MeetingTrack?>,
     isVideoGrid: Boolean,
-    isScreenShare: Boolean = false
+    isScreenShare: Boolean = false,
+    isForceUpdate : Boolean = false,
   ) {
     gridLayout = layout
     var requiresGridLayoutUpdate = false
@@ -340,7 +344,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
         layout.apply {
           // Unbind only when view is visible to user
-          if (isFragmentVisible) unbindSurfaceView(
+          if (isFragmentVisible|| isForceUpdate) unbindSurfaceView(
             currentRenderedView.binding.videoCard,
             currentRenderedView.meetingTrack
           )
@@ -358,7 +362,8 @@ abstract class VideoGridBaseFragment : Fragment() {
         if (renderedViewPair != null) {
           newRenderedViews.add(renderedViewPair)
 
-          if (isFragmentVisible) {
+          if (isFragmentVisible ||isForceUpdate) {
+
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
             bindSurfaceView(renderedViewPair.binding.videoCard, newVideo, if (isScreenshare()) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
@@ -366,7 +371,7 @@ abstract class VideoGridBaseFragment : Fragment() {
             renderedViewPair.statsInterpreter?.updateVideoTrack(newVideo.video)
           }
 
-          updateNetworkQualityView(newVideo.peer,requireContext(),renderedViewPair.binding.videoCard.networkQuality)
+          updateNetworkQualityView(newVideo.peer,renderedViewPair.binding.videoCard.networkQuality)
 
           renderedViewPair.binding.videoCard.raisedHand.alpha =
             visibilityOpacity(newVideo.peer.isHandRaised)
@@ -384,7 +389,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
 
           // Bind surfaceView when view is visible to user
-          if (isFragmentVisible) {
+          if (isFragmentVisible || isForceUpdate) {
             bindSurfaceView(videoBinding.videoCard, newVideo, if (isScreenShare) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
           }
 
@@ -437,7 +442,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         }
         HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
           renderedViewPair.binding.videoCard.networkQuality.apply {
-            updateNetworkQualityView(peerTypePair.first,requireContext(),this)
+            updateNetworkQualityView(peerTypePair.first,this)
           }
         }
 
@@ -451,13 +456,13 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
   }
 
-  private fun updateNetworkQualityView(peer : HMSPeer, context: Context, imageView: ImageView){
+  private fun updateNetworkQualityView(peer : HMSPeer, imageView: ImageView){
     if(peer.type == HMSPeerType.SIP){
       imageView.visibility = View.GONE
     }
     else {
       val downLinkScore = peer.networkQuality?.downlinkQuality
-      NetworkQualityHelper.getNetworkResource(downLinkScore, context).let { drawable ->
+      NetworkQualityHelper.getNetworkResource(downLinkScore, imageView.context).let { drawable ->
         if (downLinkScore == 0) {
           imageView.setColorFilter(
             getColorOrDefault(
@@ -485,7 +490,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       val track = renderedView.meetingTrack.audio
 
       renderedView.binding.apply {
-        if (track == null || track.isMute) {
+        if (track == null || track.isMute || renderedView.meetingTrack.peer.type == HMSPeerType.SIP) {
           videoCard.audioLevel.update(null)
         } else {
           val level = speakers.find { it.hmsTrack?.trackId == track.trackId }?.level ?: 0

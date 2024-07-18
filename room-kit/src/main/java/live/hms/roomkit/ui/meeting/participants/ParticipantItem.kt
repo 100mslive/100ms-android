@@ -7,22 +7,20 @@ import android.widget.PopupWindow
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.CustomMenuLayoutBinding
 import live.hms.roomkit.databinding.ListItemPeerListBinding
+import live.hms.roomkit.drawableStart
 import live.hms.roomkit.gone
 import live.hms.roomkit.helpers.NetworkQualityHelper
+import live.hms.roomkit.setOnSingleClickListener
 import live.hms.roomkit.show
-import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
-import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.PrebuiltInfoContainer
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.video.connection.stats.quality.HMSNetworkQuality
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSAudioTrack
@@ -47,7 +45,8 @@ class ParticipantItem(
     private val participantPreviousRoleChangeUseCase: ParticipantPreviousRoleChangeUseCase,
     private val requestPeerLeave: (hmsPeer: HMSRemotePeer, reason: String) -> Unit,
     private val activeSpeakers: LiveData<Pair<List<MeetingTrack>, Array<HMSSpeaker>>>,
-    private val lowerRemotePeerHand : (HMSPeer, HMSActionResultListener) -> Unit
+    private val lowerRemotePeerHand : (HMSPeer, HMSActionResultListener) -> Unit,
+    private val showSwitchRoleBottomSheet : (HMSPeer) -> Unit
 ) : BindableItem<ListItemPeerListBinding>(hmsPeer.peerID.hashCode().toLong()){
     override fun bind(viewBinding: ListItemPeerListBinding, position: Int) {
         viewBinding.applyTheme()
@@ -56,17 +55,17 @@ class ParticipantItem(
         } else {
             hmsPeer.name
         }
-        if(hmsPeer.type == HMSPeerType.SIP) {
+        val isSipPeer = hmsPeer.type == HMSPeerType.SIP
+        if(isSipPeer) {
             viewBinding.sipPeer.visibility = View.VISIBLE
-            viewBinding.badNetworkIndicator.visibility = View.GONE
         }
         else {
             viewBinding.sipPeer.visibility = View.GONE
-            updateNetworkQuality(hmsPeer.networkQuality, viewBinding)
         }
+        updateNetworkQuality(hmsPeer.networkQuality, viewBinding, isSipPeer)
         viewBinding.name.text = name
         updateHandRaise(hmsPeer, viewBinding)
-        updateSpeaking(hmsPeer.audioTrack, viewBinding)
+        updateSpeaking(hmsPeer.audioTrack, viewBinding, isSipPeer)
         // Don't show the settings if they aren't allowed to change anything at all.
         viewBinding.peerSettings.visibility = if(hmsPeer.isLocal || !(isAllowedToMutePeers || isAllowedToChangeRole || isAllowedToRemovePeers))
             View.GONE
@@ -124,6 +123,21 @@ class ParticipantItem(
                         mypopupWindow.dismiss()
                     }
                 }
+                with(popBinding.switchRole) {
+                    visibility = if(isAllowedToChangeRole) View.VISIBLE else View.GONE
+                    if(visibility == View.VISIBLE) {
+                        drawableStart = ResourcesCompat.getDrawable(
+                            viewBinding.root.resources,
+                            R.drawable.switch_role_participant_icon,
+                            null
+                        )
+                    }
+                    setOnSingleClickListener {
+                        // opens another bottomsheet fragment
+                        showSwitchRoleBottomSheet(hmsPeer)
+                        mypopupWindow.dismiss()
+                    }
+                }
                 popBinding.toggleAudio.visibility = if(audioIsOn != null && showToggleAudio) View.VISIBLE else View.GONE
                 if(audioIsOn == true)
                     popBinding.toggleAudio.text = "Mute Audio"
@@ -135,7 +149,7 @@ class ParticipantItem(
                     mypopupWindow.dismiss()
                 }
 
-                popBinding.toggleVideo.visibility = if(videoIsOn != null && showToggleVideo) View.VISIBLE else View.GONE
+                popBinding.toggleVideo.visibility = if(videoIsOn != null && showToggleVideo && !isSipPeer) View.VISIBLE else View.GONE
                 if(videoIsOn == true) {
                     popBinding.toggleVideo.text = "Mute Video"
                 }
@@ -206,8 +220,8 @@ class ParticipantItem(
         }
     }
 
-    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding) {
-        if (audioTrack == null) {
+    private fun updateSpeaking(audioTrack: HMSAudioTrack?, viewBinding: ListItemPeerListBinding, isSipPeer : Boolean) {
+        if (audioTrack == null || isSipPeer) {
             viewBinding.muteUnmuteIcon.gone()
             viewBinding.audioLevelView.gone()
         }
@@ -253,31 +267,11 @@ class ParticipantItem(
             audioIsOn = if(!isAllowedToMutePeers) null else hmsPeer.audioTrack?.isMute == false,
             videoIsOn = if(!isAllowedToMutePeers) null else hmsPeer.videoTrack?.isMute == false,
             showToggleAudio = hmsPeer.hmsRole.publishParams?.allowed?.contains("audio") == true,
-            showToggleVideo  = hmsPeer.hmsRole.publishParams?.allowed?.contains("video") == true
+            showToggleVideo  = hmsPeer.hmsRole.publishParams?.allowed?.contains("video") == true,
+            isAllowedToChangeRole
         )
     }
-//    private fun getMenuForGroup(forPeer: HMSPeer): Int {
-//        val isOffStageRole =
-//            prebuiltInfoContainer.onStageExp("broadcaster")?.offStageRoles?.contains(
-//                forPeer.hmsRole.name
-//            ) == true
-//        val isOnStageButNotBroadcasterRole = prebuiltInfoContainer.onStageExp("broadcaster")?.onStageRole == forPeer.hmsRole.name
-//
-//        val isHandRaised = CustomPeerMetadata.fromJson(forPeer.metadata)?.isHandRaised == true
-//                // You have to be in the offstage roles to be categorized as hand raised
-//                && isOffStageRole
-//
-//        return if (isHandRaised)
-//            R.menu.menu_participant_hand_raise
-//        else if (isOffStageRole) {
-//            R.menu.menu_participants_all
-//        } else if(isOnStageButNotBroadcasterRole) {
-//            R.menu.menu_participant_onstage_not_broadcaster
-//        }
-//        else {
-//            R.menu.menu_broadcaster
-//        }
-//    }
+
 
     private fun updateHandRaise(hmsPeer: HMSPeer, viewBinding: ListItemPeerListBinding) {
         val isHandRaised = hmsPeer.isHandRaised
@@ -289,22 +283,33 @@ class ParticipantItem(
 
     private fun updateNetworkQuality(
         networkQuality: HMSNetworkQuality?,
-        viewBinding: ListItemPeerListBinding
+        viewBinding: ListItemPeerListBinding,
+        isSipPeer: Boolean
     ) {
-        val downlinkSpeed = networkQuality?.downlinkQuality ?: -1
         val imageView = viewBinding.badNetworkIndicator
-        NetworkQualityHelper.getNetworkResource(downlinkSpeed, viewBinding.root.context).let { drawable ->
-            if (downlinkSpeed == 0) {
-                imageView.setColorFilter(getColorOrDefault(HMSPrebuiltTheme.getColours()?.alertErrorDefault, HMSPrebuiltTheme.getDefaults().error_default), android.graphics.PorterDuff.Mode.SRC_IN);
-            } else {
-                imageView.colorFilter = null
-            }
-            imageView.setImageDrawable(drawable)
-            if (drawable == null){
-                imageView.visibility = View.GONE
-            }else{
-                imageView.visibility = View.VISIBLE
-            }
+        if(isSipPeer) {
+            imageView.visibility = View.GONE
+        } else {
+            val downlinkSpeed = networkQuality?.downlinkQuality ?: -1
+            NetworkQualityHelper.getNetworkResource(downlinkSpeed, viewBinding.root.context)
+                .let { drawable ->
+                    if (downlinkSpeed == 0) {
+                        imageView.setColorFilter(
+                            getColorOrDefault(
+                                HMSPrebuiltTheme.getColours()?.alertErrorDefault,
+                                HMSPrebuiltTheme.getDefaults().error_default
+                            ), android.graphics.PorterDuff.Mode.SRC_IN
+                        );
+                    } else {
+                        imageView.colorFilter = null
+                    }
+                    imageView.setImageDrawable(drawable)
+                    if (drawable == null) {
+                        imageView.visibility = View.GONE
+                    } else {
+                        imageView.visibility = View.VISIBLE
+                    }
+                }
         }
     }
 

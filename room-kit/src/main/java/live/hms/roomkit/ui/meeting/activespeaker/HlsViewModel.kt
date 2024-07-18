@@ -2,7 +2,6 @@ package live.hms.roomkit.ui.meeting.activespeaker
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
@@ -24,7 +23,7 @@ import live.hms.video.sdk.HMSSDK
     application: Application,
     private val hlsStreamUrl : String,
     private val hmsSdk: HMSSDK,
-    private val hlsPlayerBeganToPlay : () -> Unit,
+    private val hlsPlayerBeganToPlay : (HmsHlsPlaybackState) -> Unit,
     private val displayHlsCuesUseCase : () -> DisplayHlsCuesUseCase
 ) : AndroidViewModel(application) {
     val isPlaying = MutableLiveData(true)
@@ -35,6 +34,7 @@ import live.hms.video.sdk.HMSSDK
     val behindLiveByLiveData = MutableLiveData("0:0")
     val streamEndedEvent = SingleLiveEvent<Unit>()
     val currentSubtitles = MutableLiveData<String?>()
+    val playerReady = MutableLiveData<Boolean>(false)
     private var failed = false
 
     val player = HmsHlsPlayer(application, hmsSdk).apply {
@@ -51,12 +51,12 @@ import live.hms.video.sdk.HMSSDK
         }
     }
     private fun setListeners(player: HmsHlsPlayer) {
-//        binding.hlsView.player = player.getNativePlayer()
         player.getNativePlayer().addListener(@UnstableApi object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 if (isPlaying) {
                     videoVisible.postValue(true)
+                    playerReady.postValue(true)
                 }
             }
 
@@ -79,25 +79,20 @@ import live.hms.video.sdk.HMSSDK
         player.addPlayerEventListener(object : HmsHlsPlaybackEvents {
 
             override fun onPlaybackFailure(error: HmsHlsException) {
-                Log.d("HMSHLSPLAYER", "From App, error: $error")
                 failed = true
             }
 
             @SuppressLint("UnsafeOptInUsageError")
             override fun onPlaybackStateChanged(state: HmsHlsPlaybackState) {
-//                contextSafe { context, activity ->
-//                    activity.runOnUiThread {
-                        if (state == HmsHlsPlaybackState.playing) {
-                            hlsPlayerBeganToPlay()
-                            isPlaying.postValue(true)
-                        } else if (state == HmsHlsPlaybackState.stopped) {
-                            // Open end stream fragment.
-                            streamEndedEvent.postValue(Unit)
-                            isPlaying.postValue(false)
-                        } else isPlaying.postValue(true)
-//                    }
-//                }
-//                Log.d("HMSHLSPLAYER", "From App, playback state: $state")
+                if (state == HmsHlsPlaybackState.playing) {
+                    hlsPlayerBeganToPlay(state)
+                    isPlaying.postValue(true)
+                } else if (state == HmsHlsPlaybackState.stopped) {
+                    // Open end stream fragment.
+                    hlsPlayerBeganToPlay(state)
+                    streamEndedEvent.postValue(Unit)
+                    isPlaying.postValue(false)
+                }
             }
 
             override fun onCue(cue: HmsHlsCue) {

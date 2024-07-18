@@ -1,6 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
-import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import live.hms.roomkit.R
 import live.hms.roomkit.animation.RootViewDeferringInsetsCallback
@@ -33,8 +34,6 @@ import live.hms.roomkit.util.ROOM_CODE
 import live.hms.roomkit.util.ROOM_PREBUILT
 import live.hms.roomkit.util.TOKEN
 import live.hms.roomkit.util.init
-import live.hms.video.error.HMSException
-import live.hms.video.sdk.HMSActionResultListener
 
 class MeetingActivity : AppCompatActivity() {
 
@@ -123,8 +122,14 @@ class MeetingActivity : AppCompatActivity() {
                 .show()
         }
 
-        meetingViewModel.hmsNotificationEvent.observe(this) {
-            triggerNotification(it)
+        meetingViewModel.hmsNotificationEvent.observe(this) { notification ->
+            triggerNotification(notification)
+            notification.autoRemoveTypeAfterMillis?.let {
+                lifecycleScope.launch {
+                    delay(it)
+                    tryRemovingAllNotificationsOfType(notification.type)
+                }
+            }
         }
 
         meetingViewModel.hmsRemoveNotificationEvent.observe(this) {
@@ -188,6 +193,28 @@ class MeetingActivity : AppCompatActivity() {
         result.dispatchUpdatesTo(hmsNotificationAdapter)
     }
 
+    private fun tryRemovingAllNotificationsOfType(HMSNotificationType: HMSNotificationType) {
+
+        if (hmsNotificationAdapter.getItems().isEmpty()) {
+            return
+        }
+
+        val old = hmsNotificationAdapter.getItems()
+
+        val getMatchingNotfictionTypeIndexToRemove = hmsNotificationAdapter.getItems().filter { it.type == HMSNotificationType }
+        if (getMatchingNotfictionTypeIndexToRemove.isEmpty())
+            return
+
+        val new = mutableListOf<HMSNotification>().apply {
+            addAll(old)
+            removeAll(getMatchingNotfictionTypeIndexToRemove)
+
+        }
+        val callback = HMSNotificationDiffCallBack(old, new)
+        val result = DiffUtil.calculateDiff(callback)
+        hmsNotificationAdapter.setItems(new)
+        result.dispatchUpdatesTo(hmsNotificationAdapter)
+    }
     private fun tryRemovingNotification(HMSNotificationType: HMSNotificationType) {
 
         if (hmsNotificationAdapter.getItems().isEmpty()) {
@@ -284,8 +311,11 @@ class MeetingActivity : AppCompatActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) {
+        if (it.containsKey(POST_NOTIFICATIONS)) {
+            meetingViewModel.screenshareRequest.value = Unit
+        }
         // Do not prevent joining if bluetooth connect is denied.
-        if (it.filterKeys { key -> key != BLUETOOTH_CONNECT }.values.all { granted -> granted }) meetingViewModel.permissionGranted()
+        else if (it.values.all { granted -> granted }) meetingViewModel.permissionGranted()
         else {
             // Leave the meeting
             meetingViewModel.leaveMeeting(null)

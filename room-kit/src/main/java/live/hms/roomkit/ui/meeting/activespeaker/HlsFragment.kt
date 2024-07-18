@@ -8,6 +8,7 @@ import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
@@ -105,11 +106,13 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.otaliastudios.zoom.ZoomSurfaceView
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import live.hms.roomkit.R
 import live.hms.hls_player.*
 import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.databinding.LayoutChatMergeBinding
 import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.ClosedCaptionsForEveryone
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingFragment
 import live.hms.roomkit.ui.meeting.MeetingFragmentDirections
@@ -128,12 +131,12 @@ import live.hms.roomkit.ui.meeting.chat.combined.ChatRbacRecipientHandling
 import live.hms.roomkit.ui.meeting.chat.combined.LaunchMessageOptionsDialog
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
-import live.hms.roomkit.ui.meeting.compose.Variables
-import live.hms.roomkit.ui.meeting.compose.Variables.Companion.OnSurfaceHigh
-import live.hms.roomkit.ui.meeting.compose.Variables.Companion.PrimaryDefault
-import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing0
-import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing1
-import live.hms.roomkit.ui.meeting.compose.Variables.Companion.Spacing2
+import live.hms.prebuilt_themes.Variables
+import live.hms.prebuilt_themes.Variables.Companion.OnSurfaceHigh
+import live.hms.prebuilt_themes.Variables.Companion.PrimaryDefault
+import live.hms.prebuilt_themes.Variables.Companion.Spacing0
+import live.hms.prebuilt_themes.Variables.Companion.Spacing1
+import live.hms.prebuilt_themes.Variables.Companion.Spacing2
 import live.hms.roomkit.ui.polls.leaderboard.millisToText
 import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.roomkit.util.contextSafe
@@ -171,7 +174,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
     }
     private val hlsViewModel: HlsViewModel by activityViewModels {
         HlsViewModelFactory(requireActivity().application,args.hlsStreamUrl, meetingViewModel.hmsSDK,
-            meetingViewModel::hlsPlayerBeganToPlay
+            { state : HmsHlsPlaybackState -> meetingViewModel.hlsPlayerBeganToPlay(state) }
         ) { displayHlsCuesUseCase }
     }
     private val player by lazy { hlsViewModel.player }
@@ -200,6 +203,9 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
     private lateinit var composeView: ComposeView
 
+    fun playInstead() {
+        player.play(args.hlsStreamUrl)
+    }
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -223,6 +229,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         hlsViewModel.streamEndedEvent.observe(viewLifecycleOwner) {
+            player.stop()
             StreamEnded.launch(parentFragmentManager)
         }
         meetingViewModel.broadcastsReceived.observe(viewLifecycleOwner) {
@@ -256,9 +263,10 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
                 val progressBarVisibility by hlsViewModel.progressBarVisible.observeAsState()
                 val viewMode by meetingViewModel.state.observeAsState()
+                val hlsPlayerReady by hlsViewModel.playerReady.observeAsState()
 
                 // Don't show whole view loading during the time it's disconnected or reconnecting.
-                if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing) {
+                if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing || hlsPlayerReady != true) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()
@@ -269,6 +277,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                     val isChatEnabled by rememberSaveable { mutableStateOf(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) }
                     var chatOpen by remember { mutableStateOf(isChatEnabled)}
                     val isHandRaised by meetingViewModel.isHandRaised.observeAsState(false)
+                    val allowHandRaised by remember { mutableStateOf(meetingViewModel.handRaiseAvailable()) }
                     val showDvrControls by meetingViewModel.showDvrControls.observeAsState(false)
                     val unreadMessagesCount by chatViewModel.unreadMessagesCount.observeAsState()
                     val areCaptionsSupported by remember { mutableStateOf(hlsViewModel.areClosedCaptionsSupported()) }
@@ -301,7 +310,13 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                             onNameChange = {  },
                             showPolls = { openPolls() },
                             onRecordingClicked = {},
-                            disableHandRaiseDisplay = true
+                            disableHandRaiseDisplay = true,
+                            openRealTimeClosedCaptions = {
+                                ClosedCaptionsForEveryone().show(
+                                    childFragmentManager,
+                                    ClosedCaptionsForEveryone.TAG
+                                )
+                            }
                         ).show(
                             childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
                         )
@@ -341,6 +356,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 onCloseButtonClicked = { LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
+                                allowHandRaise = allowHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
                                 showDvrControls = showDvrControls,
@@ -361,7 +377,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                         meetingViewModel,
                                         pinnedMessageUiUseCase,
                                         chatAdapter,
-                                        ::openPolls
+                                        ::openPolls,
+                                        allowHandRaised
                                     )
                                 }
                             }
@@ -399,6 +416,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                 onCloseButtonClicked = {LeaveCallBottomSheet().show(parentFragmentManager, null)},
                                 closedCaptionsEnabled = closedCaptionsEnabled,
                                 isHandRaised = isHandRaised,
+                                allowHandRaise = allowHandRaised,
                                 toggleHandRaise = meetingViewModel::toggleRaiseHand,
                                 sessionOptionsButtonTapped = ::openSessionOptions,
                                 showDvrControls = showDvrControls,
@@ -429,7 +447,8 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                                     meetingViewModel,
                                     pinnedMessageUiUseCase,
                                     chatAdapter,
-                                    ::openPolls
+                                    ::openPolls,
+                                    allowHandRaised
                                 )
                             }
                         }
@@ -437,7 +456,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
                 }
 
-                PauseWhenLeaving(player)
+                PauseWhenLeaving(player, ::playInstead)
                 RemoveStatsWhenPaused(::setPlayerStatsListener, player)
 
             }
@@ -564,9 +583,9 @@ fun ChatHeader(
                         "About Session",
                         fontSize = 16.sp,
                         lineHeight = 24.sp,
-                        fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
+                        fontFamily = FontFamily(Font(R.font.inter_semibold)),
                         fontWeight = FontWeight(600),
-                        color = Variables.OnSurfaceHigh,
+                        color = OnSurfaceHigh,
                         letterSpacing = 0.15.sp,
                     )
                     Spacer(Modifier.weight(1f))
@@ -574,7 +593,7 @@ fun ChatHeader(
                         modifier = Modifier.pointerInput(Unit) {
                             detectTapGestures(onTap = { chatDescriptionMoreClicked() })
                         },
-                        painter = painterResource(id = live.hms.roomkit.R.drawable.hls_about_description_down_chevron),
+                        painter = painterResource(id = R.drawable.hls_about_description_down_chevron),
                         contentDescription = "collapse"
                     )
                 }
@@ -603,7 +622,7 @@ fun ChatHeader(
                             it, style = TextStyle(
                                 fontSize = 14.sp,
                                 lineHeight = 20.sp,
-                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                                fontFamily = FontFamily(Font(R.font.inter_regular)),
                                 fontWeight = FontWeight(600),
                                 color = Variables.OnSecondaryHigh,
                                 letterSpacing = 0.1.sp,
@@ -614,16 +633,16 @@ fun ChatHeader(
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)) {
                         val textStyle = SpanStyle(
                             fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                            fontFamily = FontFamily(Font(R.font.inter_regular)),
                             fontWeight = FontWeight(400),
                             color = Variables.OnSurfaceMedium,
                             letterSpacing = 0.4.sp,
                         )
                         val moreStyle = SpanStyle(
-                                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
+                                fontFamily = FontFamily(Font(R.font.inter_semibold)),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight(600),
-                                color = Variables.OnSurfaceHigh,
+                                color = OnSurfaceHigh,
                         )
 
                         ClickableText(text = buildAnnotatedString {
@@ -658,7 +677,7 @@ fun ChatHeader(
                     text = description,
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
-                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                    fontFamily = FontFamily(Font(R.font.inter_regular)),
                     fontWeight = FontWeight(400),
                     color = Variables.OnSurfaceMedium,
                 )
@@ -738,9 +757,9 @@ fun ChatMessage(name: String, message: String) {
             name, style = TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
-                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                fontFamily = FontFamily(Font(R.font.inter_regular)),
                 fontWeight = FontWeight(600),
-                color = Variables.OnSurfaceHigh,
+                color = OnSurfaceHigh,
                 letterSpacing = 0.1.sp,
             )
         )
@@ -748,9 +767,9 @@ fun ChatMessage(name: String, message: String) {
             message, style = TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
-                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                fontFamily = FontFamily(Font(R.font.inter_regular)),
                 fontWeight = FontWeight(400),
-                color = Variables.OnSurfaceHigh,
+                color = OnSurfaceHigh,
                 letterSpacing = 0.25.sp,
             )
         )
@@ -803,7 +822,7 @@ fun GoLiveText(isLive : Boolean, behindBy: String, goLiveClicked : () -> Unit) {
 
         Image(
             painter = painterResource(id =
-            if(isLive) live.hms.roomkit.R.drawable.hls_live_dot else  live.hms.roomkit.R.drawable.hls_go_live_dot),
+            if(isLive) R.drawable.hls_live_dot else  R.drawable.hls_go_live_dot),
             contentDescription = "Gray",
             modifier = Modifier
                 // Margin right
@@ -815,9 +834,9 @@ fun GoLiveText(isLive : Boolean, behindBy: String, goLiveClicked : () -> Unit) {
             style = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                fontFamily = FontFamily(Font(R.font.inter_regular)),
                 fontWeight = FontWeight(600),
-                color = if(isLive) Variables.OnSurfaceHigh else Variables.OnSurfaceMedium,
+                color = if(isLive) OnSurfaceHigh else Variables.OnSurfaceMedium,
                 letterSpacing = 0.5.sp,
             )
         )
@@ -830,9 +849,9 @@ fun GoLiveText(isLive : Boolean, behindBy: String, goLiveClicked : () -> Unit) {
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 24.sp,
-                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                    fontFamily = FontFamily(Font(R.font.inter_regular)),
                     fontWeight = FontWeight(600),
-                    color = if(isLive) Variables.OnSurfaceHigh else Variables.OnSurfaceMedium,
+                    color = if(isLive) OnSurfaceHigh else Variables.OnSurfaceMedium,
                     letterSpacing = 0.5.sp,
                 )
             )
@@ -844,7 +863,7 @@ fun MaximizeButton(
     onClickAction: () -> Unit,
     isMaximized : Boolean
 ) {
-    Image(painter = painterResource(id = if(isMaximized) live.hms.roomkit.R.drawable.hls_minimize else live.hms.roomkit.R.drawable.hls_maximize),
+    Image(painter = painterResource(id = if(isMaximized) R.drawable.hls_minimize else R.drawable.hls_maximize),
         contentScale = ContentScale.None,
         contentDescription = "Maximize Video",
         modifier = Modifier
@@ -856,7 +875,7 @@ fun MaximizeButton(
 fun SettingsButton(
     onClickAction: () -> Unit
 ) {
-    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.settings),
+    Image(painter = painterResource(id = R.drawable.settings),
         contentDescription = "Layer Select",
         modifier = Modifier
             .clickable { onClickAction() }
@@ -898,6 +917,7 @@ fun HlsComposable(
     onCloseButtonClicked: () -> Unit,
     closedCaptionsEnabled: Boolean,
     isHandRaised: Boolean,
+    allowHandRaise : Boolean,
     toggleHandRaise: () -> Unit,
     sessionOptionsButtonTapped: () -> Unit,
     showDvrControls: Boolean,
@@ -993,7 +1013,7 @@ fun HlsComposable(
                                 style = TextStyle(
                                     fontSize = 11.sp,
                                     lineHeight = 13.sp,
-                                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_semibold)),
+                                    fontFamily = FontFamily(Font(R.font.inter_semibold)),
                                     color = Color.White,
                                     letterSpacing = 0.5.sp,
                                 )
@@ -1070,7 +1090,9 @@ fun HlsComposable(
             ) {
                 // chat button
                 // settings button
-                HandRaiseButton(isHandRaised, toggleHandRaise)
+                if(allowHandRaise) {
+                    HandRaiseButton(isHandRaised, toggleHandRaise)
+                }
                 SessionOptionsButton(sessionOptionsButtonTapped)
             }
             }
@@ -1096,7 +1118,7 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
                 .wrapContentSize()
                 .padding(top = Spacing1), factory = {
                 (LayoutInflater.from(it)
-                    .inflate(live.hms.roomkit.R.layout.player_controls, null) as PlayerControlView)
+                    .inflate(R.layout.player_controls, null) as PlayerControlView)
                     .apply {
                         setPlayer(player.getNativePlayer())
                         this.findViewById<LinearLayout>(androidx.media3.ui.R.id.exo_center_controls).visibility =
@@ -1132,7 +1154,7 @@ fun DvrControls(modifier: Modifier, player: HmsHlsPlayer, playPauseButton : @Com
 
 @Composable
 fun SessionOptionsButton(onClick: () -> Unit) {
-    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.compose_hls_hamburger_menu),
+    Image(painter = painterResource(id = R.drawable.compose_hls_hamburger_menu),
         contentDescription = "Menu",
         contentScale = ContentScale.None,
         modifier = Modifier
@@ -1142,7 +1164,7 @@ fun SessionOptionsButton(onClick: () -> Unit) {
 
 @Composable
 fun HandRaiseButton(isHandRaised : Boolean, onClick: () -> Unit) {
-    Image(painter = painterResource(id = if(isHandRaised) live.hms.roomkit.R.drawable.compose_hls_hand_on else live.hms.roomkit.R.drawable.compose_hls_hand_off),
+    Image(painter = painterResource(id = if(isHandRaised) R.drawable.compose_hls_hand_on else R.drawable.compose_hls_hand_off),
         contentDescription = "Close",
         contentScale = ContentScale.None,
         modifier = Modifier
@@ -1154,7 +1176,7 @@ fun HandRaiseButton(isHandRaised : Boolean, onClick: () -> Unit) {
 
 @Composable
 fun CloseButton(onCloseButtonClicked: () -> Unit) {
-    Image(painter = painterResource(id = live.hms.roomkit.R.drawable.hls_close_button),
+    Image(painter = painterResource(id = R.drawable.hls_close_button),
         contentDescription = "Close",
         contentScale = ContentScale.None,
         modifier = Modifier
@@ -1167,7 +1189,7 @@ fun CloseButton(onCloseButtonClicked: () -> Unit) {
 @Composable
 fun ClosedCaptionsButton(closedCaptionsToggleClicked: () -> Unit, closedCaptionsEnabled : Boolean) {
     Image(painter =
-    painterResource(id = if(closedCaptionsEnabled) live.hms.roomkit.R.drawable.hls_closed_caption_button else live.hms.roomkit.R.drawable.hls_closed_captions_disabled),
+    painterResource(id = if(closedCaptionsEnabled) R.drawable.hls_closed_caption_button else R.drawable.hls_closed_captions_disabled),
         contentDescription = "Closed Captions",
         contentScale = ContentScale.None,
         modifier = Modifier
@@ -1200,7 +1222,8 @@ fun ChatUI(
     meetingViewModel: MeetingViewModel,
     pinnedMessageUiUseCase: PinnedMessageUiUseCase,
     chatAdapter: ChatAdapter,
-    openPolls : () -> Unit
+    openPolls : () -> Unit,
+    allowHandRaise: Boolean
 ) {
 
     fun chatRelatedObservers(
@@ -1217,16 +1240,22 @@ fun ChatUI(
                 onNameChange = {  },
                 showPolls = { openPolls() },
                 onRecordingClicked = {},
-                disableHandRaiseDisplay = true
+                disableHandRaiseDisplay = true,
+                openRealTimeClosedCaptions = {
+                    ClosedCaptionsForEveryone().show(
+                        childFragmentManager,
+                        ClosedCaptionsForEveryone.TAG
+                    )
+                }
             ).show(
                 childFragmentManager, MeetingFragment.AudioSwitchBottomSheetTAG
             )
         }
         meetingViewModel.isHandRaised.observe(viewLifecycleOwner) {handRaised ->
             if(handRaised)
-                handRaise.setImageResource(live.hms.roomkit.R.drawable.hand_off)
+                handRaise.setImageResource(R.drawable.hand_off)
             else
-                handRaise.setImageResource(live.hms.roomkit.R.drawable.hand_on)
+                handRaise.setImageResource(R.drawable.hand_on)
 
         }
         handRaise.setOnClickListener {
@@ -1299,7 +1328,7 @@ fun ChatUI(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     AndroidView({
-        val view = LayoutInflater.from(context).inflate(live.hms.roomkit.R.layout.layout_chat_merge, null)
+        val view = LayoutInflater.from(context).inflate(R.layout.layout_chat_merge, null)
         with(LayoutChatMergeBinding.bind(view)) {
             applyTheme()
             chatRelatedObservers(this, lifecycleOwner)
@@ -1307,7 +1336,9 @@ fun ChatUI(
         view
     }, modifier = Modifier
         .fillMaxWidth()
-        .fillMaxHeight())
+        .fillMaxHeight(), update = {
+            it.findViewById<ImageView>(R.id.handRaise).visibility = if(allowHandRaise) View.VISIBLE else View.GONE
+    })
 }
 
 @Composable
@@ -1330,13 +1361,13 @@ fun OrientationSwapper(
 fun ForwardButton(isDisabled : Boolean, buttonClicked: () -> Unit) {
     BaseButton(buttonClicked = {if(!isDisabled) {
         buttonClicked()
-    }}, id = if(!isDisabled) live.hms.roomkit.R.drawable.hls_forward_arrow else live.hms.roomkit.R.drawable.forward_arrow_dimmed, description = "Forward 15 seconds")
+    }}, id = if(!isDisabled) R.drawable.hls_forward_arrow else R.drawable.forward_arrow_dimmed, description = "Forward 15 seconds")
 }
 @Composable
 fun RewindButton(buttonClicked : () -> Unit) {
     BaseButton(
         buttonClicked = buttonClicked,
-        id = live.hms.roomkit.R.drawable.hls_backward_arrow,
+        id = R.drawable.hls_backward_arrow,
         description = "Rewind ten seconds"
     )
 }
@@ -1359,7 +1390,7 @@ fun PlayPauseButton(buttonClicked : () -> Unit, isPlaying : Boolean?) {
         modifier = Modifier
             .clickable { buttonClicked() }
             .size(64.dp),
-        painter = painterResource(id = if(isPlaying == true) live.hms.roomkit.R.drawable.exo_styled_controls_pause else live.hms.roomkit.R.drawable.exo_styled_controls_play),
+        painter = painterResource(id = if(isPlaying == true) R.drawable.exo_styled_controls_pause else R.drawable.exo_styled_controls_play),
         contentDescription = "Play",
         contentScale = ContentScale.None
     )
@@ -1377,7 +1408,7 @@ fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int?, buttonClicked: () ->
     if (chatEnabled) {
         Box(contentAlignment = TopEnd) {
             Image(painter =
-            painterResource(id = live.hms.roomkit.R.drawable.hls_chat_off),
+            painterResource(id = R.drawable.hls_chat_off),
                 contentDescription = "Chat Open",
                 contentScale = ContentScale.None,
                 modifier = Modifier
@@ -1395,7 +1426,7 @@ fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int?, buttonClicked: () ->
                     lineHeight = 16.sp,
                     color = OnSurfaceHigh,
                     fontSize = 10.sp,
-                    fontFamily = FontFamily(Font(live.hms.roomkit.R.font.inter_regular)),
+                    fontFamily = FontFamily(Font(R.font.inter_regular)),
                     fontWeight = FontWeight(600),
                     textAlign = TextAlign.Center,
                 )
@@ -1405,7 +1436,7 @@ fun HlsChatIcon(chatEnabled: Boolean, unreadMessages :Int?, buttonClicked: () ->
 }
 
 @Composable
-fun PauseWhenLeaving(player : HmsHlsPlayer) {
+fun PauseWhenLeaving(player : HmsHlsPlayer, playInstead :() -> Unit) {
     OnLifecycleEvent { _, event ->
         when(event)
         {
@@ -1414,8 +1445,12 @@ fun PauseWhenLeaving(player : HmsHlsPlayer) {
             }
 
             Lifecycle.Event.ON_RESUME -> {
-                player.resume()
-                player.seekToLivePosition()
+                if(player.getNativePlayer().playbackState == Player.STATE_IDLE) {
+                    playInstead()
+                } else {
+                    player.resume()
+                    player.seekToLivePosition()
+                }
             }
 
             else -> {}

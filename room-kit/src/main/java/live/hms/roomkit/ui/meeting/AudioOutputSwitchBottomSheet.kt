@@ -6,16 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.xwray.groupie.GroupieAdapter
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.BottomSheetAudioSwitchBinding
 import live.hms.roomkit.drawableEnd
 import live.hms.roomkit.drawableStart
 import live.hms.roomkit.setDrawables
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.util.viewLifecycle
 import live.hms.video.audio.HMSAudioManager.AudioDevice
 
@@ -25,6 +27,8 @@ class AudioOutputSwitchBottomSheet(
 ) : BottomSheetDialogFragment() {
 
     private var binding by viewLifecycle<BottomSheetAudioSwitchBinding>()
+
+    private val audioDeviceAdapter = GroupieAdapter()
 
 
     private val meetingViewModel: MeetingViewModel by activityViewModels {
@@ -54,38 +58,39 @@ class AudioOutputSwitchBottomSheet(
             sheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
-        binding.root.background = resources.getDrawable(R.drawable.gray_shape_round_dialog)
-            .apply {
+        binding.audioOt.drawableStart?.setTint(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+
+        binding.audioOt.setTextColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
+                HMSPrebuiltTheme.getDefaults().onsurface_high_emp
+            )
+        )
+
+
+
+
+        binding.border5.setBackgroundColor(
+            getColorOrDefault(
+                HMSPrebuiltTheme.getColours()?.borderDefault,
+                HMSPrebuiltTheme.getDefaults().border_bright
+            )
+        )
+
+
+        binding.root.background =
+            binding.root.context.resources.getDrawable(R.drawable.gray_shape_round_dialog).apply {
                 val color = getColorOrDefault(
                     HMSPrebuiltTheme.getColours()?.backgroundDefault,
-                    HMSPrebuiltTheme.getDefaults().background_default)
+                    HMSPrebuiltTheme.getDefaults().background_default
+                )
                 setColorFilter(color, PorterDuff.Mode.ADD);
             }
-
-
-        var btnArray = arrayOf(
-            binding.muteBtn,
-            binding.speakerBtn,
-            binding.wiredBtn,
-            binding.bluetoothBtn,
-            binding.earpieceBtn,
-            binding.audioOt
-        )
-
-        val borders = arrayOf(
-            binding.border1, binding.border2, binding.border3, binding.border4, binding.border5
-        )
-
-        borders.forEach {
-            it.setBackgroundColor(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.borderDefault,
-                    HMSPrebuiltTheme.getDefaults().border_bright
-                )
-            )
-        }
-
-
 
         binding.closeBtn.drawable.setTint(
             getColorOrDefault(
@@ -93,116 +98,99 @@ class AudioOutputSwitchBottomSheet(
                 HMSPrebuiltTheme.getDefaults().onsurface_high_emp
             )
         )
-
         binding.closeBtn.setOnClickListener {
             dismissAllowingStateLoss()
         }
 
-        val devicesList = meetingViewModel.hmsSDK.getAudioDevicesList()
+        audioDeviceAdapter.clear()
+        val devicesList = meetingViewModel.hmsSDK.getAudioDevicesInfoList()
+
+        //skips for HLS playback
+        val showAudioOption = meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer()
+        var isMute: Boolean = false
+        var selectedDeviceType: AudioDevice? = null
 
         if (meetingViewModel.isPeerAudioEnabled().not()) {
-            binding.muteBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
+            isMute = true
         } else {
-            meetingViewModel.hmsSDK.getAudioOutputRouteType().let {
-                when (it) {
-                    AudioDevice.BLUETOOTH -> {
-                        binding.bluetoothBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
-                    }
+            selectedDeviceType = meetingViewModel.hmsSDK.getAudioOutputRouteType()
+        }
 
-                    AudioDevice.SPEAKER_PHONE -> {
-                        binding.speakerBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
-                    }
+        if (showAudioOption == true) {
+            for (deviceInfo in devicesList) {
 
-                    AudioDevice.EARPIECE -> {
-                        binding.earpieceBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
-                    }
+                //backward compatibility handling
+                val isSelected = (selectedDeviceType == deviceInfo.type)
+                audioDeviceAdapter.add(
+                    AudioItem(
+                        title = capitalizeAndReplaceUnderscore(deviceInfo.type.name),
+                        subTitle= deviceInfo.name.orEmpty(),
+                        isSelected = isSelected,
+                        type = deviceInfo.type,
+                        drawableRes = getDrawableBasedOnDeviceType(deviceInfo.type),
+                        onClick = { type, id ->
+                            setAudioType(type)
+                        })
+                )
 
-                    AudioDevice.WIRED_HEADSET -> {
-                        binding.wiredBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
-                    }
 
-                    else -> {
-                        binding.muteBtn.setDrawables(end = context?.getDrawable(R.drawable.tick))
-                    }
-                }
             }
         }
 
-        btnArray.forEach {
-            it.setTextColor(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-                )
-            )
 
-            it.drawableEnd?.setTint(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-                )
-            )
 
-            it.drawableStart?.setTint(
-                getColorOrDefault(
-                    HMSPrebuiltTheme.getColours()?.onSurfaceHigh,
-                    HMSPrebuiltTheme.getDefaults().onsurface_high_emp
-                )
-            )
+        audioDeviceAdapter.add(
+            AudioItem(title = "Mute",
+                isSelected = isMute,
+                drawableRes = R.drawable.ic_volume_off_24,
+                onClick = { type, id ->
+                    meetingViewModel.setPeerAudioEnabled(false)
+                    onOptionItemClicked?.invoke(null, true)
+                    dismiss()
+                })
+        )
+
+
+
+
+
+        binding.deviceList.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = audioDeviceAdapter
+        }
+    }
+
+    fun getDrawableBasedOnDeviceType(device: AudioDevice): Int = when (device) {
+        AudioDevice.BLUETOOTH -> {
+            R.drawable.bt
         }
 
-
-        if (devicesList.contains(AudioDevice.BLUETOOTH)) {
-            binding.bluetoothBtn.visibility = View.VISIBLE
+        AudioDevice.SPEAKER_PHONE -> {
+            R.drawable.ic_icon_speaker
         }
 
-        if (devicesList.contains(AudioDevice.WIRED_HEADSET)) {
-            binding.wiredBtn.visibility = View.VISIBLE
+        AudioDevice.EARPIECE -> {
+            R.drawable.phone
         }
 
-        if (devicesList.contains(AudioDevice.EARPIECE)) {
-            binding.earpieceBtn.visibility = View.VISIBLE
+        AudioDevice.WIRED_HEADSET -> {
+            R.drawable.wired
         }
 
-        if (devicesList.contains(AudioDevice.SPEAKER_PHONE)) {
-            binding.speakerBtn.visibility = View.VISIBLE
+        AudioDevice.AUTOMATIC -> R.drawable.ic_icon_speaker
+    }
+
+
+    fun capitalizeAndReplaceUnderscore(input: String): String {
+        if (input.isEmpty()) {
+            return ""
         }
 
+        // Capitalize the first character
+        val capitalized = input.toLowerCase().replaceFirstChar { it.uppercase() }
 
-
-        if (meetingViewModel.hmsSDK.getRoom()?.localPeer?.isWebrtcPeer() != true) {
-            binding.wiredBtn.visibility = View.GONE
-            binding.bluetoothBtn.visibility = View.GONE
-            binding.earpieceBtn.visibility = View.GONE
-            binding.muteBtn.visibility = View.GONE
-        } else {
-            binding.muteBtn.visibility = View.VISIBLE
-        }
-
-
-
-
-        binding.speakerBtn.setOnClickListener {
-            setAudioType(AudioDevice.SPEAKER_PHONE)
-        }
-
-        binding.wiredBtn.setOnClickListener {
-            setAudioType(AudioDevice.WIRED_HEADSET)
-        }
-
-        binding.bluetoothBtn.setOnClickListener {
-            setAudioType(AudioDevice.BLUETOOTH)
-        }
-
-        binding.earpieceBtn.setOnClickListener {
-            setAudioType(AudioDevice.EARPIECE)
-        }
-
-        binding.muteBtn.setOnClickListener {
-            meetingViewModel.setPeerAudioEnabled(false)
-            onOptionItemClicked?.invoke(null, true)
-            dismiss()
-        }
+        // Replace underscores with spaces
+        return capitalized.replace('_', ' ')
     }
 
     override fun getTheme(): Int {

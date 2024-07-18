@@ -14,8 +14,8 @@ import live.hms.roomkit.databinding.ListItemVideoBinding
 import live.hms.roomkit.helpers.NetworkQualityHelper
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.visibility
 import live.hms.video.sdk.models.HMSPeer

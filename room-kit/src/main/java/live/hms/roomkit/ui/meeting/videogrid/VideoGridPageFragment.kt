@@ -9,8 +9,8 @@ import androidx.core.os.bundleOf
 import live.hms.roomkit.databinding.FragmentVideoGridPageBinding
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.setBackgroundAndColor
 import live.hms.roomkit.util.viewLifecycle
 import kotlin.math.min
 
@@ -108,8 +108,11 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
       }
     } else {
       meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
-        val screenShareTrack = track.filter { it.isScreen  }.toList()
-        renderCurrentPage(screenShareTrack)
+        synchronized(track) {
+          val screenShareTrack = track.filter { it.isScreen  }.toList()
+          renderCurrentPage(screenShareTrack, isForceUpdate = true)
+
+        }
       }
     }
 
@@ -130,8 +133,8 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
     return isScreenShare
   }
 
-  private fun renderCurrentPage(tracks: List<MeetingTrack>) {
+  private fun renderCurrentPage(tracks: List<MeetingTrack>, isForceUpdate : Boolean = false) {
     val videos = getCurrentPageVideos(tracks)
-    updateVideos(binding.container, videos, false)
+    updateVideos(binding.container, videos, false, isForceUpdate = isForceUpdate)
   }
 }
