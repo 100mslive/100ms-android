@@ -188,7 +188,7 @@ class VideoListAdapter(
           when (payload) {
             is PeerUpdatePayloads.MetadataChanged -> {
               holder.binding.raisedHand.visibility =
-                visibility(payload.metadata?.isHandRaised == true)
+                visibility(payload.isHandRaised)
             }
             is PeerUpdatePayloads.NameChanged -> {
               holder.binding.nameInitials.text = NameUtils.getInitials(payload.name)
@@ -230,7 +230,8 @@ class VideoListAdapter(
       HMSPeerUpdate.METADATA_CHANGED -> PeerUpdatePayloads.MetadataChanged(
         CustomPeerMetadata.fromJson(
           changedPeer.first.metadata
-        )
+        ),
+        changedPeer.first.isHandRaised
       )
       HMSPeerUpdate.NETWORK_QUALITY_UPDATED -> {
         // Don't send network quality updates for SIP peers.
@@ -254,7 +255,7 @@ class VideoListAdapter(
   sealed class PeerUpdatePayloads {
     data class NameChanged(val name: String) : PeerUpdatePayloads()
     data class NetworkQualityChanged(val downlinkSpeed: Int?) : PeerUpdatePayloads()
-    data class MetadataChanged(val metadata: CustomPeerMetadata?) : PeerUpdatePayloads()
+    data class MetadataChanged(val metadata: CustomPeerMetadata?,val isHandRaised : Boolean) : PeerUpdatePayloads()
     data class SpeakerMuteUnmute(val isMute: Boolean) : PeerUpdatePayloads()
   }
 
