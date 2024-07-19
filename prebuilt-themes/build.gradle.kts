@@ -59,7 +59,7 @@ val publishing_developer_email : String by project
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "live.100ms.roomkit"
+            groupId = "live.100ms.room-kit"
             artifactId = "prebuilt-themes"
             version = HMS_ROOM_KIT_VERSION
 
