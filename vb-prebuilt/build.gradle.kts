@@ -101,7 +101,8 @@ publishing {
             }
 
             pom {
-                if (rootProject.properties["ossrhUsername"] != null) {
+                // Avoid trying to sign local builds
+                if (rootProject.properties["ossrhUsername"] != "") {
                     signing {
                         sign(publishing.publications["release"])
                     }
