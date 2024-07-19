@@ -175,7 +175,7 @@ afterEvaluate {
                     scm {
                         connection = 'SCM is private'
                         developerConnection = 'SCM is private'
-                        url = 'SCM is private'
+                        url = 'https://github.com/100mslive/100ms-android'
                     }
                 }
                 groupId = "live.100ms"
