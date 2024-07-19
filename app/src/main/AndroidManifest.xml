@@ -23,7 +23,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:theme="@style/Theme.App2">
+        android:theme="@style/Theme.Roomkit">
         <activity
             android:name=".ui.home.QrCodeActivity"
             android:exported="false" />
@@ -32,7 +32,7 @@
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.App2.NoActionBar"
+            android:theme="@style/Theme.Roomkit.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter android:exported="true">
                 <action android:name="android.intent.action.MAIN" />
