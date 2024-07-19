@@ -1,6 +1,9 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("maven-publish")
+    id("signing")
+    id("org.jetbrains.dokka") version "1.5.0"
 }
 
 android {
@@ -78,4 +81,54 @@ dependencies {
 //    implementation 'androidx.compose.runtime:runtime-livedata'
 //    implementation "com.github.bumptech.glide:compose:1.0.0-beta01"
 
+}
+val HMS_ROOM_KIT_VERSION : String by project
+val publishing_licence_url : String by project
+val publishing_licence_name : String by project
+val publishing_project_url : String by project
+val publishing_developer_id : String by project
+val publishing_developer_name : String by project
+val publishing_developer_email : String by project
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "live.100ms.roomkit"
+            artifactId = "virtual-background-bottomsheet"
+            version = HMS_ROOM_KIT_VERSION
+
+            afterEvaluate {
+                from(components["release"])
+            }
+
+            pom {
+                if (rootProject.properties["ossrhUsername"] != null) {
+                    signing {
+                        sign(publishing.publications["release"])
+                    }
+                }
+
+                name.set("100ms.live Android Room Kit virtual background component")
+                description.set("The UI component that defines the virtual background")
+                url.set(publishing_project_url)
+                licenses {
+                    license {
+                        name.set(publishing_licence_name)
+                        url.set(publishing_licence_url)
+                    }
+                }
+                developers {
+                    developer {
+                        id.set(publishing_developer_id)
+                        name.set(publishing_developer_name)
+                        email.set(publishing_developer_email)
+                    }
+                }
+                scm {
+                    connection.set("SCM is private")
+                    developerConnection.set("SCM is private")
+                    url.set("https://github.com/100mslive/100ms-android")
+                }
+            }
+        }
+    }
 }
