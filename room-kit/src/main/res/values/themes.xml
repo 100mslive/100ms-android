@@ -12,6 +12,29 @@
         <item name="fontFamily">@font/clan_pro_news</item>
     </style>
 
+    <!-- Base application theme. -->
+    <style name="Theme.HmsHomeApp" parent="Theme.MaterialComponents">
+
+        <item name="colorPrimary">#14171C</item>
+        <item name="colorSurface">#1b2028</item>
+        <item name="colorSecondaryVariant">#1b2028</item>
+        <!-- Overflow Menu -->
+        <item name="android:itemBackground">#1b2028</item>
+
+        <!-- Default Background Color -->
+        <item name="android:colorBackground">#0b0f15</item>
+        <item name="android:statusBarColor" >#14171C</item>
+        <item name="colorOnSurface">@android:color/white</item>
+        <item name="colorOnBackground">@android:color/white</item>
+        <item name="colorOnPrimarySurface">@android:color/white</item>
+
+    </style>
+
+    <style name="Theme.HmsHomeApp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="Theme.Roomkit.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

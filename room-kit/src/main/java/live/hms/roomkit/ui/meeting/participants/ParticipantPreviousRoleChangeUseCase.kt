@@ -17,10 +17,8 @@ class ParticipantPreviousRoleChangeUseCase(private val changeMetadata: (String, 
         // Set the role or create a new metadata object with it.
         val updatedMetadata = existingMetadata?.copy(prevRole = roleName,
             name = peer.name,
-            isHandRaised = false,
             isBRBOn = false)
             ?: CustomPeerMetadata(
-                isHandRaised = false,
                 isBRBOn = false,
                 name = peer.name,
                 prevRole = roleName

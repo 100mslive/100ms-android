@@ -5,12 +5,12 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 
 data class CustomPeerMetadata(
-    @SerializedName("isHandRaised")
-    val isHandRaised: Boolean,
     @SerializedName("isBRBOn")
     val isBRBOn: Boolean,
     @SerializedName("name")
     val name: String? = null,
+    @SerializedName("handRaisedAt")
+    val handRaisedAt : Long? = null,
     @SerializedName("prevRole")
     val prevRole : String? = null
 ) {

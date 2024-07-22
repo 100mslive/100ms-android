@@ -19,8 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.meeting.MeetingViewModel
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.video.error.HMSException
 import live.hms.video.sdk.listeners.PeerListResultListener
 import live.hms.video.sdk.models.HMSLocalPeer
@@ -115,7 +115,12 @@ class ParticipantsUseCase(val meetingViewModel: MeetingViewModel,
             addTextChangedListener { text ->
                 scope.launch {
                     filterText = text.toString()
-                    updateParticipantsAdapter(getAllPeers())
+                    if(isLargeRoom) {
+                        val peers = meetingViewModel.searchPeerNameInLargeRoom(text.toString(), 0)
+                        updateParticipantsAdapter(peers)
+                    } else {
+                        updateParticipantsAdapter(getAllPeers())
+                    }
                 }
             }
         }

@@ -9,8 +9,8 @@ import androidx.core.os.bundleOf
 import live.hms.roomkit.databinding.FragmentVideoGridPageBinding
 import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.setBackgroundAndColor
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.setBackgroundAndColor
 import live.hms.roomkit.util.viewLifecycle
 import kotlin.math.min
 

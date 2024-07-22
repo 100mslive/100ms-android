@@ -6,8 +6,9 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import live.hms.prebuilt_themes.dp
 import live.hms.roomkit.R
-import live.hms.roomkit.util.dp
+
 
 class SingleSideFadeRecyclerview  @JvmOverloads constructor(
     context: Context,

@@ -72,13 +72,19 @@ dependencies {
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.percentlayout:percentlayout:1.0.0'
-    def hmsVersion = "2.9.61"
+
     implementation "com.otaliastudios:zoomlayout:1.9.0"
+    implementation project(":prebuilt-themes")
+    implementation project(":vb-prebuilt")
     // To add dependencies of specific module
-    implementation "live.100ms:android-sdk:$hmsVersion"
-    implementation "live.100ms:video-view:$hmsVersion"
-    implementation "live.100ms:hls-player:$hmsVersion"
-    implementation "live.100ms:video-filters:$hmsVersion"
+    implementation "live.100ms:android-sdk:$HMS_SDK_VERSION"
+    implementation "live.100ms:video-view:$HMS_SDK_VERSION"
+    implementation "live.100ms:hls-player:$HMS_SDK_VERSION"
+    implementation "live.100ms:video-filters:$HMS_SDK_VERSION"
+    // allows the api to be present so the [HMsVirtualBackgroundInjector] can add the real
+    // class when it is included but also allows the fake one to be injected when
+    // the import is not added. This saves 26Mb from being added to every prebuilt user.
+    compileOnly "live.100ms:virtual-background:$HMS_SDK_VERSION"
 
     // Navigation
     implementation "androidx.navigation:navigation-fragment-ktx:2.7.4"
@@ -169,7 +175,7 @@ afterEvaluate {
                     scm {
                         connection = 'SCM is private'
                         developerConnection = 'SCM is private'
-                        url = 'SCM is private'
+                        url = 'https://github.com/100mslive/100ms-android'
                     }
                 }
                 groupId = "live.100ms"

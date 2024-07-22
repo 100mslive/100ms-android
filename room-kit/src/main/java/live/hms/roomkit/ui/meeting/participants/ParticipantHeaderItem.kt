@@ -8,9 +8,9 @@ import com.xwray.groupie.viewbinding.BindableItem
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.ParticipantHeaderItemBinding
 import live.hms.roomkit.drawableEnd
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.getColorOrDefault
+import live.hms.prebuilt_themes.getColorOrDefault
 
 class ParticipantHeaderItem(private val roleName: String, private val numPeers: Int? = 0, val expanded : (String, Boolean) -> Unit) :
     BindableItem<ParticipantHeaderItemBinding>(roleName.hashCode().toLong()), ExpandableItem {

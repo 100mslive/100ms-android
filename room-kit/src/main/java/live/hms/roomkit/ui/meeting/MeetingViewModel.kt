@@ -3,6 +3,8 @@ package live.hms.roomkit.ui.meeting
 import android.Manifest
 import android.app.Application
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.media.AudioManager
 import android.os.Build
 import android.util.Log
@@ -14,8 +16,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getPreviewLayout
+import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
@@ -30,20 +37,20 @@ import live.hms.roomkit.ui.polls.PollCreationInfo
 import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
-import live.hms.roomkit.ui.theme.HMSPrebuiltTheme
-import live.hms.roomkit.ui.theme.getPreviewLayout
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.roomkit.util.debounce
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
-import live.hms.video.interactivity.HmsInteractivityCenter
-import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.events.AgentType
 import live.hms.video.factories.noisecancellation.AvailabilityStatus
+import live.hms.video.interactivity.HmsInteractivityCenter
+import live.hms.video.interactivity.HmsPollUpdateListener
 import live.hms.video.media.settings.*
 import live.hms.video.media.tracks.*
+import live.hms.video.plugin.video.virtualbackground.VideoFrameInfoListener
+import live.hms.video.plugin.video.virtualbackground.VideoPluginMode
 import live.hms.video.polls.HMSPollBuilder
 import live.hms.video.polls.HMSPollQuestionBuilder
 import live.hms.video.polls.HMSPollResponseBuilder
@@ -73,7 +80,7 @@ import live.hms.video.whiteboard.HMSWhiteboardUpdateListener
 import live.hms.video.whiteboard.State
 import live.hms.videofilters.HMSVideoFilter
 import java.util.*
-import kotlin.collections.ArrayList
+import kotlin.math.abs
 import kotlin.properties.Delegates
 
 
@@ -178,6 +185,13 @@ class MeetingViewModel(
 
 
     val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }
+
+    var isVbPlugin : VideoPluginMode = VideoPluginMode.NONE
+    var selectedVbBackgroundUrl : String? = null
+    val virtualBackGroundPlugin by lazy { HmsVirtualBackgroundInjector(hmsSDK).vbPlugin }
+    fun setBlurPercentage(percentage : Int) {
+        virtualBackGroundPlugin.enableBlur(percentage)
+    }
 
     private var lastPollStartedTime : Long = 0
 
@@ -335,40 +349,60 @@ class MeetingViewModel(
             })
     }
 
-    fun showVideoFilterIcon() = settings.enableVideoFilter
-
-     fun setupFilterVideoPlugin() {
-
-        if (hmsSDK.getPlugins().isNullOrEmpty() && hmsSDK.getLocalPeer()?.videoTrack != null ) {
-            hmsSDK.addPlugin(filterPlugin, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
-
+    private val pluginMutex = Mutex()
+    fun setupFilterVideoPlugin(bitmap : Bitmap? = null) {
+        when(isVbPlugin) {
+            VideoPluginMode.REPLACE_BACKGROUND -> {
+                if(bitmap == null) {
+                    Log.d(
+                        TAG,
+                        "Ignoring replace background call because no bitmap to replace with was provided"
+                    )
+                    return
                 }
 
-                override fun onSuccess() {
-
+                if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
+                    var isLandscapeSet = false
+                    var isPotraitSet = false
+                    virtualBackGroundPlugin.setVideoFrameInfoListener(object :
+                        VideoFrameInfoListener {
+                        override fun onFrame(rotatedWidth: Int, rotatedHeight: Int, rotation: Int) {
+                            if (isVbPlugin == VideoPluginMode.REPLACE_BACKGROUND) {
+                                if (abs(rotation) % 180 == 0 && isLandscapeSet.not()) {
+                                    isLandscapeSet = true
+                                    isPotraitSet = false
+                                    virtualBackGroundPlugin.enableBackground(getCenterCroppedBitmap(bitmap, rotatedWidth, rotatedHeight))
+                                } else if (abs(rotation) % 180 != 0 && isPotraitSet.not()) {
+                                    isLandscapeSet = false
+                                    isPotraitSet = true
+                                    virtualBackGroundPlugin.enableBackground(getCenterCroppedBitmap(bitmap, rotatedWidth, rotatedHeight))
+                                }
+                            }
+                        }
+                    }
+                    )
                 }
-
-            })
+            }
+            VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
+            VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
         }
     }
 
     fun removeVideoFilterPlugIn() {
+        HMSPluginScope.launch {
+            pluginMutex.withLock {
+                hmsSDK.removePlugin(virtualBackGroundPlugin, object : HMSActionResultListener {
+                    override fun onError(error: HMSException) {
+                        triggerErrorNotification(error.message)
+                    }
 
-        if (hmsSDK.getPlugins().isNullOrEmpty().not() ) {
-            filterPlugin.stop()
-            hmsSDK.removePlugin(filterPlugin, object : HMSActionResultListener {
-                override fun onError(error: HMSException) {
+                    override fun onSuccess() {
 
-                }
+                    }
 
-                override fun onSuccess() {
-
-                }
-
-            })
+                })
+            }
         }
-
     }
 
 
@@ -397,7 +431,22 @@ class MeetingViewModel(
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                     onHMSActionResultListener?.onSuccess()
-                    roomLayoutLiveData.postValue(true)
+                    if(vbEnabled()) {
+                        viewModelScope.launch {
+                            hmsSDK.addPlugin(virtualBackGroundPlugin, object : HMSActionResultListener {
+                                override fun onError(error: HMSException) {
+                                    triggerErrorNotification(error.message)
+                                }
+
+                                override fun onSuccess() {
+                                }
+
+                            })
+                            roomLayoutLiveData.postValue(true)
+                        }
+                    } else {
+                        roomLayoutLiveData.postValue(true)
+                    }
                 }
 
             })
@@ -405,7 +454,7 @@ class MeetingViewModel(
     }
 
     private fun setTheme(theme: HMSRoomLayout.HMSRoomLayoutData.HMSRoomTheme.HMSColorPalette) {
-        HMSPrebuiltTheme.setTheme(theme)
+        HMSPrebuiltTheme.theme = theme
     }
 
     fun updateNameInPreview(nameStr: String) {
@@ -422,7 +471,6 @@ class MeetingViewModel(
             token,
             Gson().toJson(
                 CustomPeerMetadata(
-                    isHandRaised = false,
                     name = hmsPrebuiltOptions?.userName.orEmpty(),
                     isBRBOn = false
                 )
@@ -2054,6 +2102,7 @@ class MeetingViewModel(
             }
 
             override fun onSuccess() {
+                setHandRaisedAtTime(true)
                 Log.d(TAG, "Successfully raised hand")
             }
         })
@@ -2067,6 +2116,7 @@ class MeetingViewModel(
 
             override fun onSuccess() {
                 Log.d(TAG, "Successfully lowered hand")
+                setHandRaisedAtTime(false)
             }
         })
     }
@@ -2091,6 +2141,23 @@ class MeetingViewModel(
         return currentMetadata?.isBRBOn?:false
     }
 
+    fun setHandRaisedAtTime(raised : Boolean) {
+        val raisedAt = if(raised) System.currentTimeMillis() else null
+        val localPeer = hmsSDK.getLocalPeer()
+        val currentMetadata = CustomPeerMetadata.fromJson(localPeer?.metadata)
+        val newMetadataJson = currentMetadata?.copy(handRaisedAt = raisedAt) ?: CustomPeerMetadata(false, handRaisedAt = raisedAt)
+
+        hmsSDK.changeMetadata(newMetadataJson.toJson(), object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                triggerErrorNotification(error.message)
+            }
+
+            override fun onSuccess() {
+
+            }
+
+        })
+    }
     fun toggleBRB() {
         val localPeer = hmsSDK.getLocalPeer()!!
         val currentMetadata = CustomPeerMetadata.fromJson(localPeer.metadata)
@@ -2809,5 +2876,78 @@ class MeetingViewModel(
 
     fun ncPreviewNoiseCancellationInLayout() = prebuiltInfoContainer.ncInPreviewState()
     fun getAllWhitelistedRolesForChangeRole() = prebuiltInfoContainer.getAllWhitelistedRolesForChangeRole()
+    suspend fun searchPeerNameInLargeRoom(query: String,
+                                          offset : Long,
+                                          limit: Int = 10,
+                                          ): List<HMSPeer> {
+        val peers = CompletableDeferred<List<HMSPeer>>()
+        hmsSDK.searchPeerNameInLargeRoom(query,limit, offset, object : HmsTypedActionResultListener<PeerSearchResponse> {
+            override fun onSuccess(result: PeerSearchResponse) {
+                peers.complete(result.peers)
+            }
+
+            override fun onError(error: HMSException) {
+                // Send an error here
+                peers.complete(emptyList())
+                triggerErrorNotification(
+                    error.message
+                )
+            }
+
+        })
+        return peers.await()
+    }
+
+    fun vbEnabled() = prebuiltInfoContainer.vbEnabledState().vbEnabled
+    fun vbBackgrounds(): VbBackgrounds =
+        prebuiltInfoContainer.vbEnabledState().backgroundVbBackgrounds
+
+    fun getLocalPeerMeetingTracks() : MeetingTrack? {
+        val localPeer = hmsSDK.getLocalPeer() ?: return null
+        return with(localPeer) {
+            MeetingTrack(this,
+                videoTrack,
+                audioTrack)
+        }
+    }
+
+    fun getCenterCroppedBitmap(
+        src: Bitmap,
+        expectedWidth: Int,
+        expectedHeight: Int
+    ): Bitmap {
+        // Check if the image is big enough
+        val widthDelta = src.width - expectedWidth
+        val heightDelta = src.height - expectedHeight
+        val scaleFactor : Float = if(widthDelta < 0 || heightDelta < 0){
+            // Find the biggest stretch that might be required.
+            val isHeightLess = heightDelta < widthDelta
+            if(isHeightLess) {
+                //scale factor depends on height
+                expectedHeight.toFloat()/src.height
+            } else {
+                expectedWidth.toFloat() / src.width
+            }
+        } else {
+            1.0f
+        }
+        val matrix = Matrix()
+        if(scaleFactor != 1.0f) {
+            matrix.postScale(scaleFactor, scaleFactor)
+        }
+
+        // We've got to crop the image to the expected size.
+        // We either scale up first or scale down first.
+
+        val newW = ((src.width * scaleFactor - expectedWidth)/2).toInt()
+        val newH = ((src.height * scaleFactor - expectedHeight)/2).toInt()
+        return Bitmap.createBitmap(
+            Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), matrix, true),
+            newW,
+            newH,
+            expectedWidth,
+            expectedHeight
+        )
+    }
 }
 

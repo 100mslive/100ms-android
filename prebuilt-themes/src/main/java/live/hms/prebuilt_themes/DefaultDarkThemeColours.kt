@@ -1,4 +1,4 @@
-package live.hms.roomkit.ui.theme
+package live.hms.prebuilt_themes
 
 import com.google.gson.annotations.SerializedName
 

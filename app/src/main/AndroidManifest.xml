@@ -23,7 +23,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:theme="@style/Theme.App2">
+        android:theme="@style/Theme.HmsHomeApp">
         <activity
             android:name=".ui.home.QrCodeActivity"
             android:exported="false" />
@@ -31,8 +31,8 @@
             android:name=".ui.home.HomeActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:theme="@style/Theme.HmsHomeApp.NoActionBar"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.App2.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter android:exported="true">
                 <action android:name="android.intent.action.MAIN" />

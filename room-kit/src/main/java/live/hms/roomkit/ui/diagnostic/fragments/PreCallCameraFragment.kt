@@ -22,8 +22,8 @@ import live.hms.roomkit.show
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModel
 import live.hms.roomkit.ui.diagnostic.DiagnosticViewModelFactory
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.buttonEnabled
-import live.hms.roomkit.ui.theme.buttonStrokeEnabled
+import live.hms.prebuilt_themes.buttonEnabled
+import live.hms.prebuilt_themes.buttonStrokeEnabled
 import live.hms.roomkit.util.switchCamera
 import live.hms.roomkit.util.viewLifecycle
 

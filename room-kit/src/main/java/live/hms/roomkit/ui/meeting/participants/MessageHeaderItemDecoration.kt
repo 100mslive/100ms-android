@@ -7,7 +7,7 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
-import live.hms.roomkit.util.dp
+import live.hms.prebuilt_themes.dp
 
 class MessageHeaderItemDecoration(
     @ColorInt background: Int,

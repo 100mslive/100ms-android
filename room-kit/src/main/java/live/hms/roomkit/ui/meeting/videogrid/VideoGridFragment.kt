@@ -33,7 +33,7 @@ import live.hms.roomkit.ui.meeting.MeetingTrack
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
-import live.hms.roomkit.ui.theme.setIconDisabled
+import live.hms.prebuilt_themes.setIconDisabled
 import live.hms.roomkit.util.NameUtils
 import live.hms.roomkit.util.applyConstraint
 import live.hms.roomkit.util.contextSafe

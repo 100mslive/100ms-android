@@ -61,6 +61,11 @@ import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import live.hms.prebuilt_themes.HMSPrebuiltTheme
+import live.hms.prebuilt_themes.getColorOrDefault
+import live.hms.prebuilt_themes.getPreviewLayout
+import live.hms.prebuilt_themes.setIconEnabled
+import live.hms.prebuilt_themes.setIconDisabled
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentMeetingBinding
 import live.hms.roomkit.setGradient
@@ -87,7 +92,7 @@ import live.hms.roomkit.ui.meeting.chat.combined.OPEN_TO_PARTICIPANTS
 import live.hms.roomkit.ui.meeting.chat.combined.PinnedMessageUiUseCase
 import live.hms.roomkit.ui.meeting.chat.rbac.RoleBasedChatBottomSheet
 import live.hms.roomkit.ui.meeting.commons.VideoGridBaseFragment
-import live.hms.roomkit.ui.meeting.compose.Variables
+import live.hms.prebuilt_themes.Variables
 import live.hms.roomkit.ui.meeting.participants.DIRECTLY_OPENED
 import live.hms.roomkit.ui.meeting.participants.ParticipantsFragment
 import live.hms.roomkit.ui.meeting.pinnedvideo.PinnedVideoFragment
@@ -103,6 +108,7 @@ import live.hms.video.media.tracks.HMSLocalAudioTrack
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.models.HMSHlsRecordingConfig
+import live.hms.video.sdk.models.HMSLocalPeer
 import live.hms.video.sdk.models.HMSRemovedFromRoom
 import live.hms.video.sdk.models.enums.HMSRecordingState
 import live.hms.video.sdk.models.enums.HMSStreamingState
@@ -1232,10 +1238,12 @@ class MeetingFragment : Fragment() {
                             }
                         },
                         onRaiseHandClicked = { meetingViewModel.toggleRaiseHand()},
-                        onNameChange = {                 FilterBottomSheet().show(
-                            childFragmentManager,
-                            ChangeNameDialogFragment.TAG
-                        )
+                        onNameChange = {
+                            // Get the local peer but if it's null, return
+                            VirtualBackgroundBottomSheet().show(
+                                childFragmentManager,
+                                VirtualBackgroundBottomSheet.TAG
+                            )
                         },
                         disableHandRaiseDisplay = !meetingViewModel.handRaiseAvailable(),
                         showPolls = { findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment()) },

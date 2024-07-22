@@ -220,10 +220,7 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private fun changePinnedRaiseHandState() {
-    val customData = CustomPeerMetadata.fromJson(pinnedTrack?.peer?.metadata)
-    if (customData != null) {
-      binding.pinVideo.raisedHand.alpha = visibilityOpacity(customData.isHandRaised)
-    }
+    binding.pinVideo.raisedHand.alpha = visibilityOpacity(pinnedTrack?.peer?.isHandRaised == true)
   }
 
   private fun changePinnedName() {
