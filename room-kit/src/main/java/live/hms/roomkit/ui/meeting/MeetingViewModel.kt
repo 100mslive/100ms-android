@@ -188,7 +188,8 @@ class MeetingViewModel(
 
     var isVbPlugin : VideoPluginMode = VideoPluginMode.NONE
     var selectedVbBackgroundUrl : String? = null
-    val virtualBackGroundPlugin by lazy { HmsVirtualBackgroundInjector(hmsSDK).vbPlugin }
+    val vbInjector by lazy { HmsVirtualBackgroundInjector(hmsSDK) }
+    val virtualBackGroundPlugin by lazy { vbInjector.vbPlugin }
     fun setBlurPercentage(percentage : Int) {
         virtualBackGroundPlugin.enableBlur(percentage)
     }
@@ -2898,7 +2899,8 @@ class MeetingViewModel(
         return peers.await()
     }
 
-    fun vbEnabled() = prebuiltInfoContainer.vbEnabledState().vbEnabled
+    // Check whether VB is enabled on the dashboard and then whether the import is actually added added.
+    fun vbEnabled() = prebuiltInfoContainer.vbEnabledState().vbEnabled && vbInjector.isEnabled
     fun vbBackgrounds(): VbBackgrounds =
         prebuiltInfoContainer.vbEnabledState().backgroundVbBackgrounds
 

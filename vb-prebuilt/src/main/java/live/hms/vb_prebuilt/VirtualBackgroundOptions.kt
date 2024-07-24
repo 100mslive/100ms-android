@@ -180,31 +180,34 @@ fun VirtualBackgroundOptions(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(Variables.Spacing2))
-        Text(
-            text = "Backgrounds",
-            style = TextStyle(
-                fontSize = 14.sp,
-                lineHeight = 20.sp,
-                fontFamily = FontFamily(Font(R.font.inter_bold)),
-                fontWeight = FontWeight(600),
-                color = Variables.OnSurfaceHigh,
-                letterSpacing = 0.1.sp,
+        if(allBackgrounds.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(Variables.Spacing2))
+            Text(
+                text = "Backgrounds",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.inter_bold)),
+                    fontWeight = FontWeight(600),
+                    color = Variables.OnSurfaceHigh,
+                    letterSpacing = 0.1.sp,
+                )
             )
-        )
-        val coroutineScope = rememberCoroutineScope()
-        val context = LocalContext.current
+            val coroutineScope = rememberCoroutineScope()
+            val context = LocalContext.current
 
-        BackgroundListing(allBackgrounds, currentBackground) { selectedBackground ->
-            currentBackground = selectedBackground
-            selectedEffect = SelectedEffect.BACKGROUND
-            // Running here instead of launched effect because it shouldn't run
-            // the very first time we set current background to something.
-            coroutineScope.launch {
-                launch(Dispatchers.IO) {
-                    backgroundSelected(selectedBackground,
-                        Glide.with(context).asBitmap().load(selectedBackground).submit().get()
-                    )
+            BackgroundListing(allBackgrounds, currentBackground) { selectedBackground ->
+                currentBackground = selectedBackground
+                selectedEffect = SelectedEffect.BACKGROUND
+                // Running here instead of launched effect because it shouldn't run
+                // the very first time we set current background to something.
+                coroutineScope.launch {
+                    launch(Dispatchers.IO) {
+                        backgroundSelected(
+                            selectedBackground,
+                            Glide.with(context).asBitmap().load(selectedBackground).submit().get()
+                        )
+                    }
                 }
             }
         }

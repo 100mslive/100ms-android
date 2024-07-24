@@ -6,6 +6,7 @@ import live.hms.video.virtualbackground.HMSVirtualBackground
 
 class HmsVirtualBackgroundInjector(private val hmsSdk : HMSSDK) {
     val vbPlugin : HmsVirtualBackgroundInterface
+    val isEnabled : Boolean
     init {
         // implementation "live.100ms:virtual-background:$hmsVersion"
         // without the above import being added, this will return false.
@@ -21,7 +22,7 @@ class HmsVirtualBackgroundInjector(private val hmsSdk : HMSSDK) {
         } catch (ex : NoClassDefFoundError) {
             false
         }
-
+        isEnabled = isVbImportAdded
         vbPlugin = if(isVbImportAdded) HMSVirtualBackground(hmsSdk) else FakeVirtualBackground()
 
     }
