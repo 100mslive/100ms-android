@@ -95,6 +95,8 @@ class StatsInterpreter(val active: Boolean) {
                                     appendLine()
                                     append("Bitrate(A): ${webrtcStats.bitrate?.roundToInt()}")
                                     appendLine()
+                                    append("Jitter: ${webrtcStats.jitter}")
+                                    appendLine()
                                 }
                                 is HMSLocalVideoStats -> buildSpannedString {
                                     append("\nLocalVideo")
@@ -112,6 +114,8 @@ class StatsInterpreter(val active: Boolean) {
                                     append("Bitrate(V): ${webrtcStats.bitrate?.roundToInt()}")
                                     appendLine()
                                     append("QualityLimitation:${webrtcStats.qualityLimitationReason.reason}")
+                                    appendLine()
+                                    append("Jitter: ${webrtcStats.jitter}")
                                     appendLine()
                                 }
 
