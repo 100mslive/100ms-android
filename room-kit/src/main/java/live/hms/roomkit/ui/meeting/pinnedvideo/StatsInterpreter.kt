@@ -88,6 +88,10 @@ class StatsInterpreter(val active: Boolean) {
                                     appendLine()
                                     append("Jitter: ${webrtcStats.jitter}")
                                     appendLine()
+                                    append("PacketLoss: ${webrtcStats.packetLoss}")
+                                    appendLine()
+                                    append("PacketsSent: ${webrtcStats.packetsSent}")
+                                    appendLine()
                                 }
                                 is HMSLocalVideoStats -> buildSpannedString {
                                     append("\nLocalVideo")
@@ -107,6 +111,10 @@ class StatsInterpreter(val active: Boolean) {
                                     append("QualityLimitation:${webrtcStats.qualityLimitationReason.reason}")
                                     appendLine()
                                     append("Jitter: ${webrtcStats.jitter}")
+                                    appendLine()
+                                    append("PacketLoss: ${webrtcStats.packetLoss}")
+                                    appendLine()
+                                    append("PacketsSent: ${webrtcStats.packetsSent}")
                                     appendLine()
                                 }
 
