@@ -60,6 +60,7 @@ class VideoGridFragment : Fragment() {
     var isMinimized = false
     var whiteboardView : WebView? = null
     var lastVideoMuteState : Boolean? = null
+    var lastTrackId : String? = null
 
     var localMeeting : MeetingTrack? = null
 
@@ -339,12 +340,15 @@ class VideoGridFragment : Fragment() {
                             )
                         binding.minimizedIconVideoOff.isEnabled = true
 
-                        if (isMinimized.not() && it.video?.isMute !== lastVideoMuteState)
+                        if (isMinimized.not() && (it.video?.isMute !== lastVideoMuteState || lastTrackId != it.video?.trackId)) {
                             updateVideoViewLayout(
                                 binding.insetPillMaximised,
                                 isVideoOff = false,
                                 it
                             )
+                            lastTrackId = it.video?.trackId
+                        }
+
                         lastVideoMuteState = false
                     }
 
