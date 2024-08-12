@@ -60,7 +60,8 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected val meetingViewModel by activityViewModels<MeetingViewModel>()
 
   // Determined using the onResume() and onPause()
-
+  var isFragmentVisible = false
+    private set
 
   private var wasLastModePip = false
   private var wasLastSpeakingViewIndex = 0
@@ -81,8 +82,6 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   protected val renderedViews = ArrayList<RenderedViewPair>()
   private val mediaPlayerManager by lazy { MediaPlayerManager(lifecycle) }
-  
-
 
   internal fun shouldUpdateRowOrGrid(rowCount: Int, columnCount: Int) : Boolean{
     return !(rowCount == gridRowCount && columnCount == gridColumnCount)
@@ -345,7 +344,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
         layout.apply {
           // Unbind only when view is visible to user
-          if (isForceUpdate) unbindSurfaceView(
+          if (isFragmentVisible|| isForceUpdate) unbindSurfaceView(
             currentRenderedView.binding.videoCard,
             currentRenderedView.meetingTrack
           )
@@ -363,7 +362,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         if (renderedViewPair != null) {
           newRenderedViews.add(renderedViewPair)
 
-          if (isForceUpdate) {
+          if (isFragmentVisible ||isForceUpdate) {
 
             // This view is not yet initialized (possibly because when AudioTrack was added --
             // VideoTrack was not present, hence had to create an empty tile)
@@ -390,7 +389,7 @@ abstract class VideoGridBaseFragment : Fragment() {
           }
 
           // Bind surfaceView when view is visible to user
-          if (isForceUpdate) {
+          if (isFragmentVisible || isForceUpdate) {
             bindSurfaceView(videoBinding.videoCard, newVideo, if (isScreenShare) RendererCommon.ScalingType.SCALE_ASPECT_FIT else RendererCommon.ScalingType.SCALE_ASPECT_BALANCED)
           }
 
@@ -522,6 +521,7 @@ abstract class VideoGridBaseFragment : Fragment() {
       wasLastModePip = false
       return
     }
+    isFragmentVisible = true
     bindViews()
   }
 
@@ -548,6 +548,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   override fun onPause() {
     super.onPause()
+      isFragmentVisible = false
       unbindViews()
 
 
@@ -575,7 +576,6 @@ abstract class VideoGridBaseFragment : Fragment() {
     }
     // Release all references to views
     renderedViews.clear()
-
   }
 
   @CallSuper
