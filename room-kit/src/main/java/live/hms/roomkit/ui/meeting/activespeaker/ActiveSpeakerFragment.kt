@@ -227,13 +227,13 @@ class ActiveSpeakerFragment : VideoGridBaseFragment() {
       })
       screenShareTrack = screen
       screenShareOverLocalVideoInGrid()
-      if (isFragmentVisible) {
-        bindSurfaceView(
-          binding.screenShare,
-          screen,
-          RendererCommon.ScalingType.SCALE_ASPECT_FIT
-        )
-      }
+//      if (isFragmentVisible) {
+//        bindSurfaceView(
+//          binding.screenShare,
+//          screen,
+//          RendererCommon.ScalingType.SCALE_ASPECT_FIT
+//        )
+//      }
       bindVideo(binding.screenShare, screen)
       binding.screenShare.apply {
         iconAudioOff.visibility = View.GONE
