@@ -25,6 +25,14 @@
             android:supportsPictureInPicture="true"
             android:theme="@style/Theme.Roomkit.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+        <activity
+            android:name=".ui.meeting.LeakTestActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:exported="true"
+            android:label="@string/meeting"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Roomkit.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
         <activity
             android:name=".ui.diagnostic.DiagnosticActivity"
