@@ -26,6 +26,7 @@ import live.hms.video.signal.init.TokenRequestOptions
 import java.util.UUID
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resumeWithException
 
 object HMSPluginScope : CoroutineScope {
     private val executor = Executors.newSingleThreadScheduledExecutor()
@@ -55,12 +56,12 @@ internal suspend fun HMSSDK.addPlugin(plugin : HMSVideoPlugin): Unit {
 suspend fun HMSSDK.tokens(roomcode : String) :String {
     return suspendCancellableCoroutine { continuation ->
 
-
+        Log.d("LeakTest", "token")
         getAuthTokenByRoomCode(
             TokenRequest(roomcode,  UUID.randomUUID().toString()),
             TokenRequestOptions(null), object: HMSTokenListener {
                 override fun onError(error: HMSException) {
-                    continuation.tryResumeWithException(error)
+                    continuation.resumeWithException(error)
                 }
 
                 override fun onTokenSuccess(string: String) {
