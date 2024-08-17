@@ -52,21 +52,27 @@ class LeakTestViewModel(
 
             runBlocking {
                 for (i in 0..100) {
-                    val hmsSDK = HMSSDK.Builder(getApplication()).haltPreviewJoinForPermissionsRequest(true)
-                        .setFrameworkInfo(
-                            FrameworkInfo(
-                                framework = AgentType.ANDROID_NATIVE, isPrebuilt = true
+                    try {
+                        val hmsSDK = HMSSDK.Builder(getApplication()).haltPreviewJoinForPermissionsRequest(true)
+                            .setFrameworkInfo(
+                                FrameworkInfo(
+                                    framework = AgentType.ANDROID_NATIVE, isPrebuilt = true
+                                )
                             )
-                        )
-                        .setTrackSettings(hmsTrackSettings)
-                        .build()
-                    Log.d("LeakTest", "Iteration ${i} $roomCode")
-                    val token = hmsSDK.tokens(roomCode)
-                    hmsSDK.joins(HMSConfig(roomCode, token))
-                    Log.d("LeakTest", "Join $roomCode")
-                    hmsSDK.leaves()
-                    delay(100)
-                    Log.d("LeakTest", "Leave")
+                            .setTrackSettings(hmsTrackSettings)
+                            .build()
+                        Log.d("LeakTest", "Iteration ${i} $roomCode")
+                        val token = hmsSDK.tokens(roomCode)
+                        Log.d("LeakTest", "Token $token")
+                        hmsSDK.joins(HMSConfig(roomCode, token))
+                        delay(100)
+                        Log.d("LeakTest", "Join $roomCode")
+                        hmsSDK.leaves()
+                        Log.d("LeakTest", "Leave")
+
+                    } catch (e: Exception) {
+                        Log.d("LeakTest", "Error $e")
+                    }
                 }
             }
         }
