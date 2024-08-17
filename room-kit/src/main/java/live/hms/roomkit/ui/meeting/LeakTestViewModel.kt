@@ -65,7 +65,7 @@ class LeakTestViewModel(
                         val token = hmsSDK.tokens(roomCode)
                         Log.d("LeakTest", "Token $token")
                         hmsSDK.joins(HMSConfig(roomCode, token))
-                        delay(100)
+                        delay(500)
                         Log.d("LeakTest", "Join $roomCode")
                         hmsSDK.leaves()
                         Log.d("LeakTest", "Leave")
