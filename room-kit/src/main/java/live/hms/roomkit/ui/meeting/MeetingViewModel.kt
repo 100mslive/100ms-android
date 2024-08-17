@@ -1233,7 +1233,7 @@ class MeetingViewModel(
                                 }
                             }
                         }
-                       // addTrack(track, peer)
+                        addTrack(track, peer)
                     }
 
                     HMSTrackUpdate.TRACK_REMOVED -> {
@@ -1248,7 +1248,7 @@ class MeetingViewModel(
                                 }
                             }
                         }
-                       // removeTrack(track, peer)
+                        removeTrack(track, peer)
                     }
 
                     HMSTrackUpdate.TRACK_MUTED -> {
