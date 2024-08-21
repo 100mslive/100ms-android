@@ -51,7 +51,7 @@ class LeakTestViewModel(
         safeHandler.post {
 
             runBlocking {
-                for (i in 0..100) {
+                for (i in 1..100) {
                     try {
                         val hmsSDK = HMSSDK.Builder(getApplication()).haltPreviewJoinForPermissionsRequest(true)
                             .setFrameworkInfo(
@@ -63,12 +63,12 @@ class LeakTestViewModel(
                             .build()
                         Log.d("LeakTest", "Iteration ${i} $roomCode")
                         val token = hmsSDK.tokens(roomCode)
-                        Log.d("LeakTest", "Token $token")
+                        Log.d("LeakTest", "Token suceess $token")
                         hmsSDK.joins(HMSConfig(roomCode, token))
-                        delay(500)
-                        Log.d("LeakTest", "Join $roomCode")
+                        Log.d("LeakTest", "Join success $roomCode")
+                        delay(1000)
                         hmsSDK.leaves()
-                        Log.d("LeakTest", "Leave")
+                        Log.d("LeakTest", "Leave success")
 
                     } catch (e: Exception) {
                         Log.d("LeakTest", "Error $e")

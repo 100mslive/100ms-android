@@ -1,7 +1,9 @@
 package live.hms.roomkit.ui.meeting
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
+import android.os.PowerManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import live.hms.roomkit.R
@@ -29,6 +31,15 @@ class LeakTestActivity : AppCompatActivity() {
         val token: String = intent?.getStringExtra(TOKEN) ?: ""
 
         leakTestViewModel.initSdk(hmsPrebuiltOption, roomCode)
+
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+
+        // Create a WakeLock with the PARTIAL_WAKE_LOCK level
+        val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakeLockTag")
+
+        // Acquire the WakeLock
+        wakeLock?.acquire(10*60*1000L /*10 minutes*/)
+
 
     }
 
