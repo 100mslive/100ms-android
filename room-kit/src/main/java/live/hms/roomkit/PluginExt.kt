@@ -1,12 +1,14 @@
 package live.hms.roomkit
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import live.hms.video.error.HMSException
 import live.hms.video.media.tracks.HMSTrack
+import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.plugin.video.HMSVideoPlugin
 import live.hms.video.sdk.HMSActionResultListener
 import live.hms.video.sdk.HMSSDK
@@ -73,7 +75,10 @@ suspend fun HMSSDK.tokens(roomcode : String) :String {
 
 
 @OptIn(InternalCoroutinesApi::class)
-suspend fun HMSSDK.joins(config: HMSConfig) {
+suspend fun HMSSDK.joins(
+    config: HMSConfig,
+    liveTrack: MutableLiveData<Pair<HMSTrack, HMSTrackUpdate>>
+) {
     return suspendCancellableCoroutine { continuation ->
         join(config,object : HMSUpdateListener {
             override fun onChangeTrackStateRequest(details: HMSChangeTrackStateRequest) {
@@ -101,6 +106,8 @@ suspend fun HMSSDK.joins(config: HMSConfig) {
             }
 
             override fun onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer) {
+                if (track.type == HMSTrackType.VIDEO)
+                liveTrack.postValue(Pair(track, type))
             }
 
         })
@@ -112,6 +119,7 @@ suspend fun HMSSDK.leaves() {
     return suspendCancellableCoroutine { continuation ->
         leave(object : HMSActionResultListener {
             override fun onError(error: HMSException) {
+                Log.d("LeakTest", "leave error $error")
                 continuation.tryResumeWithException(error)
             }
 
