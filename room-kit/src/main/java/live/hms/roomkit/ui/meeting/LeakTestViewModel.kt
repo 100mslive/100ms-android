@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.HandlerThread
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import live.hms.roomkit.joins
@@ -14,10 +15,11 @@ import live.hms.video.events.AgentType
 import live.hms.video.media.settings.HMSAudioTrackSettings
 import live.hms.video.media.settings.HMSTrackSettings
 import live.hms.video.media.settings.HMSVideoTrackSettings
-import live.hms.video.media.settings.PhoneCallState
+import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.models.FrameworkInfo
 import live.hms.video.sdk.models.HMSConfig
+import live.hms.video.sdk.models.enums.HMSTrackUpdate
 
 class LeakTestViewModel(
     application: Application
@@ -36,6 +38,8 @@ class LeakTestViewModel(
                 .build()
         )
         .build()
+
+    val liveTrack = MutableLiveData<Pair<HMSTrack,HMSTrackUpdate>>()
 
 
     //create handler
@@ -64,7 +68,7 @@ class LeakTestViewModel(
                         Log.d("LeakTest", "Iteration ${i} $roomCode")
                         val token = hmsSDK.tokens(roomCode)
                         Log.d("LeakTest", "Token suceess $token")
-                        hmsSDK.joins(HMSConfig(roomCode, token))
+                        hmsSDK.joins(HMSConfig(roomCode, token), liveTrack)
                         delay(4000)
                         Log.d("LeakTest", "Join success $roomCode")
                         hmsSDK.leaves()
