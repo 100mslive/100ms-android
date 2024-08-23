@@ -14,7 +14,7 @@ object HMSRoomKit {
 
 
     fun launchPrebuilt(roomCode: String, activity: Activity, options: HMSPrebuiltOptions? = null) {
-        Intent(activity, LeakTestActivity::class.java).apply {
+        Intent(activity, MeetingActivity::class.java).apply {
             putExtra(ROOM_CODE, roomCode)
             putExtra(ROOM_PREBUILT, options)
             startActivity(activity, this, null)
