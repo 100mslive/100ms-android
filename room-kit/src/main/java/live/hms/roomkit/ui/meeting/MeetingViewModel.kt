@@ -477,7 +477,7 @@ class MeetingViewModel(
                 )
             )
                 .toString(),
-            captureNetworkQualityInPreview = true,
+            captureNetworkQualityInPreview = false,
             initEndpoint = initURL,
         )
 
