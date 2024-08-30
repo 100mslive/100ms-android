@@ -513,7 +513,7 @@ class VideoGridFragment : Fragment() {
                     Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
                 screenShareAdapter.totalPages = remoteScreenShareTilesCount
                 meetingViewModel.transcriptionsPositionUseCase.setScreenShare(remoteScreenShareTilesCount + localScreenShareTileCount != 0)
-                peerGridVideoAdapter.totalPages = expectedPages
+                peerGridVideoAdapter.totalPages = Math.max(1,expectedPages)
 
                 binding.tabLayoutDots.visibility =
                     if (peerGridVideoAdapter.itemCount > 1) View.VISIBLE else View.GONE
