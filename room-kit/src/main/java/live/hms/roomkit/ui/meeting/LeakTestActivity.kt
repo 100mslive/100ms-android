@@ -56,4 +56,9 @@ class LeakTestActivity : AppCompatActivity() {
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        findViewById<HMSVideoView>(R.id.videoView).removeTrack()
+    }
+
 }
