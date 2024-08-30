@@ -60,7 +60,7 @@ abstract class VideoGridBaseFragment : Fragment() {
   protected val meetingViewModel by activityViewModels<MeetingViewModel>()
 
   // Determined using the onResume() and onPause()
-  var isFragmentVisible = true
+  var isFragmentVisible = false
     private set
 
   private var wasLastModePip = false
@@ -548,7 +548,7 @@ abstract class VideoGridBaseFragment : Fragment() {
 
   override fun onPause() {
     super.onPause()
-     // isFragmentVisible = false
+      isFragmentVisible = false
       unbindViews()
 
 
