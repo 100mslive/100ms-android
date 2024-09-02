@@ -573,7 +573,7 @@ class MeetingFragment : Fragment() {
                 when (event) {
                     is MeetingViewModel.Event.SessionMetadataEvent -> {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                            //Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                         }
                     }
                     is MeetingViewModel.Event.CameraSwitchEvent -> {
@@ -728,7 +728,7 @@ class MeetingFragment : Fragment() {
                             "${peerWhoRemoved?.name} removed you from the room. ${state.details.reason}"
                         }
                     }
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    //Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 
                     meetingViewModel.leaveMeeting(state.details)
                 }
