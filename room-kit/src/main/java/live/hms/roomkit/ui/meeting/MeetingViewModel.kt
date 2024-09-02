@@ -387,6 +387,18 @@ class MeetingViewModel(
             VideoPluginMode.BLUR_BACKGROUND -> virtualBackGroundPlugin.enableBlur()
             VideoPluginMode.NONE -> virtualBackGroundPlugin.disableEffects()
         }
+
+        if(vbEnabled()){
+            hmsSDK.addPlugin(virtualBackGroundPlugin, object : HMSActionResultListener {
+                override fun onError(error: HMSException) {
+                    triggerErrorNotification(error.message)
+                }
+
+                override fun onSuccess() {
+                }
+
+            })
+        }
     }
 
     fun removeVideoFilterPlugIn() {
@@ -432,22 +444,7 @@ class MeetingViewModel(
                     setHmsConfig(hmsPrebuiltOptions, token, initURL)
                     kotlin.runCatching { setTheme(layoutConfig.data?.getOrNull(0)?.themes?.getOrNull(0)?.palette!!) }
                     onHMSActionResultListener?.onSuccess()
-                    if(vbEnabled()) {
-                        viewModelScope.launch {
-                            hmsSDK.addPlugin(virtualBackGroundPlugin, object : HMSActionResultListener {
-                                override fun onError(error: HMSException) {
-                                    triggerErrorNotification(error.message)
-                                }
-
-                                override fun onSuccess() {
-                                }
-
-                            })
-                            roomLayoutLiveData.postValue(true)
-                        }
-                    } else {
-                        roomLayoutLiveData.postValue(true)
-                    }
+                    roomLayoutLiveData.postValue(true)
                 }
 
             })
@@ -477,7 +474,7 @@ class MeetingViewModel(
                 )
             )
                 .toString(),
-            captureNetworkQualityInPreview = false,
+            captureNetworkQualityInPreview = true,
             initEndpoint = initURL,
         )
 
