@@ -63,10 +63,12 @@ suspend fun HMSSDK.tokens(roomcode : String) :String {
             TokenRequest(roomcode,  UUID.randomUUID().toString()),
             TokenRequestOptions(null), object: HMSTokenListener {
                 override fun onError(error: HMSException) {
+                    Log.e("LeakTest", "fetch token un-successful")
                     continuation.resumeWithException(error)
                 }
 
                 override fun onTokenSuccess(string: String) {
+                    Log.d("LeakTest", "fetch token successful")
                     continuation.resume(string, {})
                 }
             })

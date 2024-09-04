@@ -38,12 +38,12 @@ import live.hms.roomkit.ui.polls.QuestionUi
 import live.hms.roomkit.ui.settings.SettingsFragment.Companion.REAR_FACING_CAMERA
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.util.POLL_IDENTIFIER_FOR_HLS_CUE
+import live.hms.roomkit.util.HMSSDKInstance
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.roomkit.util.debounce
 import live.hms.video.audio.HMSAudioManager
 import live.hms.video.connection.stats.*
 import live.hms.video.error.HMSException
-import live.hms.video.events.AgentType
 import live.hms.video.factories.noisecancellation.AvailabilityStatus
 import live.hms.video.interactivity.HmsInteractivityCenter
 import live.hms.video.interactivity.HmsPollUpdateListener
@@ -158,7 +158,7 @@ class MeetingViewModel(
         .audio(
             HMSAudioTrackSettings.Builder()
                 .setUseHardwareAcousticEchoCanceler(settings.enableHardwareAEC)
-                .initialState(getAudioTrackState())
+                .initialState(HMSTrackSettings.InitState.UNMUTED)
                 .enableNoiseSupression(settings.enableWebrtcNoiseSuppression)
                 .enableNoiseCancellation(settings.enableKrispNoiseCancellation)
                 .setDisableInternalAudioManager(settings.detectDominantSpeaker.not())
@@ -169,19 +169,13 @@ class MeetingViewModel(
             HMSVideoTrackSettings.Builder().disableAutoResize(settings.disableAutoResize)
                 .forceSoftwareDecoder(settings.forceSoftwareDecoder)
                 .setDegradationPreference(settings.degradationPreferences)
-                .initialState(getVideoTrackState())
+                .initialState(HMSTrackSettings.InitState.UNMUTED)
                 .cameraFacing(getVideoCameraFacing())
                 .build()
         )
         .build()
 
-    val hmsSDK = HMSSDK
-        .Builder(application)
-        .haltPreviewJoinForPermissionsRequest(true)
-        .setFrameworkInfo(FrameworkInfo(framework = AgentType.ANDROID_NATIVE, isPrebuilt = true))
-        .setTrackSettings(hmsTrackSettings) // SDK uses HW echo cancellation, if nothing is set in builder
-        .setLogSettings(hmsLogSettings)
-        .build()
+    val hmsSDK = HMSSDKInstance.getSDKInstance(application)
 
 
     val filterPlugin  by lazy { HMSVideoFilter(hmsSDK) }

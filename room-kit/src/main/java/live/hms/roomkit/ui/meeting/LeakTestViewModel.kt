@@ -52,24 +52,24 @@ class LeakTestViewModel(
 
         val tokenURL: String = hmsPrebuiltOptions?.endPoints?.get("token") ?: ""
 
+        val hmsSDK = HMSSDK.Builder(getApplication()).haltPreviewJoinForPermissionsRequest(true)
+            .setFrameworkInfo(
+                FrameworkInfo(
+                    framework = AgentType.ANDROID_NATIVE, isPrebuilt = true
+                )
+            )
+            .setTrackSettings(hmsTrackSettings)
+            .build()
         safeHandler.post {
 
             runBlocking {
-                for (i in 1..40) {
+                for (i in 1..200) {
                     try {
-                        val hmsSDK = HMSSDK.Builder(getApplication()).haltPreviewJoinForPermissionsRequest(true)
-                            .setFrameworkInfo(
-                                FrameworkInfo(
-                                    framework = AgentType.ANDROID_NATIVE, isPrebuilt = true
-                                )
-                            )
-                            .setTrackSettings(hmsTrackSettings)
-                            .build()
                         Log.d("LeakTest", "Iteration ${i} $roomCode")
                         val token = hmsSDK.tokens(roomCode)
                         Log.d("LeakTest", "Token suceess $token")
                         hmsSDK.joins(HMSConfig(roomCode, token), liveTrack)
-                        delay(4000)
+                        delay(1000)
                         Log.d("LeakTest", "Join success $roomCode")
                         hmsSDK.leaves()
                         Log.d("LeakTest", "Leave success")
