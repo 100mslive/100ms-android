@@ -36,7 +36,8 @@ object HMSPluginScope : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = dispatcher
 }
-internal suspend fun HMSSDK.addPlugin(plugin : HMSVideoPlugin): Unit {
+
+suspend fun HMSSDK.addPlugin(plugin : HMSVideoPlugin): Unit {
     return suspendCancellableCoroutine { continuation ->
         if (getPlugins().orEmpty().isEmpty().not()){
             continuation.resume(Unit, {})
@@ -70,6 +71,24 @@ suspend fun HMSSDK.tokens(roomcode : String) :String {
                     continuation.resume(string, {})
                 }
             })
+    }
+}
+
+suspend fun HMSSDK.addPlugins(plugin : HMSVideoPlugin): Unit {
+    return suspendCancellableCoroutine { continuation ->
+        if (getPlugins().orEmpty().isEmpty().not()){
+            continuation.resume(Unit, {})
+            return@suspendCancellableCoroutine
+        }
+        addPlugin(plugin, object : HMSActionResultListener {
+            override fun onError(error: HMSException) {
+                Log.d("LeakTest", "plugin error $error")
+                continuation.resume(Unit, {})
+            }
+            override fun onSuccess() {
+                continuation.resume(Unit, {})
+            }
+        })
     }
 }
 
