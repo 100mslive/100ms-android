@@ -14,6 +14,7 @@ import live.hms.roomkit.addPlugin
 import live.hms.roomkit.addPlugins
 import live.hms.roomkit.joins
 import live.hms.roomkit.leaves
+import live.hms.roomkit.previews
 import live.hms.roomkit.tokens
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.video.events.AgentType
@@ -87,6 +88,7 @@ class LeakTestViewModel(
                         val token = hmsSDK.tokens(roomCode)
                         val plugin = HMSVirtualBackground(hmsSDK)
                         Log.d("LeakTest", "Token suceess $token")
+
                         hmsSDK.joins(HMSConfig(roomCode, token), liveTrack)
                         Log.d("LeakTest", "Join success $roomCode")
 
@@ -99,8 +101,6 @@ class LeakTestViewModel(
 
                         val random = (3000..5000).random()
                         delay(random.toLong())
-                        plugin.enableBlur()
-                        plugin.disableEffects()
 
                         hmsSDK.leaves()
                         Log.d("LeakTest", "Leave success")

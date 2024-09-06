@@ -11,6 +11,7 @@ import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.media.tracks.HMSTrackType
 import live.hms.video.plugin.video.HMSVideoPlugin
 import live.hms.video.sdk.HMSActionResultListener
+import live.hms.video.sdk.HMSPreviewListener
 import live.hms.video.sdk.HMSSDK
 import live.hms.video.sdk.HMSUpdateListener
 import live.hms.video.sdk.models.HMSConfig
@@ -89,6 +90,33 @@ suspend fun HMSSDK.addPlugins(plugin : HMSVideoPlugin): Unit {
                 continuation.resume(Unit, {})
             }
         })
+    }
+}
+@OptIn(InternalCoroutinesApi::class)
+suspend fun HMSSDK.previews(
+    config: HMSConfig
+) {
+    return suspendCancellableCoroutine { continuation ->
+        preview(config,object : HMSPreviewListener {
+            override fun onError(error: HMSException) {
+                Log.d("LeakTest", "preview error $error")
+                continuation.tryResumeWithException(error)
+            }
+
+            override fun onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer) {
+
+            }
+
+            override fun onPreview(room: HMSRoom, localTracks: Array<HMSTrack>) {
+
+            }
+
+            override fun onRoomUpdate(type: HMSRoomUpdate, hmsRoom: HMSRoom) {
+
+            }
+
+        })
+        continuation.resume(Unit, {})
     }
 }
 
