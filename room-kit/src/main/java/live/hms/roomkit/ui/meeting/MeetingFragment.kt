@@ -1491,7 +1491,7 @@ class MeetingFragment : Fragment() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     Log.v(TAG, "initOnBackPress -> handleOnBackPressed")
-                    meetingViewModel.leaveMeeting()
+                    inflateExitFlow()
                 }
             })
     }
