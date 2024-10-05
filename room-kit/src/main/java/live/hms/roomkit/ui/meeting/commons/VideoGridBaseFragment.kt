@@ -121,8 +121,6 @@ abstract class VideoGridBaseFragment : Fragment() {
     var rowIdx = 0
 
     layout.apply {
-      if (isScreenshare().not())
-      Log.d("VGBF","fatal updating grid layout dimension ${gridRowCount} else column count ${gridColumnCount}")
       fun normalLayout() {
         // The 5th video, if there are only 5, gets spread.
         val spread5thVideo = childCount == 5

@@ -573,7 +573,7 @@ class MeetingFragment : Fragment() {
                 when (event) {
                     is MeetingViewModel.Event.SessionMetadataEvent -> {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                            //Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                         }
                     }
                     is MeetingViewModel.Event.CameraSwitchEvent -> {
@@ -728,7 +728,7 @@ class MeetingFragment : Fragment() {
                             "${peerWhoRemoved?.name} removed you from the room. ${state.details.reason}"
                         }
                     }
-                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    //Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 
                     meetingViewModel.leaveMeeting(state.details)
                 }
@@ -1042,11 +1042,13 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
-                    binding.topMenu.visibility = View.VISIBLE
-                    controlBarsVisible = true
-                    if (shouldHideAfterDelay) {
-                        // Hide control bars
-                        delayedHide(3000)
+                    if (getView() != null) {
+                        binding.topMenu.visibility = View.VISIBLE
+                        controlBarsVisible = true
+                        if (shouldHideAfterDelay) {
+                            // Hide control bars
+                            delayedHide(3000)
+                        }
                     }
                 }
 
@@ -1068,6 +1070,8 @@ class MeetingFragment : Fragment() {
                 }
 
                 override fun onAnimationEnd(animation: Animator) {
+                    if (view == null)
+                        return
                     binding.bottomControls.visibility = View.VISIBLE
                     controlBarsVisible = true
                 }

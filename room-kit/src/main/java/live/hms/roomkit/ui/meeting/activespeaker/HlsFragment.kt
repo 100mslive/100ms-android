@@ -266,7 +266,7 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
                 val hlsPlayerReady by hlsViewModel.playerReady.observeAsState()
 
                 // Don't show whole view loading during the time it's disconnected or reconnecting.
-                if (progressBarVisibility == true || viewMode !is MeetingState.Ongoing || hlsPlayerReady != true) {
+                if (progressBarVisibility == true || (viewMode !is MeetingState.Ongoing && viewMode !is MeetingState.Reconnected) || hlsPlayerReady != true) {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxSize()

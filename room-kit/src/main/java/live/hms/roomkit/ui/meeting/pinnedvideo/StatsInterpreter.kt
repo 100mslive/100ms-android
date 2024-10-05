@@ -1,27 +1,19 @@
 package live.hms.roomkit.ui.meeting.pinnedvideo
 
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.SpannedString
 import android.text.TextUtils
-import android.text.style.ForegroundColorSpan
 import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import live.hms.video.connection.stats.*
-import live.hms.video.media.settings.HMSLayer
 import live.hms.video.media.tracks.HMSAudioTrack
-import live.hms.video.media.tracks.HMSTrack
 import live.hms.video.media.tracks.HMSVideoTrack
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 class StatsInterpreter(val active: Boolean) {
     // For this to happen in n time rather than n^x times for a video, they'll have to
@@ -88,12 +80,17 @@ class StatsInterpreter(val active: Boolean) {
                                     appendLine()
                                     append("Jitter:${webrtcStats.jitter}")
                                     appendLine()
-
                                 }
                                 is HMSLocalAudioStats -> buildSpannedString {
                                     append("\nLocalAudio")
                                     appendLine()
                                     append("Bitrate(A): ${webrtcStats.bitrate?.roundToInt()}")
+                                    appendLine()
+                                    append("Jitter: ${webrtcStats.jitter}")
+                                    appendLine()
+                                    append("PacketLoss: ${webrtcStats.packetLoss}")
+                                    appendLine()
+                                    append("PacketsSent: ${webrtcStats.packetsSent}")
                                     appendLine()
                                 }
                                 is HMSLocalVideoStats -> buildSpannedString {
@@ -113,6 +110,12 @@ class StatsInterpreter(val active: Boolean) {
                                     appendLine()
                                     append("QualityLimitation:${webrtcStats.qualityLimitationReason.reason}")
                                     appendLine()
+                                    append("Jitter: ${webrtcStats.jitter}")
+                                    appendLine()
+                                    append("PacketLoss: ${webrtcStats.packetLoss}")
+                                    appendLine()
+                                    append("PacketsSent: ${webrtcStats.packetsSent}")
+                                    appendLine()
                                 }
 
                                 else -> acc
@@ -123,12 +126,22 @@ class StatsInterpreter(val active: Boolean) {
                     }
                     .collect {
                         withContext(Dispatchers.Main) {
-                            setText(it)
+                            setText(buildString { append(it)
+                                spaceBottomOfView(this)
+                            })
                         }
                     }
 
 
             }
+        }
+    }
+
+    private fun spaceBottomOfView(spannableStringBuilder: StringBuilder) {
+        // Space out the view so it can be raised above the name
+        with(spannableStringBuilder) {
+            appendLine()
+            appendLine()
         }
     }
 
