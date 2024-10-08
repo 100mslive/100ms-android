@@ -175,7 +175,7 @@ fun SwitchComponent(
 ) {
     fun getDescriptionText(): AnnotatedString {
         val nameStyle = SpanStyle(
-            fontFamily = FontFamily(Font(R.font.inter_bold)),
+            fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_bold)),
         )
         return buildAnnotatedString {
 
@@ -222,7 +222,7 @@ fun SwitchComponent(
                 modifier = Modifier.weight(1f), text = "Switch Role", style = TextStyle(
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_bold)),
+                    fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_bold)),
                     fontWeight = FontWeight(600),
                     color = Variables.OnSecondaryHigh,
                     letterSpacing = 0.15.sp,
@@ -242,7 +242,7 @@ fun SwitchComponent(
             modifier = Modifier.fillMaxWidth(), text = getDescriptionText(), style = TextStyle(
                 fontSize = 14.sp,
                 lineHeight = 20.sp,
-                fontFamily = FontFamily(Font(R.font.inter_regular)),
+                fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_regular)),
                 fontWeight = FontWeight(400),
                 color = Variables.OnSurfaceMedium,
                 letterSpacing = 0.25.sp,
@@ -311,7 +311,7 @@ fun SpinnerText(it: String, modifier: Modifier) {
         text = it, modifier, style = TextStyle(
             fontSize = 16.sp,
             lineHeight = 24.sp,
-            fontFamily = FontFamily(Font(R.font.inter_regular)),
+            fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_regular)),
             fontWeight = FontWeight(400),
             color = Variables.OnSurfaceHigh
         )
@@ -388,7 +388,7 @@ fun ChangeRoleButton(
             style = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                fontFamily = FontFamily(Font(R.font.inter_bold)),
+                fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_bold)),
                 fontWeight = FontWeight(600),
                 color = Variables.OnPrimaryHigh,
                 textAlign = TextAlign.Center,
