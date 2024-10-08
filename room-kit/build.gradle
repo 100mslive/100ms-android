@@ -19,8 +19,6 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdk 34
-        versionCode 1
-        versionName getVersionName()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -39,19 +37,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildFeatures {
         viewBinding true
-        dataBinding {
-            enabled true
-        }
         compose true
+        buildConfig true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.8"
