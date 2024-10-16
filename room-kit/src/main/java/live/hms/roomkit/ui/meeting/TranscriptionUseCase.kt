@@ -152,11 +152,11 @@ data class TranscriptViewHolder(
         }
     fun getSubtitle() : AnnotatedString {
         return buildAnnotatedString {
-            withStyle(style = SpanStyle(fontFamily = FontFamily(Font(R.font.inter_bold)))) {
+            withStyle(style = SpanStyle(fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_bold)))) {
                 append(peerName)
                 append(": ")
             }
-            withStyle(style = SpanStyle(fontFamily = FontFamily(Font(R.font.inter_regular)))) {
+            withStyle(style = SpanStyle(fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_regular)))) {
                 append(text)
             }
         }

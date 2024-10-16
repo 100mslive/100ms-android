@@ -152,7 +152,7 @@ fun EnableCaptionsDisplay(onEnableForEveryoneClicked : () -> Unit,
                 text = screen.title, style = TextStyle(
                     fontSize = 20.sp,
                     lineHeight = 24.sp,
-                    fontFamily = FontFamily(Font(R.font.inter_bold)),
+                    fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_bold)),
                     fontWeight = FontWeight(600),
                     color = Variables.OnSecondaryHigh,
                     letterSpacing = 0.15.sp,
@@ -206,7 +206,7 @@ fun EnableButton(
             style = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 24.sp,
-                fontFamily = FontFamily(Font(R.font.inter_bold)),
+                fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_bold)),
                 fontWeight = FontWeight(600),
                 color = Variables.OnPrimaryHigh,
                 textAlign = TextAlign.Center,
@@ -225,7 +225,7 @@ fun DescriptionText(text : String) {
         style = TextStyle(
             fontSize = 14.sp,
             lineHeight = 20.sp,
-            fontFamily = FontFamily(Font(R.font.inter_regular)),
+            fontFamily = FontFamily(Font(live.hms.prebuilt_themes.R.font.inter_regular)),
             fontWeight = FontWeight(400),
             color = Variables.OnSurfaceMedium,
             letterSpacing = 0.25.sp,
