@@ -7,7 +7,7 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 android {
-    compileSdk 34
+    compileSdk 35
     namespace = "live.hms.app2"
 
     defaultConfig {
@@ -43,6 +43,10 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = '1.5.4'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -62,8 +66,19 @@ dependencies {
 
     //100ms.live prebuilt lib
     implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
+    
+    // Jetpack Compose dependencies
+    implementation platform('androidx.compose:compose-bom:2023.10.01')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.activity:activity-compose:1.8.0'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    
+    // Cloudy library (requires Compose)
+    implementation("com.github.skydoves:cloudy:0.1.2")
 
-    implementation "live.100ms:virtual-background:$HMS_SDK_VERSION"
+//    implementation "live.100ms:virtual-background:$HMS_SDK_VERSION"
     //100ms noise cancellation dep
     implementation "live.100ms:hms-noise-cancellation-android:$HMS_SDK_VERSION"
 
