@@ -2783,8 +2783,6 @@ fun LayoutPollQuestionCreationItemBinding.applyTheme() {
         )
     )
 
-    setSwitchThemes(notRequiredToAnswer)
-
     saveButton.saveButtonEnabled()
 
 
