@@ -1,6 +1,5 @@
 package live.hms.roomkit.ui.meeting.commons
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,6 +28,7 @@ import live.hms.roomkit.ui.theme.applyTheme
 import live.hms.prebuilt_themes.getColorOrDefault
 import live.hms.prebuilt_themes.setBackgroundAndColor
 import live.hms.roomkit.util.*
+import live.hms.video.media.settings.HMSLayer
 import live.hms.video.media.tracks.HMSLocalVideoTrack
 import live.hms.video.media.tracks.HMSRemoteVideoTrack
 import live.hms.video.media.tracks.HMSVideoTrack
@@ -111,6 +111,10 @@ abstract class VideoGridBaseFragment : Fragment() {
     Log.d("VGBF","  (screenshar : ${isScreenshare()}) grid row count ${gridRowCount} else column count ${gridColumnCount}")
   }
 
+  fun isDocked(): Boolean {
+    return gridRowCount == 1 && gridColumnCount == 2 && isScreenshare().not()
+  }
+
   protected val maxItems: Int
     get() = gridRowCount * gridColumnCount
 
@@ -188,6 +192,8 @@ abstract class VideoGridBaseFragment : Fragment() {
     item: MeetingTrack,
     scalingType: RendererCommon.ScalingType = RendererCommon.ScalingType.SCALE_ASPECT_BALANCED
   ) {
+
+    val isAutoSimulcastEnabled = if (isDocked()) false else meetingViewModel.isAutoSimulcastEnabled()
     Log.d(TAG,"bindSurfaceView for :: ${item.peer.name}")
     val earlyExit = item.video == null
             || item.video?.isMute == true
@@ -196,7 +202,11 @@ abstract class VideoGridBaseFragment : Fragment() {
       item.video?.let { track ->
         if (isScreenshare()) view.setScalingType( RendererCommon.ScalingType.SCALE_ASPECT_FIT)
         view.addTrack(track)
-        view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
+
+        view.disableAutoSimulcastLayerSelect(isAutoSimulcastEnabled)
+        if (track is HMSRemoteVideoTrack && isDocked()) {
+          track.setLayer(HMSLayer.LOW)
+        }
         if (item.video?.isDegraded == true ) binding.hmsVideoView.hide() else binding.hmsVideoView.show()
         binding.hmsVideoView.setOnLongClickListener {
           (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
