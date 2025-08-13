@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'com.google.gms.google-services' // Google Services Gradle plugin
     id 'com.google.firebase.crashlytics'
+    id 'jacoco'
 }
 android {
     compileSdk 34
@@ -28,6 +29,7 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
+            testCoverageEnabled true
         }
 
         release {
@@ -106,4 +108,28 @@ dependencies {
     testImplementation 'org.hamcrest:hamcrest:2.2'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
+    def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.from = files([mainSrc])
+    classDirectories.from = files([debugTree, kotlinDebugTree])
+    executionData.from = fileTree(dir: "$buildDir", includes: [
+            "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+            "outputs/code_coverage/debugAndroidTest/connected/*coverage.ec"
+    ])
 }

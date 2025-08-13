@@ -9,8 +9,8 @@ class CustomPeerMetadataTest{
 
     @Test
     fun correct_json_values_are_parsed() {
-        val result = CustomPeerMetadata.fromJson("{\"isHandRaised\":true, \"name\":\"Aniket\"}")
-        assertThat(result, equalTo(CustomPeerMetadata(true, false, "Aniket")))
+        val result = CustomPeerMetadata.fromJson("{\"isBRBOn\":true, \"name\":\"Aniket\"}")
+        assertThat(result, equalTo(CustomPeerMetadata(true, "Aniket", null, null)))
     }
 
     @Test
@@ -21,7 +21,7 @@ class CustomPeerMetadataTest{
 
     @Test
     fun unexpected_json_values_are_discarded() {
-        val result = CustomPeerMetadata.fromJson("{\"isHandRaised\":[34.0]}")
+        val result = CustomPeerMetadata.fromJson("{\"isBRBOn\":[34.0]}")
         assertThat(result, equalTo(null))
     }
 
