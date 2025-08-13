@@ -2681,10 +2681,9 @@ class MeetingViewModel(
                 name ?: "Participant"
             )
         }
-        newState.copy(enabled = !newState.enabled,
+        pauseChatUseCase.changeChatState(newState.copy(enabled = !newState.enabled,
             updatedBy = updatedBy
-        )
-        pauseChatUseCase.changeChatState(newState)
+        ))
     }
 
     val chatPauseState = pauseChatUseCase.currentChatPauseState
