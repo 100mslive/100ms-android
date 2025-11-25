@@ -106,7 +106,7 @@ class PreviewFragment : Fragment() {
             if (binding.buttonJoinMeeting.drawableStart == null) {
                 binding.buttonJoinMeeting.setDrawables(
                     start = ContextCompat.getDrawable(
-                        context!!, R.drawable.ic_live
+                        requireContext(), R.drawable.ic_live
                     )
                 )
             }
