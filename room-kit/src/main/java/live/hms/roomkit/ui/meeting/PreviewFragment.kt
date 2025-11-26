@@ -106,7 +106,7 @@ class PreviewFragment : Fragment() {
             if (binding.buttonJoinMeeting.drawableStart == null) {
                 binding.buttonJoinMeeting.setDrawables(
                     start = ContextCompat.getDrawable(
-                        context!!, R.drawable.ic_live
+                        requireContext(), R.drawable.ic_live
                     )
                 )
             }
@@ -667,7 +667,16 @@ class PreviewFragment : Fragment() {
                 enableDisableJoinNowButton()
 
                     updateUiBasedOnPublishParams(room.localPeer?.hmsRole?.publishParams)
-                track = MeetingTrack(room.localPeer!!, null, null)
+
+                // Guard against null localPeer during SDK initialization race condition.
+                // Return early to prevent NPE crash - UI will update via other lifecycle events
+                val localPeer = room.localPeer
+                if (localPeer == null) {
+                    Log.e(TAG, "LocalPeer is null in previewUpdateLiveData observer, skipping video initialization")
+                    return@Observer
+                }
+
+                track = MeetingTrack(localPeer, null, null)
                 localTracks.forEach {
                     when (it) {
                         is HMSLocalAudioTrack -> {
@@ -687,8 +696,8 @@ class PreviewFragment : Fragment() {
 
                 binding.editTextName.doOnTextChanged { text, start, before, count ->
                     if (text.isNullOrEmpty().not()) {
-                        val intitals = kotlin.runCatching { NameUtils.getInitials(text.toString()) }
-                        binding.nameInitials.text = intitals.getOrNull().orEmpty()
+                        val initials = kotlin.runCatching { NameUtils.getInitials(text.toString()) }
+                        binding.nameInitials.text = initials.getOrNull().orEmpty()
                         binding.noNameIv.visibility = View.GONE
                     } else {
                         binding.nameInitials.text = ""
