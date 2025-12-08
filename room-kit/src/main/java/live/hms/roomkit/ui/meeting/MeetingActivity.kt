@@ -58,6 +58,26 @@ class MeetingActivity : AppCompatActivity() {
         )
     }
 
+    // Track if user is in an active meeting (non-HLS) for foreground service
+    private var isInActiveMeeting = false
+
+    /**
+     * Updates the active meeting state based on joined status and participant type.
+     * Called when either joined or showAudioIcon LiveData changes.
+     * - joined: true when user has joined the meeting
+     * - showAudioIcon: true for regular participants, false for HLS viewers
+     */
+    private fun updateActiveMeetingState() {
+        val joined = meetingViewModel.joined.value == true
+        val isRegularParticipant = meetingViewModel.showAudioIcon.value == true
+        isInActiveMeeting = joined && isRegularParticipant
+
+        // If user left the meeting while in background, stop the service
+        if (!joined) {
+            CallForegroundService.stop(this)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMeetingBinding.inflate(layoutInflater)
@@ -105,12 +125,34 @@ class MeetingActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        // App came to foreground - stop the foreground service
+        CallForegroundService.stop(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // App going to background - start foreground service if in active meeting
+        // Don't start if activity is finishing (user leaving) or if user is HLS viewer
+        if (isInActiveMeeting && !isFinishing) {
+            CallForegroundService.start(this)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        // Ensure service is stopped when activity is destroyed
+        CallForegroundService.stop(this)
         _binding = null
     }
 
     private fun initObservers() {
+        // Track active meeting state for foreground service
+        // showAudioIcon is true for regular participants, false for HLS viewers
+        meetingViewModel.joined.observe(this) { updateActiveMeetingState() }
+        meetingViewModel.showAudioIcon.observe(this) { updateActiveMeetingState() }
+
         meetingViewModel.recordingState.observe(this) {
             invalidateOptionsMenu()
         }

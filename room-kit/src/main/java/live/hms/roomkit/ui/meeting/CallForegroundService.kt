@@ -107,13 +107,29 @@ class CallForegroundService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        // Convert vector drawable to bitmap for large icon (video camera = meeting indicator)
+        val largeIconBitmap = androidx.core.graphics.drawable.DrawableCompat.wrap(
+            androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_camera_toggle_off)!!
+        ).let { drawable ->
+            val bitmap = android.graphics.Bitmap.createBitmap(
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight,
+                android.graphics.Bitmap.Config.ARGB_8888
+            )
+            val canvas = android.graphics.Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            bitmap
+        }
+
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.call_notification_title))
             .setContentText(getString(R.string.call_notification_text))
-            .setSmallIcon(R.drawable.ic_mic_24)
+            .setSmallIcon(R.drawable.ic_app_logo)
+            .setLargeIcon(largeIconBitmap)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .build()
     }
