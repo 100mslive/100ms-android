@@ -13,6 +13,7 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import live.hms.roomkit.R
+import live.hms.roomkit.ui.notification.CallNotificationConfig
 
 /**
  * Foreground service to keep the app alive during an active call when backgrounded.
@@ -26,12 +27,31 @@ class CallForegroundService : Service() {
         private const val CHANNEL_ID = "hms_call_channel"
         private const val NOTIFICATION_ID = 100
 
+        private const val EXTRA_SMALL_ICON = "extra_small_icon"
+        private const val EXTRA_LARGE_ICON = "extra_large_icon"
+        private const val EXTRA_TITLE = "extra_title"
+        private const val EXTRA_TEXT = "extra_text"
+        private const val EXTRA_CHANNEL_NAME = "extra_channel_name"
+        private const val EXTRA_CHANNEL_DESCRIPTION = "extra_channel_description"
+
         /**
-         * Start the foreground service.
+         * Start the foreground service with optional custom notification config.
          * Call this from MeetingActivity.onStop() when user is in an active meeting.
+         *
+         * @param context The context to start the service from
+         * @param config Optional notification configuration for custom branding
          */
-        fun start(context: Context) {
-            val intent = Intent(context, CallForegroundService::class.java)
+        fun start(context: Context, config: CallNotificationConfig? = null) {
+            val intent = Intent(context, CallForegroundService::class.java).apply {
+                config?.let {
+                    it.smallIcon?.let { icon -> putExtra(EXTRA_SMALL_ICON, icon) }
+                    it.largeIcon?.let { icon -> putExtra(EXTRA_LARGE_ICON, icon) }
+                    it.title?.let { title -> putExtra(EXTRA_TITLE, title) }
+                    it.text?.let { text -> putExtra(EXTRA_TEXT, text) }
+                    it.channelName?.let { name -> putExtra(EXTRA_CHANNEL_NAME, name) }
+                    it.channelDescription?.let { desc -> putExtra(EXTRA_CHANNEL_DESCRIPTION, desc) }
+                }
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
             } else {
@@ -49,12 +69,32 @@ class CallForegroundService : Service() {
         }
     }
 
+    // Config values extracted from intent
+    private var smallIconRes: Int = R.drawable.ic_app_logo
+    private var largeIconRes: Int = R.drawable.ic_camera_toggle_off
+    private var notificationTitle: String? = null
+    private var notificationText: String? = null
+    private var channelName: String? = null
+    private var channelDescription: String? = null
+
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Extract config from intent
+        intent?.let {
+            smallIconRes = it.getIntExtra(EXTRA_SMALL_ICON, R.drawable.ic_app_logo)
+            largeIconRes = it.getIntExtra(EXTRA_LARGE_ICON, R.drawable.ic_camera_toggle_off)
+            notificationTitle = it.getStringExtra(EXTRA_TITLE)
+            notificationText = it.getStringExtra(EXTRA_TEXT)
+            channelName = it.getStringExtra(EXTRA_CHANNEL_NAME)
+            channelDescription = it.getStringExtra(EXTRA_CHANNEL_DESCRIPTION)
+        }
+
+        // Create channel after extracting config (channel name may be customized)
+        createNotificationChannel()
+
         val notification = createNotification()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -82,10 +122,10 @@ class CallForegroundService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                getString(R.string.call_notification_channel_name),
+                channelName ?: getString(R.string.call_notification_channel_name),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = getString(R.string.call_notification_channel_description)
+                description = channelDescription ?: getString(R.string.call_notification_channel_description)
                 setShowBadge(false)
             }
 
@@ -107,9 +147,9 @@ class CallForegroundService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Convert vector drawable to bitmap for large icon (video camera = meeting indicator)
+        // Convert drawable to bitmap for large icon
         val largeIconBitmap = androidx.core.graphics.drawable.DrawableCompat.wrap(
-            androidx.core.content.ContextCompat.getDrawable(this, R.drawable.ic_camera_toggle_off)!!
+            androidx.core.content.ContextCompat.getDrawable(this, largeIconRes)!!
         ).let { drawable ->
             val bitmap = android.graphics.Bitmap.createBitmap(
                 drawable.intrinsicWidth,
@@ -123,9 +163,9 @@ class CallForegroundService : Service() {
         }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.call_notification_title))
-            .setContentText(getString(R.string.call_notification_text))
-            .setSmallIcon(R.drawable.ic_app_logo)
+            .setContentTitle(notificationTitle ?: getString(R.string.call_notification_title))
+            .setContentText(notificationText ?: getString(R.string.call_notification_text))
+            .setSmallIcon(smallIconRes)
             .setLargeIcon(largeIconBitmap)
             .setOngoing(true)
             .setContentIntent(pendingIntent)

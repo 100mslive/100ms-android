@@ -27,6 +27,7 @@ import live.hms.app2.util.isValidMeetingUrl
 import live.hms.app2.util.viewLifecycle
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.HMSRoomKit
+import live.hms.roomkit.ui.notification.CallNotificationConfig
 import live.hms.roomkit.ui.meeting.DeviceStatsBottomSheet
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_PERSON
 import live.hms.roomkit.ui.meeting.LEAVE_INFORMATION_REASON
@@ -163,15 +164,28 @@ class HomeFragment : Fragment() {
 
             val consistentUserId = getConsistentUserIdOverSessions()
 
+            // Configure notification for foreground service when app is backgrounded during a call
+            val callNotificationConfig = CallNotificationConfig(
+                smallIcon = R.drawable.ic_launcher_foreground,
+                largeIcon = live.hms.roomkit.R.drawable.ic_bars_24,
+                title = "A Call is in progress",
+                text = "Click here to return to your IMPORTANT call"
+            )
+
             HMSRoomKit.launchPrebuilt(
-                code, activity, HMSPrebuiltOptions(userName = if(settings.setInitialNameFromClient) getUsername() else null, userId = consistentUserId, debugInfo = settings.inPreBuiltDebugMode,
+                code, activity, HMSPrebuiltOptions(
+                    userName = if(settings.setInitialNameFromClient) getUsername() else null,
+                    userId = consistentUserId,
+                    debugInfo = settings.inPreBuiltDebugMode,
+                    callNotificationConfig = callNotificationConfig,
                     endPoints = hashMapOf<String, String>().apply {
                         if (settings.environment.contains("prod").not()) {
                             put("token", "https://auth-nonprod.100ms.live")
                             put("init", "https://qa-init.100ms.live/init")
                             put("layout", "https://api-nonprod.100ms.live")
                         }
-                    })
+                    }
+                )
             )
         }
     }

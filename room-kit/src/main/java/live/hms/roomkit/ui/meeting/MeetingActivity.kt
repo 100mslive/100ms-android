@@ -26,6 +26,7 @@ import live.hms.roomkit.ui.notification.CardStackListener
 import live.hms.roomkit.ui.notification.Direction
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationAdapter
+ import live.hms.roomkit.ui.notification.CallNotificationConfig
 import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
 import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.polls.display.PollDisplayFragment
@@ -60,6 +61,9 @@ class MeetingActivity : AppCompatActivity() {
 
     // Track if user is in an active meeting (non-HLS) for foreground service
     private var isInActiveMeeting = false
+
+    // Notification config from HMSPrebuiltOptions for foreground service
+    private var callNotificationConfig: CallNotificationConfig? = null
 
     /**
      * Updates the active meeting state based on joined status and participant type.
@@ -97,6 +101,9 @@ class MeetingActivity : AppCompatActivity() {
 
         val hmsPrebuiltOption: HMSPrebuiltOptions? =
             intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
+
+        // Store notification config for foreground service
+        callNotificationConfig = hmsPrebuiltOption?.callNotificationConfig
 
         val roomCode: String = intent?.getStringExtra(ROOM_CODE)?:""
         val token: String = intent?.getStringExtra(TOKEN)?:""
@@ -136,7 +143,7 @@ class MeetingActivity : AppCompatActivity() {
         // App going to background - start foreground service if in active meeting
         // Don't start if activity is finishing (user leaving) or if user is HLS viewer
         if (isInActiveMeeting && !isFinishing) {
-            CallForegroundService.start(this)
+            CallForegroundService.start(this, callNotificationConfig)
         }
     }
 
