@@ -1,12 +1,16 @@
 package live.hms.roomkit.ui.meeting
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.RECORD_AUDIO
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -142,8 +146,21 @@ class MeetingActivity : AppCompatActivity() {
         super.onStop()
         // App going to background - start foreground service if in active meeting
         // Don't start if activity is finishing (user leaving) or if user is HLS viewer
-        if (isInActiveMeeting && !isFinishing) {
-            CallForegroundService.start(this, callNotificationConfig)
+        // Also check RECORD_AUDIO permission - required for FOREGROUND_SERVICE_TYPE_MICROPHONE
+        val hasAudioPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true // Permissions are granted at install time pre-M
+        }
+
+        android.util.Log.d("CallFGService", "onStop: isInActiveMeeting=$isInActiveMeeting, isFinishing=$isFinishing, hasAudioPermission=$hasAudioPermission")
+
+        if (isInActiveMeeting && !isFinishing && hasAudioPermission) {
+            try {
+                CallForegroundService.start(this, callNotificationConfig)
+            } catch (e: Exception) {
+                android.util.Log.e("CallFGService", "Failed to start foreground service", e)
+            }
         }
     }
 
