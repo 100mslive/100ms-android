@@ -166,10 +166,8 @@ class HomeFragment : Fragment() {
 
             // Configure notification for foreground service when app is backgrounded during a call
             val callNotificationConfig = CallNotificationConfig(
-                smallIcon = R.drawable.ic_launcher_foreground,
-                largeIcon = live.hms.roomkit.R.drawable.ic_bars_24,
                 title = "A Call is in progress",
-                text = "Click here to return to your IMPORTANT call"
+                text = "Tap to return to your call"
             )
 
             HMSRoomKit.launchPrebuilt(

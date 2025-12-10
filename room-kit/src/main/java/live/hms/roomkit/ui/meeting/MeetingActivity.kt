@@ -149,8 +149,15 @@ class MeetingActivity : AppCompatActivity() {
         lifecycleScope.launch {
             meetingViewModel.events.collect { event ->
                 if (event is MeetingViewModel.Event.RequestPermission) {
-                    requestedPermissions = event.permissions
-                    requestPermissionLauncher.launch(event.permissions)
+                    // Add POST_NOTIFICATIONS to the permission request on Android 13+
+                    // This is needed for foreground service notification to be visible
+                    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        event.permissions + POST_NOTIFICATIONS
+                    } else {
+                        event.permissions
+                    }
+                    requestedPermissions = permissions
+                    requestPermissionLauncher.launch(permissions)
                 }
             }
         }
@@ -385,13 +392,20 @@ class MeetingActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        if (it.containsKey(POST_NOTIFICATIONS)) {
+    ) { results ->
+        // Check if this was a screenshare-only permission request (only POST_NOTIFICATIONS)
+        val isScreensharePermissionRequest = results.size == 1 && results.containsKey(POST_NOTIFICATIONS)
+        if (isScreensharePermissionRequest) {
             meetingViewModel.screenshareRequest.value = Unit
+            return@registerForActivityResult
         }
-        // Do not prevent joining if bluetooth connect is denied.
-        else if (it.values.all { granted -> granted }) meetingViewModel.permissionGranted()
-        else {
+
+        // For meeting permissions, check if critical permissions (excluding POST_NOTIFICATIONS) are granted
+        // POST_NOTIFICATIONS is optional - meeting works without it, just notification won't show
+        val criticalPermissions = results.filterKeys { it != POST_NOTIFICATIONS }
+        if (criticalPermissions.values.all { granted -> granted }) {
+            meetingViewModel.permissionGranted()
+        } else {
             // Leave the meeting
             meetingViewModel.leaveMeeting(null)
             // Close our activity to return to whatever the user had before

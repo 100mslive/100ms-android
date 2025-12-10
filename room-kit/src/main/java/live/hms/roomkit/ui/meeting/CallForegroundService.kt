@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.notification.CallNotificationConfig
+import androidx.core.graphics.createBitmap
 
 /**
  * Foreground service to keep the app alive during an active call when backgrounded.
@@ -111,6 +112,7 @@ class CallForegroundService : Service() {
         super.onCreate()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_UPDATE_NOTIFICATION) {
             // Just update the notification, don't restart the service
@@ -208,11 +210,7 @@ class CallForegroundService : Service() {
         val largeIconBitmap = androidx.core.graphics.drawable.DrawableCompat.wrap(
             androidx.core.content.ContextCompat.getDrawable(this, largeIconRes)!!
         ).let { drawable ->
-            val bitmap = android.graphics.Bitmap.createBitmap(
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight,
-                android.graphics.Bitmap.Config.ARGB_8888
-            )
+            val bitmap = createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight)
             val canvas = android.graphics.Canvas(bitmap)
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.draw(canvas)
