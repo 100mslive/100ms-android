@@ -20,6 +20,12 @@ import live.hms.roomkit.ui.notification.CallNotificationConfig
  * This prevents Android 14+ from aggressively suspending network sockets.
  *
  * The service displays a persistent notification allowing users to return to the call.
+ *
+ * Usage:
+ * - Call start() when user joins a meeting (while app is in foreground)
+ * - Call updateNotification() with showDescription=true when app goes to background
+ * - Call updateNotification() with showDescription=false when app comes to foreground
+ * - Call stop() when user leaves the meeting
  */
 class CallForegroundService : Service() {
 
@@ -33,15 +39,19 @@ class CallForegroundService : Service() {
         private const val EXTRA_TEXT = "extra_text"
         private const val EXTRA_CHANNEL_NAME = "extra_channel_name"
         private const val EXTRA_CHANNEL_DESCRIPTION = "extra_channel_description"
+        private const val EXTRA_SHOW_DESCRIPTION = "extra_show_description"
+
+        private const val ACTION_UPDATE_NOTIFICATION = "action_update_notification"
 
         /**
-         * Start the foreground service with optional custom notification config.
-         * Call this from MeetingActivity.onStop() when user is in an active meeting.
+         * Start the foreground service when user joins a meeting.
+         * Should be called while app is in foreground to satisfy Android 14+ requirements.
          *
          * @param context The context to start the service from
          * @param config Optional notification configuration for custom branding
+         * @param showDescription Whether to show the notification description text
          */
-        fun start(context: Context, config: CallNotificationConfig? = null) {
+        fun start(context: Context, config: CallNotificationConfig? = null, showDescription: Boolean = false) {
             val intent = Intent(context, CallForegroundService::class.java).apply {
                 config?.let {
                     it.smallIcon?.let { icon -> putExtra(EXTRA_SMALL_ICON, icon) }
@@ -51,6 +61,7 @@ class CallForegroundService : Service() {
                     it.channelName?.let { name -> putExtra(EXTRA_CHANNEL_NAME, name) }
                     it.channelDescription?.let { desc -> putExtra(EXTRA_CHANNEL_DESCRIPTION, desc) }
                 }
+                putExtra(EXTRA_SHOW_DESCRIPTION, showDescription)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -60,8 +71,24 @@ class CallForegroundService : Service() {
         }
 
         /**
+         * Update the notification to show or hide description.
+         * Call with showDescription=true when app goes to background.
+         * Call with showDescription=false when app comes to foreground.
+         *
+         * @param context The context
+         * @param showDescription Whether to show the notification description text
+         */
+        fun updateNotification(context: Context, showDescription: Boolean) {
+            val intent = Intent(context, CallForegroundService::class.java).apply {
+                action = ACTION_UPDATE_NOTIFICATION
+                putExtra(EXTRA_SHOW_DESCRIPTION, showDescription)
+            }
+            context.startService(intent)
+        }
+
+        /**
          * Stop the foreground service.
-         * Call this from MeetingActivity.onStart() or when leaving the meeting.
+         * Call this when user leaves the meeting.
          */
         fun stop(context: Context) {
             val intent = Intent(context, CallForegroundService::class.java)
@@ -76,12 +103,22 @@ class CallForegroundService : Service() {
     private var notificationText: String? = null
     private var channelName: String? = null
     private var channelDescription: String? = null
+    private var showDescription: Boolean = false
+
+    private var isServiceStarted = false
 
     override fun onCreate() {
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_UPDATE_NOTIFICATION) {
+            // Just update the notification, don't restart the service
+            showDescription = intent.getBooleanExtra(EXTRA_SHOW_DESCRIPTION, false)
+            updateNotificationDisplay()
+            return START_NOT_STICKY
+        }
+
         // Extract config from intent
         intent?.let {
             smallIconRes = it.getIntExtra(EXTRA_SMALL_ICON, R.drawable.ic_app_logo)
@@ -90,6 +127,7 @@ class CallForegroundService : Service() {
             notificationText = it.getStringExtra(EXTRA_TEXT)
             channelName = it.getStringExtra(EXTRA_CHANNEL_NAME)
             channelDescription = it.getStringExtra(EXTRA_CHANNEL_DESCRIPTION)
+            showDescription = it.getBooleanExtra(EXTRA_SHOW_DESCRIPTION, false)
         }
 
         // Create channel after extracting config (channel name may be customized)
@@ -97,14 +135,24 @@ class CallForegroundService : Service() {
 
         val notification = createNotification()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-            )
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
+        if (!isServiceStarted) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(
+                        NOTIFICATION_ID,
+                        notification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                    )
+                } else {
+                    startForeground(NOTIFICATION_ID, notification)
+                }
+                isServiceStarted = true
+            } catch (e: SecurityException) {
+                // On Android 14+, MICROPHONE type may fail if app is not in eligible state
+                // Log the error and stop the service gracefully instead of crashing
+                android.util.Log.e("CallFGService", "Failed to start foreground service with MICROPHONE type", e)
+                stopSelf()
+            }
         }
 
         return START_NOT_STICKY
@@ -115,7 +163,16 @@ class CallForegroundService : Service() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onDestroy() {
         super.onDestroy()
+        isServiceStarted = false
         stopForeground(STOP_FOREGROUND_REMOVE)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun updateNotificationDisplay() {
+        if (isServiceStarted) {
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.notify(NOTIFICATION_ID, createNotification())
+        }
     }
 
     private fun createNotificationChannel() {
@@ -162,15 +219,20 @@ class CallForegroundService : Service() {
             bitmap
         }
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(notificationTitle ?: getString(R.string.call_notification_title))
-            .setContentText(notificationText ?: getString(R.string.call_notification_text))
             .setSmallIcon(smallIconRes)
             .setLargeIcon(largeIconBitmap)
             .setOngoing(true)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_CALL)
-            .build()
+
+        // Only show description text when app is in background
+        if (showDescription) {
+            builder.setContentText(notificationText ?: getString(R.string.call_notification_text))
+        }
+
+        return builder.build()
     }
 }

@@ -74,14 +74,34 @@ class MeetingActivity : AppCompatActivity() {
      * Called when either joined or showAudioIcon LiveData changes.
      * - joined: true when user has joined the meeting
      * - showAudioIcon: true for regular participants, false for HLS viewers
+     *
+     * Starts the foreground service when user joins (while app is in foreground)
      */
     private fun updateActiveMeetingState() {
         val joined = meetingViewModel.joined.value == true
         val isRegularParticipant = meetingViewModel.showAudioIcon.value == true
+        val wasInActiveMeeting = isInActiveMeeting
         isInActiveMeeting = joined && isRegularParticipant
 
-        // If user left the meeting while in background, stop the service
-        if (!joined) {
+        // Start service when user joins meeting (while app is still in foreground)
+        if (isInActiveMeeting && !wasInActiveMeeting) {
+            val hasAudioPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            } else {
+                true
+            }
+            if (hasAudioPermission) {
+                try {
+                    // Start with showDescription=false since app is in foreground
+                    CallForegroundService.start(this, callNotificationConfig, showDescription = false)
+                } catch (e: Exception) {
+                    android.util.Log.e("CallFGService", "Failed to start foreground service on join", e)
+                }
+            }
+        }
+
+        // Stop service when user leaves the meeting
+        if (!isInActiveMeeting && wasInActiveMeeting) {
             CallForegroundService.stop(this)
         }
     }
@@ -138,29 +158,18 @@ class MeetingActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // App came to foreground - stop the foreground service
-        CallForegroundService.stop(this)
+        // App came to foreground - update notification to hide description
+        if (isInActiveMeeting) {
+            CallForegroundService.updateNotification(this, showDescription = false)
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        // App going to background - start foreground service if in active meeting
-        // Don't start if activity is finishing (user leaving) or if user is HLS viewer
-        // Also check RECORD_AUDIO permission - required for FOREGROUND_SERVICE_TYPE_MICROPHONE
-        val hasAudioPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true // Permissions are granted at install time pre-M
-        }
-
-        android.util.Log.d("CallFGService", "onStop: isInActiveMeeting=$isInActiveMeeting, isFinishing=$isFinishing, hasAudioPermission=$hasAudioPermission")
-
-        if (isInActiveMeeting && !isFinishing && hasAudioPermission) {
-            try {
-                CallForegroundService.start(this, callNotificationConfig)
-            } catch (e: Exception) {
-                android.util.Log.e("CallFGService", "Failed to start foreground service", e)
-            }
+        // App going to background - update notification to show description
+        // Don't update if activity is finishing (user leaving)
+        if (isInActiveMeeting && !isFinishing) {
+            CallForegroundService.updateNotification(this, showDescription = true)
         }
     }
 
