@@ -2,6 +2,7 @@ package live.hms.roomkit.ui.meeting
 
 import android.Manifest
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
@@ -1726,6 +1727,12 @@ class MeetingViewModel(
                         && track.type == HMSTrackType.VIDEO)
             ) {
                 _tracks.remove(meetingTrack)
+
+                // Update isScreenShare when local peer's screenshare track is removed
+                // This handles the case when user stops screenshare via notification action button
+                if (peer.isLocal && track.source == HMSTrackSource.SCREEN && track.type == HMSTrackType.VIDEO) {
+                    isScreenShare.postValue(false)
+                }
             }
 
             // Update the view as some track has been removed
