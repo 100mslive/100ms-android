@@ -1,12 +1,16 @@
 package live.hms.roomkit.ui.meeting
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.RECORD_AUDIO
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -26,6 +30,7 @@ import live.hms.roomkit.ui.notification.CardStackListener
 import live.hms.roomkit.ui.notification.Direction
 import live.hms.roomkit.ui.notification.HMSNotification
 import live.hms.roomkit.ui.notification.HMSNotificationAdapter
+ import live.hms.roomkit.ui.notification.CallNotificationConfig
 import live.hms.roomkit.ui.notification.HMSNotificationDiffCallBack
 import live.hms.roomkit.ui.notification.HMSNotificationType
 import live.hms.roomkit.ui.polls.display.PollDisplayFragment
@@ -58,6 +63,49 @@ class MeetingActivity : AppCompatActivity() {
         )
     }
 
+    // Track if user is in an active meeting (non-HLS) for foreground service
+    private var isInActiveMeeting = false
+
+    // Notification config from HMSPrebuiltOptions for foreground service
+    private var callNotificationConfig: CallNotificationConfig? = null
+
+    /**
+     * Updates the active meeting state based on joined status and participant type.
+     * Called when either joined or showAudioIcon LiveData changes.
+     * - joined: true when user has joined the meeting
+     * - showAudioIcon: true for regular participants, false for HLS viewers
+     *
+     * Starts the foreground service when user joins (while app is in foreground)
+     */
+    private fun updateActiveMeetingState() {
+        val joined = meetingViewModel.joined.value == true
+        val isRegularParticipant = meetingViewModel.showAudioIcon.value == true
+        val wasInActiveMeeting = isInActiveMeeting
+        isInActiveMeeting = joined && isRegularParticipant
+
+        // Start service when user joins meeting (while app is still in foreground)
+        if (isInActiveMeeting && !wasInActiveMeeting) {
+            val hasAudioPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+            } else {
+                true
+            }
+            if (hasAudioPermission) {
+                try {
+                    // Start with showDescription=false since app is in foreground
+                    CallForegroundService.start(this, callNotificationConfig, showDescription = false)
+                } catch (e: Exception) {
+                    android.util.Log.e("CallFGService", "Failed to start foreground service on join", e)
+                }
+            }
+        }
+
+        // Stop service when user leaves the meeting
+        if (!isInActiveMeeting && wasInActiveMeeting) {
+            CallForegroundService.stop(this)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMeetingBinding.inflate(layoutInflater)
@@ -77,6 +125,9 @@ class MeetingActivity : AppCompatActivity() {
 
         val hmsPrebuiltOption: HMSPrebuiltOptions? =
             intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
+
+        // Store notification config for foreground service
+        callNotificationConfig = hmsPrebuiltOption?.callNotificationConfig
 
         val roomCode: String = intent?.getStringExtra(ROOM_CODE)?:""
         val token: String = intent?.getStringExtra(TOKEN)?:""
@@ -98,19 +149,50 @@ class MeetingActivity : AppCompatActivity() {
         lifecycleScope.launch {
             meetingViewModel.events.collect { event ->
                 if (event is MeetingViewModel.Event.RequestPermission) {
-                    requestedPermissions = event.permissions
-                    requestPermissionLauncher.launch(event.permissions)
+                    // Add POST_NOTIFICATIONS to the permission request on Android 13+
+                    // This is needed for foreground service notification to be visible
+                    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        event.permissions + POST_NOTIFICATIONS
+                    } else {
+                        event.permissions
+                    }
+                    requestedPermissions = permissions
+                    requestPermissionLauncher.launch(permissions)
                 }
             }
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        // App came to foreground - update notification to hide description
+        if (isInActiveMeeting) {
+            CallForegroundService.updateNotification(this, showDescription = false)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // App going to background - update notification to show description
+        // Don't update if activity is finishing (user leaving)
+        if (isInActiveMeeting && !isFinishing) {
+            CallForegroundService.updateNotification(this, showDescription = true)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        // Ensure service is stopped when activity is destroyed
+        CallForegroundService.stop(this)
         _binding = null
     }
 
     private fun initObservers() {
+        // Track active meeting state for foreground service
+        // showAudioIcon is true for regular participants, false for HLS viewers
+        meetingViewModel.joined.observe(this) { updateActiveMeetingState() }
+        meetingViewModel.showAudioIcon.observe(this) { updateActiveMeetingState() }
+
         meetingViewModel.recordingState.observe(this) {
             invalidateOptionsMenu()
         }
@@ -310,13 +392,20 @@ class MeetingActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) {
-        if (it.containsKey(POST_NOTIFICATIONS)) {
+    ) { results ->
+        // Check if this was a screenshare-only permission request (only POST_NOTIFICATIONS)
+        val isScreensharePermissionRequest = results.size == 1 && results.containsKey(POST_NOTIFICATIONS)
+        if (isScreensharePermissionRequest) {
             meetingViewModel.screenshareRequest.value = Unit
+            return@registerForActivityResult
         }
-        // Do not prevent joining if bluetooth connect is denied.
-        else if (it.values.all { granted -> granted }) meetingViewModel.permissionGranted()
-        else {
+
+        // For meeting permissions, check if critical permissions (excluding POST_NOTIFICATIONS) are granted
+        // POST_NOTIFICATIONS is optional - meeting works without it, just notification won't show
+        val criticalPermissions = results.filterKeys { it != POST_NOTIFICATIONS }
+        if (criticalPermissions.values.all { granted -> granted }) {
+            meetingViewModel.permissionGranted()
+        } else {
             // Leave the meeting
             meetingViewModel.leaveMeeting(null)
             // Close our activity to return to whatever the user had before

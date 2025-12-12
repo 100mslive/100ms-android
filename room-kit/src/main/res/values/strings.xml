@@ -279,4 +279,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="toggle_vb">Toggle VB</string>
+
+    <!-- Call Foreground Service Notification -->
+    <string name="call_notification_channel_name">Ongoing Call</string>
+    <string name="call_notification_channel_description">Shows when you\'re in an active call</string>
+    <string name="call_notification_title">Call in progress</string>
+    <string name="call_notification_text">Tap to return to the call</string>
 </resources>
