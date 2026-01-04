@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import android.Manifest.permission.RECORD_AUDIO
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,9 +8,11 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import live.hms.roomkit.R
@@ -140,21 +143,32 @@ class CallForegroundService : Service() {
         if (!isServiceStarted) {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    // Check if we have microphone permission to determine service type
+                    val hasMicPermission = checkSelfPermission(RECORD_AUDIO) ==
+                        PackageManager.PERMISSION_GRANTED
+                    val serviceType = if (hasMicPermission) {
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                    } else {
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                    }
+                    Log.d("CallFGService", "Using service type: ${if (hasMicPermission) "MICROPHONE" else "MEDIA_PLAYBACK"}")
                     startForeground(
                         NOTIFICATION_ID,
                         notification,
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                        serviceType
                     )
                 } else {
                     startForeground(NOTIFICATION_ID, notification)
                 }
                 isServiceStarted = true
+                Log.d("CallFGService", "Foreground service started successfully")
             } catch (e: SecurityException) {
-                // On Android 14+, MICROPHONE type may fail if app is not in eligible state
-                // Log the error and stop the service gracefully instead of crashing
-                android.util.Log.e("CallFGService", "Failed to start foreground service with MICROPHONE type", e)
+                // On Android 14+, service type may fail if app is not in eligible state
+                Log.e("CallFGService", "Failed to start foreground service", e)
                 stopSelf()
             }
+        } else {
+            Log.d("CallFGService", "Service already started, skipping startForeground")
         }
 
         return START_NOT_STICKY
