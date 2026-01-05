@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -101,17 +102,17 @@ class MeetingActivity : AppCompatActivity() {
         val wasInActiveMeeting = isInActiveMeeting
         isInActiveMeeting = joined
 
-        android.util.Log.d("CallFGService", "updateActiveMeetingState: joined=$joined, wasInActiveMeeting=$wasInActiveMeeting, isInActiveMeeting=$isInActiveMeeting")
+        Log.d("CallFGService", "updateActiveMeetingState: joined=$joined, wasInActiveMeeting=$wasInActiveMeeting, isInActiveMeeting=$isInActiveMeeting")
 
         // Start service when user joins meeting (while app is still in foreground)
         if (isInActiveMeeting && !wasInActiveMeeting) {
             try {
                 CallForegroundService.start(this, callNotificationConfig, showDescription = false)
             } catch (e: Exception) {
-                android.util.Log.e("CallFGService", "Failed to start foreground service on join", e)
+                Log.e("CallFGService", "Failed to start foreground service on join", e)
             }
         } else {
-            android.util.Log.d("CallFGService", "Not starting service: isInActiveMeeting=$isInActiveMeeting, wasInActiveMeeting=$wasInActiveMeeting")
+           Log.d("CallFGService", "Not starting service: isInActiveMeeting=$isInActiveMeeting, wasInActiveMeeting=$wasInActiveMeeting")
         }
 
         // Stop service when user leaves the meeting
