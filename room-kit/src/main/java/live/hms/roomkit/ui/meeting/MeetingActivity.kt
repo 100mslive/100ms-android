@@ -102,8 +102,6 @@ class MeetingActivity : AppCompatActivity() {
         val wasInActiveMeeting = isInActiveMeeting
         isInActiveMeeting = joined
 
-        Log.d("CallFGService", "updateActiveMeetingState: joined=$joined, wasInActiveMeeting=$wasInActiveMeeting, isInActiveMeeting=$isInActiveMeeting")
-
         // Start service when user joins meeting (while app is still in foreground)
         if (isInActiveMeeting && !wasInActiveMeeting) {
             try {

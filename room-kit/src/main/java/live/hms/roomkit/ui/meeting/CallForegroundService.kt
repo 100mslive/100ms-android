@@ -151,7 +151,6 @@ class CallForegroundService : Service() {
                     } else {
                         ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
                     }
-                    Log.d("CallFGService", "Using service type: ${if (hasMicPermission) "MICROPHONE" else "MEDIA_PLAYBACK"}")
                     startForeground(
                         NOTIFICATION_ID,
                         notification,
@@ -161,7 +160,6 @@ class CallForegroundService : Service() {
                     startForeground(NOTIFICATION_ID, notification)
                 }
                 isServiceStarted = true
-                Log.d("CallFGService", "Foreground service started successfully")
             } catch (e: SecurityException) {
                 // On Android 14+, service type may fail if app is not in eligible state
                 Log.e("CallFGService", "Failed to start foreground service", e)
