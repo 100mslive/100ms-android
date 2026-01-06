@@ -1458,6 +1458,10 @@ fun PauseWhenLeaving(player : HmsHlsPlayer, playInstead :() -> Unit) {
                 }
             }
 
+            Lifecycle.Event.ON_DESTROY -> {
+                player.stop()
+            }
+
             else -> {}
         }
     }
