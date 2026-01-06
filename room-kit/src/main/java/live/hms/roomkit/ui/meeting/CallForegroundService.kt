@@ -142,22 +142,30 @@ class CallForegroundService : Service() {
 
         if (!isServiceStarted) {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    // Check if we have microphone permission to determine service type
-                    val hasMicPermission = checkSelfPermission(RECORD_AUDIO) ==
-                        PackageManager.PERMISSION_GRANTED
-                    val serviceType = if (hasMicPermission) {
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-                    } else {
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                when {
+                    // Android 11+ (API 30+): Use MICROPHONE or MEDIA_PLAYBACK based on permission
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                        val hasMicPermission = checkSelfPermission(RECORD_AUDIO) ==
+                            PackageManager.PERMISSION_GRANTED
+                        val serviceType = if (hasMicPermission) {
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                        } else {
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                        }
+                        startForeground(NOTIFICATION_ID, notification, serviceType)
                     }
-                    startForeground(
-                        NOTIFICATION_ID,
-                        notification,
-                        serviceType
-                    )
-                } else {
-                    startForeground(NOTIFICATION_ID, notification)
+                    // Android 10 (API 29): Use MEDIA_PLAYBACK only (MICROPHONE not available)
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                        startForeground(
+                            NOTIFICATION_ID,
+                            notification,
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                        )
+                    }
+                    // Android 9 and below: No service type needed
+                    else -> {
+                        startForeground(NOTIFICATION_ID, notification)
+                    }
                 }
                 isServiceStarted = true
             } catch (e: SecurityException) {
