@@ -1,10 +1,11 @@
 package live.hms.roomkit.ui.meeting
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import android.Manifest.permission.RECORD_AUDIO
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.content.ContextCompat
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -69,35 +70,47 @@ class MeetingActivity : AppCompatActivity() {
     // Notification config from HMSPrebuiltOptions for foreground service
     private var callNotificationConfig: CallNotificationConfig? = null
 
+    // Launcher for requesting notification permission on Android 13+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // Permission result doesn't affect flow - service will start regardless. Notification just won't show if permission was denied
+    }
+
+
+    // Request POST_NOTIFICATIONS permission on Android 13+ if not already granted.
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ContextCompat.checkSelfPermission(
+                this,
+                POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!hasPermission) {
+                notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
+            }
+        }
+    }
+
     /**
-     * Updates the active meeting state based on joined status and participant type.
-     * Called when either joined or showAudioIcon LiveData changes.
-     * - joined: true when user has joined the meeting
-     * - showAudioIcon: true for regular participants, false for HLS viewers
-     *
-     * Starts the foreground service when user joins (while app is in foreground)
+     * Updates the active meeting state based on joined status.
+     * Starts the foreground service when user joins (any role).
+     * Uses MICROPHONE type for users with mic permission, MEDIA_PLAYBACK for viewers.
      */
     private fun updateActiveMeetingState() {
         val joined = meetingViewModel.joined.value == true
-        val isRegularParticipant = meetingViewModel.showAudioIcon.value == true
         val wasInActiveMeeting = isInActiveMeeting
-        isInActiveMeeting = joined && isRegularParticipant
+        isInActiveMeeting = joined
 
         // Start service when user joins meeting (while app is still in foreground)
         if (isInActiveMeeting && !wasInActiveMeeting) {
-            val hasAudioPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
-            } else {
-                true
+            try {
+                CallForegroundService.start(this, callNotificationConfig, showDescription = false)
+            } catch (e: Exception) {
+                Log.e("CallFGService", "Failed to start foreground service on join", e)
             }
-            if (hasAudioPermission) {
-                try {
-                    // Start with showDescription=false since app is in foreground
-                    CallForegroundService.start(this, callNotificationConfig, showDescription = false)
-                } catch (e: Exception) {
-                    android.util.Log.e("CallFGService", "Failed to start foreground service on join", e)
-                }
-            }
+        } else {
+           Log.d("CallFGService", "Not starting service: isInActiveMeeting=$isInActiveMeeting, wasInActiveMeeting=$wasInActiveMeeting")
         }
 
         // Stop service when user leaves the meeting
@@ -112,6 +125,9 @@ class MeetingActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         settingsStore = SettingsStore(this)
+
+        // Request notification permission on Android 13+ for foreground service notification
+        requestNotificationPermissionIfNeeded()
 
         val deferringInsetsListener = RootViewDeferringInsetsCallback(
             persistentInsetTypes = WindowInsetsCompat.Type.systemBars(),
@@ -188,11 +204,8 @@ class MeetingActivity : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        // Track active meeting state for foreground service
-        // showAudioIcon is true for regular participants, false for HLS viewers
+        // Start foreground service when user joins the meeting (any role)
         meetingViewModel.joined.observe(this) { updateActiveMeetingState() }
-        meetingViewModel.showAudioIcon.observe(this) { updateActiveMeetingState() }
-
         meetingViewModel.recordingState.observe(this) {
             invalidateOptionsMenu()
         }

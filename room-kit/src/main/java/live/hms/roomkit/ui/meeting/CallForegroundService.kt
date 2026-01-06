@@ -1,5 +1,6 @@
 package live.hms.roomkit.ui.meeting
 
+import android.Manifest.permission.RECORD_AUDIO
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,9 +8,11 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import live.hms.roomkit.R
@@ -33,6 +36,13 @@ class CallForegroundService : Service() {
     companion object {
         private const val CHANNEL_ID = "hms_call_channel"
         private const val NOTIFICATION_ID = 100
+
+        /**
+         * Flag to check if the foreground service is running.
+         * Used by HLS player to determine if it should pause when app goes to background.
+         */
+        var isRunning: Boolean = false
+            private set
 
         private const val EXTRA_SMALL_ICON = "extra_small_icon"
         private const val EXTRA_LARGE_ICON = "extra_large_icon"
@@ -139,22 +149,40 @@ class CallForegroundService : Service() {
 
         if (!isServiceStarted) {
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    startForeground(
-                        NOTIFICATION_ID,
-                        notification,
-                        ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-                    )
-                } else {
-                    startForeground(NOTIFICATION_ID, notification)
+                when {
+                    // Android 11+ (API 30+): Use MICROPHONE or MEDIA_PLAYBACK based on permission
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                        val hasMicPermission = checkSelfPermission(RECORD_AUDIO) ==
+                            PackageManager.PERMISSION_GRANTED
+                        val serviceType = if (hasMicPermission) {
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                        } else {
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                        }
+                        startForeground(NOTIFICATION_ID, notification, serviceType)
+                    }
+                    // Android 10 (API 29): Use MEDIA_PLAYBACK only (MICROPHONE not available)
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                        startForeground(
+                            NOTIFICATION_ID,
+                            notification,
+                            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+                        )
+                    }
+                    // Android 9 and below: No service type needed
+                    else -> {
+                        startForeground(NOTIFICATION_ID, notification)
+                    }
                 }
                 isServiceStarted = true
+                isRunning = true
             } catch (e: SecurityException) {
-                // On Android 14+, MICROPHONE type may fail if app is not in eligible state
-                // Log the error and stop the service gracefully instead of crashing
-                android.util.Log.e("CallFGService", "Failed to start foreground service with MICROPHONE type", e)
+                // On Android 14+, service type may fail if app is not in eligible state
+                Log.e("CallFGService", "Failed to start foreground service", e)
                 stopSelf()
             }
+        } else {
+            Log.d("CallFGService", "Service already started, skipping startForeground")
         }
 
         return START_NOT_STICKY
@@ -166,6 +194,7 @@ class CallForegroundService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         isServiceStarted = false
+        isRunning = false
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 

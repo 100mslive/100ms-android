@@ -112,6 +112,7 @@ import live.hms.roomkit.databinding.HlsFragmentLayoutBinding
 import live.hms.roomkit.databinding.LayoutChatMergeBinding
 import live.hms.roomkit.hideKeyboard
 import live.hms.roomkit.setOnSingleClickListener
+import live.hms.roomkit.ui.meeting.CallForegroundService
 import live.hms.roomkit.ui.meeting.ClosedCaptionsForEveryone
 import live.hms.roomkit.ui.meeting.HlsVideoQualitySelectorBottomSheet
 import live.hms.roomkit.ui.meeting.MeetingFragment
@@ -1442,7 +1443,10 @@ fun PauseWhenLeaving(player : HmsHlsPlayer, playInstead :() -> Unit) {
         when(event)
         {
             Lifecycle.Event.ON_PAUSE -> {
-                player.pause()
+                // Only pause if foreground service is NOT running  - This allows HLS audio to continue playing in background
+                if (!CallForegroundService.isRunning) {
+                    player.pause()
+                }
             }
 
             Lifecycle.Event.ON_RESUME -> {
@@ -1452,6 +1456,10 @@ fun PauseWhenLeaving(player : HmsHlsPlayer, playInstead :() -> Unit) {
                     player.resume()
                     player.seekToLivePosition()
                 }
+            }
+
+            Lifecycle.Event.ON_DESTROY -> {
+                player.stop()
             }
 
             else -> {}
