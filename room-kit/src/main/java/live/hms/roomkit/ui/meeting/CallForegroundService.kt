@@ -37,6 +37,13 @@ class CallForegroundService : Service() {
         private const val CHANNEL_ID = "hms_call_channel"
         private const val NOTIFICATION_ID = 100
 
+        /**
+         * Flag to check if the foreground service is running.
+         * Used by HLS player to determine if it should pause when app goes to background.
+         */
+        var isRunning: Boolean = false
+            private set
+
         private const val EXTRA_SMALL_ICON = "extra_small_icon"
         private const val EXTRA_LARGE_ICON = "extra_large_icon"
         private const val EXTRA_TITLE = "extra_title"
@@ -168,6 +175,7 @@ class CallForegroundService : Service() {
                     }
                 }
                 isServiceStarted = true
+                isRunning = true
             } catch (e: SecurityException) {
                 // On Android 14+, service type may fail if app is not in eligible state
                 Log.e("CallFGService", "Failed to start foreground service", e)
@@ -186,6 +194,7 @@ class CallForegroundService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         isServiceStarted = false
+        isRunning = false
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
