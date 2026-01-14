@@ -16,7 +16,11 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import live.hms.roomkit.R
+import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.notification.CallNotificationConfig
+import live.hms.roomkit.util.ROOM_CODE
+import live.hms.roomkit.util.ROOM_PREBUILT
+import live.hms.roomkit.util.TOKEN
 import androidx.core.graphics.createBitmap
 
 /**
@@ -51,6 +55,9 @@ class CallForegroundService : Service() {
         private const val EXTRA_CHANNEL_NAME = "extra_channel_name"
         private const val EXTRA_CHANNEL_DESCRIPTION = "extra_channel_description"
         private const val EXTRA_SHOW_DESCRIPTION = "extra_show_description"
+        private const val EXTRA_ROOM_CODE = "extra_room_code"
+        private const val EXTRA_TOKEN = "extra_token"
+        private const val EXTRA_PREBUILT_OPTIONS = "extra_prebuilt_options"
 
         private const val ACTION_UPDATE_NOTIFICATION = "action_update_notification"
 
@@ -61,8 +68,18 @@ class CallForegroundService : Service() {
          * @param context The context to start the service from
          * @param config Optional notification configuration for custom branding
          * @param showDescription Whether to show the notification description text
+         * @param roomCode The room code for the meeting (used for notification tap intent)
+         * @param token The auth token for the meeting (used for notification tap intent)
+         * @param prebuiltOptions The prebuilt options (used for notification tap intent)
          */
-        fun start(context: Context, config: CallNotificationConfig? = null, showDescription: Boolean = false) {
+        fun start(
+            context: Context,
+            config: CallNotificationConfig? = null,
+            showDescription: Boolean = false,
+            roomCode: String? = null,
+            token: String? = null,
+            prebuiltOptions: HMSPrebuiltOptions? = null
+        ) {
             val intent = Intent(context, CallForegroundService::class.java).apply {
                 config?.let {
                     it.smallIcon?.let { icon -> putExtra(EXTRA_SMALL_ICON, icon) }
@@ -73,6 +90,10 @@ class CallForegroundService : Service() {
                     it.channelDescription?.let { desc -> putExtra(EXTRA_CHANNEL_DESCRIPTION, desc) }
                 }
                 putExtra(EXTRA_SHOW_DESCRIPTION, showDescription)
+                // Pass meeting info for notification tap intent
+                roomCode?.let { putExtra(EXTRA_ROOM_CODE, it) }
+                token?.let { putExtra(EXTRA_TOKEN, it) }
+                prebuiltOptions?.let { putExtra(EXTRA_PREBUILT_OPTIONS, it) }
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -116,6 +137,11 @@ class CallForegroundService : Service() {
     private var channelDescription: String? = null
     private var showDescription: Boolean = false
 
+    // Meeting info for notification tap intent
+    private var meetingRoomCode: String? = null
+    private var meetingToken: String? = null
+    private var meetingPrebuiltOptions: HMSPrebuiltOptions? = null
+
     private var isServiceStarted = false
 
     override fun onCreate() {
@@ -140,6 +166,15 @@ class CallForegroundService : Service() {
             channelName = it.getStringExtra(EXTRA_CHANNEL_NAME)
             channelDescription = it.getStringExtra(EXTRA_CHANNEL_DESCRIPTION)
             showDescription = it.getBooleanExtra(EXTRA_SHOW_DESCRIPTION, false)
+            // Extract meeting info for notification tap intent
+            meetingRoomCode = it.getStringExtra(EXTRA_ROOM_CODE)
+            meetingToken = it.getStringExtra(EXTRA_TOKEN)
+            meetingPrebuiltOptions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                it.getParcelableExtra(EXTRA_PREBUILT_OPTIONS, HMSPrebuiltOptions::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                it.getParcelableExtra(EXTRA_PREBUILT_OPTIONS)
+            }
         }
 
         // Create channel after extracting config (channel name may be customized)
@@ -224,8 +259,12 @@ class CallForegroundService : Service() {
 
     private fun createNotification(): Notification {
         // Create intent to return to MeetingActivity when notification is tapped
+        // Include meeting info so activity can be properly recreated if it was destroyed
         val tapIntent = Intent(this, MeetingActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            meetingRoomCode?.let { putExtra(ROOM_CODE, it) }
+            meetingToken?.let { putExtra(TOKEN, it) }
+            meetingPrebuiltOptions?.let { putExtra(ROOM_PREBUILT, it) }
         }
 
         val pendingIntent = PendingIntent.getActivity(
