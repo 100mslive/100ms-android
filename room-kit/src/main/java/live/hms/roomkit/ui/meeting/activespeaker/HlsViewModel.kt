@@ -2,8 +2,11 @@ package live.hms.roomkit.ui.meeting.activespeaker
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
@@ -89,8 +92,16 @@ import live.hms.video.sdk.HMSSDK
                     hlsPlayerBeganToPlay(state)
                     isPlaying.postValue(true)
                 } else if (state == HmsHlsPlaybackState.stopped) {
-                    // Stop foreground service immediately - stream has ended
-                    CallForegroundService.stop(getApplication())
+                    // Check if app is in background (lifecycle not at least STARTED)
+                    val isAppInBackground = !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+
+                    if (isAppInBackground) {
+                        // In background: LiveData observers are paused, so we need to explicitly stop
+                        CallForegroundService.stop(getApplication())
+                        Log.d("HLSDEBUG", "Reached here, closing player")
+                        player.stop()
+                    }
+                    // In foreground: normal flow via streamEndedEvent observer will handle service/player stop
 
                     // Open end stream fragment.
                     hlsPlayerBeganToPlay(state)

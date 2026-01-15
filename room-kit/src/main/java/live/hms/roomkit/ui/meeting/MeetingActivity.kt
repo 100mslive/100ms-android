@@ -214,7 +214,6 @@ class MeetingActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // TEST: Commented out to test notification tap crash
          CallForegroundService.stop(this)
         _binding = null
     }

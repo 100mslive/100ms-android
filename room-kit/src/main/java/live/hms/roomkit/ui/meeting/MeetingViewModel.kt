@@ -16,6 +16,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -1313,8 +1314,18 @@ class MeetingViewModel(
             }
 
             override fun onRemovedFromRoom(notification: HMSRemovedFromRoom) {
-                // Stop foreground service immediately - this callback runs even when app is in background
-                CallForegroundService.stop(getApplication())
+                // Check if app is in background (lifecycle not at least STARTED)
+                val isAppInBackground = !ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+
+                if (isAppInBackground) {
+                    // In background: LiveData observers are paused, so we need to explicitly stop
+                    CallForegroundService.stop(getApplication())
+
+                    // Stop HLS Player - must be on main thread (ExoPlayer requirement)
+                    viewModelScope.launch(Dispatchers.Main) {
+                        hmsPlayer?.stop()
+                    }
+                }
 
                 // Display a dialog that says they've been removed by X for Y with an ok button.
                 state.postValue(MeetingState.ForceLeave(notification))
@@ -2754,6 +2765,10 @@ class MeetingViewModel(
     var hmsPlayer : HmsHlsPlayer? = null
     fun setHLSPlayer(player: HmsHlsPlayer) {
         hmsPlayer = player
+    }
+
+    fun clearHLSPlayer() {
+        hmsPlayer = null
     }
 
     fun getHLSPLayer() = hmsPlayer

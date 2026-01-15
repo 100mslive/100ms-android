@@ -229,6 +229,9 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
     @UnstableApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Set HLS player reference in MeetingViewModel so it can be stopped from onRemovedFromRoom
+        meetingViewModel.setHLSPlayer(player)
+
         hlsViewModel.streamEndedEvent.observe(viewLifecycleOwner) {
             player.stop()
             StreamEnded.launch(parentFragmentManager)
@@ -468,6 +471,12 @@ private const val MILLI_SECONDS_FROM_LIVE = 10_000
 
     private fun openPolls() {
         findNavController().navigate(MeetingFragmentDirections.actionMeetingFragmentToPollsCreationFragment())
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Clear HLS player reference to avoid stale references when switching modes
+        meetingViewModel.clearHLSPlayer()
     }
 
     private fun statsObservers() {
