@@ -16,6 +16,7 @@ import live.hms.hls_player.HmsHlsException
 import live.hms.hls_player.HmsHlsPlaybackEvents
 import live.hms.hls_player.HmsHlsPlaybackState
 import live.hms.hls_player.HmsHlsPlayer
+import live.hms.roomkit.ui.meeting.CallForegroundService
 import live.hms.roomkit.util.SingleLiveEvent
 import live.hms.video.sdk.HMSSDK
 
@@ -88,6 +89,9 @@ import live.hms.video.sdk.HMSSDK
                     hlsPlayerBeganToPlay(state)
                     isPlaying.postValue(true)
                 } else if (state == HmsHlsPlaybackState.stopped) {
+                    // Stop foreground service immediately - stream has ended
+                    CallForegroundService.stop(getApplication())
+
                     // Open end stream fragment.
                     hlsPlayerBeganToPlay(state)
                     streamEndedEvent.postValue(Unit)

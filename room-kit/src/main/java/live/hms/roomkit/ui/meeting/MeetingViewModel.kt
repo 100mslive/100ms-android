@@ -27,6 +27,7 @@ import live.hms.roomkit.HMSPluginScope
 import live.hms.roomkit.R
 import live.hms.roomkit.ui.HMSPrebuiltOptions
 import live.hms.roomkit.ui.meeting.activespeaker.ActiveSpeakerHandler
+import live.hms.roomkit.ui.meeting.CallForegroundService
 import live.hms.roomkit.ui.meeting.bottomsheets.StreamState
 import live.hms.roomkit.ui.meeting.chat.ChatMessage
 import live.hms.roomkit.ui.meeting.chat.Recipient
@@ -1312,6 +1313,9 @@ class MeetingViewModel(
             }
 
             override fun onRemovedFromRoom(notification: HMSRemovedFromRoom) {
+                // Stop foreground service immediately - this callback runs even when app is in background
+                CallForegroundService.stop(getApplication())
+
                 // Display a dialog that says they've been removed by X for Y with an ok button.
                 state.postValue(MeetingState.ForceLeave(notification))
             }
