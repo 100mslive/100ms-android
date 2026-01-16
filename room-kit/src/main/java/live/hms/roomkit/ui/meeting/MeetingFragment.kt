@@ -355,22 +355,6 @@ class MeetingFragment : Fragment() {
         initObservers()
         initOnBackPress()
 
-        // TEST BUTTON - Remove after testing
-//        android.widget.Button(requireContext()).apply {
-//            text = "TEST: Kill Activity"
-//            setOnClickListener {
-//                // Finish activity without stopping the foreground service
-//                activity?.finishAndRemoveTask()
-//            }
-//            binding.meetingContainer.addView(this, RelativeLayout.LayoutParams(
-//                RelativeLayout.LayoutParams.WRAP_CONTENT,
-//                RelativeLayout.LayoutParams.WRAP_CONTENT
-//            ).apply {
-//                addRule(RelativeLayout.CENTER_HORIZONTAL)
-//                topMargin = 200
-//            })
-//        }
-
         meetingViewModel.countDownTimerStartedAt.observe(viewLifecycleOwner) { startedAt ->
             if (startedAt != null) {
                 binding.tvStreamingTime.visibility = View.VISIBLE
