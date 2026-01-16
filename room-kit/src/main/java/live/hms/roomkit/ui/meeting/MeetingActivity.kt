@@ -134,10 +134,6 @@ class MeetingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        val hmsPrebuiltOption1: HMSPrebuiltOptions? =
-//            intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
-//        Log.d("MeetingActivity", "onCreate called")
-//        Log.d("MeetingActivity", "options: $hmsPrebuiltOption1")
         _binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -165,7 +161,7 @@ class MeetingActivity : AppCompatActivity() {
         callNotificationConfig = meetingPrebuiltOptions?.callNotificationConfig
 
         if (meetingRoomCode.isNullOrEmpty() && meetingToken.isNullOrEmpty()) {
-            Toast.makeText(this, "Session expired. Please rejoin the meeting.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Room code or token is required", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -214,7 +210,7 @@ class MeetingActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-         CallForegroundService.stop(this)
+        CallForegroundService.stop(this)
         _binding = null
     }
 
