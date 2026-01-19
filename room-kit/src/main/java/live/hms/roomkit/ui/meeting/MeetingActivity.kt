@@ -1,6 +1,7 @@
 package live.hms.roomkit.ui.meeting
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
@@ -70,6 +71,11 @@ class MeetingActivity : AppCompatActivity() {
     // Notification config from HMSPrebuiltOptions for foreground service
     private var callNotificationConfig: CallNotificationConfig? = null
 
+    // Meeting info for foreground service notification tap intent
+    private var meetingRoomCode: String? = null
+    private var meetingToken: String? = null
+    private var meetingPrebuiltOptions: HMSPrebuiltOptions? = null
+
     // Launcher for requesting notification permission on Android 13+
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -105,7 +111,14 @@ class MeetingActivity : AppCompatActivity() {
         // Start service when user joins meeting (while app is still in foreground)
         if (isInActiveMeeting && !wasInActiveMeeting) {
             try {
-                CallForegroundService.start(this, callNotificationConfig, showDescription = false)
+                CallForegroundService.start(
+                    context = this,
+                    config = callNotificationConfig,
+                    showDescription = false,
+                    roomCode = meetingRoomCode,
+                    token = meetingToken,
+                    prebuiltOptions = meetingPrebuiltOptions
+                )
             } catch (e: Exception) {
                 Log.e("CallFGService", "Failed to start foreground service on join", e)
             }
@@ -139,23 +152,22 @@ class MeetingActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root, deferringInsetsListener)
 
 
-        val hmsPrebuiltOption: HMSPrebuiltOptions? =
-            intent!!.extras!![ROOM_PREBUILT] as? HMSPrebuiltOptions
+        // Extract meeting info from intent (null-safe to handle edge cases like notification tap)
+        meetingPrebuiltOptions = intent?.extras?.get(ROOM_PREBUILT) as? HMSPrebuiltOptions
+        meetingRoomCode = intent?.getStringExtra(ROOM_CODE) ?: ""
+        meetingToken = intent?.getStringExtra(TOKEN) ?: ""
 
         // Store notification config for foreground service
-        callNotificationConfig = hmsPrebuiltOption?.callNotificationConfig
+        callNotificationConfig = meetingPrebuiltOptions?.callNotificationConfig
 
-        val roomCode: String = intent?.getStringExtra(ROOM_CODE)?:""
-        val token: String = intent?.getStringExtra(TOKEN)?:""
-
-        if (roomCode.isEmpty() && token.isEmpty()) {
+        if (meetingRoomCode.isNullOrEmpty() && meetingToken.isNullOrEmpty()) {
             Toast.makeText(this, "Room code or token is required", Toast.LENGTH_SHORT).show()
             finish()
+            return
         }
 
-
         binding.progressBar.visibility = View.VISIBLE
-        meetingViewModel.initSdk(roomCode, token, hmsPrebuiltOption, null)
+        meetingViewModel.initSdk(meetingRoomCode ?: "", meetingToken ?: "", meetingPrebuiltOptions, null)
 
         initObservers()
 
@@ -198,7 +210,6 @@ class MeetingActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Ensure service is stopped when activity is destroyed
         CallForegroundService.stop(this)
         _binding = null
     }
