@@ -7,13 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPinnedVideoBinding
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
+import live.hms.roomkit.ui.meeting.MeetingViewMode
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -86,10 +89,38 @@ class PinnedVideoFragment : Fragment() {
     return binding.root
   }
 
+  private fun unpinAndGoBack() {
+    meetingViewModel.localPinnedTrack.postValue(null)
+    meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
+  }
+
+  private fun showUnpinConfirmDialog() {
+    val peerName = pinnedTrack?.peer?.name ?: return
+    AlertDialog.Builder(requireContext())
+      .setTitle("Unpin")
+      .setMessage("Unpin $peerName and return to grid view?")
+      .setPositiveButton("Unpin") { _, _ -> unpinAndGoBack() }
+      .setNegativeButton("Cancel", null)
+      .show()
+  }
+
   private fun initPinnedView() {
     binding.pinVideo.hmsVideoView.apply {
       setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
       disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
+    }
+
+    // Repurpose the maximize button as a "back to grid" button
+    binding.pinVideo.iconMaximised.apply {
+      setImageResource(R.drawable.ic_grid_view_24)
+      alpha = 1f
+      visibility = View.VISIBLE
+      setOnClickListener { unpinAndGoBack() }
+    }
+
+    // Tap pinned video to unpin with confirmation
+    binding.pinVideo.surfaceViewHolder.setOnClickListener {
+      showUnpinConfirmDialog()
     }
 
     updatePinnedVideoText()
