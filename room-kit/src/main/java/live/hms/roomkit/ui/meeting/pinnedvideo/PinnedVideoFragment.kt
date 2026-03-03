@@ -90,6 +90,10 @@ class PinnedVideoFragment : Fragment() {
   }
 
   private fun unpinAndGoBack() {
+    // If the current pin is a global spotlight, clear it for all peers
+    if (!meetingViewModel.pinnedTrackUiUseCase.isLocalTrackPinned) {
+      meetingViewModel.removeSpotlight()
+    }
     meetingViewModel.localPinnedTrack.postValue(null)
     meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
   }

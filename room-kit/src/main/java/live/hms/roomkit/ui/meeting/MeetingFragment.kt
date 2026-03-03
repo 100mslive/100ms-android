@@ -555,6 +555,15 @@ class MeetingFragment : Fragment() {
             requireActivity().invalidateOptionsMenu()
         }
 
+        // Auto-switch to pinned view when a global spotlight arrives
+        meetingViewModel.pinnedTrack.observe(viewLifecycleOwner) { track ->
+            if (track != null && meetingViewModel.meetingViewMode.value != MeetingViewMode.PINNED) {
+                meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
+            } else if (track == null && meetingViewModel.meetingViewMode.value == MeetingViewMode.PINNED) {
+                meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
+            }
+        }
+
         chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
             if(meetingViewModel.prebuiltInfoContainer.isChatEnabled()) {
                 if (count > 0) {

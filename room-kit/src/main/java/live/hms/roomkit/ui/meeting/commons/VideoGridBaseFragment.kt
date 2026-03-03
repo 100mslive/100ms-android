@@ -226,7 +226,10 @@ abstract class VideoGridBaseFragment : Fragment() {
         isLocalTrack = videoTrack is HMSLocalVideoTrack,
         onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
         onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
-        onMirror = { context.showMirrorOptions(surfaceView)}
+        onMirror = { context.showMirrorOptions(surfaceView)},
+        onSpotlight = if (meetingViewModel.isAllowedToSpotlight() && videoTrack?.trackId != null) {
+          { meetingViewModel.spotlightTrack(videoTrack.trackId) }
+        } else null
       )
     }
   }

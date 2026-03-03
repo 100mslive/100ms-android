@@ -553,6 +553,30 @@ class MeetingViewModel(
         }
     }
 
+    fun spotlightTrack(trackId: String) {
+        if (!::pinnedTrackUseCase.isInitialized) return
+        pinnedTrackUseCase.updatePinnedTrack(trackId, object : HMSActionResultListener {
+            override fun onSuccess() {
+                Log.d(TAG, "Spotlight set for trackId: $trackId")
+            }
+            override fun onError(error: HMSException) {
+                Log.e(TAG, "Failed to set spotlight: ${error.message}")
+            }
+        })
+    }
+
+    fun removeSpotlight() {
+        if (!::pinnedTrackUseCase.isInitialized) return
+        pinnedTrackUseCase.updatePinnedTrack(null, object : HMSActionResultListener {
+            override fun onSuccess() {
+                Log.d(TAG, "Spotlight removed")
+            }
+            override fun onError(error: HMSException) {
+                Log.e(TAG, "Failed to remove spotlight: ${error.message}")
+            }
+        })
+    }
+
     fun isAutoSimulcastEnabled() = settings.disableAutoSimulcast
 
     fun isGoLiveInPreBuiltEnabled() = settings.enableVideoFilter
@@ -1758,6 +1782,10 @@ class MeetingViewModel(
     fun getAvailableRoles(): List<HMSRole> = hmsSDK.getRoles()
 
     fun isAllowedToChangeRole(): Boolean {
+        return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
+    }
+
+    fun isAllowedToSpotlight(): Boolean {
         return hmsSDK.getLocalPeer()?.hmsRole?.permission?.changeRole == true
     }
 
