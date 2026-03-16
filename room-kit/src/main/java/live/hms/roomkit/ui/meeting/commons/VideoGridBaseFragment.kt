@@ -200,6 +200,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         if (item.video?.isDegraded == true ) binding.hmsVideoView.hide() else binding.hmsVideoView.show()
         binding.hmsVideoView.setOnClickListener {
+          meetingViewModel.preserveLocalVideoState()
           meetingViewModel.localPinnedTrack.postValue(item)
           meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
         }
@@ -227,6 +228,7 @@ abstract class VideoGridBaseFragment : Fragment() {
         onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
         onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
         onMirror = { context.showMirrorOptions(surfaceView)},
+        peerName = peerName,
         onSpotlight = if (meetingViewModel.isAllowedToSpotlight() && videoTrack?.trackId != null) {
           { meetingViewModel.spotlightTrack(videoTrack.trackId) }
         } else null

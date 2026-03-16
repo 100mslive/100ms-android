@@ -91,7 +91,7 @@ class PinnedVideoFragment : Fragment() {
 
   private fun unpinAndGoBack() {
     // If the current pin is a global spotlight, clear it for all peers
-    if (!meetingViewModel.pinnedTrackUiUseCase.isLocalTrackPinned) {
+    if (meetingViewModel.pinnedTrack.value != null) {
       meetingViewModel.removeSpotlight()
     }
     meetingViewModel.localPinnedTrack.postValue(null)
@@ -101,8 +101,8 @@ class PinnedVideoFragment : Fragment() {
   private fun showUnpinConfirmDialog() {
     val peerName = pinnedTrack?.peer?.name ?: return
     AlertDialog.Builder(requireContext())
-      .setTitle("Unpin")
-      .setMessage("Unpin $peerName and return to grid view?")
+      .setTitle("Unpin this user?")
+      .setMessage("Unpin \"$peerName\" and return to grid view?")
       .setPositiveButton("Unpin") { _, _ -> unpinAndGoBack() }
       .setNegativeButton("Cancel", null)
       .show()
@@ -118,13 +118,20 @@ class PinnedVideoFragment : Fragment() {
     binding.pinVideo.iconMaximised.apply {
       setImageResource(R.drawable.ic_grid_view_24)
       alpha = 1f
-      visibility = View.VISIBLE
       setOnClickListener { unpinAndGoBack() }
     }
 
     // Tap pinned video to unpin with confirmation
     binding.pinVideo.surfaceViewHolder.setOnClickListener {
       showUnpinConfirmDialog()
+    }
+
+    // Reactively show/hide unpin controls based on global spotlight state
+    meetingViewModel.pinnedTrack.observe(viewLifecycleOwner) { globalTrack ->
+      val isGlobalSpotlight = globalTrack != null
+      val canUnpin = !isGlobalSpotlight || meetingViewModel.isAllowedToSpotlight()
+      binding.pinVideo.iconMaximised.visibility = if (canUnpin) View.VISIBLE else View.GONE
+      binding.pinVideo.surfaceViewHolder.isClickable = canUnpin
     }
 
     updatePinnedVideoText()

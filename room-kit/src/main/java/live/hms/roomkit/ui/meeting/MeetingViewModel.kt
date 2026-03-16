@@ -834,6 +834,14 @@ class MeetingViewModel(
 
     fun isLocalVideoEnabled(): Boolean? = hmsSDK.getLocalPeer()?.videoTrack?.isMute?.not()
 
+    // Saved video state to restore after fragment transitions that cause SDK auto-mute
+    // (all sinks removed when grid is destroyed → SDK auto-mutes → TRACK_MUTED intercepts and restores)
+    private var savedLocalVideoEnabled: Boolean? = null
+
+    fun preserveLocalVideoState() {
+        savedLocalVideoEnabled = isLocalVideoEnabled()
+    }
+
     fun toggleLocalVideo() {
         hmsSDK.getLocalPeer()?.videoTrack?.let {
             setLocalVideoEnabled(it.isMute)
@@ -1283,7 +1291,14 @@ class MeetingViewModel(
                             if (track.type == HMSTrackType.AUDIO)
                                 isLocalAudioEnabled.postValue(peer.audioTrack?.isMute != true)
                             else if (track.type == HMSTrackType.VIDEO) {
-                                isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
+                                // If the SDK auto-muted during a fragment transition (pin/unpin),
+                                // restore the previous state instead of accepting the mute
+                                if (savedLocalVideoEnabled == true) {
+                                    savedLocalVideoEnabled = null
+                                    setLocalVideoEnabled(true)
+                                } else {
+                                    isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
+                                }
                             }
                         }
                     }
