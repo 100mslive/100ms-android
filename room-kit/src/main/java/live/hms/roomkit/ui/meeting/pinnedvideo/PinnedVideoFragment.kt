@@ -179,9 +179,6 @@ class PinnedVideoFragment : Fragment() {
   private fun changePinViewVideo(track: MeetingTrack) {
     binding.pinVideo.iconAudioOff.visibility = visibility(track.peer.audioTrack?.isMute == true)
 
-
-
-    binding.pinVideo.iconAudioOff.visibility = visibility(track.peer.audioTrack?.isMute == true)
     if (track == pinnedTrack) {
       return
     }
