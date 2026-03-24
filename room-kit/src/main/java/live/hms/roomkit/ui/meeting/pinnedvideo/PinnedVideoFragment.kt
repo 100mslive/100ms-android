@@ -94,6 +94,7 @@ class PinnedVideoFragment : Fragment() {
     if (meetingViewModel.pinnedTrack.value != null) {
       meetingViewModel.removeSpotlight()
     }
+    meetingViewModel.preserveLocalVideoState()
     meetingViewModel.localPinnedTrack.postValue(null)
     meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
   }
