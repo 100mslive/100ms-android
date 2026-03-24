@@ -1297,6 +1297,7 @@ class MeetingViewModel(
                                     savedLocalVideoEnabled = null
                                     setLocalVideoEnabled(true)
                                 } else {
+                                    savedLocalVideoEnabled = null
                                     isLocalVideoEnabled.postValue(peer.videoTrack?.isMute != true)
                                 }
                             }
