@@ -24,6 +24,7 @@ import live.hms.roomkit.util.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
 import hms.webrtc.RendererCommon
+import androidx.core.graphics.toColorInt
 
 class PinnedVideoFragment : Fragment() {
 
@@ -115,10 +116,14 @@ class PinnedVideoFragment : Fragment() {
       disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
     }
 
-    // Repurpose the maximize button as a "back to grid" button
+    // Repurpose the maximize button as an unpin/close button
     binding.pinVideo.iconMaximised.apply {
-      setImageResource(R.drawable.ic_grid_view_24)
+      setImageResource(R.drawable.ic_cross)
       alpha = 1f
+      background = android.graphics.drawable.GradientDrawable().apply {
+        shape = android.graphics.drawable.GradientDrawable.OVAL
+        setColor("#2D3440".toColorInt())
+      }
       setOnClickListener { unpinAndGoBack() }
     }
 
