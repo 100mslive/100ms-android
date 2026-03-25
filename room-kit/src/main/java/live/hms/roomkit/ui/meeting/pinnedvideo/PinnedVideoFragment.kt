@@ -54,6 +54,8 @@ class PinnedVideoFragment : Fragment() {
   // Determined using the onResume() and onPause()
   private var isViewVisible = false
 
+  private var wasLocalVideoOn: Boolean? = null
+
   override fun onResume() {
     super.onResume()
     Log.d(TAG, "onResume()")
@@ -62,6 +64,11 @@ class PinnedVideoFragment : Fragment() {
     handleOnPinVideoVisibilityChange()
 
     binding.recyclerViewVideos.adapter = videoListAdapter
+
+    // Restore camera state when returning from background
+    if (wasLocalVideoOn == true) {
+      meetingViewModel.setLocalVideoEnabled(true)
+    }
   }
 
   override fun onPause() {
@@ -70,6 +77,12 @@ class PinnedVideoFragment : Fragment() {
 
     isViewVisible = false
     handleOnPinVideoVisibilityChange()
+
+    // Mute camera on background to save battery, but not when switching view modes
+    wasLocalVideoOn = meetingViewModel.isLocalVideoEnabled() == true
+    if (wasLocalVideoOn == true && meetingViewModel.meetingViewMode.value == MeetingViewMode.PINNED) {
+      meetingViewModel.setLocalVideoEnabled(false)
+    }
 
     // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
     // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
@@ -95,7 +108,6 @@ class PinnedVideoFragment : Fragment() {
     if (meetingViewModel.pinnedTrack.value != null) {
       meetingViewModel.removeSpotlight()
     }
-    meetingViewModel.preserveLocalVideoState()
     meetingViewModel.localPinnedTrack.postValue(null)
     meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
   }

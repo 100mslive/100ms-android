@@ -201,7 +201,6 @@ abstract class VideoGridBaseFragment : Fragment() {
         if (item.video?.isDegraded == true ) binding.hmsVideoView.hide() else binding.hmsVideoView.show()
         // Use single click to prevent double-tap triggering two fragment transitions
         binding.hmsVideoView.setOnSingleClickListener {
-          meetingViewModel.preserveLocalVideoState()
           meetingViewModel.localPinnedTrack.postValue(item)
           meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
         }

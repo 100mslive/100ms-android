@@ -558,14 +558,11 @@ class MeetingFragment : Fragment() {
         // Auto-switch to pinned view when a global spotlight arrives
         meetingViewModel.pinnedTrack.observe(viewLifecycleOwner) { track ->
             if (track != null && meetingViewModel.meetingViewMode.value != MeetingViewMode.PINNED) {
-                meetingViewModel.preserveLocalVideoState()
                 meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
                 val peerName = track.peer?.name ?: "Someone"
                 Toast.makeText(requireContext(), "$peerName has been spotlighted", Toast.LENGTH_SHORT).show()
             } else if (track == null && meetingViewModel.meetingViewMode.value == MeetingViewMode.PINNED) {
-                meetingViewModel.preserveLocalVideoState()
                 meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
-                Toast.makeText(requireContext(), "Spotlight has been removed", Toast.LENGTH_SHORT).show()
             }
         }
 
