@@ -24,6 +24,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -553,6 +554,17 @@ class MeetingFragment : Fragment() {
             updateMeetingViewMode(it)
             Log.d(TAG, "Meeting view mode changed to $it")
             requireActivity().invalidateOptionsMenu()
+        }
+
+        // Auto-switch to pinned view when a global spotlight arrives
+        meetingViewModel.pinnedTrack.observe(viewLifecycleOwner) { track ->
+            if (track != null && meetingViewModel.meetingViewMode.value != MeetingViewMode.PINNED) {
+                meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
+                val peerName = track.peer?.name ?: "Someone"
+                Toast.makeText(requireContext(), "$peerName has been spotlighted", Toast.LENGTH_SHORT).show()
+            } else if (track == null && meetingViewModel.meetingViewMode.value == MeetingViewMode.PINNED) {
+                meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
+            }
         }
 
         chatViewModel.unreadMessagesCount.observe(viewLifecycleOwner) { count ->
@@ -1445,7 +1457,7 @@ class MeetingFragment : Fragment() {
             kotlin.runCatching { meetingViewModel.stopCurrentWhiteBoardSession() }
             //no permission required directly start screen share
             if (meetingViewModel.preRequestingPermissionForScreenShare().not())
-            startScreenShare()
+                startScreenShare()
         }
     }
 
@@ -1461,6 +1473,7 @@ class MeetingFragment : Fragment() {
     }
 
     //entry point to start PIP mode
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun launchPipMode() {
 
         activity?.enterPictureInPictureMode()

@@ -7,13 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentPinnedVideoBinding
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
+import live.hms.roomkit.ui.meeting.MeetingViewMode
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.MeetingViewModelFactory
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -21,6 +24,7 @@ import live.hms.roomkit.util.*
 import live.hms.video.sdk.models.enums.HMSPeerUpdate
 import live.hms.videoview.HMSVideoView
 import hms.webrtc.RendererCommon
+import androidx.core.graphics.toColorInt
 
 class PinnedVideoFragment : Fragment() {
 
@@ -50,6 +54,8 @@ class PinnedVideoFragment : Fragment() {
   // Determined using the onResume() and onPause()
   private var isViewVisible = false
 
+  private var wasLocalVideoOn: Boolean? = null
+
   override fun onResume() {
     super.onResume()
     Log.d(TAG, "onResume()")
@@ -58,6 +64,11 @@ class PinnedVideoFragment : Fragment() {
     handleOnPinVideoVisibilityChange()
 
     binding.recyclerViewVideos.adapter = videoListAdapter
+
+    // Restore camera state when returning from background
+    if (wasLocalVideoOn == true) {
+      meetingViewModel.setLocalVideoEnabled(true)
+    }
   }
 
   override fun onPause() {
@@ -66,6 +77,12 @@ class PinnedVideoFragment : Fragment() {
 
     isViewVisible = false
     handleOnPinVideoVisibilityChange()
+
+    // Mute camera on background to save battery, but not when switching view modes
+    wasLocalVideoOn = meetingViewModel.isLocalVideoEnabled() == true
+    if (wasLocalVideoOn == true && meetingViewModel.meetingViewMode.value == MeetingViewMode.PINNED) {
+      meetingViewModel.setLocalVideoEnabled(false)
+    }
 
     // Detaching the recycler view adapter calls [RecyclerView.Adapter::onViewDetachedFromWindow]
     // which performs the required cleanup of the ViewHolder (Releases SurfaceViewRenderer Egl.Context)
@@ -86,10 +103,53 @@ class PinnedVideoFragment : Fragment() {
     return binding.root
   }
 
+  private fun unpinAndGoBack() {
+    // If the current pin is a global spotlight, clear it for all peers
+    if (meetingViewModel.pinnedTrack.value != null) {
+      meetingViewModel.removeSpotlight()
+    }
+    meetingViewModel.localPinnedTrack.postValue(null)
+    meetingViewModel.setMeetingViewMode(MeetingViewMode.GRID)
+  }
+
+  private fun showUnpinConfirmDialog() {
+    val peerName = pinnedTrack?.peer?.name ?: return
+    AlertDialog.Builder(requireContext())
+      .setTitle("Unpin this user?")
+      .setMessage("Unpin \"$peerName\" and return to grid view?")
+      .setPositiveButton("Unpin") { _, _ -> unpinAndGoBack() }
+      .setNegativeButton("Cancel", null)
+      .show()
+  }
+
   private fun initPinnedView() {
     binding.pinVideo.hmsVideoView.apply {
       setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
       disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
+    }
+
+    // Repurpose the maximize button as an unpin/close button
+    binding.pinVideo.iconMaximised.apply {
+      setImageResource(R.drawable.ic_cross)
+      alpha = 1f
+      background = android.graphics.drawable.GradientDrawable().apply {
+        shape = android.graphics.drawable.GradientDrawable.OVAL
+        setColor("#2D3440".toColorInt())
+      }
+      setOnClickListener { unpinAndGoBack() }
+    }
+
+    // Tap pinned video to unpin with confirmation
+    binding.pinVideo.surfaceViewHolder.setOnClickListener {
+      showUnpinConfirmDialog()
+    }
+
+    // Reactively show/hide unpin controls based on global spotlight state
+    meetingViewModel.pinnedTrack.observe(viewLifecycleOwner) { globalTrack ->
+      val isGlobalSpotlight = globalTrack != null
+      val canUnpin = !isGlobalSpotlight || meetingViewModel.isAllowedToSpotlight()
+      binding.pinVideo.iconMaximised.visibility = if (canUnpin) View.VISIBLE else View.GONE
+      binding.pinVideo.surfaceViewHolder.isClickable = canUnpin
     }
 
     updatePinnedVideoText()
@@ -137,9 +197,6 @@ class PinnedVideoFragment : Fragment() {
   private fun changePinViewVideo(track: MeetingTrack) {
     binding.pinVideo.iconAudioOff.visibility = visibility(track.peer.audioTrack?.isMute == true)
 
-
-
-    binding.pinVideo.iconAudioOff.visibility = visibility(track.peer.audioTrack?.isMute == true)
     if (track == pinnedTrack) {
       return
     }

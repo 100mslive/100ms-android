@@ -21,6 +21,7 @@ import live.hms.roomkit.hide
 import live.hms.roomkit.show
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
+import live.hms.roomkit.ui.meeting.MeetingViewMode
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.meeting.pinnedvideo.StatsInterpreter
 import live.hms.roomkit.ui.settings.SettingsStore
@@ -198,6 +199,11 @@ abstract class VideoGridBaseFragment : Fragment() {
         view.addTrack(track)
         view.disableAutoSimulcastLayerSelect(meetingViewModel.isAutoSimulcastEnabled())
         if (item.video?.isDegraded == true ) binding.hmsVideoView.hide() else binding.hmsVideoView.show()
+        // Use single click to prevent double-tap triggering two fragment transitions
+        binding.hmsVideoView.setOnSingleClickListener {
+          meetingViewModel.localPinnedTrack.postValue(item)
+          meetingViewModel.setMeetingViewMode(MeetingViewMode.PINNED)
+        }
         binding.hmsVideoView.setOnLongClickListener {
           (it as? HMSVideoView)?.let { videoView -> openDialog(videoView, item.video, item.peer.name.orEmpty()) }
           true
@@ -221,7 +227,11 @@ abstract class VideoGridBaseFragment : Fragment() {
         isLocalTrack = videoTrack is HMSLocalVideoTrack,
         onScreenCapture = { captureVideoFrame(surfaceView, videoTrack) },
         onSimulcast = { context.showSimulcastDialog(videoTrack as? HMSRemoteVideoTrack) },
-        onMirror = { context.showMirrorOptions(surfaceView)}
+        onMirror = { context.showMirrorOptions(surfaceView)},
+        peerName = peerName,
+        onSpotlight = if (meetingViewModel.isAllowedToSpotlight() && videoTrack?.trackId != null) {
+          { meetingViewModel.spotlightTrack(videoTrack.trackId) }
+        } else null
       )
     }
   }

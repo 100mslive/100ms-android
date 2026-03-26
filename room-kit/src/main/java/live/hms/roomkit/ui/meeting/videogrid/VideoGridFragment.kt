@@ -30,6 +30,7 @@ import live.hms.roomkit.ui.inset.makeInset
 import live.hms.roomkit.ui.meeting.ChangeNameDialogFragment
 import live.hms.roomkit.ui.meeting.CustomPeerMetadata
 import live.hms.roomkit.ui.meeting.MeetingTrack
+import live.hms.roomkit.ui.meeting.MeetingViewMode
 import live.hms.roomkit.ui.meeting.MeetingViewModel
 import live.hms.roomkit.ui.settings.SettingsStore
 import live.hms.roomkit.ui.theme.applyTheme
@@ -160,8 +161,12 @@ class VideoGridFragment : Fragment() {
         if (localMeeting == null) return
         wasLocalVideoTrackVideoOn = (localMeeting?.video?.isMute?:true) == false
         updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = true, localMeeting)
-        meetingViewModel.setLocalVideoEnabled(false)
-        lastVideoMuteState = true
+        // Only mute camera if we're actually going to background, not switching view modes.
+        // When switching (e.g. GRID → PINNED), meetingViewMode is already updated before onPause fires.
+        if (meetingViewModel.meetingViewMode.value == MeetingViewMode.GRID) {
+            meetingViewModel.setLocalVideoEnabled(false)
+            lastVideoMuteState = true
+        }
     }
 
     override fun onResume() {
@@ -170,7 +175,7 @@ class VideoGridFragment : Fragment() {
         if (wasLocalVideoTrackVideoOn == true) {
             meetingViewModel.setLocalVideoEnabled(true)
             if (isMinimized.not())
-            updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, localMeeting)
+                updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, localMeeting)
             lastVideoMuteState = false
         }
     }

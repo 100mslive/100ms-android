@@ -8,8 +8,10 @@ import androidx.lifecycle.MediatorLiveData
  * The purpose of this mediator livedata is to show global pinned tracks before local ones.
  * Locally pinned tracks will only be shown if the global one isn't present.
  */
-class PinnedTrackUiUseCase(local : LiveData<MeetingTrack?>,
-global : LiveData<MeetingTrack?>) : MediatorLiveData<MeetingTrack?>() {
+class PinnedTrackUiUseCase(
+    local : LiveData<MeetingTrack?>,
+    global : LiveData<MeetingTrack?>
+) : MediatorLiveData<MeetingTrack?>() {
     private val TAG = "PinnedTrackUIUseCase"
     var isLocalTrackPinned = false
         private set
