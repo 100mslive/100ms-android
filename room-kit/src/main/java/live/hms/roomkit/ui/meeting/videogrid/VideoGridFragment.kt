@@ -175,7 +175,7 @@ class VideoGridFragment : Fragment() {
         if (wasLocalVideoTrackVideoOn == true) {
             meetingViewModel.setLocalVideoEnabled(true)
             if (isMinimized.not())
-            updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, localMeeting)
+                updateVideoViewLayout(binding.insetPillMaximised, isVideoOff = false, localMeeting)
             lastVideoMuteState = false
         }
     }
