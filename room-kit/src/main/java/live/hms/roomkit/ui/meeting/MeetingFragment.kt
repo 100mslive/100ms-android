@@ -24,6 +24,7 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -1456,7 +1457,7 @@ class MeetingFragment : Fragment() {
             kotlin.runCatching { meetingViewModel.stopCurrentWhiteBoardSession() }
             //no permission required directly start screen share
             if (meetingViewModel.preRequestingPermissionForScreenShare().not())
-            startScreenShare()
+                startScreenShare()
         }
     }
 
@@ -1472,6 +1473,7 @@ class MeetingFragment : Fragment() {
     }
 
     //entry point to start PIP mode
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun launchPipMode() {
 
         activity?.enterPictureInPictureMode()
