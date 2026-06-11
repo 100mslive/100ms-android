@@ -7,13 +7,24 @@ plugins {
     id 'com.google.firebase.crashlytics'
 }
 android {
-    compileSdk 34
+    compileSdk 35
     namespace = "live.hms.app2"
+
+    signingConfigs {
+        release {
+            def props = new Properties()
+            props.load(new FileInputStream(rootProject.file("local.properties")))
+            storeFile file('100ms-android.jks')
+            storePassword props['RELEASE_STORE_PASSWORD']
+            keyAlias props['RELEASE_KEY_ALIAS']
+            keyPassword props['RELEASE_KEY_PASSWORD']
+        }
+    }
 
     defaultConfig {
         applicationId "live.hms.app2"
         minSdkVersion 21
-        targetSdk 34
+        targetSdk 35
         versionCode project.findProperty('100MS_APP_VERSION_CODE') as int
         versionName project.findProperty('100MS_APP_VERSION_NAME')
 
@@ -31,6 +42,7 @@ android {
         }
 
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
@@ -43,6 +55,12 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -61,7 +79,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     //100ms.live prebuilt lib
-    implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
+//    implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
+    implementation project(':room-kit')
+
 
     implementation "live.100ms:virtual-background:$HMS_SDK_VERSION"
     //100ms noise cancellation dep

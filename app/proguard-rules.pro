@@ -32,3 +32,9 @@
 # Previously required proguard rules for sdk, now included in the library.
 #-keep class hms.webrtc.** { *; }
 #-keep class live.hms.video.** { *; }
+
+# MediaPipe / protobuf classes referenced transitively by virtual-background
+# but not needed at runtime on Android.
+-dontwarn com.google.mediapipe.framework.image.**
+-dontwarn com.google.mediapipe.proto.**
+-dontwarn com.google.protobuf.**
