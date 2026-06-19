@@ -79,8 +79,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     //100ms.live prebuilt lib
-//    implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
-    implementation project(':room-kit')
+    implementation "live.100ms:room-kit:$HMS_ROOM_KIT_VERSION"
 
 
     implementation "live.100ms:virtual-background:$HMS_SDK_VERSION"
