@@ -12,12 +12,15 @@ android {
 
     signingConfigs {
         release {
-            def props = new Properties()
-            props.load(new FileInputStream(rootProject.file("local.properties")))
-            storeFile file('100ms-android.jks')
-            storePassword props['RELEASE_STORE_PASSWORD']
-            keyAlias props['RELEASE_KEY_ALIAS']
-            keyPassword props['RELEASE_KEY_PASSWORD']
+            def propsFile = rootProject.file("local.properties")
+            if (propsFile.exists()) {
+                def props = new Properties()
+                props.load(new FileInputStream(propsFile))
+                storeFile file('100ms-android.jks')
+                storePassword props['RELEASE_STORE_PASSWORD']
+                keyAlias props['RELEASE_KEY_ALIAS']
+                keyPassword props['RELEASE_KEY_PASSWORD']
+            }
         }
     }
 
