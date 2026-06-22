@@ -104,7 +104,11 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
     if (isScreenShare.not()) {
       meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { videoGridTrack ->
-        renderCurrentPage(videoGridTrack)
+        // isForceUpdate=true ensures bindSurfaceView runs even when isFragmentVisible
+        // hasn't been set to true yet (happens during SFU migration: pages count
+        // transiently drops to 0 → FragmentStateAdapter destroys + recreates this
+        // fragment → LiveData fires before onResume, leaving video tracks unattached).
+        renderCurrentPage(videoGridTrack, isForceUpdate = true)
       }
     } else {
       meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
