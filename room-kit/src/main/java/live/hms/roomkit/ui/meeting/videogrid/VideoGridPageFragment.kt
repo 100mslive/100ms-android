@@ -104,17 +104,20 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
 
     if (isScreenShare.not()) {
       meetingViewModel.speakerUpdateLiveData.observe(viewLifecycleOwner) { videoGridTrack ->
-        // isForceUpdate=true ensures bindSurfaceView runs even when isFragmentVisible
-        // hasn't been set to true yet (happens during SFU migration: pages count
-        // transiently drops to 0 → FragmentStateAdapter destroys + recreates this
-        // fragment → LiveData fires before onResume, leaving video tracks unattached).
-        renderCurrentPage(videoGridTrack, isForceUpdate = true)
+        // Force a bind (which creates a GPU renderer / EGL context) ONLY for the page that is
+        // actually on screen. Off-screen neighbour pages skip it and bind lazily via
+        // onResume -> bindViews() when swiped to, so we don't hold several pages' worth of EGL
+        // contexts at once (that exhausts the device's context cap in large rooms and crashes
+        // with "Failed to create EGL context"). Forcing the *selected* page still fixes the
+        // SFU-migration recreate race, where the LiveData fires before onResume promotes the
+        // freshly-created visible fragment to RESUMED.
+        renderCurrentPage(videoGridTrack, isForceUpdate = isSelectedPage())
       }
     } else {
       meetingViewModel.tracks.observe(viewLifecycleOwner) { track ->
         synchronized(track) {
           val screenShareTrack = track.filter { it.isScreen  }.toList()
-          renderCurrentPage(screenShareTrack, isForceUpdate = true)
+          renderCurrentPage(screenShareTrack, isForceUpdate = isSelectedPage())
 
         }
       }
@@ -136,6 +139,13 @@ class VideoGridPageFragment : VideoGridBaseFragment() {
   override fun isScreenshare(): Boolean {
     return isScreenShare
   }
+
+  /**
+   * True when this page is the one currently shown in its pager. Only the on-screen page should
+   * create renderers/EGL contexts; off-screen pages bind lazily when they become visible.
+   */
+  private fun isSelectedPage(): Boolean =
+    (parentFragment as? VideoGridFragment)?.currentSelectedPage(isScreenShare) == pageIndex
 
   private fun renderCurrentPage(tracks: List<MeetingTrack>, isForceUpdate : Boolean = false) {
     val videos = getCurrentPageVideos(tracks)

@@ -18,6 +18,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
@@ -58,6 +59,19 @@ class VideoGridFragment : Fragment() {
 
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
+
+    // Index of the page currently shown in each video pager. VideoGridPageFragment reads this
+    // to decide which page may create GPU renderers (EGL contexts): only the on-screen page
+    // does, so off-screen pages don't exhaust the device's EGL-context limit in large rooms.
+    var currentPeerGridPage: Int = 0
+        private set
+    var currentScreenSharePage: Int = 0
+        private set
+
+    /** Page index currently shown in the given pager (defaults to 0, incl. after a rebuild). */
+    fun currentSelectedPage(isScreenShare: Boolean): Int =
+        if (isScreenShare) currentScreenSharePage else currentPeerGridPage
+
     var isMinimized = false
     var whiteboardView : WebView? = null
     var lastVideoMuteState : Boolean? = null
@@ -191,6 +205,10 @@ class VideoGridFragment : Fragment() {
             offscreenPageLimit = 1
             adapter = this@VideoGridFragment.peerGridVideoAdapter
 
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) { currentPeerGridPage = position }
+            })
+
             TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
                 // No text to be shown
             }.attach()
@@ -199,6 +217,11 @@ class VideoGridFragment : Fragment() {
         binding.viewPagerRemoteScreenShare.apply {
             offscreenPageLimit = 1
             adapter = this@VideoGridFragment.screenShareAdapter
+
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) { currentScreenSharePage = position }
+            })
+
             TabLayoutMediator(binding.tabLayoutDotsRemoteScreenShare, this) { _, _ ->
             }.attach()
 

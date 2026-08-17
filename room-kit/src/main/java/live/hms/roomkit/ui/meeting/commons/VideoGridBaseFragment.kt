@@ -351,8 +351,12 @@ abstract class VideoGridBaseFragment : Fragment() {
         requiresGridLayoutUpdate = true
 
         layout.apply {
-          // Unbind only when view is visible to user
-          if (isFragmentVisible|| isForceUpdate) unbindSurfaceView(
+          // Always release the renderer (frees its EGL context) before dropping the tile.
+          // safeRelease() is guarded by isInitialised, so this is a no-op for a tile that never
+          // created a context. Gating this on visibility could orphan a live EGL context: the
+          // view is removed and dropped from renderedViews with nobody left to release it, which
+          // (now that binding is scoped to the selected page) leaks contexts toward the cap.
+          unbindSurfaceView(
             currentRenderedView.binding.videoCard,
             currentRenderedView.meetingTrack
           )
