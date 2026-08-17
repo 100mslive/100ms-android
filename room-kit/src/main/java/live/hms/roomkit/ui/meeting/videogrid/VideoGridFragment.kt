@@ -18,6 +18,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import live.hms.roomkit.R
 import live.hms.roomkit.databinding.FragmentGridVideoBinding
@@ -58,6 +59,19 @@ class VideoGridFragment : Fragment() {
 
     private lateinit var peerGridVideoAdapter: VideoGridAdapter
     private lateinit var screenShareAdapter: VideoGridAdapter
+
+    // Index of the page currently shown in each video pager. VideoGridPageFragment reads this
+    // to decide which page may create GPU renderers (EGL contexts): only the on-screen page
+    // does, so off-screen pages don't exhaust the device's EGL-context limit in large rooms.
+    var currentPeerGridPage: Int = 0
+        private set
+    var currentScreenSharePage: Int = 0
+        private set
+
+    /** Page index currently shown in the given pager (defaults to 0, incl. after a rebuild). */
+    fun currentSelectedPage(isScreenShare: Boolean): Int =
+        if (isScreenShare) currentScreenSharePage else currentPeerGridPage
+
     var isMinimized = false
     var whiteboardView : WebView? = null
     var lastVideoMuteState : Boolean? = null
@@ -191,6 +205,10 @@ class VideoGridFragment : Fragment() {
             offscreenPageLimit = 1
             adapter = this@VideoGridFragment.peerGridVideoAdapter
 
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) { currentPeerGridPage = position }
+            })
+
             TabLayoutMediator(binding.tabLayoutDots, this) { _, _ ->
                 // No text to be shown
             }.attach()
@@ -199,6 +217,11 @@ class VideoGridFragment : Fragment() {
         binding.viewPagerRemoteScreenShare.apply {
             offscreenPageLimit = 1
             adapter = this@VideoGridFragment.screenShareAdapter
+
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) { currentScreenSharePage = position }
+            })
+
             TabLayoutMediator(binding.tabLayoutDotsRemoteScreenShare, this) { _, _ ->
             }.attach()
 
@@ -516,8 +539,16 @@ class VideoGridFragment : Fragment() {
                 // Without this, the extra inset adds one more tile than they should
                 val expectedPages =
                     Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
+                // Keep the selected-page trackers valid across adapter rebuilds. When the page
+                // count shrinks (e.g. SFU migration drops pages to 0 then rebuilds), ViewPager2
+                // clamps currentItem to 0 but does not reliably dispatch onPageSelected(0), which
+                // would leave the tracker stale and make the visible page-0 evaluate
+                // isSelectedPage()==false — reintroducing the transient black tile this fix
+                // prevents. Mirror the clamp: if the tracked index is now out of range, reset it.
+                if (currentScreenSharePage >= remoteScreenShareTilesCount) currentScreenSharePage = 0
                 screenShareAdapter.totalPages = remoteScreenShareTilesCount
                 meetingViewModel.transcriptionsPositionUseCase.setScreenShare(remoteScreenShareTilesCount + localScreenShareTileCount != 0)
+                if (currentPeerGridPage >= expectedPages) currentPeerGridPage = 0
                 peerGridVideoAdapter.totalPages = expectedPages
 
                 binding.tabLayoutDots.visibility =
