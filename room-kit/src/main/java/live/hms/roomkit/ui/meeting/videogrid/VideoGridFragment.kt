@@ -539,8 +539,16 @@ class VideoGridFragment : Fragment() {
                 // Without this, the extra inset adds one more tile than they should
                 val expectedPages =
                     Math.ceil((onthePeerGridTileCount.toDouble() / itemsPerPage.toDouble())).toInt()
+                // Keep the selected-page trackers valid across adapter rebuilds. When the page
+                // count shrinks (e.g. SFU migration drops pages to 0 then rebuilds), ViewPager2
+                // clamps currentItem to 0 but does not reliably dispatch onPageSelected(0), which
+                // would leave the tracker stale and make the visible page-0 evaluate
+                // isSelectedPage()==false — reintroducing the transient black tile this fix
+                // prevents. Mirror the clamp: if the tracked index is now out of range, reset it.
+                if (currentScreenSharePage >= remoteScreenShareTilesCount) currentScreenSharePage = 0
                 screenShareAdapter.totalPages = remoteScreenShareTilesCount
                 meetingViewModel.transcriptionsPositionUseCase.setScreenShare(remoteScreenShareTilesCount + localScreenShareTileCount != 0)
+                if (currentPeerGridPage >= expectedPages) currentPeerGridPage = 0
                 peerGridVideoAdapter.totalPages = expectedPages
 
                 binding.tabLayoutDots.visibility =
